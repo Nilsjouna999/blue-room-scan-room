@@ -47,17 +47,22 @@ card; the site around the card is the full "scan room" reading.
 
 ## Seeing the rendered product (visual review)
 
-- **Screenshots** (the reliable way): `docs/SCREENS.md` indexes current UI
-  captures in `docs/screens/*.png` — open them as images via
-  `https://raw.githubusercontent.com/Nilsjouna999/blue-room-scan-room/main/docs/screens/<name>.png`.
-  They are regenerated after visual changes; trust them as current.
-- **Live site**: https://nilsjouna999.github.io/blue-room-scan-room/
-  with deep links `?src=1|2&t=free|shiny&tab=source|diagram|metrics`
-  (note: text-based browsing won't convey the visual design — use the
-  screenshots for look-and-feel judgments).
+1. Read `docs/SCREENS.md` — it lists every current screenshot with a
+   **full direct raw URL**. Open those URLs as images.
+2. **Judge visuals from the screenshots, not from imagined CSS.** Reading
+   styles.css and picturing the result is not visual review.
+3. Use GitHub Pages only for live/deep-link/content checks:
+   https://nilsjouna999.github.io/blue-room-scan-room/ with
+   `?src=1|2&t=free|shiny&tab=source|diagram|metrics`. Text-based
+   browsing does not convey look-and-feel.
+4. Motion (holo edge rotation, shimmer sweep, halo breathing) is not in
+   the screenshots — judging animation requires a screen recording or a
+   manual note from the maintainer.
 
 ## Fetching files
 
-Raw file URL pattern:
-`https://raw.githubusercontent.com/<owner>/blue-room-scan-room/main/<path>`
-e.g. `…/main/docs/PROJECT_OS.md` or `…/main/app.js`.
+Raw base (exact, no placeholders):
+`https://raw.githubusercontent.com/Nilsjouna999/blue-room-scan-room/main/`
+Append any repo path, e.g.
+`https://raw.githubusercontent.com/Nilsjouna999/blue-room-scan-room/main/docs/PROJECT_OS.md`
+or `…/main/app.js`.
