@@ -522,19 +522,21 @@ function renderReadingPanel(src, treatment) {
 
   /* In Free Pull the deep reading is present but veiled, plus an
      unlock preview that actually switches treatment (no checkout). */
+  /* CTA first (visible near the fold), undeveloped teasers after it as
+     supporting evidence. */
   const lockedDeep = `
-    ${lockedModule("Stance Read", "Evidence layer pending — develops with Halo Mint.")}
-    ${lockedModule("Fit Coherence", "Coherence read recorded, undeveloped. Full record develops with mint.")}
-    ${lockedModule("Oracle Read", "The full read develops with Halo Mint. One line survives the preview — see the dossier below.")}
     <div class="module unlock">
       ${moduleHead("Develop This Scan")}
       <p class="unlock__line">This is the archive preview. The full card and reading are already written — minting develops them.</p>
-      <p class="unlock__more">◆ &nbsp;The developed scan adds — full Diagram · full Metrics · Stance · Fit · Impact · Lore · Oracle · Mint Record · Receipts</p>
       <button type="button" class="unlock__btn unlock__btn--shiny" data-goto="shiny">
         <span class="unlock__name">Develop this scan</span>
         <span class="unlock__desc">Into Halo Mint · full dossier · mint record</span>
       </button>
-    </div>`;
+      <p class="unlock__more">◆ &nbsp;The developed scan adds — full Diagram · full Metrics · Stance · Fit · Impact · Lore · Oracle · Mint Record · Receipts</p>
+    </div>
+    ${lockedModule("Stance Read", "Evidence layer pending — develops with Halo Mint.")}
+    ${lockedModule("Fit Coherence", "Coherence read recorded, undeveloped. Full record develops with mint.")}
+    ${lockedModule("Oracle Read", "The full read develops with Halo Mint. One line survives the preview — see the dossier below.")}`;
 
   const shinyTease =
     treatment === "mint"
@@ -713,7 +715,7 @@ function renderDossier(src, treatment) {
     "dplate--oracle");
 
   return `
-    <div class="dossier__cue">▼ &nbsp;SCAN DOSSIER — FULL RECORD BELOW</div>
+    <div class="dossier__cue">SCAN DOSSIER — FULL RECORD</div>
     <div class="dossier__inner">
       ${record}${board}${statDossier}${hidden}${fitAura}${mintRecord}${oracle}
       <p class="dossier__end">◆ &nbsp;END OF RECORD · ${esc(src.label).toUpperCase()} · BLUE ROOM ARCHIVE</p>
@@ -727,7 +729,9 @@ function render() {
   document.body.dataset.treatment = state.treatment;
 
   document.getElementById("sourcePanel").innerHTML = renderLeftPanel(src, state.treatment, state.tab);
-  document.getElementById("stageZone").innerHTML = renderCard(src, state.treatment);
+  document.getElementById("stageZone").innerHTML =
+    renderCard(src, state.treatment) +
+    `<a class="stagecue" href="#dossierMount">▼ &nbsp;SCAN DOSSIER BELOW</a>`;
   document.getElementById("readingPanel").innerHTML = renderReadingPanel(src, state.treatment);
   document.getElementById("dossierMount").innerHTML = renderDossier(src, state.treatment);
 

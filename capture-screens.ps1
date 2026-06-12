@@ -18,9 +18,9 @@ $shots = @(
     @{ n = "src1-halo-diagram";  q = "?src=1&t=shiny&tab=diagram"; s = "1600,900"  },
     @{ n = "src2-halo-diagram";  q = "?src=2&t=shiny&tab=diagram"; s = "1600,900"  },
     @{ n = "src1-halo-metrics";  q = "?src=1&t=shiny&tab=metrics"; s = "1600,900"  },
-    @{ n = "src1-free-fullpage"; q = "?src=1&t=free";              s = "1600,3200" },
-    @{ n = "src1-halo-fullpage"; q = "?src=1&t=shiny";             s = "1600,3200" },
-    @{ n = "src2-halo-fullpage"; q = "?src=2&t=shiny";             s = "1600,3200" }
+    @{ n = "src1-free-fullpage"; q = "?src=1&t=free";              s = "1600,4400" },
+    @{ n = "src1-halo-fullpage"; q = "?src=1&t=shiny";             s = "1600,4400" },
+    @{ n = "src2-halo-fullpage"; q = "?src=2&t=shiny";             s = "1600,4400" }
 )
 
 foreach ($shot in $shots) {
