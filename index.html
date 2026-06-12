@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Blue Room — Scan Room</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body data-treatment="free">
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand__mark">◆</span>
+      <span class="brand__name">BLUE ROOM</span>
+      <span class="brand__sub">SCAN ROOM · PROTOTYPE 002</span>
+    </div>
+
+    <div class="toggle" id="sourceToggle" role="tablist" aria-label="Scan source">
+      <button type="button" data-source="0" class="toggle__btn is-active">SRC 01 · Driver</button>
+      <button type="button" data-source="1" class="toggle__btn">SRC 02 · Ice Field</button>
+    </div>
+
+    <div class="toggle toggle--treatment" id="treatmentToggle" role="tablist" aria-label="Treatment">
+      <button type="button" data-treatment="free" class="toggle__btn is-active">Free Pull</button>
+      <button type="button" data-treatment="shiny" class="toggle__btn toggle__btn--shiny">Halo Mint</button>
+    </div>
+  </header>
+
+  <main class="room">
+    <aside class="panel panel--source" id="sourcePanel"></aside>
+    <section class="stagezone" id="stageZone"></section>
+    <aside class="panel panel--reading" id="readingPanel"></aside>
+  </main>
+
+  <footer class="hint">1 / 2 switch source &nbsp;·&nbsp; F free · H halo mint &nbsp;·&nbsp; M lab state</footer>
+
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

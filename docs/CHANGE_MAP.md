@@ -1,0 +1,168 @@
+# BLUE ROOM — Change Map
+
+Practical "where do I change this?" guide for `blue-room-scan-room/`.
+Read the matching section *before* editing. Last updated: 2026-06-12.
+
+General test loop for any change:
+`python -m http.server 8743` in the project folder → open
+http://localhost:8743 → walk 2 sources × 3 treatments × 3 tabs → check the
+browser console is clean (F12).
+
+---
+
+## To change text (titles, verdicts, readings, copy)
+
+- **Edit:** `data.js` only. Card text lives in each source's `card` object
+  (`title`, `archetype`, `note`, `signature`); reading text in `reads`,
+  `aura`, `sceneRole`, `stance`, `fit`, `oracle`; left-panel text in
+  `capture`, `analysis`, `diagram.notes`.
+- **Affects:** card + right panel + left panel, depending on field.
+- **Can break:** nothing structural. Long titles can wrap the card title
+  block; very long verdicts grow the card height.
+- **Test:** check the card still fits the stage at 1600×900 (no scrollbar in
+  the center column) and the voice rules in PROJECT_OS §14.
+
+## To change stats (values)
+
+- **Edit:** `data.js` → `card.stats` per source.
+- **Affects:** card stat block, Metrics stat diamond, right-panel stat
+  reading values.
+- **Can break:** nothing; values are 0–100. Keep the *reading text* in
+  `reads` consistent with the new number.
+- **Test:** Metrics tab diamond shape updates; card numbers match.
+
+## To change stats (names) — high risk
+
+- **Edit:** `data.js` (`stats` keys, `FORMULAS`), `app.js` (`miniStat` calls
+  in `renderCard`, the `["presence","frame","signal","charge"]` array in
+  `renderReadingPanel`, `statDiamond` order array).
+- **Affects:** everything — card, metrics, right panel, formulas.
+- **Can break:** any missed reference renders `undefined`.
+- **Test:** all three tabs + card + receipts; search the repo for the old
+  name. Per PROJECT_OS §9 the current names are an audited decision — log a
+  reason in DECISION_LOG.md first.
+
+## To change source images
+
+- **Edit:** drop the file in `assets/`, point `file` in `data.js` at it
+  (any of .jpg/.jpeg/.png). Update `photoTuning` (`pos`, `zoom`, `scrim`,
+  `base`) for the new image, and realistically `markers`, `diagram`,
+  `analysis` — those coordinates are per-photo.
+- **Affects:** left panel image + card photo (same file, raw on the left,
+  tuned on the card).
+- **Can break:** stale coordinates draw markers/diagrams in wrong places;
+  missing file shows "Missing image file: …" warning (by design).
+- **Test:** Source + Diagram tabs — markers sit on the right features; card
+  crop keeps the subject readable in all three treatments.
+
+## To change diagrams
+
+- **Edit:** `data.js` → `diagram` per source: `massBox`, `gesture`
+  (`points`, `label`, optional `labelAt`), `axis`, `arrow`, `light`,
+  `pressure`, `notes`. Coordinates are % of the displayed frame
+  (0–100 × 0–100). Portrait images need `aspect` set (SRC 02 = 2.22) so
+  circles/arrowheads stay round.
+- **Affects:** Diagram tab only.
+- **Can break:** labels can collide with each other or the corner meta chip
+  — eyeball it; wrong `aspect` makes dots/rings into stretched blobs.
+- **Test:** Diagram tab in free (limited set: grid + focal + mass) and mint
+  (full set), both sources.
+
+## To change metrics
+
+- **Edit:** `data.js` → `metrics` per source: `signalMix` (5 rows),
+  `pressure` (`balance` −50..50, `centerPull`, `noise`, `clarity`),
+  `fitMatrix` (4 cells: `k`, `state`, `v`).
+- **Affects:** Metrics tab only (lore/impact come from the existing `lore` /
+  `impact` fields and show in the right panel).
+- **Can break:** nothing structural. Keep signalMix roughly summing to 100 —
+  it's presented as a recipe.
+- **Test:** Metrics tab free (diamond + mix visible, pressure + fit veiled)
+  and mint (all visible).
+
+## To change treatment colors / effects
+
+- **Edit:** `styles.css` only. Tokens at the top (`--moss*`, `--silver*`,
+  `--violet/--cyan/--halo-green`); treatment blocks:
+  `.card[data-treatment="free"|"mint"|"shiny"]` for the card,
+  `body[data-treatment=…]` for page-level accents (badges, diagram strokes,
+  diamond fill). Photo look = `--tb/--tc/--ts` multipliers per treatment.
+- **Affects:** the entire feel of Free/Mint/Halo.
+- **Can break:** the "free must stay mellow / violet-cyan-green only in
+  shiny" rules (PROJECT_OS §10, §4); photo readability under heavy overlays.
+- **Test:** all three treatments on both sources; the photo must stay
+  clearly visible in every state.
+
+## To change card layout — high risk
+
+- **Edit:** `app.js` → `renderCard()` (structure) + `styles.css` (card
+  section).
+- **Affects:** the main trophy in every state.
+- **Can break:** the LOCKED content list (PROJECT_OS §7 — no graphs/
+  diagrams/long prose on the card); height fit at 1600×900 (~786px card vs
+  ~816px stage); the one-master-base law.
+- **Test:** card fully visible without scrolling at 1600×900 in all three
+  treatments; check 1920×1080 (card grows to 550px).
+
+## To change right panel modules
+
+- **Edit:** `app.js` → `renderReadingPanel()` (which modules, order,
+  free/paid gating, locked set) + `styles.css` (`.panel--reading` chrome);
+  content in `data.js`.
+- **Affects:** paid value perception, free-to-paid clarity.
+- **Can break:** the free teaser logic (locked = stance/fit/oracle; the
+  unlock card lists the rest) — keep gating consistent with PROJECT_OS §8.
+- **Test:** free vs mint vs shiny right panel; develop buttons still switch
+  treatment.
+
+## To add a new source
+
+1. Add photo to `assets/`.
+2. In `data.js`, copy an existing SOURCES entry and rewrite every field:
+   card content, capture, markers, analysis, `photoTuning`, `diagram`
+   (with `aspect` if portrait), `metrics`, receipts, mint record.
+3. In `index.html`, add a button to `#sourceToggle` with the next
+   `data-source` index; keyboard keys 1/2 are hardcoded in `app.js` — extend
+   if needed.
+- **Note:** V1 is deliberately capped at 2 sources (DECISION_LOG) — log a
+  decision before adding a third.
+- **Test:** every tab and treatment for the new source; image loads; no
+  console errors.
+
+## To change the treatment hierarchy / tier names
+
+- **Current state (2026-06-12):** customer-facing toggle = Free Pull /
+  Halo Mint (internal key `shiny`). Signature Mint (internal key `mint`)
+  is a Lab state reachable via keyboard `M` only — no toggle button.
+- **Edit:** `index.html` (#treatmentToggle buttons), `data.js`
+  (`TREATMENTS` labels/stamps/strips), `app.js` (state badge ternary,
+  unlock CTA copy, keyboard map).
+- **Can break:** purchase-story clarity — paid must read "the card
+  developed", never "locked content" / "premium option" / cosmetic toggle.
+- **Test:** toggle shows two tiers; `M` still reaches Lab; CTA buttons
+  switch to Halo Mint.
+
+## To add a new treatment
+
+1. `data.js` → add an entry to `TREATMENTS` (label, rarity, stamp, strip).
+2. `index.html` → add a button to `#treatmentToggle`.
+3. `styles.css` → new `.card[data-treatment="x"]` block (+ optional
+   `body[data-treatment="x"]` accents). Reuse the existing layer system
+   (foil/shimmer/halo/sparkles/scrim/tone) — do not add new card DOM.
+4. `app.js` → update the state badge ternary in `renderReadingPanel`, the
+   keyboard map, and gating if the new tier changes what's unlocked.
+- **Can break:** the "few treatment states" law — design it in
+  `docs/CARD_TECH_LAB.md` first, then log the decision.
+- **Test:** all tabs/sources under the new treatment; photo readability.
+
+## To add profile layers later (BACKLOG)
+
+- **Principle:** *the photo creates the card; the profile adds the lore.*
+  User-provided only, never inferred.
+- **Where it would live:** new optional `profile` object per source in
+  `data.js`; rendered as additional right-panel modules (and later dossier
+  sections) — **not** on the card front beyond, at most, a tiny stamp.
+- **Can break:** the no-face-rating law if a layer ever *infers* traits —
+  layers must be declared by the user.
+- **Test:** right panel with and without the profile object (must degrade
+  gracefully when absent).
