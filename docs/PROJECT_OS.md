@@ -17,6 +17,9 @@ Documentation files:
 - `docs/CARD_TECH_LAB.md` — experimental lab for card treatments, tiers,
   effects, and future card families (TESTING/BACKLOG only — nothing there
   is final)
+- `docs/COPY_SYSTEM.md` — the product grammar: tone, humor rule, banned
+  words, the 12-archetype library, every-outcome-is-a-win rules. All copy
+  passes through it.
 
 ---
 
@@ -25,6 +28,12 @@ Documentation files:
 **LOCKED**
 
 > Every uploaded photo is already a card. The system develops it.
+
+**The darkroom metaphor (LOCKED):** Every photo is already fixed as an
+image, but undeveloped as a card. Blue Room is the darkroom. The scan does
+not create the card; it reveals what the photo already contained. The
+archetype was latent. The serial was waiting. The system does not invent
+an identity; it develops the artifact.
 
 Blue Room is:
 
@@ -244,6 +253,49 @@ as the verb: *Mint this scan.*
 **Future variants (BACKLOG)** — rarer materials/families above or beside
 Halo Mint: Black Star, Cold Foil, Night Gloss, Archive Foil, Static Mint,
 Mythic Prism. Not built; see CARD_TECH_LAB §5/§7.
+
+### Primary CTA (decided 2026-06-12 — CURRENT)
+
+> **Develop this scan**
+> subline: *Into Halo Mint · full dossier · mint record*
+
+"Develop this scan" fits the darkroom metaphor: the photo already contains
+the card; Blue Room develops what is latent. **Halo Mint is the
+result/treatment; Develop is the action.** Never use as primary CTA:
+"Develop into Halo Mint" (result posing as action), "Upgrade", "Unlock",
+"Premium", "Reveal premium".
+
+### Free Pull vs Halo Mint — visibility table (CURRENT)
+
+| Element | Free Pull | Halo Mint |
+| --- | --- | --- |
+| Card photo | Visible | Visible |
+| Card title | Visible | Visible |
+| Archetype | Visible as label/title | Full archetype explanation + discovery note |
+| 4 main stats | Visible as numbers | Visible with full why-it-happened read |
+| Source Record | Mostly visible | Full record |
+| Evidence Board | Partial (~3 receipts) | Full receipts |
+| Diagram / Metrics | Partial | Full |
+| Hidden Stat | Name visible; value/read withheld or teased | Full value + full read |
+| Fit + Aura Layer | Teaser only | Full |
+| Mint Record | Archive pull / reserved serial / not fully minted | Full mint record |
+| Oracle Read | One strong short line | Full oracle read |
+| Technical Receipts | Minimal | Full |
+
+**Free Pull rule: Free Pull should seduce. Halo Mint should complete.**
+Free must feel like: archive preview · undeveloped record · partial
+extraction · development pending. Free must NOT feel like: broken · empty
+· blurred paywall · cheap locked content.
+
+### Benchmark population (CURRENT)
+
+Blue Room benchmark references are **internal scan-room comparisons inside
+the prototype archive. They are not scientific population claims.**
+Approved phrasings: "Compared against the current Blue Room prototype
+archive." / "Compared against scan-room reference patterns." / "Compared
+against internal artifact classes, not human worth."
+Every diagram/stat must answer: *why did this happen? compared to what?
+what photo evidence caused it?*
 
 ## 11. Data / Schema Map
 

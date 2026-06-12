@@ -104,6 +104,28 @@ accent variables on the same effect system — no new layouts.
 Revisit: when the final Halo material is chosen (CARD_TECH_LAB §20), the
 per-source principle stays even if the palette changes.
 
+**2026-06-12 / Old three-tier structure formally retired / CURRENT**
+Why: "Free Pull / Signature Mint / Halo Foil" is retired as a visible
+structure (see the two hierarchy entries above). "Signature" survives only
+as internal mint/signature language — signature line, signature mark,
+archive signature, mint record. Halo Mint is the developed
+treatment/result, not just a skin.
+Revisit: with the rare-variant ladder (CARD_TECH_LAB §5).
+
+**2026-06-12 / Primary CTA committed: "Develop this scan" / CURRENT**
+Why: fits the darkroom metaphor — the photo already contains the card;
+develop is the action, Halo Mint is the result. Subline: "Into Halo Mint ·
+full dossier · mint record." Banned as primary: "Develop into Halo Mint",
+"Upgrade", "Unlock", "Premium", "Reveal premium".
+Revisit: only with real conversion data.
+
+**2026-06-12 / Copy System adopted as product grammar / CURRENT**
+Why: UI copy was drifting. docs/COPY_SYSTEM.md now governs tone (archival
+deadpan), humor, banned words, the 12-archetype library, and the
+every-outcome-is-a-win rules. SRC-01 = The Encounter; SRC-02 = The
+Dispatch.
+Revisit: the library grows when new sources need a class that doesn't fit.
+
 **2026-06-12 / Current Halo Foil is prototype-only, not final shiny design / TESTING**
 Why: it proves a paid treatment can pop in-browser (holo edge, halo,
 particles, shimmer) but it is an effect bucket, not a card material — it

@@ -127,9 +127,30 @@ effect was switched on.
 ## 7. Better Shiny Directions to Explore
 
 **Partially applied 2026-06-12:** Halo Mint accents are now per-source
-materials (SRC 01 "Warm Glass Copper", SRC 02 "Cold Prism Frost") via
-`halo` accent variables — the first real step toward "earned by the scan"
-shine. The material *names* below remain candidates for the final system.
+materials via `halo` accent variables — the first real step toward
+"earned by the scan" shine. The material *names* below remain candidates
+for the final system.
+
+### Committed per-source material definitions (CURRENT)
+
+**SRC-01 / Driver — Warm Glass Copper**
+- primary: amber-copper · secondary: deep graphite
+- behavior: warm edge refraction
+- texture: cabin-glass reflection / archive laminate
+- special trigger: raised palm
+- border: soft warm line, not rainbow
+- avoid: cheap rainbow foil, generic particle glow
+
+**SRC-02 / Ice Field — Cold Prism Frost**
+- primary: steel-blue / cyan · secondary: frost white / silver
+- behavior: hard cold edge
+- texture: frost grain / field-report laminate
+- special trigger: auger silhouette + treeline horizon
+- border: clean icy line / horizon etching
+- avoid: warm glow, cheap rainbow foil
+
+Purpose: Halo Mint should feel like the source developed into a rare
+artifact, not like a generic CSS glow was toggled on.
 
 All **EXPLORATION**:
 

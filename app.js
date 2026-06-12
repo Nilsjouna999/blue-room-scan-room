@@ -315,7 +315,7 @@ function renderMetricsTab(src, treatment) {
       ${mixRow("Focal clarity", m.pressure.clarity)}
     </div>`;
   const pressure = free
-    ? lockedModule("Composition Pressure", pressureBody)
+    ? lockedModule("Composition Pressure", "Pressure graph recorded, undeveloped. Develops with Halo Mint.")
     : `<div class="module">${moduleHead("Composition Pressure")}${pressureBody}</div>`;
 
   const fitBody = `
@@ -332,7 +332,7 @@ function renderMetricsTab(src, treatment) {
         .join("")}
     </div>`;
   const fit = free
-    ? lockedModule("Fit Coherence Matrix", fitBody)
+    ? lockedModule("Fit Coherence Matrix", "Matrix extracted, development pending. Develops with Halo Mint.")
     : `<div class="module">${moduleHead("Fit Coherence Matrix")}${fitBody}</div>`;
 
   return `${diamond}${mix}${pressure}${fit}
@@ -406,14 +406,13 @@ function renderCard(src, treatment) {
 
 /* ---------- right panel: reading modules ---------- */
 
-function lockedModule(label, body) {
+/* Undeveloped module — free state. Intentional archive copy, never a
+   blurred paywall (COPY_SYSTEM.md §3). */
+function lockedModule(label, line) {
   return `
     <div class="module module--locked">
       ${moduleHead(label)}
-      <div class="locked">
-        <div class="locked__body">${body}</div>
-        <div class="locked__veil"><span>Develops with Halo Mint ◆</span></div>
-      </div>
+      <p class="undeveloped__line">◆ &nbsp;${esc(line)}</p>
     </div>`;
 }
 
@@ -514,19 +513,16 @@ function renderReadingPanel(src, treatment) {
   /* In Free Pull the deep reading is present but veiled, plus an
      unlock preview that actually switches treatment (no checkout). */
   const lockedDeep = `
-    ${lockedModule(
-      "Stance Read",
-      `<p class="module__prose module__prose--serif">${esc(src.stance)}</p>`
-    )}
-    ${lockedModule("Fit Coherence", `<p class="module__line module__line--fit">${esc(src.fit)}</p>`)}
-    ${lockedModule("Oracle Read", `<p class="oracle">“${esc(src.oracle)}”</p>`)}
+    ${lockedModule("Stance Read", "Evidence layer pending — develops with Halo Mint.")}
+    ${lockedModule("Fit Coherence", "Coherence read recorded, undeveloped. Full record develops with mint.")}
+    ${lockedModule("Oracle Read", "The full read develops with Halo Mint. One line survives the preview — see the dossier below.")}
     <div class="module unlock">
       ${moduleHead("Develop This Scan")}
       <p class="unlock__line">This is the archive preview. The full card and reading are already written — minting develops them.</p>
       <p class="unlock__more">◆ &nbsp;The developed scan adds — full Diagram · full Metrics · Stance · Fit · Impact · Lore · Oracle · Mint Record · Receipts</p>
       <button type="button" class="unlock__btn unlock__btn--shiny" data-goto="shiny">
-        <span class="unlock__name">Develop into Halo Mint</span>
-        <span class="unlock__desc">The card transforms · full reading · real serial · first print</span>
+        <span class="unlock__name">Develop this scan</span>
+        <span class="unlock__desc">Into Halo Mint · full dossier · mint record</span>
       </button>
     </div>`;
 
@@ -579,7 +575,7 @@ function renderDossier(src, treatment) {
   /* 01 — Source Record (full in both states: the factual hook) */
   const record = dplate("01", "Source Record", paid, `
     <dl class="drecord">
-      <div><dt>Source ID</dt><dd>${esc(src.sourceCode)} · SRC-${pad2(src.no)}</dd></div>
+      <div><dt>Source ID</dt><dd>${esc(src.capture.code)} · SRC-${pad2(src.no)}</dd></div>
       <div><dt>Object Number</dt><dd>${esc(d.record.objectNo)}</dd></div>
       <div><dt>Capture Type</dt><dd>${esc(d.record.captureType)}</dd></div>
       <div><dt>Dominant Gesture</dt><dd>${esc(d.record.gesture)}</dd></div>
@@ -677,7 +673,7 @@ function renderDossier(src, treatment) {
   const mintBody = paid
     ? `
     <dl class="drecord drecord--mint">
-      <div><dt>Developed From</dt><dd>SRC-${pad2(src.no)} · ${esc(src.sourceCode)}</dd></div>
+      <div><dt>Developed From</dt><dd>SRC-${pad2(src.no)} · ${esc(src.capture.code)}</dd></div>
       <div><dt>Treatment</dt><dd>Halo Mint</dd></div>
       <div><dt>Primary Artifact Trigger</dt><dd>${esc(d.mint.trigger1)}</dd></div>
       <div><dt>Secondary Trigger</dt><dd>${esc(d.mint.trigger2)}</dd></div>
@@ -695,8 +691,8 @@ function renderDossier(src, treatment) {
       <div><dt>Serial</dt><dd>Reserved · BR-SRC${pad2(src.no)}-HM-····</dd></div>
     </dl>
     <button type="button" class="unlock__btn unlock__btn--shiny dmint__cta" data-goto="shiny">
-      <span class="unlock__name">Develop into Halo Mint</span>
-      <span class="unlock__desc">The card transforms · full record · ${esc(src.halo.material).toLowerCase()} · first print</span>
+      <span class="unlock__name">Develop this scan</span>
+      <span class="unlock__desc">Into Halo Mint · full dossier · mint record · ${esc(src.halo.material).toLowerCase()}</span>
     </button>`;
   const mintRecord = dplate("06", "Mint Record", paid, mintBody, "dplate--mint");
 
