@@ -347,7 +347,8 @@ function renderCard(src, treatment) {
   const minted = treatment !== "free";
 
   return `
-    <article class="card" data-treatment="${treatment}">
+    <article class="card" data-treatment="${treatment}" data-material="${esc(src.halo.material)}"
+      style="--halo-a:${esc(src.halo.a)}; --halo-b:${esc(src.halo.b)}; --halo-c:${esc(src.halo.c)};">
       <span class="card__halo" aria-hidden="true"></span>
       <div class="card__plate">
         <span class="corner corner--tl"></span><span class="corner corner--tr"></span>
@@ -553,6 +554,166 @@ function renderReadingPanel(src, treatment) {
   return `${header}${statReads}${aura}${sceneRole}${free ? lockedDeep : deep + shinyTease + shinyBadge}`;
 }
 
+/* ---------- scroll dossier (below the hero) ----------
+   Order: factual → interpretive → identity → collectible → playful.
+   Free state reads as undeveloped archive material — never a paywall. */
+
+function dplate(no, title, paid, body, extraClass = "") {
+  return `
+    <section class="dplate ${extraClass}">
+      <header class="dplate__head">
+        <span class="dplate__no">${no}</span>
+        <h3 class="dplate__title">${esc(title)}</h3>
+        <span class="dplate__rule"></span>
+        <span class="dplate__tag ${paid ? "dplate__tag--dev" : ""}">${paid ? "DEVELOPED" : "ARCHIVE PULL"}</span>
+      </header>
+      ${body}
+    </section>`;
+}
+
+function renderDossier(src, treatment) {
+  const paid = treatment !== "free";
+  const d = src.dossier;
+  const c = src.card;
+
+  /* 01 — Source Record (full in both states: the factual hook) */
+  const record = dplate("01", "Source Record", paid, `
+    <dl class="drecord">
+      <div><dt>Source ID</dt><dd>${esc(src.sourceCode)} · SRC-${pad2(src.no)}</dd></div>
+      <div><dt>Object Number</dt><dd>${esc(d.record.objectNo)}</dd></div>
+      <div><dt>Capture Type</dt><dd>${esc(d.record.captureType)}</dd></div>
+      <div><dt>Dominant Gesture</dt><dd>${esc(d.record.gesture)}</dd></div>
+      <div><dt>Scene Container</dt><dd>${esc(d.record.container)}</dd></div>
+      <div><dt>Primary Signal</dt><dd>${esc(d.record.primarySignal)}</dd></div>
+      <div><dt>Background Role</dt><dd>${esc(d.record.backgroundRole)}</dd></div>
+      <div><dt>Treatment Eligibility</dt><dd>${esc(d.record.eligibility)}</dd></div>
+      <div><dt>Provenance</dt><dd>${esc(d.record.provenance)}</dd></div>
+      <div><dt>Markings</dt><dd>${esc(d.record.markings)}</dd></div>
+    </dl>`);
+
+  /* 02 — Evidence Board */
+  const shown = paid ? d.evidence : d.evidence.filter((e) => e.free);
+  const hiddenCount = d.evidence.length - shown.length;
+  const board = dplate("02", "Evidence Board", paid, `
+    <div class="dboard">
+      ${shown
+        .map(
+          (e) => `
+        <div class="receipt">
+          <span class="receipt__k">◆ ${esc(e.k)}</span>
+          <p class="receipt__read">${esc(e.read)}</p>
+        </div>`
+        )
+        .join("")}
+      ${
+        paid
+          ? ""
+          : `<div class="receipt receipt--undeveloped">
+              <span class="receipt__k">· · ·</span>
+              <p class="receipt__read">${hiddenCount} receipts undeveloped — archive pull. Development pending.</p>
+            </div>`
+      }
+    </div>`);
+
+  /* 03 — Stat Dossier */
+  const statRows = ["presence", "frame", "signal", "charge"]
+    .map((k) => {
+      const n = d.statNotes[k];
+      return `
+      <div class="dstat">
+        <div class="dstat__head">
+          <span class="dstat__name">${k}</span>
+          <span class="dstat__track"><span class="dstat__fill" style="--v:${c.stats[k]}%"></span></span>
+          <span class="dstat__val">${c.stats[k]}</span>
+        </div>
+        <p class="dstat__why">${esc(src.reads[k])}</p>
+        ${
+          paid
+            ? `<p class="dstat__evidence">${esc(n.evidence)}</p>${n.note ? `<p class="dstat__note">${esc(n.note)}</p>` : ""}`
+            : `<p class="dstat__undeveloped">— evidence layer develops with the mint.</p>`
+        }
+      </div>`;
+    })
+    .join("");
+  const statDossier = dplate("03", "Stat Dossier", paid, `
+    <div class="dstats">${statRows}</div>
+    <p class="dossier__cap">weighted reads against the scan-room prototype benchmark — interpretive, not measured</p>`);
+
+  /* 04 — Hidden Stat */
+  const hidden = dplate("04", "Hidden Stat", paid, paid
+    ? `
+    <div class="dhidden">
+      <div class="dhidden__score"><span class="dhidden__val">${d.hidden.value}</span><span class="dhidden__name">${esc(d.hidden.name)}</span></div>
+      <p class="dhidden__read">${esc(d.hidden.read)}</p>
+    </div>`
+    : `
+    <div class="dhidden dhidden--tease">
+      <div class="dhidden__score"><span class="dhidden__val">··</span><span class="dhidden__name">${esc(d.hidden.name)}</span></div>
+      <p class="dhidden__read">${esc(d.hidden.tease)}</p>
+    </div>`);
+
+  /* 05 — Fit + Aura Layer */
+  const fitAura = dplate("05", "Fit + Aura Layer", paid, paid
+    ? `
+    <div class="dfitaura">
+      <div class="dfitaura__col">
+        <div class="aura">${src.aura.map((a) => `<span class="aura__chip">${esc(a)}</span>`).join("")}</div>
+        <p class="module__line"><b>Scene Role</b> — ${esc(src.sceneRole)}</p>
+        <p class="module__prose--serif dfitaura__stance">${esc(src.stance)}</p>
+      </div>
+      <div class="dfitaura__col">
+        <p class="module__line--fit dfitaura__fit">${esc(src.fit)}</p>
+        <div class="impact"><span class="impact__label">Impact · ${esc(src.impact.label)}</span><span class="impact__track"><span class="impact__fill" style="--v:${src.impact.value}%"></span></span><span class="impact__val">${src.impact.value}</span></div>
+        <div class="impact"><span class="impact__label">Lore · ${esc(src.lore.label)}</span><span class="impact__track"><span class="impact__fill impact__fill--dash" style="--v:${src.lore.value}%"></span></span><span class="impact__val">${src.lore.value}</span></div>
+      </div>
+    </div>`
+    : `
+    <div class="dfitaura dfitaura--tease">
+      <div class="aura aura--ghost">${src.aura.map((a) => `<span class="aura__chip">${esc(a)}</span>`).join("")}</div>
+      <p class="dstat__undeveloped">Undeveloped layer — the aura reads after the mint. The camera caught something; it has not been processed yet.</p>
+    </div>`);
+
+  /* 06 — Mint Record */
+  const mintBody = paid
+    ? `
+    <dl class="drecord drecord--mint">
+      <div><dt>Developed From</dt><dd>SRC-${pad2(src.no)} · ${esc(src.sourceCode)}</dd></div>
+      <div><dt>Treatment</dt><dd>Halo Mint</dd></div>
+      <div><dt>Primary Artifact Trigger</dt><dd>${esc(d.mint.trigger1)}</dd></div>
+      <div><dt>Secondary Trigger</dt><dd>${esc(d.mint.trigger2)}</dd></div>
+      <div><dt>Material</dt><dd class="drecord__material">${esc(src.halo.material)}</dd></div>
+      <div><dt>Treatment Family</dt><dd>${esc(d.mint.family)}</dd></div>
+      <div><dt>Archive Status</dt><dd>Developed</dd></div>
+      <div><dt>Serial</dt><dd>${esc(d.mint.serial)}</dd></div>
+    </dl>
+    <p class="dmint__note">“${esc(d.mint.note)}”</p>`
+    : `
+    <dl class="drecord drecord--mint">
+      <div><dt>Archive Status</dt><dd>Archive pull · full artifact not minted</dd></div>
+      <div><dt>Treatment Eligibility</dt><dd>${esc(d.record.eligibility)}</dd></div>
+      <div><dt>Material (on development)</dt><dd class="drecord__material">${esc(src.halo.material)}</dd></div>
+      <div><dt>Serial</dt><dd>Reserved · BR-SRC${pad2(src.no)}-HM-····</dd></div>
+    </dl>
+    <button type="button" class="unlock__btn unlock__btn--shiny dmint__cta" data-goto="shiny">
+      <span class="unlock__name">Develop into Halo Mint</span>
+      <span class="unlock__desc">The card transforms · full record · ${esc(src.halo.material).toLowerCase()} · first print</span>
+    </button>`;
+  const mintRecord = dplate("06", "Mint Record", paid, mintBody, "dplate--mint");
+
+  /* 07 — Oracle Read */
+  const oracle = dplate("07", "Oracle Read", paid, `
+    <blockquote class="doracle">“${esc(paid ? d.oracle.full : d.oracle.short)}”</blockquote>
+    ${paid ? `<p class="doracle__timeline">${esc(d.oracle.timeline)}</p>` : `<p class="doracle__timeline doracle__timeline--ghost">full read develops with the mint</p>`}`,
+    "dplate--oracle");
+
+  return `
+    <div class="dossier__cue">▼ &nbsp;SCAN DOSSIER — FULL RECORD BELOW</div>
+    <div class="dossier__inner">
+      ${record}${board}${statDossier}${hidden}${fitAura}${mintRecord}${oracle}
+      <p class="dossier__end">◆ &nbsp;END OF RECORD · ${esc(src.label).toUpperCase()} · BLUE ROOM ARCHIVE</p>
+    </div>`;
+}
+
 /* ---------- render + wiring ---------- */
 
 function render() {
@@ -562,6 +723,12 @@ function render() {
   document.getElementById("sourcePanel").innerHTML = renderLeftPanel(src, state.treatment, state.tab);
   document.getElementById("stageZone").innerHTML = renderCard(src, state.treatment);
   document.getElementById("readingPanel").innerHTML = renderReadingPanel(src, state.treatment);
+  document.getElementById("dossierMount").innerHTML = renderDossier(src, state.treatment);
+
+  /* page-level halo material accents (used by body-scoped shiny rules) */
+  document.body.style.setProperty("--halo-a", src.halo.a);
+  document.body.style.setProperty("--halo-b", src.halo.b);
+  document.body.style.setProperty("--halo-c", src.halo.c);
 
   document.querySelectorAll("#sourceToggle button").forEach((b) => {
     b.classList.toggle("is-active", Number(b.dataset.source) === state.source);

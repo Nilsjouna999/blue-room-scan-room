@@ -115,6 +115,29 @@ browser console is clean (F12).
 - **Test:** free vs mint vs shiny right panel; develop buttons still switch
   treatment.
 
+## To change the scroll dossier
+
+- **Edit:** content in `data.js` → `dossier` per source (`record`,
+  `evidence` ×6 with `free` flags, `statNotes`, `hidden`, `mint`,
+  `oracle`); structure in `app.js` → `renderDossier()` + `dplate()`;
+  styles in `styles.css` (`.dplate`, `.drecord`, `.receipt`, `.dstat`,
+  `.dhidden`, `.dfitaura`, `.doracle`).
+- **Affects:** the archive below the hero, free→paid persuasion.
+- **Can break:** the 7-section cap (cut, don't grow); the no-paywall-
+  language rule (never "locked/upgrade/premium" — use "undeveloped /
+  archive pull / development pending").
+- **Test:** both sources × free/halo; free shows 3 receipts + undeveloped
+  plate, teased hidden stat, reserved serial + CTA; halo shows all 6
+  receipts, full hidden stat, real serial + material.
+
+## To change Halo Mint material per source
+
+- **Edit:** `data.js` → `halo: { material, a, b, c }` per source. The
+  three colors feed `--halo-a/b/c` on the card and body; the conic edge,
+  glow, sparkle accents, stat bars and dossier accents all follow.
+- **Test:** SRC 01 mints copper-warm, SRC 02 frost-cold; photo stays
+  readable; no cheap rainbow.
+
 ## To add a new source
 
 1. Add photo to `assets/`.

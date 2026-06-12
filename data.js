@@ -107,6 +107,55 @@ const SOURCES = [
         { k: "Gesture", state: "Loud", v: 92 },
       ],
     },
+    /* Halo Mint material identity — accents derived from the photo
+       (red jacket, cabin warmth, window light). */
+    halo: { material: "Warm Glass Copper", a: "#c98a5e", b: "#8b7bff", c: "#e8b27d" },
+    /* Scroll dossier — factual → interpretive → identity → collectible → playful */
+    dossier: {
+      record: {
+        objectNo: "BR-OBJ-001",
+        captureType: "Cabin self-document · action-wide",
+        gesture: "Raised palm, five-spread",
+        container: "Driver's seat, parked",
+        primarySignal: "Stop-or-welcome · dual read",
+        backgroundRole: "Fjord band through glass — depth donor",
+        eligibility: "Halo Mint · gesture-triggered",
+        provenance: "Roadside pullout, northbound route",
+        markings: "Red layer vs grey cabin · wheel at right edge",
+      },
+      evidence: [
+        { k: "Gesture Lock", read: "The palm faces the lens dead-on — five fingers, no hesitation. The whole image organizes around it.", free: true },
+        { k: "Crop Pressure", read: "Cabin roof and seat press from above and left; the subject reads contained, never cramped.", free: true },
+        { k: "Subject Mass", read: "Mass sits left-of-center, balanced by the fjord window — a two-weight frame that holds.", free: true },
+        { k: "Light Direction", read: "Overcast key through the right glass; rear-left fill keeps the face open under the cap.", free: false },
+        { k: "Signal Vector", read: "Eye line and palm fire on the same axis: straight out of the windshield, straight at you.", free: false },
+        { k: "Focal Lock", read: "Face locks the left third with the palm as second anchor — the lens never wanders.", free: false },
+      ],
+      statNotes: {
+        presence: { evidence: "Cap brim, beard and red layer build a stable mass the wide lens can't dilute.", note: "Holds a vehicle's worth of clutter still." },
+        frame: { evidence: "Wide-angle barrel and dashboard intrusion tax the score; the window band claws back the right third." },
+        signal: { evidence: "A raised palm is the most legible gesture in the archive — this one is textbook.", note: "84 sits near the scan-room prototype benchmark ceiling for cabin shots." },
+        charge: { evidence: "Engine-off energy: warm, contained, ten seconds from motion." },
+      },
+      hidden: {
+        name: "Gesture Authority",
+        value: 88,
+        read: "The raised palm turns the image from selfie into encounter. You are not looking at him — he is receiving you.",
+        tease: "A second reading was detected in the gesture layer. It develops with the mint.",
+      },
+      mint: {
+        trigger1: "Raised palm",
+        trigger2: "Cabin frame",
+        family: "Halo Mint · Gesture Class",
+        note: "Minted from the exact moment between farewell and blessing.",
+        serial: "BR-SRC01-HM-0007",
+      },
+      oracle: {
+        full: "This card belongs to the rare class of images where the subject appears to be both leaving the group chat and blessing the vehicle.",
+        short: "The palm says stop. The card kept going.",
+        timeline: "In another timeline: noir still · winter field report · dashboard prophet",
+      },
+    },
     card: {
       title: "Checkpoint Wave",
       archetype: "Open-Window Operator",
@@ -216,6 +265,54 @@ const SOURCES = [
         { k: "Styling", state: "Muted", v: 64 },
         { k: "Gesture", state: "Working", v: 73 },
       ],
+    },
+    /* Halo Mint material identity — accents derived from the photo
+       (snow field, hard sun, cold sky). */
+    halo: { material: "Cold Prism Frost", a: "#5fd4e0", b: "#cfe2ee", c: "#8b9bff" },
+    dossier: {
+      record: {
+        objectNo: "BR-OBJ-002",
+        captureType: "Field document · handheld, hard sun",
+        gesture: "Crouched brace, gloves stacked",
+        container: "Frozen lake, open plateau",
+        primarySignal: "Work in progress · no audience",
+        backgroundRole: "Treeline horizon — the only witness",
+        eligibility: "Halo Mint · field-triggered",
+        provenance: "Ice plateau, late March · −12° inferred",
+        markings: "Black silhouette on white field · auger at right hand",
+      },
+      evidence: [
+        { k: "Field Pressure", read: "The snow plane owns three quarters of the frame and donates all of it to the silhouette.", free: true },
+        { k: "Subject Mass", read: "Crouched mass centered low — the posture of someone who plans to be here a while.", free: true },
+        { k: "Horizon Lock", read: "The birch treeline rules the upper quarter in one clean band. Nothing argues with it.", free: true },
+        { k: "Tool Axis", read: "The auger runs a hard diagonal into the ice — the only straight line the subject brought along.", free: false },
+        { k: "Light Direction", read: "Low hard sun from the left; the snow throws it back up and erases every shadow excuse.", free: false },
+        { k: "Signal Vector", read: "No eye line offered. The work itself is the message, and it points straight down.", free: false },
+      ],
+      statNotes: {
+        presence: { evidence: "A black silhouette on a white field is the strongest contrast the archive can record.", note: "The snow does the staging; he accepts the terms." },
+        frame: { evidence: "Treeline band, entry tracks, centered mass — near-editorial discipline for a working photo." },
+        signal: { evidence: "Hood, beanie, sunglasses: three layers of withheld face. The auger speaks instead." },
+        charge: { evidence: "Slow-burn output — the energy is in the rotation, not the expression." },
+      },
+      hidden: {
+        name: "Field Silence",
+        value: 91,
+        read: "The subject reads less like a pose and more like evidence from a cold operation. Nothing here was performed for you.",
+        tease: "A silence reading was detected in the field layer. It develops with the mint.",
+      },
+      mint: {
+        trigger1: "Auger silhouette",
+        trigger2: "Treeline horizon",
+        family: "Halo Mint · Field Class",
+        note: "Minted from two feet of ice and the patience to get through it.",
+        serial: "BR-SRC02-HM-0008",
+      },
+      oracle: {
+        full: "This card does not explain itself. It arrives as field evidence and lets the snow do most of the talking.",
+        short: "The snow kept the minutes. The card signed them.",
+        timeline: "In another timeline: cold expedition card · winter field report · quiet operator still",
+      },
     },
     card: {
       title: "Two Feet of Quiet",

@@ -50,6 +50,15 @@ light, setting, styling), never the person's looks.
 - **Left panel** = source / diagram / metrics (tabbed analysis of the photo).
 - **Center** = the card artifact on a stage.
 - **Right panel** = the deeper reading + paid modules.
+- **Scroll dossier** (below the hero, added 2026-06-12) = the archive:
+  *card above, archive below.* Seven plates, ordered factual → interpretive
+  → identity → collectible → playful: 01 Source Record · 02 Evidence Board ·
+  03 Stat Dossier · 04 Hidden Stat · 05 Fit + Aura Layer · 06 Mint Record ·
+  07 Oracle Read. Free shows undeveloped archive material (partial
+  receipts, teased hidden stat, reserved serial + develop CTA) — never
+  paywall language. Halo Mint shows the full developed record. Halo Mint is
+  also **material-specific per source**: SRC 01 mints Warm Glass Copper,
+  SRC 02 mints Cold Prism Frost (accents via `halo` in data.js).
 
 The card never carries the whole reading. The site does the deep work; the
 card stays compressed.
@@ -75,7 +84,7 @@ card stays compressed.
 - MediaPipe / real AI scan
 - profile layers (MBTI/zodiac/etc.)
 - vault
-- scroll-down dossier
+- variant system ("in another timeline" is a one-line teaser only)
 
 ## 4. Core Laws
 

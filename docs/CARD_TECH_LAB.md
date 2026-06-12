@@ -126,6 +126,11 @@ effect was switched on.
 
 ## 7. Better Shiny Directions to Explore
 
+**Partially applied 2026-06-12:** Halo Mint accents are now per-source
+materials (SRC 01 "Warm Glass Copper", SRC 02 "Cold Prism Frost") via
+`halo` accent variables — the first real step toward "earned by the scan"
+shine. The material *names* below remain candidates for the final system.
+
 All **EXPLORATION**:
 
 **A. Black Star Foil** — black chrome base, tiny star dust, deep-space

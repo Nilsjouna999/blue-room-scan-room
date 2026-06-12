@@ -23,6 +23,13 @@ keys `1` `2` for source, `F` free, `H` Halo Mint, `M` internal Lab state.
 
 ## Layout
 
+The page scrolls: the three-column hero fills the first viewport, and a
+**scan dossier** (7 archive plates: Source Record → Evidence Board → Stat
+Dossier → Hidden Stat → Fit + Aura → Mint Record → Oracle Read) continues
+below. Free Pull shows the dossier as undeveloped archive material with a
+develop CTA; Halo Mint shows the full record. Halo Mint accents are
+per-source materials (Warm Glass Copper / Cold Prism Frost).
+
 - **Left** — tabbed analysis panel:
   - **Source** — the raw photo with focal markers, capture record,
     frame-analysis notes. Answers "what photo is being read?"

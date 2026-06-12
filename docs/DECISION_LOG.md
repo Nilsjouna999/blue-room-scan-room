@@ -88,6 +88,22 @@ Night Gloss, Archive Foil, Static Mint, Mythic Prism) sit above/beside Halo
 Mint later — BACKLOG.
 Revisit: when the first rare variant ships.
 
+**2026-06-12 / Scroll dossier added below the hero / CURRENT**
+Why: the hero proves the card; the dossier deepens it. Seven plates max
+(Source Record, Evidence Board, Stat Dossier, Hidden Stat, Fit + Aura,
+Mint Record, Oracle Read), ordered factual → playful. Free reads as
+undeveloped archive material ("archive pull", "development pending") —
+paywall language (locked/upgrade/premium) is banned.
+Revisit: if the dossier bloats past 7 sections, cut, don't grow.
+
+**2026-06-12 / Halo Mint material is per-source / CURRENT**
+Why: one generic glow for every photo contradicts "earned by the image."
+Materials derive from the photo: SRC 01 = Warm Glass Copper (red jacket,
+cabin warmth), SRC 02 = Cold Prism Frost (snow, hard sun). Implemented as
+accent variables on the same effect system — no new layouts.
+Revisit: when the final Halo material is chosen (CARD_TECH_LAB §20), the
+per-source principle stays even if the palette changes.
+
 **2026-06-12 / Current Halo Foil is prototype-only, not final shiny design / TESTING**
 Why: it proves a paid treatment can pop in-browser (holo edge, halo,
 particles, shimmer) but it is an effect bucket, not a card material — it
