@@ -17,6 +17,16 @@ const pad2 = (n) => String(n).padStart(2, "0");
 
 const state = { source: 0, treatment: "free", tab: "source" };
 
+/* Deep-link support: ?src=1|2&t=free|shiny|mint&tab=source|diagram|metrics
+   (used by reviewers and the screenshot pipeline). */
+{
+  const q = new URLSearchParams(location.search);
+  const s = parseInt(q.get("src"), 10);
+  if (s === 1 || s === 2) state.source = s - 1;
+  if (["free", "shiny", "mint"].includes(q.get("t"))) state.treatment = q.get("t");
+  if (["source", "diagram", "metrics"].includes(q.get("tab"))) state.tab = q.get("tab");
+}
+
 /* ---------- shared bits ---------- */
 
 function moduleHead(label) {

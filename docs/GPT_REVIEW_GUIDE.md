@@ -45,6 +45,17 @@ card; the site around the card is the full "scan room" reading.
 - Copy voice: premium scan archive, strange but readable, never cruel,
   never fake-scientific (see PROJECT_OS §14).
 
+## Seeing the rendered product (visual review)
+
+- **Screenshots** (the reliable way): `docs/SCREENS.md` indexes current UI
+  captures in `docs/screens/*.png` — open them as images via
+  `https://raw.githubusercontent.com/Nilsjouna999/blue-room-scan-room/main/docs/screens/<name>.png`.
+  They are regenerated after visual changes; trust them as current.
+- **Live site**: https://nilsjouna999.github.io/blue-room-scan-room/
+  with deep links `?src=1|2&t=free|shiny&tab=source|diagram|metrics`
+  (note: text-based browsing won't convey the visual design — use the
+  screenshots for look-and-feel judgments).
+
 ## Fetching files
 
 Raw file URL pattern:
