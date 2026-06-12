@@ -121,7 +121,7 @@ const SOURCES = [
         backgroundRole: "Fjord band through glass — depth donor",
         eligibility: "Halo Mint · gesture-triggered",
         provenance: "Roadside pullout, northbound route",
-        markings: "Red layer vs grey cabin · wheel at right edge",
+        markings: "Red layer vs grey cabin · wheel at right edge · cap insignia: partial read, upper-center",
       },
       evidence: [
         { k: "Gesture Lock", read: "The palm faces the lens dead-on — five fingers, no hesitation. The whole image organizes around it.", free: true },
@@ -162,7 +162,9 @@ const SOURCES = [
       note: "The hand says stop, the face says welcome. The card never resolves it — and doesn't need to.",
       signature: "Filed from the driver's seat, engine off.",
       stats: { presence: 67, frame: 52, signal: 84, charge: 70 },
-      serial: "BR-002-DRV-0001",
+      /* archive/card serial — the dossier mint serial (BR-SRC01-HM-…) is
+         the separate Halo Mint development serial */
+      serial: "BR-001-DRV-0001",
       batch: "Field Batch 01",
       edition: "First Print",
       minted: "2026.06.12",
@@ -184,7 +186,7 @@ const SOURCES = [
     fit: "If the setting is formal, this card stays in the glovebox. On the road, it's the membership card.",
     impact: { value: 64, label: "Disarming" },
     lore: { value: 72, label: "Dense" },
-    oracle: "You stop at the good views. That habit is worth more than the schedule it breaks.",
+    oracle: "Logged mid-route. The palm held the shutter open; the fjord held the rest of the frame. Neither blinked.",
     receipts: [
       { k: "Lens profile", v: "Action-wide, corrected −40%" },
       { k: "Key light", v: "Overcast, rear-left" },
@@ -192,6 +194,7 @@ const SOURCES = [
       { k: "Subject lock", v: "0.83" },
       { k: "Cabin clutter index", v: "Moderate" },
       { k: "Horizon", v: "Occluded (interior)" },
+      { k: "Brand Trace", v: "Volvo wheel confirmed — the route has standards" },
     ],
   },
 
@@ -229,7 +232,7 @@ const SOURCES = [
       "TREELINE RULES UPPER QUARTER · CLEAN BAND",
       "SUBJECT CROUCHED · MASS CENTERED LOW",
       "TRACKS LEAD EYE INTO FRAME · LEFT ENTRY",
-      "THREE FACE LAYERS WITHHELD: HOOD / BEANIE / GLASS",
+      "EXPRESSION QUALIFIED: HOOD / BEANIE / GLASS · GAZE ON TASK",
     ],
     diagram: {
       aspect: 2.22,
@@ -287,12 +290,12 @@ const SOURCES = [
         { k: "Horizon Lock", read: "The birch treeline rules the upper quarter in one clean band. Nothing argues with it.", free: true },
         { k: "Tool Axis", read: "The auger runs a hard diagonal into the ice — the only straight line the subject brought along.", free: false },
         { k: "Light Direction", read: "Low hard sun from the left; the snow throws it back up and erases every shadow excuse.", free: false },
-        { k: "Signal Vector", read: "No eye line offered. The work itself is the message, and it points straight down.", free: false },
+        { k: "Signal Vector", read: "Eye contact redirected to the ice. The work itself is the message, and it points straight down.", free: false },
       ],
       statNotes: {
         presence: { evidence: "A black silhouette on a white field is the strongest contrast the archive can record.", note: "The snow does the staging; he accepts the terms." },
         frame: { evidence: "Treeline band, entry tracks, centered mass — near-editorial discipline for a working photo." },
-        signal: { evidence: "Hood, beanie, sunglasses: three layers of withheld face. The auger speaks instead." },
+        signal: { evidence: "Hood, beanie and sunglasses qualify the expression; the auger receives the eye contact instead." },
         charge: { evidence: "Slow-burn output — the energy is in the rotation, not the expression." },
       },
       hidden: {
@@ -320,7 +323,9 @@ const SOURCES = [
       note: "Crouched over a hole that isn't there yet. The confidence is in the kneel, not the catch.",
       signature: "Signed in snow, countersigned by the sun.",
       stats: { presence: 71, frame: 83, signal: 56, charge: 62 },
-      serial: "BR-002-ICE-0002",
+      /* archive/card serial — distinct from the Halo Mint development
+         serial in dossier.mint */
+      serial: "BR-002-ICE-0001",
       batch: "Ice Batch 01",
       edition: "First Print",
       minted: "2026.06.12",
@@ -331,7 +336,7 @@ const SOURCES = [
       frame:
         "Treeline holds the upper quarter, tracks lead the eye in. Near-editorial discipline for a working photo.",
       signal:
-        "Hood, beanie, sunglasses: three layers of withheld face. The task speaks where the expression won't.",
+        "Hood, beanie and sunglasses qualify the expression — the face is present, but eye contact redirects to the task.",
       charge:
         "Slow-burn output. The energy is in the rotation of the auger, not in anything performed for the lens.",
     },
@@ -350,6 +355,7 @@ const SOURCES = [
       { k: "Subject lock", v: "0.88" },
       { k: "Horizon placement", v: "Upper quarter, honest" },
       { k: "Wind", v: "Calm, inferred" },
+      { k: "Affect Trace", v: "Smile detected at work — the auger got a good rotation" },
     ],
   },
 ];

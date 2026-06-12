@@ -665,8 +665,8 @@ function renderDossier(src, treatment) {
     </div>`
     : `
     <div class="dfitaura dfitaura--tease">
-      <div class="aura aura--ghost">${src.aura.map((a) => `<span class="aura__chip">${esc(a)}</span>`).join("")}</div>
-      <p class="dstat__undeveloped">Undeveloped layer — the aura reads after the mint. The camera caught something; it has not been processed yet.</p>
+      <div class="aura">${src.aura.map((a) => `<span class="aura__chip">${esc(a)}</span>`).join("")}</div>
+      <p class="dstat__undeveloped">Aura markers visible. Full aura interpretation develops with Halo Mint.</p>
     </div>`);
 
   /* 06 — Mint Record */
@@ -680,7 +680,7 @@ function renderDossier(src, treatment) {
       <div><dt>Material</dt><dd class="drecord__material">${esc(src.halo.material)}</dd></div>
       <div><dt>Treatment Family</dt><dd>${esc(d.mint.family)}</dd></div>
       <div><dt>Archive Status</dt><dd>Developed</dd></div>
-      <div><dt>Serial</dt><dd>${esc(d.mint.serial)}</dd></div>
+      <div><dt>Mint Serial</dt><dd>${esc(d.mint.serial)}</dd></div>
     </dl>
     <p class="dmint__note">“${esc(d.mint.note)}”</p>`
     : `
@@ -688,11 +688,11 @@ function renderDossier(src, treatment) {
       <div><dt>Archive Status</dt><dd>Archive pull · full artifact not minted</dd></div>
       <div><dt>Treatment Eligibility</dt><dd>${esc(d.record.eligibility)}</dd></div>
       <div><dt>Material (on development)</dt><dd class="drecord__material">${esc(src.halo.material)}</dd></div>
-      <div><dt>Serial</dt><dd>Reserved · BR-SRC${pad2(src.no)}-HM-····</dd></div>
+      <div><dt>Mint Serial</dt><dd>Reserved · BR-SRC${pad2(src.no)}-HM-····</dd></div>
     </dl>
     <button type="button" class="unlock__btn unlock__btn--shiny dmint__cta" data-goto="shiny">
       <span class="unlock__name">Develop this scan</span>
-      <span class="unlock__desc">Into Halo Mint · full dossier · mint record · ${esc(src.halo.material).toLowerCase()}</span>
+      <span class="unlock__desc">Into Halo Mint · full record · ${esc(src.halo.material).toLowerCase()}</span>
     </button>`;
   const mintRecord = dplate("06", "Mint Record", paid, mintBody, "dplate--mint");
 
@@ -733,13 +733,15 @@ function render() {
     b.classList.toggle("is-active", b.dataset.treatment === state.treatment);
   });
 
-  document.querySelectorAll("[data-goto]").forEach((b) => {
-    b.addEventListener("click", () => {
-      state.treatment = b.dataset.goto;
-      render();
-    });
-  });
 }
+
+/* Delegated once — survives re-renders, no per-render binding. */
+document.addEventListener("click", (e) => {
+  const btn = e.target.closest("[data-goto]");
+  if (!btn) return;
+  state.treatment = btn.dataset.goto;
+  render();
+});
 
 document.getElementById("sourcePanel").addEventListener("click", (e) => {
   const btn = e.target.closest("button[data-tab]");

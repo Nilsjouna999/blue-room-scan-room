@@ -1,7 +1,8 @@
 /* =============================================================
    BLUE ROOM — SCAN ROOM (Prototype 002, desktop-first)
    Left: source + analysis · Center: card trophy · Right: reading
-   Treatments: Free Pull (mellow) → Signature Mint → Halo Foil
+   Treatments: Free Pull → Halo Mint
+   (Signature Mint retired as visible tier — internal lab language only)
 ============================================================= */
 
 :root {
@@ -726,7 +727,8 @@ body {
 .card[data-treatment="free"] .photo__tone { opacity: 0.7; }
 
 /* -------------------------------------------------------------
-   TREATMENT: Signature Mint — developed premium artifact
+   TREATMENT: Signature Mint — internal Lab state (keyboard M),
+   not a customer-facing tier; silver donor material
 ------------------------------------------------------------- */
 
 .card[data-treatment="mint"] {
@@ -772,7 +774,8 @@ body {
 }
 
 /* -------------------------------------------------------------
-   TREATMENT: Halo Foil — rare paid pop (black chrome + holo)
+   TREATMENT: Halo Mint — the paid developed card
+   (internal key "shiny"; per-source material via --halo-a/b/c)
 ------------------------------------------------------------- */
 
 @property --holo-angle {
@@ -1553,7 +1556,6 @@ body[data-treatment="shiny"] .dhidden__val { color: var(--halo-a, var(--silver-b
   padding-left: 12px;
 }
 .dfitaura--tease { grid-template-columns: 1fr; gap: 12px; }
-.aura--ghost .aura__chip { opacity: 0.35; border-style: dashed; }
 
 /* 06 — mint record */
 .dplate--mint {
