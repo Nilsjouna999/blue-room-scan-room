@@ -185,6 +185,27 @@ payment/Halo/upload analysis). GPT_REVIEW_GUIDE + TASK_QUEUE + SESSION_BRIEF
 note the folder. Roadmap unchanged beyond this checkpoint — next product task
 stays **Free Pull Mock Polish v1**.
 
+## Halo Gate Ethics Audit v1 (2026-06-13 / BR-S032, audit + 1 copy fix)
+
+Audited the `?dev=halo-gate` mock + the migrated `?dev=free-scan-sim` sealed-back
+copy against `docs/halo/HALO_GATE_BOUNDARY_V1.md` — ethics, boundary compliance,
+manipulation risk, artifact-safety. **Verdict PASS.** New audit doc
+`docs/audits/HALO_GATE_ETHICS_AUDIT_V1.md` (FILE_MAP registers it). Method: live
+DOM text-sweep + screenshot of the rendered pages (not code-only) + an
+independent adversarial five-gate / anti-manipulation review of every visible
+string (PASS). Confirmed: **no exact pre-unlock counts** (zero numbers on the
+gate; no "image lever"/"target variant"/"receipts found"/"Map exists"/"setup
+card sealed" on either route), **Free Pull still reads complete**, **Halo does
+not imply a hidden real score** ("added depth, not a hidden result" / "Halo is
+the sealed back, not a hidden score"), **dev-mock/not-payment/not-real-analysis**
+(disabled CTA + rail + footer), no manipulation, no person-truth; regression
+clean (uploaded-result/blocked + menu unchanged, Local Draft → Develop Scan still
+sealed/offline, console clean). **One low fix applied** (copy only): the Free
+Pull halo-edge note `Open the back later` → **`The front is already complete`**
+(it read as a bare "result continues later" invite on the front, without the
+gate's neutralizer; the new line affirms free-completeness). No redesign, no new
+features, no Halo Dossier, no payment/AI/backend/upload analysis.
+
 ## Halo Gate Dev Mock v1 (2026-06-13 / BR-S031, app.js + styles.css)
 
 Added a dev-only **sealed card-back / dossier chamber** mock at **`?dev=halo-gate`**,

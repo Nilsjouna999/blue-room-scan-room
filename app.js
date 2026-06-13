@@ -1446,7 +1446,7 @@ function renderFreePullMock(result) {
       <div class="fpcard__halo">
         <span class="fpcard__haloweld" aria-hidden="true"></span>
         <span class="fpcard__halotext">This card has a sealed back · Halo dossier sealed</span>
-        <span class="fpcard__halonote">Open the back later</span>
+        <span class="fpcard__halonote">The front is already complete</span>
       </div>`;
 
   return `

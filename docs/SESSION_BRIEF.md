@@ -10,6 +10,63 @@ coding session; the assistant must respect it. Files not listed under
 does not match the user's current task — **stop and ask** before doing
 anything. (GOVERNANCE_OS anti-drift.)
 
+## Active session — BR-S032
+
+**Date / Session ID:** 2026-06-13 / BR-S032
+
+**Today's task:** Halo Gate Ethics Audit v1 (audit; small copy fixes only)
+
+**Why:** Verify the Halo Gate mock + migrated Free-Pull sealed-back copy for
+ethics, boundary compliance, manipulation risk, and artifact-safety before any
+further Halo work.
+
+**Read:** docs/GPT_REVIEW_GUIDE.md · docs/PROJECT_OS.md · docs/TASK_QUEUE.md ·
+docs/SESSION_BRIEF.md · docs/CHANGE_MAP.md · docs/DECISION_LOG.md ·
+docs/halo/HALO_GATE_BOUNDARY_V1.md · docs/CARD_LOGIC_V1.md · docs/COPY_SYSTEM.md ·
+docs/research/HUMAN_IN_FRAME_READING_RULES_V1.md ·
+docs/research/LANGUAGE_SYSTEM_V1.md · docs/research/REFRAME_MAP_VALUE_SYSTEM_V1.md ·
+app.js · styles.css
+
+**Edit:** docs/audits/HALO_GATE_ETHICS_AUDIT_V1.md (new) · app.js (small copy fix
+only) · docs/FILE_MAP.md · docs/CHANGE_MAP.md · docs/TASK_QUEUE.md ·
+docs/SESSION_BRIEF.md
+
+**Do not open:** C:\Users\nilsj\OneDrive\Documents\blue-room
+
+**Do not edit:** styles.css (no fix needed) · data.js · scan-contract.js ·
+index.html · assets · docs/halo/HALO_GATE_BOUNDARY_V1.md (no rewrite)
+
+**Authority affected:** AUDIT (new audit record) + a small ACTIVE runtime copy fix
+
+**Core/spec change required?** No — audit + a one-line copy fix.
+
+**Locked constraints:** audit only (small copy/CSS fixes directly tied to
+findings; no redesign, no new features, no Halo Dossier, no payment/AI/backend/
+upload analysis, no fake real-user analysis, no scope expansion) · preserve
+`?dev=free-scan-sim`/`uploaded-result`/`uploaded-blocked` + bare menu · normal
+Local Draft → Develop Scan stays sealed/offline
+
+**Known current state:** Halo Gate Dev Mock v1 (60a924d); `?dev=halo-gate` +
+the migrated Free-Pull vault exist; no Halo Dossier; no AI/backend/payment
+
+**Definition of done:** `docs/audits/HALO_GATE_ETHICS_AUDIT_V1.md` exists with
+verdict, audited routes, strings reviewed, findings by severity, fixes,
+confirmations (no pre-unlock counts · Free reads complete · Halo ≠ hidden score ·
+dev-mock/not-payment) · any small in-scope fixes applied · FILE_MAP registers the
+audit doc · CHANGE_MAP/TASK_QUEUE/SESSION_BRIEF updated · regression clean ·
+commit + push
+
+**Verification:** `python -m http.server 8743`; live DOM sweep + screenshot of
+`?dev=halo-gate` (no counts/numbers, disabled CTA, all dev/safety labels, premium
+sealed-back not paywall) + `?dev=free-scan-sim` (qualitative vault, no counts,
+reads complete; halo note now "The front is already complete"); independent
+adversarial five-gate review = PASS; `?dev=uploaded-result`/`uploaded-blocked` +
+bare menu unchanged; renderGate/renderDraft intact; console clean.
+
+**Final response format:** commit hash · changed files · audit verdict · fixes
+applied · no pre-unlock counts · no hidden-score/paywall manipulation · next task ·
+rollback command
+
 ## Active session — BR-S031
 
 **Date / Session ID:** 2026-06-13 / BR-S031
