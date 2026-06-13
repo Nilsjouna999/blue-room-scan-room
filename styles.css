@@ -1270,8 +1270,8 @@ body[data-treatment="shiny"] .stagezone {
 .diamond { width: 100%; max-width: 320px; justify-self: center; display: block; margin: 0 auto; }
 .diamond text {
   font-family: var(--font-mono);
-  font-size: 4.6px;
-  letter-spacing: 0.16em;
+  font-size: 5.6px;
+  letter-spacing: 0.1em;
   fill: var(--silver);
 }
 .dia-grid { fill: none; stroke: rgba(226, 222, 213, 0.1); stroke-width: 1; vector-effect: non-scaling-stroke; }
@@ -1653,6 +1653,13 @@ body[data-treatment="shiny"] .dhidden__val { color: var(--halo-a, var(--t-displa
 }
 .dhidden--tease .dhidden__val { color: var(--t-ghost); font-size: 44px; }
 .dhidden--tease .dhidden__read { color: var(--t-body); font-style: italic; font-size: 15px; }
+
+/* Artifact tier-band display (Artifact Language Stabilization v1): tier WORDS
+   replace the old 0-100 numbers in the same slots — sized to read as labels,
+   not oversized digits. Bars/diamond shape still carry magnitude. */
+.ministat__val--tier { font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; }
+.dhidden__val--tier { font-size: 26px; letter-spacing: 0.04em; text-transform: uppercase; }
+.reads__val--tier, .impact__val--tier, .dstat__val--tier { text-transform: uppercase; letter-spacing: 0.06em; }
 /* free state reads as an intentionally sealed compartment, not an empty
    plate: dashed frame + a quiet "development pending" stamp. Value stays
    withheld; the Halo reveal (bold material number) is untouched. */

@@ -320,7 +320,13 @@
 
     /* Richer VALID fixture — exercises the dev renderer (stats, extended
        stats, readings, multiple receipts, mint record). Obviously a dev
-       fixture; never used for a real user image. Passes the validator. */
+       fixture; never used for a real user image. Passes the validator.
+       INTENTIONAL: this dev-only renderer harness keeps the legacy
+       Presence/Charge/Visual Impact labels, 0-100 numbers and "+N" receipt
+       deltas to exercise the legacy render path. Artifact Language
+       Stabilization v1 deliberately does NOT migrate the ?dev=uploaded-result
+       route (the explicit strictly-dev, "NOT USER SCAN" exception — see
+       DECISION_LOG 2026-06-13). Do not "fix" it to tier bands. */
     validDevRendererResult: {
       kind: "uploaded_scan_result",
       schemaVersion: "uploaded-v1",
@@ -378,16 +384,16 @@
       stats: { freeVisible: { presence: 78, frame: 60, signal: 35, visualImpact: 95 } },
       /* public display: tier band + bar (0–5), each grounded by a receipt id */
       publicStats: [
-        { label: "Presence", tier: "DOMINANT", bars: 4, receiptId: "r-anchor" },
-        { label: "Frame", tier: "STRONG", bars: 3, receiptId: "r-negspace" },
-        { label: "Signal", tier: "PRESENT", bars: 2, receiptId: "r-layer" },
-        { label: "Visual Impact", tier: "TOTAL", bars: 5, receiptId: "r-shadow-field" },
+        { label: "Frame Presence", tier: "Charged", bars: 4, receiptId: "r-anchor" },
+        { label: "Frame", tier: "Strong", bars: 3, receiptId: "r-negspace" },
+        { label: "Signal", tier: "Clean", bars: 2, receiptId: "r-layer" },
+        { label: "Scene Charge", tier: "Peak", bars: 5, receiptId: "r-shadow-field" },
       ],
       /* grounded receipts: observed cue → artifact effect. The validator's
          required fields (lens/observation/visibleCue/effect/confidence) stay;
          the renderer prefers observedCue/artifactEffect for display. */
       evidenceBoard: [
-        { id: "r-anchor", lens: "Composition", observation: "subject anchor in the lower-left third", visibleCue: "the figure sits at the lower-left third", effect: "Presence", confidence: "high",
+        { id: "r-anchor", lens: "Composition", observation: "subject anchor in the lower-left third", visibleCue: "the figure sits at the lower-left third", effect: "Frame Presence", confidence: "high",
           observedCue: "The subject anchor holds the lower-left third", artifactEffect: "the eye locks to the anchor before it reads the rest of the frame",
           chipCue: "Raised palm", chipEffect: "barrier signal" },
         { id: "r-negspace", lens: "Negative Space", observation: "wide empty field on the right", visibleCue: "the right two-thirds carry no subject", effect: "Frame", confidence: "medium",
@@ -395,31 +401,31 @@
           chipCue: "Window light", chipEffect: "cleaner edge separation" },
         { id: "r-layer", lens: "Signal", observation: "one warm colour layer over a muted ground", visibleCue: "single warm layer, low background noise", effect: "Signal", confidence: "low",
           observedCue: "One warm colour layer sits over a muted ground", artifactEffect: "a single styling signal reads clearly without competition" },
-        { id: "r-shadow-field", lens: "Tension", observation: "dark field occupies most of the frame", visibleCue: "the lit edge is the only bright region", effect: "Visual Impact", confidence: "high",
-          observedCue: "A dark field occupies most of the frame", artifactEffect: "light becomes scarce and the lit edge carries more visual weight" },
+        { id: "r-shadow-field", lens: "Tension", observation: "warm signal layer over a muted ground", visibleCue: "one warm layer reads against the cabin", effect: "Scene Charge", confidence: "high",
+          observedCue: "A warm signal layer reads against a muted ground", artifactEffect: "the single warm layer carries the frame's charge" },
       ],
       scopeLine: "BLUE ROOM reads the photograph, not the photographed. Change the photo, change the card.",
       sealedStat: { label: "Artifact Coherence", teaser: "One sealed stat reads all four public stats against each other.", reasonType: "contradiction" },
       rarity: { band: "UNCOMMON PULL", print: "Day Print", reason: "Unusual artifact profile: one warm signal layer reads clean against a quiet ground.", qualityNeutral: "Rarity tracks how unusual the artifact is — never image quality, never the person." },
       reframeMap: {
-        current: "Night Print / The Low-Light Operator",
+        current: "Day Print / The Signal Bearer",
         whyThisCard: [
-          "Dark field dominates the frame → supports the Night Print read.",
-          "A single hard light edge → raises Visual Impact.",
+          "Raised palm reads as a clean barrier signal → supports the Signal Bearer.",
+          "One warm layer over a muted cabin → a single signal carries the frame.",
         ],
         levers: [
-          { label: "Shift toward Clean Print", change: "Use even daylight and reduce shadow coverage.", effect: "Lowers the Night Print pressure and raises Frame clarity." },
-          { label: "Shift toward The Neon Witness", change: "Introduce saturated artificial light and deeper background detail.", effect: "Raises Signal and adds an off-frame pull." },
+          { label: "Shift toward Clean Print", change: "Open the crop and even the cabin light.", effect: "Eases frame pressure and lifts Frame clarity." },
+          { label: "Shift toward Field Report", change: "Step back and let the setting carry more of the frame.", effect: "Raises Lore and adds an off-frame pull." },
         ],
         setupCard: [
           "Keep one clear subject anchor.",
-          "Move the light 45 degrees off-axis.",
+          "Hold the raised-palm gesture in frame.",
           "Leave one clean field of negative space.",
           "Re-scan as a different artifact.",
         ],
       },
       readings: {
-        freeSummary: "Development fixture — not a real scan. A dark-field frame where one lit edge does the work; the deeper development stays sealed.",
+        freeSummary: "Development fixture — not a real scan. A cabin frame where a raised palm carries the signal; the deeper development stays sealed.",
         haloDossier: "",
         oracle: null,
       },

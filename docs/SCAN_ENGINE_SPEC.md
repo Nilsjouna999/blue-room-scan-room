@@ -20,14 +20,16 @@ worth, looks, biology, or psychology.
 
 ## Stats (visibility resolved 2026-06-12)
 
-- **Free Pull — exactly 4 visible public stats:** Presence · Frame ·
-  Signal · Charge. Cheap, stable, visually simple. No new public stat
-  types.
+- **Free Pull — exactly 4 visible public stats:** Frame Presence · Frame ·
+  Signal · Scene Charge (display labels; internal keys `presence/frame/
+  signal/charge`). Shown as **tier bands**, not 0–100 (Artifact Language
+  Stabilization v1, 2026-06-13). Cheap, stable, visually simple. No new
+  public stat types.
 - **Halo Mint / dossier — deeper stats:** Lore Density · Fit Coherence ·
-  Gesture Authority · Visual Impact.
-  - **Gesture Authority is conditional** — shown only when gesture/body
+  Gesture Geometry · Frame Impact *(formerly Gesture Authority / Visual Impact)*.
+  - **Gesture Geometry is conditional** — shown only when gesture/body
     evidence is visible.
-  - **Visual Impact is derived** (from Charge + Presence + Frame +
+  - **Frame Impact is derived** (from Scene Charge + Frame Presence + Frame +
     Rarity), never independently scored.
 - Route-specific stats may exist inside Halo/dossier (e.g. Creature
   Presence on ANIMAL_COMPANION) but the core product stays readable.
@@ -41,7 +43,7 @@ displayed_score = 50 + confidence * (raw_score - 50)
 ```
 
 Uncertain scans move toward neutral — no fake extreme scores.
-Examples: no visible hands → no Gesture Authority · dark background →
+Examples: no visible hands → no Gesture Geometry · dark background →
 lower Lore confidence · blurry subject → shrink bold claims · landscape
 route → never score human posture.
 

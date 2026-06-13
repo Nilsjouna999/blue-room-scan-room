@@ -15,10 +15,10 @@
    measurement. Keep the language soft ("derived from"), never
    fake-scientific. */
 const FORMULAS = [
-  { k: "Presence", v: "focal clarity + posture stability + scene ownership" },
+  { k: "Frame Presence", v: "focal clarity + posture stability + scene anchoring" },
   { k: "Frame", v: "composition balance + crop pressure + background control" },
   { k: "Signal", v: "gesture readability + eye-line clarity + styling distinctness" },
-  { k: "Charge", v: "motion potential + contrast + emotional temperature" },
+  { k: "Scene Charge", v: "motion potential + contrast + scene temperature" },
   { k: "Lore Density", v: "setting specificity + unresolved story + object cues" },
   { k: "Fit Coherence", v: "styling + setting + posture + gesture alignment" },
 ];
@@ -119,7 +119,7 @@ const SOURCES = [
       ],
       pressure: { balance: -12, centerPull: 58, noise: 47, clarity: 82 },
       fitMatrix: [
-        { k: "Person", state: "Locked", v: 84 },
+        { k: "Subject", state: "Locked", v: 84 },
         { k: "Setting", state: "Aligned", v: 76 },
         { k: "Styling", state: "Anchored", v: 81 },
         { k: "Gesture", state: "Loud", v: 92 },
@@ -152,13 +152,13 @@ const SOURCES = [
       statNotes: {
         presence: { evidence: "Cap brim, beard and red layer build a stable mass the wide lens can't dilute.", note: "Holds a vehicle's worth of clutter still." },
         frame: { evidence: "Wide-angle barrel and dashboard intrusion tax the score; the window band claws back the right third." },
-        signal: { evidence: "A raised palm is the most legible gesture in the archive — this one is textbook.", note: "84 sits near the scan-room prototype benchmark ceiling for cabin shots." },
+        signal: { evidence: "A raised palm is the most legible gesture in the archive — this one is textbook.", note: "Sits near the top of the archive band for cabin shots." },
         charge: { evidence: "Engine-off energy: warm, contained, ten seconds from motion." },
       },
       hidden: {
-        name: "Gesture Authority",
+        name: "Gesture Geometry",
         value: 88,
-        read: "The raised palm turns the image from selfie into encounter. You are not looking at him — he is receiving you.",
+        read: "The raised palm turns the image from selfie into encounter — the frame addresses the lens directly, not the other way around.",
         tease: "A second reading was detected in the gesture layer. It develops with the mint.",
       },
       mint: {
@@ -197,7 +197,7 @@ const SOURCES = [
       charge:
         "Idle-engine energy. Warm, contained, ready to pull back onto the road the moment the shutter closes.",
     },
-    aura: ["Unhurried", "Open-Palm", "Northbound"],
+    aura: ["Idle-Engine", "Open-Palm", "Northbound"],
     sceneRole: "The pause the trip gets measured by.",
     stance:
       "One arm holding the wheel's territory, the other raised flat to the lens — half stop-sign, half salute. The posture of someone who decides when the journey resumes.",
@@ -212,7 +212,7 @@ const SOURCES = [
       { k: "Subject lock", v: "0.83" },
       { k: "Cabin clutter index", v: "Moderate" },
       { k: "Horizon", v: "Occluded (interior)" },
-      { k: "Brand Trace", v: "Volvo wheel confirmed — the route has standards" },
+      { k: "Brand Trace", v: "Volvo wheel confirmed — a clean brand cue in the cabin frame" },
     ],
   },
 
@@ -281,7 +281,7 @@ const SOURCES = [
       ],
       pressure: { balance: 4, centerPull: 71, noise: 12, clarity: 74 },
       fitMatrix: [
-        { k: "Person", state: "Locked", v: 78 },
+        { k: "Subject", state: "Locked", v: 78 },
         { k: "Setting", state: "Locked", v: 91 },
         { k: "Styling", state: "Muted", v: 64 },
         { k: "Gesture", state: "Working", v: 73 },
@@ -338,7 +338,7 @@ const SOURCES = [
     card: {
       title: "Two Feet of Quiet",
       archetype: "Frost Surveyor",
-      note: "Crouched over a hole that isn't there yet. The confidence is in the kneel, not the catch.",
+      note: "Crouched over a hole that isn't there yet. The commitment is in the kneel, not the catch.",
       signature: "Signed in snow, countersigned by the sun.",
       stats: { presence: 71, frame: 83, signal: 56, charge: 62 },
       /* archive/card serial — distinct from the Halo Mint development
@@ -358,7 +358,7 @@ const SOURCES = [
       charge:
         "Slow-burn output. The energy is in the rotation of the auger, not in anything performed for the lens.",
     },
-    aura: ["Methodical", "Sun-Struck", "Load-Bearing"],
+    aura: ["Slow-Burn", "Sun-Struck", "Load-Bearing"],
     sceneRole: "Proof the lake was work, not wallpaper.",
     stance:
       "Crouched at full commitment, both gloves stacked on the brace, weight exactly where it should be. Nothing performed — the auger doesn't care, and neither does he.",
@@ -373,7 +373,7 @@ const SOURCES = [
       { k: "Subject lock", v: "0.88" },
       { k: "Horizon placement", v: "Upper quarter, honest" },
       { k: "Wind", v: "Calm, inferred" },
-      { k: "Affect Trace", v: "Smile detected at work — the auger got a good rotation" },
+      { k: "Expression Band", v: "Mouth turns up at the brace — a small warm cue in a cold frame" },
     ],
   },
 ];
@@ -395,11 +395,11 @@ const V2_EXTRAS = {
     archetypeClass: "The Encounter",
     warnings: ["Wide-angle distortion noted — corrected in read"],
     receipts: [
-      { cue: "raised palm, five-spread, facing lens", effect: "Signal +12", basis: "gesture readability", confidence: "high" },
-      { cue: "face locks left third, palm as second anchor", effect: "Presence +6", basis: "focal clarity", confidence: "high" },
-      { cue: "wide-angle barrel + dashboard intrusion", effect: "Frame -9", basis: "crop pressure", confidence: "high" },
-      { cue: "fjord band through right window glass", effect: "Lore +7", basis: "setting specificity", confidence: "medium" },
-      { cue: "red layer against grey cabin", effect: "Charge +5", basis: "contrast anchor", confidence: "high" },
+      { cue: "raised palm, five-spread, facing lens", effect: "Signal ↑", basis: "gesture readability", confidence: "high" },
+      { cue: "face locks left third, palm as second anchor", effect: "Frame Presence ↑", basis: "focal clarity", confidence: "high" },
+      { cue: "wide-angle barrel + dashboard intrusion", effect: "Frame ↓", basis: "crop pressure", confidence: "high" },
+      { cue: "fjord band through right window glass", effect: "Lore ↑", basis: "setting specificity", confidence: "medium" },
+      { cue: "red layer against grey cabin", effect: "Scene Charge ↑", basis: "contrast anchor", confidence: "high" },
     ],
   },
   "ice-auger": {
@@ -409,11 +409,11 @@ const V2_EXTRAS = {
     archetypeClass: "The Dispatch",
     warnings: ["Blown highlights on snow plane — exposure-corrected in card tuning"],
     receipts: [
-      { cue: "black silhouette on white field", effect: "Presence +9", basis: "contrast / isolation", confidence: "high" },
-      { cue: "treeline holds the upper quarter in one band", effect: "Frame +8", basis: "composition / horizon control", confidence: "high" },
-      { cue: "hood, beanie and sunglasses qualify the expression", effect: "Signal -7", basis: "eye-line redirected to task", confidence: "medium" },
-      { cue: "auger diagonal into the ice", effect: "Lore +8", basis: "tool / work evidence", confidence: "high" },
-      { cue: "crouched brace, gloves stacked", effect: "Charge +4", basis: "contained motion potential", confidence: "medium" },
+      { cue: "black silhouette on white field", effect: "Frame Presence ↑", basis: "contrast / isolation", confidence: "high" },
+      { cue: "treeline holds the upper quarter in one band", effect: "Frame ↑", basis: "composition / horizon control", confidence: "high" },
+      { cue: "hood, beanie and sunglasses qualify the expression", effect: "Signal ↓", basis: "eye-line redirected to task", confidence: "medium" },
+      { cue: "auger diagonal into the ice", effect: "Lore ↑", basis: "tool / work evidence", confidence: "high" },
+      { cue: "crouched brace, gloves stacked", effect: "Scene Charge ↑", basis: "contained motion potential", confidence: "medium" },
     ],
   },
 };
@@ -425,11 +425,11 @@ function toScanResultV2(src) {
   const fitAvg = Math.round(
     src.metrics.fitMatrix.reduce((s, f) => s + f.v, 0) / src.metrics.fitMatrix.length
   );
-  /* Gesture Authority is conditional (SCAN_ENGINE_SPEC): present only
+  /* Gesture Geometry is conditional (SCAN_ENGINE_SPEC): present only
      when gesture evidence is the visible read. SRC-01's hidden stat IS
-     Gesture Authority; SRC-02's conditional stat is Field Silence. */
+     Gesture Geometry; SRC-02's conditional stat is Field Silence. */
   const gestureAuthority =
-    src.dossier.hidden.name === "Gesture Authority"
+    src.dossier.hidden.name === "Gesture Geometry"
       ? { present: true, conditional: true, value: src.dossier.hidden.value, read: src.dossier.hidden.read }
       : { present: false, conditional: true, reason: "gesture evidence partial — brace only; conditional stat resolved as " + src.dossier.hidden.name };
 

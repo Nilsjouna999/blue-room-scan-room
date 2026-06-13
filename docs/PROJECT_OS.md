@@ -158,7 +158,10 @@ the card's own content, upload UI, anything biometric-flavored.
 - photo (treated per tier)
 - title
 - archetype
-- Presence / Frame / Signal / Charge
+- Frame Presence / Frame / Signal / Scene Charge — as **tier bands**
+  (Muted/Clean/Strong/Charged/Peak), never as public 0–100 numbers
+  (Artifact Language Stabilization v1, 2026-06-13; internal data keys stay
+  `presence/frame/signal/charge`)
 - short signal note
 - signature line
 - treatment / rarity / serial / barcode / mint stamp
@@ -184,7 +187,7 @@ the scan room instead.
 4. Scene Role
 5. Stance Read *(veiled in Free)*
 6. Fit Coherence *(veiled in Free)*
-7. Visual Impact *(paid)*
+7. Frame Impact *(paid; formerly "Visual Impact")*
 8. Lore Density *(paid)*
 9. Oracle Read *(veiled in Free)*
 10. Mint Record *(paid)*
@@ -200,24 +203,33 @@ Free mode replaces the deep modules with blurred/veiled teasers plus the
 
 ## 9. Stat System
 
-**CURRENT** — names audited 2026-06-12 and kept. Decision: keep these names.
+**CURRENT** — relabelled 2026-06-13 (Artifact Language Stabilization v1,
+DECISION_LOG). Public **display labels** are artifact-safe; internal data
+**keys** stay `presence/frame/signal/charge` for stability (renamed only at
+the display layer via app.js `STAT_LABELS`). Public values show as **tier
+bands** (Muted/Clean/Strong/Charged/Peak via `tierBand()`), never as 0–100.
 
-| Stat | Meaning | Inputs ("derived from") |
+| Stat (display label · key) | Meaning | Inputs ("derived from") |
 | --- | --- | --- |
-| **Presence** | Subject holds the frame | focal clarity + posture stability + scene ownership |
-| **Frame** | Composition / crop / background control | composition balance + crop pressure + background control |
-| **Signal** | Readability of gesture, intent, style cue | gesture readability + eye-line clarity + styling distinctness |
-| **Charge** | Energy / emotional temperature / motion potential | motion potential + contrast + emotional temperature |
+| **Frame Presence** · `presence` | Subject holds the frame | focal clarity + posture stability + scene anchoring |
+| **Frame** · `frame` | Composition / crop / background control | composition balance + crop pressure + background control |
+| **Signal** · `signal` | Readability of gesture, intent, style cue | gesture readability + eye-line clarity + styling distinctness |
+| **Scene Charge** · `charge` | Energy / scene temperature / motion potential | motion potential + contrast + scene temperature |
 
 Paid / secondary modules (right panel depth set — CURRENT):
 
-- **Visual Impact** — how hard the photo lands (value + label)
+- **Frame Impact** *(formerly "Visual Impact")* — how hard the photo lands (label + tier band)
 - **Fit Coherence** — styling + setting + posture + gesture alignment
 - **Lore Density** — how much story the photo creates
 - **Stance Read** — prose read of posture/commitment
 - **Aura Profile** — three label chips
+- **Gesture Geometry** *(conditional hidden stat; formerly "Gesture Authority")*
 
 All inputs are interpretive reads of the photo — receipts, not measurements.
+The authoritative public tier ladder is **Muted → Clean → Strong → Charged →
+Peak** (ratified 2026-06-13; reconciled into `CARD_LOGIC_V1` §2). The
+Metrics-tab interpretive diagnostics (signal mix, composition pressure, fit
+matrix) are a separate "not a measurement" class and keep numeric weights.
 
 ## 10. Treatment System
 
@@ -272,7 +284,8 @@ result/treatment; Develop is the action.** Never use as primary CTA:
 | Card photo | Visible | Visible |
 | Card title | Visible | Visible |
 | Archetype | Visible as label/title | Full archetype explanation + discovery note |
-| 4 main stats | Visible as numbers | Visible with full why-it-happened read |
+| 4 main stats | Visible as tier bands (no 0–100) | Tier bands + full why-it-happened read |
+| Hidden Stat tier | — | Tier band (formerly 0–100) |
 | Source Record | Mostly visible | Full record |
 | Evidence Board | Partial (~3 receipts) | Full receipts |
 | Diagram / Metrics | Partial | Full |

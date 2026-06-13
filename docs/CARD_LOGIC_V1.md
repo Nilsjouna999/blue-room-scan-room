@@ -20,18 +20,33 @@ stats/archetypes mean) and the future code (fixtures/validators/prompts).
 Public cards display **tiers / bars, never exact 0–100 numbers.** Internal
 engines may sort on numbers; the user-facing card shows a tier.
 
+**Authoritative public ladder (ratified 2026-06-13, Artifact Language
+Stabilization v1 / DECISION_LOG):** `MUTED → CLEAN → STRONG → CHARGED → PEAK`.
+This supersedes the earlier QUIET/PRESENT/STRONG/DOMINANT/TOTAL names here and
+the `FREE_PULL_SCREENSHOT_LAYOUT_V1` §7 recommendation (Quiet/Set/Strong/Sharp/
+Dominant). The runtime uses exactly these band words (app.js `tierBand()` for
+the sample room and `FP_TIER_LADDER` for the dev sim). "Dominant" is retired as
+a public band — it read as person/status; "Charged" carries the same ordinal
+slot without the alpha echo.
+
 | Tier | Meaning (of the image element) | Use when | Must NOT imply |
 | --- | --- | --- | --- |
-| QUIET | barely registers; present but low | the element is faint but real | "weak/bad" photo or person |
-| PRESENT | clearly there, not leading | the element reads but doesn't dominate | "average" person |
+| MUTED | barely registers; present but low | the element is faint but real | "weak/bad" photo or person |
+| CLEAN | clearly there, not leading | the element reads but doesn't dominate | "average" person |
 | STRONG | a leading element of the frame | the element clearly shapes the read | skill/worth of the person |
-| DOMINANT | commands the frame | the element controls the composition | social/physical **dominance** of a person; alpha |
-| TOTAL | the frame is essentially this element | one element overwhelms all others | "perfect"; superiority of a person |
+| CHARGED | commands the frame | the element controls the composition | social/physical dominance of a person; alpha |
+| PEAK | the frame is essentially this element | one element overwhelms all others | "perfect"; superiority of a person |
 
 **Provisional internal → public mapping** (calibrate later with real
-distribution data; not final): `0–19 QUIET · 20–44 PRESENT · 45–69 STRONG ·
-70–89 DOMINANT · 90–100 TOTAL`. Example: internal Presence 82 → public
-**DOMINANT**. Tiers describe the *image element*, never the human.
+distribution data; not final; matches app.js `tierBand()`): `<25 MUTED ·
+25–47 CLEAN · 48–65 STRONG · 66–82 CHARGED · 83–100 PEAK`. Example: internal
+Presence 82 → public **CHARGED**. Tiers describe the *image element*, never
+the human.
+
+**§6 trigger-floor note:** the archetype trigger floors below were written in
+the old vocabulary. Read them by ordinal position under the new ladder:
+QUIET→MUTED, PRESENT→CLEAN, STRONG→STRONG, DOMINANT→CHARGED, TOTAL→PEAK
+(so "Frame STRONG+" is unchanged; "Signal DOMINANT+" means "Signal CHARGED+").
 
 ## 3. Receipt Grounding (two layers)
 

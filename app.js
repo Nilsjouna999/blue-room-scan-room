@@ -15,6 +15,32 @@ function esc(s) {
 
 const pad2 = (n) => String(n).padStart(2, "0");
 
+/* ---------- artifact stat language (Artifact Language Stabilization v1) ----------
+   The 4 public sample stats keep their internal data KEYS (presence/frame/
+   signal/charge) but display under artifact-safe LABELS. "Presence" is kept
+   only in its artifact-bound form "Frame Presence" (per the language rules);
+   "Charge" -> "Scene Charge". Internal keys stay for data stability. */
+const STAT_LABELS = {
+  presence: "Frame Presence",
+  frame: "Frame",
+  signal: "Signal",
+  charge: "Scene Charge",
+};
+const statLabel = (key) => STAT_LABELS[key] || key;
+
+/* Public tier ladder — Muted/Clean/Strong/Charged/Peak (no public 0-100).
+   Provisional internal->band cuts (calibrate later with real distribution):
+   <25 Muted · 25-47 Clean · 48-65 Strong · 66-82 Charged · 83+ Peak. */
+function tierBand(v) {
+  const n = Number(v);
+  if (!isFinite(n)) return "—";
+  if (n >= 83) return "Peak";
+  if (n >= 66) return "Charged";
+  if (n >= 48) return "Strong";
+  if (n >= 25) return "Clean";
+  return "Muted";
+}
+
 const state = { source: 0, treatment: "free", tab: "source", view: "menu", draftGate: false, dev: null };
 
 /* Deep-link support: ?src=1|2&t=free|shiny|mint&tab=source|diagram|metrics
@@ -62,10 +88,11 @@ function moduleHead(label) {
 }
 
 function miniStat(name, value) {
+  /* public stat: artifact-safe tier band (no 0-100), bar still shows magnitude */
   return `
     <div class="ministat">
       <span class="ministat__name">${esc(name)}</span>
-      <span class="ministat__val">${value}</span>
+      <span class="ministat__val ministat__val--tier">${esc(tierBand(value))}</span>
       <span class="ministat__track"><span class="ministat__fill" style="--v:${value}%"></span></span>
     </div>`;
 }
@@ -285,10 +312,10 @@ function renderDiagramTab(src, treatment) {
 
 function statDiamond(stats, treatment) {
   const order = [
-    ["Presence", stats.presence],
+    ["Frame Presence", stats.presence],
     ["Frame", stats.frame],
     ["Signal", stats.signal],
-    ["Charge", stats.charge],
+    ["Scene Charge", stats.charge],
   ];
   /* P top, F right, S bottom, C left — radius 40 at value 100 */
   const pt = (i, v) => {
@@ -300,12 +327,14 @@ function statDiamond(stats, treatment) {
     .map((g) => `<polygon class="dia-grid" points="${order.map((_, i) => pt(i, g).join(",")).join(" ")}"/>`)
     .join("");
   const axes = `<line class="dia-axis" x1="50" y1="10" x2="50" y2="90"/><line class="dia-axis" x1="10" y1="50" x2="90" y2="50"/>`;
+  /* axis labels: artifact-safe stat names only (no public 0-100); the radar
+     shape carries magnitude and the tier band shows on card/panel/dossier */
   const labels = `
-    <text x="50" y="6.5" text-anchor="middle">PRESENCE ${stats.presence}</text>
-    <text x="94" y="51.5" text-anchor="start">FRAME ${stats.frame}</text>
-    <text x="50" y="97" text-anchor="middle">SIGNAL ${stats.signal}</text>
-    <text x="6" y="51.5" text-anchor="end">CHARGE ${stats.charge}</text>`;
-  return `<svg class="diamond" viewBox="-24 0 148 100">${grid}${axes}<polygon class="dia-fill" points="${poly}"/>${order
+    <text x="50" y="6.5" text-anchor="middle">FRAME PRESENCE</text>
+    <text x="94" y="51.5" text-anchor="start">FRAME</text>
+    <text x="50" y="97" text-anchor="middle">SIGNAL</text>
+    <text x="6" y="51.5" text-anchor="end">SCENE CHARGE</text>`;
+  return `<svg class="diamond" viewBox="-42 0 184 100">${grid}${axes}<polygon class="dia-fill" points="${poly}"/>${order
     .map(([, v], i) => `<circle class="dia-dot" cx="${pt(i, v)[0]}" cy="${pt(i, v)[1]}" r="1.6"/>`)
     .join("")}${labels}</svg>`;
 }
@@ -429,8 +458,8 @@ function renderCard(src, treatment) {
             /* v2 freeVisible is the source of truth for the 4 public
                stats (SCAN_ENGINE_SPEC); legacy card.stats as fallback */
             const s = getScanResult(src)?.stats.freeVisible || c.stats;
-            return ["Presence", "Frame", "Signal", "Charge"]
-              .map((n) => miniStat(n, s[n.toLowerCase()]))
+            return ["presence", "frame", "signal", "charge"]
+              .map((k) => miniStat(statLabel(k), s[k]))
               .join("");
           })()}
         </div>
@@ -487,7 +516,7 @@ function renderReadingPanel(src, treatment) {
             .map(
               (k) => `
           <div class="reads__item">
-            <div class="reads__top"><span class="reads__name">${k}</span><span class="reads__val">${vals[k]}</span></div>
+            <div class="reads__top"><span class="reads__name">${esc(statLabel(k))}</span><span class="reads__val reads__val--tier">${esc(tierBand(vals[k]))}</span></div>
             <p>${esc(src.reads[k])}</p>
           </div>`
             )
@@ -518,11 +547,11 @@ function renderReadingPanel(src, treatment) {
       <p class="module__line module__line--fit">${esc(src.fit)}</p>
     </div>
     <div class="module">
-      ${moduleHead("Visual Impact")}
+      ${moduleHead("Frame Impact")}
       <div class="impact">
         <span class="impact__label">${esc(src.impact.label)}</span>
         <span class="impact__track"><span class="impact__fill" style="--v:${src.impact.value}%"></span></span>
-        <span class="impact__val">${src.impact.value}</span>
+        <span class="impact__val impact__val--tier">${esc(tierBand(src.impact.value))}</span>
       </div>
     </div>
     <div class="module">
@@ -530,7 +559,7 @@ function renderReadingPanel(src, treatment) {
       <div class="impact">
         <span class="impact__label">${esc(src.lore.label)}</span>
         <span class="impact__track"><span class="impact__fill impact__fill--dash" style="--v:${src.lore.value}%"></span></span>
-        <span class="impact__val">${src.lore.value}</span>
+        <span class="impact__val impact__val--tier">${esc(tierBand(src.lore.value))}</span>
       </div>
     </div>
     <div class="module module--oracle">
@@ -705,9 +734,9 @@ function renderDossier(src, treatment) {
       return `
       <div class="dstat">
         <div class="dstat__head">
-          <span class="dstat__name">${k}</span>
+          <span class="dstat__name">${esc(statLabel(k))}</span>
           <span class="dstat__track"><span class="dstat__fill" style="--v:${freeVals[k]}%"></span></span>
-          <span class="dstat__val">${freeVals[k]}</span>
+          <span class="dstat__val dstat__val--tier">${esc(tierBand(freeVals[k]))}</span>
         </div>
         <p class="dstat__why">${esc(src.reads[k])}</p>
         ${
@@ -727,7 +756,7 @@ function renderDossier(src, treatment) {
   const hidden = dplate("04", "Hidden Stat", paid, paid
     ? `
     <div class="dhidden">
-      <div class="dhidden__score"><span class="dhidden__val">${hid.value}</span><span class="dhidden__name">${esc(hid.name)}</span></div>
+      <div class="dhidden__score"><span class="dhidden__val dhidden__val--tier">${esc(tierBand(hid.value))}</span><span class="dhidden__name">${esc(hid.name)}</span></div>
       <p class="dhidden__read">${esc(hid.read)}</p>
     </div>`
     : `
@@ -757,8 +786,8 @@ function renderDossier(src, treatment) {
           const vi = haloX?.visualImpact || src.impact;
           const lo = haloX?.loreDensity || src.lore;
           return `
-        <div class="impact"><span class="impact__label">Impact · ${esc(vi.label)}</span><span class="impact__track"><span class="impact__fill" style="--v:${vi.value}%"></span></span><span class="impact__val">${vi.value}</span></div>
-        <div class="impact"><span class="impact__label">Lore · ${esc(lo.label)}</span><span class="impact__track"><span class="impact__fill impact__fill--dash" style="--v:${lo.value}%"></span></span><span class="impact__val">${lo.value}</span></div>`;
+        <div class="impact"><span class="impact__label">Frame Impact · ${esc(vi.label)}</span><span class="impact__track"><span class="impact__fill" style="--v:${vi.value}%"></span></span><span class="impact__val impact__val--tier">${esc(tierBand(vi.value))}</span></div>
+        <div class="impact"><span class="impact__label">Lore · ${esc(lo.label)}</span><span class="impact__track"><span class="impact__fill impact__fill--dash" style="--v:${lo.value}%"></span></span><span class="impact__val impact__val--tier">${esc(tierBand(lo.value))}</span></div>`;
         })()}
       </div>
     </div>`
@@ -1164,6 +1193,12 @@ function renderUploadedScanResultDev(result, opts) {
   const sf = r.safetyFlags || {};
   const gate = r.gate || {};
 
+  /* INTENTIONAL (dev harness only): the ?dev=uploaded-result renderer keeps the
+     legacy Presence/Frame/Signal/Charge + Visual Impact labels and 0-100 numbers
+     to exercise the legacy render path. Artifact Language Stabilization v1 does
+     NOT migrate this strictly-dev, "NOT USER SCAN" route (see DECISION_LOG
+     2026-06-13). The sample room and ?dev=free-scan-sim use artifact-safe tier
+     bands instead. */
   const stat = (name, val) =>
     `<div class="uploadeddev__stat"><span class="uploadeddev__statname">${esc(name)}</span><span class="uploadeddev__statval">${val == null ? "—" : esc(String(val))}</span></div>`;
   const ext = (label, o) =>
@@ -1331,13 +1366,13 @@ function renderUploadedScanResultDev(result, opts) {
    No payment, no Halo unlock, no AI. The fixture is already validated by
    the caller before this runs. */
 
-/* Local display ladder for THIS dev route only. CARD_LOGIC_V1 §2 keeps the
-   authoritative public bands; Sample Room Tier Migration v1 reconciles them.
-   Derived from the public bar count so no internal 0–100 number can leak. */
-const FP_TIER_LADDER = ["Quiet", "Present", "Strong", "Sharp", "Dominant"];
+/* Public tier ladder — Muted/Clean/Strong/Charged/Peak (Artifact Language
+   Stabilization v1; matches the sample-room tierBand() ladder). Derived from
+   the public bar count so no internal 0–100 number can leak. */
+const FP_TIER_LADDER = ["Muted", "Clean", "Strong", "Charged", "Peak"];
 function fpTierLabel(stat) {
   const b = Math.max(0, Math.min(5, Number(stat && stat.bars) || 0));
-  return FP_TIER_LADDER[Math.max(0, b - 1)] || "Quiet";
+  return FP_TIER_LADDER[Math.max(0, b - 1)] || "Muted";
 }
 
 function renderFreePullMock(result) {

@@ -79,7 +79,7 @@ low-stat-safe version / hidden-stat direction.
 - **Discovery note:** "The image does not let you observe. It answers."
 - **Low-stat-safe:** Even with quiet stats, an Encounter card means the
   lens was addressed — most photos never manage that.
-- **Hidden-stat direction:** Gesture Authority, Reception Pressure.
+- **Hidden-stat direction:** Gesture Geometry, Reception Pressure.
 
 ### 2. The Dispatch
 - **Triggers:** tool + field setting + task posture
@@ -213,9 +213,11 @@ of the photograph.
 ## 6. Worked Examples (canon)
 
 ### SRC-01 / Driver — The Encounter
-- **Hidden Stat:** Gesture Authority — *"The raised palm turns the image
-  from selfie into encounter. You are not looking at him — he is
-  receiving you."*
+- **Hidden Stat:** Gesture Geometry — *"The raised palm turns the image
+  from selfie into encounter — the frame addresses the lens directly, not
+  the other way around."* *(renamed from "Gesture Authority"; the old
+  "he is receiving you" read was retired by Artifact Language Stabilization
+  v1, 2026-06-13 — it personified the subject.)*
 - **Oracle direction:** *"This card belongs to the rare class of images
   where the subject appears to be both leaving the group chat and
   blessing the vehicle."*

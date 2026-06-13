@@ -64,17 +64,24 @@ exposure `base`) lives in `photoTuning` in `data.js`. Treatments multiply
 their look on top of that base — the left scan frame always shows the raw
 source untouched.
 
-## Stats audit (2026-06-12)
+## Stats (Artifact Language Stabilization v1, 2026-06-13)
 
-Presence / Frame / Signal / Charge were audited and **kept unchanged**:
-each reads a photo quality (subject dominance / compositional craft /
-legibility of intent / energy), none implies attractiveness, all four are
-one-word screenshot-friendly, and the current values hold for both sources
-(SRC 01's low Frame = wide-angle cabin clutter; SRC 02's low Signal =
-three layers of withheld face). The paid depth set stays Visual Impact +
-Fit Coherence + Lore Density + Stance in the right panel. The interpretive
-formulas (`FORMULAS` in data.js) explain each stat's recipe inside
-Technical Receipts — "derived from" language only, no science claims.
+The four public stats display under artifact-safe **labels** — **Frame
+Presence / Frame / Signal / Scene Charge** — and as **tier bands**
+(Muted/Clean/Strong/Charged/Peak), never as public 0–100 numbers. Internal
+data **keys** stay `presence/frame/signal/charge` (the rename is display-only,
+via `STAT_LABELS` + `tierBand()` in app.js). Each reads a photo quality
+(subject presence in the frame / compositional craft / legibility of intent /
+scene energy), none implies attractiveness, and the readings hold for both
+sources (SRC 01's lower Frame = wide-angle cabin clutter; SRC 02's lower Signal
+= three layers of withheld face). The paid depth set is **Frame Impact**
+(formerly Visual Impact) + Fit Coherence + Lore Density + Stance + the
+conditional hidden stat **Gesture Geometry** (formerly Gesture Authority). The
+interpretive formulas (`FORMULAS` in data.js) explain each stat's recipe inside
+Technical Receipts — "derived from" language only, no science claims. See
+`docs/DECISION_LOG.md` (2026-06-13) and `docs/PROJECT_OS.md` §9. *(Note: the
+`?dev=uploaded-result` renderer harness intentionally keeps the legacy labels +
+0–100 to exercise the legacy path; it is strictly dev, "NOT USER SCAN".)*
 
 ## Files
 

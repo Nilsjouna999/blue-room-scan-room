@@ -155,3 +155,30 @@ Final shiny direction is being explored in `docs/CARD_TECH_LAB.md`
 (candidates: Cold Foil, Black Star, Night Gloss, Signal Halo, …).
 Revisit: after the three alternative shiny treatments are prototyped and
 compared (CARD_TECH_LAB §20).
+
+**2026-06-13 / Artifact Language Stabilization v1: public stats are artifact-safe LABELS shown as TIER BANDS, not 0–100 / CURRENT (Core Change)**
+Why: research (`docs/research/RESEARCH_COMPRESSION_V1.md`, `LANGUAGE_SYSTEM_V1`)
+and the artifact-language sweep flagged "Presence" and "Charge" as
+person/status-adjacent and bare public 0–100 numbers as score-framing that
+reads like rating a person. The sample room now **displays** the four public
+stats as **Frame Presence / Frame / Signal / Scene Charge** and as **tier
+bands** (Muted → Clean → Strong → Charged → Peak), never as 0–100. Internal
+data **keys** (`presence/frame/signal/charge`) are unchanged for stability;
+this is a display/label change only (app.js `STAT_LABELS` + `tierBand()`).
+Also: Gesture Authority → **Gesture Geometry**; "Visual Impact" module →
+"Frame Impact"; evidence-board deltas `+N`→`↑/↓`; fitMatrix "Person"→"Subject";
+banned-language sweep (confidence/Affect Trace/Unhurried/Methodical/"route has
+standards"/"scene ownership"). **Supersedes** the 2026-06-12 "Keep Presence /
+Frame / Signal / Charge" decision and the "show as numbers" convention.
+**Ratifies one authoritative public tier ladder — Muted/Clean/Strong/Charged/
+Peak** — superseding `CARD_LOGIC_V1` §2 (QUIET/PRESENT/STRONG/DOMINANT/TOTAL)
+and the `FREE_PULL_SCREENSHOT_LAYOUT_V1` §7 recommendation; both specs updated
+to match. **Carve-out:** the dev-only `?dev=uploaded-result` / `uploaded-blocked`
+renderer harness intentionally keeps the legacy labels + 0-100 + `+N` deltas to
+exercise the legacy render path (strictly dev, "NOT USER SCAN"); and the
+Metrics-tab interpretive diagnostics (signal-mix recipe, composition pressure,
+fit-coherence matrix, "subject lock") keep their numbers — they are captioned
+"interpretive formula, not a measurement", not the four public stat scores.
+PROJECT_OS §7/§9/§10 updated in the same commit (Core Change Review).
+Revisit: if users misread a band, or when a deterministic engine assigns
+calibrated band cut points (current cuts are provisional).
