@@ -6,10 +6,10 @@ Last updated: 2026-06-12.
 
 ## Active
 
-- **DESIGN_TOKENS pass 1** (this session): Vault text scale, Room/Plate/
-  Artifact depth, accent economy. **Completed**; screenshots refreshed.
-  Deliberately deferred: dossier rhythm, stat-meter redesign, any new
-  effects.
+- **DESIGN_TOKENS pass 2** (this session): readability tuning + dossier
+  rhythm (quiet→LOUD map), Hidden Stat reveal, Oracle finale.
+  **Completed**; screenshots refreshed. Still deferred: stat-meter
+  redesign, any new effects.
   *(Previous actives — v2 rendering wiring, v2 data shape, SPINE
   promotion, governance OS, doc spine cleanup — completed 2026-06-12.)*
 

@@ -10,9 +10,9 @@
      Warm archive greys; no pure white anywhere. */
   --t-display: #e9e5dc;
   --t-primary: #d7d3ca;
-  --t-body: #a9a59c;
-  --t-meta: #8b8780;
-  --t-ghost: #67645d;
+  --t-body: #b1ada4;   /* pass 2: lifted for readability */
+  --t-meta: #948f87;   /* pass 2: quiet but readable */
+  --t-ghost: #6e6b63;
 
   /* room — warm dark stage */
   --ink-950: #0a0907;
@@ -973,7 +973,7 @@ body[data-treatment="shiny"] .stagezone {
   color: var(--silver);
 }
 .reads__val { font-family: var(--font-mono); font-size: 11.5px; color: var(--silver-dim); }
-.reads__item p { font-size: 13px; line-height: 1.6; color: #b2ada3; }
+.reads__item p { font-size: 13px; line-height: 1.6; color: var(--t-body); }
 
 .aura { display: flex; flex-wrap: wrap; gap: 8px; }
 .aura__chip {
@@ -1072,7 +1072,7 @@ body[data-treatment="shiny"] .stagezone {
   font-size: 12.5px;
   font-style: italic;
   line-height: 1.55;
-  color: var(--faint);
+  color: var(--t-meta); /* pass 2: quiet, not unreadable */
 }
 
 /* unlock preview */
@@ -1101,7 +1101,7 @@ body[data-treatment="shiny"] .stagezone {
 }
 .unlock__btn:hover { border-color: var(--line-strong); background: rgba(255, 255, 255, 0.04); transform: translateY(-1px); }
 .unlock__name {
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
   letter-spacing: 0.18em;
   text-transform: uppercase;
@@ -1371,7 +1371,7 @@ body[data-treatment="shiny"] .dia-fill { fill: rgba(200, 196, 187, 0.15); stroke
   font-family: var(--font-mono);
   font-size: 9px;
   letter-spacing: 0.26em;
-  color: var(--faint);
+  color: var(--t-meta);
   padding-top: 18px;
 }
 .dossier__cap {
@@ -1429,6 +1429,23 @@ body[data-treatment="shiny"] .dplate__tag--dev {
   border-color: color-mix(in srgb, var(--halo-a, #8b7bff) 50%, transparent);
 }
 
+/* dossier rhythm (DESIGN_TOKENS): quiet → medium → medium → LOUD →
+   medium → quiet → LOUD finale. Loudness = spacing, scale, contrast —
+   never decoration. Plate order is fixed in renderDossier(). */
+.dossier__inner .dplate:nth-of-type(1),
+.dossier__inner .dplate:nth-of-type(6) {
+  padding: 20px 26px 22px; /* quiet plates sit tighter */
+}
+.dossier__inner .dplate:nth-of-type(1) .dplate__title,
+.dossier__inner .dplate:nth-of-type(6) .dplate__title { font-size: 19px; }
+.dossier__inner .dplate:nth-of-type(4),
+.dossier__inner .dplate:nth-of-type(7) {
+  padding: 38px 36px 40px; /* LOUD plates get air */
+  margin-top: 14px;
+  background: rgba(233, 229, 220, 0.022);
+  border-top-color: rgba(233, 229, 220, 0.18);
+}
+
 /* 01 + 06 — record grids */
 .drecord {
   display: grid;
@@ -1451,7 +1468,7 @@ body[data-treatment="shiny"] .dplate__tag--dev {
   white-space: nowrap;
 }
 .drecord dd {
-  font-size: 12.5px;
+  font-size: 13px;
   color: var(--text);
   text-align: right;
 }
@@ -1479,7 +1496,7 @@ body[data-treatment="shiny"] .dplate__tag--dev {
   text-transform: uppercase;
   color: var(--silver);
 }
-.receipt__read { font-size: 12.5px; line-height: 1.6; color: var(--muted); }
+.receipt__read { font-size: 13px; line-height: 1.6; color: var(--t-body); }
 .receipt--undeveloped {
   border-style: dashed;
   background: none;
@@ -1521,9 +1538,9 @@ body[data-treatment="shiny"] .dplate__tag--dev {
 /* accent economy: dossier stat bars stay silver — the Hidden Stat
    number is the plate's one accent moment */
 .dstat__val { font-family: var(--font-mono); font-size: 13px; color: var(--silver-bright); }
-.dstat__why { font-size: 12.5px; line-height: 1.6; color: #b2ada3; }
+.dstat__why { font-size: 13px; line-height: 1.6; color: var(--t-body); }
 .dstat__evidence {
-  font-size: 12px;
+  font-size: 12.5px;
   line-height: 1.55;
   color: var(--muted);
   border-left: 2px solid var(--line);
@@ -1541,32 +1558,32 @@ body[data-treatment="shiny"] .dplate__tag--dev {
   color: var(--faint);
 }
 
-/* 04 — hidden stat */
-.dhidden { display: flex; align-items: center; gap: 30px; }
-.dhidden__score { display: grid; gap: 5px; text-align: center; flex: none; }
+/* 04 — hidden stat: the reveal (LOUD, restrained — number does the work) */
+.dhidden { display: flex; align-items: center; gap: 38px; }
+.dhidden__score { display: grid; gap: 8px; text-align: center; flex: none; }
 .dhidden__val {
   font-family: var(--font-mono);
-  font-size: 44px;
+  font-size: 64px;
   line-height: 1;
-  color: var(--silver-bright);
+  color: var(--t-display);
 }
-body[data-treatment="shiny"] .dhidden__val { color: var(--halo-a, var(--silver-bright)); }
+body[data-treatment="shiny"] .dhidden__val { color: var(--halo-a, var(--t-display)); }
 .dhidden__name {
-  font-size: 9.5px;
+  font-size: 10.5px;
   font-weight: 600;
-  letter-spacing: 0.24em;
+  letter-spacing: 0.26em;
   text-transform: uppercase;
-  color: var(--silver-dim);
+  color: var(--t-meta);
   white-space: nowrap;
 }
 .dhidden__read {
   font-family: var(--font-display);
-  font-size: 18px;
+  font-size: 20px;
   line-height: 1.5;
-  color: var(--silver);
+  color: var(--t-primary);
 }
-.dhidden--tease .dhidden__val { color: var(--faint); }
-.dhidden--tease .dhidden__read { color: var(--muted); font-style: italic; font-size: 15px; }
+.dhidden--tease .dhidden__val { color: var(--t-ghost); font-size: 44px; }
+.dhidden--tease .dhidden__read { color: var(--t-body); font-style: italic; font-size: 15px; }
 
 /* 05 — fit + aura */
 .dfitaura { display: grid; grid-template-columns: 1.1fr 1fr; gap: 16px 40px; }
@@ -1606,14 +1623,14 @@ body[data-treatment="shiny"] .dplate--mint {
   font-family: var(--font-display);
   font-style: italic;
   font-weight: 500;
-  font-size: 23px;
-  line-height: 1.5;
-  color: var(--silver);
-  max-width: 640px;
+  font-size: 27px;
+  line-height: 1.55;
+  color: var(--t-primary);
+  max-width: 700px;
   margin: 0 auto;
 }
 .doracle__timeline {
-  margin-top: 16px;
+  margin-top: 20px;
   font-family: var(--font-mono);
   font-size: 9.5px;
   letter-spacing: 0.18em;

@@ -115,6 +115,17 @@ browser console is clean (F12).
 - **Test:** free vs mint vs shiny right panel; develop buttons still switch
   treatment.
 
+## DESIGN_TOKENS pass 2 (2026-06-12, styles.css only)
+
+Readability: `--t-body/meta/ghost` lifted; hardcoded warm greys folded
+into tiers; dossier/right-panel body text up ~0.5px; undeveloped lines
+and end-marks moved ghost→meta. Dossier rhythm via `:nth-of-type` on the
+fixed plate order: quiet (01, 06) tighter + smaller titles; LOUD (04, 07)
+extra padding/margin + faint bg lift + brighter top edge. Hidden Stat
+reveal: 64px number (44px tease), 20px read. Oracle finale: 27px serif.
+CTA name 13px. No new effects/animation. NOTE: rhythm selectors depend on
+plate order in renderDossier() — reorder plates ⇒ update these selectors.
+
 ## DESIGN_TOKENS pass 1 (2026-06-12, styles.css only)
 
 Vault text scale: 5 named tiers (`--t-display/primary/body/meta/ghost`),
