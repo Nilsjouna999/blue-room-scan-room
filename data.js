@@ -28,9 +28,27 @@ const FORMULAS = [
    feeds Free Pull polish and the future final Halo material.
    Internal keys (free/mint/shiny) stay stable; only labels changed. */
 const TREATMENTS = {
-  free: { label: "Free Pull", rarity: "ARCHIVE PREVIEW", stamp: "FREE PULL", strip: "UNMINTED · ARCHIVE PREVIEW" },
-  mint: { label: "Lab · Signature Mint", rarity: "LAB STATE", stamp: "LAB MINT", strip: "INTERNAL · NOT A TIER" },
-  shiny: { label: "Halo Mint", rarity: "HALO MINT · DEVELOPED", stamp: "HALO MINT", strip: "FIRST PRINT · DEVELOPED" },
+  free: {
+    label: "Free Pull",
+    rarity: "ARCHIVE PREVIEW",
+    stamp: "FREE PULL",
+    strip: "UNMINTED · ARCHIVE PREVIEW",
+    tagline: "First pull — the surface scan. The card already exists; it has not been developed.",
+  },
+  mint: {
+    label: "Lab · Signature Mint",
+    rarity: "LAB STATE",
+    stamp: "LAB MINT",
+    strip: "INTERNAL · NOT A TIER",
+    tagline: "Internal material study. Not a customer state.",
+  },
+  shiny: {
+    label: "Halo Mint",
+    rarity: "HALO MINT · DEVELOPED",
+    stamp: "HALO MINT",
+    strip: "FIRST PRINT · DEVELOPED",
+    tagline: "Fully developed — structured evidence, hidden stat, mint record, oracle.",
+  },
 };
 
 const SOURCES = [
@@ -65,7 +83,7 @@ const SOURCES = [
     horizon: null,
     analysis: [
       "WIDE-ANGLE FIELD · BARREL DISTORTION +12%",
-      "SUBJECT OFFSET LEFT · CABIN FRAME DOMINANT",
+      "SUBJECT OFFSET LEFT · CABIN OWNS THE FRAME",
       "OPEN PALM PARTIALLY OCCLUDES KEY · DELIBERATE",
       "WINDOW BAND PRESERVES DEPTH CUE · RIGHT THIRD",
       "COLOR ANCHOR: RED LAYER VS GREY CABIN",

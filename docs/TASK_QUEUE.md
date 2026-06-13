@@ -6,9 +6,9 @@ Last updated: 2026-06-12.
 
 ## Active
 
-- **Micro-legibility + card focus pocket** (this session): half-step
-  text lifts in evidence/metrics/metadata; static two-layer focus pocket
-  on the stage. **Completed**; screenshots refreshed.
+- **Product clarity pass** (this session): state taglines, tightened
+  develop CTA (hooks-first), banned-word sweep clean. **Completed**;
+  screenshots refreshed.
   *(Previous actives — v2 rendering wiring, v2 data shape, SPINE
   promotion, governance OS, doc spine cleanup — completed 2026-06-12.)*
 

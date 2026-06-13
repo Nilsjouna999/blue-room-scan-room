@@ -115,6 +115,18 @@ browser console is clean (F12).
 - **Test:** free vs mint vs shiny right panel; develop buttons still switch
   treatment.
 
+## Product clarity pass (2026-06-12, data.js + app.js + tiny CSS)
+
+State taglines added to `TREATMENTS` (free: "First pull — the surface
+scan…"; halo: "Fully developed — structured evidence, hidden stat, mint
+record, oracle."), rendered as one quiet line in the Scan Reading header.
+Free CTA tightened: lead line "The full reading is already written into
+this image. Minting develops it."; button subline "the card finishes
+developing"; module laundry-list replaced with a prioritized hook line
+(hidden stat first). Dossier CTA subline aligned. Field label "Dominant
+Gesture" → "Lead Gesture"; one analysis note reworded — full
+banned/hype-word sweep now clean across all states.
+
 ## Micro-legibility + card focus pocket (2026-06-12, styles.css only)
 
 Half-step lifts: receipt cue `#bcb7ae` (between body/primary tiers),

@@ -465,6 +465,7 @@ function renderReadingPanel(src, treatment) {
         <span class="readhead__chip">${esc(src.capture.code)}</span>
         <span class="readhead__badge readhead__badge--${treatment}">${esc(stateBadge)}</span>
       </div>
+      <p class="readhead__line">${esc(TREATMENTS[treatment].tagline)}</p>
     </div>`;
 
   const statReads = `
@@ -559,12 +560,12 @@ function renderReadingPanel(src, treatment) {
   const lockedDeep = `
     <div class="module unlock">
       ${moduleHead("Develop This Scan")}
-      <p class="unlock__line">This is the archive preview. The full card and reading are already written — minting develops them.</p>
+      <p class="unlock__line">The full reading is already written into this image. Minting develops it.</p>
       <button type="button" class="unlock__btn unlock__btn--shiny" data-goto="shiny">
         <span class="unlock__name">Develop this scan</span>
-        <span class="unlock__desc">Into Halo Mint · full dossier · mint record</span>
+        <span class="unlock__desc">Into Halo Mint · the card finishes developing</span>
       </button>
-      <p class="unlock__more">◆ &nbsp;The developed scan adds — full Diagram · full Metrics · Stance · Fit · Impact · Lore · Oracle · Mint Record · Receipts</p>
+      <p class="unlock__more">◆ &nbsp;Develops: the hidden stat · structured evidence · full diagram &amp; metrics · mint record · the full oracle</p>
     </div>
     ${lockedModule("Stance Read", "Evidence layer pending — develops with Halo Mint.")}
     ${lockedModule("Fit Coherence", "Coherence read recorded, undeveloped. Full record develops with mint.")}
@@ -626,7 +627,7 @@ function renderDossier(src, treatment) {
       <div><dt>Source ID</dt><dd>${esc(src.capture.code)} · SRC-${pad2(src.no)}</dd></div>
       <div><dt>Object Number</dt><dd>${esc(d.record.objectNo)}</dd></div>
       <div><dt>Capture Type</dt><dd>${esc(d.record.captureType)}</dd></div>
-      <div><dt>Dominant Gesture</dt><dd>${esc(d.record.gesture)}</dd></div>
+      <div><dt>Lead Gesture</dt><dd>${esc(d.record.gesture)}</dd></div>
       <div><dt>Scene Container</dt><dd>${esc(d.record.container)}</dd></div>
       <div><dt>Primary Signal</dt><dd>${esc(d.record.primarySignal)}</dd></div>
       <div><dt>Background Role</dt><dd>${esc(d.record.backgroundRole)}</dd></div>
@@ -779,7 +780,7 @@ function renderDossier(src, treatment) {
     </dl>
     <button type="button" class="unlock__btn unlock__btn--shiny dmint__cta" data-goto="shiny">
       <span class="unlock__name">Develop this scan</span>
-      <span class="unlock__desc">Into Halo Mint · full record · ${esc(src.halo.material).toLowerCase()}</span>
+      <span class="unlock__desc">The card finishes developing · ${esc(src.halo.material).toLowerCase()} · first print</span>
     </button>`;
   const mintRecord = dplate("06", "Mint Record", paid, mintBody, "dplate--mint");
 

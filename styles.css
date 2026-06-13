@@ -924,7 +924,13 @@ body[data-treatment="shiny"] .stagezone {
   font-size: 24px;
   color: var(--silver-bright);
 }
-.readhead__meta { display: flex; gap: 8px; align-items: center; padding-bottom: 10px; }
+.readhead__meta { display: flex; gap: 8px; align-items: center; }
+.readhead__line {
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--t-meta);
+  padding-bottom: 10px;
+}
 .readhead__chip {
   font-family: var(--font-mono);
   font-size: 9.5px;
