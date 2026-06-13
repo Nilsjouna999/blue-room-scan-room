@@ -127,6 +127,41 @@ developing"; module laundry-list replaced with a prioritized hook line
 Gesture" → "Lead Gesture"; one analysis note reworded — full
 banned/hype-word sweep now clean across all states.
 
+## To change the front-door menu
+
+- **Edit:** structure/content in `app.js` → `renderMenu()` (pulls
+  title/archetype/material from `SOURCES[0]` + `TREATMENTS` stamps — no
+  separate menu data, no fabricated stats); styling in `styles.css` (the
+  "Main Menu" block: `.menu*`, `.msample*`, `.mtile*`); the mount +
+  `data-view="menu"` default live in `index.html` (`#menuView`).
+- **View model:** `state.view` is `"menu"` or `"room"`; `applyView()`
+  writes `body[data-view]`. Any deep-link param (`src`/`t`/`tab`) forces
+  `view="room"` at init so links bypass the menu. `[data-view-to]`
+  buttons switch views ("Enter Scan Room" → room; footer "↑ Menu" →
+  menu); Enter key on the menu also enters the room.
+- **Can break:** the one-sample rule (do NOT add route cards or new
+  assets); the no-face-rating law (the trust line and tiles read the
+  image, never the person); the Room/Plate/Artifact law (Free tile flat
+  plate, Halo tile = the only depth/material element).
+- **Test:** bare URL shows the menu; the four deep links open the room
+  directly; Enter Scan Room reveals the unchanged room.
+
+## Main Menu v1 (2026-06-13, index.html + app.js + styles.css + capture-screens.ps1)
+
+Added a front-door **menu view** before the scan room, using the existing
+SRC-01 sample only (no new asset). Shows the same photo two ways — a matte
+**Free Pull** plate and a copper-edged **Halo Mint** artifact — with brand,
+thesis, a compliant trust line ("…it reads frame, gesture and signal, never
+the person"; the suggested "beauty/face" wording was dropped to honour
+COPY_SYSTEM + the task's own no-beauty-language rule), the tier chips, an
+"Enter Scan Room" CTA and a disabled "Add your photo · later" secondary.
+Implemented as `state.view` + `body[data-view]` (`applyView()`); deep links
+with any `src/t/tab` param bypass the menu (`view="room"` at init). Scan
+room DOM/rendering/gating untouched. One new no-param screenshot state
+(`menu-front`) added to the capture pipeline + SCREENS.md (all existing
+param shots bypass the menu, so a bare-URL shot is the only way to review
+it).
+
 ## Conversion spine pass (2026-06-13, app.js + styles.css)
 
 Three additive fixes from the first-time product audit, no redesign:

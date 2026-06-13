@@ -6,14 +6,15 @@ Last updated: 2026-06-12.
 
 ## Active
 
-- **Conversion spine pass** (2026-06-13): hero orientation line + sample
-  cue, Develop CTA weight (`unlock--spine` material-edged plate), Free
-  Hidden Stat sealed/undeveloped treatment. **Completed** (app.js +
-  styles.css); screenshots refreshed; no redesign, gating/deep-links/v2
-  untouched.
-  *(Previous actives — product clarity pass, v2 rendering wiring, v2 data
-  shape, SPINE promotion, governance OS, doc spine cleanup — completed
-  2026-06-12.)*
+- **Main Menu v1** (2026-06-13): front-door view (`state.view` +
+  `body[data-view]`) showing one existing sample (SRC-01) as Free Pull vs
+  Halo Mint, with Enter Scan Room CTA + disabled "Add your photo · later".
+  **Completed** (index.html + app.js + styles.css + capture-screens.ps1);
+  deep links bypass the menu; scan room untouched; `menu-front` shot +
+  SCREENS.md row added.
+  *(Previous actives — conversion spine pass, product clarity pass, v2
+  rendering wiring, v2 data shape, SPINE promotion, governance OS, doc
+  spine cleanup — completed 2026-06-12/13.)*
 
 ## Ready (supported by current docs, clear definition of done)
 

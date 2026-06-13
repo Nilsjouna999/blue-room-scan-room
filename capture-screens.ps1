@@ -10,7 +10,10 @@ $out = Join-Path $PSScriptRoot "docs\screens"
 New-Item -ItemType Directory -Force $out | Out-Null
 
 # name, query, window size (hero = 1600x900; dossier shots are tall pages)
+# menu-front has NO query params on purpose: a bare URL shows the front-door
+# menu, so it is the only state that captures it (all param shots bypass it).
 $shots = @(
+    @{ n = "menu-front";         q = "";                           s = "1600,900"  },
     @{ n = "src1-free-hero";     q = "?src=1&t=free";              s = "1600,900"  },
     @{ n = "src1-halo-hero";     q = "?src=1&t=shiny";             s = "1600,900"  },
     @{ n = "src2-free-hero";     q = "?src=2&t=free";              s = "1600,900"  },

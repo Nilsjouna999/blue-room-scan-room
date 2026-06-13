@@ -12,7 +12,12 @@
   />
   <link rel="stylesheet" href="styles.css" />
 </head>
-<body data-treatment="free">
+<body data-treatment="free" data-view="menu">
+  <!-- MAIN MENU (front door) — one existing sample (SRC-01) shown as
+       Free Pull vs Halo Mint. Rendered by app.js into #menuView; shown
+       only when the URL has no scan-room params (deep links bypass it). -->
+  <section class="menu" id="menuView"></section>
+
   <header class="topbar">
     <div class="brand">
       <span class="brand__mark">◆</span>
@@ -39,7 +44,7 @@
 
   <section class="dossier" id="dossierMount"></section>
 
-  <footer class="hint">1 / 2 switch source &nbsp;·&nbsp; F free · H halo mint &nbsp;·&nbsp; M lab state</footer>
+  <footer class="hint"><button type="button" class="hint__back" data-view-to="menu">↑&nbsp;Menu</button>1 / 2 switch source &nbsp;·&nbsp; F free · H halo mint &nbsp;·&nbsp; M lab state</footer>
 
   <script src="data.js"></script>
   <script src="app.js"></script>

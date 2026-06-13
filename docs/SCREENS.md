@@ -9,6 +9,7 @@ Raw base: `https://raw.githubusercontent.com/Nilsjouna999/blue-room-scan-room/ma
 
 | Source | Treatment | Tab | Crop | Direct raw URL |
 | --- | --- | --- | --- | --- |
+| (front door) | Free → Halo sample | Main Menu | hero | https://raw.githubusercontent.com/Nilsjouna999/blue-room-scan-room/main/docs/screens/menu-front.png |
 | SRC-01 Driver | Free Pull | Source | hero | https://raw.githubusercontent.com/Nilsjouna999/blue-room-scan-room/main/docs/screens/src1-free-hero.png |
 | SRC-01 Driver | Halo Mint | Source | hero | https://raw.githubusercontent.com/Nilsjouna999/blue-room-scan-room/main/docs/screens/src1-halo-hero.png |
 | SRC-02 Ice Field | Free Pull | Source | hero | https://raw.githubusercontent.com/Nilsjouna999/blue-room-scan-room/main/docs/screens/src2-free-hero.png |
@@ -21,7 +22,9 @@ Raw base: `https://raw.githubusercontent.com/Nilsjouna999/blue-room-scan-room/ma
 | SRC-02 Ice Field | Halo Mint | Source | full-page (hero + dossier) | https://raw.githubusercontent.com/Nilsjouna999/blue-room-scan-room/main/docs/screens/src2-halo-fullpage.png |
 
 Deep links (live site / localhost): `?src=1|2` · `&t=free|shiny` ·
-`&tab=source|diagram|metrics` — e.g. `/?src=2&t=shiny&tab=metrics`.
+`&tab=source|diagram|metrics` — e.g. `/?src=2&t=shiny&tab=metrics`. A bare
+URL (no params) shows the front-door **Main Menu**; any of those params
+opens the scan room directly and bypasses the menu.
 
 **Workflow:** after any visual change → run `capture-screens.ps1` →
 commit + push. Stale screens are worse than no screens.

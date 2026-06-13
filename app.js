@@ -15,16 +15,19 @@ function esc(s) {
 
 const pad2 = (n) => String(n).padStart(2, "0");
 
-const state = { source: 0, treatment: "free", tab: "source" };
+const state = { source: 0, treatment: "free", tab: "source", view: "menu" };
 
 /* Deep-link support: ?src=1|2&t=free|shiny|mint&tab=source|diagram|metrics
-   (used by reviewers and the screenshot pipeline). */
+   (used by reviewers and the screenshot pipeline). Any of these params
+   means the visitor is addressing a specific scan-room state, so skip the
+   front-door menu and open the room directly — deep links never see it. */
 {
   const q = new URLSearchParams(location.search);
   const s = parseInt(q.get("src"), 10);
   if (s === 1 || s === 2) state.source = s - 1;
   if (["free", "shiny", "mint"].includes(q.get("t"))) state.treatment = q.get("t");
   if (["source", "diagram", "metrics"].includes(q.get("tab"))) state.tab = q.get("tab");
+  if (q.has("src") || q.has("t") || q.has("tab")) state.view = "room";
 }
 
 /* ---------- ScanResult v2 access (SCAN_ENGINE_SPEC) ----------
@@ -804,11 +807,77 @@ function renderDossier(src, treatment) {
     </div>`;
 }
 
+/* ---------- front-door menu (one sample: SRC-01, Free vs Halo) ----------
+   One existing sample shown two ways: the same photo as a matte Free
+   plate and a developed Halo artifact. Pulls title / archetype / material
+   from SOURCES[0] + the tier stamps — no stats, no fabricated analysis,
+   no new asset. */
+
+function applyView() {
+  document.body.dataset.view = state.view;
+}
+
+function renderMenu() {
+  const s = SOURCES[0];
+  const c = s.card;
+  const shot = (stamp, stampCls) => `
+    <div class="mtile__shot" data-imgwrap style="--pos:${esc(s.photoTuning.pos)};">
+      ${imgOrPlaceholder(s.file, "mtile__img")}
+      <span class="mtile__scrim"></span>
+      <span class="mtile__stamp ${stampCls}">${esc(stamp)}</span>
+    </div>`;
+  return `
+    <div class="menu__inner">
+      <header class="menu__head">
+        <h1 class="menu__brand"><span class="menu__mark">◆</span> BLUE ROOM</h1>
+        <p class="menu__thesis">Every photo is already a card. The room develops it.</p>
+        <p class="menu__trust">Image-as-artifact scan — it reads frame, gesture and signal, never the person.</p>
+      </header>
+
+      <section class="msample" style="--halo-a:${esc(s.halo.a)}; --halo-b:${esc(s.halo.b)}; --halo-c:${esc(s.halo.c)};">
+        <div class="msample__cap">
+          <span class="msample__label">Sample Scan</span>
+          <span class="msample__type">Human Sample · Archive</span>
+        </div>
+        <h2 class="msample__title">${esc(c.title)}</h2>
+        <p class="msample__arch">◆ &nbsp;${esc(c.archetype)}</p>
+
+        <div class="msample__compare">
+          <figure class="mtile mtile--free">
+            ${shot(TREATMENTS.free.stamp, "")}
+            <figcaption class="mtile__cap">
+              <span class="mtile__tier">Free Pull</span>
+              <span class="mtile__chips">first pull · surface scan · card exists</span>
+            </figcaption>
+          </figure>
+
+          <span class="msample__arrow" aria-hidden="true">→<span>develops</span></span>
+
+          <figure class="mtile mtile--halo">
+            ${shot(TREATMENTS.shiny.stamp, "mtile__stamp--halo")}
+            <figcaption class="mtile__cap">
+              <span class="mtile__tier mtile__tier--halo">Halo Mint</span>
+              <span class="mtile__chips">developed print · hidden stat · structured evidence · oracle</span>
+            </figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <div class="menu__actions">
+        <button type="button" class="menu__enter" data-view-to="room">Enter Scan Room</button>
+        <button type="button" class="menu__add" disabled aria-disabled="true">Add your photo<span class="menu__add-tag"> · local draft · later</span></button>
+      </div>
+
+      <p class="menu__foot">One sample · SRC-01 · the same photo, developed two ways.</p>
+    </div>`;
+}
+
 /* ---------- render + wiring ---------- */
 
 function render() {
   const src = SOURCES[state.source];
   document.body.dataset.treatment = state.treatment;
+  applyView();
 
   document.getElementById("sourcePanel").innerHTML = renderLeftPanel(src, state.treatment, state.tab);
   /* one quiet orientation line above the artifact — what the room does,
@@ -848,6 +917,16 @@ document.addEventListener("click", (e) => {
   render();
 });
 
+/* View switch: front-door menu ⇄ scan room. Separate attribute from
+   [data-goto] (treatment) so the two delegated handlers never collide. */
+document.addEventListener("click", (e) => {
+  const btn = e.target.closest("[data-view-to]");
+  if (!btn) return;
+  state.view = btn.dataset.viewTo;
+  applyView();
+  if (state.view === "room") window.scrollTo(0, 0);
+});
+
 document.getElementById("sourcePanel").addEventListener("click", (e) => {
   const btn = e.target.closest("button[data-tab]");
   if (!btn) return;
@@ -870,6 +949,11 @@ document.getElementById("treatmentToggle").addEventListener("click", (e) => {
 });
 
 document.addEventListener("keydown", (e) => {
+  /* on the front door the only shortcut is Enter → open the room */
+  if (state.view === "menu") {
+    if (e.key === "Enter") { state.view = "room"; applyView(); window.scrollTo(0, 0); }
+    return;
+  }
   if (e.key === "1") state.source = 0;
   else if (e.key === "2") state.source = 1;
   else if (e.key.toLowerCase() === "f") state.treatment = "free";
@@ -879,4 +963,5 @@ document.addEventListener("keydown", (e) => {
   render();
 });
 
+document.getElementById("menuView").innerHTML = renderMenu();
 render();
