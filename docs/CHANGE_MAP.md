@@ -127,6 +127,24 @@ developing"; module laundry-list replaced with a prioritized hook line
 Gesture" → "Lead Gesture"; one analysis note reworded — full
 banned/hype-word sweep now clean across all states.
 
+## To change the local draft intake
+
+- **Edit:** structure/content in `app.js` → `renderDraft()` + the
+  `loadDraftFile()` / `pickPhoto()` / `humanSize()` helpers and the
+  `draft` module var (a plain object — NOT a ScanResult). Styling in
+  `styles.css` (`.draft*`, `.draftcard*`). The mount (`#draftView`) and
+  the hidden `<input type="file" accept="image/*">` live in `index.html`.
+- **View model:** `state.view` gains a third value `draft`; `applyView()`
+  + the `body[data-view]` visibility matrix show exactly one of
+  menu/room/draft. Reached only by a user file pick (`[data-draft-pick]`)
+  — never via URL. `URL.createObjectURL` preview, revoked on replace.
+- **Hard rule:** the draft shows NO analysis — no stats, receipts,
+  oracle, hidden stat, score, or serial. If a number appears on the draft
+  card it is a bug. No upload, no storage, no AI.
+- **Test:** Add your photo → Local Draft preview; non-image rejected;
+  replace revokes the old object URL; Replace / Enter sample room / Main
+  menu / Resume all work; deep links still bypass to the room.
+
 ## To change the front-door menu
 
 - **Edit:** structure/content in `app.js` → `renderMenu()` (pulls
@@ -145,6 +163,22 @@ banned/hype-word sweep now clean across all states.
   plate, Halo tile = the only depth/material element).
 - **Test:** bare URL shows the menu; the four deep links open the room
   directly; Enter Scan Room reveals the unchanged room.
+
+## Local Draft intake v1 (2026-06-13, index.html + app.js + styles.css)
+
+"Add your photo" is now a real browser-local intake. A hidden image file
+input feeds `loadDraftFile()`, which builds a `URL.createObjectURL`
+preview and switches to a third view (`draft`) showing a LOCAL DRAFT
+artifact card + honest copy (browser-local only / no scan has run / ready
+for scan development / no analysis). No upload, no storage, no AI, and NO
+fabricated stats/receipts/oracle/hidden/serial. Non-image files are
+rejected with a short message; large files (>25 MB) warn but still
+preview; object URLs are revoked on replace. Return paths: Replace image ·
+Enter sample scan room · Main menu · Resume local draft (menu re-renders
+to offer Resume). Deep links and the sample room are untouched. The draft
+view needs a user-selected file, so it is NOT in the headless capture set
+(verified live via the preview tools instead); only `menu-front`
+refreshed (the Add button is now active, not "· later").
 
 ## Main Menu v1 (2026-06-13, index.html + app.js + styles.css + capture-screens.ps1)
 

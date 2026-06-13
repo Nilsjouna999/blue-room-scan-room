@@ -865,10 +865,121 @@ function renderMenu() {
 
       <div class="menu__actions">
         <button type="button" class="menu__enter" data-view-to="room">Enter Scan Room</button>
-        <button type="button" class="menu__add" disabled aria-disabled="true">Add your photo<span class="menu__add-tag"> · local draft · later</span></button>
+        <button type="button" class="menu__add" data-draft-pick>${draft ? "Replace your photo" : "Add your photo"}<span class="menu__add-tag"> · local draft</span></button>
+        ${draft ? `<button type="button" class="menu__resume" data-view-to="draft">Resume local draft →</button>` : ""}
+        <p class="pickmsg" role="status" aria-live="polite"></p>
       </div>
 
       <p class="menu__foot">One sample · SRC-01 · the same photo, developed two ways.</p>
+    </div>`;
+}
+
+function mountMenu() {
+  document.getElementById("menuView").innerHTML = renderMenu();
+}
+
+/* ---------- local draft intake (browser-only, no upload, no analysis) ----------
+   The chosen image never leaves the browser and never receives a scan.
+   `draft` is a plain object — NOT a ScanResult — and carries no stats,
+   receipts, oracle, or hidden stat. renderDraft() must never read sample
+   scan data: if a number ever appears on the draft, that is a bug. */
+
+let draft = null; // { url, name, sizeLabel, warn } | null
+
+function humanSize(bytes) {
+  if (bytes >= 1024 * 1024) return (bytes / (1024 * 1024)).toFixed(1) + " MB";
+  if (bytes >= 1024) return Math.round(bytes / 1024) + " KB";
+  return (bytes || 0) + " B";
+}
+
+const DRAFT_LARGE_FILE = 25 * 1024 * 1024; // gentle-warning threshold; still previews
+
+function pickPhoto() {
+  const input = document.getElementById("draftFile");
+  input.value = ""; // reset so re-picking the same filename still fires `change`
+  input.click();
+}
+
+function setPickError(msg) {
+  const host = state.view === "draft" ? document.getElementById("draftView") : document.getElementById("menuView");
+  const el = host && host.querySelector(".pickmsg");
+  if (el) el.textContent = msg;
+}
+
+function loadDraftFile(file) {
+  if (!file) return; // dialog cancelled
+  if (!file.type || !file.type.startsWith("image/")) {
+    setPickError("That file is not an image. Blue Room takes one photo — JPG, PNG, WEBP or similar.");
+    return;
+  }
+  if (draft && draft.url) URL.revokeObjectURL(draft.url); // release the previous object URL
+  draft = {
+    url: URL.createObjectURL(file),
+    name: file.name || "untitled image",
+    sizeLabel: humanSize(file.size || 0),
+    warn: file.size > DRAFT_LARGE_FILE ? "Large file — the preview may take a moment to render in this browser." : "",
+  };
+  state.view = "draft";
+  document.getElementById("draftView").innerHTML = renderDraft();
+  mountMenu(); // the menu now offers "Resume local draft"
+  applyView();
+  window.scrollTo(0, 0);
+}
+
+/* The draft card reuses the Room/Plate/Artifact grammar but shows ZERO
+   analysis — no stats, no receipts, no oracle, no hidden stat, no serial.
+   It says only what is true: a local, unscanned image. */
+function renderDraft() {
+  const d = draft;
+  if (!d) return "";
+  return `
+    <div class="draft__inner">
+      <div class="draft__cue">◆ &nbsp;BLUE ROOM · LOCAL DRAFT INTAKE</div>
+
+      <article class="draftcard" aria-label="Local draft preview">
+        <div class="draftcard__plate">
+          <header class="draftcard__head">
+            <span class="draftcard__house">◆ BLUE ROOM ARCHIVE</span>
+            <span class="draftcard__state">LOCAL DRAFT</span>
+          </header>
+
+          <figure class="draftcard__photo">
+            <img class="draftcard__img" src="${esc(d.url)}" alt="Local draft preview"
+              onerror="this.closest('.draftcard__photo').classList.add('img-missing')" />
+            <span class="draftcard__scrim"></span>
+            <span class="draftcard__stamp">LOCAL DRAFT · UNSCANNED</span>
+          </figure>
+
+          <div class="draftcard__body">
+            <h2 class="draftcard__title">${esc(d.name)}</h2>
+            <div class="draftcard__archline">
+              <span class="draftcard__archrule"></span>
+              <span class="draftcard__arch">◆ &nbsp;UNSCANNED ARTIFACT &nbsp;◆</span>
+              <span class="draftcard__archrule"></span>
+            </div>
+            <p class="draftcard__note">Image loaded in this browser only. No scan has run yet.</p>
+          </div>
+
+          <div class="draftcard__strip">
+            <span class="draftcard__stripstate">LOCAL DRAFT</span>
+            <span class="draftcard__stripmeta">NOT MINTED · NO SERIAL</span>
+          </div>
+        </div>
+      </article>
+
+      <section class="draftinfo">
+        <p class="draftinfo__line">Ready for scan development. The room can preview the artifact before the scan engine is connected.</p>
+        <p class="draftinfo__sub">No analysis has run — no stats, no receipts, no oracle. Nothing here reads the image or the person in it.</p>
+        <p class="draftinfo__meta">${esc(d.name)} · ${esc(d.sizeLabel)}${d.warn ? ` · <span class="draftinfo__warn">${esc(d.warn)}</span>` : ""}</p>
+      </section>
+
+      <div class="draft__actions">
+        <button type="button" class="menu__enter" data-draft-pick>Replace image</button>
+        <button type="button" class="draft__sample" data-view-to="room">Enter sample scan room</button>
+        <button type="button" class="draft__back" data-view-to="menu">Main menu</button>
+      </div>
+
+      <p class="pickmsg" role="status" aria-live="polite"></p>
     </div>`;
 }
 
@@ -922,9 +1033,19 @@ document.addEventListener("click", (e) => {
 document.addEventListener("click", (e) => {
   const btn = e.target.closest("[data-view-to]");
   if (!btn) return;
-  state.view = btn.dataset.viewTo;
+  const to = btn.dataset.viewTo;
+  if (to === "draft" && !draft) return; // nothing to resume
+  state.view = to;
   applyView();
-  if (state.view === "room") window.scrollTo(0, 0);
+  window.scrollTo(0, 0);
+});
+
+/* Local draft: pick / replace a browser-local photo (no upload, no store). */
+document.addEventListener("click", (e) => {
+  if (e.target.closest("[data-draft-pick]")) pickPhoto();
+});
+document.getElementById("draftFile").addEventListener("change", (e) => {
+  loadDraftFile(e.target.files && e.target.files[0]);
 });
 
 document.getElementById("sourcePanel").addEventListener("click", (e) => {
@@ -949,9 +1070,11 @@ document.getElementById("treatmentToggle").addEventListener("click", (e) => {
 });
 
 document.addEventListener("keydown", (e) => {
-  /* on the front door the only shortcut is Enter → open the room */
-  if (state.view === "menu") {
-    if (e.key === "Enter") { state.view = "room"; applyView(); window.scrollTo(0, 0); }
+  /* room shortcuts (1/2/F/H/M) only fire inside the room. On the front
+     door Enter opens the room; on a draft Escape returns to the menu. */
+  if (state.view !== "room") {
+    if (state.view === "menu" && e.key === "Enter") { state.view = "room"; applyView(); window.scrollTo(0, 0); }
+    else if (state.view === "draft" && e.key === "Escape") { state.view = "menu"; applyView(); }
     return;
   }
   if (e.key === "1") state.source = 0;
@@ -963,5 +1086,5 @@ document.addEventListener("keydown", (e) => {
   render();
 });
 
-document.getElementById("menuView").innerHTML = renderMenu();
+mountMenu();
 render();

@@ -6,15 +6,17 @@ Last updated: 2026-06-12.
 
 ## Active
 
-- **Main Menu v1** (2026-06-13): front-door view (`state.view` +
-  `body[data-view]`) showing one existing sample (SRC-01) as Free Pull vs
-  Halo Mint, with Enter Scan Room CTA + disabled "Add your photo · later".
-  **Completed** (index.html + app.js + styles.css + capture-screens.ps1);
-  deep links bypass the menu; scan room untouched; `menu-front` shot +
-  SCREENS.md row added.
-  *(Previous actives — conversion spine pass, product clarity pass, v2
-  rendering wiring, v2 data shape, SPINE promotion, governance OS, doc
-  spine cleanup — completed 2026-06-12/13.)*
+- **Local Draft intake v1** (2026-06-13): "Add your photo" → browser-local
+  file pick → `URL.createObjectURL` preview in a third `draft` view with a
+  LOCAL DRAFT artifact card and honest copy; no upload/storage/AI, no fake
+  analysis. **Completed** (index.html + app.js + styles.css); object URLs
+  revoked on replace; non-image rejected; deep links + sample room
+  untouched; `menu-front` refreshed (draft view not headlessly capturable
+  — verified live via preview tools + a 5-dimension adversarial review,
+  0 findings).
+  *(Previous actives — Main Menu v1, conversion spine pass, product
+  clarity pass, v2 rendering wiring, v2 data shape, SPINE promotion,
+  governance OS, doc spine cleanup — completed 2026-06-12/13.)*
 
 ## Ready (supported by current docs, clear definition of done)
 

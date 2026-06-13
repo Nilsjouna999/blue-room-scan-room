@@ -1732,11 +1732,19 @@ body[data-treatment="shiny"] .dplate--mint {
    developed artifact (the only element here with material + depth).
 ============================================================= */
 
+/* view visibility — exactly one of menu / room / draft is shown */
 body[data-view="menu"] .topbar,
 body[data-view="menu"] .room,
 body[data-view="menu"] .dossier,
-body[data-view="menu"] .hint { display: none; }
-body[data-view="room"] .menu { display: none; }
+body[data-view="menu"] .hint,
+body[data-view="menu"] .draft,
+body[data-view="draft"] .topbar,
+body[data-view="draft"] .room,
+body[data-view="draft"] .dossier,
+body[data-view="draft"] .hint,
+body[data-view="draft"] .menu,
+body[data-view="room"] .menu,
+body[data-view="room"] .draft { display: none; }
 
 .menu {
   min-height: 100vh;
@@ -1822,10 +1830,18 @@ body[data-view="room"] .menu { display: none; }
 .menu__enter:hover { border-color: var(--silver-dim); background: rgba(255, 255, 255, 0.07); transform: translateY(-1px); }
 .menu__add {
   font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
-  color: var(--t-ghost); padding: 8px 16px; border: 1px dashed var(--line-faint); border-radius: 6px;
-  background: none; cursor: not-allowed;
+  color: var(--silver-dim); padding: 8px 16px; border: 1px dashed var(--line); border-radius: 6px;
+  background: none; cursor: pointer; transition: border-color 160ms ease, color 160ms ease;
 }
+.menu__add:hover { border-color: var(--line-strong); color: var(--silver); }
 .menu__add-tag { color: var(--faint); }
+.menu__resume {
+  font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--silver-dim); padding: 7px 14px; border: 1px solid var(--line); border-radius: 6px;
+  background: none; cursor: pointer; transition: border-color 160ms ease, color 160ms ease;
+}
+.menu__resume:hover { border-color: var(--line-strong); color: var(--silver); }
+.pickmsg { font-family: var(--font-mono); font-size: 9.5px; letter-spacing: 0.06em; color: var(--moss-bright); min-height: 12px; margin-top: 2px; }
 .menu__foot { font-family: var(--font-mono); font-size: 8.5px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--faint); }
 
 .hint__back {
@@ -1833,6 +1849,72 @@ body[data-view="room"] .menu { display: none; }
   background: none; border: 0; padding: 0; margin-right: 12px; cursor: pointer;
 }
 .hint__back:hover { color: var(--silver); }
+
+/* =============================================================
+   Local Draft intake (front-door view #3) — a browser-local photo
+   entering the room. The draft card is the only object here with
+   material depth (Artifact law); it is explicitly LOCAL DRAFT and
+   never a Free/Halo tier. No stats, no receipts — nothing scored.
+============================================================= */
+
+.draft {
+  min-height: 100vh;
+  display: flex; align-items: center; justify-content: center;
+  padding: 34px 24px;
+}
+.draft__inner { width: 100%; max-width: 560px; display: grid; justify-items: center; gap: 20px; text-align: center; }
+.draft__cue { font-family: var(--font-mono); font-size: 8.5px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--faint); }
+
+.draftcard { width: 320px; max-width: 100%; }
+.draftcard__plate {
+  position: relative; display: grid; gap: 13px;
+  padding: 18px; border-radius: var(--card-radius);
+  border: 1px solid var(--line);
+  background: linear-gradient(180deg, var(--ink-800), var(--ink-900));
+  box-shadow: 0 18px 50px -24px rgba(0, 0, 0, 0.85), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+.draftcard__head { display: flex; align-items: center; justify-content: space-between; }
+.draftcard__house { font-family: var(--font-mono); font-size: 8px; letter-spacing: 0.2em; color: var(--silver-dim); }
+.draftcard__state {
+  font-family: var(--font-mono); font-size: 8px; letter-spacing: 0.22em; color: var(--t-meta);
+  padding: 2px 8px; border: 1px dashed var(--line); border-radius: 999px;
+}
+.draftcard__photo {
+  position: relative; aspect-ratio: 4 / 5; overflow: hidden;
+  border-radius: var(--r-plate); border: 1px solid var(--line); background: var(--ink-950);
+}
+.draftcard__img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 45%; display: block; }
+.draftcard__photo.img-missing .draftcard__img { display: none; }
+.draftcard__scrim { position: absolute; inset: 0; background: linear-gradient(180deg, transparent 55%, rgba(8, 7, 5, 0.5)); pointer-events: none; }
+.draftcard__stamp {
+  position: absolute; left: 9px; bottom: 9px;
+  font-family: var(--font-mono); font-size: 8px; letter-spacing: 0.18em; color: var(--silver);
+  background: rgba(8, 7, 5, 0.72); border: 1px solid var(--line); border-radius: 3px; padding: 3px 7px;
+}
+.draftcard__body { display: grid; gap: 8px; justify-items: center; }
+.draftcard__title { font-family: var(--font-display); font-size: 18px; font-weight: 600; line-height: 1.15; color: var(--t-display); word-break: break-word; max-width: 100%; }
+.draftcard__archline { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; }
+.draftcard__archrule { height: 1px; flex: 1; max-width: 56px; background: var(--line); }
+.draftcard__arch { font-family: var(--font-mono); font-size: 8px; letter-spacing: 0.2em; color: var(--silver-dim); white-space: nowrap; }
+.draftcard__note { font-family: var(--font-display); font-style: italic; font-size: 13px; line-height: 1.45; color: var(--t-body); }
+.draftcard__strip { display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--line-faint); padding-top: 11px; }
+.draftcard__stripstate { font-family: var(--font-mono); font-size: 8px; letter-spacing: 0.2em; color: var(--silver-dim); border: 1px dashed var(--line); border-radius: 3px; padding: 3px 7px; }
+.draftcard__stripmeta { font-family: var(--font-mono); font-size: 8px; letter-spacing: 0.14em; color: var(--faint); }
+
+.draftinfo { display: grid; gap: 7px; max-width: 460px; }
+.draftinfo__line { font-family: var(--font-display); font-size: 15px; line-height: 1.45; color: var(--t-primary); }
+.draftinfo__sub { font-size: 11.5px; line-height: 1.5; color: var(--t-meta); }
+.draftinfo__meta { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.06em; color: var(--faint); }
+.draftinfo__warn { color: var(--moss-bright); }
+
+.draft__actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 4px; }
+.draft__sample, .draft__back {
+  font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--t-meta);
+  padding: 11px 18px; border: 1px solid var(--line); border-radius: 6px; background: none; cursor: pointer;
+  transition: border-color 160ms ease, color 160ms ease;
+}
+.draft__sample:hover, .draft__back:hover { border-color: var(--line-strong); color: var(--silver); }
+.draft__back { border-style: dashed; }
 
 /* =============================================================
    Fallback for narrow screens (desktop is the priority)

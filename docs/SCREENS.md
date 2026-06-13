@@ -26,6 +26,11 @@ Deep links (live site / localhost): `?src=1|2` · `&t=free|shiny` ·
 URL (no params) shows the front-door **Main Menu**; any of those params
 opens the scan room directly and bypasses the menu.
 
+The **Local Draft** intake view (menu → *Add your photo*) requires a
+user-selected local file, so it cannot be reproduced by the headless
+capture pipeline and is intentionally not committed as a screenshot — it
+is verified live in-browser during development.
+
 **Workflow:** after any visual change → run `capture-screens.ps1` →
 commit + push. Stale screens are worse than no screens.
 Motion (holo edge rotation, shimmer, halo breathing) is not captured —

@@ -18,6 +18,12 @@
        only when the URL has no scan-room params (deep links bypass it). -->
   <section class="menu" id="menuView"></section>
 
+  <!-- LOCAL DRAFT intake — a browser-local preview of a user-chosen photo.
+       No upload, no storage, no analysis. Rendered into #draftView by
+       app.js; reached only when the user picks a file (never via URL). -->
+  <section class="draft" id="draftView"></section>
+  <input type="file" id="draftFile" accept="image/*" hidden aria-hidden="true" />
+
   <header class="topbar">
     <div class="brand">
       <span class="brand__mark">◆</span>
