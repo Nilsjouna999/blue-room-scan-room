@@ -6,13 +6,12 @@ Last updated: 2026-06-12.
 
 ## Active
 
-- **Wire SCAN_RESULTS_V2 into rendering** (this session): helpers added;
-  stats/hidden/mint/oracle read v2 with legacy fallback; Evidence Board +
-  Metrics tab left legacy with TODO(v2-render) markers. **Completed** —
-  visual output unchanged by design (the receipt-plate redesign is a
-  separate, queued decision).
-  *(Previous actives — v2 data shape, SPINE promotion, governance OS, doc
-  spine cleanup — completed 2026-06-12.)*
+- **DESIGN_TOKENS pass 1** (this session): Vault text scale, Room/Plate/
+  Artifact depth, accent economy. **Completed**; screenshots refreshed.
+  Deliberately deferred: dossier rhythm, stat-meter redesign, any new
+  effects.
+  *(Previous actives — v2 rendering wiring, v2 data shape, SPINE
+  promotion, governance OS, doc spine cleanup — completed 2026-06-12.)*
 
 ## Ready (supported by current docs, clear definition of done)
 

@@ -115,6 +115,19 @@ browser console is clean (F12).
 - **Test:** free vs mint vs shiny right panel; develop buttons still switch
   treatment.
 
+## DESIGN_TOKENS pass 1 (2026-06-12, styles.css only)
+
+Vault text scale: 5 named tiers (`--t-display/primary/body/meta/ghost`),
+warm archive greys, no pure white — legacy color vars alias to the tiers
+so every rule inherited the shift. Room warmed (ink + line tokens).
+Plates flattened: `--r-plate: 4px`, flat backgrounds, top-edge light on
+modules/dplates. Artifact raised: deeper static card shadow + inset top
+light. Accent economy: removed shiny accent overrides from aura chips,
+balance dot, diagram strokes/labels, dossier stat bars; developed-state
+diamond is quiet silver — the card alone carries the material. No
+animation/backdrop-filter/blend-mode added. Dossier rhythm and stat-meter
+redesign deliberately NOT applied (later passes).
+
 ## ScanResult v2 rendering integration (2026-06-12, app.js)
 
 `getScanResult(src)` / `getActiveScan()` / `getTierOutput(scan, treatment)`

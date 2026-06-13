@@ -6,21 +6,34 @@
 ============================================================= */
 
 :root {
-  /* color tokens */
-  --ink-950: #08090b;
-  --ink-900: #0c0d10;
-  --ink-850: #101216;
-  --ink-800: #14161b;
-  --ink-700: #1b1e24;
-  --line-faint: rgba(255, 255, 255, 0.06);
-  --line: rgba(255, 255, 255, 0.11);
-  --line-strong: rgba(255, 255, 255, 0.2);
-  --silver: #c9ccd6;
-  --silver-bright: #e8eaf0;
-  --silver-dim: #8e93a0;
-  --text: #dfe2ea;
-  --muted: #9aa0ad;
-  --faint: #6b707d;
+  /* Vault text scale — 5 named tiers (DESIGN_TOKENS pass 1).
+     Warm archive greys; no pure white anywhere. */
+  --t-display: #e9e5dc;
+  --t-primary: #d7d3ca;
+  --t-body: #a9a59c;
+  --t-meta: #8b8780;
+  --t-ghost: #67645d;
+
+  /* room — warm dark stage */
+  --ink-950: #0a0907;
+  --ink-900: #0d0c0a;
+  --ink-850: #11100d;
+  --ink-800: #151310;
+  --ink-700: #1c1915;
+  --line-faint: rgba(233, 229, 220, 0.07);
+  --line: rgba(233, 229, 220, 0.12);
+  --line-strong: rgba(233, 229, 220, 0.2);
+
+  /* legacy aliases — every existing rule inherits the warm scale */
+  --silver: #c8c4bb;
+  --silver-bright: var(--t-display);
+  --silver-dim: var(--t-meta);
+  --text: var(--t-primary);
+  --muted: var(--t-body);
+  --faint: var(--t-ghost);
+
+  /* plate geometry — flat archive documents, not floating cards */
+  --r-plate: 4px;
   --moss: #5e6f60;            /* free-pull dark green, muted */
   --moss-bright: #7e937f;
   --violet: #8b7bff;
@@ -50,7 +63,7 @@ body {
   font-family: var(--font-ui);
   color: var(--text);
   background:
-    radial-gradient(110% 80% at 50% -10%, #15171d 0%, var(--ink-900) 55%, var(--ink-950) 100%);
+    radial-gradient(110% 80% at 50% -10%, #161411 0%, var(--ink-900) 55%, var(--ink-950) 100%);
   background-attachment: fixed;
   -webkit-font-smoothing: antialiased;
   overflow-y: auto;
@@ -273,14 +286,14 @@ body {
   inset: 8px;
   pointer-events: none;
   background:
-    linear-gradient(#dfe2ea, #dfe2ea) 0 0 / 11px 1px,
-    linear-gradient(#dfe2ea, #dfe2ea) 0 0 / 1px 11px,
-    linear-gradient(#dfe2ea, #dfe2ea) 100% 0 / 11px 1px,
-    linear-gradient(#dfe2ea, #dfe2ea) 100% 0 / 1px 11px,
-    linear-gradient(#dfe2ea, #dfe2ea) 0 100% / 11px 1px,
-    linear-gradient(#dfe2ea, #dfe2ea) 0 100% / 1px 11px,
-    linear-gradient(#dfe2ea, #dfe2ea) 100% 100% / 11px 1px,
-    linear-gradient(#dfe2ea, #dfe2ea) 100% 100% / 1px 11px;
+    linear-gradient(#e2ddd3, #e2ddd3) 0 0 / 11px 1px,
+    linear-gradient(#e2ddd3, #e2ddd3) 0 0 / 1px 11px,
+    linear-gradient(#e2ddd3, #e2ddd3) 100% 0 / 11px 1px,
+    linear-gradient(#e2ddd3, #e2ddd3) 100% 0 / 1px 11px,
+    linear-gradient(#e2ddd3, #e2ddd3) 0 100% / 11px 1px,
+    linear-gradient(#e2ddd3, #e2ddd3) 0 100% / 1px 11px,
+    linear-gradient(#e2ddd3, #e2ddd3) 100% 100% / 11px 1px,
+    linear-gradient(#e2ddd3, #e2ddd3) 100% 100% / 1px 11px;
   background-repeat: no-repeat;
   opacity: 0.25;
 }
@@ -290,7 +303,7 @@ body {
   font-family: var(--font-mono);
   font-size: 7px;
   letter-spacing: 0.18em;
-  color: rgba(225, 228, 238, 0.6);
+  color: rgba(226, 222, 213, 0.6);
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
   background: rgba(8, 9, 12, 0.4);
   padding: 3px 6px;
@@ -309,7 +322,7 @@ body {
 .marker__ring {
   position: absolute;
   inset: 0;
-  border: 1px solid rgba(232, 234, 240, 0.55);
+  border: 1px solid rgba(228, 224, 215, 0.55);
   border-radius: 50%;
   box-shadow: 0 0 8px rgba(0, 0, 0, 0.4), inset 0 0 6px rgba(0, 0, 0, 0.3);
 }
@@ -321,7 +334,7 @@ body {
   width: 3px;
   height: 3px;
   border-radius: 50%;
-  background: rgba(232, 234, 240, 0.8);
+  background: rgba(228, 224, 215, 0.8);
   transform: translate(-50%, -50%);
 }
 .marker__no {
@@ -344,7 +357,7 @@ body {
   left: 0;
   right: 0;
   height: 1px;
-  background: repeating-linear-gradient(90deg, rgba(232, 234, 240, 0.5) 0 6px, transparent 6px 12px);
+  background: repeating-linear-gradient(90deg, rgba(228, 224, 215, 0.5) 0 6px, transparent 6px 12px);
   opacity: 0.5;
 }
 
@@ -404,7 +417,8 @@ body {
   border-radius: var(--card-radius);
   padding: 1px;
   background: linear-gradient(170deg, var(--line-strong) 0%, var(--line-faint) 30%, var(--line-faint) 70%, var(--line-strong) 100%);
-  box-shadow: 0 30px 70px rgba(0, 0, 0, 0.55), 0 4px 18px rgba(0, 0, 0, 0.45);
+  /* artifact: raised above the plates — deeper static shadow */
+  box-shadow: 0 44px 90px rgba(0, 0, 0, 0.62), 0 10px 28px rgba(0, 0, 0, 0.5);
   animation: card-in 360ms cubic-bezier(0.2, 0.7, 0.2, 1);
 }
 @keyframes card-in {
@@ -418,6 +432,7 @@ body {
   background: linear-gradient(180deg, var(--ink-800) 0%, var(--ink-850) 55%, var(--ink-900) 100%);
   padding: var(--card-pad);
   overflow: hidden;
+  box-shadow: inset 0 1px 0 rgba(233, 229, 220, 0.055); /* artifact top light */
 }
 .card__plate::before {
   content: "";
@@ -567,7 +582,7 @@ body {
   font-family: var(--font-mono);
   font-size: 7px;
   letter-spacing: 0.18em;
-  color: rgba(225, 228, 238, 0.55);
+  color: rgba(226, 222, 213, 0.55);
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
   z-index: 2;
 }
@@ -580,7 +595,7 @@ body {
   font-family: var(--font-mono);
   font-size: 8px;
   letter-spacing: 0.2em;
-  color: rgba(225, 228, 238, 0.6);
+  color: rgba(226, 222, 213, 0.6);
   background: rgba(8, 9, 12, 0.5);
   border: 1px solid rgba(255, 255, 255, 0.07);
   border-radius: 3px;
@@ -786,7 +801,7 @@ body {
 .card[data-treatment="mint"] .titleblock__archetype { color: var(--silver); }
 .card[data-treatment="mint"] .mintstrip__serial { color: var(--silver); }
 .card[data-treatment="mint"] .mintstrip__state {
-  background: linear-gradient(180deg, rgba(232, 234, 240, 0.16), rgba(232, 234, 240, 0.03));
+  background: linear-gradient(180deg, rgba(228, 224, 215, 0.16), rgba(228, 224, 215, 0.03));
   border-color: rgba(220, 224, 234, 0.5);
 }
 
@@ -936,8 +951,9 @@ body[data-treatment="shiny"] .stagezone {
 /* every reading module sits in its own card */
 .panel--reading .module {
   border: 1px solid var(--line-faint);
-  border-radius: 9px;
-  background: rgba(255, 255, 255, 0.018);
+  border-top-color: rgba(233, 229, 220, 0.12); /* plate top-edge light */
+  border-radius: var(--r-plate);
+  background: rgba(233, 229, 220, 0.015);
   padding: 15px 16px 16px;
 }
 .panel--reading .module__label {
@@ -957,7 +973,7 @@ body[data-treatment="shiny"] .stagezone {
   color: var(--silver);
 }
 .reads__val { font-family: var(--font-mono); font-size: 11.5px; color: var(--silver-dim); }
-.reads__item p { font-size: 13px; line-height: 1.6; color: #aab0bc; }
+.reads__item p { font-size: 13px; line-height: 1.6; color: #b2ada3; }
 
 .aura { display: flex; flex-wrap: wrap; gap: 8px; }
 .aura__chip {
@@ -971,11 +987,8 @@ body[data-treatment="shiny"] .stagezone {
   padding: 5px 12px;
   background: rgba(255, 255, 255, 0.02);
 }
-body[data-treatment="shiny"] .aura__chip:first-child {
-  border-color: color-mix(in srgb, var(--halo-a, #8b7bff) 50%, transparent);
-  color: var(--halo-a, var(--violet));
-  background: color-mix(in srgb, var(--halo-a, #8b7bff) 8%, transparent);
-}
+/* accent economy: aura chips stay neutral in every state — the card
+   carries the material, the plates stay quiet */
 
 .impact { display: flex; align-items: center; gap: 12px; }
 .impact__label {
@@ -1052,7 +1065,7 @@ body[data-treatment="shiny"] .aura__chip:first-child {
 .panel--reading .module--locked {
   border: 1px dashed var(--line-faint);
   background: none;
-  border-radius: 9px;
+  border-radius: var(--r-plate);
   padding: 14px 16px;
 }
 .undeveloped__line {
@@ -1161,10 +1174,10 @@ body[data-treatment="shiny"] .aura__chip:first-child {
 }
 .diagsvg * { vector-effect: non-scaling-stroke; }
 
-.dg--grid line { stroke: rgba(223, 226, 234, 0.13); stroke-width: 1; }
+.dg--grid line { stroke: rgba(226, 222, 213, 0.13); stroke-width: 1; }
 .dg--mass rect {
   fill: none;
-  stroke: rgba(223, 226, 234, 0.5);
+  stroke: rgba(226, 222, 213, 0.5);
   stroke-width: 1;
   stroke-dasharray: 5 4;
 }
@@ -1172,20 +1185,15 @@ body[data-treatment="shiny"] .aura__chip:first-child {
 .dg--focal line { stroke: var(--silver-bright); stroke-width: 1.2; }
 .dg--gesture polyline { fill: none; stroke: var(--silver); stroke-width: 1.4; }
 .dg--gesture ellipse { fill: var(--silver-bright); stroke: none; }
-.dg--axis line { stroke: rgba(223, 226, 234, 0.55); stroke-width: 1; stroke-dasharray: 7 5; }
+.dg--axis line { stroke: rgba(226, 222, 213, 0.55); stroke-width: 1; stroke-dasharray: 7 5; }
 .dg--arrow line { stroke: var(--silver); stroke-width: 1.4; }
 .dg--arrow polygon { fill: var(--silver-bright); stroke: none; }
-.dg--light line { stroke: rgba(232, 234, 240, 0.65); stroke-width: 1; }
-.dg--light ellipse { fill: rgba(232, 234, 240, 0.8); }
-.dg-zone { fill: rgba(223, 226, 234, 0.07); stroke: none; }
+.dg--light line { stroke: rgba(228, 224, 215, 0.65); stroke-width: 1; }
+.dg--light ellipse { fill: rgba(228, 224, 215, 0.8); }
+.dg-zone { fill: rgba(226, 222, 213, 0.07); stroke: none; }
 
-/* shiny: holo accents on the active reads — strokes stay thin */
-body[data-treatment="shiny"] .dg--gesture polyline,
-body[data-treatment="shiny"] .dg--arrow line { stroke: var(--cyan); }
-body[data-treatment="shiny"] .dg--gesture ellipse,
-body[data-treatment="shiny"] .dg--arrow polygon { fill: var(--cyan); }
-body[data-treatment="shiny"] .dg--focal ellipse,
-body[data-treatment="shiny"] .dg--focal line { stroke: var(--violet); }
+/* accent economy: the diagram is an instrument, not a billboard —
+   silver strokes in every state; the card alone carries the material */
 
 .diaglabels { position: absolute; inset: 0; pointer-events: none; }
 .dg-label {
@@ -1193,7 +1201,7 @@ body[data-treatment="shiny"] .dg--focal line { stroke: var(--violet); }
   font-family: var(--font-mono);
   font-size: 7.5px;
   letter-spacing: 0.16em;
-  color: rgba(232, 234, 240, 0.78);
+  color: rgba(228, 224, 215, 0.78);
   background: rgba(8, 9, 12, 0.62);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 3px;
@@ -1201,8 +1209,7 @@ body[data-treatment="shiny"] .dg--focal line { stroke: var(--violet); }
   white-space: nowrap;
 }
 .dg-label--focal { color: var(--silver-bright); }
-.dg-label--zone { color: rgba(232, 234, 240, 0.5); }
-body[data-treatment="shiny"] .dg-label--focal { color: var(--violet); }
+.dg-label--zone { color: rgba(233, 229, 220, 0.5); }
 
 .devnote {
   font-family: var(--font-mono);
@@ -1224,8 +1231,8 @@ body[data-treatment="shiny"] .dg-label--focal { color: var(--violet); }
   letter-spacing: 0.16em;
   fill: var(--silver-dim);
 }
-.dia-grid { fill: none; stroke: rgba(223, 226, 234, 0.1); stroke-width: 1; vector-effect: non-scaling-stroke; }
-.dia-axis { stroke: rgba(223, 226, 234, 0.08); stroke-width: 1; vector-effect: non-scaling-stroke; }
+.dia-grid { fill: none; stroke: rgba(226, 222, 213, 0.1); stroke-width: 1; vector-effect: non-scaling-stroke; }
+.dia-axis { stroke: rgba(226, 222, 213, 0.08); stroke-width: 1; vector-effect: non-scaling-stroke; }
 .dia-fill {
   fill: rgba(126, 147, 127, 0.2);
   stroke: var(--moss-bright);
@@ -1233,8 +1240,9 @@ body[data-treatment="shiny"] .dg-label--focal { color: var(--violet); }
   vector-effect: non-scaling-stroke;
 }
 .dia-dot { fill: var(--silver-bright); }
-body[data-treatment="mint"] .dia-fill { fill: rgba(201, 204, 214, 0.16); stroke: var(--silver); }
-body[data-treatment="shiny"] .dia-fill { fill: rgba(139, 123, 255, 0.16); stroke: var(--cyan); }
+/* accent economy: developed states share one quiet silver diamond */
+body[data-treatment="mint"] .dia-fill,
+body[data-treatment="shiny"] .dia-fill { fill: rgba(200, 196, 187, 0.15); stroke: var(--silver); }
 
 .mixrows { display: grid; gap: 9px; }
 .metriccap {
@@ -1268,7 +1276,7 @@ body[data-treatment="shiny"] .dia-fill { fill: rgba(139, 123, 255, 0.16); stroke
   top: -3px;
   bottom: -3px;
   width: 1px;
-  background: rgba(223, 226, 234, 0.35);
+  background: rgba(226, 222, 213, 0.35);
 }
 .balance__dot {
   position: absolute;
@@ -1280,14 +1288,14 @@ body[data-treatment="shiny"] .dia-fill { fill: rgba(139, 123, 255, 0.16); stroke
   transform: translate(-50%, -50%);
   box-shadow: 0 0 8px rgba(0, 0, 0, 0.5);
 }
-body[data-treatment="shiny"] .balance__dot { background: var(--cyan); }
+/* accent economy: balance dot stays silver in all states */
 
 .fitgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .fitcell {
   display: grid;
   gap: 3px;
   border: 1px solid var(--line-faint);
-  border-radius: 7px;
+  border-radius: 3px;
   padding: 10px 12px;
   background: rgba(255, 255, 255, 0.015);
 }
@@ -1377,8 +1385,9 @@ body[data-treatment="shiny"] .balance__dot { background: var(--cyan); }
 /* archive plate — one screenshot-sized section */
 .dplate {
   border: 1px solid var(--line-faint);
-  border-radius: 10px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.02) 0%, rgba(255, 255, 255, 0.008) 100%);
+  border-top-color: rgba(233, 229, 220, 0.13); /* plate top-edge light */
+  border-radius: var(--r-plate);
+  background: rgba(233, 229, 220, 0.012); /* flat archive document */
   padding: 24px 28px 26px;
 }
 .dplate__head {
@@ -1456,7 +1465,7 @@ body[data-treatment="shiny"] .dplate__tag--dev {
 }
 .receipt {
   border: 1px solid var(--line-faint);
-  border-radius: 8px;
+  border-radius: 3px;
   background: rgba(0, 0, 0, 0.16);
   padding: 14px 16px;
   display: grid;
@@ -1509,11 +1518,10 @@ body[data-treatment="shiny"] .dplate__tag--dev {
   border-radius: 99px;
   background: linear-gradient(90deg, #6f7480, var(--silver));
 }
-body[data-treatment="shiny"] .dstat__fill {
-  background: linear-gradient(90deg, var(--halo-a, #8b7bff), var(--halo-b, #5fd4e0));
-}
+/* accent economy: dossier stat bars stay silver — the Hidden Stat
+   number is the plate's one accent moment */
 .dstat__val { font-family: var(--font-mono); font-size: 13px; color: var(--silver-bright); }
-.dstat__why { font-size: 12.5px; line-height: 1.6; color: #aab0bc; }
+.dstat__why { font-size: 12.5px; line-height: 1.6; color: #b2ada3; }
 .dstat__evidence {
   font-size: 12px;
   line-height: 1.55;
