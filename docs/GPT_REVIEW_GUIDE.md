@@ -16,6 +16,12 @@ card; the site around the card is the full "scan room" reading.
    effects). Nothing in it is final; this is where new visual ideas belong.
 4. `docs/CHANGE_MAP.md` — what edits touch what.
 
+**Distilled research:** `docs/research/` now holds a compressed research
+checkpoint — `RESEARCH_COMPRESSION_V1.md` is the compact source (artifact
+language, stat/tier, human-in-frame, rare-trigger, Reframe Map, voice rules).
+It is **RESEARCH — it informs, never implements** (read it only when reviewing
+language/card/stat/rarity/Reframe decisions; ACTIVE specs still win).
+
 ## The code (no build step — plain HTML/CSS/JS)
 
 - `index.html` — shell: top bar, source + treatment toggles, three panels

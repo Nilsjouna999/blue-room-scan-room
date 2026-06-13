@@ -168,6 +168,23 @@ banned/hype-word sweep now clean across all states.
 - **Test:** bare URL shows the menu; the four deep links open the room
   directly; Enter Scan Room reveals the unchanged room.
 
+## Distilled research checkpoint (2026-06-13 / BR-S028, docs only)
+
+Saved the distilled BLUE ROOM research into `docs/research/` so future
+GPT/Claude sessions keep the artifact-language, stat/tier, human-in-frame,
+rare-trigger, Reframe Map, and voice rules. New files: `docs/research/README.md`
+(folder guide + RESEARCH-authority + live-divergence notes) + the distilled
+pack — **`RESEARCH_COMPRESSION_V1.md` (the compact source for future coding/spec
+prompts)**, `HUMAN_IN_FRAME_READING_RULES_V1.md`, `RARE_ARTIFACT_TRIGGER_SYSTEM_V1.md`,
+`REFRAME_MAP_VALUE_SYSTEM_V1.md`, `LANGUAGE_SYSTEM_V1.md`. These are
+**RESEARCH (informs, never implements** — GOVERNANCE_OS §3); ACTIVE specs still
+win, and the stat-name / tier-ladder divergences they propose stay deferred to
+*Sample Room Tier Migration v1*. **Docs only — runtime unchanged** (no
+app.js/styles.css/data.js/scan-contract.js/index.html edits; no AI/backend/
+payment/Halo/upload analysis). GPT_REVIEW_GUIDE + TASK_QUEUE + SESSION_BRIEF
+note the folder. Roadmap unchanged beyond this checkpoint — next product task
+stays **Free Pull Mock Polish v1**.
+
 ## Free Pull Layout Mock v1 (2026-06-13 / BR-S027, app.js + styles.css)
 
 The dev-only Free Scan Simulation route (`?dev=free-scan-sim`) is now the first

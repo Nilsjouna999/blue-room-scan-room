@@ -10,6 +10,67 @@ coding session; the assistant must respect it. Files not listed under
 does not match the user's current task — **stop and ask** before doing
 anything. (GOVERNANCE_OS anti-drift.)
 
+## Active session — BR-S028
+
+**Date / Session ID:** 2026-06-13 / BR-S028
+
+**Today's task:** Save distilled research into docs/research (docs only)
+
+**Why:** Cloud checkpoint so future GPT/Claude sessions keep the distilled
+artifact-language, stat/tier, human-in-frame, rare-trigger, Reframe Map, and
+voice rules. Source = the uploaded distilled-research transfer zip.
+
+**Read:** docs/PROJECT_OS.md · docs/FREE_PULL_SCREENSHOT_LAYOUT_V1.md ·
+docs/HALO_GATE_UPGRADE_LAYUP_V1.md · docs/CARD_SYSTEM_V1.md ·
+docs/CARD_LOGIC_V1.md · docs/CHANGE_MAP.md · docs/TASK_QUEUE.md ·
+docs/SESSION_BRIEF.md · docs/GPT_REVIEW_GUIDE.md · docs/GOVERNANCE_OS.md
+
+**Edit:** docs/research/README.md (new) · docs/research/RESEARCH_COMPRESSION_V1.md
+(new) · docs/research/HUMAN_IN_FRAME_READING_RULES_V1.md (new) ·
+docs/research/RARE_ARTIFACT_TRIGGER_SYSTEM_V1.md (new) ·
+docs/research/REFRAME_MAP_VALUE_SYSTEM_V1.md (new) ·
+docs/research/LANGUAGE_SYSTEM_V1.md (new) · docs/GPT_REVIEW_GUIDE.md ·
+docs/CHANGE_MAP.md · docs/TASK_QUEUE.md · docs/SESSION_BRIEF.md
+
+**Do not open:** C:\Users\nilsj\OneDrive\Documents\blue-room
+
+**Do not edit (runtime):** app.js · styles.css · data.js · scan-contract.js ·
+index.html · assets
+
+**Authority affected:** RESEARCH (new distilled checkpoint) + ACTIVE SPECS
+(index/notes only)
+
+**Core/spec change required?** No — docs-only research checkpoint. The saved
+research is RESEARCH authority (informs, never implements); ACTIVE specs still
+win. No new system built.
+
+**Locked constraints:** docs only · do not edit runtime files · do not
+implement any new system · no Halo / AI / backend / payment / upload analysis /
+login / social / real card logic · do not change roadmap beyond adding this
+checkpoint · keep the next product task = Free Pull Mock Polish v1 · raw
+research is not pasted into normal coding tasks (GOVERNANCE_OS §3)
+
+**Known current state:** Free Pull Layout Mock v1 (7c666f5) · Free Pull
+Screenshot Audit completed (PASS WITH SMALL FIXES, audit only, no code) ·
+`docs/research/` already held SPINE.md + 3 raw files · normal Local Draft →
+Develop Scan opens the sealed offline gate · no AI/backend/payment
+
+**Definition of done:** docs/research/ holds the 6 new files (README +
+RESEARCH_COMPRESSION_V1 + 4 split docs) · README explains the folder, names
+RESEARCH_COMPRESSION_V1 as the compact source, flags RESEARCH authority, keeps
+next task = Free Pull Mock Polish v1 · GPT_REVIEW_GUIDE + CHANGE_MAP +
+TASK_QUEUE note the folder · no runtime files changed · the stray empty
+`docs/New Text Document.txt` is NOT committed · commit + push completed
+
+**Verification:** `git diff --stat` shows only docs/ changes (no app.js/
+styles.css/data.js/scan-contract.js/index.html); the 5 distilled files match
+the source zip byte-for-byte; no fake implementation language; tree clean after
+push (stray empty txt left untracked, reported).
+
+**Final response format:** commit hash · files changed · verification performed
+· docs/research/ confirmed in repo/cloud · runtime untouched · next recommended
+task · rollback command
+
 ## Active session — BR-S027
 
 **Date / Session ID:** 2026-06-13 / BR-S027

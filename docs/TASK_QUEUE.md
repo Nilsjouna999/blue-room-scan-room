@@ -6,6 +6,31 @@ Last updated: 2026-06-13.
 
 ## Active
 
+- **Distilled research checkpoint** (2026-06-13 / BR-S028, docs only): saved
+  the distilled BLUE ROOM research into `docs/research/` — new
+  `docs/research/README.md` + the pack **`RESEARCH_COMPRESSION_V1.md` (the
+  compact research source for future coding/spec prompts)**,
+  `HUMAN_IN_FRAME_READING_RULES_V1.md`, `RARE_ARTIFACT_TRIGGER_SYSTEM_V1.md`,
+  `REFRAME_MAP_VALUE_SYSTEM_V1.md`, `LANGUAGE_SYSTEM_V1.md`. RESEARCH authority
+  (informs, never implements — GOVERNANCE_OS §3); ACTIVE specs still win and
+  the proposed stat-name / tier-ladder directions stay deferred to *Sample Room
+  Tier Migration v1*. **Completed** — docs only, runtime untouched (no AI/
+  backend/payment/Halo/upload analysis); GPT_REVIEW_GUIDE + CHANGE_MAP +
+  SESSION_BRIEF note the folder. Roadmap unchanged. **Next up:** Free Pull Mock
+  Polish v1 (Ready #0).
+
+- **Free Pull Screenshot Audit** (2026-06-13 / BR-S027, audit only): audited
+  the Free Pull mock (`?dev=free-scan-sim`) against
+  `docs/FREE_PULL_SCREENSHOT_LAYOUT_V1.md` §11/§13 at 1600×900 + 1920×1080.
+  **Verdict: PASS WITH SMALL FIXES** — reads as one landscape graded-slab
+  artifact, image-dominant, safety airtight (all five gates pass, lexicon sweep
+  clean), sealed vault shape-only, Halo edge calm, all `?dev` routes + menu
+  preserved, console clean. Findings → *Free Pull Mock Polish v1* (Ready #0):
+  receipt chips too long (~110–116 chars, wrap 2–3 lines); title "DEV FREE SCAN
+  FIXTURE" un-collectible; image↔archetype mismatch (daylight Driver vs "Low-
+  Light Operator / Night Print"); ~12% side margin at 1920 (1500px cap) vs the
+  5–7% target. **Completed** — no code changed (audit only).
+
 - **Free Pull Layout Mock v1** (2026-06-13 / BR-S027, app.js + styles.css):
   the dev route `?dev=free-scan-sim` now renders the **Free Pull front** as ONE
   landscape **graded-slab artifact** (image slab window ~52% + certification /
@@ -155,19 +180,25 @@ Last updated: 2026-06-13.
    future pass can align it too if wanted.)*
    *(Free Pull Layout Mock v1 — completed by BR-S027; the `?dev=free-scan-sim`
    route renders the landscape split-artifact Free Pull front. See Active.)*
-0. **Free Pull Screenshot Audit** (NEXT) — review the BR-S027 Free Pull mock
-   (`?dev=free-scan-sim`) against `docs/FREE_PULL_SCREENSHOT_LAYOUT_V1.md` §11
-   (visual feel) and §13 (acceptance): screenshot at 1600×900 + 1920×1080 and
-   judge it as a real collectible artifact. Known items to weigh: the slab uses
-   `SOURCES[0]` (Driver, daylight) as a dev stand-in while the fixture archetype
-   is "The Low-Light Operator / Night Print" (image↔archetype mismatch — pick a
-   better stand-in or note it); receipt-chip length / contact-sheet feel; the
-   ~12% side margin at 1920 (1500px cap) vs the 5–7% target; tier-notch /
-   weld / shimmer polish. **Audit only** — log fixes here, do not redesign
-   inline. *Done when:* screenshots captured + filed (SCREENS.md if added to
-   the pipeline); a short findings list logged here; no banned language; still
-   no public 0–100 numbers; no runtime regressions to the other `?dev` routes
-   or normal flow.
+   *(Free Pull Screenshot Audit — completed by BR-S027 (audit only). Verdict:
+   PASS WITH SMALL FIXES; findings feed Free Pull Mock Polish v1 below.)*
+0. **Free Pull Mock Polish v1** (NEXT) — dev-route copy/polish for the Free Pull
+   mock (`?dev=free-scan-sim`) from the BR-S027 audit. Scope: (1) shorten the 2
+   receipt chips to tight `cue → effect` (≤ ~50 chars, e.g. "Raised palm →
+   barrier signal", "Window light → cleaner edge separation"); (2) give the dev
+   fixture a real artifact title instead of "DEV FREE SCAN FIXTURE"; (3) align
+   the fixture archetype/print to the daylight Driver stand-in image (the
+   "Low-Light Operator / Night Print" mismatch); (4) optional: raise `.fpwrap`
+   max-width ~1560–1600px so 1920 margins land ~7–9%. Edits limited to the
+   fixture text in `scan-contract.js`, chip handling in `app.js`
+   `renderFreePullMock`, and optionally `.fpwrap` in `styles.css`. **Do NOT**
+   change stat labels or the tier ladder (that is Sample Room Tier Migration v1)
+   — see `docs/research/RESEARCH_COMPRESSION_V1.md` for the language candidates.
+   *Done when:* chips are 1-line and Driver-coherent; title/archetype read as a
+   real artifact; fixture still passes `validateUploadedScanResult` (no banned
+   lexicon, all safetyFlags false, no public 0–100); `?dev=uploaded-result` /
+   `?dev=uploaded-blocked` + normal menu/draft/Develop-gate unchanged; verified
+   at 1600×900 + 1920×1080; console clean.
 1. **Sample Room Tier Migration v1** — reconcile the legacy sample-room
    numeric display (`PROJECT_OS` §7/§9 still shows Presence/Frame/Signal/
    **Charge** as 0–100 numbers) into the public **tier-band** system, and
