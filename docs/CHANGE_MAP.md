@@ -115,6 +115,17 @@ browser console is clean (F12).
 - **Test:** free vs mint vs shiny right panel; develop buttons still switch
   treatment.
 
+## Evidence Board v2 + metrics readability (2026-06-12, app.js + styles.css)
+
+Evidence Board now renders v2 structured receipts (effect mark +
+confidence tag + cue + basis) — free shows tierOutputs.free.receiptsShown,
+halo shows all; legacy prose receipts remain as fallback when v2 is
+absent. Metrics instruments lifted one tier (impact labels/values,
+diamond text 4.6px, caps/captions ghost→meta); track bgs warmed. Free
+CTA: desc/more lines meta tier, material-tinted button border/bg
+(static). TODO(v2-render) for receipts removed; route label in Source
+Record still pending (TASK_QUEUE).
+
 ## DESIGN_TOKENS pass 2 (2026-06-12, styles.css only)
 
 Readability: `--t-body/meta/ghost` lifted; hardcoded warm greys folded

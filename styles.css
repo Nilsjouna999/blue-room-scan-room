@@ -992,11 +992,11 @@ body[data-treatment="shiny"] .stagezone {
 
 .impact { display: flex; align-items: center; gap: 12px; }
 .impact__label {
-  font-size: 10.5px;
+  font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--muted);
+  color: var(--t-body);
   white-space: nowrap;
   min-width: 100px;
 }
@@ -1005,7 +1005,7 @@ body[data-treatment="shiny"] .stagezone {
   position: relative;
   height: 4px;
   border-radius: 99px;
-  background: rgba(255, 255, 255, 0.06);
+  background: rgba(233, 229, 220, 0.09);
   overflow: hidden;
 }
 .impact__fill {
@@ -1018,7 +1018,7 @@ body[data-treatment="shiny"] .stagezone {
 .impact__fill--dash {
   background: repeating-linear-gradient(90deg, var(--silver-dim) 0 5px, transparent 5px 8px);
 }
-.impact__val { font-family: var(--font-mono); font-size: 11.5px; color: var(--silver-dim); }
+.impact__val { font-family: var(--font-mono); font-size: 11.5px; color: var(--silver); }
 
 .module--oracle .oracle {
   font-family: var(--font-display);
@@ -1083,9 +1083,9 @@ body[data-treatment="shiny"] .stagezone {
   font-size: 10px;
   letter-spacing: 0.04em;
   line-height: 1.6;
-  color: var(--faint);
+  color: var(--t-meta);
   border: 1px dashed var(--line-faint);
-  border-radius: 6px;
+  border-radius: var(--r-plate);
   padding: 8px 11px;
 }
 .unlock__btn {
@@ -1107,8 +1107,8 @@ body[data-treatment="shiny"] .stagezone {
   text-transform: uppercase;
   color: var(--silver-bright);
 }
-.unlock__desc { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.05em; color: var(--faint); line-height: 1.55; }
-.unlock__btn--shiny { border-color: rgba(139, 123, 255, 0.35); }
+.unlock__desc { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.05em; color: var(--t-meta); line-height: 1.55; }
+.unlock__btn--shiny { border-color: color-mix(in srgb, var(--halo-a, #8b7bff) 45%, transparent); background: color-mix(in srgb, var(--halo-a, #8b7bff) 4%, transparent); }
 .unlock__btn--shiny:hover { border-color: rgba(139, 123, 255, 0.65); background: rgba(139, 123, 255, 0.05); }
 .unlock__btn--shiny .unlock__name {
   background: linear-gradient(90deg, var(--violet), var(--cyan), var(--halo-green));
@@ -1227,9 +1227,9 @@ body[data-treatment="shiny"] .stagezone {
 .diamond { width: 100%; max-width: 320px; justify-self: center; display: block; margin: 0 auto; }
 .diamond text {
   font-family: var(--font-mono);
-  font-size: 4.2px;
+  font-size: 4.6px;
   letter-spacing: 0.16em;
-  fill: var(--silver-dim);
+  fill: var(--silver);
 }
 .dia-grid { fill: none; stroke: rgba(226, 222, 213, 0.1); stroke-width: 1; vector-effect: non-scaling-stroke; }
 .dia-axis { stroke: rgba(226, 222, 213, 0.08); stroke-width: 1; vector-effect: non-scaling-stroke; }
@@ -1249,7 +1249,7 @@ body[data-treatment="shiny"] .dia-fill { fill: rgba(200, 196, 187, 0.15); stroke
   font-family: var(--font-mono);
   font-size: 9.5px;
   letter-spacing: 0.08em;
-  color: var(--faint);
+  color: var(--t-meta);
   line-height: 1.5;
 }
 .metriccap--foot {
@@ -1261,7 +1261,7 @@ body[data-treatment="shiny"] .dia-fill { fill: rgba(200, 196, 187, 0.15); stroke
 .balance__cap {
   font-family: var(--font-mono);
   font-size: 9px;
-  color: var(--faint);
+  color: var(--t-meta);
 }
 .balance__track {
   flex: 1;
@@ -1495,6 +1495,32 @@ body[data-treatment="shiny"] .dplate__tag--dev {
   letter-spacing: 0.2em;
   text-transform: uppercase;
   color: var(--silver);
+}
+/* v2 structured receipts: effect mark + confidence tag + basis line */
+.receipt__top { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.receipt__effect {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--silver);
+}
+.receipt__conf {
+  font-family: var(--font-mono);
+  font-size: 7.5px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--t-ghost);
+  border: 1px solid var(--line-faint);
+  border-radius: 2px;
+  padding: 2px 5px;
+  white-space: nowrap;
+}
+.receipt__basis {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  color: var(--t-meta);
 }
 .receipt__read { font-size: 13px; line-height: 1.6; color: var(--t-body); }
 .receipt--undeveloped {

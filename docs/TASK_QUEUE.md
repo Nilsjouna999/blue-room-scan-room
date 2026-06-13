@@ -6,10 +6,9 @@ Last updated: 2026-06-12.
 
 ## Active
 
-- **DESIGN_TOKENS pass 2** (this session): readability tuning + dossier
-  rhythm (quiet→LOUD map), Hidden Stat reveal, Oracle finale.
-  **Completed**; screenshots refreshed. Still deferred: stat-meter
-  redesign, any new effects.
+- **Evidence Board v2 + metrics readability** (this session): structured
+  receipts live (free 3 / halo all, legacy fallback kept); left metrics +
+  free panel lifted one tier. **Completed**; screenshots refreshed.
   *(Previous actives — v2 rendering wiring, v2 data shape, SPINE
   promotion, governance OS, doc spine cleanup — completed 2026-06-12.)*
 
@@ -40,15 +39,11 @@ Last updated: 2026-06-12.
    bleed in (Mint Record plate already does).
    *Done when:* Halo dossier plates carry a restrained material accent;
    free stays matte; screenshots regenerated.
-6. **Render v2 receipts + route label in the UI** — the deferred half of
-   the v2 wiring: Evidence Board shows structured receipts (cue/effect/
-   basis/confidence) and Source Record shows the route label. Needs one
-   small presentation decision first: how effect values ("Frame +8")
-   appear without turning plates into a dashboard (DESIGN_TOKENS accent
-   rules apply).
-   *Done when:* Evidence Board renders scan.receipts (free 3 / halo all),
-   route label in Source Record, TODO(v2-render) markers removed,
-   screenshots regenerated.
+6. **Route label in Source Record** — the last remnant of v2 surfacing:
+   one row in the dossier Source Record showing `scan.route` +
+   `scanStatus` (e.g. "HUMAN_SOLO · accepted"), legacy-safe when v2
+   absent. Tiny app.js change.
+   *Done when:* the row renders in both states; copy passes COPY_SYSTEM.
 
 ## Backlog / needs decision
 

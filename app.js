@@ -635,13 +635,39 @@ function renderDossier(src, treatment) {
       <div><dt>Markings</dt><dd>${esc(d.record.markings)}</dd></div>
     </dl>`);
 
-  /* 02 — Evidence Board
-     TODO(v2-render): switch to scan.receipts / tierOut.receiptsShown
-     (cue/effect/basis/confidence) once the receipt-plate presentation
-     of effect values is designed. Legacy prose receipts until then. */
-  const shown = paid ? d.evidence : d.evidence.filter((e) => e.free);
-  const hiddenCount = d.evidence.length - shown.length;
-  const board = dplate("02", "Evidence Board", paid, `
+  /* 02 — Evidence Board — v2 structured receipts (cue/effect/basis/
+     confidence) preferred; legacy prose receipts as fallback. Effects
+     render as quiet mono marks, never a dashboard. */
+  let boardBody;
+  if (scan?.receipts?.length) {
+    const all = scan.receipts;
+    const shownR = paid ? all : scan.tierOutputs.free.receiptsShown || all.slice(0, 3);
+    const hiddenN = all.length - shownR.length;
+    boardBody = `
+    <div class="dboard">
+      ${shownR
+        .map(
+          (r) => `
+        <div class="receipt">
+          <div class="receipt__top"><span class="receipt__effect">${esc(r.effect)}</span><span class="receipt__conf">${esc(r.confidence)}</span></div>
+          <p class="receipt__read">${esc(r.cue)}</p>
+          <span class="receipt__basis">${esc(r.basis)}</span>
+        </div>`
+        )
+        .join("")}
+      ${
+        paid || hiddenN <= 0
+          ? ""
+          : `<div class="receipt receipt--undeveloped">
+              <span class="receipt__k">· · ·</span>
+              <p class="receipt__read">${hiddenN} receipts undeveloped — archive pull. Development pending.</p>
+            </div>`
+      }
+    </div>`;
+  } else {
+    const shown = paid ? d.evidence : d.evidence.filter((e) => e.free);
+    const hiddenCount = d.evidence.length - shown.length;
+    boardBody = `
     <div class="dboard">
       ${shown
         .map(
@@ -660,7 +686,9 @@ function renderDossier(src, treatment) {
               <p class="receipt__read">${hiddenCount} receipts undeveloped — archive pull. Development pending.</p>
             </div>`
       }
-    </div>`);
+    </div>`;
+  }
+  const board = dplate("02", "Evidence Board", paid, boardBody);
 
   /* 03 — Stat Dossier (values + visibility from v2 when present) */
   const statRows = (scan?.tierOutputs.free.statsShown || ["presence", "frame", "signal", "charge"])
