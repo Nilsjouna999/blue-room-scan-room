@@ -6,6 +6,19 @@ Last updated: 2026-06-13.
 
 ## Active
 
+- **data.js Copy System Audit v1** (2026-06-13 / BR-S034, audit + 3 small fixes):
+  audited all sample-card copy in `data.js` against COPY_SYSTEM (banned-lexicon,
+  five-gate, tone, every-outcome-is-a-win) — two token-greps + an independent
+  adversarial sub-agent. **Verdict PASS WITH FIXES.** Confirmed 0 `you/your`, 0
+  gendered pronouns, 0 banned status/beauty/SaaS in visible copy; every-outcome-
+  is-a-win holds. **3 small fixes (no logic change):** "tax the score"→"tax the
+  composition" (statNote); internal routeLogic "dominant"→"strongest stat pair"
+  (non-rendered, defense-in-depth); + COPY_SYSTEM §6 canon "for you"→"for the
+  lens" coherence. New audit doc `docs/audits/DATA_COPY_SYSTEM_AUDIT_V1.md`.
+  Verified live (4 representative states + 4 dev routes + menu + sealed/offline
+  flow unchanged; data.js parses; console clean). **Completed.** Implements
+  Ready #0; **next up:** Render archetype discovery note in Halo (Ready #0).
+
 - **Sample Room 18-State Audit v1** (2026-06-13 / BR-S033, audit + 4 copy fixes):
   audited the full sample-room matrix (2 sources × free/halo/lab × source/diagram/
   metrics = 18 states) after Artifact Language Stabilization Pack v1. **Verdict
@@ -287,28 +300,26 @@ Last updated: 2026-06-13.
    Verdict PASS WITH FIXES; migration correct across all 18 states, 4 person-
    pronoun copy fixes. Audit doc `docs/audits/SAMPLE_ROOM_18_STATE_AUDIT_V1.md`.
    See Active.)*
-0. **data.js copy audit against COPY_SYSTEM** (NEXT) — the grammar postdates most
-   shipped copy.
-   *Done when:* every string in data.js passes the banned-word list, the
-   tone test (§1) and the every-outcome-is-a-win rules (§5); fixes
-   committed; no meaning drift.
-1. **Render archetype discovery note in Halo** — PROJECT_OS visibility
+   *(data.js copy audit against COPY_SYSTEM — completed by BR-S034 (data.js Copy
+   System Audit v1). Verdict PASS WITH FIXES; 3 small fixes. Audit doc
+   `docs/audits/DATA_COPY_SYSTEM_AUDIT_V1.md`. See Active.)*
+0. **Render archetype discovery note in Halo** (NEXT) — PROJECT_OS visibility
    table promises "full archetype explanation + discovery note" in Halo;
    no data field or render exists yet. Pull discovery notes from
    COPY_SYSTEM §4 (Encounter / Dispatch).
    *Done when:* Halo shows the archetype class + discovery note (right
    panel or dossier §4/§5 — not on the card); Free shows label only.
-2. **Three shiny material prototypes** — CARD_TECH_LAB §20: Cold Foil /
+1. **Three shiny material prototypes** — CARD_TECH_LAB §20: Cold Foil /
    Black Star / Night Gloss as data-only `halo` presets behind the Lab
    key, no layout changes.
    *Done when:* three presets switchable in Lab, screenshots captured and
    compared side-by-side, comparison filed in CARD_TECH_LAB.
-3. **Dossier plate material polish** — taste debt from the 2026-06-12
+2. **Dossier plate material polish** — taste debt from the 2026-06-12
    review: plates read flat next to the card; let the material accent
    bleed in (Mint Record plate already does).
    *Done when:* Halo dossier plates carry a restrained material accent;
    free stays matte; screenshots regenerated.
-4. **Route label in Source Record** — the last remnant of v2 surfacing:
+3. **Route label in Source Record** — the last remnant of v2 surfacing:
    one row in the dossier Source Record showing `scan.route` +
    `scanStatus` (e.g. "HUMAN_SOLO · accepted"), legacy-safe when v2
    absent. Tiny app.js change.
@@ -316,7 +327,7 @@ Last updated: 2026-06-13.
 
 ## Backlog / needs decision
 
-- **Final Halo material decision** — after Ready #2 (Three shiny material
+- **Final Halo material decision** — after Ready #1 (Three shiny material
   prototypes); log winner in DECISION_LOG, promote rules to PROJECT_OS
   (CARD_TECH_LAB §18/§20).
 - **Develop/mint transformation moment** — CARD_TECH_LAB §15; needs scope

@@ -224,8 +224,9 @@ of the photograph.
 
 ### SRC-02 / Ice Field — The Dispatch
 - **Hidden Stat:** Field Silence — *"The subject reads less like a pose
-  and more like evidence from a cold operation. Nothing here performs
-  for you."*
+  and more like evidence from a cold operation. Nothing here was performed
+  for the lens."* *(the old "performs for you" read was retired by the
+  data.js Copy System Audit v1, 2026-06-13 — second-person address.)*
 - **Oracle direction:** *"This card does not explain itself. It arrives
   as field evidence and lets the snow do most of the talking."*
 

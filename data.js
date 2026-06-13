@@ -151,7 +151,7 @@ const SOURCES = [
       ],
       statNotes: {
         presence: { evidence: "Cap brim, beard and red layer build a stable mass the wide lens can't dilute.", note: "Holds a vehicle's worth of clutter still." },
-        frame: { evidence: "Wide-angle barrel and dashboard intrusion tax the score; the window band claws back the right third." },
+        frame: { evidence: "Wide-angle barrel and dashboard intrusion tax the composition; the window band claws back the right third." },
         signal: { evidence: "A raised palm is the most legible gesture in the archive — this one is textbook.", note: "Sits near the top of the archive band for cabin shots." },
         charge: { evidence: "Engine-off energy: warm, contained, ten seconds from motion." },
       },
@@ -457,7 +457,7 @@ function toScanResultV2(src) {
     archetype: {
       title: src.card.archetype, // instance title (photo role, not personality)
       class: x.archetypeClass, // COPY_SYSTEM §4 class
-      routeLogic: `${x.route} + dominant stat pair + strongest receipt`,
+      routeLogic: `${x.route} + strongest stat pair + strongest receipt`,
     },
     readings: {
       freeLine: src.card.note, // short, preview-sized

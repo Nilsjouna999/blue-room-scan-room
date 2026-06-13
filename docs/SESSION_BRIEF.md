@@ -10,6 +10,68 @@ coding session; the assistant must respect it. Files not listed under
 does not match the user's current task — **stop and ask** before doing
 anything. (GOVERNANCE_OS anti-drift.)
 
+## Active session — BR-S034
+
+**Date / Session ID:** 2026-06-13 / BR-S034
+
+**Today's task:** data.js Copy System Audit v1 (copy-safety/tone audit; small fixes)
+
+**Why:** Audit and lightly polish all sample-card copy in data.js against the
+BLUE ROOM copy system — image-as-artifact, no second-person/gender/status/
+attractiveness, voice, every-outcome-is-a-win. Not a redesign.
+
+**Read:** docs/GPT_REVIEW_GUIDE.md · docs/PROJECT_OS.md · docs/TASK_QUEUE.md ·
+docs/SESSION_BRIEF.md · docs/CHANGE_MAP.md · docs/DECISION_LOG.md ·
+docs/COPY_SYSTEM.md · docs/CARD_LOGIC_V1.md ·
+docs/audits/SAMPLE_ROOM_18_STATE_AUDIT_V1.md ·
+docs/research/HUMAN_IN_FRAME_READING_RULES_V1.md ·
+docs/research/LANGUAGE_SYSTEM_V1.md · docs/research/REFRAME_MAP_VALUE_SYSTEM_V1.md ·
+data.js
+
+**Edit:** docs/audits/DATA_COPY_SYSTEM_AUDIT_V1.md (new) · data.js (small copy
+fixes only) · docs/COPY_SYSTEM.md (one §6 canon coherence fix) · docs/FILE_MAP.md ·
+docs/CHANGE_MAP.md · docs/TASK_QUEUE.md · docs/SESSION_BRIEF.md
+
+**Do not open:** C:\Users\nilsj\OneDrive\Documents\blue-room
+
+**Do not edit:** app.js / styles.css / scan-contract.js / index.html / assets
+(no logic/layout change) · docs/halo/* · the migrated specs
+
+**Authority affected:** AUDIT (new record) + small ACTIVE data.js copy fixes +
+one COPY_SYSTEM canon coherence fix
+
+**Core/spec change required?** No — copy audit + 3 small fixes.
+
+**Locked constraints:** image-as-artifact (five-gate) · no second-person/gender/
+identity/status/personality/attractiveness · BLUE ROOM voice (dry cinematic;
+premium-neutral on labels) · every-outcome-is-a-win · preserve the approved
+systems (Frame Presence/Frame/Signal/Scene Charge · Muted…Peak · Gesture
+Geometry · Frame Impact · Subject · evidence arrows · no exact pre-unlock
+counts) · small surgical fixes only, do not flatten the voice · no new features /
+schemas / layout / Halo Dossier / payment / AI / backend / upload analysis ·
+preserve all routes + sealed/offline flow
+
+**Known current state:** Sample Room 18-State Audit v1 (3e735f0); data.js visible
+person-pronoun layer already cleaned; dev routes free-scan-sim/halo-gate/uploaded-
+result/uploaded-blocked exist; no AI/backend/payment
+
+**Definition of done:** `docs/audits/DATA_COPY_SYSTEM_AUDIT_V1.md` exists with
+verdict + risky copy + fixes + intentionally-kept lines + confirmations (human-
+in-frame safe · no banned status/attractiveness/personality · every-outcome-is-
+a-win) · small in-scope fixes applied · FILE_MAP registers it · CHANGE_MAP/
+TASK_QUEUE/SESSION_BRIEF updated · data.js parses · sample room + dev routes
+render · console clean · commit + push
+
+**Verification:** `python -m http.server 8743`; data.js parses; the 4
+representative states (src1/src2 × free-source / shiny-metrics) render with tier
+bands; fix #1 renders ("tax the composition"); free-scan-sim / halo-gate /
+uploaded-result / uploaded-blocked unchanged; bare URL → menu; Local Draft →
+Develop Scan still sealed/offline; live sweeps: you/your 0 · he/she 0 · score 0;
+console clean.
+
+**Final response format:** commit hash · changed files · verdict · exact fixes ·
+intentionally-left lines · verification · next task · rollback
+
 ## Active session — BR-S033
 
 **Date / Session ID:** 2026-06-13 / BR-S033

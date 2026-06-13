@@ -185,6 +185,32 @@ payment/Halo/upload analysis). GPT_REVIEW_GUIDE + TASK_QUEUE + SESSION_BRIEF
 note the folder. Roadmap unchanged beyond this checkpoint — next product task
 stays **Free Pull Mock Polish v1**.
 
+## data.js Copy System Audit v1 (2026-06-13 / BR-S034, audit + 3 small fixes)
+
+Audited **all** sample-card copy in `data.js` against `docs/COPY_SYSTEM.md` +
+the research human-in-frame / language rules (image-as-artifact five-gate, no
+second-person, no gender/identity, no status/personality/attractiveness, BLUE
+ROOM voice, every-outcome-is-a-win). **Verdict PASS WITH FIXES.** New audit doc
+`docs/audits/DATA_COPY_SYSTEM_AUDIT_V1.md` (FILE_MAP registers it). Method: two
+token-greps over data.js + an independent adversarial sub-agent over every
+string field; both converged. **Confirmed:** 0 occurrences of `you/your`, 0
+gendered pronouns (he/she), 0 banned status/beauty/SaaS words in any visible
+reading; every-outcome-is-a-win holds. **3 small fixes (no logic change):**
+(1) `data.js` SRC-01 statNote "…tax the **score**" → "…tax the **composition**"
+(the one place prose treated a stat as a grade, threatening §5); (2) `data.js`
+internal `archetype.routeLogic` "**dominant** stat pair" → "**strongest** stat
+pair" (non-rendered, defense-in-depth before any v2 surface ships); (3)
+`docs/COPY_SYSTEM.md` §6 canon "Nothing here performs **for you**." → "…was
+performed **for the lens**." (the governing tone-benchmark still enshrined the
+exact "for you" the prior audit retired from shipped copy). Borderline-kept
+(documented): Disarming/Grounding (Frame Impact labels), "motion potential",
+fitMatrix "Locked" state, "posture of someone who decides", "beard", the
+confidence-band diagnostic, the group-chat oracle joke. **Verified live**:
+data.js parses; 4 representative states render with tier bands; fix #1 renders;
+all 4 dev routes + bare menu unchanged; Local Draft → Develop Scan still
+sealed/offline; console clean. No redesign / new features / Halo Dossier /
+payment / AI / backend / upload analysis.
+
 ## Sample Room 18-State Audit v1 (2026-06-13 / BR-S033, audit + 4 copy fixes)
 
 Audited the full sample-room state matrix (2 sources × free/halo/lab × source/
