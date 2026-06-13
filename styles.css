@@ -1916,6 +1916,53 @@ body[data-view="room"] .draft { display: none; }
 .draft__sample:hover, .draft__back:hover { border-color: var(--line-strong); color: var(--silver); }
 .draft__back { border-style: dashed; }
 
+/* Develop-scan CTA on the local-draft intake — the quiet next step. */
+.draft__develop { display: grid; justify-items: center; gap: 6px; }
+.draft__developsub { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--faint); }
+
+/* Scan Development Gate — a sealed development step for a staged local
+   draft. A locked chamber, not a SaaS modal: flat plate, static ledger,
+   disabled run button. Nothing here implies that processing happened. */
+.gate { width: 100%; max-width: 520px; display: grid; justify-items: center; gap: 18px; text-align: center; }
+.gatepanel {
+  width: 100%; display: grid; gap: 14px; padding: 22px 22px 20px;
+  border: 1px solid var(--line); border-radius: var(--r-plate);
+  background: linear-gradient(180deg, var(--ink-850), var(--ink-900));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+.gatepanel__head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.gatepanel__title { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.26em; text-transform: uppercase; color: var(--silver); }
+.gatepanel__tag {
+  font-family: var(--font-mono); font-size: 8px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--t-meta);
+  padding: 3px 9px; border: 1px dashed var(--line); border-radius: 999px; white-space: nowrap;
+}
+.gatepanel__staged {
+  position: relative; width: 116px; justify-self: center; aspect-ratio: 4 / 5; overflow: hidden;
+  border-radius: var(--r-plate); border: 1px solid var(--line); background: var(--ink-950);
+}
+.gatepanel__img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 45%; display: block; filter: grayscale(0.25) brightness(0.6); }
+.gatepanel__staged.img-missing .gatepanel__img { display: none; }
+.gatepanel__sealed {
+  position: absolute; inset: 0; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 7px;
+  font-family: var(--font-mono); font-size: 7px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--silver-dim);
+  background: linear-gradient(180deg, rgba(8, 7, 5, 0.1), rgba(8, 7, 5, 0.55));
+}
+.gatepanel__lead { font-family: var(--font-display); font-size: 15px; line-height: 1.45; color: var(--t-primary); }
+.gatecheck {
+  list-style: none; display: grid; gap: 6px; justify-items: start; max-width: 250px; margin: 0 auto; padding: 12px 0;
+  border-top: 1px solid var(--line-faint); border-bottom: 1px solid var(--line-faint);
+}
+.gatecheck li { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.03em; color: var(--t-meta); padding-left: 18px; position: relative; }
+.gatecheck li::before { content: "—"; position: absolute; left: 0; color: var(--t-ghost); }
+.gatepanel__foot { display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap; }
+.gatepanel__pending { font-family: var(--font-mono); font-size: 8.5px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--silver-dim); }
+.gatepanel__run {
+  font-family: var(--font-mono); font-size: 9.5px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--t-ghost);
+  padding: 9px 16px; border: 1px dashed var(--line); border-radius: 6px; background: none; cursor: not-allowed;
+}
+.gatepanel__ready { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--faint); }
+.gateactions { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+
 /* =============================================================
    Fallback for narrow screens (desktop is the priority)
 ============================================================= */

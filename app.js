@@ -15,7 +15,7 @@ function esc(s) {
 
 const pad2 = (n) => String(n).padStart(2, "0");
 
-const state = { source: 0, treatment: "free", tab: "source", view: "menu" };
+const state = { source: 0, treatment: "free", tab: "source", view: "menu", draftGate: false };
 
 /* Deep-link support: ?src=1|2&t=free|shiny|mint&tab=source|diagram|metrics
    (used by reviewers and the screenshot pipeline). Any of these params
@@ -920,18 +920,25 @@ function loadDraftFile(file) {
     warn: file.size > DRAFT_LARGE_FILE ? "Large file — the preview may take a moment to render in this browser." : "",
   };
   state.view = "draft";
+  state.draftGate = false; // a fresh / replaced draft always starts at intake, not the gate
   document.getElementById("draftView").innerHTML = renderDraft();
   mountMenu(); // the menu now offers "Resume local draft"
   applyView();
   window.scrollTo(0, 0);
 }
 
+/* Two local-draft states share one mount (#draftView): the intake preview
+   and the sealed Scan Development Gate. Neither generates any analysis. */
+function renderDraft() {
+  if (!draft) return "";
+  return state.draftGate ? renderGate() : renderDraftIntake();
+}
+
 /* The draft card reuses the Room/Plate/Artifact grammar but shows ZERO
    analysis — no stats, no receipts, no oracle, no hidden stat, no serial.
    It says only what is true: a local, unscanned image. */
-function renderDraft() {
+function renderDraftIntake() {
   const d = draft;
-  if (!d) return "";
   return `
     <div class="draft__inner">
       <div class="draft__cue">◆ &nbsp;BLUE ROOM · LOCAL DRAFT INTAKE</div>
@@ -973,13 +980,68 @@ function renderDraft() {
         <p class="draftinfo__meta">${esc(d.name)} · ${esc(d.sizeLabel)}${d.warn ? ` · <span class="draftinfo__warn">${esc(d.warn)}</span>` : ""}</p>
       </section>
 
+      <div class="draft__develop">
+        <button type="button" class="menu__enter" data-gate="open">Develop scan</button>
+        <p class="draft__developsub">Scan engine not connected yet.</p>
+      </div>
+
       <div class="draft__actions">
-        <button type="button" class="menu__enter" data-draft-pick>Replace image</button>
+        <button type="button" class="draft__sample" data-draft-pick>Replace image</button>
         <button type="button" class="draft__sample" data-view-to="room">Enter sample scan room</button>
         <button type="button" class="draft__back" data-view-to="menu">Main menu</button>
       </div>
 
       <p class="pickmsg" role="status" aria-live="polite"></p>
+    </div>`;
+}
+
+/* Scan Development Gate — a sealed next step for a staged local draft.
+   The scan engine is NOT connected: this renders a locked development
+   chamber with a static "nothing has run" ledger and a DISABLED run
+   button. It generates NOTHING (no stats / receipts / oracle / hidden
+   stat / mint / Halo) and never touches SOURCES, SCAN_RESULTS_V2,
+   getActiveScan() or getScanResult(). It reads only `draft`. */
+function renderGate() {
+  const d = draft;
+  return `
+    <div class="gate">
+      <div class="draft__cue">◆ &nbsp;BLUE ROOM · SCAN DEVELOPMENT GATE</div>
+
+      <section class="gatepanel">
+        <header class="gatepanel__head">
+          <span class="gatepanel__title">Scan Development Gate</span>
+          <span class="gatepanel__tag">Engine offline</span>
+        </header>
+
+        <figure class="gatepanel__staged">
+          <img class="gatepanel__img" src="${esc(d.url)}" alt="Staged artifact"
+            onerror="this.closest('.gatepanel__staged').classList.add('img-missing')" />
+          <span class="gatepanel__sealed">Artifact staged · sealed</span>
+        </figure>
+
+        <p class="gatepanel__lead">The artifact is staged. The scan engine is not connected yet.</p>
+
+        <ul class="gatecheck">
+          <li>No analysis has run.</li>
+          <li>No stats have been generated.</li>
+          <li>No receipts exist.</li>
+          <li>No oracle exists.</li>
+          <li>No Halo result exists.</li>
+        </ul>
+
+        <div class="gatepanel__foot">
+          <span class="gatepanel__pending">Development pending</span>
+          <button type="button" class="gatepanel__run" disabled aria-disabled="true">Run engine · offline</button>
+        </div>
+        <p class="gatepanel__ready">Ready for future scan engine.</p>
+      </section>
+
+      <div class="gateactions">
+        <button type="button" class="menu__enter" data-gate="close">Return to local draft</button>
+        <button type="button" class="draft__sample" data-draft-pick>Replace image</button>
+        <button type="button" class="draft__sample" data-view-to="room">Enter sample scan room</button>
+        <button type="button" class="draft__back" data-view-to="menu">Main menu</button>
+      </div>
     </div>`;
 }
 
@@ -1035,6 +1097,11 @@ document.addEventListener("click", (e) => {
   if (!btn) return;
   const to = btn.dataset.viewTo;
   if (to === "draft" && !draft) return; // nothing to resume
+  if (to === "draft") {
+    /* Resume always lands on the intake, not the gate */
+    state.draftGate = false;
+    document.getElementById("draftView").innerHTML = renderDraft();
+  }
   state.view = to;
   applyView();
   window.scrollTo(0, 0);
@@ -1046,6 +1113,16 @@ document.addEventListener("click", (e) => {
 });
 document.getElementById("draftFile").addEventListener("change", (e) => {
   loadDraftFile(e.target.files && e.target.files[0]);
+});
+
+/* Scan Development Gate: open ("Develop scan") / close ("Return to local
+   draft"). Toggles a render flag only — it never runs or generates a scan. */
+document.addEventListener("click", (e) => {
+  const btn = e.target.closest("[data-gate]");
+  if (!btn) return;
+  state.draftGate = btn.dataset.gate === "open";
+  document.getElementById("draftView").innerHTML = renderDraft();
+  window.scrollTo(0, 0);
 });
 
 document.getElementById("sourcePanel").addEventListener("click", (e) => {
@@ -1074,7 +1151,11 @@ document.addEventListener("keydown", (e) => {
      door Enter opens the room; on a draft Escape returns to the menu. */
   if (state.view !== "room") {
     if (state.view === "menu" && e.key === "Enter") { state.view = "room"; applyView(); window.scrollTo(0, 0); }
-    else if (state.view === "draft" && e.key === "Escape") { state.view = "menu"; applyView(); }
+    else if (state.view === "draft" && e.key === "Escape") {
+      /* Escape steps back one level: gate → intake, intake → menu */
+      if (state.draftGate) { state.draftGate = false; document.getElementById("draftView").innerHTML = renderDraft(); }
+      else { state.view = "menu"; applyView(); }
+    }
     return;
   }
   if (e.key === "1") state.source = 0;

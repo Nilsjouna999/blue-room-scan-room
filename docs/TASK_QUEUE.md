@@ -6,17 +6,18 @@ Last updated: 2026-06-12.
 
 ## Active
 
-- **Local Draft intake v1** (2026-06-13): "Add your photo" → browser-local
-  file pick → `URL.createObjectURL` preview in a third `draft` view with a
-  LOCAL DRAFT artifact card and honest copy; no upload/storage/AI, no fake
-  analysis. **Completed** (index.html + app.js + styles.css); object URLs
-  revoked on replace; non-image rejected; deep links + sample room
-  untouched; `menu-front` refreshed (draft view not headlessly capturable
-  — verified live via preview tools + a 5-dimension adversarial review,
-  0 findings).
-  *(Previous actives — Main Menu v1, conversion spine pass, product
-  clarity pass, v2 rendering wiring, v2 data shape, SPINE promotion,
-  governance OS, doc spine cleanup — completed 2026-06-12/13.)*
+- **Scan Development Gate v1** (2026-06-13 / BR-S016): Local Draft intake
+  gains a "Develop scan" CTA → sealed **Scan Development Gate**
+  (`state.draftGate`, `renderGate()`) saying the engine is not connected;
+  disabled run button; generates NOTHING (no stats/receipts/oracle/hidden/
+  mint/Halo), never calls getActiveScan/getScanResult or touches
+  SOURCES/SCAN_RESULTS_V2. **Completed** (app.js + styles.css +
+  SESSION_BRIEF); return/replace/sample-room/menu paths + both deep links
+  verified live; gate not headlessly capturable (no screenshot).
+  *(Previous actives — Local Draft intake v1, Main Menu v1, conversion
+  spine pass, product clarity pass, v2 rendering wiring, v2 data shape,
+  SPINE promotion, governance OS, doc spine cleanup — completed
+  2026-06-12/13.)*
 
 ## Ready (supported by current docs, clear definition of done)
 

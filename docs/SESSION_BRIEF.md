@@ -10,6 +10,52 @@ coding session; the assistant must respect it. Files not listed under
 does not match the user's current task — **stop and ask** before doing
 anything. (GOVERNANCE_OS anti-drift.)
 
+## Active session — BR-S016
+
+**Date / Session ID:** 2026-06-13 / BR-S016
+
+**Today's task:** Scan Development Gate v1
+
+**Why:** Give the staged local draft a clear next-step gate without
+pretending scan analysis exists yet.
+
+**Read:** docs/FILE_MAP.md · docs/SCREENS.md · app.js · styles.css
+
+**Edit:** docs/SESSION_BRIEF.md · app.js · styles.css · docs/CHANGE_MAP.md ·
+docs/TASK_QUEUE.md · docs/SCREENS.md (if needed)
+
+**Do not open:** C:\Users\nilsj\OneDrive\Documents\blue-room · docs/research/*
+
+**Authority affected:** ACTIVE SPECS
+
+**Core/spec change required?** no
+
+**Locked constraints:** no backend · no upload · no AI · no payment · no
+fake stats · no fake receipts · no fake oracle · no fake Halo result ·
+local draft stays separate from sample ScanResult v2 · preserve sample
+scan room · preserve all deep links
+
+**Known current state:** Main Menu v1 pushed at def0dfe · Upload/Intake
+Shell v1 pushed at d590e55 · Add Your Photo opens local file picker ·
+selected image appears as LOCAL DRAFT · Local Draft correctly says no scan
+has run yet
+
+**Definition of done:** Local Draft has a clear Develop Scan button/state ·
+clicking Develop Scan opens a sealed gate panel/state · gate copy clearly
+says the scan engine is not connected yet · no generated result appears ·
+no sample ScanResult data reused for the local draft · no fake stats,
+readings, receipts, oracle, mint record, or Halo output · user can return
+to Local Draft, replace image, enter the sample room, or main menu
+
+**Verification:** open http://localhost:8743/ · Add Your Photo works ·
+Local Draft appears · Develop Scan opens the sealed gate · the gate
+generates no result · SRC 01 / SRC 02 still work ·
+?src=1&t=free&tab=source bypasses the menu · ?src=2&t=shiny&tab=metrics
+bypasses the menu
+
+**Final response format:** Files changed · What changed · What was
+intentionally not changed · Verification result · Risks · Git commands
+
 ## Template (copy, fill, run)
 
 **Date / Session ID:**

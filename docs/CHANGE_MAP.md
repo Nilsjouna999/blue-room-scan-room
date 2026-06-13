@@ -141,6 +141,10 @@ banned/hype-word sweep now clean across all states.
 - **Hard rule:** the draft shows NO analysis — no stats, receipts,
   oracle, hidden stat, score, or serial. If a number appears on the draft
   card it is a bug. No upload, no storage, no AI.
+- **Develop Scan gate:** the intake's "Develop scan" CTA flips
+  `state.draftGate` and re-renders `#draftView` via `renderGate()` — a
+  sealed, generate-nothing chamber (`[data-gate="open|close"]`). Same hard
+  rule: no analysis, no numbers, no sample-data calls.
 - **Test:** Add your photo → Local Draft preview; non-image rejected;
   replace revokes the old object URL; Replace / Enter sample room / Main
   menu / Resume all work; deep links still bypass to the room.
@@ -163,6 +167,26 @@ banned/hype-word sweep now clean across all states.
   plate, Halo tile = the only depth/material element).
 - **Test:** bare URL shows the menu; the four deep links open the room
   directly; Enter Scan Room reveals the unchanged room.
+
+## Scan Development Gate v1 (2026-06-13 / BR-S016, app.js + styles.css)
+
+The Local Draft intake now carries a quiet **"Develop scan"** CTA (subcopy
+"Scan engine not connected yet."). Clicking it sets `state.draftGate = true`
+and re-renders `#draftView` as a sealed **Scan Development Gate**
+(`renderGate()`): an "Engine offline" tag, a dimmed sealed thumbnail of the
+staged artifact, the fixed ledger (No analysis has run · No stats have been
+generated · No receipts exist · No oracle exists · No Halo result exists),
+a DISABLED "Run engine · offline" button, "Development pending" + "Ready for
+future scan engine." It generates NOTHING and never calls
+`getActiveScan()`/`getScanResult()` or touches `SOURCES`/`SCAN_RESULTS_V2`
+— it reads only `draft`. Return paths: Return to local draft
+(`data-gate="close"`) · Replace image · Enter sample scan room · Main menu;
+Escape steps back (gate → intake → menu); a fresh/replaced draft and the
+menu Resume both land on the intake. Like the intake, the gate needs a
+user-picked file, so it is not headlessly capturable (not screenshotted).
+Sample room, menu, and deep links are unchanged. Styles: `.gate`,
+`.gatepanel*`, `.gatecheck`, `.gateactions`, `.draft__develop*` (existing
+tokens; flat plate, no animation).
 
 ## Local Draft intake v1 (2026-06-13, index.html + app.js + styles.css)
 
