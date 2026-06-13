@@ -10,6 +10,76 @@ coding session; the assistant must respect it. Files not listed under
 does not match the user's current task — **stop and ask** before doing
 anything. (GOVERNANCE_OS anti-drift.)
 
+## Active session — BR-S026
+
+**Date / Session ID:** 2026-06-13 / BR-S026
+
+**Today's task:** Free Pull Screenshot Layout Spec v1 (docs only)
+
+**Why:** Specify the **front** of the Free Pull card (the screenshot-worthy
+artifact) before the Halo Gate runtime / sealed back is mocked. A mock must
+not be built before the spec it renders; a back must not be mocked before the
+front exists. (Roadmap correction: do NOT build Halo Gate runtime yet.)
+
+**Read:** docs/PROJECT_OS.md · docs/CARD_SYSTEM_V1.md · docs/CARD_LOGIC_V1.md ·
+docs/HALO_GATE_UPGRADE_LAYUP_V1.md · docs/FILE_MAP.md · docs/TASK_QUEUE.md ·
+docs/SESSION_BRIEF.md · docs/CHANGE_MAP.md · docs/DESIGN_TOKENS.md ·
+docs/GOVERNANCE_OS.md
+
+**Edit:** docs/SESSION_BRIEF.md · docs/FREE_PULL_SCREENSHOT_LAYOUT_V1.md (new)
+· docs/FILE_MAP.md · docs/CHANGE_MAP.md · docs/TASK_QUEUE.md
+
+**Do not open:** C:\Users\nilsj\OneDrive\Documents\blue-room
+
+**Do not edit (runtime):** app.js · data.js · scan-contract.js · index.html ·
+styles.css · assets
+
+**Authority affected:** ACTIVE SPECS
+
+**Core/spec change required?** Yes — docs-only layout spec (Spec Change
+Review: §7 recommends a screenshot-facing tier-band ladder that diverges from
+`CARD_LOGIC_V1` §2; the conflict is named, not picked silently — reconcile in
+Sample Room Tier Migration v1; no LOCKED safety law relaxed). No runtime
+change.
+
+**Locked constraints:** BLUE ROOM reads the photo, not the person · Free Pull
+is the complete card front (not a teaser) · Halo is the sealed back / dossier
+of the same card (not a better score / reroll / gamble / "true self") · no
+public 0–100 numbers · no paragraphs on the front · receipts are chips
+(observed cue → artifact effect) · Reframe Map never expands on Free · sealed
+stat + Reframe Map live in one sealed vault · no AI · no backend · no upload
+analysis · no payment / checkout · no Halo unlock · no runtime mock · no fake
+stats for real uploaded photos · no person-rating language · no fake urgency /
+countdowns / near-miss / packs / subscription language
+
+**Known current state:** Halo Gate / Upgrade Layup v1 (c4757ba) · dev route
+`?dev=free-scan-sim` shows public tiers + grounded receipts + scope + sealed
+stat + rarity + Reframe Map preview · normal Local Draft → Develop Scan opens
+the sealed offline gate · no AI / backend / payment / real scan engine ·
+uploaded photos still produce no analysis · sample room (data.js) still shows
+Presence/Frame/Signal/**Charge** as 0–100 numbers (migration pending)
+
+**Definition of done:** docs/FREE_PULL_SCREENSHOT_LAYOUT_V1.md exists as an
+ACTIVE spec defining purpose, product role, the Split Artifact / Stat Board
+layout anatomy, screenshot rules, content budget, receipt-chip grammar,
+tier-band grammar (with the §2 reconciliation flagged), sealed-vault grammar,
+the Halo seal edge, the scope line, visual feel, anti-goals, mock acceptance
+criteria, and the corrected downstream roadmap · FILE_MAP registers it ·
+CHANGE_MAP + TASK_QUEUE updated (roadmap re-ordered to Free Pull Layout Mock
+v1 → Sample Room Tier Migration v1 → Halo Gate Dev Mock v1) · no runtime
+changes · commit + push completed
+
+**Verification:** `git status` + `git diff --stat` show docs-only changes; no
+app.js/index.html/styles.css/data.js/scan-contract.js/assets edits;
+FREE_PULL_SCREENSHOT_LAYOUT_V1 registered in FILE_MAP; new doc re-read
+top-to-bottom (Free complete not teaser · Halo sealed back not SaaS · Reframe
+Map shape-only on Free · no 0–100 public numbers · no person-rating language ·
+no payment/backend/AI); tree clean after push.
+
+**Final response format:** commit hash · files changed · verification
+performed · whether runtime was untouched · next recommended task · rollback
+command
+
 ## Active session — BR-S025
 
 **Date / Session ID:** 2026-06-13 / BR-S025

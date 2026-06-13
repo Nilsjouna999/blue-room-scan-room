@@ -2,9 +2,25 @@
 
 Ranked work queue, not a dream backlog. One Active item at a time.
 Out-of-scope findings from any session get logged here, not patched.
-Last updated: 2026-06-12.
+Last updated: 2026-06-13.
 
 ## Active
+
+- **Free Pull Screenshot Layout Spec v1** (2026-06-13 / BR-S026, docs only):
+  new ACTIVE spec `docs/FREE_PULL_SCREENSHOT_LAYOUT_V1.md` — defines the
+  **front** of the Free Pull card as a **Split Artifact / Stat Board** (one
+  landscape PC-first card: image ~48% near-fullbleed + title + print/serial/
+  Free Pull badge; right ~52% = archetype teaser, 4 public **tier-band** stats
+  Presence/Frame/Signal/Visual Impact (no 0–100), 2 grounded receipt chips,
+  sealed vault [01 Sealed Stat name+reason · 02 Reframe Map shape only], quiet
+  scope line, calm Halo seal edge). Adds screenshot rules, content budget,
+  receipt + tier-band + sealed-vault grammar, anti-goals, and mock acceptance
+  criteria. **Roadmap corrected**: the front is specified before the Halo
+  *back* is mocked. §7 recommends bands Quiet/Set/Strong/Sharp/Dominant but
+  **flags the divergence from `CARD_LOGIC_V1` §2** (does not override it) —
+  reconcile in Sample Room Tier Migration v1. **Completed** — docs only,
+  runtime unchanged (no AI/backend/upload/payment/Halo unlock/mock); FILE_MAP
+  registers it. **Next up:** Free Pull Layout Mock v1 (Ready #0).
 
 - **Halo Gate / Upgrade Layup v1** (2026-06-13 / BR-S025, docs only): new
   ACTIVE spec `docs/HALO_GATE_UPGRADE_LAYUP_V1.md` — the Halo upgrade as a
@@ -117,42 +133,67 @@ Last updated: 2026-06-12.
    scope/sealed/rarity/Reframe Map). `validDevRendererResult` (the raw
    uploaded-result harness) was intentionally left on its prior shape; a
    future pass can align it too if wanted.)*
-0. **Halo Gate Dev Mock v1** (NEXT) — a dev-only mock of the Halo Gate from
+0. **Free Pull Layout Mock v1** (NEXT) — a dev-only mock of the Free Pull
+   **front** from `docs/FREE_PULL_SCREENSHOT_LAYOUT_V1.md`: the Split Artifact
+   / Stat Board (image ~48% near-fullbleed + title + print/serial/Free Pull
+   badge; right ~52% = archetype teaser, 4 public tier-band stats, 2 grounded
+   receipt chips, sealed vault [01 Sealed Stat · 02 Reframe Map shape only],
+   quiet scope line, Halo seal edge) — **no AI, no payment, no Halo unlock, no
+   fake stats for real uploaded photos**; behind an explicit dev route,
+   unmistakably labelled DEV.
+   *Done when:* the mock passes the §13 acceptance criteria (one landscape
+   artifact at 1600×900 + 1920×1080, image dominates left, stat board reads
+   without becoming a report, vault visible but not dominant, Reframe Map
+   shape-only, Halo edge not a SaaS upsell, no public 0–100 numbers); normal
+   flow + sample room + deep links + the three existing `?dev` routes
+   unchanged; reviewed.
+1. **Sample Room Tier Migration v1** — reconcile the legacy sample-room
+   numeric display (`PROJECT_OS` §7/§9 still shows Presence/Frame/Signal/
+   **Charge** as 0–100 numbers) into the public **tier-band** system, and
+   ratify ONE authoritative public band ladder — reconciling
+   `CARD_LOGIC_V1` §2 (QUIET/PRESENT/STRONG/DOMINANT/TOTAL) with
+   `FREE_PULL_SCREENSHOT_LAYOUT_V1` §7 (Quiet/Set/Strong/Sharp/Dominant) and
+   the Charge→Visual Impact front swap (`CARD_SYSTEM_V1` §2).
+   *Done when:* one band ladder is decided + logged (DECISION_LOG / owning
+   spec); the sample room shows tier bands (no public 0–100); the §7/§2
+   divergence is resolved, not duplicated; safety law unchanged.
+2. **Halo Gate Dev Mock v1** — a dev-only mock of the Halo Gate from
    `docs/HALO_GATE_UPGRADE_LAYUP_V1.md`: a sealed-dossier chamber (sealed
    stat / Reframe-Map / evidence / oracle / mint envelopes showing *shape*,
    not contents), "Open Halo Dossier" / "Keep Free Pull", and a calm
    post-unlock reveal — **no payment, no checkout, no real unlock**; behind
-   an explicit dev route, unmistakably labelled DEV.
+   an explicit dev route, unmistakably labelled DEV. **Build the Free Pull
+   front (Ready #0) first — a back must not be mocked before its front.**
    *Done when:* the mock renders the layout + copy from the spec; clicking
    "open" runs the calm reveal of the existing dev fixture's sealed contents
    (no Stripe, no fake urgency, no dark patterns); normal flow + sample room
    + deep links + the three existing `?dev` routes unchanged; reviewed.
-1. **18-state audit** — PROJECT_OS §17.1. Walk 2 sources × 3 treatments
+3. **18-state audit** — PROJECT_OS §17.1. Walk 2 sources × 3 treatments
    (incl. Lab) × 3 tabs at 1600×900.
    *Done when:* every state screenshotted or DOM-verified; issues logged
    here, not fixed inline.
-2. **data.js copy audit against COPY_SYSTEM** — the grammar postdates most
+4. **data.js copy audit against COPY_SYSTEM** — the grammar postdates most
    shipped copy.
    *Done when:* every string in data.js passes the banned-word list, the
    tone test (§1) and the every-outcome-is-a-win rules (§5); fixes
    committed; no meaning drift.
-3. **Render archetype discovery note in Halo** — PROJECT_OS visibility
+5. **Render archetype discovery note in Halo** — PROJECT_OS visibility
    table promises "full archetype explanation + discovery note" in Halo;
    no data field or render exists yet. Pull discovery notes from
    COPY_SYSTEM §4 (Encounter / Dispatch).
    *Done when:* Halo shows the archetype class + discovery note (right
    panel or dossier §4/§5 — not on the card); Free shows label only.
-4. **Three shiny material prototypes** — CARD_TECH_LAB §20: Cold Foil /
+6. **Three shiny material prototypes** — CARD_TECH_LAB §20: Cold Foil /
    Black Star / Night Gloss as data-only `halo` presets behind the Lab
    key, no layout changes.
    *Done when:* three presets switchable in Lab, screenshots captured and
    compared side-by-side, comparison filed in CARD_TECH_LAB.
-5. **Dossier plate material polish** — taste debt from the 2026-06-12
+7. **Dossier plate material polish** — taste debt from the 2026-06-12
    review: plates read flat next to the card; let the material accent
    bleed in (Mint Record plate already does).
    *Done when:* Halo dossier plates carry a restrained material accent;
    free stays matte; screenshots regenerated.
-6. **Route label in Source Record** — the last remnant of v2 surfacing:
+8. **Route label in Source Record** — the last remnant of v2 surfacing:
    one row in the dossier Source Record showing `scan.route` +
    `scanStatus` (e.g. "HUMAN_SOLO · accepted"), legacy-safe when v2
    absent. Tiny app.js change.
@@ -160,8 +201,9 @@ Last updated: 2026-06-12.
 
 ## Backlog / needs decision
 
-- **Final Halo material decision** — after Ready #4; log winner in
-  DECISION_LOG, promote rules to PROJECT_OS (CARD_TECH_LAB §18/§20).
+- **Final Halo material decision** — after Ready #6 (Three shiny material
+  prototypes); log winner in DECISION_LOG, promote rules to PROJECT_OS
+  (CARD_TECH_LAB §18/§20).
 - **Develop/mint transformation moment** — CARD_TECH_LAB §15; needs scope
   decision (animation budget, where it triggers).
 - **Rare-variant ladder** (Black Star etc. as tiers above Halo Mint) —

@@ -168,6 +168,34 @@ banned/hype-word sweep now clean across all states.
 - **Test:** bare URL shows the menu; the four deep links open the room
   directly; Enter Scan Room reveals the unchanged room.
 
+## Free Pull Screenshot Layout Spec v1 (2026-06-13 / BR-S026, docs only)
+
+New ACTIVE spec `docs/FREE_PULL_SCREENSHOT_LAYOUT_V1.md` (244 lines) — defines
+the **front of the Free Pull card** as a **Split Artifact / Stat Board**:
+one landscape, PC-first card object, image ~48% near-fullbleed (the image *is*
+the card) + artifact title + tiny print/serial/Free Pull badge on the left;
+archetype teaser, **4 public tier-band stats** (Presence/Frame/Signal/**Visual
+Impact**, bars not 0–100 numbers), **2 grounded receipt chips** (`observed cue
+→ artifact effect`), a **sealed vault** (01 Sealed Stat name+structural reason
+no tier · 02 Reframe Map *shape/count only* — never expands on Free), a quiet
+**scope line**, and a calm **Halo seal edge** (artifact edge, not a SaaS button
+stack) on the right. Adds screenshot rules (all of: image · archetype · 4
+bands · 2 chips · vault shape · scope · Halo edge in one shot), a hard content
+budget (no paragraphs / ≤2–3 chips / short labels), receipt grammar (good +
+banned), sealed-vault grammar, anti-goals, and **mock acceptance criteria** for
+the next task. **Roadmap correction recorded:** the front is specified *before*
+the Halo back (the sealed back) is mocked — corrected order is Free Pull Layout
+Mock v1 → Sample Room Tier Migration v1 → Halo Gate Dev Mock v1. **Spec Change
+Review (slim):** §7 recommends a screenshot-facing band ladder **Quiet · Set ·
+Strong · Sharp · Dominant** that **diverges from `CARD_LOGIC_V1` §2**
+(QUIET/PRESENT/STRONG/DOMINANT/TOTAL); the conflict is **named, not picked
+silently** — the spec explicitly does NOT override §2, and flags reconciliation
+to *Sample Room Tier Migration v1* (which also migrates the legacy sample-room
+Charge/0–100 display per `PROJECT_OS` §7/§9). **Docs only — runtime unchanged**
+(no app.js/scan-contract.js/data.js/index.html/styles.css edits; no AI/backend/
+upload analysis/payment/Halo unlock/runtime mock). FILE_MAP registers it. No
+LOCKED safety rule relaxed.
+
 ## Halo Gate / Upgrade Layup v1 (2026-06-13 / BR-S025, docs only)
 
 New ACTIVE spec `docs/HALO_GATE_UPGRADE_LAYUP_V1.md` (284 lines) — designs
