@@ -15,7 +15,7 @@ function esc(s) {
 
 const pad2 = (n) => String(n).padStart(2, "0");
 
-const state = { source: 0, treatment: "free", tab: "source", view: "menu", draftGate: false };
+const state = { source: 0, treatment: "free", tab: "source", view: "menu", draftGate: false, dev: null };
 
 /* Deep-link support: ?src=1|2&t=free|shiny|mint&tab=source|diagram|metrics
    (used by reviewers and the screenshot pipeline). Any of these params
@@ -27,7 +27,11 @@ const state = { source: 0, treatment: "free", tab: "source", view: "menu", draft
   if (s === 1 || s === 2) state.source = s - 1;
   if (["free", "shiny", "mint"].includes(q.get("t"))) state.treatment = q.get("t");
   if (["source", "diagram", "metrics"].includes(q.get("tab"))) state.tab = q.get("tab");
-  if (q.has("src") || q.has("t") || q.has("tab")) state.view = "room";
+  /* Dev-only harness route (NOT a product feature): ?dev=uploaded-result |
+     uploaded-blocked renders a validated DEV fixture, never a user scan. */
+  const dev = q.get("dev");
+  if (dev === "uploaded-result" || dev === "uploaded-blocked") { state.view = "dev"; state.dev = dev; }
+  else if (q.has("src") || q.has("t") || q.has("tab")) state.view = "room";
 }
 
 /* ---------- ScanResult v2 access (SCAN_ENGINE_SPEC) ----------
@@ -1068,7 +1072,7 @@ function renderGate() {
    receipts beyond the validator errors. It is NOT wired into the normal
    user flow (Develop scan still only opens the offline gate); a future
    engine — or a dev/test trigger — supplies the state. */
-function renderBlockedScan(b) {
+function renderBlockedScan(b, actionsHtml) {
   const errs = (b && Array.isArray(b.errors) && b.errors.length ? b.errors : [b && b.reason ? b.reason : "contract violation"]);
   return `
     <div class="gate">
@@ -1089,12 +1093,142 @@ function renderBlockedScan(b) {
         <p class="gatepanel__ready">No card, no stats, no oracle, no receipts were produced.</p>
       </section>
 
-      <div class="gateactions">
+      ${actionsHtml || `<div class="gateactions">
         <button type="button" class="menu__enter" data-view-to="draft">Return to local draft</button>
         <button type="button" class="draft__sample" data-draft-pick>Replace image</button>
         <button type="button" class="draft__sample" data-view-to="room">Enter sample scan room</button>
         <button type="button" class="draft__back" data-view-to="menu">Main menu</button>
+      </div>`}
+    </div>`;
+}
+
+/* ---------- DEV HARNESS: uploaded-scan-result renderer (dev route only) ----------
+   Reachable ONLY via ?dev=uploaded-result | ?dev=uploaded-blocked. Renders a
+   VALIDATED dev fixture — never a real user scan, never the local draft, never
+   any AI output. It ALWAYS runs the contract validator first: an invalid
+   fixture renders the safe blocked state, so an invalid result can never
+   display as a valid card. Every surface is labelled DEV HARNESS / NOT USER SCAN. */
+
+function mountDev() {
+  const C = window.BlueRoomScanContract;
+  const F = (C && C.DEV_FIXTURES) || {};
+  const result = state.dev === "uploaded-blocked"
+    ? F.invalidAttractivenessResult
+    : (F.validDevRendererResult || F.validMinimalFutureResult);
+  document.getElementById("devView").innerHTML = renderUploadedScanResultDev(result);
+}
+
+function renderUploadedScanResultDev(result) {
+  const C = window.BlueRoomScanContract;
+  if (!C || typeof C.validateUploadedScanResult !== "function") {
+    return `<div class="dev"><p class="uploadeddev__tag">◆ DEV HARNESS — scan-contract.js not loaded</p></div>`;
+  }
+  const v = C.validateUploadedScanResult(result);
+
+  /* invalid fixture → the safe blocked state (no card / stats / oracle).
+     The dev route has no local draft, so it supplies harness-scoped return
+     actions (room / menu) instead of the draft-oriented defaults. */
+  if (!v.ok) {
+    const blocked = C.createBlockedScanState("dev harness · fixture failed validation", v.errors);
+    const devActions = `
+        <div class="gateactions">
+          <button type="button" class="draft__sample" data-view-to="room">Enter sample scan room</button>
+          <button type="button" class="draft__back" data-view-to="menu">Main menu</button>
+        </div>`;
+    return `
+      <div class="dev">
+        <p class="uploadeddev__tag uploadeddev__tag--block">◆ DEV HARNESS · NOT USER SCAN · BLOCKED FIXTURE</p>
+        ${renderBlockedScan(blocked, devActions)}
+      </div>`;
+  }
+
+  const r = result;
+  const a = r.artifact || {};
+  const src = r.source || {};
+  const fv = (r.stats && r.stats.freeVisible) || {};
+  const hx = (r.stats && r.stats.haloExtended) || {};
+  const rd = r.readings || {};
+  const sf = r.safetyFlags || {};
+  const gate = r.gate || {};
+
+  const stat = (name, val) =>
+    `<div class="uploadeddev__stat"><span class="uploadeddev__statname">${esc(name)}</span><span class="uploadeddev__statval">${val == null ? "—" : esc(String(val))}</span></div>`;
+  const ext = (label, o) =>
+    o && typeof o === "object"
+      ? `<div class="uploadeddev__stat"><span class="uploadeddev__statname">${esc(label)}</span><span class="uploadeddev__statval">${esc(String(o.value))}${o.label ? " · " + esc(o.label) : ""}</span></div>`
+      : "";
+
+  const statsBlock = `
+    <div class="uploadeddev__plate">
+      <div class="uploadeddev__head">Visible stats</div>
+      <div class="uploadeddev__stats">${stat("Presence", fv.presence)}${stat("Frame", fv.frame)}${stat("Signal", fv.signal)}${stat("Charge", fv.charge)}</div>
+      ${hx.loreDensity || hx.fitCoherence || hx.stanceRead || hx.visualImpact
+        ? `<div class="uploadeddev__head uploadeddev__head--sub">Extended stats</div>
+           <div class="uploadeddev__stats">${ext("Lore Density", hx.loreDensity)}${ext("Fit Coherence", hx.fitCoherence)}${ext("Stance Read", hx.stanceRead)}${ext("Visual Impact", hx.visualImpact)}</div>`
+        : ""}
+      <p class="uploadeddev__cap">presentation scores of the image artifact — not the person</p>
+    </div>`;
+
+  const readingsBlock = rd.freeSummary || rd.haloDossier || rd.oracle
+    ? `<div class="uploadeddev__plate">
+         <div class="uploadeddev__head">Readings</div>
+         ${rd.freeSummary ? `<p class="uploadeddev__read"><b>Free</b> — ${esc(rd.freeSummary)}</p>` : ""}
+         ${rd.haloDossier ? `<p class="uploadeddev__read"><b>Halo</b> — ${esc(rd.haloDossier)}</p>` : ""}
+         ${rd.oracle ? `<p class="uploadeddev__read uploadeddev__read--oracle">“${esc(rd.oracle)}”</p>` : ""}
+       </div>`
+    : "";
+
+  const receiptsBlock = Array.isArray(r.evidenceBoard) && r.evidenceBoard.length
+    ? `<div class="uploadeddev__plate">
+         <div class="uploadeddev__head">Evidence board</div>
+         ${r.evidenceBoard
+           .map((e) => `
+         <div class="uploadeddev__receipt">
+           <div class="uploadeddev__rectop"><span class="uploadeddev__lens">${esc(e.lens)}</span><span class="uploadeddev__effect">${esc(e.effect)}</span><span class="uploadeddev__conf">${esc(e.confidence)}</span></div>
+           <p class="uploadeddev__obs">${esc(e.observation)}</p>
+           <span class="uploadeddev__rcue">cue · ${esc(e.visibleCue)}</span>
+         </div>`)
+           .join("")}
+       </div>`
+    : "";
+
+  const flagsBlock = `
+    <div class="uploadeddev__plate">
+      <div class="uploadeddev__head">Safety flags &amp; schema</div>
+      <div class="uploadeddev__flags">${Object.keys(sf)
+        .map((k) => `<span class="uploadeddev__flag">${esc(k)}: ${sf[k] === false ? "false ✓" : esc(String(sf[k]))}</span>`)
+        .join("")}</div>
+      <dl class="uploadeddev__meta">
+        <div><dt>kind</dt><dd>${esc(r.kind)}</dd></div>
+        <div><dt>schemaVersion</dt><dd>${esc(r.schemaVersion)}</dd></div>
+        <div><dt>status</dt><dd>${esc(r.status)}</dd></div>
+        <div><dt>route</dt><dd>${esc(gate.route || "—")} · ${esc(gate.scanStatus || "—")}</dd></div>
+        ${r.confidence ? `<div><dt>confidence</dt><dd>${esc(String(r.confidence.overall))} · ${esc(r.confidence.band || "")}</dd></div>` : ""}
+      </dl>
+    </div>`;
+
+  return `
+    <div class="dev uploadeddev">
+      <p class="uploadeddev__tag">◆ DEV HARNESS · NOT USER SCAN · VALIDATED FIXTURE</p>
+
+      <article class="uploadeddev__card">
+        <header class="uploadeddev__cardhead">
+          <span class="uploadeddev__house">◆ BLUE ROOM ARCHIVE · UPLOADED (DEV)</span>
+          <span class="uploadeddev__state">DEV HARNESS</span>
+        </header>
+        <h2 class="uploadeddev__title">${esc(a.title || "—")}</h2>
+        <p class="uploadeddev__arch">◆ &nbsp;${esc(a.archetypeClass || "—")} &nbsp;· ${esc(a.rarity || "—")} · ${esc(a.editionLabel || "—")}</p>
+        <p class="uploadeddev__file">${esc(src.fileType || "IMG")} · ${esc(src.fileSize || "—")} · ${esc(src.fileLabel || "—")}</p>
+      </article>
+
+      ${statsBlock}${readingsBlock}${receiptsBlock}${flagsBlock}
+
+      <div class="gateactions">
+        <button type="button" class="draft__sample" data-view-to="room">Enter sample scan room</button>
+        <button type="button" class="draft__back" data-view-to="menu">Main menu</button>
       </div>
+
+      <p class="uploadeddev__foot">DEV HARNESS · generated from BlueRoomScanContract.DEV_FIXTURES · not a real scan · no AI · no user photo analyzed</p>
     </div>`;
 }
 
@@ -1221,4 +1355,5 @@ document.addEventListener("keydown", (e) => {
 });
 
 mountMenu();
+if (state.view === "dev") mountDev();
 render();

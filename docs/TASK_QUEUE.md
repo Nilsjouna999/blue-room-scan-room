@@ -6,6 +6,16 @@ Last updated: 2026-06-12.
 
 ## Active
 
+- **Uploaded Scan Result Renderer v1 — Dev Harness** (2026-06-13 / BR-S020):
+  a dev-only 4th view (`?dev=uploaded-result` | `?dev=uploaded-blocked`)
+  that previews a *validated* future uploaded-result via
+  `renderUploadedScanResultDev` — validator-gated (invalid → blocked
+  state), labelled DEV HARNESS / NOT USER SCAN, plus a new
+  `DEV_FIXTURES.validDevRendererResult`. **Completed & verified live** — no
+  AI, no user-photo analysis, no menu link; normal menu/draft/Develop-gate,
+  sample room, and both deep links unchanged; console clean. Dev harness
+  not headlessly capturable (no screenshot).
+
 - **Scan Engine Foundation v1** (2026-06-13 / BR-S019): pure non-AI
   `scan-contract.js` (`window.BlueRoomScanContract`) —
   `validateUploadedScanResult` (uploaded-v1 shape + safety flags + evidence

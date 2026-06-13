@@ -33,7 +33,10 @@ intentionally not committed as screenshots — they are verified live
 in-browser during development. The **safe blocked/failure state**
 (`renderBlockedScan`, BR-S019) is foundation only — not reachable in normal
 flow (a future engine / dev test supplies it) — so it is likewise not
-captured.
+captured. The **Uploaded Scan Result dev harness** (BR-S020, `?dev=uploaded-result`
+/ `?dev=uploaded-blocked`) renders a validated DEV fixture and is reachable
+only by an explicit query (no menu link), so it is also outside the
+headless pipeline — verified live in-browser.
 
 **Workflow:** after any visual change → run `capture-screens.ps1` →
 commit + push. Stale screens are worse than no screens.

@@ -317,6 +317,46 @@
       // safetyFlags intentionally omitted
       warnings: [],
     },
+
+    /* Richer VALID fixture — exercises the dev renderer (stats, extended
+       stats, readings, multiple receipts, mint record). Obviously a dev
+       fixture; never used for a real user image. Passes the validator. */
+    validDevRendererResult: {
+      kind: "uploaded_scan_result",
+      schemaVersion: "uploaded-v1",
+      status: "scan_complete_future",
+      source: { mode: "local_browser_draft", fileLabel: "dev-fixture.png", fileType: "PNG", fileSize: "0.8 MB" },
+      gate: { scanStatus: "accepted", route: "HUMAN_SOLO", limitedReason: null },
+      confidence: { overall: 0.7, band: "high" },
+      artifact: { title: "DEV FIXTURE ARTIFACT", archetypeClass: "The Threshold", rarity: "free", editionLabel: "Dev Print", generatedAt: "2026-06-13T00:00:00Z" },
+      stats: {
+        freeVisible: { presence: 61, frame: 70, signal: 55, charge: 48 },
+        haloExtended: {
+          loreDensity: { value: 64, label: "Dense" },
+          fitCoherence: { value: 72, label: "Aligned" },
+          stanceRead: { value: 58, label: "Braced" },
+          visualImpact: { value: 60, label: "Steady", derived: true, derivedFrom: ["charge", "presence", "frame", "rarity"] },
+        },
+      },
+      evidenceBoard: [
+        { lens: "Frame", observation: "subject sits left of center against open space", visibleCue: "wide negative space on the right third", effect: "Frame +8", confidence: "high" },
+        { lens: "Signal", observation: "one strong colour layer over a muted setting", visibleCue: "red jacket against grey interior", effect: "Signal +5", confidence: "medium" },
+        { lens: "Charge", observation: "contained, engine-off stillness", visibleCue: "relaxed posture, one hand raised flat", effect: "Charge +3", confidence: "medium" },
+      ],
+      readings: {
+        freeSummary: "Development fixture — not a real scan. A quiet frame with strong distance control, used only to test the renderer.",
+        haloDossier: "Development fixture dossier. The room reads composition, framing and signal; it does not read the subject.",
+        oracle: "Development fixture oracle line — artifact language only, no real reading.",
+      },
+      mintRecord: { mintSerial: "BR-UP-DEV-0001", material: "Warm Glass Copper", treatmentFamily: "Halo Mint Dev" },
+      safetyFlags: {
+        containsSensitiveInference: false,
+        containsHumanWorthScoring: false,
+        containsAttractivenessScoring: false,
+        containsBiologyRating: false,
+      },
+      warnings: [],
+    },
   };
 
   var api = {

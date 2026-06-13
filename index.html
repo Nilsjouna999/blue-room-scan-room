@@ -24,6 +24,11 @@
   <section class="draft" id="draftView"></section>
   <input type="file" id="draftFile" accept="image/*" hidden aria-hidden="true" />
 
+  <!-- DEV HARNESS — future uploaded-scan-result renderer. Reachable ONLY via
+       ?dev=uploaded-result | ?dev=uploaded-blocked. Renders a VALIDATED dev
+       fixture (never a user scan, never the local draft). app.js fills it. -->
+  <section class="dev" id="devView"></section>
+
   <header class="topbar">
     <div class="brand">
       <span class="brand__mark">◆</span>

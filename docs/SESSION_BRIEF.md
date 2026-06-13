@@ -10,6 +10,59 @@ coding session; the assistant must respect it. Files not listed under
 does not match the user's current task — **stop and ask** before doing
 anything. (GOVERNANCE_OS anti-drift.)
 
+## Active session — BR-S020
+
+**Date / Session ID:** 2026-06-13 / BR-S020
+
+**Today's task:** Uploaded Scan Result Renderer v1 — Dev Harness Only
+
+**Why:** Create a validated renderer path for future uploaded-photo scan
+results without connecting AI or generating any real uploaded-photo
+analysis.
+
+**Read:** docs/FILE_MAP.md · docs/PROJECT_OS.md · docs/SCAN_ENGINE_CONTRACT.md ·
+docs/SCREENS.md · scan-contract.js · app.js · data.js · index.html · styles.css
+
+**Edit:** docs/SESSION_BRIEF.md · app.js · styles.css · scan-contract.js
+(new dev fixture) · index.html (#devView mount) · docs/CHANGE_MAP.md ·
+docs/TASK_QUEUE.md · docs/SCREENS.md
+
+**Do not open:** C:\Users\nilsj\OneDrive\Documents\blue-room
+
+**Authority affected:** ACTIVE SPECS + runtime renderer foundation
+
+**Core/spec change required?** No — contract support only.
+
+**Locked constraints:** no backend · no upload · no AI · no payment · no
+fake stats/receipts/oracle/Halo for user uploaded photos · uploaded local
+draft stays separate from sample ScanResult v2 · dev fixture clearly
+labelled DEV HARNESS / NOT USER SCAN · preserve sample scan room · preserve
+all deep links
+
+**Known current state:** Main Menu v1 (def0dfe) · Upload/Intake Shell v1
+(d590e55) · Scan Development Gate v1 (e19e183) · Local Draft Polish v1
+(c7d2cd8) · Scan Engine Contract v1 (2ad2fb3) · Scan Engine Foundation v1
+(7e0709d) · validator at window.BlueRoomScanContract · blocked-state
+renderer foundation-only
+
+**Definition of done:** a renderer for validated uploaded_scan_result
+objects · refuses to render unless `validateUploadedScanResult(result).ok`
+· invalid dev fixture → blocked state · valid dev fixture → preview clearly
+labelled DEV HARNESS / NOT USER SCAN · reachable only by `?dev=uploaded-result`
+/ `?dev=uploaded-blocked` · normal menu / local draft / Develop Scan
+unchanged · Develop Scan still opens the sealed engine-offline gate ·
+uploaded local photos still produce no stats · sample scan room + deep
+links work · docs updated · commit + push completed
+
+**Verification:** `python -m http.server 8743`; bare URL → menu; Add Your
+Photo → Local Draft; Develop Scan → sealed offline gate (no result);
+`?dev=uploaded-result` → valid DEV HARNESS preview; `?dev=uploaded-blocked`
+→ blocked state; invalid fixture cannot render as valid; both deep links +
+sample SRC 01/02 work; console clean.
+
+**Final response format:** commit hash · files changed · what changed ·
+verification result · review/agent findings · rollback command
+
 ## Active session — BR-S019
 
 **Date / Session ID:** 2026-06-13 / BR-S019

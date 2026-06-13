@@ -168,6 +168,28 @@ banned/hype-word sweep now clean across all states.
 - **Test:** bare URL shows the menu; the four deep links open the room
   directly; Enter Scan Room reveals the unchanged room.
 
+## Uploaded Scan Result Renderer v1 — Dev Harness (2026-06-13 / BR-S020, app.js + scan-contract.js + index.html + styles.css)
+
+A fourth **dev-only** view (`state.view==="dev"`) that previews what a
+*future* uploaded-photo scan result would look like — **dev fixtures only,
+no AI, no user-photo analysis**. Reachable ONLY via the URL query
+`?dev=uploaded-result` or `?dev=uploaded-blocked` (no menu link, no product
+CTA; the dev param gate takes precedence over the src/t/tab room gate).
+`renderUploadedScanResultDev(result)` (app.js) **always** runs
+`validateUploadedScanResult` first: `!ok` → the safe blocked state, `ok` →
+a preview (artifact card, visible + extended stats, readings, evidence
+board, safety-flags/schema), every surface labelled **DEV HARNESS / NOT
+USER SCAN** with a "presentation scores of the image artifact — not the
+person" caption. A new valid fixture `DEV_FIXTURES.validDevRendererResult`
+(obviously a dev fixture, passes the validator) drives `?dev=uploaded-result`;
+`?dev=uploaded-blocked` feeds an invalid fixture → blocked. index.html adds
+`#devView`; styles.css adds `.dev` / `.uploadeddev*` and extends the
+visibility matrix to four views. **Normal flow unchanged**: bare URL →
+menu; Add Your Photo → Local Draft; Develop Scan still opens the sealed
+engine-offline gate; uploaded photos still produce nothing; sample room +
+deep links verified unchanged; console clean. The dev harness needs an
+explicit query, so it is not in the headless screenshot pipeline.
+
 ## Scan Engine Foundation v1 (2026-06-13 / BR-S019, scan-contract.js + app.js + index.html + styles.css)
 
 New pure non-AI **safety valve** `scan-contract.js` (IIFE →
