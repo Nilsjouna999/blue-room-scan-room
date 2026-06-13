@@ -173,7 +173,11 @@ body {
   padding: 16px 24px 10px;
   scrollbar-width: thin;
   scrollbar-color: var(--ink-700) transparent;
-  background: radial-gradient(56% 46% at 50% 42%, rgba(160, 168, 184, 0.04) 0%, transparent 72%);
+  /* focus pocket: faint warm lift where the artifact sits, light
+     falling off into the room at the edges — felt, not noticed */
+  background:
+    radial-gradient(58% 50% at 50% 44%, rgba(233, 229, 220, 0.035) 0%, transparent 62%),
+    radial-gradient(130% 115% at 50% 46%, transparent 40%, rgba(4, 3, 2, 0.52) 100%);
 }
 
 /* in-hero dossier cue — pinned under the card so the archive is
@@ -239,12 +243,12 @@ body {
   font-size: 9.5px;
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: var(--faint);
+  color: var(--t-meta);
 }
 .kv dd {
   font-family: var(--font-mono);
   font-size: 11px;
-  color: var(--silver-dim);
+  color: var(--silver);
   text-align: right;
 }
 
@@ -895,9 +899,12 @@ body {
   100% { opacity: 0.95; }
 }
 
-/* page-level accent shifts (body --halo-* vars set per source by app.js) */
+/* page-level accent shifts (body --halo-* vars set per source by app.js):
+   shiny keeps the same focus pocket, with a whisper of material in the lift */
 body[data-treatment="shiny"] .stagezone {
-  background: radial-gradient(60% 50% at 50% 38%, color-mix(in srgb, var(--halo-a, #8b7bff) 6%, transparent) 0%, transparent 70%);
+  background:
+    radial-gradient(58% 50% at 50% 44%, color-mix(in srgb, var(--halo-a, #8b7bff) 5%, transparent) 0%, transparent 62%),
+    radial-gradient(130% 115% at 50% 46%, transparent 40%, rgba(4, 3, 2, 0.52) 100%);
 }
 
 /* =============================================================
@@ -1057,8 +1064,8 @@ body[data-treatment="shiny"] .stagezone {
   border-top: 1px solid var(--line-faint);
 }
 .receipts__list div { display: flex; justify-content: space-between; gap: 12px; }
-.receipts__list dt { font-family: var(--font-mono); font-size: 11px; color: var(--faint); }
-.receipts__list dd { font-family: var(--font-mono); font-size: 11px; color: var(--silver-dim); text-align: right; }
+.receipts__list dt { font-family: var(--font-mono); font-size: 11px; color: var(--t-meta); }
+.receipts__list dd { font-family: var(--font-mono); font-size: 11px; color: var(--silver); text-align: right; }
 
 /* undeveloped modules (Free Pull) — intentional archive copy, no blur */
 .module--locked,
@@ -1311,7 +1318,7 @@ body[data-treatment="shiny"] .dia-fill { fill: rgba(200, 196, 187, 0.15); stroke
   font-weight: 500;
   color: var(--silver-bright);
 }
-.fitcell__v { font-family: var(--font-mono); font-size: 10px; color: var(--silver-dim); }
+.fitcell__v { font-family: var(--font-mono); font-size: 10px; color: var(--silver); }
 
 /* ---- formula receipts (right panel, inside Technical Receipts) ---- */
 
@@ -1518,11 +1525,11 @@ body[data-treatment="shiny"] .dplate__tag--dev {
 }
 .receipt__basis {
   font-family: var(--font-mono);
-  font-size: 9px;
+  font-size: 9.5px;
   letter-spacing: 0.08em;
   color: var(--t-meta);
 }
-.receipt__read { font-size: 13px; line-height: 1.6; color: var(--t-body); }
+.receipt__read { font-size: 13px; line-height: 1.6; color: #bcb7ae; /* half-step between body and primary — cue carries the evidence */ }
 .receipt--undeveloped {
   border-style: dashed;
   background: none;

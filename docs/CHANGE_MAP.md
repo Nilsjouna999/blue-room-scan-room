@@ -115,6 +115,15 @@ browser console is clean (F12).
 - **Test:** free vs mint vs shiny right panel; develop buttons still switch
   treatment.
 
+## Micro-legibility + card focus pocket (2026-06-12, styles.css only)
+
+Half-step lifts: receipt cue `#bcb7ae` (between body/primary tiers),
+basis 9.5px, kv labels ghost→meta + values →silver, fit-cell values
+→silver, technical-receipt rows →meta/silver. Focus pocket: `.stagezone`
+two-layer static radial (faint warm lift at the card, edge fall-off into
+the room); shiny variant tints the lift with `--halo-a` at 5%. No
+animation, no blur, no layout change. Five selector groups total.
+
 ## Evidence Board v2 + metrics readability (2026-06-12, app.js + styles.css)
 
 Evidence Board now renders v2 structured receipts (effect mark +

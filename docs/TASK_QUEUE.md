@@ -6,9 +6,9 @@ Last updated: 2026-06-12.
 
 ## Active
 
-- **Evidence Board v2 + metrics readability** (this session): structured
-  receipts live (free 3 / halo all, legacy fallback kept); left metrics +
-  free panel lifted one tier. **Completed**; screenshots refreshed.
+- **Micro-legibility + card focus pocket** (this session): half-step
+  text lifts in evidence/metrics/metadata; static two-layer focus pocket
+  on the stage. **Completed**; screenshots refreshed.
   *(Previous actives — v2 rendering wiring, v2 data shape, SPINE
   promotion, governance OS, doc spine cleanup — completed 2026-06-12.)*
 
