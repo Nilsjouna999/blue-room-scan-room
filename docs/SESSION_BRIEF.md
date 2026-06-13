@@ -10,6 +10,77 @@ coding session; the assistant must respect it. Files not listed under
 does not match the user's current task — **stop and ask** before doing
 anything. (GOVERNANCE_OS anti-drift.)
 
+## Active session — BR-S029
+
+**Date / Session ID:** 2026-06-13 / BR-S029
+
+**Today's task:** Artifact Language Stabilization Pack v1 (Sample Room Tier
+Migration v1 + human-in-frame / banned-language sweep + dev-fixture cleanup)
+
+**Why:** Stabilize the visible artifact language across sample/card/dev-fixture
+surfaces — migrate the sample room's stat labels + public 0–100 scores to
+artifact-safe labels + tier bands, ratify ONE public tier ladder, and sweep
+person/status/attractiveness language. No new product features.
+
+**Read:** docs/GPT_REVIEW_GUIDE.md · docs/PROJECT_OS.md · docs/CHANGE_MAP.md ·
+docs/TASK_QUEUE.md · docs/SESSION_BRIEF.md · docs/research/README.md ·
+docs/research/RESEARCH_COMPRESSION_V1.md · docs/research/LANGUAGE_SYSTEM_V1.md ·
+docs/research/HUMAN_IN_FRAME_READING_RULES_V1.md ·
+docs/research/RARE_ARTIFACT_TRIGGER_SYSTEM_V1.md ·
+docs/research/REFRAME_MAP_VALUE_SYSTEM_V1.md · docs/CARD_LOGIC_V1.md ·
+docs/DECISION_LOG.md · docs/GOVERNANCE_OS.md · app.js · data.js ·
+scan-contract.js · styles.css
+
+**Edit:** data.js · app.js · scan-contract.js · styles.css ·
+docs/DECISION_LOG.md · docs/PROJECT_OS.md · docs/CARD_LOGIC_V1.md ·
+docs/SCAN_ENGINE_SPEC.md · docs/COPY_SYSTEM.md · README.md ·
+docs/CHANGE_MAP.md · docs/TASK_QUEUE.md · docs/SESSION_BRIEF.md
+
+**Do not open:** C:\Users\nilsj\OneDrive\Documents\blue-room
+
+**Authority affected:** CORE LAW (PROJECT_OS §7/§9 — Core Change Review) +
+ACTIVE SPECS (CARD_LOGIC_V1, SCAN_ENGINE_SPEC) + runtime
+
+**Core/spec change required?** Yes — Core Change Review (changes LOCKED
+PROJECT_OS §7 card content / §9 stat names + supersedes the DECISION_LOG
+keep-names decision). DECISION_LOG entry + PROJECT_OS updated in the same
+commit; one public tier ladder ratified and reconciled into CARD_LOGIC_V1 §2.
+
+**Locked constraints:** reads the photo not the person · visible cue → image
+effect (five-gate) · no person/status/attractiveness/personality/biology/
+identity language · no public 0–100 score framing on the 4 public stats ·
+ratify ONE tier ladder (Muted/Clean/Strong/Charged/Peak) · keep internal data
+keys for stability · no Halo build · no Halo Dossier · no AI/backend/payment/
+upload analysis/login/social/real unlock · no Free-Pull-slab redesign · no full
+visual redesign · do not change normal Local Draft → Develop Scan sealed/offline
+· preserve `?dev=uploaded-result` + `?dev=uploaded-blocked` (dev-only exception)
+
+**Known current state:** Free Pull Mock Polish v1 (700d8f8) · research checkpoint
+(ef213ff) · sample room showed Presence/Frame/Signal/Charge as 0–100 across
+card/diamond/right-panel/dossier · dev free-scan-sim showed Quiet/Present/Strong/
+Sharp/Dominant ladder · no AI/backend/payment
+
+**Definition of done:** sample room shows artifact-safe stat labels (Frame
+Presence/Frame/Signal/Scene Charge) as tier bands, no public 0–100 · banned
+person/status language removed · Gesture Authority→Gesture Geometry · dev-sim +
+scan-contract on the ratified ladder · dev-fixture reframeMap residue cleaned
+coherently · one ladder ratified + logged (DECISION_LOG) + reconciled
+(CARD_LOGIC_V1 §2, PROJECT_OS §7/§9/§10, SCAN_ENGINE_SPEC, COPY_SYSTEM, README) ·
+dev-harness exemption documented · `?dev=uploaded-result`/`uploaded-blocked` +
+menu + Develop-gate unchanged · console clean · commit(s) + push completed
+
+**Verification:** `python -m http.server 8743`; live-verified sample SRC-01/02 ×
+free/halo × source/diagram/metrics — tier bands + renamed labels, no public
+0–100, diamond labels fit, evidence arrows, Gesture Geometry, "commitment in the
+kneel"; `?dev=free-scan-sim` shows Frame Presence/Scene Charge + Muted…Peak and
+stays Checkpoint Wave; `?dev=uploaded-result` (legacy labels, intentional) +
+`?dev=uploaded-blocked` preserved; bare URL → menu; console clean. 3-agent
+adversarial review (regression/safety/scope) applied (govced docs added).
+
+**Final response format:** commit hash(es) · changed files · exact old→new
+labels + tier ladder · remaining old terms + why · reframeMap cleaned vs
+deferred · verification result · rollback command
+
 ## Active session — BR-S028
 
 **Date / Session ID:** 2026-06-13 / BR-S028

@@ -185,6 +185,53 @@ payment/Halo/upload analysis). GPT_REVIEW_GUIDE + TASK_QUEUE + SESSION_BRIEF
 note the folder. Roadmap unchanged beyond this checkpoint — next product task
 stays **Free Pull Mock Polish v1**.
 
+## Artifact Language Stabilization Pack v1 (2026-06-13 / BR-S029, runtime + Core Change docs)
+
+Migrated the **sample room's** visible artifact language (Sample Room Tier
+Migration v1 + language/banned sweep). **Display-only** stat changes — internal
+data keys (`presence/frame/signal/charge`) are unchanged; renamed at the render
+layer via new app.js `STAT_LABELS` + `tierBand()`:
+- **Stat labels:** Presence→**Frame Presence**, Charge→**Scene Charge** (Frame/
+  Signal kept) across card miniStat, metrics diamond, Stat Reading, Stat
+  Dossier, FORMULAS, Frame Impact/Lore modules. Hidden stat Gesture Authority→
+  **Gesture Geometry**; "Visual Impact" module→**Frame Impact**.
+- **No public 0–100:** the 4 public stat scores now show as **tier bands**
+  (Muted/Clean/Strong/Charged/Peak) on card/Stat Reading/Stat Dossier/Frame
+  Impact/Lore/Hidden/Fit+Aura; bars + diamond geometry kept (diamond axis labels
+  are names only, viewBox widened to fit + font bumped — label-fit, not a
+  redesign). Evidence-board receipt deltas `+N`/`-N`→`↑/↓`.
+- **Tier ladder:** dev-sim `FP_TIER_LADDER` and scan-contract `publicStats`
+  migrated to Muted/Clean/Strong/Charged/Peak (kills the rendered "Dominant").
+- **Banned-language sweep** (data.js): "confidence in the kneel"→"commitment",
+  Affect Trace/Smile→"Expression Band", aura Unhurried/Methodical→Idle-Engine/
+  Slow-Burn, fitMatrix "Person"→"Subject", "route has standards"→softened,
+  "scene ownership"→"scene anchoring", hidden read personification removed.
+- **Dev fixture coherence:** `validFreeSimulationResult` reframeMap/freeSummary/
+  receipt residue cleaned to the Checkpoint Wave / Signal Bearer / Day Print
+  front (displayed lever/variant counts 2/2 preserved).
+
+**Intentional carve-outs (documented in-code + DECISION_LOG):** the dev-only
+`?dev=uploaded-result`/`uploaded-blocked` renderer harness keeps legacy labels +
+0–100 + `+N` deltas (strictly dev, "NOT USER SCAN"); the Metrics-tab interpretive
+diagnostics (signal mix, composition pressure, fit matrix, subject-lock) keep
+numeric weights ("interpretive formula, not a measurement", not the 4 public
+scores).
+
+**Core Change Review (LOCKED §7/§9):** DECISION_LOG (2026-06-13) supersedes the
+"keep Presence/Frame/Signal/Charge" + show-as-numbers decisions and **ratifies
+one authoritative public tier ladder — Muted/Clean/Strong/Charged/Peak** —
+reconciled into `CARD_LOGIC_V1` §2 (supersedes QUIET/PRESENT/STRONG/DOMINANT/
+TOTAL and the FREE_PULL §7 recommendation; §6 trigger floors read by ordinal
+mapping). PROJECT_OS §7/§9/§10, SCAN_ENGINE_SPEC, COPY_SYSTEM §6, and README
+updated to match. **Verified live** (1600×900): sample SRC-01/02 × free/halo ×
+all 3 tabs show tier bands + renamed labels, no public 0–100, diamond labels
+fit, evidence arrows, Gesture Geometry; `?dev=free-scan-sim` migrated (Frame
+Presence/Scene Charge + Muted…Peak) and still Checkpoint Wave; uploaded-result/
+uploaded-blocked preserved; menu + Develop-gate intact; console clean.
+Adversarial 3-agent review (regression/safety/scope): code PASS, govced docs
+applied. **No new product features; no AI/backend/payment/Halo/upload analysis;
+no layout/slab redesign.**
+
 ## Free Pull Layout Mock v1 (2026-06-13 / BR-S027, app.js + styles.css)
 
 The dev-only Free Scan Simulation route (`?dev=free-scan-sim`) is now the first

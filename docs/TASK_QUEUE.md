@@ -6,6 +6,29 @@ Last updated: 2026-06-13.
 
 ## Active
 
+- **Artifact Language Stabilization Pack v1 / Sample Room Tier Migration v1**
+  (2026-06-13 / BR-S029, runtime + Core Change docs): migrated the **sample
+  room's** visible stat language — display labels Presence→**Frame Presence**,
+  Charge→**Scene Charge** (Frame/Signal kept; internal keys unchanged), public
+  0–100 scores → **tier bands** (Muted/Clean/Strong/Charged/Peak via `tierBand()`)
+  across card/diamond/Stat Reading/Stat Dossier/Frame Impact/Lore/Hidden/Fit+Aura;
+  evidence deltas `+N`→`↑/↓`; Gesture Authority→**Gesture Geometry**; Visual
+  Impact module→**Frame Impact**; banned-language sweep (confidence/Affect Trace/
+  aura/standards/scene-ownership); dev-sim `FP_TIER_LADDER` + scan-contract
+  `publicStats` → new ladder; dev-fixture reframeMap residue cleaned coherently.
+  **Core Change Review done** — DECISION_LOG (2026-06-13) supersedes keep-names +
+  numbers and **ratifies one ladder** (Muted/Clean/Strong/Charged/Peak),
+  reconciled into `CARD_LOGIC_V1` §2 (+§6 mapping note); PROJECT_OS §7/§9/§10,
+  SCAN_ENGINE_SPEC, COPY_SYSTEM §6, README updated. **Carve-outs (documented):**
+  the dev `?dev=uploaded-result`/`uploaded-blocked` harness keeps legacy labels +
+  0–100 (strictly dev, NOT USER SCAN); Metrics-tab interpretive diagnostics keep
+  numeric weights. **Completed & verified live** — sample SRC-01/02 × free/halo ×
+  3 tabs, dev free-scan-sim (still Checkpoint Wave), uploaded-result/blocked
+  preserved, menu + Develop-gate intact, console clean; 3-agent adversarial review
+  (regression/safety/scope) findings applied. No new features / no AI/backend/
+  payment/Halo/upload analysis / no redesign. Completes Ready #1 (and the
+  language/banned-sweep + dev-fixture cleanup). **Next up:** Halo Gate Dev Mock v1.
+
 - **Distilled research checkpoint** (2026-06-13 / BR-S028, docs only): saved
   the distilled BLUE ROOM research into `docs/research/` — new
   `docs/research/README.md` + the pack **`RESEARCH_COMPRESSION_V1.md` (the
@@ -181,71 +204,54 @@ Last updated: 2026-06-13.
    *(Free Pull Layout Mock v1 — completed by BR-S027; the `?dev=free-scan-sim`
    route renders the landscape split-artifact Free Pull front. See Active.)*
    *(Free Pull Screenshot Audit — completed by BR-S027 (audit only). Verdict:
-   PASS WITH SMALL FIXES; findings feed Free Pull Mock Polish v1 below.)*
-0. **Free Pull Mock Polish v1** (NEXT) — dev-route copy/polish for the Free Pull
-   mock (`?dev=free-scan-sim`) from the BR-S027 audit. Scope: (1) shorten the 2
-   receipt chips to tight `cue → effect` (≤ ~50 chars, e.g. "Raised palm →
-   barrier signal", "Window light → cleaner edge separation"); (2) give the dev
-   fixture a real artifact title instead of "DEV FREE SCAN FIXTURE"; (3) align
-   the fixture archetype/print to the daylight Driver stand-in image (the
-   "Low-Light Operator / Night Print" mismatch); (4) optional: raise `.fpwrap`
-   max-width ~1560–1600px so 1920 margins land ~7–9%. Edits limited to the
-   fixture text in `scan-contract.js`, chip handling in `app.js`
-   `renderFreePullMock`, and optionally `.fpwrap` in `styles.css`. **Do NOT**
-   change stat labels or the tier ladder (that is Sample Room Tier Migration v1)
-   — see `docs/research/RESEARCH_COMPRESSION_V1.md` for the language candidates.
-   *Done when:* chips are 1-line and Driver-coherent; title/archetype read as a
-   real artifact; fixture still passes `validateUploadedScanResult` (no banned
-   lexicon, all safetyFlags false, no public 0–100); `?dev=uploaded-result` /
-   `?dev=uploaded-blocked` + normal menu/draft/Develop-gate unchanged; verified
-   at 1600×900 + 1920×1080; console clean.
-1. **Sample Room Tier Migration v1** — reconcile the legacy sample-room
-   numeric display (`PROJECT_OS` §7/§9 still shows Presence/Frame/Signal/
-   **Charge** as 0–100 numbers) into the public **tier-band** system, and
-   ratify ONE authoritative public band ladder — reconciling
-   `CARD_LOGIC_V1` §2 (QUIET/PRESENT/STRONG/DOMINANT/TOTAL) with
-   `FREE_PULL_SCREENSHOT_LAYOUT_V1` §7 (Quiet/Set/Strong/Sharp/Dominant) and
-   the Charge→Visual Impact front swap (`CARD_SYSTEM_V1` §2).
-   *Done when:* one band ladder is decided + logged (DECISION_LOG / owning
-   spec); the sample room shows tier bands (no public 0–100); the §7/§2
-   divergence is resolved, not duplicated; safety law unchanged.
-2. **Halo Gate Dev Mock v1** — a dev-only mock of the Halo Gate from
+   PASS WITH SMALL FIXES; findings fed Free Pull Mock Polish v1.)*
+   *(Free Pull Mock Polish v1 — completed at commit 700d8f8: chips shortened,
+   title→Checkpoint Wave, archetype→The Signal Bearer / Day Print, max-width
+   evaluated + reverted. Not separately queue-logged at the time.)*
+   *(Sample Room Tier Migration v1 — completed by BR-S029 (Artifact Language
+   Stabilization Pack v1; see Active). One ladder ratified — Muted/Clean/Strong/
+   Charged/Peak; sample room shows tier bands, no public 0–100; CARD_LOGIC_V1
+   §2 + FREE_PULL §7 reconciled.)*
+0. **Halo Gate Dev Mock v1** (NEXT) — a dev-only mock of the Halo Gate from
    `docs/HALO_GATE_UPGRADE_LAYUP_V1.md`: a sealed-dossier chamber (sealed
    stat / Reframe-Map / evidence / oracle / mint envelopes showing *shape*,
    not contents), "Open Halo Dossier" / "Keep Free Pull", and a calm
    post-unlock reveal — **no payment, no checkout, no real unlock**; behind
-   an explicit dev route, unmistakably labelled DEV. **Build the Free Pull
-   front (Ready #0) first — a back must not be mocked before its front.**
+   an explicit dev route, unmistakably labelled DEV. (The Free Pull front it
+   sits behind is built + migrated; the back can now be mocked. Use the
+   ratified tier ladder Muted/Clean/Strong/Charged/Peak and artifact-safe
+   stat labels.)
    *Done when:* the mock renders the layout + copy from the spec; clicking
    "open" runs the calm reveal of the existing dev fixture's sealed contents
    (no Stripe, no fake urgency, no dark patterns); normal flow + sample room
    + deep links + the three existing `?dev` routes unchanged; reviewed.
-3. **18-state audit** — PROJECT_OS §17.1. Walk 2 sources × 3 treatments
-   (incl. Lab) × 3 tabs at 1600×900.
+1. **18-state audit** — PROJECT_OS §17.1. Walk 2 sources × 3 treatments
+   (incl. Lab) × 3 tabs at 1600×900. *(Re-verify the BR-S029 tier-band
+   migration across all states while walking them.)*
    *Done when:* every state screenshotted or DOM-verified; issues logged
    here, not fixed inline.
-4. **data.js copy audit against COPY_SYSTEM** — the grammar postdates most
+2. **data.js copy audit against COPY_SYSTEM** — the grammar postdates most
    shipped copy.
    *Done when:* every string in data.js passes the banned-word list, the
    tone test (§1) and the every-outcome-is-a-win rules (§5); fixes
    committed; no meaning drift.
-5. **Render archetype discovery note in Halo** — PROJECT_OS visibility
+3. **Render archetype discovery note in Halo** — PROJECT_OS visibility
    table promises "full archetype explanation + discovery note" in Halo;
    no data field or render exists yet. Pull discovery notes from
    COPY_SYSTEM §4 (Encounter / Dispatch).
    *Done when:* Halo shows the archetype class + discovery note (right
    panel or dossier §4/§5 — not on the card); Free shows label only.
-6. **Three shiny material prototypes** — CARD_TECH_LAB §20: Cold Foil /
+4. **Three shiny material prototypes** — CARD_TECH_LAB §20: Cold Foil /
    Black Star / Night Gloss as data-only `halo` presets behind the Lab
    key, no layout changes.
    *Done when:* three presets switchable in Lab, screenshots captured and
    compared side-by-side, comparison filed in CARD_TECH_LAB.
-7. **Dossier plate material polish** — taste debt from the 2026-06-12
+5. **Dossier plate material polish** — taste debt from the 2026-06-12
    review: plates read flat next to the card; let the material accent
    bleed in (Mint Record plate already does).
    *Done when:* Halo dossier plates carry a restrained material accent;
    free stays matte; screenshots regenerated.
-8. **Route label in Source Record** — the last remnant of v2 surfacing:
+6. **Route label in Source Record** — the last remnant of v2 surfacing:
    one row in the dossier Source Record showing `scan.route` +
    `scanStatus` (e.g. "HUMAN_SOLO · accepted"), legacy-safe when v2
    absent. Tiny app.js change.
@@ -253,7 +259,7 @@ Last updated: 2026-06-13.
 
 ## Backlog / needs decision
 
-- **Final Halo material decision** — after Ready #6 (Three shiny material
+- **Final Halo material decision** — after Ready #4 (Three shiny material
   prototypes); log winner in DECISION_LOG, promote rules to PROJECT_OS
   (CARD_TECH_LAB §18/§20).
 - **Develop/mint transformation moment** — CARD_TECH_LAB §15; needs scope
