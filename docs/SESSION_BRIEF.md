@@ -10,6 +10,77 @@ coding session; the assistant must respect it. Files not listed under
 does not match the user's current task — **stop and ask** before doing
 anything. (GOVERNANCE_OS anti-drift.)
 
+## Active session — BR-S035
+
+**Date / Session ID:** 2026-06-14 / BR-S035
+
+**Today's task:** Render Archetype Discovery Note v1 (small fulfillment/render)
+
+**Why:** Fulfil the Halo half of the PROJECT_OS §10 visibility table ("Archetype —
+Halo Mint: full archetype explanation + discovery note"), which had no data field
+and no render. Surface the existing audited archetype CLASS + COPY_SYSTEM §4 copy as
+an artifact note — not a new analysis system, not Halo Dossier.
+
+**Read:** docs/GPT_REVIEW_GUIDE.md · docs/PROJECT_OS.md · docs/TASK_QUEUE.md ·
+docs/SESSION_BRIEF.md · docs/CHANGE_MAP.md · docs/DECISION_LOG.md ·
+docs/COPY_SYSTEM.md · docs/CARD_LOGIC_V1.md ·
+docs/audits/DATA_COPY_SYSTEM_AUDIT_V1.md ·
+docs/audits/SAMPLE_ROOM_18_STATE_AUDIT_V1.md ·
+docs/research/HUMAN_IN_FRAME_READING_RULES_V1.md ·
+docs/research/LANGUAGE_SYSTEM_V1.md · docs/halo/HALO_GATE_BOUNDARY_V1.md ·
+data.js · app.js · styles.css
+
+**Edit:** data.js (copy-only ARCHETYPE_NOTES map) · app.js (new reading-panel
+module) · docs/COPY_SYSTEM.md (one §4 canon de-second-person sub-fix) ·
+docs/CHANGE_MAP.md · docs/TASK_QUEUE.md · docs/SESSION_BRIEF.md
+*(styles.css NOT edited — zero new CSS, existing classes reused for fit.)*
+
+**Do not open:** C:\Users\nilsj\OneDrive\Documents\blue-room
+
+**Do not edit:** styles.css (none needed) · scan-contract.js · index.html · assets ·
+docs/halo/* (no rewrite) · the migrated specs · the card content list (LOCKED) ·
+the 7-plate dossier
+
+**Authority affected:** ACTIVE SPECS implementation (runtime render) + a small
+ACTIVE COPY_SYSTEM §4 canon coherence sub-fix
+
+**Core/spec change required?** No — copy-surfacing render + 1 surgical doc-canon line.
+
+**Locked constraints:** image-as-artifact (five-gate) · no second-person/gender/
+identity/status/personality/attractiveness · no "you are your archetype" framing ·
+no public 0–100 leakage · no new analysis system / schema expansion (a copy-only
+class-keyed map is allowed) · no Halo Dossier / payment / AI / backend / upload /
+login / cloud · no redesign of Free Pull / Halo Gate / Sample Room · no undo of the
+stat/tier migration · Free stays complete (note is Halo/developed only; no locked
+teaser) · preserve all routes + sealed/offline Local Draft flow
+
+**Known current state:** data.js Copy System Audit v1 (8a11196); archetype CLASS is
+live at `getScanResult(src).archetype.class` (The Encounter / The Dispatch) but the
+discovery note had no render; dossier capped at 7 plates; dev routes free-scan-sim/
+halo-gate/uploaded-result/uploaded-blocked exist; no AI/backend/payment
+
+**Definition of done:** Halo/developed right panel renders an "Artifact Archetype"
+module (class + §4 one-liner + discovery note) for both sources · Free shows the
+card instance label only (no module/teaser) · COPY_SYSTEM §4 Encounter note
+de-second-personed to match shipped copy · data.js parses · no public 0–100 in the
+module · all 4 dev routes + bare menu unchanged · Local Draft → Develop Scan still
+sealed/offline · console clean · CHANGE_MAP/TASK_QUEUE/SESSION_BRIEF updated ·
+commit + push
+
+**Verification:** `python -m http.server 8743`, 1600×900 (live preview MCP): the
+module renders on `?src=1&t=shiny` (The Encounter) and `?src=2&t=shiny` (The
+Dispatch) across source+metrics tabs with exact copy + italic pulled-quote
+(`.module__line--fit`) + mono scope caption (`.metriccap`); absent on `?src=1&t=free`
+(card instance label "Open-Window Operator" intact); `?dev=free-scan-sim` /
+`halo-gate` / `uploaded-result` / `uploaded-blocked` + bare URL → menu unchanged;
+console clean (error + warn sweeps empty). Pre-edit 5-agent adversarial critique
+(coherence/drift/copy-safety/UI-fit/data-shape) = GO_WITH_CHANGES; all mandatory
+changes applied.
+
+**Final response format:** critique verdict · commit hash · changed files · where
+the note renders · exact copy used · whether any copy was changed · verification ·
+next task · rollback
+
 ## Active session — BR-S034
 
 **Date / Session ID:** 2026-06-13 / BR-S034

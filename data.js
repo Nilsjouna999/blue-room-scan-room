@@ -51,6 +51,28 @@ const TREATMENTS = {
   },
 };
 
+/* Archetype discovery notes — class-level copy from COPY_SYSTEM §4 (the
+   12-archetype library). Keyed by archetype CLASS (not the per-source
+   instance title), matching V2_EXTRAS.archetypeClass. Surfaced ONLY in the
+   developed (Halo / Lab) reading panel as an artifact note — never in Free,
+   never on the card. Copy-only lookup table: no score, no stat, no
+   derivation, no schema field. Fulfils the Halo half of the PROJECT_OS §10
+   visibility table ("full archetype explanation + discovery note"); Free
+   already carries the instance archetype label on the card.
+   `discovery` for The Encounter is the de-second-personed form of the §4
+   note (the canonical "does not let you observe" was retired here — second
+   person; COPY_SYSTEM §4 updated to match). */
+const ARCHETYPE_NOTES = {
+  "The Encounter": {
+    line: "The photo becomes an interaction, not just a picture.",
+    discovery: "The image does not wait to be observed. It answers.",
+  },
+  "The Dispatch": {
+    line: "The image reads like a report from somewhere active, cold, remote, or operational.",
+    discovery: "This was not taken. It was filed.",
+  },
+};
+
 const SOURCES = [
   // ---- SCAN SOURCE 01 — car selfie, open palm, fjord out the window
   {

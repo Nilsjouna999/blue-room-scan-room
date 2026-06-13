@@ -185,6 +185,59 @@ payment/Halo/upload analysis). GPT_REVIEW_GUIDE + TASK_QUEUE + SESSION_BRIEF
 note the folder. Roadmap unchanged beyond this checkpoint — next product task
 stays **Free Pull Mock Polish v1**.
 
+## Render Archetype Discovery Note v1 (2026-06-14 / BR-S035, app.js + data.js + COPY_SYSTEM §4)
+
+Rendered the Halo **archetype discovery note** that the PROJECT_OS §10 visibility
+table promised ("Archetype — Halo Mint: full archetype explanation + discovery
+note") but which had **no data field and no render** anywhere in the running room.
+**Copy-surfacing only — no new analysis system, no schema/score/derivation, no
+Halo Dossier, no payment/AI/backend/upload, no redesign.**
+
+- **data.js:** new copy-only constant `ARCHETYPE_NOTES`, keyed by archetype
+  **class** (matches `V2_EXTRAS.archetypeClass`) — 2 entries (The Encounter / The
+  Dispatch), each `{ line, discovery }` taken from `COPY_SYSTEM §4` (the
+  one-liner + the discovery note). Parallels the existing `TREATMENTS` /
+  `STAT_LABELS` / `FORMULAS` constants; **no per-source field, no `V2_EXTRAS` /
+  `toScanResultV2` / ScanResult-v2 change.**
+- **app.js:** new **"Artifact Archetype"** module in `renderReadingPanel`,
+  **developed states only** — prepended to the existing `!free` `deep` string, so
+  the one existing gate covers both mint + shiny (no new conditional). Looks up
+  the note by `getScanResult(src).archetype.class`; **omits the module entirely**
+  when the v2 scan/class is absent or unmapped (no instance-title fallback, no
+  "undefined"). Order: head "Artifact Archetype" → class chip
+  "Artifact class · The Encounter/Dispatch" → one-liner → discovery note (italic
+  pulled-quote) → scope caption "artifact archetype · a photo role, not a
+  person". **Zero new CSS** (reuses `.module` / `moduleHead` / `.aura` /
+  `.aura__chip` / `.module__line` / `.module__line--fit` / `.metriccap`).
+- **Free unchanged:** the card still shows the per-source **instance** archetype
+  label (`renderCard`) — Free stays complete ("label only"); **no** locked/teaser
+  module added (would manufacture a "missing result" hole, PROJECT_OS §10).
+- **Anti-drift framing:** the governing noun ("Artifact"/"class") is bound to
+  **both** the module header and the chip so it reads as a *photo role, not a
+  personality type*; every rendered line's grammatical subject is the
+  photo/image/artifact/class (five-gate / Artifact-Test clean).
+- **COPY_SYSTEM §4 sub-fix (surgical, one line):** the canon "The Encounter"
+  discovery note "The image does not let **you** observe. It answers." →
+  "The image does not **wait to be** observed. It answers." (de-second-personed;
+  dated retirement note appended) so shipped copy and canon match — same shape as
+  the BR-S034 §6 "for you"→"for the lens" fix. No other §4 archetype or §6 touched.
+- **Right-panel chosen deliberately:** the TASK_QUEUE Done-when alternative
+  "dossier §4/§5" would require building the Halo Dossier, which
+  `HALO_GATE_BOUNDARY §D` marks "define; do NOT build", and the dossier is
+  hard-capped at 7 plates (DECISION_LOG). So the right-panel render is in-scope by
+  spec, not deferred dossier work. The card content list is LOCKED (PROJECT_OS §7).
+- **Pre-edit critique:** a 5-agent adversarial workflow (coherence / personality-
+  drift / copy-safety / UI-fit / data-shape) returned **GO_WITH_CHANGES**; all
+  mandatory changes applied (header word "Artifact Archetype", noun-bound chip,
+  cleaner Encounter rewrite, `.module__line--fit` quote class, null/unknown-class
+  guard, verbatim shipped scope caption).
+- **Verified live** (1600×900): the module renders on src1 (The Encounter) / src2
+  (The Dispatch) × shiny × source+metrics with the exact copy + italic pulled-
+  quote + mono scope caption; **absent in Free** (card instance label intact); no
+  public 0–100 in the module; `?dev=free-scan-sim` / `halo-gate` /
+  `uploaded-result` / `uploaded-blocked` + bare menu unchanged; normal Local Draft
+  → Develop Scan code path untouched (sealed/offline); console clean.
+
 ## data.js Copy System Audit v1 (2026-06-13 / BR-S034, audit + 3 small fixes)
 
 Audited **all** sample-card copy in `data.js` against `docs/COPY_SYSTEM.md` +

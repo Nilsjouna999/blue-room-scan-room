@@ -76,7 +76,9 @@ low-stat-safe version / hidden-stat direction.
 ### 1. The Encounter
 - **Triggers:** direct gaze + gesture + tight/interior frame
 - **One-liner:** The photo becomes an interaction, not just a picture.
-- **Discovery note:** "The image does not let you observe. It answers."
+- **Discovery note:** "The image does not wait to be observed. It answers."
+  *(the old "does not let you observe" read was retired by Render Archetype
+  Discovery Note v1, 2026-06-14 — second-person address.)*
 - **Low-stat-safe:** Even with quiet stats, an Encounter card means the
   lens was addressed — most photos never manage that.
 - **Hidden-stat direction:** Gesture Geometry, Reception Pressure.

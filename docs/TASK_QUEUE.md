@@ -2,9 +2,34 @@
 
 Ranked work queue, not a dream backlog. One Active item at a time.
 Out-of-scope findings from any session get logged here, not patched.
-Last updated: 2026-06-13.
+Last updated: 2026-06-14.
 
 ## Active
+
+- **Render Archetype Discovery Note v1** (2026-06-14 / BR-S035, app.js + data.js +
+  COPY_SYSTEM §4): rendered the Halo archetype discovery note promised by
+  PROJECT_OS §10's visibility table ("full archetype explanation + discovery
+  note") — it had no data field/render. Copy-only `ARCHETYPE_NOTES` (class-keyed,
+  2 entries pulled verbatim from COPY_SYSTEM §4) + a new **"Artifact Archetype"**
+  reading-panel module shown in **developed states only** (prepended to the `!free`
+  deep block; one existing gate covers mint + shiny). **Free unchanged** — the
+  card keeps the instance archetype label ("label only"); no teaser added. **Zero
+  new CSS** (reuses module/aura/`.module__line--fit` pulled-quote/`.metriccap`);
+  module **omits cleanly** when the v2 class is absent. Anti-drift: the chip
+  "Artifact class · The Encounter/Dispatch" + the header bind the governing noun
+  so it reads as a photo role, not a personality. Surgical COPY_SYSTEM §4 sub-fix:
+  the Encounter note de-second-personed ("does not let **you** observe" → "does
+  not **wait to be** observed", dated retirement note) so shipped copy = canon
+  (BR-S034 precedent). Right-panel chosen deliberately — the Done-when "dossier
+  §4/§5" path is the unbuilt Halo Dossier (HALO_GATE_BOUNDARY §D "define; do NOT
+  build") and the dossier is 7-plate-capped. Pre-edit 5-agent adversarial critique
+  (coherence/drift/copy-safety/UI-fit/data-shape) → **GO_WITH_CHANGES**, all
+  changes applied. **Verified live** (1600×900): src1 (Encounter) / src2 (Dispatch)
+  × shiny × source+metrics render the note; Free complete (no module); 4 dev routes
+  + bare menu unchanged; Local Draft → Develop Scan still sealed/offline; no public
+  0–100; console clean. **Completed.** Implements the former Ready #0 (Render
+  archetype discovery note); **next up:** Three shiny material prototypes (now
+  Ready #0).
 
 - **data.js Copy System Audit v1** (2026-06-13 / BR-S034, audit + 3 small fixes):
   audited all sample-card copy in `data.js` against COPY_SYSTEM (banned-lexicon,
@@ -303,23 +328,23 @@ Last updated: 2026-06-13.
    *(data.js copy audit against COPY_SYSTEM — completed by BR-S034 (data.js Copy
    System Audit v1). Verdict PASS WITH FIXES; 3 small fixes. Audit doc
    `docs/audits/DATA_COPY_SYSTEM_AUDIT_V1.md`. See Active.)*
-0. **Render archetype discovery note in Halo** (NEXT) — PROJECT_OS visibility
-   table promises "full archetype explanation + discovery note" in Halo;
-   no data field or render exists yet. Pull discovery notes from
-   COPY_SYSTEM §4 (Encounter / Dispatch).
-   *Done when:* Halo shows the archetype class + discovery note (right
-   panel or dossier §4/§5 — not on the card); Free shows label only.
-1. **Three shiny material prototypes** — CARD_TECH_LAB §20: Cold Foil /
+   *(Render archetype discovery note in Halo — completed by BR-S035 (Render
+   Archetype Discovery Note v1). The Halo/developed right panel now renders the
+   **Artifact Archetype** module — class chip ("Artifact class · The Encounter/
+   Dispatch") + the COPY_SYSTEM §4 one-liner + discovery note; Free shows the card
+   instance label only. Right-panel, not dossier §4/§5 (= unbuilt Halo Dossier per
+   HALO_GATE_BOUNDARY §D). See Active.)*
+0. **Three shiny material prototypes** (NEXT) — CARD_TECH_LAB §20: Cold Foil /
    Black Star / Night Gloss as data-only `halo` presets behind the Lab
    key, no layout changes.
    *Done when:* three presets switchable in Lab, screenshots captured and
    compared side-by-side, comparison filed in CARD_TECH_LAB.
-2. **Dossier plate material polish** — taste debt from the 2026-06-12
+1. **Dossier plate material polish** — taste debt from the 2026-06-12
    review: plates read flat next to the card; let the material accent
    bleed in (Mint Record plate already does).
    *Done when:* Halo dossier plates carry a restrained material accent;
    free stays matte; screenshots regenerated.
-3. **Route label in Source Record** — the last remnant of v2 surfacing:
+2. **Route label in Source Record** — the last remnant of v2 surfacing:
    one row in the dossier Source Record showing `scan.route` +
    `scanStatus` (e.g. "HUMAN_SOLO · accepted"), legacy-safe when v2
    absent. Tiny app.js change.
@@ -327,7 +352,7 @@ Last updated: 2026-06-13.
 
 ## Backlog / needs decision
 
-- **Final Halo material decision** — after Ready #1 (Three shiny material
+- **Final Halo material decision** — after Ready #0 (Three shiny material
   prototypes); log winner in DECISION_LOG, promote rules to PROJECT_OS
   (CARD_TECH_LAB §18/§20).
 - **Develop/mint transformation moment** — CARD_TECH_LAB §15; needs scope
@@ -342,6 +367,12 @@ Last updated: 2026-06-13.
   inferred; needs activation decision.
 - **Mobile pass** — currently basic fallback by decision; needs a "now
   it matters" call.
+- **COPY_SYSTEM §4 residual second-person** (logged BR-S035, not patched) —
+  two library archetype notes still carry "you/your": **The Anchor**
+  ("…including your attention.") and **The Civilian** ("…arranged for you.").
+  Out of scope for BR-S035 (neither class is in `ARCHETYPE_NOTES` or rendered).
+  De-second-person them (same shape as the BR-S035 Encounter / BR-S034 §6 fixes)
+  **before** either class is ever added to `ARCHETYPE_NOTES` and surfaced.
 
 ## Retired / won't do
 

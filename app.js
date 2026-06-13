@@ -629,7 +629,28 @@ function renderReadingPanel(src, treatment) {
     </div>`
       : "";
 
-  return `${header}${statReads}${aura}${sceneRole}${free ? lockedDeep : deep + shinyTease + shinyBadge}`;
+  /* Artifact Archetype — class + one-liner + discovery note (COPY_SYSTEM §4),
+     developed states only. Copy-only ARCHETYPE_NOTES lookup by the v2 archetype
+     CLASS; omitted when the v2 scan or class is absent (no instance-title
+     fallback — the instance label already lives on the card). The class is
+     scoped at the chip ("Artifact class · …") so it reads as a photo role, not
+     a person typology. Fulfils the Halo half of the PROJECT_OS §10 promise. */
+  const archetypeModule = (() => {
+    const scan = getScanResult(src);
+    const cls = scan?.archetype?.class;
+    const note = cls && typeof ARCHETYPE_NOTES !== "undefined" ? ARCHETYPE_NOTES[cls] : null;
+    if (!note) return "";
+    return `
+    <div class="module">
+      ${moduleHead("Artifact Archetype")}
+      <div class="aura"><span class="aura__chip">${esc(`Artifact class · ${cls}`)}</span></div>
+      <p class="module__line">${esc(note.line)}</p>
+      <p class="module__line--fit">${esc(note.discovery)}</p>
+      <p class="metriccap">artifact archetype · a photo role, not a person</p>
+    </div>`;
+  })();
+
+  return `${header}${statReads}${aura}${sceneRole}${free ? lockedDeep : archetypeModule + deep + shinyTease + shinyBadge}`;
 }
 
 /* ---------- scroll dossier (below the hero) ----------
