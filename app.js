@@ -1366,19 +1366,22 @@ function renderFreePullMock(result) {
     })
     .join("");
 
-  /* 2 grounded receipt chips (cue → effect), contact-sheet annotations.
-     Take the first two grounded receipts; they read as composition notes. */
+  /* Max 2 grounded receipt chips (cue → effect), contact-sheet annotations.
+     Prefer the short chipCue/chipEffect headline when present, else fall back
+     to the longer observedCue/artifactEffect. Keeps chips one-line. */
   const chips = eb
     .filter((e) => e.observedCue && e.artifactEffect)
     .slice(0, 2)
-    .map(
-      (e) => `
+    .map((e) => {
+      const cue = e.chipCue || e.observedCue;
+      const eff = e.chipEffect || e.artifactEffect;
+      return `
       <div class="fpcard__chip">
-        <span class="fpcard__chipcue">${esc(e.observedCue)}</span>
+        <span class="fpcard__chipcue">${esc(cue)}</span>
         <span class="fpcard__chiparrow" aria-hidden="true">→</span>
-        <span class="fpcard__chipeff">${esc(e.artifactEffect)}</span>
-      </div>`
-    )
+        <span class="fpcard__chipeff">${esc(eff)}</span>
+      </div>`;
+    })
     .join("");
 
   /* sealed vault — SHAPE ONLY. The Reframe Map shows counts, never its

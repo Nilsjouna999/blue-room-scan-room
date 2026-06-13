@@ -372,7 +372,7 @@
       source: { mode: "local_browser_draft", fileLabel: "dev-free-sim.png", fileType: "PNG", fileSize: "0.6 MB" },
       gate: { scanStatus: "accepted", route: "HUMAN_SOLO", limitedReason: null },
       confidence: { overall: 0.62, band: "medium" },
-      artifact: { title: "DEV FREE SCAN FIXTURE", archetypeClass: "The Low-Light Operator", rarity: "free", editionLabel: "Dev Free Print", generatedAt: "2026-06-13T00:00:00Z" },
+      artifact: { title: "Checkpoint Wave", archetypeClass: "The Signal Bearer", rarity: "free", editionLabel: "Dev Free Print", generatedAt: "2026-06-13T00:00:00Z" },
       /* internal numeric stats — for sorting only; NEVER printed on the card
          surface (public display uses the tiers/bars below). */
       stats: { freeVisible: { presence: 78, frame: 60, signal: 35, visualImpact: 95 } },
@@ -388,9 +388,11 @@
          the renderer prefers observedCue/artifactEffect for display. */
       evidenceBoard: [
         { id: "r-anchor", lens: "Composition", observation: "subject anchor in the lower-left third", visibleCue: "the figure sits at the lower-left third", effect: "Presence", confidence: "high",
-          observedCue: "The subject anchor holds the lower-left third", artifactEffect: "the eye locks to the anchor before it reads the rest of the frame" },
+          observedCue: "The subject anchor holds the lower-left third", artifactEffect: "the eye locks to the anchor before it reads the rest of the frame",
+          chipCue: "Raised palm", chipEffect: "barrier signal" },
         { id: "r-negspace", lens: "Negative Space", observation: "wide empty field on the right", visibleCue: "the right two-thirds carry no subject", effect: "Frame", confidence: "medium",
-          observedCue: "A wide empty field fills the right of the frame", artifactEffect: "the negative space pushes compositional weight back toward the anchor" },
+          observedCue: "A wide empty field fills the right of the frame", artifactEffect: "the negative space pushes compositional weight back toward the anchor",
+          chipCue: "Window light", chipEffect: "cleaner edge separation" },
         { id: "r-layer", lens: "Signal", observation: "one warm colour layer over a muted ground", visibleCue: "single warm layer, low background noise", effect: "Signal", confidence: "low",
           observedCue: "One warm colour layer sits over a muted ground", artifactEffect: "a single styling signal reads clearly without competition" },
         { id: "r-shadow-field", lens: "Tension", observation: "dark field occupies most of the frame", visibleCue: "the lit edge is the only bright region", effect: "Visual Impact", confidence: "high",
@@ -398,7 +400,7 @@
       ],
       scopeLine: "BLUE ROOM reads the photograph, not the photographed. Change the photo, change the card.",
       sealedStat: { label: "Artifact Coherence", teaser: "One sealed stat reads all four public stats against each other.", reasonType: "contradiction" },
-      rarity: { band: "UNCOMMON PULL", print: "Night Print", reason: "Unusual artifact profile: high darkness ratio with one strong edge of contrast.", qualityNeutral: "Rarity tracks how unusual the artifact is — never image quality, never the person." },
+      rarity: { band: "UNCOMMON PULL", print: "Day Print", reason: "Unusual artifact profile: one warm signal layer reads clean against a quiet ground.", qualityNeutral: "Rarity tracks how unusual the artifact is — never image quality, never the person." },
       reframeMap: {
         current: "Night Print / The Low-Light Operator",
         whyThisCard: [
