@@ -185,6 +185,43 @@ payment/Halo/upload analysis). GPT_REVIEW_GUIDE + TASK_QUEUE + SESSION_BRIEF
 note the folder. Roadmap unchanged beyond this checkpoint — next product task
 stays **Free Pull Mock Polish v1**.
 
+## Halo Gate Dev Mock v1 (2026-06-13 / BR-S031, app.js + styles.css)
+
+Added a dev-only **sealed card-back / dossier chamber** mock at **`?dev=halo-gate`**,
+bound by `docs/halo/HALO_GATE_BOUNDARY_V1.md`. **Not payment · not unlock · not
+AI/backend/upload analysis · not a real user result** — it shows ZERO analysis
+data, only the sealed-back metaphor + qualitative depth hints. New
+`renderHaloGateMock()` (mounted via `mountDev` when `state.dev === "halo-gate"`;
+the dev allowlist now includes `halo-gate`). Layout: a landscape graded slab —
+**left** = sealed dark back-plate (no photo; "BACK FACE · ARCHIVED · DOSSIER
+LAYER · HELD IN CONSERVATION", a material conservation-seal mark + one restrained
+shimmer/weld), **right** = dossier gate panel (kicker "◆ HALO DOSSIER", title
+"THE BACK OF THIS CARD IS SEALED", subtitle "The Free Pull is yours. The back is
+still closed.", three **qualitative** seal rows "Production notes sealed / Variant
+routes sealed / Back face archived · conservation seal intact", a Free-complete
+reassurance line, a **disabled** "Open Halo Dossier · dev mock — no payment" CTA +
+a "Keep Free Pull" decline, and the artifact scope/safety line). A persistent rail
+**"DEV MOCK · NOT PAYMENT · NOT REAL ANALYSIS"** + a foot reiterating Free stays
+complete / Halo is the sealed back not a hidden score. **No exact locked counts,
+no numbers, no module inventory, no urgency/chance/loot-box/person-truth.**
+styles.css adds the `.halogate*` block (tokens only; one material shimmer +
+sealed weld) + a narrow-screen stack rule.
+
+Also **migrated the Free Pull mock's vault** (`renderFreePullMock`, the
+boundary's §G known-gap): the old enumerated count line *"Map exists — 2 image
+levers · 2 target variants · setup card sealed"* + the `01/02` named-module rows
+are replaced by a single **qualitative** sealed-back block — "Sealed back · in
+conservation · This card has a sealed back. The dossier layer is archived —
+additional production notes held in conservation. · Back face sealed · opens with
+Halo." (removed the now-unused lever/variant count computation). **Verified live**
+(1600×900): `?dev=halo-gate` renders the sealed-back mock with all dev labels, no
+counts/numbers, disabled CTA; `?dev=free-scan-sim` no longer shows exact counts
+and stays polished (Checkpoint Wave, tier bands, chips intact); `?dev=uploaded-result`
+/ `?dev=uploaded-blocked` unchanged; bare URL → menu; normal Local Draft → Develop
+Scan sealed/offline (renderGate/renderDraft intact); console clean. No
+AI/backend/payment/upload analysis; runtime change limited to dev/mock routes +
+the one Free-front vault copy line.
+
 ## Halo Gate Boundary Lock v1 (2026-06-13 / BR-S030, docs only)
 
 New ACTIVE spec `docs/halo/HALO_GATE_BOUNDARY_V1.md` (225 lines) — locks the

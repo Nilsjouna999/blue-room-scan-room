@@ -10,6 +10,71 @@ coding session; the assistant must respect it. Files not listed under
 does not match the user's current task — **stop and ask** before doing
 anything. (GOVERNANCE_OS anti-drift.)
 
+## Active session — BR-S031
+
+**Date / Session ID:** 2026-06-13 / BR-S031
+
+**Today's task:** Halo Gate Dev Mock v1 (dev/mock route only)
+
+**Why:** Build the sealed card-back / dossier chamber as a dev mock using the
+locked Halo boundary — desirable through depth, not pressure; and close the
+boundary's §G gap by migrating the Free-scan-sim vault off exact counts.
+
+**Read:** docs/GPT_REVIEW_GUIDE.md · docs/PROJECT_OS.md · docs/TASK_QUEUE.md ·
+docs/SESSION_BRIEF.md · docs/CHANGE_MAP.md · docs/DECISION_LOG.md ·
+docs/halo/HALO_GATE_BOUNDARY_V1.md · docs/HALO_GATE_UPGRADE_LAYUP_V1.md ·
+docs/CARD_LOGIC_V1.md · docs/COPY_SYSTEM.md · app.js · styles.css
+
+**Edit:** app.js · styles.css · docs/CHANGE_MAP.md · docs/TASK_QUEUE.md ·
+docs/SESSION_BRIEF.md
+
+**Do not open:** C:\Users\nilsj\OneDrive\Documents\blue-room
+
+**Do not edit:** index.html · data.js · scan-contract.js · assets ·
+docs/halo/HALO_GATE_BOUNDARY_V1.md (no rewrite needed)
+
+**Authority affected:** ACTIVE SPECS implementation (dev/mock runtime, bound by
+the Halo Gate boundary lock)
+
+**Core/spec change required?** No — implements HALO_GATE_BOUNDARY_V1; dev route
++ one Free-front vault copy line only.
+
+**Locked constraints:** Free Pull = complete card front; Halo = sealed card
+back (not a hidden real score) · **no exact locked counts / no module
+inventory** on the Free front or pre-unlock gate (qualitative sealed-back
+language only) · no fake urgency/chance/loot-box/subscription-trap/person-truth ·
+no payment / no unlock state · no AI/backend/upload analysis · no fake real-user
+analysis · dev route clearly DEV MOCK · NOT PAYMENT · NOT REAL ANALYSIS · do not
+build the full Halo Dossier / do not reveal real modules · preserve bare URL/menu
+· preserve `?dev=free-scan-sim`/`uploaded-result`/`uploaded-blocked` · normal
+Local Draft → Develop Scan stays sealed/offline
+
+**Known current state:** Halo Gate Boundary Lock v1 (0862416); the
+`?dev=free-scan-sim` vault rendered "Map exists — 2 image levers · 2 target
+variants · setup card sealed" (the boundary's §G gap, now closed); no Halo UI
+existed; no AI/backend/payment
+
+**Definition of done:** `?dev=halo-gate` renders the sealed card-back mock
+(DEV MOCK · NOT PAYMENT · NOT REAL ANALYSIS, sealed-back title/subtitle/safety
+line, qualitative depth hints with no counts, disabled non-payment CTA, Free-
+complete messaging) · `?dev=free-scan-sim` no longer shows exact counts and
+stays polished · uploaded-result/uploaded-blocked + bare menu unchanged · Local
+Draft → Develop Scan still sealed/offline · no AI/backend/payment/upload analysis ·
+console clean · CHANGE_MAP/TASK_QUEUE/SESSION_BRIEF updated · commit + push
+
+**Verification:** `python -m http.server 8743`; live-verified at 1600×900 —
+`?dev=halo-gate` renders the sealed-back slab (no counts/numbers, disabled CTA,
+all dev/safety labels, Free-complete line); `?dev=free-scan-sim` vault is
+qualitative ("Sealed back · in conservation · … · Back face sealed · opens with
+Halo"), no exact-count hits, still Checkpoint Wave + tier bands + chips;
+`?dev=uploaded-result` (8 stats) + `?dev=uploaded-blocked` (blocked) unchanged;
+bare URL → menu; renderGate/renderDraft intact; console clean. Screenshot
+confirms a quiet premium sealed-back chamber.
+
+**Final response format:** commit hash · changed files · route added · exact
+Free Pull vault copy replacement · Halo Gate copy used · verification result ·
+next recommended task · rollback command
+
 ## Active session — BR-S030
 
 **Date / Session ID:** 2026-06-13 / BR-S030

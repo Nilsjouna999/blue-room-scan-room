@@ -54,9 +54,10 @@ const state = { source: 0, treatment: "free", tab: "source", view: "menu", draft
   if (["free", "shiny", "mint"].includes(q.get("t"))) state.treatment = q.get("t");
   if (["source", "diagram", "metrics"].includes(q.get("tab"))) state.tab = q.get("tab");
   /* Dev-only harness route (NOT a product feature): ?dev=uploaded-result |
-     uploaded-blocked renders a validated DEV fixture, never a user scan. */
+     uploaded-blocked renders a validated DEV fixture, never a user scan.
+     free-scan-sim = Free Pull mock · halo-gate = sealed card-back mock. */
   const dev = q.get("dev");
-  if (dev === "uploaded-result" || dev === "uploaded-blocked" || dev === "free-scan-sim") { state.view = "dev"; state.dev = dev; }
+  if (["uploaded-result", "uploaded-blocked", "free-scan-sim", "halo-gate"].includes(dev)) { state.view = "dev"; state.dev = dev; }
   else if (q.has("src") || q.has("t") || q.has("tab")) state.view = "room";
 }
 
@@ -1141,6 +1142,10 @@ function renderBlockedScan(b, actionsHtml) {
 function mountDev() {
   const C = window.BlueRoomScanContract;
   const F = (C && C.DEV_FIXTURES) || {};
+  if (state.dev === "halo-gate") {
+    document.getElementById("devView").innerHTML = renderHaloGateMock();
+    return;
+  }
   if (state.dev === "free-scan-sim") {
     const simFixture = F.validFreeSimulationResult || F.validDevRendererResult;
     document.getElementById("devView").innerHTML = renderUploadedScanResultDev(simFixture, { mode: "free-scan-sim" });
@@ -1419,34 +1424,17 @@ function renderFreePullMock(result) {
     })
     .join("");
 
-  /* sealed vault — SHAPE ONLY. The Reframe Map shows counts, never its
-     levers / target variants / setup-card contents (those are Halo-side). */
-  const rm = r.reframeMap || {};
-  const leverCount = Array.isArray(rm.levers) ? rm.levers.length : 0;
-  const variantCount = Array.isArray(rm.levers) ? new Set(rm.levers.map((l) => l && l.label)).size : 0;
-  const sealed = r.sealedStat || {};
-  const plural = (n, w) => `${n} ${w}${n === 1 ? "" : "s"}`;
+  /* sealed-back hint — QUALITATIVE only (Halo Gate Boundary Lock v1 §B): the
+     Free front states that a sealed back exists, never an exact locked count
+     or an enumerated module inventory. Real contents open only post-unlock. */
   const vault = `
       <div class="fpcard__vault">
         <div class="fpcard__vaulthead">
-          <span class="fpcard__vaultmark" aria-hidden="true">◇</span>Sealed vault
+          <span class="fpcard__vaultmark" aria-hidden="true">◇</span>Sealed back
           <span class="fpcard__vaulttag">in conservation</span>
         </div>
-        <div class="fpcard__vrow">
-          <span class="fpcard__vno">01</span>
-          <div class="fpcard__vbody">
-            <span class="fpcard__vname">Sealed Stat · ${esc(sealed.label || "—")}</span>
-            <p class="fpcard__vreason">${esc(sealed.teaser || "A back-of-card axis, sealed by structure — no tier shown on the front.")}</p>
-          </div>
-        </div>
-        <div class="fpcard__vrow">
-          <span class="fpcard__vno">02</span>
-          <div class="fpcard__vbody">
-            <span class="fpcard__vname">Reframe Map</span>
-            <p class="fpcard__vreason">Map exists — ${plural(leverCount, "image lever")} · ${plural(variantCount, "target variant")} · setup card sealed.</p>
-            <span class="fpcard__vsealed">Contents sealed · opens with the Halo dossier</span>
-          </div>
-        </div>
+        <p class="fpcard__vreason">This card has a sealed back. The dossier layer is archived — additional production notes held in conservation.</p>
+        <span class="fpcard__vsealed">Back face sealed · opens with Halo</span>
       </div>`;
 
   const scope = `<p class="fpcard__scope">◆ &nbsp;${esc(
@@ -1509,6 +1497,81 @@ function renderFreePullMock(result) {
       </div>
 
       <p class="fpwrap__foot">DEV SIMULATION · NOT REAL ANALYSIS · NOT USER SCAN · sample image used as a dev stand-in · no AI · no user photo analyzed</p>
+    </div>`;
+}
+
+/* ---------- Halo Gate Dev Mock v1 (dev route only) ----------
+   A dev-only MOCK of the sealed card-back / dossier chamber, bound by
+   docs/halo/HALO_GATE_BOUNDARY_V1.md. It is NOT payment, NOT unlock logic,
+   NOT AI/backend/upload analysis, NOT a real user result. It shows ZERO
+   analysis data — only the sealed-back metaphor and qualitative depth hints
+   (no exact locked counts, no module inventory). Free Pull stays the complete
+   card front; Halo is the sealed back, not a hidden score. Left = sealed
+   card-back slab; right = dossier gate panel. The "Open Halo Dossier" CTA is
+   permanently disabled (no payment / no unlock exists). */
+function renderHaloGateMock() {
+  /* material identity reused from the sample (a dev stand-in), so the sealed
+     back carries the same restrained material weld/shimmer as the Free front. */
+  const s0 = (typeof SOURCES !== "undefined" && SOURCES[0]) ? SOURCES[0] : null;
+  const halo = (s0 && s0.halo) || { a: "#c98a5e", b: "#8b7bff", c: "#e8b27d", material: "Warm Glass Copper" };
+
+  /* qualitative sealed-back rows — categories, never counts or named modules
+     (Halo Gate Boundary Lock v1 §C allowed list). */
+  const sealRows = ["Production notes sealed", "Variant routes sealed", "Back face archived · conservation seal intact"]
+    .map((t) => `<div class="halogate__sealrow"><span class="halogate__sealmark" aria-hidden="true">◇</span>${esc(t)}</div>`)
+    .join("");
+
+  return `
+    <div class="dev halogate">
+      <div class="fprail halogate__rail">
+        <span class="fprail__dot" aria-hidden="true"></span>
+        <span class="fprail__txt">DEV MOCK · NOT PAYMENT · NOT REAL ANALYSIS</span>
+        <span class="fprail__id">HALO GATE · DEV</span>
+      </div>
+
+      <article class="halogate__card" data-material="${esc(halo.material)}"
+        style="--halo-a:${esc(halo.a)}; --halo-b:${esc(halo.b)}; --halo-c:${esc(halo.c)};">
+        <span class="halogate__weld" aria-hidden="true"></span>
+        <div class="halogate__grid">
+
+          <figure class="halogate__back" aria-label="Sealed card back">
+            <span class="halogate__backgrain" aria-hidden="true"></span>
+            <span class="halogate__shimmer" aria-hidden="true"></span>
+            <span class="halogate__backhouse">◆ BLUE ROOM ARCHIVE</span>
+            <span class="halogate__seal" aria-hidden="true">◈<span class="halogate__sealring"></span></span>
+            <figcaption class="halogate__backcap">
+              <span class="halogate__backtitle">BACK FACE · ARCHIVED</span>
+              <span class="halogate__backid">DOSSIER LAYER · HELD IN CONSERVATION</span>
+            </figcaption>
+          </figure>
+
+          <div class="halogate__panel">
+            <header class="halogate__head">
+              <span class="halogate__kicker">◆ HALO DOSSIER</span>
+              <h2 class="halogate__title">THE BACK OF THIS CARD IS SEALED</h2>
+              <p class="halogate__sub">The Free Pull is yours. The back is still closed.</p>
+            </header>
+
+            <div class="halogate__seals">${sealRows}</div>
+
+            <p class="halogate__complete">The Free Pull card front is complete. Halo opens the sealed back of the same card — added depth, not a hidden result.</p>
+
+            <div class="halogate__cta">
+              <button type="button" class="halogate__open" disabled aria-disabled="true">Open Halo Dossier · dev mock — no payment</button>
+              <button type="button" class="halogate__keep" data-view-to="room">Keep Free Pull</button>
+            </div>
+
+            <p class="halogate__scope">◆ &nbsp;This reads the image artifact — frame, light, styling, setting, gesture — not the person.</p>
+          </div>
+        </div>
+      </article>
+
+      <div class="gateactions">
+        <button type="button" class="draft__sample" data-view-to="room">Enter sample scan room</button>
+        <button type="button" class="draft__back" data-view-to="menu">Main menu</button>
+      </div>
+
+      <p class="halogate__foot">DEV MOCK · NOT PAYMENT · NOT REAL ANALYSIS · no AI · no user photo analyzed · Free Pull stays complete; Halo is the sealed back, not a hidden score.</p>
     </div>`;
 }
 

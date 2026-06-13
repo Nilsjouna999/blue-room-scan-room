@@ -2209,6 +2209,85 @@ body[data-view="room"] .dev { display: none; }
 .fpwrap__foot { font-family: var(--font-mono); font-size: 8px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--faint); text-align: center; }
 
 /* =============================================================
+   Halo Gate Dev Mock v1 (?dev=halo-gate)
+   A sealed card-back / dossier chamber — premium but quiet, dry
+   cinematic, desirable through depth not pressure. Left = sealed back
+   slab (no image; the back face is archived); right = dossier gate
+   panel. Dev mock only — no payment, no unlock, no analysis. One
+   restrained material weld/shimmer; the card is the only object with depth.
+============================================================= */
+.halogate { width: min(88vw, 1500px); margin-inline: auto; display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; }
+
+/* the sealed-back slab — landscape graded artifact, the only depth object */
+.halogate__card {
+  position: relative; border-radius: 14px; overflow: hidden; border: 1px solid var(--line);
+  background: linear-gradient(180deg, var(--ink-800), var(--ink-900));
+  box-shadow: 0 24px 60px -28px rgba(0, 0, 0, 0.82), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+.halogate__weld {
+  position: absolute; top: 0; bottom: 0; left: 46%; width: 1px; z-index: 2; pointer-events: none;
+  background: linear-gradient(180deg, transparent, color-mix(in srgb, var(--halo-a, var(--silver)) 55%, transparent), transparent);
+}
+.halogate__grid { display: grid; grid-template-columns: 46% 54%; min-height: 440px; }
+
+/* LEFT — sealed back face (dark archival plate, no photo) */
+.halogate__back {
+  position: relative; overflow: hidden; isolation: isolate; display: grid; align-content: space-between;
+  padding: 18px 18px 16px; background:
+    radial-gradient(120% 90% at 50% 0%, var(--ink-700) 0%, var(--ink-850) 58%, var(--ink-950) 100%);
+}
+.halogate__backgrain {
+  position: absolute; inset: 0; opacity: 0.5; mix-blend-mode: overlay; pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.12'/%3E%3C/svg%3E");
+}
+.halogate__shimmer {
+  position: absolute; inset: -20% -50%; pointer-events: none; mix-blend-mode: screen;
+  background: linear-gradient(105deg, transparent 44%, color-mix(in srgb, var(--halo-c, var(--silver)) 16%, transparent) 50%, transparent 56%);
+}
+.halogate__backhouse { position: relative; z-index: 1; font-family: var(--font-mono); font-size: 8px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--silver-dim); }
+/* conservation seal mark — material-tinted ring + glyph, centered */
+.halogate__seal {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1;
+  width: 64px; height: 64px; display: grid; place-items: center; border-radius: 50%;
+  font-size: 22px; color: color-mix(in srgb, var(--halo-a, var(--silver)) 70%, var(--t-display));
+  border: 1px solid color-mix(in srgb, var(--halo-a, var(--silver)) 35%, var(--line));
+  background: radial-gradient(circle, color-mix(in srgb, var(--halo-a, var(--silver)) 10%, transparent), transparent 70%);
+}
+.halogate__sealring { position: absolute; inset: 6px; border-radius: 50%; border: 1px dashed color-mix(in srgb, var(--halo-a, var(--silver)) 28%, var(--line-faint)); }
+.halogate__backcap { position: relative; z-index: 1; display: grid; gap: 3px; }
+.halogate__backtitle { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.2em; color: var(--t-primary); }
+.halogate__backid { font-family: var(--font-mono); font-size: 8px; letter-spacing: 0.16em; color: var(--faint); }
+
+/* RIGHT — dossier gate panel (a quiet plate, no depth) */
+.halogate__panel { display: grid; align-content: start; gap: 14px; padding: 22px 24px; border-left: 1px solid var(--line-faint); }
+.halogate__head { display: grid; gap: 6px; }
+.halogate__kicker { font-family: var(--font-mono); font-size: 8px; letter-spacing: 0.24em; text-transform: uppercase; color: var(--silver-dim); }
+.halogate__title { font-family: var(--font-display); font-size: 27px; font-weight: 600; line-height: 1.08; color: var(--t-display); letter-spacing: 0.01em; }
+.halogate__sub { font-size: 13px; line-height: 1.5; color: var(--t-body); }
+
+.halogate__seals { display: grid; gap: 7px; padding: 13px 15px; border-radius: var(--r-plate); border: 1px dashed var(--line); background: rgba(8, 10, 12, 0.35); }
+.halogate__sealrow { display: flex; align-items: center; gap: 9px; font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.08em; color: var(--silver-dim); }
+.halogate__sealmark { color: var(--faint); }
+
+.halogate__complete { font-size: 12px; line-height: 1.5; color: var(--t-meta); }
+
+.halogate__cta { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+/* the "open" CTA is intentionally inert: sealed, not a bright SaaS button */
+.halogate__open {
+  font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--t-meta); padding: 11px 16px; border: 1px solid var(--line); border-radius: var(--r-plate);
+  background: rgba(255, 255, 255, 0.015); cursor: not-allowed; opacity: 0.85;
+}
+.halogate__keep {
+  font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--silver-dim); padding: 11px 14px; border: 1px solid var(--line-faint); border-radius: var(--r-plate);
+  background: none; cursor: pointer;
+}
+.halogate__keep:hover { color: var(--silver); border-color: var(--line); }
+.halogate__scope { font-family: var(--font-display); font-style: italic; font-size: 12.5px; line-height: 1.45; color: var(--t-body); padding-top: 4px; border-top: 1px solid var(--line-faint); }
+.halogate__foot { font-family: var(--font-mono); font-size: 8px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--faint); text-align: center; }
+
+/* =============================================================
    Fallback for narrow screens (desktop is the priority)
 ============================================================= */
 
@@ -2228,6 +2307,12 @@ body[data-view="room"] .dev { display: none; }
   .fpcard__weld { display: none; }
   .fpcard__window { min-height: 280px; }
   .fpcard__label { border-left: 0; border-top: 1px solid var(--line-faint); }
+  /* Halo Gate mock stacks: sealed back on top, gate panel below */
+  .halogate { width: 100%; }
+  .halogate__grid { grid-template-columns: 1fr; }
+  .halogate__weld { display: none; }
+  .halogate__back { min-height: 220px; }
+  .halogate__panel { border-left: 0; border-top: 1px solid var(--line-faint); }
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -6,6 +6,24 @@ Last updated: 2026-06-13.
 
 ## Active
 
+- **Halo Gate Dev Mock v1** (2026-06-13 / BR-S031, app.js + styles.css): added a
+  dev-only **sealed card-back / dossier chamber** mock at **`?dev=halo-gate`**,
+  bound by `docs/halo/HALO_GATE_BOUNDARY_V1.md` — left sealed back-plate (BACK
+  FACE · ARCHIVED + conservation seal) + right dossier gate panel ("THE BACK OF
+  THIS CARD IS SEALED" / "The Free Pull is yours. The back is still closed." /
+  three qualitative seal rows / Free-complete line / **disabled** "Open Halo
+  Dossier · dev mock — no payment" + "Keep Free Pull" / scope line), DEV MOCK ·
+  NOT PAYMENT · NOT REAL ANALYSIS rail+foot. **No exact counts, no numbers, no
+  module inventory, no urgency/chance/person-truth** — not payment / not unlock /
+  not AI/backend/analysis / not a real result. Also **migrated the Free Pull mock
+  vault** (`renderFreePullMock`) from the old "Map exists — 2 image levers · 2
+  target variants · setup card sealed" to qualitative sealed-back copy (boundary
+  §G gap closed). **Completed & verified live** — `?dev=halo-gate` renders clean
+  (no counts, disabled CTA); `?dev=free-scan-sim` no longer shows counts and stays
+  polished; uploaded-result/blocked + bare menu unchanged; Local Draft → Develop
+  Scan still sealed/offline; console clean. Implements Ready #0; **next up:** Halo
+  Gate Ethics Audit (Ready #0).
+
 - **Halo Gate Boundary Lock v1** (2026-06-13 / BR-S030, docs only): new ACTIVE
   spec `docs/halo/HALO_GATE_BOUNDARY_V1.md` locking the honest Free/Halo
   boundary before any Halo UI. **Free Pull = complete card front; Halo = sealed
@@ -230,59 +248,45 @@ Last updated: 2026-06-13.
    Stabilization Pack v1; see Active). One ladder ratified — Muted/Clean/Strong/
    Charged/Peak; sample room shows tier bands, no public 0–100; CARD_LOGIC_V1
    §2 + FREE_PULL §7 reconciled.)*
-0. **Halo Gate Dev Mock v1** (NEXT) — a dev-only mock of the Halo Gate, **bound
-   by `docs/halo/HALO_GATE_BOUNDARY_V1.md`** (read it first) and built on
-   `docs/HALO_GATE_UPGRADE_LAYUP_V1.md`: a sealed card-back / dossier chamber,
-   "Open Halo Dossier" *(disabled / dev mock — no payment)* / "Keep Free Pull",
-   and a calm post-unlock reveal — **no payment, no checkout, no real unlock**;
-   behind an explicit dev route, unmistakably labelled DEV / NOT PAYMENT / NOT
-   REAL ANALYSIS. **Use qualitative sealed-back language — NO exact locked counts**
-   ("Sealed back · archived", "Back face held in conservation"; not "2 image
-   levers · 2 target variants"). Also **migrate the existing `?dev=free-scan-sim`
-   vault line** (`renderFreePullMock`, app.js — currently "Map exists — 2 image
-   levers · 2 target variants · setup card sealed") to qualitative copy, per the
-   boundary's §G known-gap. Use the ratified tier ladder (Muted/Clean/Strong/
-   Charged/Peak) + artifact-safe stat labels.
-   *Done when:* the gate renders the sealed-back layout + qualitative copy (no
-   exact pre-unlock counts, no urgency/chance/dark patterns); the Free-scan-sim
-   count line is migrated to qualitative; normal flow + sample room + deep links
-   + the three existing `?dev` routes unchanged; console clean; reviewed.
-1. **Halo Gate Ethics Audit** — after the mock: audit `?dev` Halo Gate +
-   Free-Pull sealed-back copy against `docs/halo/HALO_GATE_BOUNDARY_V1.md` §C/§F
-   and `HALO_GATE_UPGRADE_LAYUP_V1` §12 (dark-pattern ban). Confirm: no exact
-   pre-unlock counts, no fake urgency/chance/loot-box/subscription-trap, no
-   person-truth/"real score hidden", no real-user analysis claim; Free still
-   feels complete, Halo desirable via artifact depth. **Audit only** — log fixes
-   here, don't redesign inline.
+   *(Halo Gate Dev Mock v1 — completed by BR-S031; `?dev=halo-gate` renders the
+   sealed card-back chamber and the Free-scan-sim vault migrated to qualitative
+   copy. See Active.)*
+0. **Halo Gate Ethics Audit** (NEXT) — audit the `?dev=halo-gate` Halo Gate +
+   the `?dev=free-scan-sim` Free-Pull sealed-back copy against
+   `docs/halo/HALO_GATE_BOUNDARY_V1.md` §C/§F and `HALO_GATE_UPGRADE_LAYUP_V1`
+   §12 (dark-pattern ban). Confirm: no exact pre-unlock counts, no fake urgency/
+   chance/loot-box/subscription-trap, no person-truth/"real score hidden", no
+   real-user analysis claim; Free still feels complete, Halo desirable via
+   artifact depth. **Audit only** — log fixes here, don't redesign inline.
    *Done when:* every visible Halo/sealed-back string five-gated + boundary-
    checked; findings logged; no banned manipulation language remains.
-2. **18-state audit** — PROJECT_OS §17.1. Walk 2 sources × 3 treatments
+1. **18-state audit** — PROJECT_OS §17.1. Walk 2 sources × 3 treatments
    (incl. Lab) × 3 tabs at 1600×900. *(Re-verify the BR-S029 tier-band
    migration across all states while walking them.)*
    *Done when:* every state screenshotted or DOM-verified; issues logged
    here, not fixed inline.
-3. **data.js copy audit against COPY_SYSTEM** — the grammar postdates most
+2. **data.js copy audit against COPY_SYSTEM** — the grammar postdates most
    shipped copy.
    *Done when:* every string in data.js passes the banned-word list, the
    tone test (§1) and the every-outcome-is-a-win rules (§5); fixes
    committed; no meaning drift.
-4. **Render archetype discovery note in Halo** — PROJECT_OS visibility
+3. **Render archetype discovery note in Halo** — PROJECT_OS visibility
    table promises "full archetype explanation + discovery note" in Halo;
    no data field or render exists yet. Pull discovery notes from
    COPY_SYSTEM §4 (Encounter / Dispatch).
    *Done when:* Halo shows the archetype class + discovery note (right
    panel or dossier §4/§5 — not on the card); Free shows label only.
-5. **Three shiny material prototypes** — CARD_TECH_LAB §20: Cold Foil /
+4. **Three shiny material prototypes** — CARD_TECH_LAB §20: Cold Foil /
    Black Star / Night Gloss as data-only `halo` presets behind the Lab
    key, no layout changes.
    *Done when:* three presets switchable in Lab, screenshots captured and
    compared side-by-side, comparison filed in CARD_TECH_LAB.
-6. **Dossier plate material polish** — taste debt from the 2026-06-12
+5. **Dossier plate material polish** — taste debt from the 2026-06-12
    review: plates read flat next to the card; let the material accent
    bleed in (Mint Record plate already does).
    *Done when:* Halo dossier plates carry a restrained material accent;
    free stays matte; screenshots regenerated.
-7. **Route label in Source Record** — the last remnant of v2 surfacing:
+6. **Route label in Source Record** — the last remnant of v2 surfacing:
    one row in the dossier Source Record showing `scan.route` +
    `scanStatus` (e.g. "HUMAN_SOLO · accepted"), legacy-safe when v2
    absent. Tiny app.js change.
@@ -290,7 +294,7 @@ Last updated: 2026-06-13.
 
 ## Backlog / needs decision
 
-- **Final Halo material decision** — after Ready #5 (Three shiny material
+- **Final Halo material decision** — after Ready #4 (Three shiny material
   prototypes); log winner in DECISION_LOG, promote rules to PROJECT_OS
   (CARD_TECH_LAB §18/§20).
 - **Develop/mint transformation moment** — CARD_TECH_LAB §15; needs scope
