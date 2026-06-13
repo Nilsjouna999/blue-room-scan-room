@@ -6,6 +6,17 @@ Last updated: 2026-06-12.
 
 ## Active
 
+- **Local Draft Polish v1** (2026-06-13 / BR-S017): presentation-only
+  polish of the intake + sealed gate — cleaner filename label (title now
+  "Local image" + compact "PNG · size · short…name", real name kept
+  internally), tighter card hierarchy (prominent "No scan has run yet.",
+  next-step "Ready for scan development."), CTA subcopy "Stage artifact for
+  future scan engine.", gate offline dot + clearer "Development pending".
+  **Completed** (app.js + styles.css + SESSION_BRIEF); no engine/analysis,
+  reads only `draft`; sample room + both deep links verified live; console
+  clean.
+  *(Previous active — Scan Development Gate v1 — pushed at e19e183.)*
+
 - **Scan Development Gate v1** (2026-06-13 / BR-S016): Local Draft intake
   gains a "Develop scan" CTA → sealed **Scan Development Gate**
   (`state.draftGate`, `renderGate()`) saying the engine is not connected;
@@ -13,7 +24,8 @@ Last updated: 2026-06-12.
   mint/Halo), never calls getActiveScan/getScanResult or touches
   SOURCES/SCAN_RESULTS_V2. **Completed** (app.js + styles.css +
   SESSION_BRIEF); return/replace/sample-room/menu paths + both deep links
-  verified live; gate not headlessly capturable (no screenshot).
+  verified live; gate not headlessly capturable (no screenshot); pushed at
+  e19e183.
   *(Previous actives — Local Draft intake v1, Main Menu v1, conversion
   spine pass, product clarity pass, v2 rendering wiring, v2 data shape,
   SPINE promotion, governance OS, doc spine cleanup — completed

@@ -168,6 +168,25 @@ banned/hype-word sweep now clean across all states.
 - **Test:** bare URL shows the menu; the four deep links open the room
   directly; Enter Scan Room reveals the unchanged room.
 
+## Local Draft Polish v1 (2026-06-13 / BR-S017, app.js + styles.css)
+
+Presentation-only polish of the browser-local intake + sealed gate — no
+engine, no analysis. The real `file.name` still lives on `draft`; two
+display helpers (`fileTypeLabel()`, `cleanFileLabel()`) format a clean
+label so the card title is now **"Local image"** with a compact secondary
+line "PNG · 1.0 MB · ac277f35…eb8.png" (long names shortened, extension
+kept) — no more raw ugly filename as the title. Card hierarchy tightened:
+prominent "No scan has run yet." status + quiet "Image loaded in this
+browser only." sub; intake lead trimmed to a next-step "Ready for scan
+development." Develop CTA subcopy → "Stage artifact for future scan
+engine." (honest, no implication a scan ran). Gate clarity: an "engine
+offline" status dot on the tag and a slightly stronger "Development
+pending" — ledger, disabled Run-engine button, and all "nothing has run"
+copy unchanged. Still reads only `draft`; never calls getActiveScan/
+getScanResult or touches SOURCES/SCAN_RESULTS_V2; no numbers/stats on the
+draft beyond honest file size. Sample room + deep links untouched; gate/
+intake remain not headlessly capturable (no screenshots).
+
 ## Scan Development Gate v1 (2026-06-13 / BR-S016, app.js + styles.css)
 
 The Local Draft intake now carries a quiet **"Develop scan"** CTA (subcopy

@@ -10,6 +10,51 @@ coding session; the assistant must respect it. Files not listed under
 does not match the user's current task — **stop and ask** before doing
 anything. (GOVERNANCE_OS anti-drift.)
 
+## Active session — BR-S017
+
+**Date / Session ID:** 2026-06-13 / BR-S017
+
+**Today's task:** Local Draft Polish v1
+
+**Why:** Clean up the browser-local intake and sealed gate presentation
+before any scan engine work.
+
+**Read:** docs/FILE_MAP.md · docs/SCREENS.md · app.js · styles.css
+
+**Edit:** docs/SESSION_BRIEF.md · app.js · styles.css · docs/CHANGE_MAP.md ·
+docs/TASK_QUEUE.md · docs/SCREENS.md (if needed)
+
+**Do not open:** C:\Users\nilsj\OneDrive\Documents\blue-room · docs/research/*
+
+**Authority affected:** ACTIVE SPECS
+
+**Core/spec change required?** no
+
+**Locked constraints:** no backend · no upload · no AI · no payment · no
+fake stats · no fake receipts · no fake oracle · no fake Halo result ·
+local draft stays separate from sample ScanResult v2 · preserve sample
+scan room · preserve all deep links
+
+**Known current state:** Main Menu v1 pushed at def0dfe · Upload/Intake
+Shell v1 pushed at d590e55 · Scan Development Gate v1 pushed at e19e183 ·
+Local Draft works · Develop Scan opens the sealed gate
+
+**Definition of done:** ugly long filenames display cleaner · Local Draft
+image/card spacing feels better · Develop Scan CTA feels slightly more
+intentional without implying a scan ran · sealed gate still says engine
+offline / no analysis / no stats / no receipts / no oracle / no Halo
+result · no fake output appears · sample scan room still works · deep links
+still work · commit and push completed
+
+**Verification:** open http://localhost:8743/ · Add Your Photo works ·
+Local Draft shows a cleaned filename / compact file label · Develop Scan
+opens the sealed gate · no generated result appears · SRC 01 / SRC 02 still
+work · ?src=1&t=free&tab=source bypasses the menu · ?src=2&t=shiny&tab=metrics
+bypasses the menu
+
+**Final response format:** Files changed · What changed · Verification
+result · Git commands · Rollback command
+
 ## Active session — BR-S016
 
 **Date / Session ID:** 2026-06-13 / BR-S016

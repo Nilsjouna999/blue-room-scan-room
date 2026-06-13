@@ -892,6 +892,20 @@ function humanSize(bytes) {
   return (bytes || 0) + " B";
 }
 
+/* Display-only label helpers — the real file.name stays on `draft`; these
+   only format a cleaner, shorter on-screen label. No scan, no analysis. */
+function fileTypeLabel(name) {
+  const m = String(name || "").match(/\.([a-z0-9]+)$/i);
+  return m ? m[1].toUpperCase() : "IMG";
+}
+function cleanFileLabel(name) {
+  const safe = String(name || "image");
+  const dot = safe.lastIndexOf(".");
+  const ext = dot > 0 ? safe.slice(dot) : "";
+  const base = dot > 0 ? safe.slice(0, dot) : safe;
+  return base.length <= 16 ? safe : base.slice(0, 8) + "…" + base.slice(-3) + ext;
+}
+
 const DRAFT_LARGE_FILE = 25 * 1024 * 1024; // gentle-warning threshold; still previews
 
 function pickPhoto() {
@@ -958,13 +972,15 @@ function renderDraftIntake() {
           </figure>
 
           <div class="draftcard__body">
-            <h2 class="draftcard__title">${esc(d.name)}</h2>
+            <h2 class="draftcard__title">Local image</h2>
+            <p class="draftcard__file">${esc(fileTypeLabel(d.name))} · ${esc(d.sizeLabel)} · ${esc(cleanFileLabel(d.name))}</p>
             <div class="draftcard__archline">
               <span class="draftcard__archrule"></span>
               <span class="draftcard__arch">◆ &nbsp;UNSCANNED ARTIFACT &nbsp;◆</span>
               <span class="draftcard__archrule"></span>
             </div>
-            <p class="draftcard__note">Image loaded in this browser only. No scan has run yet.</p>
+            <p class="draftcard__status">No scan has run yet.</p>
+            <p class="draftcard__sub">Image loaded in this browser only.</p>
           </div>
 
           <div class="draftcard__strip">
@@ -975,14 +991,14 @@ function renderDraftIntake() {
       </article>
 
       <section class="draftinfo">
-        <p class="draftinfo__line">Ready for scan development. The room can preview the artifact before the scan engine is connected.</p>
-        <p class="draftinfo__sub">No analysis has run — no stats, no receipts, no oracle. Nothing here reads the image or the person in it.</p>
-        <p class="draftinfo__meta">${esc(d.name)} · ${esc(d.sizeLabel)}${d.warn ? ` · <span class="draftinfo__warn">${esc(d.warn)}</span>` : ""}</p>
+        <p class="draftinfo__line">Ready for scan development.</p>
+        <p class="draftinfo__sub">The room previews the artifact before the scan engine is connected. No analysis has run — no stats, no receipts, no oracle; nothing here reads the image or the person in it.</p>
+        ${d.warn ? `<p class="draftinfo__warn">${esc(d.warn)}</p>` : ""}
       </section>
 
       <div class="draft__develop">
         <button type="button" class="menu__enter" data-gate="open">Develop scan</button>
-        <p class="draft__developsub">Scan engine not connected yet.</p>
+        <p class="draft__developsub">Stage artifact for future scan engine.</p>
       </div>
 
       <div class="draft__actions">
@@ -1010,7 +1026,7 @@ function renderGate() {
       <section class="gatepanel">
         <header class="gatepanel__head">
           <span class="gatepanel__title">Scan Development Gate</span>
-          <span class="gatepanel__tag">Engine offline</span>
+          <span class="gatepanel__tag"><span class="gatepanel__dot" aria-hidden="true"></span>Engine offline</span>
         </header>
 
         <figure class="gatepanel__staged">

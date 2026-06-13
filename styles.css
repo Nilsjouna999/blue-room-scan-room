@@ -1891,8 +1891,11 @@ body[data-view="room"] .draft { display: none; }
   font-family: var(--font-mono); font-size: 8px; letter-spacing: 0.18em; color: var(--silver);
   background: rgba(8, 7, 5, 0.72); border: 1px solid var(--line); border-radius: 3px; padding: 3px 7px;
 }
-.draftcard__body { display: grid; gap: 8px; justify-items: center; }
-.draftcard__title { font-family: var(--font-display); font-size: 18px; font-weight: 600; line-height: 1.15; color: var(--t-display); word-break: break-word; max-width: 100%; }
+.draftcard__body { display: grid; gap: 7px; justify-items: center; }
+.draftcard__title { font-family: var(--font-display); font-size: 19px; font-weight: 600; line-height: 1.15; color: var(--t-display); }
+.draftcard__file { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.08em; color: var(--t-meta); word-break: break-all; max-width: 100%; }
+.draftcard__status { font-family: var(--font-display); font-style: italic; font-size: 15px; line-height: 1.4; color: var(--t-primary); margin-top: 1px; }
+.draftcard__sub { font-family: var(--font-mono); font-size: 8.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--faint); }
 .draftcard__archline { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; }
 .draftcard__archrule { height: 1px; flex: 1; max-width: 56px; background: var(--line); }
 .draftcard__arch { font-family: var(--font-mono); font-size: 8px; letter-spacing: 0.2em; color: var(--silver-dim); white-space: nowrap; }
@@ -1917,7 +1920,7 @@ body[data-view="room"] .draft { display: none; }
 .draft__back { border-style: dashed; }
 
 /* Develop-scan CTA on the local-draft intake — the quiet next step. */
-.draft__develop { display: grid; justify-items: center; gap: 6px; }
+.draft__develop { display: grid; justify-items: center; gap: 7px; margin-top: 2px; }
 .draft__developsub { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--faint); }
 
 /* Scan Development Gate — a sealed development step for a staged local
@@ -1933,9 +1936,11 @@ body[data-view="room"] .draft { display: none; }
 .gatepanel__head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .gatepanel__title { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.26em; text-transform: uppercase; color: var(--silver); }
 .gatepanel__tag {
+  display: inline-flex; align-items: center; gap: 6px;
   font-family: var(--font-mono); font-size: 8px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--t-meta);
-  padding: 3px 9px; border: 1px dashed var(--line); border-radius: 999px; white-space: nowrap;
+  padding: 3px 10px; border: 1px dashed var(--line); border-radius: 999px; white-space: nowrap;
 }
+.gatepanel__dot { width: 5px; height: 5px; border-radius: 999px; background: var(--t-meta); box-shadow: 0 0 0 2px rgba(148, 143, 135, 0.12); }
 .gatepanel__staged {
   position: relative; width: 116px; justify-self: center; aspect-ratio: 4 / 5; overflow: hidden;
   border-radius: var(--r-plate); border: 1px solid var(--line); background: var(--ink-950);
@@ -1955,7 +1960,7 @@ body[data-view="room"] .draft { display: none; }
 .gatecheck li { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.03em; color: var(--t-meta); padding-left: 18px; position: relative; }
 .gatecheck li::before { content: "—"; position: absolute; left: 0; color: var(--t-ghost); }
 .gatepanel__foot { display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap; }
-.gatepanel__pending { font-family: var(--font-mono); font-size: 8.5px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--silver-dim); }
+.gatepanel__pending { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--silver); }
 .gatepanel__run {
   font-family: var(--font-mono); font-size: 9.5px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--t-ghost);
   padding: 9px 16px; border: 1px dashed var(--line); border-radius: 6px; background: none; cursor: not-allowed;
