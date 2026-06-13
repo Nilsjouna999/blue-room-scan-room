@@ -168,6 +168,32 @@ banned/hype-word sweep now clean across all states.
 - **Test:** bare URL shows the menu; the four deep links open the room
   directly; Enter Scan Room reveals the unchanged room.
 
+## Free Scan Simulation v1 — Dev Only (2026-06-13 / BR-S021, app.js + scan-contract.js + styles.css)
+
+A third dev-only route `?dev=free-scan-sim` (alongside `uploaded-result` /
+`uploaded-blocked`) that previews the **future Free Scan rhythm** — dev
+fixture only, **no AI, no user-photo analysis**. `mountDev()` loads the new
+`DEV_FIXTURES.validFreeSimulationResult` (a FREE-tier result: 4 visible
+stats, limited receipts, free summary, no Halo-only fields — passes the
+validator) and calls `renderUploadedScanResultDev(result, { mode:
+"free-scan-sim" })`. Sim mode adds a triple-labelled banner (DEV SIMULATION
+· NOT REAL ANALYSIS · NOT USER SCAN), a "FREE SCAN SIMULATION · DEV ONLY"
+heading, and a **static** 3-step stepper (Local draft staged → Scan
+development simulated → Free result preview — no progress bar implying real
+processing), each step carrying one of the three labels; the preview shows
+only the 4 visible stats with a sealed-Halo note (not unlocked). The
+renderer **always** validates first — an invalid fixture renders the safe
+blocked state, so the sim can't bypass validation. styles.css adds
+`.freesim*` / `.uploadeddev__tag--sim` (cyan accent, distinct from the moss
+dev-harness) + `.uploadeddev__sealed`. `renderUploadedScanResultDev` gained
+a backward-compatible `opts` param (existing callers unchanged). **Normal
+flow untouched**: bare URL → menu; Develop Scan still opens the sealed
+engine-offline gate; uploaded photos still produce nothing; both existing
+`?dev` routes, the sample room, and all deep links verified unchanged;
+console clean. Adversarial review (safety / validator / preservation / UX):
+**0 findings**. Dev simulation needs an explicit query — not in the
+screenshot pipeline.
+
 ## Uploaded Scan Result Renderer v1 — Dev Harness (2026-06-13 / BR-S020, app.js + scan-contract.js + index.html + styles.css)
 
 A fourth **dev-only** view (`state.view==="dev"`) that previews what a

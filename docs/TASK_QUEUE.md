@@ -6,6 +6,16 @@ Last updated: 2026-06-12.
 
 ## Active
 
+- **Free Scan Simulation v1 — Dev Only** (2026-06-13 / BR-S021): a dev-only
+  `?dev=free-scan-sim` route showing a static 3-step staged flow (Intake →
+  Development → validated Free preview) from `DEV_FIXTURES.validFreeSimulationResult`
+  via `renderUploadedScanResultDev(result,{mode:'free-scan-sim'})` —
+  validator-gated, labelled DEV SIMULATION / NOT REAL ANALYSIS / NOT USER
+  SCAN, 4 visible stats + sealed Halo. **Completed & verified live** — no
+  AI, no user-photo analysis; normal menu/draft/Develop-gate, both existing
+  `?dev` routes, sample room, and deep links unchanged; review 0 findings;
+  console clean. Not headlessly capturable (no screenshot).
+
 - **Uploaded Scan Result Renderer v1 — Dev Harness** (2026-06-13 / BR-S020):
   a dev-only 4th view (`?dev=uploaded-result` | `?dev=uploaded-blocked`)
   that previews a *validated* future uploaded-result via

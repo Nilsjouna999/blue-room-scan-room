@@ -10,6 +10,56 @@ coding session; the assistant must respect it. Files not listed under
 does not match the user's current task — **stop and ask** before doing
 anything. (GOVERNANCE_OS anti-drift.)
 
+## Active session — BR-S021
+
+**Date / Session ID:** 2026-06-13 / BR-S021
+
+**Today's task:** Free Scan Simulation v1 — Dev Only / Not Real Analysis
+
+**Why:** Preview the future Free Scan rhythm using a validated dev fixture,
+without AI or real uploaded-photo analysis.
+
+**Read:** docs/FILE_MAP.md · docs/PROJECT_OS.md · docs/SCAN_ENGINE_CONTRACT.md ·
+docs/SCREENS.md · scan-contract.js · app.js · data.js · index.html · styles.css
+
+**Edit:** docs/SESSION_BRIEF.md · app.js · scan-contract.js (new fixture) ·
+styles.css · docs/CHANGE_MAP.md · docs/TASK_QUEUE.md · docs/SCREENS.md
+
+**Do not open:** C:\Users\nilsj\OneDrive\Documents\blue-room
+
+**Authority affected:** ACTIVE SPECS + runtime simulation guardrails
+
+**Core/spec change required?** No — dev-only harness only.
+
+**Locked constraints:** no backend · no upload · no AI · no payment · no
+real analysis · no fake analysis in normal user flow · uploaded local draft
+stays separate from sample ScanResult v2 · dev simulation unmistakably
+labelled · preserve sample scan room · preserve all deep links
+
+**Known current state:** … · Scan Engine Foundation v1 (7e0709d) ·
+Uploaded Scan Result Renderer v1 (6e1703a) · validator at
+window.BlueRoomScanContract · dev routes `?dev=uploaded-result` /
+`?dev=uploaded-blocked` exist · normal Local Draft → Develop Scan still
+opens the sealed offline gate
+
+**Definition of done:** a dev-only `?dev=free-scan-sim` route showing a
+staged flow (Intake → Development → Validated Free Result Preview) using a
+dev fixture only · simulated result passes `validateUploadedScanResult`
+before rendering · UI labelled DEV SIMULATION / NOT REAL ANALYSIS / NOT
+USER SCAN · normal Add Photo → Local Draft → Develop Scan stays
+offline/sealed · uploaded photos still produce no real stats · existing
+`?dev=uploaded-result` / `?dev=uploaded-blocked` still work · sample room +
+deep links work · docs updated · commit + push completed
+
+**Verification:** `python -m http.server 8743`; bare URL → menu; Develop
+Scan → sealed offline gate; `?dev=free-scan-sim` → 3-step simulation +
+validated Free preview (4 stats, sealed Halo); invalid fixture → blocked;
+both existing `?dev` routes + both deep links + sample SRC 01/02 work;
+console clean.
+
+**Final response format:** commit hash · files changed · what changed ·
+verification result · review/agent findings · rollback command
+
 ## Active session — BR-S020
 
 **Date / Session ID:** 2026-06-13 / BR-S020

@@ -30,7 +30,7 @@ const state = { source: 0, treatment: "free", tab: "source", view: "menu", draft
   /* Dev-only harness route (NOT a product feature): ?dev=uploaded-result |
      uploaded-blocked renders a validated DEV fixture, never a user scan. */
   const dev = q.get("dev");
-  if (dev === "uploaded-result" || dev === "uploaded-blocked") { state.view = "dev"; state.dev = dev; }
+  if (dev === "uploaded-result" || dev === "uploaded-blocked" || dev === "free-scan-sim") { state.view = "dev"; state.dev = dev; }
   else if (q.has("src") || q.has("t") || q.has("tab")) state.view = "room";
 }
 
@@ -1112,13 +1112,20 @@ function renderBlockedScan(b, actionsHtml) {
 function mountDev() {
   const C = window.BlueRoomScanContract;
   const F = (C && C.DEV_FIXTURES) || {};
+  if (state.dev === "free-scan-sim") {
+    const simFixture = F.validFreeSimulationResult || F.validDevRendererResult;
+    document.getElementById("devView").innerHTML = renderUploadedScanResultDev(simFixture, { mode: "free-scan-sim" });
+    return;
+  }
   const result = state.dev === "uploaded-blocked"
     ? F.invalidAttractivenessResult
     : (F.validDevRendererResult || F.validMinimalFutureResult);
   document.getElementById("devView").innerHTML = renderUploadedScanResultDev(result);
 }
 
-function renderUploadedScanResultDev(result) {
+function renderUploadedScanResultDev(result, opts) {
+  opts = opts || {};
+  const sim = opts.mode === "free-scan-sim"; // Free Scan Simulation route
   const C = window.BlueRoomScanContract;
   if (!C || typeof C.validateUploadedScanResult !== "function") {
     return `<div class="dev"><p class="uploadeddev__tag">◆ DEV HARNESS — scan-contract.js not loaded</p></div>`;
@@ -1137,7 +1144,7 @@ function renderUploadedScanResultDev(result) {
         </div>`;
     return `
       <div class="dev">
-        <p class="uploadeddev__tag uploadeddev__tag--block">◆ DEV HARNESS · NOT USER SCAN · BLOCKED FIXTURE</p>
+        <p class="uploadeddev__tag uploadeddev__tag--block">◆ ${sim ? "DEV SIMULATION · NOT REAL ANALYSIS · BLOCKED FIXTURE" : "DEV HARNESS · NOT USER SCAN · BLOCKED FIXTURE"}</p>
         ${renderBlockedScan(blocked, devActions)}
       </div>`;
   }
@@ -1162,10 +1169,12 @@ function renderUploadedScanResultDev(result) {
     <div class="uploadeddev__plate">
       <div class="uploadeddev__head">Visible stats</div>
       <div class="uploadeddev__stats">${stat("Presence", fv.presence)}${stat("Frame", fv.frame)}${stat("Signal", fv.signal)}${stat("Charge", fv.charge)}</div>
-      ${hx.loreDensity || hx.fitCoherence || hx.stanceRead || hx.visualImpact
-        ? `<div class="uploadeddev__head uploadeddev__head--sub">Extended stats</div>
-           <div class="uploadeddev__stats">${ext("Lore Density", hx.loreDensity)}${ext("Fit Coherence", hx.fitCoherence)}${ext("Stance Read", hx.stanceRead)}${ext("Visual Impact", hx.visualImpact)}</div>`
-        : ""}
+      ${sim
+        ? `<p class="uploadeddev__sealed">Halo Mint develops the deeper read — sealed in this Free preview (dev).</p>`
+        : (hx.loreDensity || hx.fitCoherence || hx.stanceRead || hx.visualImpact
+          ? `<div class="uploadeddev__head uploadeddev__head--sub">Extended stats</div>
+             <div class="uploadeddev__stats">${ext("Lore Density", hx.loreDensity)}${ext("Fit Coherence", hx.fitCoherence)}${ext("Stance Read", hx.stanceRead)}${ext("Visual Impact", hx.visualImpact)}</div>`
+          : "")}
       <p class="uploadeddev__cap">presentation scores of the image artifact — not the person</p>
     </div>`;
 
@@ -1207,14 +1216,29 @@ function renderUploadedScanResultDev(result) {
       </dl>
     </div>`;
 
+  /* Free Scan Simulation chrome: a triple-labelled banner + a STATIC
+     stepper (no progress bar implying real processing). Each step also
+     carries one of the DEV SIMULATION / NOT REAL ANALYSIS / NOT USER SCAN
+     labels. The preview below is a VALIDATED fixture, never a user scan. */
+  const simHead = sim
+    ? `
+      <p class="uploadeddev__tag uploadeddev__tag--sim">◆ DEV SIMULATION · NOT REAL ANALYSIS · NOT USER SCAN</p>
+      <p class="freesim__heading">FREE SCAN SIMULATION · DEV ONLY · NOT REAL ANALYSIS</p>
+      <ol class="freesim__steps">
+        <li class="freesim__step"><span class="freesim__num">1</span><div class="freesim__body"><b>Local draft staged</b><span>No real image analysis. <em>DEV SIMULATION</em></span></div></li>
+        <li class="freesim__step"><span class="freesim__num">2</span><div class="freesim__body"><b>Scan development simulated</b><span>Contract validator runs against the fixture only. <em>NOT REAL ANALYSIS</em></span></div></li>
+        <li class="freesim__step freesim__step--now"><span class="freesim__num">3</span><div class="freesim__body"><b>Free result preview</b><span>Validated fixture render below. <em>NOT USER SCAN</em></span></div></li>
+      </ol>`
+    : "";
+
   return `
     <div class="dev uploadeddev">
-      <p class="uploadeddev__tag">◆ DEV HARNESS · NOT USER SCAN · VALIDATED FIXTURE</p>
+      ${sim ? simHead : `<p class="uploadeddev__tag">◆ DEV HARNESS · NOT USER SCAN · VALIDATED FIXTURE</p>`}
 
       <article class="uploadeddev__card">
         <header class="uploadeddev__cardhead">
-          <span class="uploadeddev__house">◆ BLUE ROOM ARCHIVE · UPLOADED (DEV)</span>
-          <span class="uploadeddev__state">DEV HARNESS</span>
+          <span class="uploadeddev__house">◆ ${sim ? "BLUE ROOM · FREE SCAN (DEV SIM)" : "BLUE ROOM ARCHIVE · UPLOADED (DEV)"}</span>
+          <span class="uploadeddev__state">${sim ? "DEV SIM" : "DEV HARNESS"}</span>
         </header>
         <h2 class="uploadeddev__title">${esc(a.title || "—")}</h2>
         <p class="uploadeddev__arch">◆ &nbsp;${esc(a.archetypeClass || "—")} &nbsp;· ${esc(a.rarity || "—")} · ${esc(a.editionLabel || "—")}</p>
@@ -1228,7 +1252,9 @@ function renderUploadedScanResultDev(result) {
         <button type="button" class="draft__back" data-view-to="menu">Main menu</button>
       </div>
 
-      <p class="uploadeddev__foot">DEV HARNESS · generated from BlueRoomScanContract.DEV_FIXTURES · not a real scan · no AI · no user photo analyzed</p>
+      <p class="uploadeddev__foot">${sim
+        ? "DEV SIMULATION · NOT REAL ANALYSIS · NOT USER SCAN · no AI · no user photo analyzed"
+        : "DEV HARNESS · generated from BlueRoomScanContract.DEV_FIXTURES · not a real scan · no AI · no user photo analyzed"}</p>
     </div>`;
 }
 

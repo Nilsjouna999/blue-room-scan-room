@@ -357,6 +357,36 @@
       },
       warnings: [],
     },
+
+    /* Free Scan Simulation fixture — a FREE-tier result (4 visible stats,
+       limited receipts, free summary only, no Halo-only fields). Obviously
+       a development fixture; never a real user scan. Passes the validator. */
+    validFreeSimulationResult: {
+      kind: "uploaded_scan_result",
+      schemaVersion: "uploaded-v1",
+      status: "scan_complete_future",
+      source: { mode: "local_browser_draft", fileLabel: "dev-free-sim.png", fileType: "PNG", fileSize: "0.6 MB" },
+      gate: { scanStatus: "accepted", route: "HUMAN_SOLO", limitedReason: null },
+      confidence: { overall: 0.6, band: "medium" },
+      artifact: { title: "DEV FREE SCAN FIXTURE", archetypeClass: "The Threshold", rarity: "free", editionLabel: "Dev Free Print", generatedAt: "2026-06-13T00:00:00Z" },
+      stats: { freeVisible: { presence: 58, frame: 66, signal: 52, charge: 45 } },
+      evidenceBoard: [
+        { lens: "Frame", observation: "subject set against open space", visibleCue: "wide negative space, right third", effect: "Frame +6", confidence: "medium" },
+        { lens: "Signal", observation: "one clear colour layer over a muted ground", visibleCue: "single warm layer, low background noise", effect: "Signal +4", confidence: "low" },
+      ],
+      readings: {
+        freeSummary: "Development fixture — not a real scan. A surface read for the Free preview only; the deeper development stays sealed.",
+        haloDossier: "",
+        oracle: null,
+      },
+      safetyFlags: {
+        containsSensitiveInference: false,
+        containsHumanWorthScoring: false,
+        containsAttractivenessScoring: false,
+        containsBiologyRating: false,
+      },
+      warnings: [],
+    },
   };
 
   var api = {

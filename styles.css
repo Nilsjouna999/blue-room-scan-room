@@ -2042,6 +2042,21 @@ body[data-view="room"] .dev { display: none; }
 .uploadeddev__meta dt { font-family: var(--font-mono); font-size: 8px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--faint); min-width: 78px; }
 .uploadeddev__meta dd { font-family: var(--font-mono); font-size: 9px; color: var(--t-meta); }
 .uploadeddev__foot { font-family: var(--font-mono); font-size: 8px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--faint); text-align: center; margin-top: 4px; }
+.uploadeddev__sealed { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.06em; color: var(--t-meta); border: 1px dashed var(--line); border-radius: var(--r-plate); padding: 8px 11px; }
+
+/* Free Scan Simulation — cool "sim" accent + a STATIC stepper (no progress
+   animation). Visually distinct from the moss dev-harness so the two dev
+   routes never read alike. */
+.uploadeddev__tag--sim { color: var(--cyan); border-color: color-mix(in srgb, var(--cyan) 45%, var(--line)); background: color-mix(in srgb, var(--cyan) 6%, transparent); }
+.freesim__heading { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--silver-dim); text-align: center; }
+.freesim__steps { list-style: none; display: grid; gap: 8px; padding: 2px 0; margin: 0; }
+.freesim__step { display: flex; align-items: flex-start; gap: 11px; padding: 11px 13px; border: 1px solid var(--line-faint); border-radius: var(--r-plate); background: rgba(255, 255, 255, 0.012); }
+.freesim__step--now { border-color: color-mix(in srgb, var(--cyan) 30%, var(--line)); }
+.freesim__num { font-family: var(--font-mono); font-size: 10px; width: 20px; height: 20px; flex: none; display: flex; align-items: center; justify-content: center; border: 1px solid var(--line); border-radius: 999px; color: var(--silver-dim); }
+.freesim__body { display: grid; gap: 2px; }
+.freesim__body b { font-size: 12px; color: var(--t-primary); font-weight: 600; }
+.freesim__body span { font-family: var(--font-mono); font-size: 8.5px; letter-spacing: 0.04em; color: var(--t-meta); }
+.freesim__body em { font-style: normal; color: var(--cyan); letter-spacing: 0.1em; }
 
 /* =============================================================
    Fallback for narrow screens (desktop is the priority)
