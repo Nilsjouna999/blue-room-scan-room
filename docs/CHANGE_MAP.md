@@ -168,6 +168,28 @@ banned/hype-word sweep now clean across all states.
 - **Test:** bare URL shows the menu; the four deep links open the room
   directly; Enter Scan Room reveals the unchanged room.
 
+## Executable Card Logic v1 (2026-06-13 / BR-S023, docs only)
+
+New ACTIVE spec `docs/CARD_LOGIC_V1.md` (223 lines) — turns CARD_SYSTEM_V1
+into a hidden ruleset so cards read rule-driven, not "vibe text with fake
+precision". Defines: **public tier bands** (QUIET/PRESENT/STRONG/DOMINANT/
+TOTAL — cards show tiers/bars, never exact 0–100; DOMINANT explicitly
+guarded against person/alpha dominance) with a *provisional* internal→public
+mapping; **two-layer receipt grounding** (`[observed cue] → [artifact
+effect]`, no Tier 2 without Tier 1); detected cue categories; the **Artifact
+Test as an executable line check** (sentence subject must be an image
+element, never the person); **trigger rules for all 24 archetypes** (Primary
+/ Cue / Lenses / Block / Tie-break) + the 3 risky ones held; **sealed-stat
+logic** (5 reason types, never always the highest); **rarity logic**
+(unusual artifact profile, never better-human; 6 provisional bands);
+**Reframe Map** (image changes only — never "look/dress/be better");
+**low-information ladder** (8 safe special-card types + a blocked path for
+face-rating bait); **voice-register rotation** + house-phrase watchlist; and
+**validator targets**. **Docs only — runtime unchanged** (no
+app.js/scan-contract.js/data.js/index.html/styles.css edits). FILE_MAP
+registers it. Feeds *Card System Fixture Upgrade v1*. No LOCKED safety rule
+relaxed.
+
 ## Card System Spec v1 (2026-06-13 / BR-S022, docs only)
 
 New ACTIVE spec `docs/CARD_SYSTEM_V1.md` (333 lines) — the official card

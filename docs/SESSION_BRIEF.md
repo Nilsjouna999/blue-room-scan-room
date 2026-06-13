@@ -10,6 +10,54 @@ coding session; the assistant must respect it. Files not listed under
 does not match the user's current task — **stop and ask** before doing
 anything. (GOVERNANCE_OS anti-drift.)
 
+## Active session — BR-S023
+
+**Date / Session ID:** 2026-06-13 / BR-S023
+
+**Today's task:** Executable Card Logic v1 (docs only)
+
+**Why:** Define the hidden ruleset behind stats, receipts, archetypes,
+rarity, sealed stats, Reframe Map, and low-information cases before
+upgrading fixtures or connecting any engine.
+
+**Read:** docs/FILE_MAP.md · docs/PROJECT_OS.md · docs/SCAN_ENGINE_CONTRACT.md ·
+docs/CARD_SYSTEM_V1.md · docs/SCREENS.md · scan-contract.js · app.js
+
+**Edit:** docs/SESSION_BRIEF.md · docs/CARD_LOGIC_V1.md (new) ·
+docs/FILE_MAP.md · docs/CHANGE_MAP.md · docs/TASK_QUEUE.md
+
+**Do not open:** C:\Users\nilsj\OneDrive\Documents\blue-room
+
+**Authority affected:** ACTIVE SPECS
+
+**Core/spec change required?** Yes — docs-only logic spec (Spec Change
+Review: derives executable rules from CARD_SYSTEM_V1; no LOCKED safety law
+relaxed). No runtime changes.
+
+**Locked constraints:** image-as-artifact only · no face-rating · no
+attractiveness/beauty scoring · no biology scoring · no race/gender/age/
+health guessing · no fake psychology · no personality diagnosis · no
+human-worth ranking · no alpha/beta hierarchy · no body/face feature
+scoring · no runtime changes
+
+**Known current state:** Card System Spec v1 pushed at d4874b7 · Free Scan
+Simulation v1 pushed at 547bc29 · dev renderer + validator exist · runtime
+still has no AI, no real scan engine, no uploaded-photo analysis
+
+**Definition of done:** docs/CARD_LOGIC_V1.md exists as an ACTIVE spec
+defining public stat tiers (no fake precision), receipt grounding, archetype
+trigger rules, sealed-stat logic, rarity logic, Reframe Map logic, low-info
+/ degenerate-input handling, voice-register rotation, and the Artifact Test
+as an executable line check · FILE_MAP registers it · CHANGE_MAP + TASK_QUEUE
+updated · no runtime behavior changes · commit + push completed
+
+**Verification:** `git status` + `git diff --stat` show docs-only changes;
+no app.js/index.html/styles.css/data.js/scan-contract.js edits; CARD_LOGIC_V1
+registered in FILE_MAP; tree clean after push.
+
+**Final response format:** commit hash · files changed · what changed ·
+verification result · review findings · rollback command
+
 ## Active session — BR-S022
 
 **Date / Session ID:** 2026-06-13 / BR-S022

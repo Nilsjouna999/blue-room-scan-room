@@ -6,6 +6,14 @@ Last updated: 2026-06-12.
 
 ## Active
 
+- **Executable Card Logic v1** (2026-06-13 / BR-S023, docs only): new ACTIVE
+  spec `docs/CARD_LOGIC_V1.md` — public tier bands (no fake numbers),
+  two-layer receipt grounding, 24 archetype triggers, sealed-stat / rarity /
+  Reframe Map logic, low-info ladder, voice registers, Artifact-Test line
+  check, validator targets. **Completed** — docs only, runtime unchanged;
+  FILE_MAP registers it; review clean. **Next up:** Card System Fixture
+  Upgrade v1 (Ready #0).
+
 - **Card System Spec v1** (2026-06-13 / BR-S022, docs only): new ACTIVE spec
   `docs/CARD_SYSTEM_V1.md` — Artifact Test, final v1 stats (4 Free / 6 Halo,
   Gesture Geometry rename), 10 lenses, 24 safe archetypes, receipt rules +
