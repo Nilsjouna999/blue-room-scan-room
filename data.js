@@ -359,3 +359,120 @@ const SOURCES = [
     ],
   },
 ];
+
+/* =============================================================
+   ScanResult v2 — stable data shape per SCAN_ROUTING_SPEC +
+   SCAN_ENGINE_SPEC (2026-06-12). Append-only: existing SOURCES
+   fields are MAPPED, not duplicated. Not yet read by app.js —
+   this is the shape for later Free/Halo rendering, kept alongside
+   legacy data for full compatibility.
+============================================================= */
+
+/* v2-only fixture data, keyed by source id */
+const V2_EXTRAS = {
+  "driver-salute": {
+    route: "HUMAN_SOLO",
+    scanStatus: "accepted",
+    confidence: { overall: 0.83, band: "high" }, // matches "Subject lock 0.83" receipt
+    archetypeClass: "The Encounter",
+    warnings: ["Wide-angle distortion noted — corrected in read"],
+    receipts: [
+      { cue: "raised palm, five-spread, facing lens", effect: "Signal +12", basis: "gesture readability", confidence: "high" },
+      { cue: "face locks left third, palm as second anchor", effect: "Presence +6", basis: "focal clarity", confidence: "high" },
+      { cue: "wide-angle barrel + dashboard intrusion", effect: "Frame -9", basis: "crop pressure", confidence: "high" },
+      { cue: "fjord band through right window glass", effect: "Lore +7", basis: "setting specificity", confidence: "medium" },
+      { cue: "red layer against grey cabin", effect: "Charge +5", basis: "contrast anchor", confidence: "high" },
+    ],
+  },
+  "ice-auger": {
+    route: "HUMAN_SOLO",
+    scanStatus: "accepted",
+    confidence: { overall: 0.88, band: "high" }, // matches "Subject lock 0.88" receipt
+    archetypeClass: "The Dispatch",
+    warnings: ["Blown highlights on snow plane — exposure-corrected in card tuning"],
+    receipts: [
+      { cue: "black silhouette on white field", effect: "Presence +9", basis: "contrast / isolation", confidence: "high" },
+      { cue: "treeline holds the upper quarter in one band", effect: "Frame +8", basis: "composition / horizon control", confidence: "high" },
+      { cue: "hood, beanie and sunglasses qualify the expression", effect: "Signal -7", basis: "eye-line redirected to task", confidence: "medium" },
+      { cue: "auger diagonal into the ice", effect: "Lore +8", basis: "tool / work evidence", confidence: "high" },
+      { cue: "crouched brace, gloves stacked", effect: "Charge +4", basis: "contained motion potential", confidence: "medium" },
+    ],
+  },
+};
+
+/* Builder: maps legacy source fields into the v2 shape. */
+function toScanResultV2(src) {
+  const x = V2_EXTRAS[src.id];
+  const srcId = `SRC-${String(src.no).padStart(2, "0")}`;
+  const fitAvg = Math.round(
+    src.metrics.fitMatrix.reduce((s, f) => s + f.v, 0) / src.metrics.fitMatrix.length
+  );
+  /* Gesture Authority is conditional (SCAN_ENGINE_SPEC): present only
+     when gesture evidence is the visible read. SRC-01's hidden stat IS
+     Gesture Authority; SRC-02's conditional stat is Field Silence. */
+  const gestureAuthority =
+    src.dossier.hidden.name === "Gesture Authority"
+      ? { present: true, conditional: true, value: src.dossier.hidden.value, read: src.dossier.hidden.read }
+      : { present: false, conditional: true, reason: "gesture evidence partial — brace only; conditional stat resolved as " + src.dossier.hidden.name };
+
+  return {
+    scanId: `BR-SCAN-${src.dossier.record.objectNo.slice(-3)}`,
+    sourceId: srcId,
+    route: x.route,
+    scanStatus: x.scanStatus, // accepted | limited | rejected
+    confidence: x.confidence, // { overall: 0..1, band: high|medium|low }
+    stats: {
+      freeVisible: { ...src.card.stats }, // Presence / Frame / Signal / Charge — exactly 4
+      haloExtended: {
+        loreDensity: { value: src.lore.value, label: src.lore.label },
+        fitCoherence: { value: fitAvg, label: fitAvg >= 80 ? "Locked" : "Aligned" },
+        gestureAuthority,
+        visualImpact: {
+          value: src.impact.value,
+          label: src.impact.label,
+          derived: true,
+          derivedFrom: ["charge", "presence", "frame", "rarity"], // never independently scored
+        },
+      },
+    },
+    receipts: x.receipts, // { cue, effect, basis, confidence }
+    archetype: {
+      title: src.card.archetype, // instance title (photo role, not personality)
+      class: x.archetypeClass, // COPY_SYSTEM §4 class
+      routeLogic: `${x.route} + dominant stat pair + strongest receipt`,
+    },
+    readings: {
+      freeLine: src.card.note, // short, preview-sized
+      haloRead: src.stance, // deeper; develops, never contradicts freeLine
+      oracle: src.dossier.oracle.full,
+    },
+    treatment: {
+      free: { key: "free", label: "Free Pull" },
+      halo: { key: "shiny", label: "Halo Mint", material: src.halo.material },
+    },
+    tierOutputs: {
+      free: {
+        statsShown: ["presence", "frame", "signal", "charge"],
+        receiptsShown: x.receipts.slice(0, 3),
+        reading: src.card.note,
+        oracle: src.dossier.oracle.short,
+        serial: `Reserved · BR-${srcId}-HM-····`,
+      },
+      halo: {
+        statsShown: ["presence", "frame", "signal", "charge", "loreDensity", "fitCoherence", "visualImpact"],
+        receiptsShown: x.receipts,
+        reading: src.stance,
+        oracle: src.dossier.oracle.full,
+        mintSerial: src.dossier.mint.serial,
+        material: src.halo.material,
+        triggers: [src.dossier.mint.trigger1, src.dossier.mint.trigger2],
+      },
+    },
+    conditionalStats: [
+      { name: src.dossier.hidden.name, value: src.dossier.hidden.value, read: src.dossier.hidden.read, tier: "halo" },
+    ],
+    warnings: x.warnings,
+  };
+}
+
+const SCAN_RESULTS_V2 = SOURCES.map(toScanResultV2);

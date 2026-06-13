@@ -6,11 +6,11 @@ Last updated: 2026-06-12.
 
 ## Active
 
-- **SPINE promotion into active specs** (this session): SCAN_ROUTING_SPEC,
-  SCAN_ENGINE_SPEC, ARCHETYPE_LIBRARY, PERFORMANCE_BUDGET, DESIGN_TOKENS
-  created; stat visibility resolved (4 free / deeper Halo).
-  *(Previous actives — governance OS, doc spine cleanup — completed
-  2026-06-12.)*
+- **ScanResult v2 data shape** (this session): `V2_EXTRAS` +
+  `toScanResultV2()` + `SCAN_RESULTS_V2` appended to data.js; legacy
+  rendering untouched. **Completed.**
+  *(Previous actives — SPINE promotion, governance OS, doc spine cleanup —
+  completed 2026-06-12.)*
 
 ## Ready (supported by current docs, clear definition of done)
 
@@ -39,12 +39,14 @@ Last updated: 2026-06-12.
    bleed in (Mint Record plate already does).
    *Done when:* Halo dossier plates carry a restrained material accent;
    free stays matte; screenshots regenerated.
-6. **ScanResult v2 data shape** — SPINE §16 Phase 2, now spec-backed:
-   extend the fixture ScanResult with route, gate result, confidence,
-   receipt objects (cue/effect/basis/confidence), free vs halo reading
-   fields — data.js only, no UI redesign.
-   *Done when:* both sources carry the v2 shape; existing UI renders
-   unchanged; CHANGE_MAP updated.
+6. **Wire SCAN_RESULTS_V2 into rendering** — make Free/Halo views read
+   tierOutputs (receipts, confidence band, route label, structured
+   receipts in the Evidence Board) instead of ad-hoc fields. app.js +
+   possibly styles.css; no new sections; visible behavior may improve
+   but legacy content must not regress.
+   *Done when:* dossier Evidence Board renders v2 receipts (cue/effect/
+   basis/confidence), free shows 3 / halo shows all; route label visible
+   in Source Record; screenshots regenerated.
 
 ## Backlog / needs decision
 

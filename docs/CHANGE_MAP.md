@@ -115,6 +115,15 @@ browser console is clean (F12).
 - **Test:** free vs mint vs shiny right panel; develop buttons still switch
   treatment.
 
+## ScanResult v2 data shape (2026-06-12, data.js only)
+
+Append-only block at the end of `data.js`: `V2_EXTRAS` (route, gate
+status, confidence, structured receipts, warnings per source) +
+`toScanResultV2()` (maps legacy fields — no duplication) +
+`SCAN_RESULTS_V2`. **Not yet read by app.js** — it's the stable shape
+for later Free/Halo rendering. To change v2 content: edit `V2_EXTRAS`
+or the mapped legacy fields; never fork values that exist in legacy data.
+
 ## SPINE promotion (2026-06-12, docs only)
 
 Five active specs promoted from docs/research/SPINE.md: SCAN_ROUTING_SPEC
