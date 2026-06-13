@@ -168,6 +168,30 @@ banned/hype-word sweep now clean across all states.
 - **Test:** bare URL shows the menu; the four deep links open the room
   directly; Enter Scan Room reveals the unchanged room.
 
+## Halo Gate / Upgrade Layup v1 (2026-06-13 / BR-S025, docs only)
+
+New ACTIVE spec `docs/HALO_GATE_UPGRADE_LAYUP_V1.md` (284 lines) — designs
+the Halo upgrade as a **sealed-dossier ritual, not a SaaS paywall**, with
+no payment implemented. Core law: Free Pull is complete; Halo opens the
+**back of the same card** (the user opens a dossier on a card they already
+hold — never a reroll, gamble, or rarity chase). Defines: upgrade **timing**
+(gate appears only after the Free Pull fully lands; never an interrupt
+before value); the **gate layout** (a card-back/sealed chamber with sealed
+stat / Reframe-Map / evidence / oracle / mint envelopes showing *shape*, not
+contents; CTA "Open Halo Dossier", decline "Keep Free Pull"); **Free preview
+vs Halo content**; **sealed-stat** presentation (structural reason, no tier);
+the **Reframe-Map envelope** ("3 image levers · 2 target variants · setup
+card sealed" — no near-miss language); **per-scan price framing** (one-time,
+this card only; no subscription/packs/credits/blind purchase — no price
+picked, no checkout); **ethical decline** (no confirmshaming/nags);
+**post-unlock reveal rhythm** (calm archival sequence, no slot-machine/
+chest/confetti); a hard **dark-pattern ban list**; and a **copy library**
+(20 headings, 20 CTA/support, 20 decline, 20 Reframe envelope, 20 sealed
+teaser, 10 reveal). **Docs only — runtime unchanged** (no app.js/
+scan-contract.js/data.js/index.html/styles.css edits; no payment/checkout).
+FILE_MAP registers it. Feeds *Halo Gate Dev Mock v1*. No LOCKED safety rule
+relaxed.
+
 ## Card System Fixture Upgrade v1 (2026-06-13 / BR-S024, scan-contract.js + app.js + styles.css)
 
 The dev-only Free Scan Simulation (`?dev=free-scan-sim`) now reflects

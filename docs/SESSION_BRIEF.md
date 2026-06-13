@@ -10,6 +10,56 @@ coding session; the assistant must respect it. Files not listed under
 does not match the user's current task — **stop and ask** before doing
 anything. (GOVERNANCE_OS anti-drift.)
 
+## Active session — BR-S025
+
+**Date / Session ID:** 2026-06-13 / BR-S025
+
+**Today's task:** Halo Gate / Upgrade Layup v1 (docs only)
+
+**Why:** Define the upgrade moment as a sealed artifact/dossier unlock
+before any payment or Halo runtime implementation.
+
+**Read:** docs/FILE_MAP.md · docs/PROJECT_OS.md · docs/SCAN_ENGINE_CONTRACT.md ·
+docs/CARD_SYSTEM_V1.md · docs/CARD_LOGIC_V1.md · docs/SCREENS.md ·
+scan-contract.js · app.js
+
+**Edit:** docs/SESSION_BRIEF.md · docs/HALO_GATE_UPGRADE_LAYUP_V1.md (new) ·
+docs/FILE_MAP.md · docs/CHANGE_MAP.md · docs/TASK_QUEUE.md
+
+**Do not open:** C:\Users\nilsj\OneDrive\Documents\blue-room
+
+**Authority affected:** ACTIVE SPECS
+
+**Core/spec change required?** Yes — docs-only upgrade/product spec. No
+runtime change, no payment, no LOCKED safety law relaxed.
+
+**Locked constraints:** Free is complete · Halo is a per-scan dossier
+unlock · no blind randomized purchase · no fake urgency · no packs/credits/
+subscription in v1 · no self-rating · no person-ranking · no attractiveness/
+beauty/biology/status/identity claims · no payment implementation yet · no
+runtime changes
+
+**Known current state:** dev route `?dev=free-scan-sim` shows public tiers,
+grounded receipts, scope line, sealed stat, rarity reason, Reframe Map
+preview · normal Local Draft → Develop Scan opens the sealed offline gate ·
+no AI, no backend, no payment, no real scan engine · uploaded photos still
+produce no analysis
+
+**Definition of done:** docs/HALO_GATE_UPGRADE_LAYUP_V1.md exists as an
+ACTIVE spec defining upgrade timing, the Halo Gate layout, Free preview vs
+Halo content, sealed-stat presentation, the Reframe-Map envelope, per-scan
+price framing (no price/payment), ethical decline behavior, post-unlock
+reveal rhythm, the dark-pattern ban list, and a copy library · FILE_MAP
+registers it · CHANGE_MAP + TASK_QUEUE updated · no runtime changes · commit
++ push completed
+
+**Verification:** `git status` + `git diff --stat` show docs-only changes;
+no app.js/index.html/styles.css/data.js/scan-contract.js edits;
+HALO_GATE_UPGRADE_LAYUP_V1 registered in FILE_MAP; tree clean after push.
+
+**Final response format:** commit hash · files changed · what changed ·
+verification result · review findings · rollback command
+
 ## Active session — BR-S024
 
 **Date / Session ID:** 2026-06-13 / BR-S024

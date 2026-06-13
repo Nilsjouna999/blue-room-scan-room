@@ -6,6 +6,16 @@ Last updated: 2026-06-12.
 
 ## Active
 
+- **Halo Gate / Upgrade Layup v1** (2026-06-13 / BR-S025, docs only): new
+  ACTIVE spec `docs/HALO_GATE_UPGRADE_LAYUP_V1.md` — the Halo upgrade as a
+  sealed-dossier ritual (Free complete, Halo opens the back of the same
+  card; no reroll/gamble/rarity-chase), with gate timing/layout, Free
+  preview vs Halo content, sealed-stat + Reframe-Map envelopes, per-scan
+  price *framing* (no payment), ethical decline, post-unlock rhythm, a hard
+  dark-pattern ban list, and a copy library. **Completed** — docs only,
+  runtime unchanged, no payment; FILE_MAP registers it.
+  **Next up:** Halo Gate Dev Mock v1 (Ready #0).
+
 - **Card System Fixture Upgrade v1** (2026-06-13 / BR-S024): dev-only Free
   Scan Simulation (`?dev=free-scan-sim`) upgraded to CARD_SYSTEM_V1 +
   CARD_LOGIC_V1 — public tier bands (no printed 0–100), grounded receipts
@@ -107,6 +117,16 @@ Last updated: 2026-06-12.
    scope/sealed/rarity/Reframe Map). `validDevRendererResult` (the raw
    uploaded-result harness) was intentionally left on its prior shape; a
    future pass can align it too if wanted.)*
+0. **Halo Gate Dev Mock v1** (NEXT) — a dev-only mock of the Halo Gate from
+   `docs/HALO_GATE_UPGRADE_LAYUP_V1.md`: a sealed-dossier chamber (sealed
+   stat / Reframe-Map / evidence / oracle / mint envelopes showing *shape*,
+   not contents), "Open Halo Dossier" / "Keep Free Pull", and a calm
+   post-unlock reveal — **no payment, no checkout, no real unlock**; behind
+   an explicit dev route, unmistakably labelled DEV.
+   *Done when:* the mock renders the layout + copy from the spec; clicking
+   "open" runs the calm reveal of the existing dev fixture's sealed contents
+   (no Stripe, no fake urgency, no dark patterns); normal flow + sample room
+   + deep links + the three existing `?dev` routes unchanged; reviewed.
 1. **18-state audit** — PROJECT_OS §17.1. Walk 2 sources × 3 treatments
    (incl. Lab) × 3 tabs at 1600×900.
    *Done when:* every state screenshotted or DOM-verified; issues logged
