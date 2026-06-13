@@ -10,6 +10,73 @@ coding session; the assistant must respect it. Files not listed under
 does not match the user's current task — **stop and ask** before doing
 anything. (GOVERNANCE_OS anti-drift.)
 
+## Active session — BR-S030
+
+**Date / Session ID:** 2026-06-13 / BR-S030
+
+**Today's task:** Halo Gate Boundary Lock v1 (docs only — decision/spec)
+
+**Why:** Lock the honest Free/Halo boundary before any Halo UI is built —
+resolve the exact-locked-counts tension so Free Pull feels complete and Halo
+feels desirable without manipulation.
+
+**Read:** docs/GPT_REVIEW_GUIDE.md · docs/PROJECT_OS.md · docs/CHANGE_MAP.md ·
+docs/TASK_QUEUE.md · docs/SESSION_BRIEF.md · docs/DECISION_LOG.md ·
+docs/CARD_LOGIC_V1.md · docs/COPY_SYSTEM.md · docs/HALO_GATE_UPGRADE_LAYUP_V1.md ·
+docs/FREE_PULL_SCREENSHOT_LAYOUT_V1.md · docs/research/RESEARCH_COMPRESSION_V1.md ·
+docs/research/REFRAME_MAP_VALUE_SYSTEM_V1.md · docs/research/LANGUAGE_SYSTEM_V1.md ·
+docs/research/HUMAN_IN_FRAME_READING_RULES_V1.md
+
+**Edit:** docs/halo/HALO_GATE_BOUNDARY_V1.md (new) · docs/DECISION_LOG.md ·
+docs/TASK_QUEUE.md · docs/CHANGE_MAP.md · docs/SESSION_BRIEF.md ·
+docs/FILE_MAP.md (register the new doc)
+
+**Do not open:** C:\Users\nilsj\OneDrive\Documents\blue-room
+
+**Do not edit (runtime):** app.js · data.js · scan-contract.js · styles.css ·
+index.html · assets
+
+**Authority affected:** ACTIVE SPECS (new boundary spec; supersedes pre-unlock
+count guidance in two existing specs)
+
+**Core/spec change required?** Yes — docs-only boundary spec (Spec Change
+Review). Names the conflict + supersedes the count guidance in
+HALO_GATE_UPGRADE_LAYUP_V1 §4/§5/§7/§11 + FREE_PULL_SCREENSHOT_LAYOUT_V1 §8;
+DECISION_LOG entry added. No LOCKED safety law relaxed; no runtime change.
+
+**Locked constraints:** Free Pull = complete card front · Halo = sealed card
+back/dossier (not a hidden real score / re-roll / rarity chase) · **no exact
+locked counts on the Free front or pre-unlock gate** (qualitative sealed-back
+language only; counts post-unlock) · no fake urgency / chance / loot-box /
+subscription-trap / person-truth / "real score hidden" · no Halo build · no
+Halo Dossier build · no payment · no AI/backend/upload analysis · no login/
+profile/cloud · no fake real-user analysis · no Free Pull redesign · no change
+to normal Local Draft → Develop Scan sealed/offline
+
+**Known current state:** Artifact Language Stabilization Pack v1 (8504f96) ·
+`?dev=free-scan-sim` currently renders "Map exists — 2 image levers · 2 target
+variants · setup card sealed" (the count line this lock retires; runtime fix
+deferred to the next coding task) · normal Develop Scan opens the sealed offline
+gate · no AI/backend/payment
+
+**Definition of done:** docs/halo/HALO_GATE_BOUNDARY_V1.md exists and is clear
+(product frame · Free/Halo/Dossier boundaries · explicit exact-count decision ·
+Halo anti-manipulation rules · copy bank · anti-patterns · implementation
+consequence) · DECISION_LOG records the lock · TASK_QUEUE marks it complete,
+keeps Halo Gate Dev Mock v1 as next coding task (bound by the lock) + adds Halo
+Gate Ethics Audit after · CHANGE_MAP + SESSION_BRIEF + FILE_MAP updated · no
+runtime change · commit + push completed
+
+**Verification:** `git status` + `git diff --stat` show docs-only changes; no
+app.js/data.js/scan-contract.js/styles.css/index.html edits; new doc registered
+in FILE_MAP; boundary re-read top-to-bottom (Free complete · Halo sealed back ·
+exact-count decision explicit · anti-manipulation explicit · next task clear);
+tree clean after push.
+
+**Final response format:** commit hash · changed files · exact locked-count
+decision · approved Halo copy examples · forbidden patterns · next coding task ·
+rollback command
+
 ## Active session — BR-S029
 
 **Date / Session ID:** 2026-06-13 / BR-S029

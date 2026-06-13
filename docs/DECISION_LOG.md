@@ -182,3 +182,15 @@ fit-coherence matrix, "subject lock") keep their numbers — they are captioned
 PROJECT_OS §7/§9/§10 updated in the same commit (Core Change Review).
 Revisit: if users misread a band, or when a deterministic engine assigns
 calibrated band cut points (current cuts are provisional).
+
+**2026-06-13 / Halo Gate Boundary Lock v1 / LOCKED**
+Why: lock the honest Free/Halo boundary before Halo UI. Free Pull = complete
+card front; Halo = sealed card back/dossier of the *same* card — added depth,
+not a hidden real score / re-roll / rarity chase. The Free front + pre-unlock
+gate must **NOT** show exact locked counts (a withheld-inventory read); use
+qualitative sealed-back language — exact counts only post-unlock. Halo earns its
+price by artifact depth, never urgency / chance / loot-box / person-truth. Full
+rules, copy bank, and the supersession of earlier pre-unlock count guidance:
+`docs/halo/HALO_GATE_BOUNDARY_V1.md` (§H). Docs only — no runtime change.
+Revisit: if the qualitative hint reads as empty, add a non-enumerated proof
+line — never an exact count.

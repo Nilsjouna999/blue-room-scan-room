@@ -185,6 +185,35 @@ payment/Halo/upload analysis). GPT_REVIEW_GUIDE + TASK_QUEUE + SESSION_BRIEF
 note the folder. Roadmap unchanged beyond this checkpoint — next product task
 stays **Free Pull Mock Polish v1**.
 
+## Halo Gate Boundary Lock v1 (2026-06-13 / BR-S030, docs only)
+
+New ACTIVE spec `docs/halo/HALO_GATE_BOUNDARY_V1.md` (225 lines) — locks the
+honest Free/Halo boundary before any Halo UI. **Free Pull = complete card
+front; Halo = sealed card back / dossier layer** of the same card (additive
+artifact depth, never a hidden "real score" / re-roll / rarity chase).
+**Headline decision (LOCKED): the Free Pull front and the pre-unlock Halo Gate
+must NOT show exact locked counts** ("2 image levers · 2 target variants · 6
+receipts found") — they read as a *withheld inventory* and make the complete
+card feel like a teaser. Use **qualitative sealed-back language** ("Sealed back ·
+archived", "Back face held in conservation", "A dossier layer exists"); exact
+counts/contents only **post-unlock**. Honesty preserved — the back genuinely
+exists; we drop quantification, not truthfulness. Halo must be desirable via
+artifact depth, never fake urgency / chance / loot-box / subscription-trap /
+person-truth. The doc defines: product frame · Free Pull boundary (+ the
+exact-count ban table) · Halo Gate boundary (forbidden list) · Halo Dossier
+boundary (7 candidate modules as *production notes*, framing law — not built) ·
+a copy bank (sealed-back hint / gate title+subtitle / disabled CTA / safety /
+dev-route label) · anti-patterns (+ why) · implementation consequence for *Halo
+Gate Dev Mock v1*. **Supersedes** the pre-unlock count guidance in
+`HALO_GATE_UPGRADE_LAYUP_V1` §4/§5/§7/§11 and `FREE_PULL_SCREENSHOT_LAYOUT_V1`
+§8 (rest of both specs stands; named, not silently contradicted).
+**Docs only — runtime unchanged**: the current `?dev=free-scan-sim` mock still
+renders the "2 image levers · 2 target variants" vault line; that is now a
+**known boundary gap**, migrated to qualitative copy in *Halo Gate Dev Mock v1*
+(not here). DECISION_LOG (2026-06-13) + FILE_MAP register it; TASK_QUEUE binds
+the next mock task and adds a *Halo Gate Ethics Audit* after it. No
+AI/backend/payment/upload-analysis; no fake user analysis.
+
 ## Artifact Language Stabilization Pack v1 (2026-06-13 / BR-S029, runtime + Core Change docs)
 
 Migrated the **sample room's** visible artifact language (Sample Room Tier
