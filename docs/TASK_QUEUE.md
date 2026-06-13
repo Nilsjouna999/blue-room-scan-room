@@ -6,6 +6,15 @@ Last updated: 2026-06-12.
 
 ## Active
 
+- **Scan Engine Contract v1** (2026-06-13 / BR-S018): new ACTIVE spec
+  `docs/SCAN_ENGINE_CONTRACT.md` defining the future uploaded-photo result
+  shape (`ScanResultUploaded v1`), allowed/forbidden lenses, lifecycle
+  states, receipt rules, the Free/Halo reveal model, and engine-connection
+  safety gates. **Completed** — docs only, runtime intentionally unchanged;
+  uploaded results kept separate from sample ScanResult v2; `FILE_MAP`
+  registers the new spec.
+  **Next up:** Scan Contract Validator Stub v1 (Ready #0 below).
+
 - **Local Draft Polish v1** (2026-06-13 / BR-S017): presentation-only
   polish of the intake + sealed gate — cleaner filename label (title now
   "Local image" + compact "PNG · size · short…name", real name kept
@@ -33,6 +42,18 @@ Last updated: 2026-06-12.
 
 ## Ready (supported by current docs, clear definition of done)
 
+0. **Scan Contract Validator Stub v1** (NEXT) — a small **non-AI**
+   validator that checks a candidate `ScanResultUploaded` object against
+   `docs/SCAN_ENGINE_CONTRACT.md`: `kind`/`schemaVersion`, required fields,
+   stat ranges (0–100), a receipt present for every displayed score, and
+   that every `safetyFlags.*` is false (plus no forbidden lens/word). It
+   **generates nothing**, runs no analysis, and makes no AI/API call; on a
+   violation it returns a block reason for a safe failure state.
+   *Done when:* a pure validator function passes a hand-written in-spec
+   object and rejects out-of-spec ones (missing field, bad stat range,
+   true safety flag, receipt-less score) — verified with simple checks; no
+   fixture added to data.js; no engine; no runtime UI change unless
+   explicitly scoped.
 1. **18-state audit** — PROJECT_OS §17.1. Walk 2 sources × 3 treatments
    (incl. Lab) × 3 tabs at 1600×900.
    *Done when:* every state screenshotted or DOM-verified; issues logged

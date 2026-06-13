@@ -10,6 +10,55 @@ coding session; the assistant must respect it. Files not listed under
 does not match the user's current task — **stop and ask** before doing
 anything. (GOVERNANCE_OS anti-drift.)
 
+## Active session — BR-S018
+
+**Date / Session ID:** 2026-06-13 / BR-S018
+
+**Today's task:** Scan Engine Contract v1
+
+**Why:** Define the future uploaded-photo scan result contract and safety
+boundaries before connecting any AI or analysis engine.
+
+**Read:** docs/FILE_MAP.md · docs/PROJECT_OS.md · docs/SCREENS.md ·
+docs/research/SPINE.md · app.js · data.js
+
+**Edit:** docs/SESSION_BRIEF.md · docs/CHANGE_MAP.md · docs/TASK_QUEUE.md ·
+docs/SCAN_ENGINE_CONTRACT.md (new) · docs/FILE_MAP.md (register the new spec)
+
+**Do not open:** C:\Users\nilsj\OneDrive\Documents\blue-room · docs/research/* (beyond SPINE, which this brief lists under Read)
+
+**Authority affected:** ACTIVE SPECS
+
+**Core/spec change required?** Yes — adds a new ACTIVE spec
+(SCAN_ENGINE_CONTRACT) as a documented contract; no LOCKED law changes, so
+Spec Change Review only (rationale logged in CHANGE_MAP + this brief).
+
+**Locked constraints:** no backend · no upload · no AI · no payment · no
+fake stats · no fake receipts · no fake oracle · no fake Halo result ·
+uploaded local draft stays separate from sample ScanResult v2 · preserve
+sample scan room · preserve all deep links
+
+**Known current state:** Main Menu v1 pushed at def0dfe · Upload/Intake
+Shell v1 pushed at d590e55 · Scan Development Gate v1 pushed at e19e183 ·
+Local Draft Polish v1 pushed at c7d2cd8 · Local Draft works · Develop Scan
+opens the sealed engine-offline gate
+
+**Definition of done:** a clear Scan Engine Contract v1 exists in docs ·
+defines the future uploaded-photo ScanResult shape · allowed + forbidden
+lenses · result states / lifecycle · evidence/receipt requirements · red
+lines against face/attractiveness/biology/age/health/race/gender guessing,
+human-worth scoring, fake psychology · what Free and Halo may later reveal
+· how a local draft becomes eligible for a future scan without pretending a
+scan has run now · runtime behavior unchanged · sample scan room still
+works · deep links still work · commit and push completed
+
+**Verification:** docs-only — `git status` + `git diff --stat` show only
+docs changes, no runtime files; no unintended files; (no smoke test
+needed since app.js/data.js/styles.css untouched)
+
+**Final response format:** Files changed · What changed · Verification
+result · Git commands · Rollback command
+
 ## Active session — BR-S017
 
 **Date / Session ID:** 2026-06-13 / BR-S017

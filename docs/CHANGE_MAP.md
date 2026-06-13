@@ -168,6 +168,24 @@ banned/hype-word sweep now clean across all states.
 - **Test:** bare URL shows the menu; the four deep links open the room
   directly; Enter Scan Room reveals the unchanged room.
 
+## Scan Engine Contract v1 (2026-06-13 / BR-S018, docs only)
+
+New ACTIVE spec `docs/SCAN_ENGINE_CONTRACT.md` — the allowed output shape
+and safety boundaries for a *future* engine that develops an **uploaded**
+photo. Documentation only: **runtime behavior intentionally unchanged**
+(no app.js/data.js/styles.css edits) — the local draft still produces no
+stats and "Develop scan" still only opens the engine-offline gate. The
+contract defines: red lines (no person/beauty/biology/identity/worth/fake-
+psychology), the `ScanResultUploaded v1` shape (a separate `kind`, reusing
+ScanResult v2 stat/receipt/confidence conventions but never mixed with
+`SOURCES`/`SCAN_RESULTS_V2`), the result lifecycle (`local_draft` /
+`gate_offline` active; `scan_pending/complete/failed_future` placeholders),
+allowed vs forbidden lenses, receipt rules, the Free-vs-Halo reveal model,
+and engine-connection gates (schema-validate + block unsafe fields before
+any engine is wired). `docs/FILE_MAP.md` registers the new spec (governance:
+no new doc without a FILE_MAP entry). Spec Change Review only — no LOCKED
+law changed. Next: a non-AI Scan Contract Validator Stub (TASK_QUEUE).
+
 ## Local Draft Polish v1 (2026-06-13 / BR-S017, app.js + styles.css)
 
 Presentation-only polish of the browser-local intake + sealed gate — no
