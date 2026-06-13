@@ -10,6 +10,53 @@ coding session; the assistant must respect it. Files not listed under
 does not match the user's current task — **stop and ask** before doing
 anything. (GOVERNANCE_OS anti-drift.)
 
+## Active session — BR-S022
+
+**Date / Session ID:** 2026-06-13 / BR-S022
+
+**Today's task:** Card System Spec v1 (docs only)
+
+**Why:** Lock the creative card/stat/lens/archetype system before upgrading
+dev fixtures or connecting any future scan engine.
+
+**Read:** docs/FILE_MAP.md · docs/PROJECT_OS.md · docs/SCAN_ENGINE_CONTRACT.md ·
+docs/SCREENS.md · docs/research/SPINE.md · scan-contract.js · app.js
+
+**Edit:** docs/SESSION_BRIEF.md · docs/CARD_SYSTEM_V1.md (new) ·
+docs/CHANGE_MAP.md · docs/TASK_QUEUE.md · docs/FILE_MAP.md
+
+**Do not open:** C:\Users\nilsj\OneDrive\Documents\blue-room
+
+**Authority affected:** ACTIVE SPECS
+
+**Core/spec change required?** Yes — but docs-only (Spec Change Review:
+v1 stat taxonomy refines SCAN_ENGINE_SPEC; rationale logged in CHANGE_MAP +
+the new spec's authority note). No LOCKED safety law relaxed.
+
+**Locked constraints:** image-as-artifact only · no face-rating · no
+attractiveness/beauty scoring · no biology scoring · no race/gender/age/
+health guessing · no fake psychology · no personality diagnosis · no
+human-worth ranking · no alpha/beta hierarchy · no body/face feature
+scoring · no runtime changes
+
+**Known current state:** … · Free Scan Simulation v1 pushed at 547bc29 ·
+validator at window.BlueRoomScanContract · dev routes uploaded-result /
+uploaded-blocked / free-scan-sim exist · normal Develop Scan still opens the
+sealed offline gate
+
+**Definition of done:** docs/CARD_SYSTEM_V1.md exists as an ACTIVE spec
+defining the Artifact Test, final v1 stats, v1 lenses, a safe v1 archetype
+set, receipt rules, Free vs Halo output shape, BLUE ROOM tone, and forbidden
+language · FILE_MAP registers it · CHANGE_MAP + TASK_QUEUE updated · no
+runtime behavior changes · commit + push completed
+
+**Verification:** `git status` + `git diff --stat` show docs-only changes;
+no app.js/index.html/styles.css/data.js/scan-contract.js edits; CARD_SYSTEM_V1
+registered in FILE_MAP; tree clean after push.
+
+**Final response format:** commit hash · files changed · what changed ·
+verification result · rollback command
+
 ## Active session — BR-S021
 
 **Date / Session ID:** 2026-06-13 / BR-S021

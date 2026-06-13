@@ -62,6 +62,7 @@ implementation (GOVERNANCE_OS funnel).
 | `docs/SCAN_ROUTING_SPEC.md` | ACTIVE spec: intake gate, routes, reject/limited copy, Free/Halo routing split | Building intake/routing; writing route copy | — |
 | `docs/SCAN_ENGINE_SPEC.md` | ACTIVE spec: lens engine, stat visibility (4 free / deeper Halo), confidence shrinkage, receipts | Building scoring/receipts; any stat-visibility question | — |
 | `docs/SCAN_ENGINE_CONTRACT.md` | ACTIVE spec: future **uploaded-photo** result shape + safety boundaries (red lines, lifecycle, Free/Halo reveal, engine-connection gates) | Designing/validating the uploaded-photo engine; before connecting any analysis | — |
+| `docs/CARD_SYSTEM_V1.md` | ACTIVE spec: the card creative system — Artifact Test, v1 stats (4 Free / 6 Halo), 10 lenses, 24 archetypes, receipt rules, Free/Halo output, BLUE ROOM tone, forbidden language. Refines SCAN_ENGINE_SPEC stat taxonomy | Writing stats/archetypes/receipts/copy; upgrading fixtures or future prompts | Relaxing any §1/§5/§6 safety rule |
 | `docs/ARCHETYPE_LIBRARY.md` | ACTIVE spec: archetype selection + naming formulas, banned wording (classes live in COPY_SYSTEM §4) | Naming/selecting archetypes | — |
 | `docs/PERFORMANCE_BUDGET.md` | ACTIVE spec: cost law (Free cheap), effects law, testing checklist | Adding any effect or runtime cost | — |
 | `docs/DESIGN_TOKENS.md` | ACTIVE spec: Room/Plate/Artifact grammar, color/type/depth laws, dossier rhythm | Visual changes — read before styles.css | — |

@@ -6,6 +6,14 @@ Last updated: 2026-06-12.
 
 ## Active
 
+- **Card System Spec v1** (2026-06-13 / BR-S022, docs only): new ACTIVE spec
+  `docs/CARD_SYSTEM_V1.md` — Artifact Test, final v1 stats (4 Free / 6 Halo,
+  Gesture Geometry rename), 10 lenses, 24 safe archetypes, receipt rules +
+  20 examples, Free/Halo output, BLUE ROOM tone, forbidden language.
+  **Completed** — docs only, runtime unchanged; refines SCAN_ENGINE_SPEC
+  stat taxonomy; FILE_MAP registers it.
+  **Next up:** Card System Fixture Upgrade v1 (Ready #0 below).
+
 - **Free Scan Simulation v1 — Dev Only** (2026-06-13 / BR-S021): a dev-only
   `?dev=free-scan-sim` route showing a static 3-step staged flow (Intake →
   Development → validated Free preview) from `DEV_FIXTURES.validFreeSimulationResult`
@@ -76,6 +84,16 @@ Last updated: 2026-06-12.
 
    *(Scan Contract Validator Stub v1 — completed by BR-S019 Scan Engine
    Foundation v1; see Active.)*
+0. **Card System Fixture Upgrade v1** (NEXT) — align the dev fixtures in
+   `scan-contract.js` (`validDevRendererResult`, `validFreeSimulationResult`)
+   to `docs/CARD_SYSTEM_V1.md`: Free-front stats = Presence/Frame/Signal/
+   Visual Impact; Charge + the new Halo-depth stats (Gesture Geometry /
+   Setting Gravity / Artifact Coherence) move to `haloExtended`; v1 archetype
+   names; receipts in the new lens vocabulary.
+   *Done when:* updated fixtures still pass `validateUploadedScanResult`; the
+   dev/sim renderers show the v1 stat layout; no AI, no real analysis, no
+   data.js sample insertion, normal flow + deep links unchanged. (May need a
+   small `SCAN_ENGINE_SPEC` reconcile note.)
 1. **18-state audit** — PROJECT_OS §17.1. Walk 2 sources × 3 treatments
    (incl. Lab) × 3 tabs at 1600×900.
    *Done when:* every state screenshotted or DOM-verified; issues logged

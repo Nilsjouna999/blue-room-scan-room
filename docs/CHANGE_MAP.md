@@ -168,6 +168,26 @@ banned/hype-word sweep now clean across all states.
 - **Test:** bare URL shows the menu; the four deep links open the room
   directly; Enter Scan Room reveals the unchanged room.
 
+## Card System Spec v1 (2026-06-13 / BR-S022, docs only)
+
+New ACTIVE spec `docs/CARD_SYSTEM_V1.md` (333 lines) — the official card
+creative system: the Artifact Test ("if a different photo of the same
+person could change the score it is an artifact signal; if it sticks to the
+person it is banned"), final v1 stats (Free-front: Presence/Frame/Signal/
+Visual Impact · Halo-depth: Charge/Lore Density/Fit Coherence/**Gesture
+Geometry**/Setting Gravity/Artifact Coherence — "Stance Read"/"Gesture
+Authority" renamed to Gesture Geometry), 10 lenses, 24 safe archetypes in 5
+families (3 risky ones held for later; "The Beautiful Contradiction"
+renamed "The Striking Contradiction" — "beautiful" is banned beauty-app
+language), receipt rules + 20 safe examples, Free vs Halo output shape, and
+BLUE ROOM tone (20 approved + 20 banned patterns, 20 Free / 20 Halo / 10
+oracle lines), plus the global forbidden-language list. **Docs only —
+runtime unchanged** (no app.js/scan-contract.js/data.js/index.html/styles.css
+edits). Spec Change Review: the v1 stat taxonomy refines `SCAN_ENGINE_SPEC`
+(Charge → Halo, Visual Impact → Free front, +Setting Gravity/Artifact
+Coherence); the shipped fixtures still use the prior set and migrate in the
+next task. `FILE_MAP` registers the spec. No LOCKED safety rule relaxed.
+
 ## Free Scan Simulation v1 — Dev Only (2026-06-13 / BR-S021, app.js + scan-contract.js + styles.css)
 
 A third dev-only route `?dev=free-scan-sim` (alongside `uploaded-result` /
