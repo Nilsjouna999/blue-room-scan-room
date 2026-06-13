@@ -115,6 +115,14 @@ browser console is clean (F12).
 - **Test:** free vs mint vs shiny right panel; develop buttons still switch
   treatment.
 
+## SPINE promotion (2026-06-12, docs only)
+
+Five active specs promoted from docs/research/SPINE.md: SCAN_ROUTING_SPEC
+(gate + routes), SCAN_ENGINE_SPEC (lenses, stats, confidence, receipts),
+ARCHETYPE_LIBRARY (selection + naming), PERFORMANCE_BUDGET (cost +
+effects law), DESIGN_TOKENS (Room/Plate/Artifact grammar). No code
+touched. Build sessions read the relevant spec, not raw research.
+
 ## Governance / research organization (2026-06-12)
 
 Governance and research docs were reorganized — no code touched.

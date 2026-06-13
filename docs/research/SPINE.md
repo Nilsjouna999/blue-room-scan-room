@@ -4,6 +4,9 @@ Layer: RESEARCH (top of the research stack) · Status: DRAFT
 Purpose: keep only the useful research. Remove rambling, academic filler, overbuilt feature ideas, and anything that would make Fable over-engineer.
 Rule: nothing here is buildable until promoted into an ACTIVE spec
 (see docs/GOVERNANCE_OS.md — research promotion funnel).
+Promoted 2026-06-12: §2–4 → SCAN_ROUTING_SPEC · §5,15 → PERFORMANCE_BUDGET
+· §7–10 → SCAN_ENGINE_SPEC · §11–13 → ARCHETYPE_LIBRARY · §14 →
+DESIGN_TOKENS. The specs win where wording differs.
 
 ---
 

@@ -6,10 +6,11 @@ Last updated: 2026-06-12.
 
 ## Active
 
-- **Governance OS + research spine organization** (this session):
-  GOVERNANCE_OS created; docs/research/SPINE.md adopted as top-of-research;
-  FILE_MAP / SESSION_BRIEF / DECISION_LOG / CHANGE_MAP updated.
-  *(Previous active — documentation spine cleanup — completed 2026-06-12.)*
+- **SPINE promotion into active specs** (this session): SCAN_ROUTING_SPEC,
+  SCAN_ENGINE_SPEC, ARCHETYPE_LIBRARY, PERFORMANCE_BUDGET, DESIGN_TOKENS
+  created; stat visibility resolved (4 free / deeper Halo).
+  *(Previous actives — governance OS, doc spine cleanup — completed
+  2026-06-12.)*
 
 ## Ready (supported by current docs, clear definition of done)
 
@@ -38,12 +39,12 @@ Last updated: 2026-06-12.
    bleed in (Mint Record plate already does).
    *Done when:* Halo dossier plates carry a restrained material accent;
    free stays matte; screenshots regenerated.
-6. **Promote first SPINE principles into specs** — pick the ratified
-   pieces of docs/research/SPINE.md (Free-cheap/Halo-deep split is already
-   decided; intake gate + routes + ScanResult shape are candidates) and
-   write them into PROJECT_OS or a new spec via the GOVERNANCE_OS funnel.
-   *Done when:* promoted sections carry ACTIVE status in a spec doc and
-   SPINE marks them promoted; FILE_MAP updated if a new spec is created.
+6. **ScanResult v2 data shape** — SPINE §16 Phase 2, now spec-backed:
+   extend the fixture ScanResult with route, gate result, confidence,
+   receipt objects (cue/effect/basis/confidence), free vs halo reading
+   fields — data.js only, no UI redesign.
+   *Done when:* both sources carry the v2 shape; existing UI renders
+   unchanged; CHANGE_MAP updated.
 
 ## Backlog / needs decision
 

@@ -137,6 +137,16 @@ AI-developed pass; paid may differ from free but must not contradict
 visible facts established by Free.
 Revisit: if the funnel adds more friction than it removes for a solo builder.
 
+**2026-06-12 / Stat visibility resolved: 4 free / deeper Halo / CURRENT**
+Why: SPINE proposed 6 main stats; PROJECT_OS holds 4. Resolution (in
+SCAN_ENGINE_SPEC): Free Pull shows exactly Presence/Frame/Signal/Charge —
+cheap, stable, screenshot-simple. Halo/dossier reveals Lore Density, Fit
+Coherence, Gesture Authority (conditional on visible gesture evidence)
+and Visual Impact (derived, never independently scored). Rarity is a
+lens, never attractiveness. First SPINE promotion completed same day
+(5 specs).
+Revisit: if real users consistently ask what a deeper stat means in Free.
+
 **2026-06-12 / Current Halo Foil is prototype-only, not final shiny design / TESTING**
 Why: it proves a paid treatment can pop in-browser (holo edge, halo,
 particles, shimmer) but it is an effect bucket, not a card material — it

@@ -58,6 +58,11 @@ implementation (GOVERNANCE_OS funnel).
 | `docs/TASK_QUEUE.md` | Ranked work queue | Logging out-of-scope findings; picking next work | — |
 | `docs/SESSION_BRIEF.md` | Per-session scope template + example | Start of every session | — |
 | `docs/GOVERNANCE_OS.md` | Authority layers, statuses, change reviews, promotion funnel, anti-drift/clutter rules | A change touches LOCKED/ACTIVE authority; resolving conflicts | To excuse skipping the funnel |
+| `docs/SCAN_ROUTING_SPEC.md` | ACTIVE spec: intake gate, routes, reject/limited copy, Free/Halo routing split | Building intake/routing; writing route copy | — |
+| `docs/SCAN_ENGINE_SPEC.md` | ACTIVE spec: lens engine, stat visibility (4 free / deeper Halo), confidence shrinkage, receipts | Building scoring/receipts; any stat-visibility question | — |
+| `docs/ARCHETYPE_LIBRARY.md` | ACTIVE spec: archetype selection + naming formulas, banned wording (classes live in COPY_SYSTEM §4) | Naming/selecting archetypes | — |
+| `docs/PERFORMANCE_BUDGET.md` | ACTIVE spec: cost law (Free cheap), effects law, testing checklist | Adding any effect or runtime cost | — |
+| `docs/DESIGN_TOKENS.md` | ACTIVE spec: Room/Plate/Artifact grammar, color/type/depth laws, dossier rhythm | Visual changes — read before styles.css | — |
 | `docs/research/SPINE.md` | Top-of-research filtered spine — high-signal product principles awaiting promotion | Distilling raw research; planning a promotion into a spec | During daily coding unless SESSION_BRIEF says so |
 | `docs/research/*.md` (others) | Raw reference research (RESEARCH authority, unfiltered) | Mining for SPINE distillation only | Building from directly — never |
 
