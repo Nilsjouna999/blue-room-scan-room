@@ -115,6 +115,18 @@ browser console is clean (F12).
 - **Test:** free vs mint vs shiny right panel; develop buttons still switch
   treatment.
 
+## ScanResult v2 rendering integration (2026-06-12, app.js)
+
+`getScanResult(src)` / `getActiveScan()` / `getTierOutput(scan, treatment)`
+helpers in app.js. v2 is now the preferred source (legacy fallback via
+`||` everywhere) for: card + reading-panel + dossier stat values and
+visibility (`tierOutputs.free.statsShown` / `stats.freeVisible`), hidden
+stat (`conditionalStats`), Fit+Aura Impact/Lore (`haloExtended`), Mint
+Record serial/material/triggers, and both oracles. Still legacy with
+`// TODO(v2-render)` markers: Evidence Board prose receipts and the
+Metrics tab (signalMix/pressure/fitMatrix aren't in v2). Visual output
+unchanged by design.
+
 ## ScanResult v2 data shape (2026-06-12, data.js only)
 
 Append-only block at the end of `data.js`: `V2_EXTRAS` (route, gate

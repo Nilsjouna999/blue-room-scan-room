@@ -6,11 +6,13 @@ Last updated: 2026-06-12.
 
 ## Active
 
-- **ScanResult v2 data shape** (this session): `V2_EXTRAS` +
-  `toScanResultV2()` + `SCAN_RESULTS_V2` appended to data.js; legacy
-  rendering untouched. **Completed.**
-  *(Previous actives — SPINE promotion, governance OS, doc spine cleanup —
-  completed 2026-06-12.)*
+- **Wire SCAN_RESULTS_V2 into rendering** (this session): helpers added;
+  stats/hidden/mint/oracle read v2 with legacy fallback; Evidence Board +
+  Metrics tab left legacy with TODO(v2-render) markers. **Completed** —
+  visual output unchanged by design (the receipt-plate redesign is a
+  separate, queued decision).
+  *(Previous actives — v2 data shape, SPINE promotion, governance OS, doc
+  spine cleanup — completed 2026-06-12.)*
 
 ## Ready (supported by current docs, clear definition of done)
 
@@ -39,14 +41,15 @@ Last updated: 2026-06-12.
    bleed in (Mint Record plate already does).
    *Done when:* Halo dossier plates carry a restrained material accent;
    free stays matte; screenshots regenerated.
-6. **Wire SCAN_RESULTS_V2 into rendering** — make Free/Halo views read
-   tierOutputs (receipts, confidence band, route label, structured
-   receipts in the Evidence Board) instead of ad-hoc fields. app.js +
-   possibly styles.css; no new sections; visible behavior may improve
-   but legacy content must not regress.
-   *Done when:* dossier Evidence Board renders v2 receipts (cue/effect/
-   basis/confidence), free shows 3 / halo shows all; route label visible
-   in Source Record; screenshots regenerated.
+6. **Render v2 receipts + route label in the UI** — the deferred half of
+   the v2 wiring: Evidence Board shows structured receipts (cue/effect/
+   basis/confidence) and Source Record shows the route label. Needs one
+   small presentation decision first: how effect values ("Frame +8")
+   appear without turning plates into a dashboard (DESIGN_TOKENS accent
+   rules apply).
+   *Done when:* Evidence Board renders scan.receipts (free 3 / halo all),
+   route label in Source Record, TODO(v2-render) markers removed,
+   screenshots regenerated.
 
 ## Backlog / needs decision
 

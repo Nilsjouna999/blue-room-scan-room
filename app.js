@@ -27,6 +27,27 @@ const state = { source: 0, treatment: "free", tab: "source" };
   if (["source", "diagram", "metrics"].includes(q.get("tab"))) state.tab = q.get("tab");
 }
 
+/* ---------- ScanResult v2 access (SCAN_ENGINE_SPEC) ----------
+   v2 is the preferred source of truth where it cleanly applies;
+   every read falls back to legacy source fields so the app keeps
+   working even if v2 is absent. */
+
+function getScanResult(src) {
+  if (typeof SCAN_RESULTS_V2 === "undefined" || !src) return null;
+  return SCAN_RESULTS_V2.find((r) => r.sourceId === `SRC-${pad2(src.no)}`) || null;
+}
+
+function getActiveScan() {
+  return getScanResult(SOURCES[state.source]);
+}
+
+/* Free gets the preview tier; Halo Mint and the internal Lab state
+   both get the developed tier (matches current gating: paid = !free). */
+function getTierOutput(scan, treatment) {
+  if (!scan) return null;
+  return treatment === "free" ? scan.tierOutputs.free : scan.tierOutputs.halo;
+}
+
 /* ---------- shared bits ---------- */
 
 function moduleHead(label) {
@@ -292,6 +313,8 @@ function mixRow(k, v) {
 }
 
 function renderMetricsTab(src, treatment) {
+  /* TODO(v2-render): signalMix / pressure / fitMatrix are not part of
+     ScanResult v2 yet — this tab stays on legacy src.metrics. */
   const free = treatment === "free";
   const m = src.metrics;
 
@@ -395,10 +418,14 @@ function renderCard(src, treatment) {
         </div>
 
         <div class="statzone">
-          ${miniStat("Presence", c.stats.presence)}
-          ${miniStat("Frame", c.stats.frame)}
-          ${miniStat("Signal", c.stats.signal)}
-          ${miniStat("Charge", c.stats.charge)}
+          ${(() => {
+            /* v2 freeVisible is the source of truth for the 4 public
+               stats (SCAN_ENGINE_SPEC); legacy card.stats as fallback */
+            const s = getScanResult(src)?.stats.freeVisible || c.stats;
+            return ["Presence", "Frame", "Signal", "Charge"]
+              .map((n) => miniStat(n, s[n.toLowerCase()]))
+              .join("");
+          })()}
         </div>
 
         <p class="signature">${esc(c.signature)}</p>
@@ -444,15 +471,20 @@ function renderReadingPanel(src, treatment) {
     <div class="module">
       ${moduleHead("Stat Reading")}
       <div class="reads">
-        ${["presence", "frame", "signal", "charge"]
-          .map(
-            (k) => `
+        ${(() => {
+          const scan = getScanResult(src);
+          const shown = scan?.tierOutputs.free.statsShown || ["presence", "frame", "signal", "charge"];
+          const vals = scan?.stats.freeVisible || c.stats;
+          return shown
+            .map(
+              (k) => `
           <div class="reads__item">
-            <div class="reads__top"><span class="reads__name">${k}</span><span class="reads__val">${c.stats[k]}</span></div>
+            <div class="reads__top"><span class="reads__name">${k}</span><span class="reads__val">${vals[k]}</span></div>
             <p>${esc(src.reads[k])}</p>
           </div>`
-          )
-          .join("")}
+            )
+            .join("");
+        })()}
       </div>
     </div>`;
 
@@ -583,6 +615,10 @@ function renderDossier(src, treatment) {
   const paid = treatment !== "free";
   const d = src.dossier;
   const c = src.card;
+  const scan = getScanResult(src);
+  const tierOut = getTierOutput(scan, treatment);
+  const freeVals = scan?.stats.freeVisible || c.stats;
+  const haloX = scan?.stats.haloExtended;
 
   /* 01 — Source Record (full in both states: the factual hook) */
   const record = dplate("01", "Source Record", paid, `
@@ -599,7 +635,10 @@ function renderDossier(src, treatment) {
       <div><dt>Markings</dt><dd>${esc(d.record.markings)}</dd></div>
     </dl>`);
 
-  /* 02 — Evidence Board */
+  /* 02 — Evidence Board
+     TODO(v2-render): switch to scan.receipts / tierOut.receiptsShown
+     (cue/effect/basis/confidence) once the receipt-plate presentation
+     of effect values is designed. Legacy prose receipts until then. */
   const shown = paid ? d.evidence : d.evidence.filter((e) => e.free);
   const hiddenCount = d.evidence.length - shown.length;
   const board = dplate("02", "Evidence Board", paid, `
@@ -623,16 +662,16 @@ function renderDossier(src, treatment) {
       }
     </div>`);
 
-  /* 03 — Stat Dossier */
-  const statRows = ["presence", "frame", "signal", "charge"]
+  /* 03 — Stat Dossier (values + visibility from v2 when present) */
+  const statRows = (scan?.tierOutputs.free.statsShown || ["presence", "frame", "signal", "charge"])
     .map((k) => {
       const n = d.statNotes[k];
       return `
       <div class="dstat">
         <div class="dstat__head">
           <span class="dstat__name">${k}</span>
-          <span class="dstat__track"><span class="dstat__fill" style="--v:${c.stats[k]}%"></span></span>
-          <span class="dstat__val">${c.stats[k]}</span>
+          <span class="dstat__track"><span class="dstat__fill" style="--v:${freeVals[k]}%"></span></span>
+          <span class="dstat__val">${freeVals[k]}</span>
         </div>
         <p class="dstat__why">${esc(src.reads[k])}</p>
         ${
@@ -647,12 +686,13 @@ function renderDossier(src, treatment) {
     <div class="dstats">${statRows}</div>
     <p class="dossier__cap">weighted reads against the scan-room prototype benchmark — interpretive, not measured</p>`);
 
-  /* 04 — Hidden Stat */
+  /* 04 — Hidden Stat (v2 conditionalStats preferred; tease stays legacy) */
+  const hid = scan?.conditionalStats?.[0] || d.hidden;
   const hidden = dplate("04", "Hidden Stat", paid, paid
     ? `
     <div class="dhidden">
-      <div class="dhidden__score"><span class="dhidden__val">${d.hidden.value}</span><span class="dhidden__name">${esc(d.hidden.name)}</span></div>
-      <p class="dhidden__read">${esc(d.hidden.read)}</p>
+      <div class="dhidden__score"><span class="dhidden__val">${hid.value}</span><span class="dhidden__name">${esc(hid.name)}</span></div>
+      <p class="dhidden__read">${esc(hid.read)}</p>
     </div>`
     : `
     <div class="dhidden dhidden--tease">
@@ -671,8 +711,15 @@ function renderDossier(src, treatment) {
       </div>
       <div class="dfitaura__col">
         <p class="module__line--fit dfitaura__fit">${esc(src.fit)}</p>
-        <div class="impact"><span class="impact__label">Impact · ${esc(src.impact.label)}</span><span class="impact__track"><span class="impact__fill" style="--v:${src.impact.value}%"></span></span><span class="impact__val">${src.impact.value}</span></div>
-        <div class="impact"><span class="impact__label">Lore · ${esc(src.lore.label)}</span><span class="impact__track"><span class="impact__fill impact__fill--dash" style="--v:${src.lore.value}%"></span></span><span class="impact__val">${src.lore.value}</span></div>
+        ${(() => {
+          /* Halo deeper stats from v2 haloExtended (Visual Impact is
+             derived, Lore Density carried) — legacy fallback */
+          const vi = haloX?.visualImpact || src.impact;
+          const lo = haloX?.loreDensity || src.lore;
+          return `
+        <div class="impact"><span class="impact__label">Impact · ${esc(vi.label)}</span><span class="impact__track"><span class="impact__fill" style="--v:${vi.value}%"></span></span><span class="impact__val">${vi.value}</span></div>
+        <div class="impact"><span class="impact__label">Lore · ${esc(lo.label)}</span><span class="impact__track"><span class="impact__fill impact__fill--dash" style="--v:${lo.value}%"></span></span><span class="impact__val">${lo.value}</span></div>`;
+        })()}
       </div>
     </div>`
     : `
@@ -687,12 +734,12 @@ function renderDossier(src, treatment) {
     <dl class="drecord drecord--mint">
       <div><dt>Developed From</dt><dd>SRC-${pad2(src.no)} · ${esc(src.capture.code)}</dd></div>
       <div><dt>Treatment</dt><dd>Halo Mint</dd></div>
-      <div><dt>Primary Artifact Trigger</dt><dd>${esc(d.mint.trigger1)}</dd></div>
-      <div><dt>Secondary Trigger</dt><dd>${esc(d.mint.trigger2)}</dd></div>
-      <div><dt>Material</dt><dd class="drecord__material">${esc(src.halo.material)}</dd></div>
+      <div><dt>Primary Artifact Trigger</dt><dd>${esc((scan?.tierOutputs.halo.triggers || [d.mint.trigger1, d.mint.trigger2])[0])}</dd></div>
+      <div><dt>Secondary Trigger</dt><dd>${esc((scan?.tierOutputs.halo.triggers || [d.mint.trigger1, d.mint.trigger2])[1])}</dd></div>
+      <div><dt>Material</dt><dd class="drecord__material">${esc(scan?.tierOutputs.halo.material || src.halo.material)}</dd></div>
       <div><dt>Treatment Family</dt><dd>${esc(d.mint.family)}</dd></div>
       <div><dt>Archive Status</dt><dd>Developed</dd></div>
-      <div><dt>Mint Serial</dt><dd>${esc(d.mint.serial)}</dd></div>
+      <div><dt>Mint Serial</dt><dd>${esc(scan?.tierOutputs.halo.mintSerial || d.mint.serial)}</dd></div>
     </dl>
     <p class="dmint__note">“${esc(d.mint.note)}”</p>`
     : `
@@ -700,7 +747,7 @@ function renderDossier(src, treatment) {
       <div><dt>Archive Status</dt><dd>Archive pull · full artifact not minted</dd></div>
       <div><dt>Treatment Eligibility</dt><dd>${esc(d.record.eligibility)}</dd></div>
       <div><dt>Material (on development)</dt><dd class="drecord__material">${esc(src.halo.material)}</dd></div>
-      <div><dt>Mint Serial</dt><dd>Reserved · BR-SRC${pad2(src.no)}-HM-····</dd></div>
+      <div><dt>Mint Serial</dt><dd>${esc(scan?.tierOutputs.free.serial || `Reserved · BR-SRC${pad2(src.no)}-HM-····`)}</dd></div>
     </dl>
     <button type="button" class="unlock__btn unlock__btn--shiny dmint__cta" data-goto="shiny">
       <span class="unlock__name">Develop this scan</span>
@@ -710,7 +757,9 @@ function renderDossier(src, treatment) {
 
   /* 07 — Oracle Read */
   const oracle = dplate("07", "Oracle Read", paid, `
-    <blockquote class="doracle">“${esc(paid ? d.oracle.full : d.oracle.short)}”</blockquote>
+    <blockquote class="doracle">“${esc(
+      paid ? scan?.readings.oracle || d.oracle.full : scan?.tierOutputs.free.oracle || d.oracle.short
+    )}”</blockquote>
     ${paid ? `<p class="doracle__timeline">${esc(d.oracle.timeline)}</p>` : `<p class="doracle__timeline doracle__timeline--ghost">full read develops with the mint</p>`}`,
     "dplate--oracle");
 

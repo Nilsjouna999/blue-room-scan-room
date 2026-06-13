@@ -456,7 +456,8 @@ function toScanResultV2(src) {
         receiptsShown: x.receipts.slice(0, 3),
         reading: src.card.note,
         oracle: src.dossier.oracle.short,
-        serial: `Reserved · BR-${srcId}-HM-····`,
+        /* must match the legacy rendered string exactly (BR-SRC01, no dash) */
+        serial: `Reserved · BR-SRC${String(src.no).padStart(2, "0")}-HM-····`,
       },
       halo: {
         statsShown: ["presence", "frame", "signal", "charge", "loreDensity", "fitCoherence", "visualImpact"],
