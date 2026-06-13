@@ -558,7 +558,7 @@ function renderReadingPanel(src, treatment) {
   /* CTA first (visible near the fold), undeveloped teasers after it as
      supporting evidence. */
   const lockedDeep = `
-    <div class="module unlock">
+    <div class="module unlock unlock--spine">
       ${moduleHead("Develop This Scan")}
       <p class="unlock__line">The full reading is already written into this image. Minting develops it.</p>
       <button type="button" class="unlock__btn unlock__btn--shiny" data-goto="shiny">
@@ -725,7 +725,11 @@ function renderDossier(src, treatment) {
     </div>`
     : `
     <div class="dhidden dhidden--tease">
-      <div class="dhidden__score"><span class="dhidden__val">··</span><span class="dhidden__name">${esc(d.hidden.name)}</span></div>
+      <div class="dhidden__score">
+        <span class="dhidden__val">··</span>
+        <span class="dhidden__name">${esc(d.hidden.name)}</span>
+        <span class="dhidden__seal">Sealed · development pending</span>
+      </div>
       <p class="dhidden__read">${esc(d.hidden.tease)}</p>
     </div>`);
 
@@ -807,7 +811,16 @@ function render() {
   document.body.dataset.treatment = state.treatment;
 
   document.getElementById("sourcePanel").innerHTML = renderLeftPanel(src, state.treatment, state.tab);
+  /* one quiet orientation line above the artifact — what the room does,
+     stated once, plus a sample-scan cue so the demo photos read as
+     fixtures, not someone's profile. */
+  const stageIntro = `
+    <div class="stageintro">
+      <p class="stageintro__line">Every photo is already a card. The room develops it.</p>
+      <span class="stageintro__cue">Sample scan · ${pad2(src.no)} / ${pad2(SOURCES.length)}</span>
+    </div>`;
   document.getElementById("stageZone").innerHTML =
+    stageIntro +
     renderCard(src, state.treatment) +
     `<a class="stagecue" href="#dossierMount">▼ &nbsp;SCAN DOSSIER BELOW</a>`;
   document.getElementById("readingPanel").innerHTML = renderReadingPanel(src, state.treatment);

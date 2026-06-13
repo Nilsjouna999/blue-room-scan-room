@@ -170,7 +170,7 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  padding: 16px 24px 10px;
+  padding: 9px 24px 8px;
   scrollbar-width: thin;
   scrollbar-color: var(--ink-700) transparent;
   /* focus pocket: faint warm lift where the artifact sits, light
@@ -178,6 +178,23 @@ body {
   background:
     radial-gradient(58% 50% at 50% 44%, rgba(233, 229, 220, 0.035) 0%, transparent 62%),
     radial-gradient(130% 115% at 50% 46%, transparent 40%, rgba(4, 3, 2, 0.52) 100%);
+}
+
+/* stage orientation — what the room does, stated once above the
+   artifact (compact: must not steal the card's vertical budget) */
+.stageintro { text-align: center; display: grid; gap: 3px; margin: 0 0 7px; max-width: 460px; }
+.stageintro__line {
+  font-family: var(--font-display);
+  font-size: 14px;
+  line-height: 1.4;
+  color: var(--t-body);
+}
+.stageintro__cue {
+  font-family: var(--font-mono);
+  font-size: 8.5px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--faint);
 }
 
 /* in-hero dossier cue — pinned under the card so the archive is
@@ -1090,6 +1107,19 @@ body[data-treatment="shiny"] .stagezone {
 
 /* unlock preview */
 .unlock { gap: 11px; }
+/* Develop CTA = the conversion spine: a material-edged plate (the
+   source's own halo accent, like the Mint Record plate), lifted above
+   the quiet undeveloped teasers below it. Static — no glow, no fill. */
+.unlock--spine {
+  gap: 9px;
+  padding: 14px 15px;
+  border: 1px solid color-mix(in srgb, var(--halo-a, var(--violet)) 28%, var(--line));
+  border-left: 2px solid color-mix(in srgb, var(--halo-a, var(--violet)) 55%, transparent);
+  border-radius: var(--r-plate);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--halo-a, var(--violet)) 6%, transparent), transparent 72%);
+}
+.unlock--spine .module__label { color: var(--silver); }
+.unlock--spine .unlock__line { color: var(--t-primary); }
 .unlock__line { font-size: 13px; line-height: 1.55; color: var(--muted); }
 .unlock__more {
   font-family: var(--font-mono);
@@ -1623,6 +1653,22 @@ body[data-treatment="shiny"] .dhidden__val { color: var(--halo-a, var(--t-displa
 }
 .dhidden--tease .dhidden__val { color: var(--t-ghost); font-size: 44px; }
 .dhidden--tease .dhidden__read { color: var(--t-body); font-style: italic; font-size: 15px; }
+/* free state reads as an intentionally sealed compartment, not an empty
+   plate: dashed frame + a quiet "development pending" stamp. Value stays
+   withheld; the Halo reveal (bold material number) is untouched. */
+.dhidden--tease .dhidden__score {
+  gap: 7px;
+  padding: 13px 20px;
+  border: 1px dashed var(--line);
+  border-radius: var(--r-plate);
+}
+.dhidden__seal {
+  font-family: var(--font-mono);
+  font-size: 8px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--t-ghost);
+}
 
 /* 05 — fit + aura */
 .dfitaura { display: grid; grid-template-columns: 1.1fr 1fr; gap: 16px 40px; }

@@ -127,6 +127,27 @@ developing"; module laundry-list replaced with a prioritized hook line
 Gesture" → "Lead Gesture"; one analysis note reworded — full
 banned/hype-word sweep now clean across all states.
 
+## Conversion spine pass (2026-06-13, app.js + styles.css)
+
+Three additive fixes from the first-time product audit, no redesign:
+(1) **Hero orientation line** — `render()` injects one serif line above the
+card in `#stageZone` ("Every photo is already a card. The room develops
+it.") + a mono `Sample scan · 0X / 02` cue (`pad2(src.no)/pad2(SOURCES.length)`)
+so demo photos read as fixtures. `.stageintro*` in styles; `.stagezone`
+top padding trimmed 16→9px to protect the 1600×900 card-fit (verified —
+card + mint strip uncut). (2) **Develop CTA weight** — free Develop
+module gets modifier `unlock--spine`: a material-edged plate (left border
++ faint top-bleed in the source's own `--halo-a`, like `.dplate--mint`),
+lead line + label lifted one tier. No copy change, no animation; the
+deliverables box already names hidden stat/evidence/dossier/mint/oracle.
+(3) **Free Hidden Stat sealed** — free `dhidden--tease` score wrapped in a
+dashed compartment + mono "SEALED · DEVELOPMENT PENDING" stamp (mirrors
+Evidence Board "development pending"); value stays withheld `··`; Halo
+reveal (bold `--halo-a` number) untouched. Selectors: `.stageintro*`,
+`.unlock--spine`, `.dhidden--tease .dhidden__score`, `.dhidden__seal`.
+NOTE: the dossier rhythm `:nth-of-type` selectors still depend on plate
+order — unchanged here.
+
 ## Micro-legibility + card focus pocket (2026-06-12, styles.css only)
 
 Half-step lifts: receipt cue `#bcb7ae` (between body/primary tiers),

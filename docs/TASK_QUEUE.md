@@ -6,11 +6,14 @@ Last updated: 2026-06-12.
 
 ## Active
 
-- **Product clarity pass** (this session): state taglines, tightened
-  develop CTA (hooks-first), banned-word sweep clean. **Completed**;
-  screenshots refreshed.
-  *(Previous actives — v2 rendering wiring, v2 data shape, SPINE
-  promotion, governance OS, doc spine cleanup — completed 2026-06-12.)*
+- **Conversion spine pass** (2026-06-13): hero orientation line + sample
+  cue, Develop CTA weight (`unlock--spine` material-edged plate), Free
+  Hidden Stat sealed/undeveloped treatment. **Completed** (app.js +
+  styles.css); screenshots refreshed; no redesign, gating/deep-links/v2
+  untouched.
+  *(Previous actives — product clarity pass, v2 rendering wiring, v2 data
+  shape, SPINE promotion, governance OS, doc spine cleanup — completed
+  2026-06-12.)*
 
 ## Ready (supported by current docs, clear definition of done)
 
