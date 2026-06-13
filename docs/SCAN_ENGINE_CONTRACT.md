@@ -115,12 +115,12 @@ receipt fields, same confidence model — but is never mixed with them
       "gestureAuthority": { "present": false, "conditional": true } // only when gesture evidence is visible
     }
   },
-  "evidenceBoard": [                         // v2 receipt shape + explicit lens
-    { "lens": "Frame",
-      "cue": "subject centered against wide field",
+  "evidenceBoard": [                         // uploaded-v1 receipt (validated by scan-contract.js)
+    { "lens": "Frame",                       // which lens (SCAN_ENGINE_SPEC: Frame/Gesture/Signal/Charge/Lore/Coherence/Rarity)
+      "observation": "subject centered against wide field",
+      "visibleCue": "wide negative space on the right third",
       "effect": "Frame +8",
-      "basis": "composition / negative space",
-      "confidence": "high" }
+      "confidence": "high" }                 // low | medium | high
   ],
   "readings": {
     "freeSummary": "one line, preview-sized",
@@ -173,8 +173,14 @@ of a human.
 
 ## 6. Evidence & receipts
 
-Every score the engine displays must carry receipts, and every receipt
-must point to a **visible image cue only**: composition · camera angle ·
+Each `evidenceBoard` receipt is `{ lens, observation, visibleCue, effect,
+confidence }` (enforced by `scan-contract.js`). The guard scans **every
+string value** (title, stat labels, archetype class, material, treatment
+family, file label, readings, evidence text) for the forbidden lexicon, so
+all user-facing text must avoid those words — e.g. a treatment family is
+"Gesture Family", never "Gesture Class". Every score the engine displays
+must carry receipts, and every receipt's `visibleCue` must point to a
+**visible image cue only**: composition · camera angle ·
 subject placement · gesture/pose/posture · clothing/styling as visible
 design · environment/background · lighting/color/contrast · expression
 **as visible expression only**.

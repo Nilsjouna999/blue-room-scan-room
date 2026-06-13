@@ -10,6 +10,57 @@ coding session; the assistant must respect it. Files not listed under
 does not match the user's current task — **stop and ask** before doing
 anything. (GOVERNANCE_OS anti-drift.)
 
+## Active session — BR-S019
+
+**Date / Session ID:** 2026-06-13 / BR-S019
+
+**Today's task:** Scan Engine Foundation v1
+
+**Why:** Add a non-AI validation and safe-failure foundation before any
+uploaded-photo scan result can ever render.
+
+**Read:** docs/FILE_MAP.md · docs/PROJECT_OS.md · docs/SCAN_ENGINE_CONTRACT.md ·
+docs/SCREENS.md · app.js · data.js · index.html · styles.css
+
+**Edit:** docs/SESSION_BRIEF.md · scan-contract.js (new pure validator) ·
+app.js (blocked-state renderer, foundation only) · index.html (load script) ·
+styles.css · docs/CHANGE_MAP.md · docs/TASK_QUEUE.md · docs/FILE_MAP.md ·
+docs/SCREENS.md · docs/SCAN_ENGINE_CONTRACT.md (field-name reconcile)
+
+**Do not open:** C:\Users\nilsj\OneDrive\Documents\blue-room
+
+**Authority affected:** ACTIVE SPECS + runtime guardrails
+
+**Core/spec change required?** No — contract support only (Spec Change
+Review for the evidence field-name reconcile; no LOCKED law changed).
+
+**Locked constraints:** no backend · no upload · no AI · no payment · no
+fake stats · no fake receipts · no fake oracle · no fake Halo result ·
+uploaded local draft stays separate from sample ScanResult v2 · preserve
+sample scan room · preserve all deep links
+
+**Known current state:** Main Menu v1 (def0dfe) · Upload/Intake Shell v1
+(d590e55) · Scan Development Gate v1 (e19e183) · Local Draft Polish v1
+(c7d2cd8) · Scan Engine Contract v1 (2ad2fb3) · Local Draft works ·
+Develop Scan opens the sealed engine-offline gate
+
+**Definition of done:** a pure `validateUploadedScanResult` exists ·
+accepts a safe minimal future object · rejects forbidden/sensitive/
+fake-human-rating fields · rejects missing safety flags · rejects objects
+that try to mix with sample ScanResult v2 · a safe blocked/failure UI state
+exists but is not triggered by normal flow · Develop Scan gate remains
+offline/sealed · Local Draft still produces no stats · sample scan room
+works · deep links work · docs updated · commit + push completed
+
+**Verification:** `python -m http.server 8743`; menu → Add Your Photo →
+Local Draft → Develop Scan still opens the sealed offline gate (no result);
+sample SRC 01/02 + both deep links work; in dev console the validator
+accepts `validMinimalFutureResult` and rejects the four invalid fixtures;
+blocked state renders safely only when dev-injected.
+
+**Final response format:** commit hash · files changed · what changed ·
+verification result · review/agent findings · rollback command
+
 ## Active session — BR-S018
 
 **Date / Session ID:** 2026-06-13 / BR-S018

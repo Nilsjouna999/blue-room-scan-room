@@ -30,7 +30,10 @@ The **Local Draft** intake view and its **Scan Development Gate** (menu →
 *Add your photo* → *Develop scan*) require a user-selected local file, so
 they cannot be reproduced by the headless capture pipeline and are
 intentionally not committed as screenshots — they are verified live
-in-browser during development.
+in-browser during development. The **safe blocked/failure state**
+(`renderBlockedScan`, BR-S019) is foundation only — not reachable in normal
+flow (a future engine / dev test supplies it) — so it is likewise not
+captured.
 
 **Workflow:** after any visual change → run `capture-screens.ps1` →
 commit + push. Stale screens are worse than no screens.

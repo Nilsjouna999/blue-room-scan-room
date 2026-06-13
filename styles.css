@@ -1968,6 +1968,21 @@ body[data-view="room"] .draft { display: none; }
 .gatepanel__ready { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--faint); }
 .gateactions { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
 
+/* Safe blocked / failure state — calm and archival, never an alarm. Same
+   sealed-plate grammar as the gate; errors listed as a quiet ledger. */
+.gatepanel--blocked { border-color: var(--line); }
+.gatepanel__dot--block { background: var(--moss-bright); }
+.gateblock__errs {
+  list-style: none; display: grid; gap: 5px; justify-items: start; text-align: left;
+  max-width: 380px; margin: 0 auto; padding: 12px 2px;
+  border-top: 1px solid var(--line-faint); border-bottom: 1px solid var(--line-faint);
+}
+.gateblock__errs li {
+  font-family: var(--font-mono); font-size: 9.5px; line-height: 1.45; color: var(--t-meta);
+  padding-left: 16px; position: relative; word-break: break-word;
+}
+.gateblock__errs li::before { content: "▢"; position: absolute; left: 0; color: var(--t-ghost); }
+
 /* =============================================================
    Fallback for narrow screens (desktop is the priority)
 ============================================================= */

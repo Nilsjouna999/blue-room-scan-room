@@ -1061,6 +1061,43 @@ function renderGate() {
     </div>`;
 }
 
+/* Safe blocked / failure state — FOUNDATION ONLY (Scan Engine Foundation
+   v1). Renders a `blocked_scan_state` (from
+   window.BlueRoomScanContract.createBlockedScanState) as a sealed plate
+   listing the contract violations — NO card, NO stats, NO oracle, NO
+   receipts beyond the validator errors. It is NOT wired into the normal
+   user flow (Develop scan still only opens the offline gate); a future
+   engine — or a dev/test trigger — supplies the state. */
+function renderBlockedScan(b) {
+  const errs = (b && Array.isArray(b.errors) && b.errors.length ? b.errors : [b && b.reason ? b.reason : "contract violation"]);
+  return `
+    <div class="gate">
+      <div class="draft__cue">◆ &nbsp;BLUE ROOM · SCAN BLOCKED</div>
+
+      <section class="gatepanel gatepanel--blocked">
+        <header class="gatepanel__head">
+          <span class="gatepanel__title">${esc((b && b.title) || "Scan blocked")}</span>
+          <span class="gatepanel__tag"><span class="gatepanel__dot gatepanel__dot--block" aria-hidden="true"></span>Blocked</span>
+        </header>
+
+        <p class="gatepanel__lead">${esc((b && b.message) || "This result did not pass the BLUE ROOM scan contract.")}</p>
+
+        <ul class="gateblock__errs">
+          ${errs.map((e) => `<li>${esc(String(e))}</li>`).join("")}
+        </ul>
+
+        <p class="gatepanel__ready">No card, no stats, no oracle, no receipts were produced.</p>
+      </section>
+
+      <div class="gateactions">
+        <button type="button" class="menu__enter" data-view-to="draft">Return to local draft</button>
+        <button type="button" class="draft__sample" data-draft-pick>Replace image</button>
+        <button type="button" class="draft__sample" data-view-to="room">Enter sample scan room</button>
+        <button type="button" class="draft__back" data-view-to="menu">Main menu</button>
+      </div>
+    </div>`;
+}
+
 /* ---------- render + wiring ---------- */
 
 function render() {

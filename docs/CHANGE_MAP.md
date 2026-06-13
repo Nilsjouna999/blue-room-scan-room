@@ -168,6 +168,39 @@ banned/hype-word sweep now clean across all states.
 - **Test:** bare URL shows the menu; the four deep links open the room
   directly; Enter Scan Room reveals the unchanged room.
 
+## Scan Engine Foundation v1 (2026-06-13 / BR-S019, scan-contract.js + app.js + index.html + styles.css)
+
+New pure non-AI **safety valve** `scan-contract.js` (IIFE →
+`window.BlueRoomScanContract`). `validateUploadedScanResult(result) ->
+{ok, errors[], warnings[]}` enforces the uploaded-v1 contract
+(kind/schemaVersion/status/source.mode; all four `safetyFlags` present and
+false; `evidenceBoard` items `{lens, observation, visibleCue, effect,
+confidence}`), blocks sample mixing (sample kind / `SRC-*` ids / v2
+schema), and scans the forbidden human-rating lexicon in keys
+(allowlist-guarded so legit keys like `label`/`archetypeClass` and the
+`contains*` flags never false-trigger) and in **every string value**
+(whole-word), enforces a bare `value` key positionally (allowed only as a
+numeric stat under `stats.*`), and flags person-truth claims in
+`artifact.title` + `readings.*`. A 4-pass adversarial review workflow
+(safety / preservation / UX / simplicity) surfaced **3 confirmed safety
+gaps** — forbidden terms unscanned in label/archetypeClass/material/family/
+fileLabel *values*, a `value`-key bypass, and unscanned title person-truth
+— all fixed before commit (3 nitpicks rejected). `createBlockedScanState(reason,
+errors)` is a pure failure-state shape. `DEV_FIXTURES` (validMinimal + 4
+invalid) are console/test only — never rendered as analysis. The validator
+is pure: no DOM/AI/API/IO, no input mutation. app.js gains
+`renderBlockedScan(b)` — a calm, archival safe-failure plate (errors
+ledger; "no card/stats/oracle/receipts"; four return paths) — **FOUNDATION
+ONLY, not wired to normal flow**. index.html loads the script before
+app.js; styles.css adds `.gatepanel--blocked` / `.gateblock__errs`.
+**No engine, no AI, no fake output**: the local draft still produces
+nothing and "Develop scan" still only opens the sealed offline gate.
+Reconciled `SCAN_ENGINE_CONTRACT` §4/§6 evidence field names to
+`{lens, observation, visibleCue, effect, confidence}` to match the
+validator (Spec Change Review). `FILE_MAP` registers `scan-contract.js`.
+Verified live: all 5 fixtures validate as expected; sample room + both
+deep links unchanged; console clean.
+
 ## Scan Engine Contract v1 (2026-06-13 / BR-S018, docs only)
 
 New ACTIVE spec `docs/SCAN_ENGINE_CONTRACT.md` — the allowed output shape
