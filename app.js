@@ -1165,18 +1165,30 @@ function renderUploadedScanResultDev(result, opts) {
       ? `<div class="uploadeddev__stat"><span class="uploadeddev__statname">${esc(label)}</span><span class="uploadeddev__statval">${esc(String(o.value))}${o.label ? " · " + esc(o.label) : ""}</span></div>`
       : "";
 
-  const statsBlock = `
-    <div class="uploadeddev__plate">
-      <div class="uploadeddev__head">Visible stats</div>
-      <div class="uploadeddev__stats">${stat("Presence", fv.presence)}${stat("Frame", fv.frame)}${stat("Signal", fv.signal)}${stat("Charge", fv.charge)}</div>
-      ${sim
-        ? `<p class="uploadeddev__sealed">Halo Mint develops the deeper read — sealed in this Free preview (dev).</p>`
-        : (hx.loreDensity || hx.fitCoherence || hx.stanceRead || hx.visualImpact
-          ? `<div class="uploadeddev__head uploadeddev__head--sub">Extended stats</div>
-             <div class="uploadeddev__stats">${ext("Lore Density", hx.loreDensity)}${ext("Fit Coherence", hx.fitCoherence)}${ext("Stance Read", hx.stanceRead)}${ext("Visual Impact", hx.visualImpact)}</div>`
-          : "")}
-      <p class="uploadeddev__cap">presentation scores of the image artifact — not the person</p>
-    </div>`;
+  /* tier row — public tier band + a 5-segment bar; NO exact 0–100 number. */
+  const tierRow = (s) => {
+    const bars = Math.max(0, Math.min(5, Number(s.bars) || 0));
+    const meter = `<span class="uploadeddev__tbon">${"▰".repeat(bars)}</span><span class="uploadeddev__tboff">${"▱".repeat(5 - bars)}</span>`;
+    return `<div class="uploadeddev__tier"><span class="uploadeddev__tname">${esc(s.label)}</span><span class="uploadeddev__tband">${esc(s.tier)}</span><span class="uploadeddev__tbar" aria-hidden="true">${meter}</span></div>`;
+  };
+  const statsBlock = Array.isArray(r.publicStats) && r.publicStats.length
+    ? `<div class="uploadeddev__plate">
+         <div class="uploadeddev__head">Public stats · tier bands</div>
+         <div class="uploadeddev__tiers">${r.publicStats.map(tierRow).join("")}</div>
+         ${sim ? `<p class="uploadeddev__sealed">Halo Mint develops the deeper read — sealed in this Free preview (dev).</p>` : ""}
+         <p class="uploadeddev__cap">tier bands of the image artifact — not exact scores, not the person</p>
+       </div>`
+    : `<div class="uploadeddev__plate">
+         <div class="uploadeddev__head">Visible stats</div>
+         <div class="uploadeddev__stats">${stat("Presence", fv.presence)}${stat("Frame", fv.frame)}${stat("Signal", fv.signal)}${stat("Charge", fv.charge)}</div>
+         ${sim
+           ? `<p class="uploadeddev__sealed">Halo Mint develops the deeper read — sealed in this Free preview (dev).</p>`
+           : (hx.loreDensity || hx.fitCoherence || hx.stanceRead || hx.visualImpact
+             ? `<div class="uploadeddev__head uploadeddev__head--sub">Extended stats</div>
+                <div class="uploadeddev__stats">${ext("Lore Density", hx.loreDensity)}${ext("Fit Coherence", hx.fitCoherence)}${ext("Stance Read", hx.stanceRead)}${ext("Visual Impact", hx.visualImpact)}</div>`
+             : "")}
+         <p class="uploadeddev__cap">presentation scores of the image artifact — not the person</p>
+       </div>`;
 
   const readingsBlock = rd.freeSummary || rd.haloDossier || rd.oracle
     ? `<div class="uploadeddev__plate">
@@ -1187,12 +1199,19 @@ function renderUploadedScanResultDev(result, opts) {
        </div>`
     : "";
 
-  const receiptsBlock = Array.isArray(r.evidenceBoard) && r.evidenceBoard.length
+  const eb = Array.isArray(r.evidenceBoard) ? r.evidenceBoard : [];
+  const grounded = eb.some((e) => e.observedCue || e.artifactEffect);
+  const receiptsBlock = eb.length
     ? `<div class="uploadeddev__plate">
-         <div class="uploadeddev__head">Evidence board</div>
-         ${r.evidenceBoard
-           .map((e) => `
-         <div class="uploadeddev__receipt">
+         <div class="uploadeddev__head">${grounded ? "Grounded receipts" : "Evidence board"}</div>
+         ${eb
+           .map((e) =>
+             e.observedCue || e.artifactEffect
+               ? `<div class="uploadeddev__receipt">
+           <div class="uploadeddev__rectop"><span class="uploadeddev__lens">${esc(e.lens)} Lens</span><span class="uploadeddev__conf">${esc(e.confidence)}</span></div>
+           <p class="uploadeddev__ground">${esc(e.observedCue || e.observation)} <span class="uploadeddev__arrow">→</span> ${esc(e.artifactEffect || e.effect)}</p>
+         </div>`
+               : `<div class="uploadeddev__receipt">
            <div class="uploadeddev__rectop"><span class="uploadeddev__lens">${esc(e.lens)}</span><span class="uploadeddev__effect">${esc(e.effect)}</span><span class="uploadeddev__conf">${esc(e.confidence)}</span></div>
            <p class="uploadeddev__obs">${esc(e.observation)}</p>
            <span class="uploadeddev__rcue">cue · ${esc(e.visibleCue)}</span>
@@ -1215,6 +1234,39 @@ function renderUploadedScanResultDev(result, opts) {
         ${r.confidence ? `<div><dt>confidence</dt><dd>${esc(String(r.confidence.overall))} · ${esc(r.confidence.band || "")}</dd></div>` : ""}
       </dl>
     </div>`;
+
+  /* CARD_LOGIC_V1 surfaces (rendered only when the fixture carries them, so
+     the uploaded-result harness is unaffected). Image-only; no numbers. */
+  const scopeBlock = r.scopeLine ? `<p class="uploadeddev__scope">◆ &nbsp;${esc(r.scopeLine)}</p>` : "";
+
+  const sealedBlock = r.sealedStat
+    ? `<div class="uploadeddev__plate">
+         <div class="uploadeddev__head">Sealed stat</div>
+         <p class="uploadeddev__seallabel">${esc(r.sealedStat.label || "—")}<span class="uploadeddev__sealreason">${esc(r.sealedStat.reasonType || "")}</span><span class="uploadeddev__seallock">SEALED</span></p>
+         ${r.sealedStat.teaser ? `<p class="uploadeddev__read">${esc(r.sealedStat.teaser)}</p>` : ""}
+       </div>`
+    : "";
+
+  const rarityBlock = r.rarity
+    ? `<div class="uploadeddev__plate">
+         <div class="uploadeddev__head">Rarity</div>
+         <p class="uploadeddev__rarity"><span class="uploadeddev__rband">${esc(r.rarity.band || "—")}</span>${r.rarity.print ? `<span class="uploadeddev__rprint">${esc(r.rarity.print)}</span>` : ""}</p>
+         ${r.rarity.reason ? `<p class="uploadeddev__read">${esc(r.rarity.reason)}</p>` : ""}
+         ${r.rarity.qualityNeutral ? `<p class="uploadeddev__cap">${esc(r.rarity.qualityNeutral)}</p>` : ""}
+       </div>`
+    : "";
+
+  const rm = r.reframeMap;
+  const reframeBlock = rm
+    ? `<div class="uploadeddev__plate">
+         <div class="uploadeddev__head">Reframe Map · image changes only</div>
+         ${rm.current ? `<p class="uploadeddev__read"><b>Now</b> — ${esc(rm.current)}</p>` : ""}
+         ${Array.isArray(rm.whyThisCard) && rm.whyThisCard.length ? `<ul class="uploadeddev__why">${rm.whyThisCard.map((w) => `<li>${esc(w)}</li>`).join("")}</ul>` : ""}
+         ${Array.isArray(rm.levers) ? rm.levers.map((l) => `
+         <div class="uploadeddev__lever"><span class="uploadeddev__levlabel">${esc(l.label || "")}</span><p class="uploadeddev__levchange">${esc(l.change || "")}</p><span class="uploadeddev__leveffect">${esc(l.effect || "")}</span></div>`).join("") : ""}
+         ${Array.isArray(rm.setupCard) && rm.setupCard.length ? `<div class="uploadeddev__setup"><span class="uploadeddev__head uploadeddev__head--sub">Setup card · re-shoot, re-scan</span><ol>${rm.setupCard.map((s) => `<li>${esc(s)}</li>`).join("")}</ol></div>` : ""}
+       </div>`
+    : "";
 
   /* Free Scan Simulation chrome: a triple-labelled banner + a STATIC
      stepper (no progress bar implying real processing). Each step also
@@ -1245,7 +1297,7 @@ function renderUploadedScanResultDev(result, opts) {
         <p class="uploadeddev__file">${esc(src.fileType || "IMG")} · ${esc(src.fileSize || "—")} · ${esc(src.fileLabel || "—")}</p>
       </article>
 
-      ${statsBlock}${readingsBlock}${receiptsBlock}${flagsBlock}
+      ${scopeBlock}${statsBlock}${readingsBlock}${receiptsBlock}${sealedBlock}${rarityBlock}${reframeBlock}${flagsBlock}
 
       <div class="gateactions">
         <button type="button" class="draft__sample" data-view-to="room">Enter sample scan room</button>

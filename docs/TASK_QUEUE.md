@@ -6,6 +6,16 @@ Last updated: 2026-06-12.
 
 ## Active
 
+- **Card System Fixture Upgrade v1** (2026-06-13 / BR-S024): dev-only Free
+  Scan Simulation (`?dev=free-scan-sim`) upgraded to CARD_SYSTEM_V1 +
+  CARD_LOGIC_V1 — public tier bands (no printed 0–100), grounded receipts
+  (cue → effect), scope line, sealed-stat reason, rarity reason, Reframe Map
+  preview. **Completed & verified live** — fixture still passes the
+  (unchanged) validator; renderer gates new surfaces on field presence so
+  uploaded-result/blocked routes, normal menu/draft/Develop-gate, sample
+  room, and deep links are unchanged; review 3 low findings all fixed;
+  console clean. Implements the *Card System Fixture Upgrade v1* Ready item.
+
 - **Executable Card Logic v1** (2026-06-13 / BR-S023, docs only): new ACTIVE
   spec `docs/CARD_LOGIC_V1.md` — public tier bands (no fake numbers),
   two-layer receipt grounding, 24 archetype triggers, sealed-stat / rarity /
@@ -92,16 +102,11 @@ Last updated: 2026-06-12.
 
    *(Scan Contract Validator Stub v1 — completed by BR-S019 Scan Engine
    Foundation v1; see Active.)*
-0. **Card System Fixture Upgrade v1** (NEXT) — align the dev fixtures in
-   `scan-contract.js` (`validDevRendererResult`, `validFreeSimulationResult`)
-   to `docs/CARD_SYSTEM_V1.md`: Free-front stats = Presence/Frame/Signal/
-   Visual Impact; Charge + the new Halo-depth stats (Gesture Geometry /
-   Setting Gravity / Artifact Coherence) move to `haloExtended`; v1 archetype
-   names; receipts in the new lens vocabulary.
-   *Done when:* updated fixtures still pass `validateUploadedScanResult`; the
-   dev/sim renderers show the v1 stat layout; no AI, no real analysis, no
-   data.js sample insertion, normal flow + deep links unchanged. (May need a
-   small `SCAN_ENGINE_SPEC` reconcile note.)
+   *(Card System Fixture Upgrade v1 — completed by BR-S024 for the
+   `validFreeSimulationResult` sim fixture (tier bands, grounded receipts,
+   scope/sealed/rarity/Reframe Map). `validDevRendererResult` (the raw
+   uploaded-result harness) was intentionally left on its prior shape; a
+   future pass can align it too if wanted.)*
 1. **18-state audit** — PROJECT_OS §17.1. Walk 2 sources × 3 treatments
    (incl. Lab) × 3 tabs at 1600×900.
    *Done when:* every state screenshotted or DOM-verified; issues logged

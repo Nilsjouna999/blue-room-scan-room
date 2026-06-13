@@ -10,6 +10,55 @@ coding session; the assistant must respect it. Files not listed under
 does not match the user's current task — **stop and ask** before doing
 anything. (GOVERNANCE_OS anti-drift.)
 
+## Active session — BR-S024
+
+**Date / Session ID:** 2026-06-13 / BR-S024
+
+**Today's task:** Card System Fixture Upgrade v1 (dev harness + fixture)
+
+**Why:** Upgrade dev-only scan fixtures/rendering to the official card logic
+without connecting AI or analyzing uploaded photos.
+
+**Read:** docs/FILE_MAP.md · docs/PROJECT_OS.md · docs/SCAN_ENGINE_CONTRACT.md ·
+docs/CARD_SYSTEM_V1.md · docs/CARD_LOGIC_V1.md · docs/SCREENS.md ·
+scan-contract.js · app.js · index.html · styles.css · data.js
+
+**Edit:** docs/SESSION_BRIEF.md · scan-contract.js · app.js · styles.css ·
+docs/CHANGE_MAP.md · docs/TASK_QUEUE.md · docs/SCREENS.md
+
+**Do not open:** C:\Users\nilsj\OneDrive\Documents\blue-room
+
+**Authority affected:** runtime dev harness + ACTIVE SPECS implementation alignment
+
+**Core/spec change required?** No.
+
+**Locked constraints:** no backend · no upload · no AI · no payment · no
+real analysis · no fake analysis in normal user flow · uploaded local draft
+stays separate from sample ScanResult v2 · dev simulation unmistakably
+labelled · preserve sample scan room · preserve all deep links
+
+**Known current state:** Card System Spec v1 (d4874b7) · Executable Card
+Logic v1 (95396d6) · dev routes free-scan-sim / uploaded-result /
+uploaded-blocked exist · normal Local Draft → Develop Scan opens the sealed
+offline gate
+
+**Definition of done:** dev Free Scan Simulation shows public stat tiers
+(no user-facing 0–100) · grounded receipts (observed cue → artifact effect)
+· scope line · sealed-stat reason · rarity reason · Reframe Map preview ·
+validator still gates before render · invalid fixture still blocks · normal
+Add Photo → Local Draft → Develop Scan stays offline/sealed · uploaded
+photos still produce no stats · all three ?dev routes + both deep links +
+sample SRC 01/02 work · docs updated · commit + push completed
+
+**Verification:** `python -m http.server 8743`; validated live — fixture
+passes validateUploadedScanResult; ?dev=free-scan-sim shows tiers/grounded
+receipts/scope/sealed/rarity/Reframe Map with DEV labels and no printed
+numbers; ?dev=uploaded-result + ?dev=uploaded-blocked unchanged; Develop
+Scan → sealed offline gate; both deep links + sample room work; console clean.
+
+**Final response format:** commit hash · files changed · what changed ·
+verification result · review findings · rollback command
+
 ## Active session — BR-S023
 
 **Date / Session ID:** 2026-06-13 / BR-S023

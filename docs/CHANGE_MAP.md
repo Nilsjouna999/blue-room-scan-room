@@ -168,6 +168,35 @@ banned/hype-word sweep now clean across all states.
 - **Test:** bare URL shows the menu; the four deep links open the room
   directly; Enter Scan Room reveals the unchanged room.
 
+## Card System Fixture Upgrade v1 (2026-06-13 / BR-S024, scan-contract.js + app.js + styles.css)
+
+The dev-only Free Scan Simulation (`?dev=free-scan-sim`) now reflects
+CARD_SYSTEM_V1 + CARD_LOGIC_V1 — **dev fixture only, no AI, no user-photo
+analysis**. `DEV_FIXTURES.validFreeSimulationResult` gained future-facing
+fields (still passes the unchanged validator): **publicStats** (label/tier/
+bars/receiptId — public TIER bands, the card shows tiers/bars, never exact
+0–100; internal numbers kept for sorting but never printed), **grounded
+receipts** (added `observedCue`/`artifactEffect` alongside the
+validator-required lens/observation/visibleCue/effect/confidence), a
+**scopeLine**, a **sealedStat** (label/teaser/reasonType — sealed, no value
+shown), **rarity** (band/print/reason + a quality-neutral note that avoids
+the forbidden lexicon), and a **reframeMap** (current / whyThisCard /
+levers / setupCard — image-setup changes only, no near-miss or
+self-improvement language). `renderUploadedScanResultDev` renders tier rows
+(tonal 5-seg bar), grounded "cue → effect" receipts, and scope/sealed/
+rarity/Reframe panels — all **gated on field presence**, so
+`?dev=uploaded-result` is pixel-identical and `?dev=uploaded-blocked` still
+blocks. The **validator was not weakened** (SCHEMA_KEYS / FORBIDDEN_TERMS /
+scanForbidden unchanged; the upgraded fixture passes, invalid fixtures still
+fail). styles.css adds `.uploadeddev__tier*` / `__scope` / `__ground` /
+`__seal*` / `__rarity*` / `__lever`/`__setup` (tokens only). **Normal flow
+untouched**: Develop Scan still opens the sealed engine-offline gate;
+uploaded photos still produce nothing; sample room + deep links verified
+unchanged; console clean. Adversarial review (safety / validator /
+preservation / UX): 3 low findings, all fixed (plate-order restore for
+uploaded-result, tonal tier bars, sealed-header wrap). Dev sim needs an
+explicit query — not in the screenshot pipeline.
+
 ## Executable Card Logic v1 (2026-06-13 / BR-S023, docs only)
 
 New ACTIVE spec `docs/CARD_LOGIC_V1.md` (223 lines) — turns CARD_SYSTEM_V1
