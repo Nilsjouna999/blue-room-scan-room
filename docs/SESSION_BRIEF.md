@@ -10,6 +10,64 @@ coding session; the assistant must respect it. Files not listed under
 does not match the user's current task — **stop and ask** before doing
 anything. (GOVERNANCE_OS anti-drift.)
 
+## Active session — BR-S033
+
+**Date / Session ID:** 2026-06-13 / BR-S033
+
+**Today's task:** Sample Room 18-State Audit v1 (audit; small copy fixes only)
+
+**Why:** Verify the full sample-room state matrix after Artifact Language
+Stabilization Pack v1 — stat/tier migration correctness, no public 0–100 leakage,
+human-in-frame safety, layout/fit, route regression, Halo boundary carryover.
+
+**Read:** docs/GPT_REVIEW_GUIDE.md · docs/PROJECT_OS.md · docs/TASK_QUEUE.md ·
+docs/SESSION_BRIEF.md · docs/CHANGE_MAP.md · docs/DECISION_LOG.md ·
+docs/CARD_LOGIC_V1.md · docs/COPY_SYSTEM.md ·
+docs/audits/HALO_GATE_ETHICS_AUDIT_V1.md ·
+docs/research/HUMAN_IN_FRAME_READING_RULES_V1.md ·
+docs/research/LANGUAGE_SYSTEM_V1.md · app.js · data.js · styles.css
+
+**Edit:** docs/audits/SAMPLE_ROOM_18_STATE_AUDIT_V1.md (new) · data.js (small copy
+fixes only) · docs/FILE_MAP.md · docs/CHANGE_MAP.md · docs/TASK_QUEUE.md ·
+docs/SESSION_BRIEF.md
+
+**Do not open:** C:\Users\nilsj\OneDrive\Documents\blue-room
+
+**Do not edit:** app.js / styles.css / scan-contract.js / index.html / assets
+(migration logic is correct — no code change needed) · docs/halo/* · the
+migrated specs (no rewrite)
+
+**Authority affected:** AUDIT (new audit record) + small ACTIVE runtime copy fixes
+
+**Core/spec change required?** No — audit + 4 prose copy fixes.
+
+**Locked constraints:** audit only (small copy/label/CSS-fit fixes directly tied
+to findings; no new features, no Halo Dossier, no payment/unlock, no AI/backend/
+upload analysis, no fake real-user analysis, no major redesign, no scope
+expansion) · preserve `?dev=free-scan-sim`/`halo-gate`/`uploaded-result`/
+`uploaded-blocked` + bare menu · normal Local Draft → Develop Scan stays
+sealed/offline · no exact pre-unlock counts / no hidden-score on Free or Halo Gate
+
+**Known current state:** Halo Gate Ethics Audit v1 (08bd2de); sample room migrated
+to tier bands (Frame Presence/Frame/Signal/Scene Charge · Muted…Peak); dev routes
+free-scan-sim/halo-gate/uploaded-result/uploaded-blocked exist; no AI/backend/payment
+
+**Definition of done:** `docs/audits/SAMPLE_ROOM_18_STATE_AUDIT_V1.md` exists with
+verdict + the 18 states + findings + confirmations (migration correct · no public
+0–100 · human-in-frame safe · routes regression-clean · Halo boundary carryover) ·
+small in-scope fixes applied · FILE_MAP registers it · CHANGE_MAP/TASK_QUEUE/
+SESSION_BRIEF updated · console clean · commit + push
+
+**Verification:** `python -m http.server 8743`; walked all 18 states (DOM sweep:
+tier-band labels, leaked-term regex all 0, no 0–100 on stat surfaces, diamond
+bbox no-overflow, no clipped bands) + screenshot (card reads premium, not
+dashboard); independent five-gate sub-agent = PASS_WITH_FIXES; 4 person-pronoun
+fixes verified live (he/for you/at you gone); menu + 4 dev routes + sealed/offline
+flow regression-clean; console clean.
+
+**Final response format:** commit hash · changed files · verdict · states audited ·
+fixes applied · allowed exceptions · route verification · next task · rollback
+
 ## Active session — BR-S032
 
 **Date / Session ID:** 2026-06-13 / BR-S032

@@ -185,6 +185,34 @@ payment/Halo/upload analysis). GPT_REVIEW_GUIDE + TASK_QUEUE + SESSION_BRIEF
 note the folder. Roadmap unchanged beyond this checkpoint — next product task
 stays **Free Pull Mock Polish v1**.
 
+## Sample Room 18-State Audit v1 (2026-06-13 / BR-S033, audit + 4 copy fixes)
+
+Audited the full sample-room state matrix (2 sources × free/halo/lab × source/
+diagram/metrics = 18 states) after Artifact Language Stabilization Pack v1.
+**Verdict PASS WITH FIXES.** New audit doc
+`docs/audits/SAMPLE_ROOM_18_STATE_AUDIT_V1.md` (FILE_MAP registers it). Method:
+live route-walk at 1600×900 (per-state DOM sweep: stat labels, tier bands,
+leaked-term regex, 0–100-on-stat-surfaces, diamond label bbox, clipped-band,
+banned-language, console) + screenshot + an independent five-gate copy-safety
+sub-agent. **Migration confirmed fully correct** across all 18 states: every
+public stat shows Frame Presence / Frame / Signal / Scene Charge as tier bands
+(Muted/Clean/Strong/Charged/Peak); hidden = Gesture Geometry / Field Silence;
+deep module = Frame Impact; evidence = ↑/↓ arrows; **no standalone Presence/
+Charge/Visual Impact/Gesture Authority/Dominant, no public 0–100 stat score, no
+±N delta, no diamond overflow, no clipped tier labels** anywhere. The kept
+Metrics-tab numeric diagnostics are the documented "interpretive formula, not a
+measurement" exception; the `?dev=uploaded-result` harness keeps legacy labels
+(NOT USER SCAN exception). All routes regression-clean (menu + 4 dev routes +
+Local Draft → Develop Scan sealed/offline; console clean). **4 copy fixes
+(data.js, prose only — pre-existing, not migration-introduced):** SRC-02 stance
+"…neither does **he**." → "…the frame doesn't pretend otherwise."; SRC-02
+statNote "…**he** accepts the terms." → "…the silhouette accepts the terms.";
+SRC-02 hidden.read "…performed **for you**." → "…for the lens."; SRC-01 latent
+evidence "…straight **at you**." → "…straight at the lens." (legacy
+`d.evidence` branch is unreachable — fixed for defense-in-depth). No
+code/logic change; no redesign / new features / Halo Dossier / payment / AI /
+backend / upload analysis.
+
 ## Halo Gate Ethics Audit v1 (2026-06-13 / BR-S032, audit + 1 copy fix)
 
 Audited the `?dev=halo-gate` mock + the migrated `?dev=free-scan-sim` sealed-back

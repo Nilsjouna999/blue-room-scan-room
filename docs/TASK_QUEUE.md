@@ -6,6 +6,22 @@ Last updated: 2026-06-13.
 
 ## Active
 
+- **Sample Room 18-State Audit v1** (2026-06-13 / BR-S033, audit + 4 copy fixes):
+  audited the full sample-room matrix (2 sources × free/halo/lab × source/diagram/
+  metrics = 18 states) after Artifact Language Stabilization Pack v1. **Verdict
+  PASS WITH FIXES** — live route-walk (DOM sweep + diamond bbox + screenshot) + an
+  independent five-gate sub-agent. **Migration confirmed correct everywhere:**
+  tier-band labels (Frame Presence/Frame/Signal/Scene Charge · Muted…Peak), no
+  standalone Presence/Charge/Visual Impact/Gesture Authority/Dominant, no public
+  0–100 stat score, no ±N delta, no diamond overflow/clipped labels; the card
+  still reads as a premium artifact, not a dashboard. Kept-numeric Metrics
+  diagnostics + the `?dev=uploaded-result` harness are the documented exceptions.
+  All routes regression-clean (menu + 4 dev routes + Local Draft → Develop Scan
+  sealed/offline; console clean). **4 pre-existing person-pronoun copy fixes in
+  data.js** (SRC-02 "he"×2 + "for you"; SRC-01 latent "at you"). New audit doc
+  `docs/audits/SAMPLE_ROOM_18_STATE_AUDIT_V1.md`. **Completed.** Implements Ready
+  #0; **next up:** data.js copy audit against COPY_SYSTEM (Ready #0).
+
 - **Halo Gate Ethics Audit v1** (2026-06-13 / BR-S032, audit + 1 copy fix):
   audited `?dev=halo-gate` + the migrated `?dev=free-scan-sim` sealed-back copy
   against `docs/halo/HALO_GATE_BOUNDARY_V1.md` (ethics / boundary / manipulation /
@@ -267,33 +283,32 @@ Last updated: 2026-06-13.
    *(Halo Gate Ethics Audit v1 — completed by BR-S032. Verdict PASS; one low
    copy fix applied (Free Pull halo note). Audit doc
    `docs/audits/HALO_GATE_ETHICS_AUDIT_V1.md`. See Active.)*
-0. **18-state audit** (NEXT) — PROJECT_OS §17.1. Walk 2 sources × 3 treatments
-   (incl. Lab) × 3 tabs at 1600×900. *(Re-verify the BR-S029 tier-band
-   migration across all states while walking them.)*
-   *Done when:* every state screenshotted or DOM-verified; issues logged
-   here, not fixed inline.
-1. **data.js copy audit against COPY_SYSTEM** — the grammar postdates most
+   *(18-state audit — completed by BR-S033 (Sample Room 18-State Audit v1).
+   Verdict PASS WITH FIXES; migration correct across all 18 states, 4 person-
+   pronoun copy fixes. Audit doc `docs/audits/SAMPLE_ROOM_18_STATE_AUDIT_V1.md`.
+   See Active.)*
+0. **data.js copy audit against COPY_SYSTEM** (NEXT) — the grammar postdates most
    shipped copy.
    *Done when:* every string in data.js passes the banned-word list, the
    tone test (§1) and the every-outcome-is-a-win rules (§5); fixes
    committed; no meaning drift.
-2. **Render archetype discovery note in Halo** — PROJECT_OS visibility
+1. **Render archetype discovery note in Halo** — PROJECT_OS visibility
    table promises "full archetype explanation + discovery note" in Halo;
    no data field or render exists yet. Pull discovery notes from
    COPY_SYSTEM §4 (Encounter / Dispatch).
    *Done when:* Halo shows the archetype class + discovery note (right
    panel or dossier §4/§5 — not on the card); Free shows label only.
-3. **Three shiny material prototypes** — CARD_TECH_LAB §20: Cold Foil /
+2. **Three shiny material prototypes** — CARD_TECH_LAB §20: Cold Foil /
    Black Star / Night Gloss as data-only `halo` presets behind the Lab
    key, no layout changes.
    *Done when:* three presets switchable in Lab, screenshots captured and
    compared side-by-side, comparison filed in CARD_TECH_LAB.
-4. **Dossier plate material polish** — taste debt from the 2026-06-12
+3. **Dossier plate material polish** — taste debt from the 2026-06-12
    review: plates read flat next to the card; let the material accent
    bleed in (Mint Record plate already does).
    *Done when:* Halo dossier plates carry a restrained material accent;
    free stays matte; screenshots regenerated.
-5. **Route label in Source Record** — the last remnant of v2 surfacing:
+4. **Route label in Source Record** — the last remnant of v2 surfacing:
    one row in the dossier Source Record showing `scan.route` +
    `scanStatus` (e.g. "HUMAN_SOLO · accepted"), legacy-safe when v2
    absent. Tiny app.js change.
@@ -301,7 +316,7 @@ Last updated: 2026-06-13.
 
 ## Backlog / needs decision
 
-- **Final Halo material decision** — after Ready #3 (Three shiny material
+- **Final Halo material decision** — after Ready #2 (Three shiny material
   prototypes); log winner in DECISION_LOG, promote rules to PROJECT_OS
   (CARD_TECH_LAB §18/§20).
 - **Develop/mint transformation moment** — CARD_TECH_LAB §15; needs scope

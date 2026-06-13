@@ -146,7 +146,7 @@ const SOURCES = [
         { k: "Crop Pressure", read: "Cabin roof and seat press from above and left; the subject reads contained, never cramped.", free: true },
         { k: "Subject Mass", read: "Mass sits left-of-center, balanced by the fjord window — a two-weight frame that holds.", free: true },
         { k: "Light Direction", read: "Overcast key through the right glass; rear-left fill keeps the face open under the cap.", free: false },
-        { k: "Signal Vector", read: "Eye line and palm fire on the same axis: straight out of the windshield, straight at you.", free: false },
+        { k: "Signal Vector", read: "Eye line and palm fire on the same axis: straight out of the windshield, straight at the lens.", free: false },
         { k: "Focal Lock", read: "Face locks the left third with the palm as second anchor — the lens never wanders.", free: false },
       ],
       statNotes: {
@@ -311,7 +311,7 @@ const SOURCES = [
         { k: "Signal Vector", read: "Eye contact redirected to the ice. The work itself is the message, and it points straight down.", free: false },
       ],
       statNotes: {
-        presence: { evidence: "A black silhouette on a white field is the strongest contrast the archive can record.", note: "The snow does the staging; he accepts the terms." },
+        presence: { evidence: "A black silhouette on a white field is the strongest contrast the archive can record.", note: "The snow does the staging; the silhouette accepts the terms." },
         frame: { evidence: "Treeline band, entry tracks, centered mass — near-editorial discipline for a working photo." },
         signal: { evidence: "Hood, beanie and sunglasses qualify the expression; the auger receives the eye contact instead." },
         charge: { evidence: "Slow-burn output — the energy is in the rotation, not the expression." },
@@ -319,7 +319,7 @@ const SOURCES = [
       hidden: {
         name: "Field Silence",
         value: 91,
-        read: "The subject reads less like a pose and more like evidence from a cold operation. Nothing here was performed for you.",
+        read: "The subject reads less like a pose and more like evidence from a cold operation. Nothing here was performed for the lens.",
         tease: "A silence reading was detected in the field layer. It develops with the mint.",
       },
       mint: {
@@ -361,7 +361,7 @@ const SOURCES = [
     aura: ["Slow-Burn", "Sun-Struck", "Load-Bearing"],
     sceneRole: "Proof the lake was work, not wallpaper.",
     stance:
-      "Crouched at full commitment, both gloves stacked on the brace, weight exactly where it should be. Nothing performed — the auger doesn't care, and neither does he.",
+      "Crouched at full commitment, both gloves stacked on the brace, weight exactly where it should be. Nothing performed — the auger doesn't care, and the frame doesn't pretend otherwise.",
     fit: "Anywhere patience is currency, this card appreciates. In rooms that demand noise, it simply waits.",
     impact: { value: 58, label: "Grounding" },
     lore: { value: 77, label: "Dense" },
