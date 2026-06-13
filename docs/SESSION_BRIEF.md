@@ -10,6 +10,75 @@ coding session; the assistant must respect it. Files not listed under
 does not match the user's current task — **stop and ask** before doing
 anything. (GOVERNANCE_OS anti-drift.)
 
+## Active session — BR-S027
+
+**Date / Session ID:** 2026-06-13 / BR-S027
+
+**Today's task:** Free Pull Layout Mock v1 (runtime / dev route only)
+
+**Why:** Turn the dev Free Scan Simulation (`?dev=free-scan-sim`) into the
+first screenshot-worthy Free Pull **front** — one landscape graded-slab
+artifact — per `docs/FREE_PULL_SCREENSHOT_LAYOUT_V1.md`, before any Halo
+Gate/back is mocked. Do NOT build Halo Gate or Halo Dossier yet; do NOT
+migrate the sample room yet.
+
+**Read:** docs/PROJECT_OS.md · docs/FREE_PULL_SCREENSHOT_LAYOUT_V1.md ·
+docs/HALO_GATE_UPGRADE_LAYUP_V1.md · docs/CARD_SYSTEM_V1.md ·
+docs/CARD_LOGIC_V1.md · docs/TASK_QUEUE.md · docs/SESSION_BRIEF.md ·
+docs/CHANGE_MAP.md · app.js · data.js · styles.css · index.html · scan-contract.js
+
+**Edit:** app.js · styles.css · docs/CHANGE_MAP.md · docs/TASK_QUEUE.md ·
+docs/SESSION_BRIEF.md
+
+**Do not open:** C:\Users\nilsj\OneDrive\Documents\blue-room
+
+**Avoid editing:** scan-contract.js · index.html · data.js (none were needed
+— the slab reuses `SOURCES[0]` read-only as a dev stand-in)
+
+**Authority affected:** ACTIVE SPECS implementation (runtime dev mock)
+
+**Core/spec change required?** No — dev-route mock only; implements
+FREE_PULL_SCREENSHOT_LAYOUT_V1. The local tier-display ladder is dev-only and
+does NOT rewrite CARD_LOGIC_V1 §2 (Sample Room Tier Migration v1 owns that).
+
+**Locked constraints:** BLUE ROOM reads the photo, not the person · dev sim
+unmistakably labelled DEV SIMULATION / NOT REAL ANALYSIS / NOT USER SCAN · no
+public 0–100 numbers · receipts are chips (cue → artifact effect) · sealed
+vault shows shape only (Reframe Map never expands on Free) · no banned
+person-rating language · no AI · no backend · no upload analysis · no payment/
+checkout/login · no Halo unlock · no fake stats for normal uploaded photos ·
+preserve normal menu / Add Your Photo / Local Draft / Develop Scan sealed
+engine-offline gate · preserve `?dev=uploaded-result` + `?dev=uploaded-blocked`
++ all deep links
+
+**Known current state:** Free Pull Screenshot Layout Spec v1 (12c4cd2) ·
+`?dev=free-scan-sim` previously rendered a vertical plate stack that leaked the
+full Reframe Map on Free · normal Local Draft → Develop Scan opens the sealed
+offline gate · no AI / backend / payment / real scan engine
+
+**Definition of done:** `?dev=free-scan-sim` renders one landscape graded-slab
+Free Pull (image slab window left ~52% + certification/stat-board label right
+~48%) with a slim persistent dev rail, 4 public tier-notch stats (no 0–100),
+2 grounded receipt chips, a shape-only sealed vault, a quiet scope line and a
+calm Halo seal edge · `renderUploadedScanResultDev` still validates first and
+the other two `?dev` routes are byte-identical · normal menu/draft/Develop-gate
++ deep links unchanged · uploaded photos still produce nothing · no AI/backend/
+payment/Halo unlock · docs updated · commit + push completed
+
+**Verification:** `python -m http.server 8743`; `?dev=free-scan-sim` is one
+landscape artifact at 1600×900 (1364×513, ~7% margin) + 1920×1080 (image
+dominates, 52/48, fits height), rail+footer show all three dev labels, tier
+bands Sharp/Strong/Present/Dominant, 2 cue→effect chips, vault shape-only (no
+Reframe contents leaked), scope + Halo edge present, no public 0–100, lexicon
+sweep clean; `?dev=uploaded-result` (original layout, 8 stat rows + flags) +
+`?dev=uploaded-blocked` (blocked panel) unchanged; bare URL → menu; console
+clean. (Verified via DOM/geometry inspection — preview screenshot tool was
+timing out; route is dev-query-only, not in the headless pipeline.)
+
+**Final response format:** commit hash · files changed · verification performed
+· whether normal upload flow stayed sealed/offline · whether runtime was
+limited to dev/mock behavior · next recommended task · rollback command
+
 ## Active session — BR-S026
 
 **Date / Session ID:** 2026-06-13 / BR-S026

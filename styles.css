@@ -2087,6 +2087,121 @@ body[data-view="room"] .dev { display: none; }
 .freesim__body em { font-style: normal; color: var(--cyan); letter-spacing: 0.1em; }
 
 /* =============================================================
+   Free Pull Layout Mock v1 (?dev=free-scan-sim)
+   ONE landscape collectible artifact — a graded slab: image window +
+   certification label, sealed vault (shape only), quiet scope, calm
+   Halo seal edge. Dev sim only; the slab image is a labelled sample
+   stand-in, never real analysis. The card is the only object with
+   depth (DESIGN_TOKENS Room/Plate/Artifact law); accent is restrained
+   to one shimmer + the material weld.
+============================================================= */
+/* full-width single column + auto margins override the shared .dev flex
+   centering so the slab fills ~88vw (quiet 5–7% side margin), not content width */
+.fpwrap { width: min(88vw, 1500px); margin-inline: auto; display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; }
+
+/* slim persistent dev rail — keeps the labels without a giant block */
+.fprail {
+  display: flex; align-items: center; gap: 12px; padding: 7px 15px;
+  border: 1px dashed color-mix(in srgb, var(--cyan) 45%, var(--line));
+  border-radius: 999px; background: color-mix(in srgb, var(--cyan) 6%, transparent);
+}
+.fprail__dot { width: 6px; height: 6px; border-radius: 50%; background: var(--cyan); box-shadow: 0 0 8px var(--cyan); flex: none; }
+.fprail__txt { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--cyan); }
+.fprail__id { margin-left: auto; font-family: var(--font-mono); font-size: 8px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--t-meta); }
+
+/* the artifact — a landscape graded slab; the only element with depth */
+.fpcard {
+  position: relative; border-radius: 14px; overflow: hidden; border: 1px solid var(--line);
+  background: linear-gradient(180deg, var(--ink-800), var(--ink-900));
+  box-shadow: 0 24px 60px -28px rgba(0, 0, 0, 0.82), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+/* sealed slab weld — a thin material seam down the split (Halo edge cue) */
+.fpcard__weld {
+  position: absolute; top: 0; bottom: 0; left: 52%; width: 1px; z-index: 2; pointer-events: none;
+  background: linear-gradient(180deg, transparent, color-mix(in srgb, var(--halo-a, var(--silver)) 55%, transparent), transparent);
+}
+.fpcard__grid { display: grid; grid-template-columns: 52% 48%; min-height: 470px; }
+
+/* LEFT — image slab window (near-fullbleed; the image is the card) */
+.fpcard__window {
+  position: relative; overflow: hidden; isolation: isolate; background: var(--ink-850);
+  --pos: 50% 50%; --zoom: 1; --scrim: 0.1; --b: 1; --c: 1; --s: 1;
+}
+.fpcard__img {
+  position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
+  object-position: var(--pos); transform: scale(var(--zoom)); transform-origin: var(--pos);
+  filter: brightness(var(--b)) contrast(var(--c)) saturate(var(--s));
+}
+.fpcard__img.is-missing { display: none; }
+.fpcard__window.img-missing { display: grid; place-items: center; }
+.fpcard__scrim {
+  position: absolute; inset: 0;
+  background: linear-gradient(180deg, rgba(6, 9, 12, calc(var(--scrim) * 0.7)) 0%, transparent 30%, rgba(6, 9, 12, 0.16) 60%, rgba(6, 9, 12, 0.8) 100%);
+}
+/* the one restrained foil/shimmer accent (material-tinted) */
+.fpcard__shimmer {
+  position: absolute; inset: -20% -50%; pointer-events: none; mix-blend-mode: screen;
+  background: linear-gradient(105deg, transparent 44%, color-mix(in srgb, var(--halo-c, var(--silver)) 20%, transparent) 50%, transparent 56%);
+}
+.fpcard__hairline { position: absolute; inset: 0; border: 1px solid rgba(255, 255, 255, 0.06); pointer-events: none; }
+.fpcard__edition {
+  position: absolute; top: 12px; left: 12px; z-index: 1;
+  font-family: var(--font-mono); font-size: 8px; letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--t-display); padding: 4px 8px; border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 3px; background: rgba(8, 10, 12, 0.5);
+}
+.fpcard__caption { position: absolute; left: 16px; right: 16px; bottom: 14px; z-index: 1; display: grid; gap: 4px; }
+.fpcard__title { font-family: var(--font-display); font-size: 30px; font-weight: 600; line-height: 1.04; color: var(--t-display); text-shadow: 0 2px 18px rgba(0, 0, 0, 0.7); }
+.fpcard__certid { font-family: var(--font-mono); font-size: 8px; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(226, 222, 213, 0.7); }
+
+/* RIGHT — certification label / stat board (a flat plate, no depth) */
+.fpcard__label { display: grid; align-content: start; gap: 14px; padding: 20px 22px; border-left: 1px solid var(--line-faint); }
+.fpcard__labelhead { display: grid; gap: 3px; }
+.fpcard__house { font-family: var(--font-mono); font-size: 8px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--t-meta); }
+.fpcard__arch { font-family: var(--font-display); font-style: italic; font-size: 20px; color: var(--t-primary); }
+.fpcard__archsub { font-family: var(--font-mono); font-size: 7.5px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--faint); }
+
+.fpcard__tiers { display: grid; gap: 9px; }
+.fpcard__tier { display: grid; grid-template-columns: 92px 66px 1fr; align-items: center; gap: 12px; }
+.fpcard__tname { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--t-meta); }
+.fpcard__tband { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.12em; color: var(--silver-bright); }
+.fpcard__notches { display: flex; gap: 4px; }
+.fpcard__notch { flex: 1; height: 7px; border-radius: 1px; border: 1px solid var(--line); background: transparent; }
+.fpcard__notch.is-on { background: var(--silver); border-color: var(--silver); }
+
+.fpcard__chips { display: grid; gap: 7px; }
+.fpcard__chip {
+  display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px;
+  padding: 8px 11px; border: 1px solid var(--line-faint);
+  border-left: 2px solid var(--line-strong); border-radius: var(--r-plate); background: rgba(255, 255, 255, 0.012);
+}
+.fpcard__chipcue { font-size: 11px; line-height: 1.4; color: var(--t-primary); }
+.fpcard__chiparrow { font-family: var(--font-mono); font-size: 11px; color: var(--silver-dim); }
+.fpcard__chipeff { font-size: 11px; line-height: 1.4; color: var(--t-meta); }
+
+/* sealed vault — "in conservation", not locked loot */
+.fpcard__vault { display: grid; gap: 9px; padding: 13px 15px; border-radius: var(--r-plate); border: 1px dashed var(--line); background: rgba(8, 10, 12, 0.35); }
+.fpcard__vaulthead { display: flex; align-items: center; gap: 8px; font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--silver-dim); }
+.fpcard__vaultmark { color: var(--silver-dim); }
+.fpcard__vaulttag { margin-left: auto; font-size: 7.5px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--faint); border: 1px solid var(--line-faint); border-radius: 999px; padding: 2px 8px; }
+.fpcard__vrow { display: grid; grid-template-columns: auto 1fr; gap: 11px; align-items: start; }
+.fpcard__vno { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.1em; color: var(--t-ghost); }
+.fpcard__vbody { display: grid; gap: 3px; }
+.fpcard__vname { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.08em; color: var(--silver-bright); }
+.fpcard__vreason { font-size: 11px; line-height: 1.4; color: var(--t-meta); }
+.fpcard__vsealed { font-family: var(--font-mono); font-size: 8px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--faint); }
+
+.fpcard__scope { font-family: var(--font-display); font-style: italic; font-size: 13px; line-height: 1.45; color: var(--t-body); }
+
+/* calm Halo seal edge — part of the artifact edge, not a button stack */
+.fpcard__halo { display: flex; align-items: center; gap: 10px; padding-top: 12px; border-top: 1px solid var(--line-faint); }
+.fpcard__haloweld { width: 22px; height: 1px; flex: none; background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--halo-a, var(--silver)) 70%, transparent)); }
+.fpcard__halotext { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--silver-dim); }
+.fpcard__halonote { margin-left: auto; font-family: var(--font-mono); font-size: 8px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--faint); }
+
+.fpwrap__foot { font-family: var(--font-mono); font-size: 8px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--faint); text-align: center; }
+
+/* =============================================================
    Fallback for narrow screens (desktop is the priority)
 ============================================================= */
 
@@ -2100,6 +2215,12 @@ body[data-view="room"] .dev { display: none; }
   .dhidden { flex-direction: column; text-align: center; gap: 14px; }
   .menu__brand { font-size: 23px; letter-spacing: 0.26em; }
   .msample__arrow { transform: rotate(90deg); }
+  /* Free Pull mock stacks: image slab on top, label below */
+  .fpwrap { width: 100%; }
+  .fpcard__grid { grid-template-columns: 1fr; }
+  .fpcard__weld { display: none; }
+  .fpcard__window { min-height: 280px; }
+  .fpcard__label { border-left: 0; border-top: 1px solid var(--line-faint); }
 }
 
 @media (prefers-reduced-motion: reduce) {

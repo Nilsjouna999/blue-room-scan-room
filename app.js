@@ -1149,6 +1149,12 @@ function renderUploadedScanResultDev(result, opts) {
       </div>`;
   }
 
+  /* Free Pull Layout Mock v1 — the ?dev=free-scan-sim route renders the
+     validated fixture as ONE landscape collectible artifact (split slab),
+     not the debug stack. The uploaded-result / uploaded-blocked routes keep
+     the original layout below, untouched. */
+  if (sim) return renderFreePullMock(result);
+
   const r = result;
   const a = r.artifact || {};
   const src = r.source || {};
@@ -1307,6 +1313,164 @@ function renderUploadedScanResultDev(result, opts) {
       <p class="uploadeddev__foot">${sim
         ? "DEV SIMULATION · NOT REAL ANALYSIS · NOT USER SCAN · no AI · no user photo analyzed"
         : "DEV HARNESS · generated from BlueRoomScanContract.DEV_FIXTURES · not a real scan · no AI · no user photo analyzed"}</p>
+    </div>`;
+}
+
+/* ---------- Free Pull Layout Mock v1 (dev sim route only) ----------
+   Renders the ?dev=free-scan-sim fixture as ONE landscape collectible
+   artifact per docs/FREE_PULL_SCREENSHOT_LAYOUT_V1.md: a graded image slab
+   window (left, ~52%) + a certification / stat-board label (right, ~48%),
+   with segmented tier notches (no 0–100 numbers), grounded receipt chips,
+   a SHAPE-ONLY sealed vault (the Reframe Map never expands on Free — only
+   counts), a quiet scope line, and a calm Halo seal edge (not a SaaS button
+   stack). A small persistent dev rail keeps DEV SIMULATION / NOT REAL
+   ANALYSIS / NOT USER SCAN visible without a giant warning block.
+
+   The slab image is a SAMPLE asset (SOURCES[0]) used only as a clearly
+   labelled dev stand-in — never a real uploaded or analyzed user photo.
+   No payment, no Halo unlock, no AI. The fixture is already validated by
+   the caller before this runs. */
+
+/* Local display ladder for THIS dev route only. CARD_LOGIC_V1 §2 keeps the
+   authoritative public bands; Sample Room Tier Migration v1 reconciles them.
+   Derived from the public bar count so no internal 0–100 number can leak. */
+const FP_TIER_LADDER = ["Quiet", "Present", "Strong", "Sharp", "Dominant"];
+function fpTierLabel(stat) {
+  const b = Math.max(0, Math.min(5, Number(stat && stat.bars) || 0));
+  return FP_TIER_LADDER[Math.max(0, b - 1)] || "Quiet";
+}
+
+function renderFreePullMock(result) {
+  const r = result || {};
+  const a = r.artifact || {};
+  const ps = Array.isArray(r.publicStats) ? r.publicStats : [];
+  const eb = Array.isArray(r.evidenceBoard) ? r.evidenceBoard : [];
+
+  /* sample stand-in image + its tuning/material (dev stand-in only) */
+  const s0 = (typeof SOURCES !== "undefined" && SOURCES[0]) ? SOURCES[0] : null;
+  const pt = (s0 && s0.photoTuning) || { pos: "50% 45%", zoom: 1, scrim: 0.12, base: { bright: 1, contrast: 1, sat: 1 } };
+  const imgFile = s0 ? s0.file : "";
+  const halo = (s0 && s0.halo) || { a: "#c98a5e", b: "#8b7bff", c: "#e8b27d", material: "Warm Glass Copper" };
+
+  /* 4 public tier rows — segmented notches, never a 0–100 number */
+  const tierRows = ps
+    .map((st) => {
+      const bars = Math.max(0, Math.min(5, Number(st.bars) || 0));
+      const notches = Array.from({ length: 5 }, (_, i) => `<span class="fpcard__notch ${i < bars ? "is-on" : ""}"></span>`).join("");
+      return `
+      <div class="fpcard__tier">
+        <span class="fpcard__tname">${esc(st.label)}</span>
+        <span class="fpcard__tband">${esc(fpTierLabel(st))}</span>
+        <span class="fpcard__notches" aria-hidden="true">${notches}</span>
+      </div>`;
+    })
+    .join("");
+
+  /* 2 grounded receipt chips (cue → effect), contact-sheet annotations.
+     Take the first two grounded receipts; they read as composition notes. */
+  const chips = eb
+    .filter((e) => e.observedCue && e.artifactEffect)
+    .slice(0, 2)
+    .map(
+      (e) => `
+      <div class="fpcard__chip">
+        <span class="fpcard__chipcue">${esc(e.observedCue)}</span>
+        <span class="fpcard__chiparrow" aria-hidden="true">→</span>
+        <span class="fpcard__chipeff">${esc(e.artifactEffect)}</span>
+      </div>`
+    )
+    .join("");
+
+  /* sealed vault — SHAPE ONLY. The Reframe Map shows counts, never its
+     levers / target variants / setup-card contents (those are Halo-side). */
+  const rm = r.reframeMap || {};
+  const leverCount = Array.isArray(rm.levers) ? rm.levers.length : 0;
+  const variantCount = Array.isArray(rm.levers) ? new Set(rm.levers.map((l) => l && l.label)).size : 0;
+  const sealed = r.sealedStat || {};
+  const plural = (n, w) => `${n} ${w}${n === 1 ? "" : "s"}`;
+  const vault = `
+      <div class="fpcard__vault">
+        <div class="fpcard__vaulthead">
+          <span class="fpcard__vaultmark" aria-hidden="true">◇</span>Sealed vault
+          <span class="fpcard__vaulttag">in conservation</span>
+        </div>
+        <div class="fpcard__vrow">
+          <span class="fpcard__vno">01</span>
+          <div class="fpcard__vbody">
+            <span class="fpcard__vname">Sealed Stat · ${esc(sealed.label || "—")}</span>
+            <p class="fpcard__vreason">${esc(sealed.teaser || "A back-of-card axis, sealed by structure — no tier shown on the front.")}</p>
+          </div>
+        </div>
+        <div class="fpcard__vrow">
+          <span class="fpcard__vno">02</span>
+          <div class="fpcard__vbody">
+            <span class="fpcard__vname">Reframe Map</span>
+            <p class="fpcard__vreason">Map exists — ${plural(leverCount, "image lever")} · ${plural(variantCount, "target variant")} · setup card sealed.</p>
+            <span class="fpcard__vsealed">Contents sealed · opens with the Halo dossier</span>
+          </div>
+        </div>
+      </div>`;
+
+  const scope = `<p class="fpcard__scope">◆ &nbsp;${esc(
+    r.scopeLine || "This reads the image artifact — frame, light, styling, setting, gesture — not the person."
+  )}</p>`;
+
+  /* calm Halo seal edge — part of the artifact edge, never a button stack */
+  const haloEdge = `
+      <div class="fpcard__halo">
+        <span class="fpcard__haloweld" aria-hidden="true"></span>
+        <span class="fpcard__halotext">This card has a sealed back · Halo dossier sealed</span>
+        <span class="fpcard__halonote">Open the back later</span>
+      </div>`;
+
+  return `
+    <div class="dev fpwrap">
+      <div class="fprail">
+        <span class="fprail__dot" aria-hidden="true"></span>
+        <span class="fprail__txt">DEV SIMULATION · NOT REAL ANALYSIS · NOT USER SCAN</span>
+        <span class="fprail__id">FREE PULL MOCK · DEV</span>
+      </div>
+
+      <article class="fpcard" data-material="${esc(halo.material)}"
+        style="--halo-a:${esc(halo.a)}; --halo-b:${esc(halo.b)}; --halo-c:${esc(halo.c)};">
+        <span class="fpcard__weld" aria-hidden="true"></span>
+        <div class="fpcard__grid">
+
+          <figure class="fpcard__window" data-imgwrap
+            style="--pos:${esc(pt.pos)}; --zoom:${pt.zoom}; --scrim:${pt.scrim}; --b:${pt.base.bright}; --c:${pt.base.contrast}; --s:${pt.base.sat};">
+            ${imgOrPlaceholder(imgFile, "fpcard__img")}
+            <span class="fpcard__scrim"></span>
+            <span class="fpcard__shimmer" aria-hidden="true"></span>
+            <span class="fpcard__hairline" aria-hidden="true"></span>
+            <span class="fpcard__edition">◆ FREE PULL · DEV SIM</span>
+            <figcaption class="fpcard__caption">
+              <h2 class="fpcard__title">${esc(a.title || "—")}</h2>
+              <span class="fpcard__certid">ARTIFACT ID · BR-FP-DEV-0001 · ${esc(a.rarity || "free")}</span>
+            </figcaption>
+          </figure>
+
+          <div class="fpcard__label">
+            <header class="fpcard__labelhead">
+              <span class="fpcard__house">◆ BLUE ROOM · ARTIFACT CERTIFICATION</span>
+              <span class="fpcard__arch">${esc(a.archetypeClass || "—")}</span>
+              <span class="fpcard__archsub">artifact archetype · a photo role, not a person</span>
+            </header>
+
+            <div class="fpcard__tiers">${tierRows}</div>
+            <div class="fpcard__chips">${chips}</div>
+            ${vault}
+            ${scope}
+            ${haloEdge}
+          </div>
+        </div>
+      </article>
+
+      <div class="gateactions">
+        <button type="button" class="draft__sample" data-view-to="room">Enter sample scan room</button>
+        <button type="button" class="draft__back" data-view-to="menu">Main menu</button>
+      </div>
+
+      <p class="fpwrap__foot">DEV SIMULATION · NOT REAL ANALYSIS · NOT USER SCAN · sample image used as a dev stand-in · no AI · no user photo analyzed</p>
     </div>`;
 }
 

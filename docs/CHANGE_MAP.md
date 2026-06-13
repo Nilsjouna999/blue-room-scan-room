@@ -168,6 +168,53 @@ banned/hype-word sweep now clean across all states.
 - **Test:** bare URL shows the menu; the four deep links open the room
   directly; Enter Scan Room reveals the unchanged room.
 
+## Free Pull Layout Mock v1 (2026-06-13 / BR-S027, app.js + styles.css)
+
+The dev-only Free Scan Simulation route (`?dev=free-scan-sim`) is now the first
+screenshot-worthy **Free Pull front** per `docs/FREE_PULL_SCREENSHOT_LAYOUT_V1.md`
+— a single **landscape graded-slab artifact**, not a report stack. **Dev sim
+only · no AI · no user-photo analysis · no payment · no Halo unlock.**
+`renderUploadedScanResultDev` gains one early branch — `if (sim) return
+renderFreePullMock(result);` **after** the validator/blocked path — so an
+invalid sim fixture still renders the safe blocked state, and the
+`?dev=uploaded-result` / `?dev=uploaded-blocked` routes keep the **original
+layout untouched** (verified: no `.fpcard`, original `.uploadeddev__card`, 8
+stat rows + flags plate; blocked route still shows the blocked panel). New
+`renderFreePullMock()` builds: a slim **persistent dev rail** (DEV SIMULATION ·
+NOT REAL ANALYSIS · NOT USER SCAN — not a giant warning block); an **image slab
+window** (~52%, left) using `SOURCES[0]` as a clearly-labelled **sample dev
+stand-in** (the fixture carries no photo) with the existing photoTuning/material,
+a tiny `FREE PULL · DEV SIM` edition stamp, artifact title + quiet **ARTIFACT
+ID**; and a **certification label** (~48%, right) with the archetype teaser
+("a photo role, not a person"), **4 public tier rows as segmented notches**
+(Presence/Frame/Signal/Visual Impact — bands from a local display ladder
+**Quiet/Present/Strong/Sharp/Dominant**, derived from the public bar count so
+**no 0–100 number leaks**), **2 grounded receipt chips** (`observed cue →
+artifact effect`, contact-sheet annotations), a **shape-only sealed vault**
+("in conservation": 01 Sealed Stat name+structural reason **no tier**; 02
+Reframe Map **counts only** — "2 image levers · 2 target variants · setup card
+sealed", **no lever/variant/setup contents** — fixing the old sim, which leaked
+the full Reframe Map on Free), a quiet **scope line**, and a calm **Halo seal
+edge** ("This card has a sealed back · Halo dossier sealed" — not a button
+stack). styles.css adds the `.fpwrap` / `.fprail` / `.fpcard*` block (tokens
+only; one restrained material shimmer + a sealed-slab weld seam; the card is the
+only object with depth per DESIGN_TOKENS) + a narrow-screen stack rule.
+
+**Local tier-display ladder is dev-route-only** (Quiet/Present/Strong/Sharp/
+Dominant) — it does NOT rewrite `CARD_LOGIC_V1` §2; *Sample Room Tier Migration
+v1* still owns the authoritative public band reconcile. **Verified live**
+(`?dev=free-scan-sim`): one landscape artifact at 1600×900 (1364×513, ~7% side
+margin) and 1920×1080 (image dominates, 52/48 split, fits height); rail +
+footer carry all three dev labels; tier bands Sharp/Strong/Present/Dominant; 2
+cue→effect chips; vault shape-only (no Reframe contents leaked); scope + Halo
+edge present; no public 0–100 numbers; forbidden-lexicon sweep clean; console
+clean. `?dev=uploaded-result` + `?dev=uploaded-blocked` + bare-URL menu
+unchanged. **Normal flow untouched** (zero edits to renderMenu/renderDraft/
+renderGate/draft wiring): Local Draft → Develop Scan still opens the sealed
+engine-offline gate; uploaded photos still produce no analysis. (Screenshot
+pipeline unchanged — the dev route needs an explicit `?dev` query; verified via
+DOM/geometry inspection as the preview screenshot tool was timing out.)
+
 ## Free Pull Screenshot Layout Spec v1 (2026-06-13 / BR-S026, docs only)
 
 New ACTIVE spec `docs/FREE_PULL_SCREENSHOT_LAYOUT_V1.md` (244 lines) — defines
