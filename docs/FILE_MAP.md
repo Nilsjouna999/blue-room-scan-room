@@ -20,13 +20,22 @@ Read this before opening anything else. Last verified: 2026-06-12.
 
 1. `docs/SESSION_BRIEF.md` — today's scope (wins for "what to do now")
 2. `docs/FILE_MAP.md` — this file (wins for "where things live")
-3. `docs/PROJECT_OS.md` — product laws, layout, stats, treatments
-4. `docs/DECISION_LOG.md` — why + revisit conditions; check before
+3. `docs/GOVERNANCE_OS.md` — authority layers, statuses, change reviews,
+   research promotion funnel
+4. `docs/PROJECT_OS.md` — product laws, layout, stats, treatments
+5. `docs/DECISION_LOG.md` — why + revisit conditions; check before
    contradicting anything
-5. `docs/COPY_SYSTEM.md` — all copy/tone/naming rules
-6. `docs/CHANGE_MAP.md` — how to make a given change safely
-7. `docs/CARD_TECH_LAB.md` — explorations only; nothing there is final
-8. `docs/SCREENS.md` + `docs/GPT_REVIEW_GUIDE.md` — visual review channel
+6. `docs/COPY_SYSTEM.md` — all copy/tone/naming rules
+7. `docs/CHANGE_MAP.md` — how to make a given change safely
+8. `docs/CARD_TECH_LAB.md` — explorations only; nothing there is final
+9. `docs/research/SPINE.md` — top-of-research filtered spine (RESEARCH
+   authority — informs, never implements directly)
+10. `docs/SCREENS.md` + `docs/GPT_REVIEW_GUIDE.md` — visual review channel
+
+**Research rule:** daily coding sessions do not open `docs/research/*`
+unless SESSION_BRIEF lists it under Read. Raw research cannot directly
+change product or code — it flows raw → SPINE.md → active spec →
+implementation (GOVERNANCE_OS funnel).
 
 ## File map
 
@@ -48,6 +57,9 @@ Read this before opening anything else. Last verified: 2026-06-12.
 | `capture-screens.ps1` | Headless-Edge screenshot pipeline → `docs/screens/*.png` (needs server on :8743) | Adding/removing capture states | — |
 | `docs/TASK_QUEUE.md` | Ranked work queue | Logging out-of-scope findings; picking next work | — |
 | `docs/SESSION_BRIEF.md` | Per-session scope template + example | Start of every session | — |
+| `docs/GOVERNANCE_OS.md` | Authority layers, statuses, change reviews, promotion funnel, anti-drift/clutter rules | A change touches LOCKED/ACTIVE authority; resolving conflicts | To excuse skipping the funnel |
+| `docs/research/SPINE.md` | Top-of-research filtered spine — high-signal product principles awaiting promotion | Distilling raw research; planning a promotion into a spec | During daily coding unless SESSION_BRIEF says so |
+| `docs/research/*.md` (others) | Raw reference research (RESEARCH authority, unfiltered) | Mining for SPINE distillation only | Building from directly — never |
 
 ## LOCKED rules (copied from PROJECT_OS / DECISION_LOG — current)
 

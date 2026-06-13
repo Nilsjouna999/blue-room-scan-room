@@ -126,6 +126,17 @@ every-outcome-is-a-win rules. SRC-01 = The Encounter; SRC-02 = The
 Dispatch.
 Revisit: the library grows when new sources need a class that doesn't fit.
 
+**2026-06-12 / Compact Governance OS + research hierarchy adopted / CURRENT**
+Why: docs and research were starting to outrun the product. Four authority
+layers (CORE LAW / ACTIVE SPECS / RESEARCH / ARCHIVE), four statuses
+(LOCKED / ACTIVE / DRAFT / RETIRED). `docs/research/SPINE.md` is the
+top-of-research layer; raw research cannot directly cause code/product
+changes — it flows raw → SPINE → active spec → implementation. Confirmed
+product split: Free Pull = cheap/low-cost preview; Halo Mint = deeper
+AI-developed pass; paid may differ from free but must not contradict
+visible facts established by Free.
+Revisit: if the funnel adds more friction than it removes for a solo builder.
+
 **2026-06-12 / Current Halo Foil is prototype-only, not final shiny design / TESTING**
 Why: it proves a paid treatment can pop in-browser (holo edge, halo,
 particles, shimmer) but it is an effect bucket, not a card material — it

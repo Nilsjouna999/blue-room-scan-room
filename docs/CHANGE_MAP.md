@@ -115,6 +115,14 @@ browser console is clean (F12).
 - **Test:** free vs mint vs shiny right panel; develop buttons still switch
   treatment.
 
+## Governance / research organization (2026-06-12)
+
+Governance and research docs were reorganized — no code touched.
+Future sessions: read `docs/FILE_MAP.md` + `docs/SESSION_BRIEF.md` first;
+authority/status/funnel rules live in `docs/GOVERNANCE_OS.md`; filtered
+research lives in `docs/research/SPINE.md` (RESEARCH authority — promote
+before building).
+
 ## To change the scroll dossier
 
 - **Edit:** content in `data.js` → `dossier` per source (`record`,

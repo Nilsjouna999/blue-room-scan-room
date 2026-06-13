@@ -6,7 +6,13 @@ coding session; the assistant must respect it. Files not listed under
 
 ---
 
+**Staleness rule:** if this brief is stale, missing date/session ID, or
+does not match the user's current task — **stop and ask** before doing
+anything. (GOVERNANCE_OS anti-drift.)
+
 ## Template (copy, fill, run)
+
+**Date / Session ID:**
 
 **Today's task:**
 
@@ -17,6 +23,11 @@ coding session; the assistant must respect it. Files not listed under
 **Edit:**
 
 **Do not open:**
+
+**Authority affected:** (CORE LAW / ACTIVE SPECS / RESEARCH / ARCHIVE)
+
+**Core/spec change required?** yes/no — if yes, name the review
+(Core Change Review or Spec Change Review, see GOVERNANCE_OS)
 
 **Locked constraints:**
 
@@ -33,8 +44,14 @@ Files created · Files changed · What changed · What was intentionally not cha
 
 ## Example session: visual review URL cleanup
 
+**Date / Session ID:** 2026-06-12 / BR-S014
+
 **Today's task:** Fix the raw screenshot URLs in the visual-review docs so
 external reviewers can open them directly.
+
+**Authority affected:** ACTIVE SPECS (SCREENS, GPT_REVIEW_GUIDE)
+
+**Core/spec change required?** no — content correction within existing specs
 
 **Why:** Reviewers reported the raw URL pattern was a placeholder; visual
 review depends on working image links.
