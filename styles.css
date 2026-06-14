@@ -827,6 +827,122 @@ body {
 }
 
 /* -------------------------------------------------------------
+   LAB MATERIAL PROTOTYPES (CARD_TECH_LAB §20) — finish studies layered
+   ONLY on the internal Lab state (treatment "mint") via data-lab-material.
+   100% static: no animation (the inherited mint shimmer sweep is neutralized
+   per finish), no large-area blur (glow = tight box-shadow). Geometry-locked:
+   background / box-shadow / existing layers only — no padding/margin/border-
+   width change. Material identity is the finish-specific base; per-source
+   --halo-* stays for accent. Not a customer tier — Lab study only.
+------------------------------------------------------------- */
+
+/* Cold Foil — pale icy metallic foil (light/cool, distinct from the black finishes) */
+.card[data-treatment="mint"][data-lab-material="cold-foil"] {
+  background: linear-gradient(
+    160deg,
+    #e3ecf6 0%, #aebfd4 20%, #5f6f87 44%, #93a4bb 66%, #e7eef7 100%
+  );
+  box-shadow:
+    0 34px 80px rgba(0, 0, 0, 0.55),
+    0 0 0 1px rgba(196, 214, 236, 0.55),
+    0 0 30px rgba(180, 206, 236, 0.1),
+    0 6px 22px rgba(0, 0, 0, 0.5);
+}
+.card[data-treatment="mint"][data-lab-material="cold-foil"] .card__plate {
+  background: linear-gradient(180deg, #141a23 0%, #0f141c 55%, #0b0f15 100%);
+}
+.card[data-treatment="mint"][data-lab-material="cold-foil"] .photo__shimmer {
+  animation: none;
+  transform: none;
+  opacity: 0.5;
+  background: linear-gradient(
+    118deg,
+    transparent 36%,
+    rgba(210, 228, 246, 0.16) 46%,
+    rgba(236, 245, 253, 0.26) 50%,
+    rgba(210, 228, 246, 0.12) 54%,
+    transparent 64%
+  );
+}
+.card[data-treatment="mint"][data-lab-material="cold-foil"] .corner::before,
+.card[data-treatment="mint"][data-lab-material="cold-foil"] .corner::after { background: rgba(208, 226, 246, 0.62); }
+.card[data-treatment="mint"][data-lab-material="cold-foil"] .card__rarity { color: #d2e2f5; }
+.card[data-treatment="mint"][data-lab-material="cold-foil"] .ministat__fill {
+  background: linear-gradient(90deg, #6f8398 0%, #cfe0f4 80%, #eef5fc 100%);
+}
+
+/* Black Star — neutral graphite black-chrome plate with a faint constellation
+   grain baked in (identity from the BASE, not from sprinkled overlay dots).
+   Kept deliberately NEUTRAL (graphite, low blue) so it reads distinctly from the
+   blue-glass Night Gloss. */
+.card[data-treatment="mint"][data-lab-material="black-star"] {
+  background: linear-gradient(
+    160deg,
+    #383839 0%, #161514 26%, #070706 52%, #1d1c1b 76%, #333231 100%
+  );
+  box-shadow:
+    0 34px 84px rgba(0, 0, 0, 0.72),
+    0 0 0 1px rgba(150, 146, 138, 0.32),
+    0 6px 22px rgba(0, 0, 0, 0.6);
+}
+.card[data-treatment="mint"][data-lab-material="black-star"] .card__plate {
+  background:
+    radial-gradient(1.1px 1.1px at 16% 26%, rgba(255, 255, 255, 0.5) 50%, transparent 51%),
+    radial-gradient(1px 1px at 66% 16%, rgba(235, 230, 220, 0.42) 50%, transparent 51%),
+    radial-gradient(1.3px 1.3px at 82% 58%, rgba(255, 255, 255, 0.34) 50%, transparent 51%),
+    radial-gradient(1px 1px at 36% 74%, rgba(240, 236, 226, 0.3) 50%, transparent 51%),
+    radial-gradient(1px 1px at 92% 30%, rgba(238, 233, 222, 0.28) 50%, transparent 51%),
+    linear-gradient(180deg, #16150f 0%, #0b0a08 55%, #070605 100%);
+}
+.card[data-treatment="mint"][data-lab-material="black-star"] .photo__shimmer {
+  animation: none;
+  transform: none;
+  opacity: 0.22;
+  background: linear-gradient(105deg, transparent 44%, rgba(186, 198, 226, 0.12) 50%, transparent 56%);
+}
+.card[data-treatment="mint"][data-lab-material="black-star"] .corner::before,
+.card[data-treatment="mint"][data-lab-material="black-star"] .corner::after { background: rgba(184, 178, 166, 0.5); }
+.card[data-treatment="mint"][data-lab-material="black-star"] .card__rarity { color: #cbc6ba; }
+.card[data-treatment="mint"][data-lab-material="black-star"] .ministat__fill {
+  background: linear-gradient(90deg, #45433c 0%, #9c968a 70%, #ddd8cc 100%);
+}
+
+/* Night Gloss — cool blue-black wet glass with one static specular highlight.
+   Deliberately BLUER/glassier so it reads distinctly from the neutral-graphite
+   Black Star. */
+.card[data-treatment="mint"][data-lab-material="night-gloss"] {
+  background: linear-gradient(
+    160deg,
+    #1d2a3b 0%, #0a121d 28%, #03070d 54%, #0e1c2c 80%, #1a2a3d 100%
+  );
+  box-shadow:
+    0 34px 84px rgba(0, 0, 0, 0.74),
+    0 0 0 1px rgba(46, 64, 90, 0.95),
+    0 0 22px rgba(58, 92, 140, 0.2),
+    0 6px 22px rgba(0, 0, 0, 0.6);
+}
+.card[data-treatment="mint"][data-lab-material="night-gloss"] .card__plate {
+  background: linear-gradient(178deg, #0c121b 0%, #070c13 52%, #03070d 100%);
+}
+.card[data-treatment="mint"][data-lab-material="night-gloss"] .photo__shimmer {
+  animation: none;
+  transform: none;
+  opacity: 0.6;
+  background: linear-gradient(
+    179deg,
+    rgba(255, 255, 255, 0.16) 0%,
+    rgba(255, 255, 255, 0.05) 12%,
+    transparent 32%
+  );
+}
+.card[data-treatment="mint"][data-lab-material="night-gloss"] .corner::before,
+.card[data-treatment="mint"][data-lab-material="night-gloss"] .corner::after { background: rgba(96, 122, 158, 0.55); }
+.card[data-treatment="mint"][data-lab-material="night-gloss"] .card__rarity { color: #a6b6cf; }
+.card[data-treatment="mint"][data-lab-material="night-gloss"] .ministat__fill {
+  background: linear-gradient(90deg, #283341 0%, #5f7aa0 72%, #a6bcd9 100%);
+}
+
+/* -------------------------------------------------------------
    TREATMENT: Halo Mint — the paid developed card
    (internal key "shiny"; per-source material via --halo-a/b/c)
 ------------------------------------------------------------- */

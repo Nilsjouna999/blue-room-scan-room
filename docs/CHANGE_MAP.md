@@ -185,6 +185,56 @@ payment/Halo/upload analysis). GPT_REVIEW_GUIDE + TASK_QUEUE + SESSION_BRIEF
 note the folder. Roadmap unchanged beyond this checkpoint — next product task
 stays **Free Pull Mock Polish v1**.
 
+## Three Shiny Material Prototypes v1 (2026-06-14 / BR-S036, data.js + app.js + styles.css)
+
+Built the CARD_TECH_LAB §20 / TASK_QUEUE Ready #0 prototype: three controlled
+card-finish studies — **Cold Foil · Black Star · Night Gloss** — switchable in the
+**Lab state** for screenshot comparison. **No new tier, no new reading, no Halo
+Dossier, no payment/AI/backend/upload, no layout change.** Pre-task critique = a
+2-agent Opus panel (sequencing/scope + design/mechanism/taste) → GO_WITH_CHANGES.
+
+- **Mechanism — `data-lab-material` overlay, NOT a new `data-treatment`.** A new
+  treatment value would crash the unconditional `TREATMENTS[treatment]` /
+  `t.rarity` lookup in `renderCard` and force churn across gating/stateBadge/
+  toggle/keyboard/18-state matrix (CHANGE_MAP "To add a new treatment"). The
+  overlay restyles only the Lab (`mint`) card; `state.treatment` stays
+  {free,mint,shiny}, so gating, the 18-state matrix, free, and the paid Halo path
+  are all untouched. (Divergence from §20 #4's literal "new data-treatment skin"
+  is named in CARD_TECH_LAB §20.)
+- **data.js:** new copy-only `LAB_MATERIALS` constant (3 `{key,label,note}`
+  finish presets, ordered = cycle order). Finish names describe the card SURFACE,
+  never the person. Parallels TREATMENTS/STAT_LABELS/FORMULAS — no score/stat/
+  reading/derivation.
+- **app.js:** `state.labMaterial` (default null = Signature Mint silver); a
+  guarded `?lab=cold-foil|black-star|night-gloss` deep link that applies **only
+  when `t=mint`** (and does not, alone, open the room); a Lab-only `[` / `]`
+  keyboard cycle (signature → cold-foil → black-star → night-gloss → signature);
+  `renderCard` sets `data-lab-material` + a one-slot finish label
+  ("LAB STATE · Cold Foil") **only when `treatment==="mint"`**; `labMaterial`
+  resets to null on any switch to free/shiny (keyboard F/H/S + the toggle/goto
+  click handlers). Free/shiny `renderCard` output is byte-identical to before.
+- **styles.css:** 3 finish skins keyed `.card[data-treatment="mint"][data-lab-material="…"]`
+  (mint-only by selector construction). **100% static** — each neutralizes the
+  inherited mint `.photo__shimmer` sweep (`animation:none`), so no new animated
+  selector and no `prefers-reduced-motion` edit needed. Distinct material BASE per
+  finish (icy foil / black-chrome+constellation-grain / near-black glass);
+  per-source `--halo-*` used for accent only; glow is a tight box-shadow (no
+  large-area `filter:blur`); only background/box-shadow/existing layers touched →
+  geometry LOCKED.
+- **Scope discipline:** rendered on the **Lab (`mint`) state only**, never on the
+  live paid `shiny` Halo. **No winner picked, no DECISION_LOG/PROJECT_OS
+  promotion** — that stays with the separate Backlog item *Final Halo material
+  decision*; a provisional non-binding lean (Black Star / Night Gloss) is recorded
+  in CARD_TECH_LAB §20.
+- **Verified live** (DOM + computed-style; the headless screenshot tool times out
+  on this project): all 3 finishes apply only at `t=mint` with distinct material
+  bases + "LAB STATE · <finish>" label + static shimmer; `t=free` and `t=shiny`
+  ignore `lab` (free/shiny unchanged); base `t=mint` (no lab) unchanged; `[`/`]`
+  cycles + wraps and `f` exits Lab clearing the overlay; **geometry locked** (card
+  440×~721, head 28, label single-line — identical across all finishes + free +
+  shiny); the Artifact Archetype module still renders in Lab; all 4 `?dev` routes
+  + bare menu unchanged; console clean.
+
 ## Render Archetype Discovery Note v1 (2026-06-14 / BR-S035, app.js + data.js + COPY_SYSTEM §4)
 
 Rendered the Halo **archetype discovery note** that the PROJECT_OS §10 visibility

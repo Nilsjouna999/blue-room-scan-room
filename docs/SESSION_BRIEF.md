@@ -10,6 +10,75 @@ coding session; the assistant must respect it. Files not listed under
 does not match the user's current task — **stop and ask** before doing
 anything. (GOVERNANCE_OS anti-drift.)
 
+## Active session — BR-S036
+
+**Date / Session ID:** 2026-06-14 / BR-S036
+
+**Today's task:** Three Shiny Material Prototypes v1 (controlled card-finish study)
+
+**Why:** Make the higher-tier / Lab card feel more premium without expanding scope
+— prototype Cold Foil / Black Star / Night Gloss (CARD_TECH_LAB §20) so they can be
+compared and one picked LATER. Not new readings, not a new tier, not Halo Dossier.
+
+**Read:** docs/GPT_REVIEW_GUIDE.md · docs/PROJECT_OS.md · docs/TASK_QUEUE.md ·
+docs/SESSION_BRIEF.md · docs/CHANGE_MAP.md · docs/DECISION_LOG.md ·
+docs/COPY_SYSTEM.md · docs/CARD_LOGIC_V1.md · docs/CARD_TECH_LAB.md (§5/§7/§16/§20)
+· docs/halo/HALO_GATE_BOUNDARY_V1.md · docs/research/LANGUAGE_SYSTEM_V1.md ·
+docs/research/HUMAN_IN_FRAME_READING_RULES_V1.md · index.html · app.js · styles.css ·
+data.js · scan-contract.js
+
+**Edit:** data.js (copy-only LAB_MATERIALS) · app.js (state.labMaterial, guarded
+?lab deep link, renderCard overlay + label, [ / ] cycle + resets) · styles.css (3
+static .card[data-treatment="mint"][data-lab-material="…"] skins) · docs/CARD_TECH_LAB.md
+(§20 comparison note) · docs/CHANGE_MAP.md · docs/TASK_QUEUE.md · docs/SESSION_BRIEF.md
+
+**Do not open:** C:\Users\nilsj\OneDrive\Documents\blue-room
+
+**Do not edit:** index.html · scan-contract.js · assets · docs/halo/* (no rewrite) ·
+DECISION_LOG / PROJECT_OS (no winner promotion this task) · the TREATMENTS object
+shape · the customer #treatmentToggle · the 18-state content gating
+
+**Authority affected:** ACTIVE SPECS implementation (CARD_TECH_LAB §20 prototype) —
+runtime visual study only; no CORE LAW change
+
+**Core/spec change required?** No — overlay visual prototype + a CARD_TECH_LAB §20
+note. No DECISION_LOG/PROJECT_OS promotion (deferred to "Final Halo material decision").
+
+**Locked constraints:** treatments restyle, never re-layout (geometry LOCKED) · Lab
+overlay only, never a customer tier / new treatment value / new toggle button ·
+render on `mint` ONLY (free + paid `shiny` byte-identical) · 100% static effects
+(neutralize the inherited shimmer; no canvas/WebGL/large-area blur/motion ignoring
+reduced-motion) · distinct material base per finish, `--halo-*` accent only · finish
+names describe the CARD surface, never the person · no second-person/gendered/status/
+personality/attractiveness · no Halo Dossier / payment / AI / backend / upload /
+login · no public 0–100 / no exact pre-unlock counts · preserve all routes + sealed/
+offline Local Draft flow
+
+**Known current state:** Render Archetype Discovery Note v1 (3ae19b1); Lab = keyboard
+`M` (treatment `mint`, Signature Mint silver); per-source `halo:{material,a,b,c}` →
+`--halo-a/b/c`; treatment skins are pure `.card[data-treatment="…"]` CSS; reduced-
+motion already nulls card animations; dev routes free-scan-sim/halo-gate/uploaded-
+result/uploaded-blocked exist; no AI/backend/payment
+
+**Definition of done:** three finishes switchable in the Lab state (`?t=mint&lab=<key>`
++ `[`/`]`) with distinct material identity + a "LAB STATE · <finish>" label · free +
+shiny + Halo Gate + dev routes unchanged · geometry locked · 100% static · console
+clean · comparison + provisional lean filed in CARD_TECH_LAB §20 (no DECISION_LOG) ·
+CHANGE_MAP/TASK_QUEUE/SESSION_BRIEF updated · commit + push
+
+**Verification:** preview MCP (DOM + computed-style; headless screenshot tool times
+out on this project): `?src=1|2&t=mint&lab=cold-foil|black-star|night-gloss` each
+apply with a distinct base gradient + label + static shimmer; `t=free`/`t=shiny`
+ignore `lab` (unchanged); base `t=mint` unchanged; `[`/`]` cycle/wrap + `f`-exit
+clears overlay; geometry identical (card 440×~721, head 28, label single-line) across
+all finishes + free + shiny; `?dev=free-scan-sim`/`halo-gate`/`uploaded-result`/
+`uploaded-blocked` + bare menu unchanged; Local Draft → Develop Scan sealed/offline;
+console clean. Pre-task 2-agent Opus critique = GO_WITH_CHANGES.
+
+**Final response format:** critique verdict · agent/model lineup used · commit hash ·
+changed files · exact prototypes added · where they render · CSS/perf effects added ·
+verification · next task · rollback
+
 ## Active session — BR-S035
 
 **Date / Session ID:** 2026-06-14 / BR-S035

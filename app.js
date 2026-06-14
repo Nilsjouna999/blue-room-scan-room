@@ -41,7 +41,7 @@ function tierBand(v) {
   return "Muted";
 }
 
-const state = { source: 0, treatment: "free", tab: "source", view: "menu", draftGate: false, dev: null };
+const state = { source: 0, treatment: "free", tab: "source", view: "menu", draftGate: false, dev: null, labMaterial: null };
 
 /* Deep-link support: ?src=1|2&t=free|shiny|mint&tab=source|diagram|metrics
    (used by reviewers and the screenshot pipeline). Any of these params
@@ -53,6 +53,10 @@ const state = { source: 0, treatment: "free", tab: "source", view: "menu", draft
   if (s === 1 || s === 2) state.source = s - 1;
   if (["free", "shiny", "mint"].includes(q.get("t"))) state.treatment = q.get("t");
   if (["source", "diagram", "metrics"].includes(q.get("tab"))) state.tab = q.get("tab");
+  /* Lab material study (CARD_TECH_LAB §20) — reproducible-capture deep link.
+     Applies ONLY in the Lab state (t=mint); ignored otherwise. Does not, on its
+     own, open the room — only t/src/tab do that (below). */
+  if (q.get("t") === "mint" && ["cold-foil", "black-star", "night-gloss"].includes(q.get("lab"))) state.labMaterial = q.get("lab");
   /* Dev-only harness route (NOT a product feature): ?dev=uploaded-result |
      uploaded-blocked renders a validated DEV fixture, never a user scan.
      free-scan-sim = Free Pull mock · halo-gate = sealed card-back mock. */
@@ -415,9 +419,17 @@ function renderCard(src, treatment) {
   const t = TREATMENTS[treatment];
   const c = src.card;
   const minted = treatment !== "free";
+  /* Lab material overlay (CARD_TECH_LAB §20): a visual finish study, active
+     ONLY in the internal Lab state ("mint"). Never on free/shiny — so the paid
+     and free cards stay byte-identical. Drives a card-scoped data-lab-material
+     skin + a one-slot finish label appended to the LAB STATE rarity line. */
+  const labMat =
+    treatment === "mint" && typeof LAB_MATERIALS !== "undefined" && state.labMaterial
+      ? LAB_MATERIALS.find((m) => m.key === state.labMaterial)
+      : null;
 
   return `
-    <article class="card" data-treatment="${treatment}" data-material="${esc(src.halo.material)}"
+    <article class="card" data-treatment="${treatment}" data-material="${esc(src.halo.material)}"${labMat ? ` data-lab-material="${esc(labMat.key)}"` : ""}
       style="--halo-a:${esc(src.halo.a)}; --halo-b:${esc(src.halo.b)}; --halo-c:${esc(src.halo.c)};">
       <span class="card__halo" aria-hidden="true"></span>
       <div class="card__plate">
@@ -427,7 +439,7 @@ function renderCard(src, treatment) {
 
         <header class="card__head">
           <span class="card__house">◆ BLUE ROOM ARCHIVE</span>
-          <span class="card__rarity">${esc(t.rarity)}</span>
+          <span class="card__rarity">${esc(labMat ? `${t.rarity} · ${labMat.label}` : t.rarity)}</span>
         </header>
 
         <figure class="photo" data-imgwrap
@@ -1638,6 +1650,7 @@ document.addEventListener("click", (e) => {
   const btn = e.target.closest("[data-goto]");
   if (!btn) return;
   state.treatment = btn.dataset.goto;
+  if (state.treatment !== "mint") state.labMaterial = null;
   render();
 });
 
@@ -1694,6 +1707,7 @@ document.getElementById("treatmentToggle").addEventListener("click", (e) => {
   const btn = e.target.closest("button[data-treatment]");
   if (!btn) return;
   state.treatment = btn.dataset.treatment;
+  if (state.treatment !== "mint") state.labMaterial = null;
   render();
 });
 
@@ -1711,9 +1725,16 @@ document.addEventListener("keydown", (e) => {
   }
   if (e.key === "1") state.source = 0;
   else if (e.key === "2") state.source = 1;
-  else if (e.key.toLowerCase() === "f") state.treatment = "free";
+  else if (e.key.toLowerCase() === "f") { state.treatment = "free"; state.labMaterial = null; }
   else if (e.key.toLowerCase() === "m") state.treatment = "mint";
-  else if (e.key.toLowerCase() === "h" || e.key.toLowerCase() === "s") state.treatment = "shiny";
+  else if (e.key.toLowerCase() === "h" || e.key.toLowerCase() === "s") { state.treatment = "shiny"; state.labMaterial = null; }
+  else if ((e.key === "[" || e.key === "]") && state.treatment === "mint") {
+    /* Lab-only finish cycle (CARD_TECH_LAB §20 material study): signature(null)
+       → cold-foil → black-star → night-gloss → signature. Lab state only. */
+    const seq = [null, "cold-foil", "black-star", "night-gloss"];
+    const i = seq.indexOf(state.labMaterial);
+    state.labMaterial = seq[(i + (e.key === "]" ? 1 : -1) + seq.length) % seq.length];
+  }
   else return;
   render();
 });

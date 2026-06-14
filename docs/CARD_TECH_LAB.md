@@ -401,3 +401,53 @@ Honest current evaluation (TESTING):
 6. Keep the others as backlog rarity variants
 7. Log the outcome in DECISION_LOG.md and promote the winner's rules into
    PROJECT_OS.md
+
+### Prototype build — Three Shiny Material Prototypes v1 (2026-06-14 / BR-S036)
+
+Steps 3–4/6 of this list are now built. **Cold Foil · Black Star · Night Gloss**
+exist as switchable, screenshot-comparable card-finish studies in the **Lab
+state** (treatment `mint`). Steps 5/7 (pick a winner + DECISION_LOG/PROJECT_OS
+promotion) are intentionally **deferred** to the separate Backlog item *Final
+Halo material decision* — this task delivers the comparison artifact only.
+
+**Implementation divergence from §20 #4 (named, not silent — per the repo's
+"name the conflict" convention):** §20 #4 said "add a new `data-treatment` skin."
+The build instead used a **`data-lab-material` overlay** on the existing
+`data-treatment="mint"` card. Reason: a new `data-treatment` value crashes the
+unconditional `const t = TREATMENTS[treatment]` / `t.rarity` lookup in
+`renderCard` (app.js) and would force churn across the stateBadge ternary,
+free-vs-Halo gating, `#treatmentToggle`, the keyboard map, and the audited
+18-state matrix (CHANGE_MAP "To add a new treatment"). The overlay touches none
+of that — it only restyles the Lab card and leaves `state.treatment` at
+{free,mint,shiny}. Same comparison outcome, far smaller blast radius.
+
+**How to view (reproducible deep links, Lab state only):**
+`?src=1|2&t=mint&lab=cold-foil` · `…&lab=black-star` · `…&lab=night-gloss`
+(the `lab` param is ignored unless `t=mint`). Live flip in the Lab with the
+`[` / `]` keys (signature → cold-foil → black-star → night-gloss → signature).
+Free and Halo Mint are untouched.
+
+**The three finishes (all 100% static — no animation; per-source `--halo-*` is
+accent only, so each finish keeps its own material identity rather than becoming
+three tints of one card):**
+
+| Finish | Material identity | Notes |
+| --- | --- | --- |
+| **Cold Foil** | pale icy metallic foil — light/cool silver-blue plate, one fixed diagonal sheen, icy edge | The only *light* finish; reads as foil, not glow. Distinct from the per-source **Cold Prism Frost** accent (§7) — that is SRC-02's existing Halo accent; *Cold Foil* is a candidate whole-card finish. |
+| **Black Star** | black-chrome plate with a faint constellation grain **baked into the surface** | Grain is part of the base, **not** sprinkled overlay dots (avoids the §6 "effect on top" failure). Elegant, archive-aligned. |
+| **Night Gloss** | near-black wet **glass** with one static specular highlight + a tight (not blurred) glow | The most restrained; reads as material, not effect. |
+
+**Provisional lean (non-binding — formal pick deferred):** consistent with §18,
+**Black Star** (best mood fit) and **Night Gloss** (best luxury fit) read as the
+strongest archive-aligned paid candidates; **Cold Foil** is the most divergent
+(light) and is the natural rare-variant rather than the default. The formal
+decision belongs to *Final Halo material decision* with real side-by-side
+screenshots.
+
+**Verification note:** material distinctness + geometry-lock were verified via
+live DOM + computed-style inspection (card outer size, head height, and the
+"LAB STATE · <finish>" label width are identical across all finishes and to
+free/shiny; each finish's base gradient is materially distinct). Headless
+*image* capture was unavailable (the preview screenshot tool times out on this
+project — a known issue from prior sessions); the deep links above are provided
+so screenshots can be captured manually for the §18/Final-decision comparison.

@@ -6,6 +6,31 @@ Last updated: 2026-06-14.
 
 ## Active
 
+- **Three Shiny Material Prototypes v1** (2026-06-14 / BR-S036, data.js + app.js +
+  styles.css): built CARD_TECH_LAB §20's three card-finish studies — **Cold Foil ·
+  Black Star · Night Gloss** — switchable in the **Lab state** for screenshot
+  comparison. Implemented as a **`data-lab-material` overlay** on the existing
+  `mint` (Lab) card, NOT a new `data-treatment` (which would crash the
+  `TREATMENTS[treatment]`/`t.rarity` lookup and churn gating/stateBadge/toggle/
+  keyboard/18-state — divergence from §20 #4 named in CARD_TECH_LAB §20). Copy-only
+  `LAB_MATERIALS` (3 finish presets); `state.labMaterial`; guarded `?lab=` deep
+  link (applies only at `t=mint`); Lab-only `[`/`]` cycle; one-slot
+  "LAB STATE · <finish>" label. **100% static** skins (each neutralizes the
+  inherited shimmer; distinct material base; `--halo-*` accent only; tight-shadow
+  glow, no large-area blur; geometry locked). **Free + paid Halo (`shiny`) +
+  Halo Gate + dev routes untouched.** No winner picked / no DECISION_LOG /
+  PROJECT_OS promotion — deferred to the *Final Halo material decision* backlog
+  item (provisional lean Black Star / Night Gloss filed in CARD_TECH_LAB §20).
+  Pre-task 2-agent Opus critique → GO_WITH_CHANGES, all changes applied. **Verified
+  live** (DOM + computed-style; headless screenshot tool times out on this project):
+  3 finishes apply only at `t=mint` with distinct bases + label + static shimmer;
+  `t=free`/`t=shiny` ignore `lab`; geometry locked (440×~721, no label wrap) across
+  all finishes + free + shiny; `[`/`]` cycle/wrap + `f`-exit clears overlay; 4 dev
+  routes + bare menu unchanged; Local Draft → Develop Scan still sealed/offline;
+  console clean. **Completed.** Implements the former Ready #0 (Three shiny material
+  prototypes); **next up:** Halo Dossier Schema v1 — schema first, not full route
+  (newly the head of Ready below).
+
 - **Render Archetype Discovery Note v1** (2026-06-14 / BR-S035, app.js + data.js +
   COPY_SYSTEM §4): rendered the Halo archetype discovery note promised by
   PROJECT_OS §10's visibility table ("full archetype explanation + discovery
@@ -334,11 +359,20 @@ Last updated: 2026-06-14.
    Dispatch") + the COPY_SYSTEM §4 one-liner + discovery note; Free shows the card
    instance label only. Right-panel, not dossier §4/§5 (= unbuilt Halo Dossier per
    HALO_GATE_BOUNDARY §D). See Active.)*
-0. **Three shiny material prototypes** (NEXT) — CARD_TECH_LAB §20: Cold Foil /
-   Black Star / Night Gloss as data-only `halo` presets behind the Lab
-   key, no layout changes.
-   *Done when:* three presets switchable in Lab, screenshots captured and
-   compared side-by-side, comparison filed in CARD_TECH_LAB.
+   *(Three shiny material prototypes — completed by BR-S036 (Three Shiny Material
+   Prototypes v1). Cold Foil / Black Star / Night Gloss render as a
+   `data-lab-material` overlay on the Lab (mint) state, switchable via
+   `?t=mint&lab=<key>` or the `[` / `]` keys; recipes + provisional lean (Black
+   Star / Night Gloss) filed in CARD_TECH_LAB §20. Built as an overlay, NOT §20
+   #4's new `data-treatment` (avoids the `TREATMENTS`-lookup crash + gating churn).
+   Formal winner pick deferred to "Final Halo material decision". See Active.)*
+0. **Halo Dossier Schema v1** (NEXT) — schema FIRST, not the full route/build.
+   Define the data shape for the sealed Halo dossier (the card back) per
+   `docs/halo/HALO_GATE_BOUNDARY_V1.md` §D (its 7 candidate modules are
+   "production notes — define, do NOT build"), reusing the audited artifact-safe
+   language; no runtime build, no payment/AI/unlock/upload.
+   *Done when:* a Halo dossier schema spec exists (fields + safety rules + the
+   Free/Halo reveal model), FILE_MAP registers it, runtime unchanged.
 1. **Dossier plate material polish** — taste debt from the 2026-06-12
    review: plates read flat next to the card; let the material accent
    bleed in (Mint Record plate already does).
@@ -352,8 +386,9 @@ Last updated: 2026-06-14.
 
 ## Backlog / needs decision
 
-- **Final Halo material decision** — after Ready #0 (Three shiny material
-  prototypes); log winner in DECISION_LOG, promote rules to PROJECT_OS
+- **Final Halo material decision** — after Three Shiny Material Prototypes v1
+  (completed BR-S036; prototypes + provisional lean now exist in CARD_TECH_LAB
+  §20); log winner in DECISION_LOG, promote rules to PROJECT_OS
   (CARD_TECH_LAB §18/§20).
 - **Develop/mint transformation moment** — CARD_TECH_LAB §15; needs scope
   decision (animation budget, where it triggers).

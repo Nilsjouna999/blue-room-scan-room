@@ -73,6 +73,20 @@ const ARCHETYPE_NOTES = {
   },
 };
 
+/* Lab material prototypes (CARD_TECH_LAB §20) — controlled card-FINISH studies
+   shown ONLY as a visual overlay inside the internal Lab state (treatment
+   "mint"); they are NOT a customer tier, NOT a new treatment, NOT a reading.
+   Each finish describes the card SURFACE, never the person. Default (no entry /
+   null) = the existing Signature Mint silver. Order is the cycle order
+   (signature → cold-foil → black-star → night-gloss). Reached via the Lab
+   `[` / `]` keys or `?t=mint&lab=<key>` for reproducible side-by-side capture.
+   This is a prototype/compare artifact only — no winner is promoted here. */
+const LAB_MATERIALS = [
+  { key: "cold-foil", label: "Cold Foil", note: "Pale icy metallic foil pass — cool silver-blue plate, one restrained static sheen." },
+  { key: "black-star", label: "Black Star", note: "Black-chrome plate with a faint constellation grain baked into the surface." },
+  { key: "night-gloss", label: "Night Gloss", note: "Near-black glass surface with a single static specular highlight." },
+];
+
 const SOURCES = [
   // ---- SCAN SOURCE 01 — car selfie, open palm, fjord out the window
   {
