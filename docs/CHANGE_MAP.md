@@ -185,6 +185,22 @@ payment/Halo/upload analysis). GPT_REVIEW_GUIDE + TASK_QUEUE + SESSION_BRIEF
 note the folder. Roadmap unchanged beyond this checkpoint — next product task
 stays **Free Pull Mock Polish v1**.
 
+## Magnetism Model v1 (2026-06-14, docs only — research)
+
+Saved `docs/research/MAGNETISM_MODEL_V1.md` (RESEARCH; FILE_MAP registers it) from a 14-agent
+White Death (8 Sonnet axes → 2 Haiku compulsion-sweep + 2 Opus magnetism/FIT judges → Opus
+consolidate → Opus rank), bar = magnetism-not-compulsion (any exploit mechanic = instant kill).
+22→8 CONFIDENT survivors, 8 killed. Definition: pull by GIVING MORE (provenance, not rarity);
+the operating copy-test = it dies the instant wording shifts from "this was partial / assigned
+on Develop" to "unlock your score / you missed something better." The 8 survivors are all
+copy/CSS framing of LIVE state (serial spine, archetype class made legible, latent→developed
+law, filing-event row on Plate 01, Develop-as-chapter, oracle-as-close, room-as-place [static
+light+grid], minted colophon) — i.e. the magnetism is already built, it just needs surfacing.
+Notably killed BOTH money-gate hooks (the "in another timeline" oracle variant-window and the
+future-framed sealed-stat tease) under the hard rule even though both scored STRONG. Pull on
+demand; implements nothing. Completes the 6-doc scope spine (universe · free-paid · layup ·
+layering · depth · magnetism).
+
 ## Depth + Interconnection Model v1 (2026-06-14, docs only — research)
 
 Saved `docs/research/DEPTH_MODEL_V1.md` (RESEARCH; FILE_MAP registers it) from an 8-agent
