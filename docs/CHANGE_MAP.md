@@ -185,6 +185,24 @@ payment/Halo/upload analysis). GPT_REVIEW_GUIDE + TASK_QUEUE + SESSION_BRIEF
 note the folder. Roadmap unchanged beyond this checkpoint — next product task
 stays **Free Pull Mock Polish v1**.
 
+## Research Synthesis v1 — the canon (2026-06-14, docs only — research)
+
+Saved `docs/research/RESEARCH_SYNTHESIS_V1.md` (RESEARCH CANON; FILE_MAP registers it as
+START-HERE) from a 19-agent White Death AUDIT over all 15 research docs (1 Sonnet distiller per
+doc → Opus consolidate → Opus works-together + Opus conflict-hunter → Opus rank). **Verdict: the
+research COHERES** — 64 high-value+high-confidence survivors (54 KEEP, 10 DILUTE), 62 killed, and
+every clash is a CSS/copy/spec reconciliation, NOT a model contradiction. The doc is the
+reconciliation layer atop the 6 spine + 9 foundational docs: the 9 coherent systems (Master Law
+Stack · Closed Language System · Three-Layer Scan Engine · Honest Free/Paid Seam · Depth Physics ·
+Typographic Hierarchy · Engineered-Instrument Chrome · Dossier Pacing · Interconnection Spine), 2
+merges (Rare-Artifact Determinism; Latent→Developed incl. Oracle close), the full
+conflicts-with-resolutions (plate-depth → LAYUP wins; free "counts" struck; 0-100 internal-only;
+accent artifact-vs-surround split; one warm token ramp + one base hex; warm-neutral wins;
+glow keyed to RARE not PAID; Halo = mode not deeper-AI; + tensions incl. humor-off-safety,
+one-rarity-axis, lens-7v10 deferred, forbidden-cross-as-validator, frozen colophon, static-card-
+first, card-scoped mix-blend), and the build-now-vs-later split. Pull on demand; implements
+nothing. This is the index for the whole research body.
+
 ## Magnetism Model v1 (2026-06-14, docs only — research)
 
 Saved `docs/research/MAGNETISM_MODEL_V1.md` (RESEARCH; FILE_MAP registers it) from a 14-agent
