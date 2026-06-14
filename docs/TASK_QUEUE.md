@@ -6,6 +6,23 @@ Last updated: 2026-06-14.
 
 ## Active
 
+- **Menu Re-frame v1 — Direction A "Sealed Pull"** (2026-06-14 / BR-S041, app.js renderMenu +
+  styles.css): the "layup" fix — turned the landing page from a Free-vs-Halo tier ladder into ONE
+  complete Free Pull card (free-as-hero). Removed `.msample__compare` (both tiles + the "→ develops"
+  arrow + the Halo inventory chips) + the "developed two ways" footer; added a single full-saturation
+  card via the existing `shot()` inside `.msample__solo` (no `.mtile--free` → no desaturation filter/
+  scrim) + a `.msample__seal` caption "The front is complete. The same card has a sealed back."
+  (structural fact, not "unlock"); footer → "One sample · SRC-01 · Driver."; `.menu__inner` 760→500.
+  Thesis/trust verbatim; CTA stays "Enter Scan Room"; `renderHaloGateMock`/darkroom copy untouched.
+  **Chosen via a 16-agent design pass** (5 Haiku / 8 Sonnet / 3 Opus → judge → synth → adversarial
+  safety = SAFE, 0 fixes); builder picked A (inviting+balanced), keeping B's caption. No DECISION_LOG
+  (ACTIVE impl of a researched fix). **Verified live**: bare URL → one full-saturation card (filter
+  none, no scrim), FREE PULL stamp, sealed caption, no ladder; 360×270 card in a 500px column; deep
+  links bypass to the room; `?devnav=1` rail + Enter/Add intact; console clean. **Completed.**
+  **Next up:** run /cleanup on the menu diff (app.js + styles.css — incl. the now-dead `.mtile--free/
+  --halo/__compare/__arrow/__chips` CSS + the latent `<\button>` typo at app.js resume branch), then
+  Left redesign (Source merge).
+
 - **Dev Nav Rail v1** (2026-06-14 / BR-S040, index.html + app.js + styles.css): a dev-only
   on-screen state-jumper revealed ONLY by `?devnav=1` — Menu/Room · SRC 01/02 · Free/Halo/Lab ·
   Source/Diagram/Metrics · the 4 dev fixtures (Free-Sim/Halo-Gate/Uploaded/Blocked) + a "◆ DEV"
@@ -399,10 +416,11 @@ Last updated: 2026-06-14.
 
 ## Ready (supported by current docs, clear definition of done)
 
-> **Builder-set near-term sequence (2026-06-14, BR-S040):** dev-nav (DONE) →
-> **Menu Re-frame v1** → **Left redesign (Source merge)** → Below redesign (Dossier
-> de-dull) → Right polish. Grounded by the direction-synthesis workflow + research:
-> - **Menu Re-frame v1 (NEXT)** — the "layup" fix. `FREE_PAID_MODEL_V1` verdict: the
+> **Builder-set near-term sequence (updated 2026-06-14, BR-S041):** dev-nav (DONE, BR-S040) →
+> Menu Re-frame (DONE, BR-S041) → **/cleanup the menu diff (NEXT)** → **Left redesign (Source merge)**
+> → Below redesign (Dossier de-dull) → Right polish. Grounded by the direction-synthesis workflow + research:
+> - **Menu Re-frame v1 (DONE, BR-S041)** — built Direction A "Sealed Pull" (one complete card, ladder
+>   killed, sealed caption). Originally specced: the "layup" fix. `FREE_PAID_MODEL_V1` verdict: the
 >   complete-front/sealed-back model is LOCKED and right; the defect is tier-ladder
 >   FRAMING on the menu (the `.msample__compare` Free-vs-Halo tiles + the "→ develops"
 >   arrow + Halo inventory chips read as "pick the better grade"). Fix in `renderMenu`

@@ -206,6 +206,28 @@ banned/hype-word sweep now clean across all states.
 - **Test:** `?devnav=1` shows the rail and each button lands its state; a clean URL
   (no `?devnav`) shows NO rail (`display:none`, body has no `data-devnav`, rail unfilled).
 
+## Menu Re-frame v1 — Direction A "Sealed Pull" (2026-06-14 / BR-S041, app.js renderMenu + styles.css)
+
+The "layup" fix from `FREE_PAID_MODEL_V1`: the complete-front/sealed-back model is LOCKED-right;
+the defect was tier-ladder FRAMING in the menu. **Removed** the `.msample__compare` block (the
+Free-vs-Halo tiles + the "→ develops" arrow + the Halo inventory chips) and the "developed two ways"
+footer. **Added** ONE complete Free Pull card via the existing `shot()` helper inside a new
+`.msample__solo` figure — because `.mtile--free` is NOT applied, the card renders at FULL saturation
+(no desaturation filter / matte scrim) — plus a `.msample__seal` caption "The front is complete. The
+same card has a sealed back." (a structural fact, never "unlock/you're missing"). Footer → "One sample
+· SRC-01 · Driver." `.menu__inner` max-width 760→500 to balance the single artifact. Thesis + trust
+verbatim; CTA stays "Enter Scan Room" (NOT "Develop" — paid verb); `renderHaloGateMock` + darkroom
+copy untouched. **Direction chosen** via a 16-agent design pass (5 Haiku / 8 Sonnet / 3 Opus → judge →
+synth → adversarial safety = SAFE, 0 fixes); builder picked A ("inviting + balanced") keeping B's
+caption. No DECISION_LOG (ACTIVE implementation of a researched fix). **Dead CSS left for the queued
+/cleanup pass:** `.mtile--free/--halo`, `.msample__compare`, `.msample__arrow`, `.mtile__chips/__tier/
+__cap` are now unused — but `.mtile__shot/__img/__scrim/__stamp` STAY (reused by `shot()`). Latent
+pre-existing typo flagged: app.js resume branch `<\button>` → `</button>`. **Verified live**: bare URL →
+one full-saturation card (filter:none, no scrim), FREE PULL stamp, the sealed caption, no compare/
+arrow/chips; 360×270 card in a 500px column; deep links still bypass to the room; `?devnav=1` rail +
+Enter/Add still work; console clean. **Next up:** run /cleanup on the menu diff, then Left redesign
+(Source merge).
+
 ## Dev Nav Rail v1 (2026-06-14 / BR-S040, index.html + app.js + styles.css)
 
 Added a dev-only state-jumper rail revealed ONLY by `?devnav=1` — Menu/Room · SRC

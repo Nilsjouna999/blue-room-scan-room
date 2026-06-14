@@ -10,6 +10,65 @@ coding session; the assistant must respect it. Files not listed under
 does not match the user's current task — **stop and ask** before doing
 anything. (GOVERNANCE_OS anti-drift.)
 
+## Active session — BR-S041
+
+**Date / Session ID:** 2026-06-14 / BR-S041
+
+**Today's task:** Menu Re-frame v1 — Direction A "Sealed Pull" (the "layup" fix)
+
+**Why:** Realize free-as-hero on the landing page. `FREE_PAID_MODEL_V1`: the complete-front/
+sealed-back model is LOCKED-right; the defect is tier-ladder FRAMING in `renderMenu` (the
+`.msample__compare` Free-vs-Halo tiles + the "→ develops" arrow + Halo inventory chips +
+"developed two ways" footer read as "pick the better grade"). Picked via a 16-agent design pass
+(5 Haiku / 8 Sonnet / 3 Opus → judge → synth → adversarial safety = SAFE, 0 fixes). Builder chose
+**Direction A** ("more inviting + balanced"; B "too in-your-face"), KEEPING B's caption text and
+asking for light polish.
+
+**Read:** docs/FILE_MAP.md · docs/SESSION_BRIEF.md · docs/TASK_QUEUE.md · docs/CHANGE_MAP.md ·
+docs/research/FREE_PAID_MODEL_V1.md · docs/research/MAGNETISM_MODEL_V1.md · docs/COPY_SYSTEM.md ·
+docs/DESIGN_TOKENS.md · app.js (renderMenu) · styles.css (.menu/.msample/.mtile block)
+
+**Edit:** app.js (`renderMenu` only — replace `.msample__compare` with one complete card + caption;
+footer copy) · styles.css (`.menu__inner` max-width; add `.msample__solo` / `.msample__seal`) ·
+docs/CHANGE_MAP.md · docs/TASK_QUEUE.md · docs/SESSION_BRIEF.md
+*(no data.js/index.html/scan-contract.js change. The dead `.mtile--free/--halo/__compare/__arrow/
+__chips/__tier/__cap` CSS is left for the queued /cleanup pass — `.mtile__shot/__img/__scrim/__stamp`
+are STILL used by the reused `shot()`. No DECISION_LOG — ACTIVE implementation of a researched fix.)*
+
+**Do not open:** C:\Users\nilsj\OneDrive\Documents\blue-room
+
+**Authority affected:** ACTIVE SPECS implementation (renderMenu + menu CSS). No CORE LAW / spec /
+DECISION_LOG change; the LOCKED Free/Halo boundary is honored (this is framing, not the model).
+
+**Locked constraints:** ONE complete Free Pull card, full saturation (do NOT apply `.mtile--free` →
+no desaturation filter / matte scrim) · NO compare tiles / "→ develops" arrow / Halo inventory chips /
+"developed two ways" footer (the tier ladder) · NO full Halo stats-card, NO second tile · keep the
+LOCKED thesis + trust lines verbatim · CTA stays "Enter Scan Room" (NEVER "Develop" — paid verb) ·
+caption = "The front is complete. The same card has a sealed back." (structural fact, never "unlock/
+you're missing") · do NOT touch `renderHaloGateMock` or darkroom copy · flatness budget (card is the
+only depth object; no glow/shadow/gradient wash added; one warm key) · no second-person/gender/status/
+personality · no public 0–100 · no AI/backend/payment/upload · preserve `?devnav=1` rail + all routes +
+deep-link bypass + sealed/offline Local Draft flow.
+
+**Known current state:** BR-S040 (dev-nav, `7c9d57b`) shipped + pushed. `renderMenu` (app.js ~928-983)
+renders the compare ladder; menu CSS at styles.css ~1935-2031. `shot()` helper produces
+`.mtile__shot/__img/__scrim/__stamp`. Pre-existing latent typo at app.js:977 (`<\button>` in the
+resume branch) — out of scope; flagged for /cleanup.
+
+**Definition of done:** the menu shows ONE complete full-saturation Free Pull card (reused `shot()`),
+the caption "The front is complete. The same card has a sealed back." below it, NO compare ladder /
+arrow / chips / "developed two ways"; thesis + trust verbatim; CTA "Enter Scan Room"; column narrowed +
+balanced (inviting, not sparse); deep links still bypass the menu; Add-photo / Enter / dev-nav still
+work; console clean; CHANGE_MAP + TASK_QUEUE + SESSION_BRIEF updated; one commit to main + push; rollback.
+
+**Verification:** `python -m http.server 8743` + Preview MCP @1600×900: bare URL → menu shows one
+card, full saturation, FREE PULL stamp, the sealed caption, no second tile/arrow/chips; `?devnav=1`
+rail still works; `?src=1&t=shiny` etc. still bypass to the room; Enter Scan Room + Add your photo
+work; console clean. Design-pass adversarial safety = SAFE (serves as the pre-edit critique).
+
+**Final response format:** chosen direction · commit hash · changed files · what changed (incl. exact
+new/removed copy) · whether copy changed · verification · next task · rollback (`git revert <hash>`).
+
 ## Active session — BR-S040
 
 **Date / Session ID:** 2026-06-14 / BR-S040

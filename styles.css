@@ -1941,7 +1941,7 @@ body[data-view="room"] .dev { display: none; }
 }
 .menu__inner {
   width: 100%;
-  max-width: 760px;
+  max-width: 500px;
   display: grid;
   justify-items: center;
   gap: 22px;
@@ -1973,6 +1973,14 @@ body[data-view="room"] .dev { display: none; }
 }
 .msample__title { font-family: var(--font-display); font-size: 25px; font-weight: 600; line-height: 1.1; color: var(--t-display); }
 .msample__arch { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--silver-dim); }
+
+/* Menu Re-frame v1 (Direction A "Sealed Pull") — ONE complete Free Pull card,
+   no compare ladder. The card reuses the shot() markup WITHOUT .mtile--free, so
+   it renders at full saturation (no desaturation filter / matte scrim). The seal
+   line names the sealed back as a structural fact, never a withheld reward. */
+.msample__solo { display: grid; justify-items: center; gap: 13px; width: 100%; max-width: 360px; margin-top: 18px; }
+.msample__solo .mtile__shot { width: 100%; border: 1px solid var(--line); }
+.msample__seal { font-family: var(--font-mono); font-size: 9.5px; letter-spacing: 0.12em; line-height: 1.6; color: var(--t-meta); max-width: 300px; }
 
 .msample__compare { margin-top: 12px; display: flex; align-items: center; justify-content: center; gap: 22px; flex-wrap: wrap; }
 .mtile { display: grid; gap: 11px; width: 224px; }

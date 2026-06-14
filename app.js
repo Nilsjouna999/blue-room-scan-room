@@ -950,25 +950,10 @@ function renderMenu() {
         <h2 class="msample__title">${esc(c.title)}</h2>
         <p class="msample__arch">◆ &nbsp;${esc(c.archetype)}</p>
 
-        <div class="msample__compare">
-          <figure class="mtile mtile--free">
-            ${shot(TREATMENTS.free.stamp, "")}
-            <figcaption class="mtile__cap">
-              <span class="mtile__tier">Free Pull</span>
-              <span class="mtile__chips">first pull · surface scan · card exists</span>
-            </figcaption>
-          </figure>
-
-          <span class="msample__arrow" aria-hidden="true">→<span>develops</span></span>
-
-          <figure class="mtile mtile--halo">
-            ${shot(TREATMENTS.shiny.stamp, "mtile__stamp--halo")}
-            <figcaption class="mtile__cap">
-              <span class="mtile__tier mtile__tier--halo">Halo Mint</span>
-              <span class="mtile__chips">developed print · hidden stat · structured evidence · oracle</span>
-            </figcaption>
-          </figure>
-        </div>
+        <figure class="msample__solo">
+          ${shot(TREATMENTS.free.stamp, "")}
+          <p class="msample__seal">The front is complete. The same card has a sealed back.</p>
+        </figure>
       </section>
 
       <div class="menu__actions">
@@ -978,7 +963,7 @@ function renderMenu() {
         <p class="pickmsg" role="status" aria-live="polite"></p>
       </div>
 
-      <p class="menu__foot">One sample · SRC-01 · the same photo, developed two ways.</p>
+      <p class="menu__foot">One sample · SRC-01 · Driver.</p>
     </div>`;
 }
 
