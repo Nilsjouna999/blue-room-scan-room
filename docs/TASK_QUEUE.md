@@ -667,6 +667,37 @@ Last updated: 2026-06-14.
     load-bearing wall); this remains the engine-phase guard that actually builds it.
 
 
+- **Code-scan findings — logged, not patched** (2026-06-15, read-only 8-agent scan: 5 Sonnet + 2 Haiku →
+  Opus adversarial verify; **no code changed**). Whole-repo scan for security + optimization + correctness.
+  The 2 verified **security** findings went to `docs/security/SECURITY_REVIEW_PLAYBOOK.md` §3 (rows 11–12,
+  both N/A-today). Logged here for a future behavior-preserving pass (one category per commit, per `/cleanup`):
+  - **Dead code (high confidence — re-confirms the BR-S042 proposed-but-unapplied list):** `getActiveScan`
+    (app.js:87-89) + `getTierOutput` (app.js:93-96) have zero call sites; `gestureAuthority`
+    (data.js:467-470,483) is computed every `SOURCES.map` but never read by app.js; the `sim ? …` ternaries
+    after the `sim` early-return in `renderUploadedScanResultDev` (app.js:1240 vs 1274/1280-1285) are
+    unreachable. Keep `gestureAuthority` only if reserving it for the future engine contract.
+  - **CSS micro-cleanups (low confidence — not re-read in the verify pass; confirm before touching):** duplicate
+    160×160 fractalNoise data-URIs `.photo__grain` (styles.css:575) vs `.halogate__backgrain` (:2404); `.photo`
+    declared twice back-to-back (:513-519, :524-530); `.scanframe--diagram` filter applied unconditionally then
+    reset to `none` in `is-clean` (:1341/:1347).
+  - **Correctness / robustness:** fragile partial-result chains `scan?.tierOutputs.free.X` / `.halo.X`
+    (app.js:730/780/855-857/860/868) stop the optional chain at `scan` — a truthy engine result lacking
+    `tierOutputs` throws instead of falling back to `|| legacy`; deepen to `scan?.tierOutputs?.free?.X` before
+    the engine is wired (safe today — `getScanResult` always returns the full shape). Stale comment:
+    `scan-contract.js:40` says `SCHEMA_KEYS` lists "every legitimate key" but `validFreeSimulationResult`
+    (:380-439) uses many keys absent from it (validator still correct — those names carry no forbidden term;
+    refresh so a future rating-like key stays distinguishable). Minor: `isUnderStats` `indexOf('stats.')` is
+    case-sensitive + over-broad (scan-contract.js:77-79; partially refuted — `SCHEMA_KEYS` independently
+    catches it); `mountDev` passes an undefined fixture to the validator if both fixtures are absent
+    (app.js:1200-1201; relies on validator null-tolerance, dev-surface only).
+  - **NOT a bug — confirmed intentional:** `mixRow` showing raw 0–100 on the **Metrics tab** (app.js:333;
+    signalMix :353, pressure :368-370) is the **documented** "interpretive diagnostics, not the 4 public
+    scores" carve-out (DECISION_LOG / BR-S029, re-confirmed by the BR-S033 18-state audit) — not a 0–100 leak.
+  - **Dismissed by the verifier** (already covered or refuted): `onerror=` / CSP / SRI / `dev-live.html`-in-prod
+    (security register rows 3/9/10); the devnav `location.href` rebuild (refuted — `new URL()` +
+    `searchParams.set` URL-encodes the value, so no scheme smuggling); README/`.ps1`/`.gitignore` dev-hygiene
+    (below the noise bar on a static no-secrets prototype).
+
 - **Final Halo material decision** — after Three Shiny Material Prototypes v1
   (completed BR-S036; prototypes + provisional lean now exist in CARD_TECH_LAB
   §20); log winner in DECISION_LOG, promote rules to PROJECT_OS

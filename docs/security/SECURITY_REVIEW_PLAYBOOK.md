@@ -207,6 +207,13 @@ is latent until a capability is wired).
 | 8 | high | FUTURE — trust boundary | (no server yet) | Client-side validation (incl. `scan-contract.js`) is a UX guard, not the trust boundary. Server must re-validate and hold all secrets. | open (N/A today) |
 | 9 | medium | FUTURE — host headers/CSP | `index.html`; host config | No CSP/security headers; inline `style=`/`onerror=` and the font `<link>` need CSP planning before public deploy. | open (N/A today) |
 | 10 | low | Deploy — dev surfaces | `app.js` (`?devnav`,`?dev`), `dev-live.html` | Ensure dev rail, `?dev=` harness, and the `fetch`-using `dev-live.html` are inert/absent in prod. | open (N/A today) |
+| 11 | medium | FUTURE engine — person-truth gate scope | `scan-contract.js:203-217` (PERSON_TRUTH) vs `:182-193` (evidenceBoard) | `PERSON_TRUTH` runs only over `artifact.title` + `readings.*` (the `narrative` array, 204-212); the user-facing `evidenceBoard` text fields (observation/visibleCue/effect; fixture observedCue/artifactEffect/chipCue/chipEffect) are never added to it. A person-claim that dodges `FORBIDDEN_TERMS` (e.g. "you are clearly high-status" — "status"/"high-status" not listed) clears `validateUploadedScanResult` and reaches the renderer. Add evidenceBoard text to the person-truth pass before trusting engine output. (Sharpens row 7.) | open (N/A today) |
+| 12 | low | FUTURE engine — CSS-value sinks not coercion-guarded | `app.js` numeric `style=` (110/332/362/427/547/555/787/838-839/1516) + halo color `:414` and **`setProperty :1652-1654`** | Only `--pos` is `esc()`-wrapped; all numeric stat values + the 3 halo hex colors are interpolated/assigned raw (no `esc()`/`Number()`/color guard), and the `body.style.setProperty('--halo-*')` path bypasses `esc()` entirely via CSSOM. Safe today (data.js feeds only hardcoded literals); when the engine supplies these, re-type to number/hex at the sink — the code-level companion to row 5. (Distinct from row 1: these are unescaped entirely, not a quote-style gap.) | open (N/A today) |
+
+> *Rows 11–12 added 2026-06-15 from a read-only 8-agent scan (5 Sonnet + 2 Haiku → Opus adversarial verify;
+> 46 raw findings → 2 verified-new, 10 dismissed as already-covered or refuted). Both are future-conditional —
+> they bite at engine-wiring time, not on today's static prototype. Optimization + correctness notes from the
+> same scan are logged in `TASK_QUEUE.md` (Backlog), not here (this register is security-only).*
 
 ---
 
