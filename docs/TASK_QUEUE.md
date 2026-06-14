@@ -6,6 +6,33 @@ Last updated: 2026-06-14.
 
 ## Active
 
+- **Filing-Event Row + Serial Reveal on Plate 01** (2026-06-14 / BR-S038, app.js +
+  styles.css): the research-canon "convergent first build" (`RESEARCH_SYNTHESIS_V1`
+  closing line; endorsed by MAGNETISM filing-event row + DEPTH/LAYERING serial-spine).
+  On dossier **Plate 01 (Source Record)**, below the record grid, two **flat** caption
+  blocks (copy + CSS only; no data.js change — all fields already existed):
+  **(A) Filing event** — descending caption `capture · {code} ↳ route · {route} ↳
+  scan status · {status} ↳ filed as · {class}`, both states (Free watches the photo
+  get classified); frozen-past, no numbers, **no discovery-note prose** (that stays
+  Halo-only in the right-panel Artifact Archetype module — the class LABEL recurs as
+  the DEPTH content-axis join, the prose does not). **(B) Serial lineage** — a flat
+  left-rail spine `Object → Scan → Card → Mint`; **Card + Mint are developed
+  identities → masked `····` on Free, assigned on Halo** (latent→developed law; serials
+  pulled from `scan.tierOutputs`, not hand-rolled). `objectNo` moved out of `.drecord`
+  to the spine head (single source, no duplication). **No 8th plate** (inside Plate 01's
+  body → 7-plate `:nth-of-type` rhythm intact). Mandatory pre-edit **4-agent adversarial
+  critique** (research-fidelity / drift+duplication / copy-safety / regression+data-shape)
+  → all REQUIRED changes folded in (dropped the duplicate discovery note; masked the Card
+  rung too once `card.serial` was confirmed latent in Free on the card; full optional-
+  chaining guards; no `ARCHETYPE_NOTES` lookup → no crash vector). **Verified live**
+  (1500×2600 headless-Edge screenshots + DOM): SRC-01/02 × free/halo all correct
+  (The Encounter / The Dispatch; BR-OBJ→BR-SCAN→card→mint; `····` ghost on Free,
+  assigned on Halo); no confidence/0–100 leak; no discovery-prose leak on Plate 01;
+  `?dev=halo-gate` (renderDossier runs unconditionally) uncrashed; console clean; 7 plates.
+  **Completed.** Clears Ready #6 "Route label in Source Record" (superset).
+  **Next up:** Engineered Technique Pass #2 (scroll-driven dossier reveal) — resume the
+  technique program, OR pull the next Around-the-Card / interconnection layer.
+
 - **Engineered Technique Pass v1** (2026-06-14 / BR-S037, in progress — styles.css):
   ranked build program from the deep code-design scout (5 web-standard, zero-dep,
   reduced-motion-safe techniques, each mapped to an existing surface). **One
@@ -421,11 +448,10 @@ Last updated: 2026-06-14.
    bleed in (Mint Record plate already does).
    *Done when:* Halo dossier plates carry a restrained material accent;
    free stays matte; screenshots regenerated.
-6. **Route label in Source Record** — the last remnant of v2 surfacing:
-   one row in the dossier Source Record showing `scan.route` +
-   `scanStatus` (e.g. "HUMAN_SOLO · accepted"), legacy-safe when v2
-   absent. Tiny app.js change.
-   *Done when:* the row renders in both states; copy passes COPY_SYSTEM.
+   *(Route label in Source Record — completed by BR-S038 (Filing-Event Row +
+   Serial Reveal on Plate 01; see Active). The filing event surfaces route +
+   scanStatus (+ capture code + filed-as class) on the dossier Source Record in
+   both states, legacy-safe via optional-chaining guards. Superset of this item.)*
 
 ## Backlog / needs decision
 

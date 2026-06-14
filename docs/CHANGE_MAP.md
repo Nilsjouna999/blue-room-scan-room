@@ -1076,6 +1076,28 @@ before building).
   plate, teased hidden stat, reserved serial + CTA; halo shows all 6
   receipts, full hidden stat, real serial + material.
 
+### Plate 01 — filing event + serial lineage (BR-S038)
+
+- **Edit:** `app.js` → `renderDossier()` Plate 01 block — `fileSteps`
+  (capture → route → scan status → filed-as class, from `getScanResult(src)`)
+  and `lineageRows` (Object → Scan → Card → Mint); styles in `styles.css`
+  (`.dfile`, `.dfiling__*`, `.dlineage*`, all flat — edge+tone+type only).
+- **Source data:** `src.capture.code`, `scan.route/scanStatus/scanId/`
+  `archetype.class`, `d.record.objectNo`, `c.serial`,
+  `scan.tierOutputs.{free.serial|halo.mintSerial}` (already present; no
+  data.js change). objectNo now lives ONLY here (removed from `.drecord`).
+- **Locked rules:** the archetype **class** label may recur (content-axis
+  join, DEPTH model) but the **discovery-note prose is Halo-only** — it lives
+  in the right-panel "Artifact Archetype" module (`app.js` ~650), do NOT
+  repeat it on Plate 01. Card + Mint serials are **developed identities** →
+  masked `····` on Free, assigned on Halo (latent→developed law); pull the
+  serials from `tierOutputs`, never hand-roll a mask. No confidence/0–100 on
+  this surface. Add nothing as a `<section class="dplate">` (keep the 7-plate
+  `:nth-of-type` rhythm — see the dossier-rhythm note above).
+- **Test:** both sources × free/halo — filing chain reads the same in both
+  states; lineage Card+Mint show `····` (ghost) on Free, real serials on Halo;
+  console clean; 7 plates.
+
 ## To change Halo Mint material per source
 
 - **Edit:** `data.js` → `halo: { material, a, b, c }` per source. The

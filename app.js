@@ -691,11 +691,36 @@ function renderDossier(src, treatment) {
   const freeVals = scan?.stats.freeVisible || c.stats;
   const haloX = scan?.stats.haloExtended;
 
-  /* 01 — Source Record (full in both states: the factual hook) */
+  /* 01 — Source Record (full in both states: the factual hook).
+     Below the record grid, two flat caption blocks (plates stay flat —
+     edge + tone + type only):
+       • Filing event — capture → route → scan status → filed-as class,
+         a descending caption (the MAGNETISM filing-event row). Reads as a
+         completed past filing, never a Develop tease. The archetype CLASS
+         is the content-axis join shared with the Halo archetype module —
+         the prose/discovery note stays Halo-only there, not repeated here.
+       • Serial lineage — Object → Scan → Card → Mint join-key spine
+         (DEPTH/LAYERING). Card + Mint are the developed identities: masked
+         '····' on Free, assigned on Develop (latent→developed law). objectNo
+         lives once now, as the spine head (removed from the grid above). */
+  const fileSteps = [`<span class="dfiling__step">capture · <b>${esc(src.capture.code)}</b></span>`];
+  if (scan?.route) fileSteps.push(`<span class="dfiling__step"><span class="dfiling__arr">↳</span> route · <b>${esc(scan.route)}</b></span>`);
+  if (scan?.scanStatus) fileSteps.push(`<span class="dfiling__step"><span class="dfiling__arr">↳</span> scan status · <b>${esc(scan.scanStatus)}</b></span>`);
+  if (scan?.archetype?.class) fileSteps.push(`<span class="dfiling__step"><span class="dfiling__arr">↳</span> filed as · <b>${esc(scan.archetype.class)}</b></span>`);
+
+  const lineageRows = [
+    ["Object", esc(d.record.objectNo), false],
+    ...(scan?.scanId ? [["Scan", esc(scan.scanId), false]] : []),
+    ["Card", paid ? esc(c.serial) : "····", !paid],
+    ["Mint", paid ? esc(scan?.tierOutputs?.halo?.mintSerial || d.mint.serial) : "····", !paid],
+  ];
+  const lineageHtml = lineageRows
+    .map(([k, v, ghost]) => `<div class="dlineage__row"><span class="dlineage__k">${k}</span><span class="dlineage__v${ghost ? " dlineage__v--ghost" : ""}">${v}</span></div>`)
+    .join("");
+
   const record = dplate("01", "Source Record", paid, `
     <dl class="drecord">
       <div><dt>Source ID</dt><dd>${esc(src.capture.code)} · SRC-${pad2(src.no)}</dd></div>
-      <div><dt>Object Number</dt><dd>${esc(d.record.objectNo)}</dd></div>
       <div><dt>Capture Type</dt><dd>${esc(d.record.captureType)}</dd></div>
       <div><dt>Lead Gesture</dt><dd>${esc(d.record.gesture)}</dd></div>
       <div><dt>Scene Container</dt><dd>${esc(d.record.container)}</dd></div>
@@ -704,7 +729,17 @@ function renderDossier(src, treatment) {
       <div><dt>Treatment Eligibility</dt><dd>${esc(d.record.eligibility)}</dd></div>
       <div><dt>Provenance</dt><dd>${esc(d.record.provenance)}</dd></div>
       <div><dt>Markings</dt><dd>${esc(d.record.markings)}</dd></div>
-    </dl>`);
+    </dl>
+    <div class="dfile">
+      <div class="dfiling">
+        <div class="dfile__kick">Filing event</div>
+        <p class="dfiling__chain">${fileSteps.join("")}</p>
+      </div>
+      <div class="dlineage-wrap">
+        <div class="dfile__kick">Serial lineage</div>
+        <div class="dlineage">${lineageHtml}</div>
+      </div>
+    </div>`);
 
   /* 02 — Evidence Board — v2 structured receipts (cue/effect/basis/
      confidence) preferred; legacy prose receipts as fallback. Effects

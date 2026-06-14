@@ -1644,6 +1644,45 @@ body[data-treatment="shiny"] .dplate__tag--dev {
 }
 .drecord__material { color: var(--halo-a, var(--silver)); font-weight: 500; }
 
+/* 01 — filing event + serial lineage (flat captions below the record;
+   plates stay flat — edge + tone + type only, no depth/shadow/glow) */
+.dfile {
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line-faint);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px 40px;
+}
+.dfile__kick {
+  font-family: var(--font-mono);
+  font-size: 8.5px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--faint);
+  margin-bottom: 9px;
+}
+.dfiling__chain {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1.85;
+  letter-spacing: 0.03em;
+  color: var(--t-meta);
+}
+.dfiling__step { display: block; }
+.dfiling__chain b { color: var(--text); font-weight: 500; letter-spacing: 0.05em; }
+.dfiling__arr { color: var(--faint); padding-right: 4px; }
+.dlineage {
+  display: grid;
+  gap: 9px;
+  padding-left: 14px;
+  border-left: 1px solid var(--line-faint);
+}
+.dlineage__row { display: flex; align-items: baseline; gap: 12px; font-family: var(--font-mono); font-size: 11px; }
+.dlineage__k { width: 46px; flex: none; font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--faint); }
+.dlineage__v { color: var(--text); letter-spacing: 0.04em; }
+.dlineage__v--ghost { color: var(--faint); }
+
 /* 02 — evidence board */
 .dboard {
   display: grid;

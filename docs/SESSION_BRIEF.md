@@ -10,6 +10,66 @@ coding session; the assistant must respect it. Files not listed under
 does not match the user's current task — **stop and ask** before doing
 anything. (GOVERNANCE_OS anti-drift.)
 
+## Active session — BR-S038
+
+**Date / Session ID:** 2026-06-14 / BR-S038
+
+**Today's task:** Filing-Event Row + Serial Reveal on Plate 01 (copy + flat CSS)
+
+**Why:** Ship the research-canon "convergent first build" (`RESEARCH_SYNTHESIS_V1`
+closing line; MAGNETISM filing-event row + DEPTH/LAYERING serial spine). Surface, on
+the dossier Source Record, how the photo becomes a classified, serialized record —
+making Develop feel consequential through visible provenance, not pressure. Also clears
+the live Ready item "Route label in Source Record".
+
+**Read:** docs/FILE_MAP.md · docs/SESSION_BRIEF.md · docs/TASK_QUEUE.md ·
+docs/research/RESEARCH_SYNTHESIS_V1.md · docs/research/MAGNETISM_MODEL_V1.md ·
+docs/research/DEPTH_MODEL_V1.md · docs/research/LAYERING_MODEL_V1.md · docs/CHANGE_MAP.md
+· app.js · data.js · styles.css
+
+**Edit:** app.js (renderDossier Plate 01 block) · styles.css (flat `.dfile`/`.dfiling`/
+`.dlineage` classes) · docs/CHANGE_MAP.md · docs/TASK_QUEUE.md · docs/SESSION_BRIEF.md
+*(data.js NOT edited — every field already existed.)*
+
+**Do not open:** C:\Users\nilsj\OneDrive\Documents\blue-room
+
+**Authority affected:** ACTIVE SPECS implementation (runtime render of existing v2 data) —
+no CORE LAW / spec change.
+
+**Locked constraints:** image-as-artifact (reads the record, never the person) · plates
+stay FLAT (edge+tone+type only — no depth/shadow/glow/transform) · Free shows route LABEL
+only, no counts / no 0–100 / no confidence · discovery-note PROSE is Halo-only (lives in
+the right-panel Artifact Archetype module; class LABEL may recur as the content-axis join,
+prose may not) · Card+Mint serials masked `····` on Free, assigned on Halo (latent→
+developed; pull from `tierOutputs`, never hand-roll) · no 8th plate (preserve the 7-plate
+`:nth-of-type` rhythm) · no second-person/gendered/status/personality · frozen-past framing
+(no Develop tease / CTA in the filing row) · no AI/backend/payment/upload · preserve all
+routes + sealed/offline Local Draft flow.
+
+**Known current state:** Engineered Technique Pass #1 corner-shape (d81811b) + 3 Lab
+materials (9a5ffb0) + Artifact Archetype module (3ae19b1) shipped; research canon saved at
+HEAD (f976fa4). Plate 01 previously showed the `.drecord` grid only; route/scanStatus/
+scanId/archetypeClass + serial chain existed in v2 data but were unsurfaced.
+
+**Definition of done:** Plate 01 renders (A) a descending filing caption (capture → route
+→ scan status → filed-as class, both states) and (B) a flat serial-lineage spine (Object →
+Scan → Card → Mint), Card+Mint masked on Free / assigned on Halo · no discovery-prose or
+0–100 leak on Plate 01 · objectNo de-duplicated (lives once, as the spine head) · 7 plates
+intact · both sources × both states verified · dev routes uncrashed · console clean ·
+CHANGE_MAP/TASK_QUEUE/SESSION_BRIEF updated · commit to main.
+
+**Verification:** python http.server 8743 + Preview MCP (DOM) + 1500×2600 headless-Edge
+screenshots. SRC-01/02 × free/halo all correct (The Encounter / The Dispatch; filing chain
+identical both states; lineage Object/Scan assigned, Card/Mint `····` ghost on Free, real
+serials on Halo); no confidence/0–100 match; no discovery-prose on Plate 01; `?dev=halo-gate`
+(renderDossier runs unconditionally) uncrashed; 7 plates; console error+warn sweeps empty.
+Mandatory pre-edit 4-agent adversarial critique (research-fidelity / drift+duplication /
+copy-safety / regression+data-shape) → GO_WITH_CHANGES; all REQUIRED changes applied.
+
+**Final response format:** critique verdict · commit hash · changed files · what renders
+(both blocks, both states) · safety confirmations (flat / no prose-dup / no 0–100 / masked
+Free) · verification · next task · rollback.
+
 ## Active session — BR-S037
 
 **Date / Session ID:** 2026-06-14 / BR-S037
