@@ -573,6 +573,20 @@ Last updated: 2026-06-14.
 
 ## Backlog / needs decision
 
+- **Safety hardening — Human-Read Line enforcement** (from the `/gods-finger` audit, 2026-06-14,
+  safety-critical): the safety line (`docs/HUMAN_READ_LINE_V1.md`) is asserted, not enforced. Three fixes:
+  - **(a) Leaking-copy sweep — DO NOW (live on the page):** rewrite sample copy in `data.js` that reads the
+    PERMANENT not the image-act — "the cap and beard do quiet structural work" (anatomy as composition),
+    "nobody crouches by accident" (intent/character), "the posture of someone who decides" (trait grammar),
+    and character aura chips ("Load-Bearing" / "Slow-Burn" → cue-named or cut).
+  - **(b) Validator extension — engine phase:** run `PERSON_TRUTH` over evidenceBoard/discoveryNote/oracle/
+    aura (not just title+readings); add the connotation gate (gate 3) + the re-authorable-cue gate (gate 1);
+    stop trusting self-attested `safetyFlags` (require the independent scan to also pass).
+  - **(c) Aggregate no-persistence guard — engine phase (highest leverage):** re-derive archetype/hidden-stat/
+    aura FRESH per scan, no person-key joining pulls, no streaks/counts; the cross-pull layer must
+    structurally refuse to reconstruct a stable trait. Gates the future "weight on the internet" ambition.
+
+
 - **Final Halo material decision** — after Three Shiny Material Prototypes v1
   (completed BR-S036; prototypes + provisional lean now exist in CARD_TECH_LAB
   §20); log winner in DECISION_LOG, promote rules to PROJECT_OS

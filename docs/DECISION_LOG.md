@@ -227,3 +227,17 @@ shadow PAIR exists today and none was invented.
 Revisit: if the deferred tier-ratio re-derivation shows the cool floor reads cold under
 the warm mids, warm `#0a0b0d` to a warm-neutral near-black at the same luminance and
 re-log.
+
+**2026-06-14 / Human-Read Line v1 — image-act vs permanent (3-gate) / ACTIVE (revisable)**
+Why: the literal "reads the photo, never the person" would ban the posture/gesture/role reads
+that are the product's soul (builder correction — "we should not become only a camera lens").
+Refined: read the IMAGE-ACT (what the human performed in THIS frame — re-authorable by reshooting:
+posture, gesture, gaze, styling, the role), never the PERMANENT (fixed worth/identity/biology). A
+read is allowed only if it clears 3 gates — (1) re-authorable CUE (not body/face/build), (2) the
+grammatical SUBJECT is the photo, (3) CONNOTATION-STRIP (predicate isn't a stable disposition) —
+and the wall holds at the AGGREGATE layer too (many pulls of one person must not reconstruct a
+trait). Full spec + ruby-tier readings + raw→user-facing transformation: `docs/HUMAN_READ_LINE_V1.md`.
+Supersedes the too-absolute reading of "never the person". NOTE: this is the RULE; it is currently
+ASSERTED, not enforced — validator/copy/aggregate gaps logged in TASK_QUEUE (safety-critical).
+Surfaced + adversary-tested via the `/gods-finger` pass.
+Revisit: when the uploaded-photo engine is built (the aggregate guard ships with it).
