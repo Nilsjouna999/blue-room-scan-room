@@ -6,6 +6,33 @@ Last updated: 2026-06-14.
 
 ## Active
 
+- **Security review playbook v1 (`docs/security/`)** (2026-06-14 / BR-S047, docs only — new `docs/security/`
+  folder + FILE_MAP + DECISION_LOG; shipped together with BR-S046 as one scaffolding commit): staged
+  `docs/security/SECURITY_REVIEW_PLAYBOOK.md` — the ordered, gate-by-gate security go-through to run WHEN a
+  security pass is greenlit (not a standing claim). Honest posture (static prototype: no backend/upload/secrets/
+  payment today; the real attack surface is FUTURE), a 7-step sequence with pass/fail gates (DOM/XSS via `esc()`,
+  URL-param allowlists, fonts-without-SRI → the FUTURE red lines: engine validator wiring, the §7 aggregate wall,
+  server-side trust boundary, no client secrets, CSP/headers → privacy/safety invariants → deploy hardening), an
+  append-only findings register (10 seeded rows, most N/A-today), and re-run triggers. The §2.5–§2.6 red lines
+  inherit from `UNIVERSE_ZONE_MAP_V1` §7 / `HUMAN_READ_LINE_V1` / `halo/HALO_GATE_BOUNDARY_V1` — not relaxable
+  here. Grounded by the same 6-agent workflow (security lane, real-code greps: `esc()` @ app.js:8-14 does not
+  escape `'`; draft filename escaped; params allowlisted). **No scan run; runtime untouched.** **Completed.**
+  **Next up:** Dossier de-dull (the build).
+
+- **Live-artifact skeleton map v1 (`docs/map/`)** (2026-06-14 / BR-S046, docs only — new `docs/map/` folder +
+  FILE_MAP + DECISION_LOG): built the granular "you are here" structural map of the BUILT app, grounded in real
+  code (cited identifiers + file:line). Five docs: `00_INDEX` (what/why + the source×treatment×tab coordinate
+  convention + keep-in-sync triggers) · `01_PAGE_SKELETON` (the `index.html` DOM shell + the `body[data-view]`
+  CSS visibility gate) · `02_VIEWS_AND_STATE` (the `state` object @ app.js:44, URL params, the 4 views, the
+  `render()` pipeline, keyboard + delegated handlers, dev routes) · `03_SURFACES` (left Diagram|Metrics +
+  CLEAN|ANNOTATED, center card skins, right reading modules, the 7 dossier plates, the full state matrix) ·
+  `04_CODE_MAP` (data.js corpus + v2 shape, app.js fn inventory, scan-contract.js valve, styles.css systems).
+  **Built via a 6-agent grounded workflow** (4 layer-mappers → security lane → accuracy verifier =
+  ACCURATE_WITH_FIXES); all 3 corrections applied + spot-verified against real code (`toScanResultV2` @ 458,
+  7 DEV_FIXTURES, the legacy 3-col `.tabbar` grid). Complements UNIVERSE_ZONE_MAP (concept zones) + FILE_MAP
+  (file router) — no duplication. **Runtime untouched.** **Completed.** **Next up:** Security review playbook
+  (BR-S047), then Dossier de-dull.
+
 - **Universe/Zone Map v1 committed + governance trail** (2026-06-14 / BR-S045, docs only —
   UNIVERSE_ZONE_MAP_V1 + FILE_MAP + DECISION_LOG + HUMAN_READ_LINE_V1 + TASK_QUEUE): committed the
   already-written, reviewed-good `docs/UNIVERSE_ZONE_MAP_V1.md` (was untracked) — the ACTIVE

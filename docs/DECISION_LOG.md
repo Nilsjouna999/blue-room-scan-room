@@ -258,3 +258,25 @@ respected). Docs only — runtime untouched. Two internal section-ref errors in 
 in the same commit (§6→§7 for the wall; PROJECT_OS §3→§15 for the Vault/Codex backlog).
 Revisit: when the uploaded-photo engine is built — the aggregate guard ships in the same
 change, or the engine does not ship.
+
+**2026-06-14 / Live-artifact skeleton map adopted (`docs/map/`) / ACTIVE (maintained reference)**
+Why: the built artifact needed a granular "you are here" structural map — the DOM shell, the runtime state
+machine, the rendered surfaces, and the code structure — so any session knows where a thing lives and renders.
+Five docs (`00_INDEX` + `01_PAGE_SKELETON` / `02_VIEWS_AND_STATE` / `03_SURFACES` / `04_CODE_MAP`), grounded in
+real code (cited identifiers + file:line). Distinct from `UNIVERSE_ZONE_MAP_V1` (concept zones) and `FILE_MAP`
+(file router) — this maps what the code DOES. Built via a 6-agent grounded workflow (4 layer-mappers + accuracy
+verifier); the verifier's 3 corrections were applied and spot-checked against real code. Docs only; runtime untouched.
+Revisit: keep current — re-verify the affected doc on any structural change (DOM/state/surface/code), per
+`docs/map/00_INDEX.md` "Keep in sync".
+
+**2026-06-14 / Security review playbook staged (`docs/security/`), pass deferred until greenlit / ACTIVE (run on greenlight)**
+Why: ready an ordered, gate-by-gate security go-through so a future security pass is pre-defined, not invented
+under deadline — and flag the live + future things-to-check now. `docs/security/SECURITY_REVIEW_PLAYBOOK.md`
+records the honest posture (static prototype: no backend/upload/secrets/payment today; the real attack surface is
+FUTURE), a 7-step ordered sequence with pass/fail gates, an append-only findings register (10 seeded rows, most
+N/A-today), and re-run triggers. The §2.5–§2.6 red lines (validator wiring, the §7 aggregate wall, server-side
+trust boundary, no client secrets, CSP) are NOT relaxable by this doc — they inherit from `UNIVERSE_ZONE_MAP_V1`
+§7, `HUMAN_READ_LINE_V1`, and `halo/HALO_GATE_BOUNDARY_V1`. A clean run records "the gates were walked," never
+"the code is secure." Docs only; no scan run, no runtime change.
+Revisit: run the playbook (and re-trigger per its §4) before wiring the uploaded-photo engine / any backend /
+payment / first public deploy, or on any new param/external script/`innerHTML`/`esc()`/contract change.
