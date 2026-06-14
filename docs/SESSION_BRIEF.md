@@ -10,6 +10,63 @@ coding session; the assistant must respect it. Files not listed under
 does not match the user's current task — **stop and ask** before doing
 anything. (GOVERNANCE_OS anti-drift.)
 
+## Active session — BR-S040
+
+**Date / Session ID:** 2026-06-14 / BR-S040
+
+**Today's task:** Dev Nav Rail v1 (dev-only state jumper)
+
+**Why:** Builder wants in-site buttons to jump between menu / room / treatments / sources / tabs /
+the 4 dev fixtures without typing URLs — to self-inspect every state before the upcoming menu
+re-frame + left/below redesigns. Agreed sequence: **dev-nav FIRST → menu re-frame → left redesign**
+(per the direction-synthesis workflow). Dev ergonomics only; ships inert to real users.
+
+**Read:** docs/FILE_MAP.md · docs/SESSION_BRIEF.md · docs/TASK_QUEUE.md · docs/CHANGE_MAP.md ·
+docs/GOVERNANCE_OS.md · index.html · app.js · styles.css
+
+**Edit:** index.html (one `<nav id="devnav" hidden>`) · app.js (`DEVNAV` flag + `renderDevnav()` +
+one delegated `[data-devnav]` handler + mount after `mountMenu()`) · styles.css (`.devnav` block) ·
+docs/CHANGE_MAP.md · docs/TASK_QUEUE.md · docs/SESSION_BRIEF.md
+*(no data.js/scan-contract.js change; no DECISION_LOG — routine dev tooling, no product/spec change;
+FILE_MAP not touched — no new committed file.)*
+
+**Do not open:** C:\Users\nilsj\OneDrive\Documents\blue-room
+
+**Authority affected:** routine ACTIVE runtime (dev-only tooling). No CORE LAW / spec / DECISION_LOG change.
+
+**Locked constraints (folded in from the mandatory 3-lens pre-edit critique → GO_WITH_CHANGES):**
+state navigation ONLY — **no "pick"/file-picker button, no draft view** (product side-effect + silent-
+fails from room) · defense-in-depth gate — rail is `display:none` unless `body[data-devnav="1"]` AND
+revealed only on `?devnav=1` (cannot paint for a real user) · a visible "◆ DEV" tag so any screenshot
+reads as a dev session · dev-fixture buttons MUST `location.href`-reload carrying `&devnav=1` (`mountDev()`
+runs only at init — reject `replaceState` there) · new `[data-devnav]` attribute namespace (no collision
+with `[data-goto]`/`[data-view-to]`) · reuse existing setters/`applyView()`/`render()` (no new state
+fields, no refactor) · additive (revert = delete the block) · no product UI/copy change · no
+second-person/gendered/status/personality · no public 0–100 · no Halo Dossier/payment/AI/backend/upload ·
+preserve all routes + keyboard shortcuts + sealed/offline Local Draft flow.
+
+**Known current state:** BR-S039 (token lock, `d10b2df`) shipped + pushed. No dev nav exists. State is
+fully addressable (`state`+`?src/?t/?tab/?dev`); delegated `[data-goto]`/`[data-view-to]` pattern;
+`applyView()` sets `body[data-view]`; CSS visibility matrix hides sections per view (a top-level `.devnav`
+sits outside it); `render()`/`mountMenu()` run at init; `mountDev()` runs only at init.
+
+**Definition of done:** `?devnav=1` reveals a sticky dev rail (◆ DEV · Menu/Room · SRC 01/02 ·
+Free/Halo/Lab · Source/Diagram/Metrics · Free-Sim/Halo-Gate/Uploaded/Blocked); every button lands the
+correct state; treat/src/tab also enter the room so the change is visible; dev-fixture buttons reload
+carrying `&devnav=1` (rail survives); a CLEAN URL (no `?devnav`) shows NO rail and is byte-identical to
+before; no collision with existing handlers/keyboard; console clean; CHANGE_MAP + TASK_QUEUE +
+SESSION_BRIEF updated; one commit to main + push; rollback line.
+
+**Verification:** `python -m http.server 8743` + Preview MCP @1600×900: load `?devnav=1` → rail visible;
+click Room/Menu (view flips), SRC 02 (source flips + enters room), Halo/Lab (treatment), each tab, each
+dev fixture (URL gains `&devnav=1`, fixture renders, rail persists); load a CLEAN `/` and `?src=1&t=shiny`
+→ NO `.devnav` in DOM-visible (display:none) and `body` has no `data-devnav`; existing routes + keyboard
+(1/2/F/H/M) unaffected; console error+warn sweeps empty. Pre-edit 3-agent critique → GO_WITH_CHANGES;
+required changes folded (cut pick/draft, body-attr+CSS gate, DEV tag, reload kept for fixtures).
+
+**Final response format:** critique verdict · commit hash · changed files · what was added · whether
+copy changed · verification · next task · rollback (`git revert <hash>`).
+
 ## Active session — BR-S039
 
 **Date / Session ID:** 2026-06-14 / BR-S039

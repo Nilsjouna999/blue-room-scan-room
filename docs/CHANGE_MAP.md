@@ -190,6 +190,42 @@ banned/hype-word sweep now clean across all states.
 - **Test:** bare URL shows the menu; the four deep links open the room
   directly; Enter Scan Room reveals the unchanged room.
 
+## Dev nav rail (?devnav=1) — dev only
+
+- **What:** a sticky on-screen rail to jump between states without typing URLs —
+  Menu/Room · SRC 01/02 · Free/Halo/Lab · Source/Diagram/Metrics · the 4 dev
+  fixtures. Reveals ONLY on `?devnav=1`; never shown to a real user.
+- **Edit:** `index.html` (`<nav id="devnav" hidden>`), `app.js` (`renderDevnav()`,
+  the delegated `[data-devnav="kind:val"]` handler, the `DEVNAV` flag + mount after
+  `mountMenu()`), `styles.css` (`.devnav` block).
+- **Add a button:** add `b("kind:val", "Label")` in `renderDevnav()`; kinds are
+  `view | treat | src | tab | dev`. `treat/src/tab` also enter the room so the change
+  is visible; `dev` reloads carrying `&devnav=1` (`mountDev` runs only at init).
+- **Can break:** nothing for real users — triple-gated by `body[data-devnav="1"]`
+  + CSS `display:none` + the `hidden` attribute. Keep all three; never auto-reveal it.
+- **Test:** `?devnav=1` shows the rail and each button lands its state; a clean URL
+  (no `?devnav`) shows NO rail (`display:none`, body has no `data-devnav`, rail unfilled).
+
+## Dev Nav Rail v1 (2026-06-14 / BR-S040, index.html + app.js + styles.css)
+
+Added a dev-only state-jumper rail revealed ONLY by `?devnav=1` — Menu/Room · SRC
+01/02 · Free/Halo/Lab · Source/Diagram/Metrics · the 4 dev fixtures + a "◆ DEV" tag.
+One `<nav id="devnav" hidden>`, one `renderDevnav()`, one delegated
+`[data-devnav="kind:val"]` handler reusing the existing setters (`applyView`/`render`),
+a `DEVNAV` flag + mount after `mountMenu()`, and a `.devnav` CSS block. **Defense-in-depth
+gate:** `display:none` unless `body[data-devnav="1"]` (set only on the flag) AND the
+`hidden` attribute — so it can never paint for a real user (verified: a clean
+`?src=1&t=shiny` deep link leaves the rail unfilled + `display:none`, body has no
+`data-devnav`). Dev-fixture buttons `location.href`-reload carrying `&devnav=1`
+(`mountDev` runs only at init — `replaceState` rejected, it would skip the fixture
+render). **Pre-edit 3-agent critique → GO_WITH_CHANGES**; folded in: cut the
+"pick"/draft button (product side-effect + silent-fail), the body-attr+CSS gate, the
+DEV tag. No DECISION_LOG (routine dev tooling, no product/spec change). **Verified
+live** (`?devnav=1`): rail sticky + all 14 buttons land their state; treat/src/tab
+enter the room; Halo-Gate fixture reloads + rail persists; clean URLs + bare menu show
+no rail; console clean. Additive — revert = delete the block. **Next up:** Menu
+re-frame (the "layup" fix).
+
 ## Base-Hex + Warm-Ramp Lock v1 (2026-06-14 / BR-S039, styles.css `:root` + governance docs)
 
 Locked the token foundation `RESEARCH_SYNTHESIS_V1` gates contrast/type work on.

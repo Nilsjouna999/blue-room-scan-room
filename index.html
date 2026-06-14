@@ -13,6 +13,11 @@
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body data-treatment="free" data-view="menu">
+  <!-- DEV NAV — dev-only state jumper. Hidden by default; revealed ONLY when the
+       URL carries ?devnav=1 (app.js sets body[data-devnav="1"] + fills/unhides it).
+       State navigation only — never shown to a real user, never a product control. -->
+  <nav class="devnav" id="devnav" hidden aria-label="Dev navigation"></nav>
+
   <!-- MAIN MENU (front door) — one existing sample (SRC-01) shown as
        Free Pull vs Halo Mint. Rendered by app.js into #menuView; shown
        only when the URL has no scan-room params (deep links bypass it). -->

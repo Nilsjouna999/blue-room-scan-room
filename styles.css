@@ -2488,3 +2488,45 @@ body[data-view="room"] .dev { display: none; }
 @media (prefers-reduced-motion: reduce) {
   .card, .ministat__fill, .photo__shimmer, .card__sparkles, .card__halo { animation: none !important; }
 }
+
+/* =============================================================
+   DEV NAV — dev-only state jumper (gated by ?devnav=1)
+   Hidden by default; revealed ONLY when app.js sets body[data-devnav="1"]
+   on ?devnav=1. Defense-in-depth: display:none unless that attribute is
+   present, so it can never paint for a real user. Not a product surface.
+============================================================= */
+.devnav { display: none; }
+body[data-devnav="1"] .devnav {
+  position: sticky;
+  top: 0;
+  z-index: 9999;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 6px;
+  padding: 6px 10px;
+  background: rgba(10, 11, 13, 0.92);
+  border-bottom: 1px solid var(--line);
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+}
+.devnav__tag {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  color: var(--cyan);
+  padding-right: 4px;
+}
+.devnav__btn {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  color: var(--t-meta);
+  background: transparent;
+  border: 1px solid var(--line-faint);
+  border-radius: 3px;
+  padding: 3px 7px;
+  cursor: pointer;
+}
+.devnav__btn:hover { color: var(--t-display); border-color: var(--line-strong); }
+.devnav__sep { color: var(--t-ghost); font-size: 9px; padding: 0 1px; }

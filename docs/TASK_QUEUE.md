@@ -6,6 +6,22 @@ Last updated: 2026-06-14.
 
 ## Active
 
+- **Dev Nav Rail v1** (2026-06-14 / BR-S040, index.html + app.js + styles.css): a dev-only
+  on-screen state-jumper revealed ONLY by `?devnav=1` — Menu/Room · SRC 01/02 · Free/Halo/Lab ·
+  Source/Diagram/Metrics · the 4 dev fixtures (Free-Sim/Halo-Gate/Uploaded/Blocked) + a "◆ DEV"
+  tag — so the builder can inspect every state without typing URLs. One `<nav id="devnav" hidden>`,
+  `renderDevnav()`, one delegated `[data-devnav="kind:val"]` handler reusing the existing setters
+  (`applyView`/`render`; `treat/src/tab` also enter the room), `DEVNAV` flag + mount after
+  `mountMenu()`, `.devnav` CSS. **Triple-gated** (`body[data-devnav="1"]` + CSS `display:none` +
+  `hidden` attr) so it can NEVER paint for a real user; dev-fixture buttons reload carrying
+  `&devnav=1` (`mountDev` runs only at init). **Pre-edit 3-agent critique → GO_WITH_CHANGES** —
+  cut the "pick"/draft button (product side-effect), added the body-attr+CSS gate + DEV tag, kept
+  reload for fixtures. No DECISION_LOG (routine dev tooling). **Verified live**: `?devnav=1` rail +
+  all 14 buttons land their state; Halo-Gate fixture reloads + rail persists; clean `?src=1&t=shiny`
+  + bare menu show NO rail (unfilled, `display:none`, no `data-devnav`); console clean. Additive
+  (revert = delete the block). **Completed.** First step of the builder's agreed sequence (dev-nav →
+  menu re-frame → left redesign). **Next up:** Menu Re-frame v1 (the "layup" / FREE_PAID menu fix).
+
 - **Base-Hex + Warm-Ramp Lock v1** (2026-06-14 / BR-S039, styles.css `:root` + governance docs):
   locked the token foundation `RESEARCH_SYNTHESIS_V1` gates all contrast/type work on ("…font-roles
   + tabular numbers + one-focal-point *after* locking one base hex + one warm ramp"). **Narrowed
@@ -382,6 +398,30 @@ Last updated: 2026-06-14.
   2026-06-12/13.)*
 
 ## Ready (supported by current docs, clear definition of done)
+
+> **Builder-set near-term sequence (2026-06-14, BR-S040):** dev-nav (DONE) →
+> **Menu Re-frame v1** → **Left redesign (Source merge)** → Below redesign (Dossier
+> de-dull) → Right polish. Grounded by the direction-synthesis workflow + research:
+> - **Menu Re-frame v1 (NEXT)** — the "layup" fix. `FREE_PAID_MODEL_V1` verdict: the
+>   complete-front/sealed-back model is LOCKED and right; the defect is tier-ladder
+>   FRAMING on the menu (the `.msample__compare` Free-vs-Halo tiles + the "→ develops"
+>   arrow + Halo inventory chips read as "pick the better grade"). Fix in `renderMenu`
+>   only: render ONE complete Free card in its graphite/moss key, drop the compare-tiles
+>   + arrow + chips, caption with completeness ("sealed back · held in conservation", no
+>   counts) — realizes free-as-hero. Builder framing: the perfect landing page, "scan
+>   your image → a pull", magnetic but no hype/overreach. Do NOT touch the LOCKED
+>   sealed-back (`renderHaloGateMock`) or darkroom copy. *Done when:* menu reads as one
+>   complete artifact (not a tier ladder); no Halo inventory list / "→develops" arrow;
+>   boundary copy untouched; routes + console clean. (Deferred sibling: soften the same
+>   ladder on the in-room "Develops:" CTA + the 7× ARCHIVE-PULL plate tags.)
+> - **Left redesign — Source merge** = `LAYUP_RESEARCH_V1` Task #4 (collapse Source into
+>   Diagram as CLEAN|ANNOTATED, delete the redundant Capture Record, re-point ?tab=source).
+> - **Below redesign — Dossier de-dull** = LAYUP Task #3a (counting-spine gutter, room→archive
+>   threshold rule, shutter reveal). **Right polish** = LAYUP Task #3b (later; "medium", not "lacking").
+> - **Set aside (builder, BR-S040):** a full Halo card "example" — a populated stats-card
+>   trips the magnetism kill-rule; revisit later (sealed-back only if shown). Deeper
+>   "essence / marketing / value-stacking / existence-framing" = a FUTURE research pass, not now.
+> - Held: "diagram of the card" (#5, new concept, after left/below) + a darkroom "how it works" surface.
 
 > **Around-the-Card Redesign program (pull on demand)** — the prioritized redesign
 > for everything around the card lives in **`docs/research/LAYUP_RESEARCH_V1.md`**

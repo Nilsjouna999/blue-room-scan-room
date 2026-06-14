@@ -65,6 +65,12 @@ const state = { source: 0, treatment: "free", tab: "source", view: "menu", draft
   else if (q.has("src") || q.has("t") || q.has("tab")) state.view = "room";
 }
 
+/* DEV NAV gate — the dev-only state-jumper rail (renderDevnav) is revealed ONLY
+   when the URL carries ?devnav=1. Defense-in-depth: this flag also sets
+   body[data-devnav="1"], and the CSS keeps .devnav display:none without it, so
+   the rail can never paint for a real user. Pure dev tooling — no product effect. */
+const DEVNAV = new URLSearchParams(location.search).has("devnav");
+
 /* ---------- ScanResult v2 access (SCAN_ENGINE_SPEC) ----------
    v2 is the preferred source of truth where it cleanly applies;
    every read falls back to legacy source fields so the app keeps
@@ -980,6 +986,23 @@ function mountMenu() {
   document.getElementById("menuView").innerHTML = renderMenu();
 }
 
+/* DEV NAV rail markup (dev-only; mounted only when DEVNAV). State navigation
+   only — no product copy, no file picker, no draft. Buttons reuse the existing
+   state setters via one delegated [data-devnav="kind:val"] handler below. */
+function renderDevnav() {
+  const b = (dn, label) => `<button type="button" class="devnav__btn" data-devnav="${dn}">${label}</button>`;
+  const sep = `<span class="devnav__sep" aria-hidden="true">·</span>`;
+  return [
+    `<span class="devnav__tag">◆ DEV</span>`,
+    b("view:menu", "Menu"), b("view:room", "Room"), sep,
+    b("src:0", "SRC 01"), b("src:1", "SRC 02"), sep,
+    b("treat:free", "Free"), b("treat:shiny", "Halo"), b("treat:mint", "Lab"), sep,
+    b("tab:source", "Source"), b("tab:diagram", "Diagram"), b("tab:metrics", "Metrics"), sep,
+    b("dev:free-scan-sim", "Free Sim"), b("dev:halo-gate", "Halo Gate"),
+    b("dev:uploaded-result", "Uploaded"), b("dev:uploaded-blocked", "Blocked"),
+  ].join("");
+}
+
 /* ---------- local draft intake (browser-only, no upload, no analysis) ----------
    The chosen image never leaves the browser and never receives a scan.
    `draft` is a plain object — NOT a ScanResult — and carries no stats,
@@ -1706,6 +1729,22 @@ document.addEventListener("click", (e) => {
   window.scrollTo(0, 0);
 });
 
+/* DEV NAV (dev-only, gated by ?devnav=1 + body[data-devnav]) — jumps between
+   addressable states for inspection. Separate [data-devnav] namespace so it
+   never collides with [data-goto]/[data-view-to]. State navigation only: no
+   product side effect, no file picker. treat/src/tab also enter the room so
+   the change is visible; dev fixtures reload (mountDev runs only at init). */
+document.addEventListener("click", (e) => {
+  const btn = e.target.closest("[data-devnav]");
+  if (!btn) return;
+  const [kind, val] = btn.dataset.devnav.split(":");
+  if (kind === "view") { state.view = val; applyView(); window.scrollTo(0, 0); }
+  else if (kind === "treat") { state.treatment = val; if (val !== "mint") state.labMaterial = null; state.view = "room"; render(); window.scrollTo(0, 0); }
+  else if (kind === "src") { state.source = Number(val); state.view = "room"; render(); window.scrollTo(0, 0); }
+  else if (kind === "tab") { state.tab = val; state.view = "room"; render(); window.scrollTo(0, 0); }
+  else if (kind === "dev") { const u = new URL(location.href); u.searchParams.set("dev", val); u.searchParams.set("devnav", "1"); location.href = u.toString(); }
+});
+
 /* Local draft: pick / replace a browser-local photo (no upload, no store). */
 document.addEventListener("click", (e) => {
   if (e.target.closest("[data-draft-pick]")) pickPhoto();
@@ -1775,5 +1814,13 @@ document.addEventListener("keydown", (e) => {
 });
 
 mountMenu();
+/* DEV NAV: fill + reveal the dev rail only behind ?devnav=1; sets the
+   body attribute the CSS gates on. Inert (display:none) on any clean URL. */
+if (DEVNAV) {
+  document.body.dataset.devnav = "1";
+  const devnavEl = document.getElementById("devnav");
+  devnavEl.innerHTML = renderDevnav();
+  devnavEl.removeAttribute("hidden");
+}
 if (state.view === "dev") mountDev();
 render();
