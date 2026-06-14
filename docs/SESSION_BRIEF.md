@@ -10,6 +10,70 @@ coding session; the assistant must respect it. Files not listed under
 does not match the user's current task — **stop and ask** before doing
 anything. (GOVERNANCE_OS anti-drift.)
 
+## Active session — BR-S039
+
+**Date / Session ID:** 2026-06-14 / BR-S039
+
+**Today's task:** Base-Hex + Warm-Ramp Lock v1 (narrowed from "Token Foundation Lock v1")
+
+**Why:** Lock the token foundation canon (`RESEARCH_SYNTHESIS_V1` build-now list) gates all
+contrast/type work on — *"font-roles + tabular numbers + one-focal-point after locking one base
+hex + one warm ramp"*. The incoming "Token Foundation Lock v1" prompt was **narrowed by the
+mandatory 11-agent pre-edit critique (NARROW_SCOPE)**: three sub-parts were impossible/illegal as
+written — `--vault-*` is defined **nowhere in code** (doc-only artifact), "one plate-bg hex" collides
+with the LOCKED per-source Copper/Frost material plates (2026-06-12) + frost carve-out, and
+tier-ratio/engraved-shadow re-tune touches the LOCKED Muted/Clean/Strong/Charged/Peak ladder
+(2026-06-13) / a shadow PAIR that does not exist. Those are split out to TASK_QUEUE.
+
+**Read:** docs/FILE_MAP.md · docs/SESSION_BRIEF.md · docs/TASK_QUEUE.md · docs/CHANGE_MAP.md ·
+docs/DECISION_LOG.md · docs/GOVERNANCE_OS.md · docs/DESIGN_TOKENS.md ·
+docs/research/RESEARCH_SYNTHESIS_V1.md · docs/research/TEXT_EYE_TRAVEL.md · styles.css
+
+**Edit:** styles.css (`:root` only — `--ink-950` value + the Sand-ramp / room-base comments) ·
+docs/DECISION_LOG.md (new entry, BEFORE/with the code) · docs/DESIGN_TOKENS.md (locked-token-canon
+backfill) · docs/research/TEXT_EYE_TRAVEL.md (one SUPERSEDED annotation on the dead cool `--vault-*`
+ramp) · docs/CHANGE_MAP.md · docs/TASK_QUEUE.md · docs/SESSION_BRIEF.md
+*(no app.js/data.js/index.html/scan-contract.js change; FILE_MAP not touched — no new committed file.)*
+
+**Do not open:** C:\Users\nilsj\OneDrive\Documents\blue-room
+
+**Authority affected:** ACTIVE SPECS (DESIGN_TOKENS canon backfill) + a DECISION_LOG Spec-Change
+entry. No CORE LAW relaxed; no LOCKED decision contradicted (the locked plates + band ladder are
+explicitly preserved and the dependent re-derivation deferred).
+
+**Locked constraints:** change ONLY `--ink-950` (the deepest room-shadow floor) + comments — no
+other token value moves · do NOT touch `--ink-900/850/800/700` (re-deriving them vs the base is the
+DEFERRED tier-ratio task — and `--ink-900` doubles as dark-on-light chip text, so a shift there is
+out of scope) · `--t-*` warm Sand ramp values UNCHANGED (affirmed, not re-valued) · preserve the
+LOCKED per-source Copper/Frost plates + frost carve-out (no plate-bg edit) · preserve the LOCKED
+Muted/Clean/Strong/Charged/Peak band ladder (no tier-ratio edit) · do NOT invent an engraved/
+letterpress shadow pair · no layout/copy/route change · no second-person/gendered/status/personality ·
+no AI/backend/payment/upload · preserve all routes + sealed/offline Local Draft flow.
+
+**Known current state:** BR-S038 (Plate 01 filing-event row, `02c97bd`) shipped **and pushed** to
+origin/main (tree was ahead 1; now `0 0`). `--ink-950` ships `#0a0907` (warm); canon locks `#0a0b0d`.
+`--vault-*` exists only in `RESEARCH_SYNTHESIS_V1` + `TEXT_EYE_TRAVEL` (cool ramp, never built).
+`DESIGN_TOKENS` states grammar but names no hex.
+
+**Definition of done:** `--ink-950 = #0a0b0d` in `:root`; `--t-*` unchanged; the Sand-ramp + room-base
+comments name the lock; DECISION_LOG carries the `#0a0b0d`-vs-`#0a0907` resolution + warm-neutral
+tension note; DESIGN_TOKENS backfills the locked base hex + the warm Sand ramp + the deferred items;
+TEXT_EYE_TRAVEL's cool `--vault-*` ramp annotated SUPERSEDED; the two split tasks (Plate-bg
+consolidation v1, Tier-ratio re-derivation v1) filed in TASK_QUEUE with locked-state-preserving
+done-conditions; CHANGE_MAP + SESSION_BRIEF updated; verified in-browser (computed `--ink-950` =
+`rgb(10,11,13)`, `--t-*` unchanged, room/card/7-plate dossier render, console clean across routes);
+one commit to main + push; rollback line.
+
+**Verification:** `python -m http.server 8743` + Preview MCP at 1600×900 (screenshot tool times out —
+use `getComputedStyle`): confirm `--ink-950` resolves to `rgb(10, 11, 13)` and `--t-display/.../ghost`
+are byte-unchanged; body/card-plate/7-plate dossier still render in free + shiny on both sources;
+`?dev=free-scan-sim|halo-gate|uploaded-result|uploaded-blocked` + bare menu uncrashed; console
+error+warn sweeps empty. Mandatory pre-edit 11-agent adversarial critique → **NARROW_SCOPE**; all
+REQUIRED changes folded in.
+
+**Final response format:** critique verdict · commit hash · changed files · what changed (the one
+token + the doc canon) · whether copy changed · verification · next task · rollback (`git revert <hash>`).
+
 ## Active session — BR-S038
 
 **Date / Session ID:** 2026-06-14 / BR-S038

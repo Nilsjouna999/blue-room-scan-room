@@ -194,3 +194,36 @@ rules, copy bank, and the supersession of earlier pre-unlock count guidance:
 `docs/halo/HALO_GATE_BOUNDARY_V1.md` (§H). Docs only — no runtime change.
 Revisit: if the qualitative hint reads as empty, add a non-enumerated proof
 line — never an exact count.
+
+**2026-06-14 / Base-Hex + Warm-Ramp Lock v1: base hex locked to `#0a0b0d`; `--t-*` is the one warm "Sand" ramp; cool `--vault-*` killed / ACTIVE (Spec Change)**
+Why: the foundation lock `RESEARCH_SYNTHESIS_V1` (build-now list) gates all
+contrast/type work on — "font-roles + tabular numbers + one-focal-point *after*
+locking one base hex + one warm ramp". Canon (synthesis "Base background
+mismatch") locks **one base hex `#0a0b0d`**, resolving a three-way mismatch:
+Vault ratios were computed on `#0c0d10`, the depth model ships `#0a0b0d`, and
+`styles.css` shipped `--ink-950: #0a0907`. **Resolution: lock `#0a0b0d`** as the
+base floor (`--ink-950`) — it is both the canon value and the explicit task value.
+**Noted tension (logged, not hidden):** `#0a0b0d` is faintly cool (B `0d` > R `0a`)
+while the synthesis "warm vs cool surfaces" resolution mandates warm-neutral for all
+non-frost surfaces. Accepted ONLY as the deepest room-shadow FLOOR (luminance < 1%,
+visually neutral; the warm `#161411`→`--ink-900` body field and the warm Sand text
+ramp keep the room warm); warm-neutral still governs every lighter surface and all
+text. The single canonical warm text ramp is **`--t-display/primary/body/meta/ghost`**
+(`#e9e5dc → #6e6b63`), affirmed UNCHANGED as the "Sand" ramp. The cool **`--vault-*`**
+alternative (`docs/research/TEXT_EYE_TRAVEL.md`) is **killed** — it was never
+implemented (defined nowhere in styles.css/app.js/data.js) and is overruled by the
+warm-neutral resolution; TEXT_EYE_TRAVEL annotated SUPERSEDED. `DESIGN_TOKENS.md`
+backfilled with the locked base hex + the warm Sand ramp in the same commit.
+**Scope (narrowed from the "Token Foundation Lock v1" prompt by the mandatory pre-edit
+critique, NARROW_SCOPE):** only `--ink-950` changed (`#0a0907`→`#0a0b0d`); no other
+token value, no layout/copy/route change. **DEFERRED to TASK_QUEUE, gated behind this
+lock:** (1) *Tier-ratio re-derivation v1* — re-derive the upper `--ink-*` stops + the
+public tier-band ratios against `#0a0b0d`; **must preserve the LOCKED Muted/Clean/
+Strong/Charged/Peak ladder** (2026-06-13). (2) *Plate-bg consolidation v1* — unify only
+the base/default `.card__plate` gradient; **must preserve the LOCKED per-source Copper/
+Frost material plates** (2026-06-12) + the frost cool carve-out; the engraved
+text-shadow re-tune is its last step (the shadow tunes to the locked plate). No CSS
+shadow PAIR exists today and none was invented.
+Revisit: if the deferred tier-ratio re-derivation shows the cool floor reads cold under
+the warm mids, warm `#0a0b0d` to a warm-neutral near-black at the same luminance and
+re-log.

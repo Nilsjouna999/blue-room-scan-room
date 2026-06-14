@@ -93,6 +93,28 @@ browser console is clean (F12).
 - **Test:** all three treatments on both sources; the photo must stay
   clearly visible in every state.
 
+## To change a base / foundation token (palette lock) — high risk
+
+- **Edit:** `styles.css` `:root` only (the `--ink-*` room ramp, the `--t-*` Sand
+  text ramp). The canonical values these names must carry live in
+  `docs/DESIGN_TOKENS.md` → "Locked token canon"; the lock + its rationale live in
+  `docs/DECISION_LOG.md`.
+- **Log first:** a foundation token (base hex, the warm ramp, a tier ratio) is
+  governed — add a `DECISION_LOG` entry **before/with** the CSS and backfill
+  `DESIGN_TOKENS` in the **same commit** (GOVERNANCE_OS Spec Change Review).
+- **Affects:** potentially the whole room — `--ink-*` are background substrates
+  (body radial-gradient, card/draft/gate/dev plates); `--t-*` are all foreground
+  text tiers + the tier-band lightness.
+- **Can break:** contrast in two *directions* — `--ink-900` is dark text on LIGHT
+  chips (`.toggle__btn.is-active`, `.marker__no`, `.markerlegend__no`) AND a dark
+  substrate; a global shift cannot serve both. The LOCKED per-source Copper/Frost
+  plates (DECISION_LOG 2026-06-12) and the LOCKED Muted/Clean/Strong/Charged/Peak
+  band ladder (2026-06-13) must not be silently moved.
+- **Test:** node is NOT installed — verify in-browser via `getComputedStyle`
+  (the screenshot tool times out). Confirm the changed token resolves to its new
+  value and the *unchanged* tokens are byte-identical; walk 2 sources × free/shiny
+  + the 7-plate dossier + the 4 `?dev` routes + bare menu; console clean.
+
 ## To change card layout — high risk
 
 - **Edit:** `app.js` → `renderCard()` (structure) + `styles.css` (card
@@ -167,6 +189,26 @@ banned/hype-word sweep now clean across all states.
   plate, Halo tile = the only depth/material element).
 - **Test:** bare URL shows the menu; the four deep links open the room
   directly; Enter Scan Room reveals the unchanged room.
+
+## Base-Hex + Warm-Ramp Lock v1 (2026-06-14 / BR-S039, styles.css `:root` + governance docs)
+
+Locked the token foundation `RESEARCH_SYNTHESIS_V1` gates contrast/type work on.
+**Narrowed from the "Token Foundation Lock v1" prompt by the mandatory 11-agent
+pre-edit critique → NARROW_SCOPE:** the prompt's other three sub-parts were
+impossible/illegal as written — `--vault-*` is defined **nowhere in code** (a
+doc-only artifact in `RESEARCH_SYNTHESIS_V1` + `TEXT_EYE_TRAVEL`), "one plate-bg hex"
+collides with the LOCKED per-source Copper/Frost plates (2026-06-12), and the
+tier-ratio / engraved-shadow re-tune touches the LOCKED Muted/Clean/Strong/Charged/
+Peak ladder (2026-06-13) / a letterpress shadow PAIR that does not exist.
+**Shipped (one commit):** `styles.css` `--ink-950 #0a0907 → #0a0b0d` (the deepest
+room-shadow floor; the only token value changed) + the `:root` Sand-ramp / room-base
+comments naming the lock; `--t-*` warm Sand ramp affirmed UNCHANGED; `DECISION_LOG`
+entry (the `#0a0b0d`-vs-`#0a0907` resolution + the cool-floor/warm-text tension);
+`DESIGN_TOKENS` "Locked token canon" backfill; `TEXT_EYE_TRAVEL` cool `--vault-*` ramp
+annotated SUPERSEDED. **Deferred to TASK_QUEUE (gated behind this lock):** *Tier-ratio
+re-derivation v1* (preserve the band ladder) and *Plate-bg consolidation v1* (preserve
+the per-source plates; engraved-shadow re-tune is its last step). Visual delta ≈ nil
+(floor shift < 1% luminance, never under text). Rollback: `git revert <hash>`.
 
 ## Distilled research checkpoint (2026-06-13 / BR-S028, docs only)
 

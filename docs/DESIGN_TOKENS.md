@@ -49,3 +49,27 @@ quiet → medium → medium → LOUD → medium → quiet → LOUD finale
 (Current order: Source Record → Evidence → Stats → HIDDEN STAT →
 Fit+Aura → Mint Record → ORACLE — already close; tune loudness via
 plate accent, not new sections.)
+
+## Locked token canon (Base-Hex + Warm-Ramp Lock v1 · 2026-06-14)
+
+The values these names must carry — the lock that gates all contrast/type
+work (`RESEARCH_SYNTHESIS_V1` build-now list; DECISION_LOG 2026-06-14):
+
+- **Base hex (Room floor): `#0a0b0d`** → `--ink-950`. The deepest room-shadow
+  stop. Faintly cool by the numbers but visually neutral at < 1% luminance; it
+  is the only sanctioned cool-leaning surface, and only as the floor. The
+  warm-neutral rule below still governs every lighter surface.
+- **Warm "Sand" text ramp — the ONE neutral ramp: `--t-*`** → Display `#e9e5dc`
+  · Primary `#d7d3ca` · Body `#b1ada4` · Meta `#948f87` · Ghost `#6e6b63`. Warm
+  archive greys, no pure white. This is the single canonical ramp. The cool
+  `--vault-*` alternative (`research/TEXT_EYE_TRAVEL.md`) is **killed** — never
+  implemented, overruled by warm-neutral.
+- **Warm-neutral rule:** all non-frost surfaces stay warm-neutral; cool is
+  reserved for the Cold Prism Frost material + the violet bridge.
+
+Deferred (gated behind this lock — see TASK_QUEUE; do NOT silently fold in):
+re-derive the upper `--ink-*` surface stops + the tier-band ratios against
+`#0a0b0d` (**preserve the Muted/Clean/Strong/Charged/Peak ladder**); consolidate
+only the base/default plate-bg (**preserve the per-source Copper/Frost plates**),
+with the engraved text-shadow re-tune as that task's last step. No letterpress
+shadow PAIR exists today; do not invent one here.

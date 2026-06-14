@@ -6,6 +6,27 @@ Last updated: 2026-06-14.
 
 ## Active
 
+- **Base-Hex + Warm-Ramp Lock v1** (2026-06-14 / BR-S039, styles.css `:root` + governance docs):
+  locked the token foundation `RESEARCH_SYNTHESIS_V1` gates all contrast/type work on ("…font-roles
+  + tabular numbers + one-focal-point *after* locking one base hex + one warm ramp"). **Narrowed
+  from the incoming "Token Foundation Lock v1" prompt by the mandatory 11-agent pre-edit critique →
+  NARROW_SCOPE** — three sub-parts were impossible/illegal as written: `--vault-*` is defined
+  **nowhere in code** (doc-only, in `RESEARCH_SYNTHESIS_V1` + `TEXT_EYE_TRAVEL`); "one plate-bg hex"
+  collides with the LOCKED per-source Copper/Frost plates (2026-06-12); tier-ratio/engraved-shadow
+  re-tune touches the LOCKED Muted/Clean/Strong/Charged/Peak ladder (2026-06-13) / a letterpress
+  shadow PAIR that doesn't exist. **Shipped (one commit):** `--ink-950 #0a0907 → #0a0b0d` (the
+  deepest room-shadow floor — the only token value changed) + `:root` comments naming the lock;
+  `--t-*` warm Sand ramp affirmed UNCHANGED; DECISION_LOG entry (resolves canon `#0a0b0d` vs shipped
+  `#0a0907`; logs the cool-floor/warm-text tension under the warm-neutral rule); DESIGN_TOKENS
+  "Locked token canon" backfill; TEXT_EYE_TRAVEL cool `--vault-*` ramp annotated SUPERSEDED. Visual
+  delta ≈ nil (floor shift < 1% luminance, never under text); `--ink-900/850/800/700` untouched
+  (their re-derivation is the deferred tier-ratio task — and `--ink-900` doubles as dark-on-light
+  chip text). **Verified** in-browser (`getComputedStyle`; screenshot tool times out): `--ink-950`
+  resolves to `rgb(10, 11, 13)`, `--t-*` byte-unchanged, room/card/7-plate dossier render in
+  free+shiny on both sources, 4 `?dev` routes + bare menu uncrashed, console clean. **Completed.**
+  **Split out to Ready #6/#7 (gated behind this lock):** Tier-ratio re-derivation v1 + Plate-bg
+  consolidation v1. **Next up:** Engineered Technique Pass #2 (scroll-driven dossier reveal) — unchanged.
+
 - **Filing-Event Row + Serial Reveal on Plate 01** (2026-06-14 / BR-S038, app.js +
   styles.css): the research-canon "convergent first build" (`RESEARCH_SYNTHESIS_V1`
   closing line; endorsed by MAGNETISM filing-event row + DEPTH/LAYERING serial-spine).
@@ -448,6 +469,24 @@ Last updated: 2026-06-14.
    bleed in (Mint Record plate already does).
    *Done when:* Halo dossier plates carry a restrained material accent;
    free stays matte; screenshots regenerated.
+6. **Tier-ratio re-derivation v1** *(gated behind Base-Hex + Warm-Ramp Lock v1, BR-S039)* —
+   re-derive the upper `--ink-*` surface stops (900/850/800/700) and the public tier-band
+   lightness ratios against the now-locked base `#0a0b0d`, so the warm dark ramp and the bands
+   compute from canon rather than the legacy `#0a0907` floor (canon "re-derive the tier ratios
+   against it"). *Done when:* the `--ink-*` stops + band ratios derive from `#0a0b0d` (ratios
+   stated explicitly); the LOCKED **Muted/Clean/Strong/Charged/Peak** ladder (DECISION_LOG
+   2026-06-13) is preserved — no collapse/reorder/rename; `--ink-900`'s dark-on-light chip uses
+   (`.toggle__btn.is-active`, `.marker__no`, `.markerlegend__no`) keep AA in the OPPOSITE
+   direction from the substrate; verified via `getComputedStyle` contrast deltas; console clean.
+7. **Plate-bg consolidation v1** *(gated behind BR-S039; do AFTER #6)* — unify only the
+   **base/default** `.card__plate` gradient against the locked base; **preserve the LOCKED
+   per-source Copper/Frost material plates** (mint `#171a20`, cold-foil `#141a23`, night-gloss
+   `#0c121b`, black-star, shiny — DECISION_LOG 2026-06-12) and the frost cool carve-out. Its
+   **last step** is the engraved text-shadow re-tune — tune the 3 single dark shadows
+   (`.scanframe__meta`, `.photo__meta`, `.fpcard__title`) TO the locked plate; do NOT add a
+   letterpress PAIR unless explicitly decided. *Done when:* the default plate reads against
+   `#0a0b0d`; the 5 material plates + frost are visibly unchanged; engraved captions stay crisp
+   (not muddy on the slightly cooler floor); free stays matte; verified in-browser; console clean.
    *(Route label in Source Record — completed by BR-S038 (Filing-Event Row +
    Serial Reveal on Plate 01; see Active). The filing event surfaces route +
    scanStatus (+ capture code + filed-as class) on the dossier Source Record in

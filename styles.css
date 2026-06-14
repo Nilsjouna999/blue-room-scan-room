@@ -6,16 +6,20 @@
 ============================================================= */
 
 :root {
-  /* Vault text scale — 5 named tiers (DESIGN_TOKENS pass 1).
-     Warm archive greys; no pure white anywhere. */
+  /* Sand text ramp — the ONE canonical warm neutral ramp, 5 named tiers
+     (Base-Hex + Warm-Ramp Lock v1; DESIGN_TOKENS). Warm archive greys, no
+     pure white. The cool --vault-* alternative is killed — never implemented. */
   --t-display: #e9e5dc;
   --t-primary: #d7d3ca;
   --t-body: #b1ada4;   /* pass 2: lifted for readability */
   --t-meta: #948f87;   /* pass 2: quiet but readable */
   --t-ghost: #6e6b63;
 
-  /* room — warm dark stage */
-  --ink-950: #0a0907;
+  /* room — warm dark stage. --ink-950 is the LOCKED base hex #0a0b0d
+     (Base-Hex + Warm-Ramp Lock v1) — the deepest shadow FLOOR only; warm-neutral
+     still governs lighter surfaces. Upper stops (900/850/800/700) re-derive vs
+     this base in the deferred tier-ratio task. */
+  --ink-950: #0a0b0d;
   --ink-900: #0d0c0a;
   --ink-850: #11100d;
   --ink-800: #151310;

@@ -63,6 +63,16 @@
 
 ## Details — The Deliverables
 
+> **SUPERSEDED (2026-06-14, Base-Hex + Warm-Ramp Lock v1 / DECISION_LOG).** The
+> `--vault-*` cool ramp below (`#D8DAE0 / #9AA0AD / #6B7180 / #474C57` on a `#0c0d10`
+> base) was **never implemented and is killed.** The canonical token foundation is:
+> base hex **`#0a0b0d`** (`--ink-950`) + the **warm `--t-*` "Sand" ramp**
+> (`#e9e5dc → #6e6b63`), per `RESEARCH_SYNTHESIS_V1` (warm-neutral wins for non-frost
+> surfaces) and `DESIGN_TOKENS.md` (Locked token canon). NB: the hexes in (a) below are
+> **cool/blue-leaning despite the "Sand-style" label** — that mislabel is the reason this
+> note exists. Read the tier-gap *idea* (the ~15:1→~2:1 contrast spread) as still useful;
+> ignore the cool *hexes* and the `--vault-*` token names. RESEARCH informs, never implements.
+
 ### (a) Recommended 5-tier text tone scale for a #0c0d10 background
 Named the **"Vault" scale**, warm-tinted (Sand-style, hue ≈55–60°) to harmonize with copper. Values are warm off-whites/greys, never pure white, to avoid halation. Approximate contrast ratios against #0c0d10 in parentheses.
 
