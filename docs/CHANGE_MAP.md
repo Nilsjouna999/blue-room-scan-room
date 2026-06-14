@@ -185,6 +185,21 @@ payment/Halo/upload analysis). GPT_REVIEW_GUIDE + TASK_QUEUE + SESSION_BRIEF
 note the folder. Roadmap unchanged beyond this checkpoint — next product task
 stays **Free Pull Mock Polish v1**.
 
+## Layering Model v1 (2026-06-14, docs only — research)
+
+Saved `docs/research/LAYERING_MODEL_V1.md` (RESEARCH; FILE_MAP registers it) from a
+15-agent White Death SCOUT on layering (6 ground → Opus substrate → 6 scout → Opus
+FIT-adversary → Opus rank), FIT as the bar. Finding: a more coherent universe = surfacing
+seams that ALREADY exist in the data, connective-only (no detector, no new schema, no
+grammar-bend). Holds the 4 priority seams (P1 archetype bridge: class→family→lens→hidden-
+stat map; P2 provenance lineage: objectNo→scanId→serial through-line making Develop a
+visible identity event; P3 evidence→stat→display closed loop: subject-lock=confidence,
+receiptId→board entry; P4 single back-seam gate as the surface layers land on), 8 ranked
+survivors (5 KEEP/High, 1 KEEP/Med, 2 DILUTE), the floating guardrails (person-drift /
+detector-implying / backlog-zone / premature-enum kills), and a 30-seam latent-link index.
+Pull on demand; implements nothing. Note: survivor #3 (route+status rows) also satisfies
+the existing "Route label in Source Record" Ready item.
+
 ## Free / Paid Model v1 (2026-06-14, docs only — research)
 
 Saved `docs/research/FREE_PAID_MODEL_V1.md` (RESEARCH; FILE_MAP registers it) from an
