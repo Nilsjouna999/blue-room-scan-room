@@ -185,6 +185,20 @@ payment/Halo/upload analysis). GPT_REVIEW_GUIDE + TASK_QUEUE + SESSION_BRIEF
 note the folder. Roadmap unchanged beyond this checkpoint — next product task
 stays **Free Pull Mock Polish v1**.
 
+## Universe Map v1 (2026-06-14, docs only — research)
+
+Saved `docs/research/UNIVERSE_MAP_V1.md` (RESEARCH; FILE_MAP registers it) from a White
+Death pass (Phase A audit of the "universe" vision + Phase B scout, 6 cheap scouts +
+Opus bar-holder). Verdict: the win is **one "Archive" universe → flat zone-map (Lobby ·
+Scan Room · Card Record · Vault · Codex) → latent↔developed flip as physics**, all
+CSS/SVG/light-JS (no WebGL/slob). Killed the literal 3D / world-above-below / flipped
+worlds / per-stat realms / game-fantasy tone. Holds the verdict table + a fast/no-slob
+inspiration map per surviving concept (Obra Dinn manifest = vault+card-record+flip in
+one; Cooper Hewitt/Louvre/Wellcome = vault; Pentiment SVG zone-graph + Museum Department
+frame + CSS view-timeline HUD = zones; clip-path develop wipe + CSS card-flip +
+view-transitions = flip/card-record). Pull on demand; implements nothing. Flags the
+open follow-on: how Free/Paid lines cut across the universe.
+
 ## Layup / Around-the-Card Redesign Research v1 (2026-06-14, docs only — research)
 
 Saved `docs/research/LAYUP_RESEARCH_V1.md` (RESEARCH authority — informs, never
