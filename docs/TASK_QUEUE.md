@@ -457,6 +457,10 @@ Last updated: 2026-06-14.
 >   trips the magnetism kill-rule; revisit later (sealed-back only if shown). Deeper
 >   "essence / marketing / value-stacking / existence-framing" = a FUTURE research pass, not now.
 > - Held: "diagram of the card" (#5, new concept, after left/below) + a darkroom "how it works" surface.
+> - **Menu v2 — explain/hint what Blue Room IS (noted BR-S042, FOR LATER):** the re-framed menu (BR-S041)
+>   currently shows only the one raw photo/card — it does NOT yet show, explain, or HINT what Blue Room is
+>   about. A later pass adds a brief "what this is" hint/explanation in the darkroom-thesis voice (no hype,
+>   no overreach, no tier ladder). Deliberately deferred — not part of the current left/below work.
 
 > **Around-the-Card Redesign program (pull on demand)** — the prioritized redesign
 > for everything around the card lives in **`docs/research/LAYUP_RESEARCH_V1.md`**
