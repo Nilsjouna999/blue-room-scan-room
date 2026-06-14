@@ -1536,16 +1536,28 @@ body[data-treatment="shiny"] .dia-fill { fill: rgba(200, 196, 187, 0.15); stroke
 ============================================================= */
 
 .dossier {
-  border-top: 1px solid var(--line-faint);
+  border-top: 2px solid var(--line-strong); /* room → archive threshold rule */
   padding: 0 24px 70px;
 }
 .dossier__cue {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
   text-align: center;
   font-family: var(--font-mono);
   font-size: 9px;
   letter-spacing: 0.3em;
   color: var(--faint);
   padding: 16px 0 34px;
+}
+/* flanking hairlines make the cue read as the record threshold label */
+.dossier__cue::before,
+.dossier__cue::after {
+  content: "";
+  flex: 0 1 120px;
+  height: 1px;
+  background: var(--line-faint);
 }
 .dossier__inner {
   max-width: 1040px;
@@ -1571,23 +1583,34 @@ body[data-treatment="shiny"] .dia-fill { fill: rgba(200, 196, 187, 0.15); stroke
 
 /* archive plate — one screenshot-sized section */
 .dplate {
+  display: grid;
+  grid-template-columns: 44px 1fr;
+  column-gap: 16px;
+  align-items: start;
   border: 1px solid var(--line-faint);
   border-top-color: rgba(233, 229, 220, 0.13); /* plate top-edge light */
   border-radius: var(--r-plate);
   background: rgba(233, 229, 220, 0.012); /* flat archive document */
   padding: 24px 28px 26px;
 }
+/* counting spine — the plate numeral pinned in a left gutter (flat: number + type, no depth) */
+.dplate__spine {
+  grid-column: 1;
+  font-family: var(--font-mono);
+  font-size: 22px;
+  line-height: 1;
+  letter-spacing: 0.04em;
+  color: var(--t-ghost);
+  font-variant-numeric: tabular-nums;
+}
+.dplate__body { grid-column: 2; min-width: 0; }
+/* the Oracle plate centers on the full plate, not the narrower 1fr body column */
+.dplate--oracle .dplate__body { grid-column: 1 / -1; }
 .dplate__head {
   display: flex;
   align-items: baseline;
   gap: 14px;
   padding-bottom: 18px;
-}
-.dplate__no {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  letter-spacing: 0.1em;
-  color: var(--faint);
 }
 .dplate__title {
   font-family: var(--font-display);
@@ -1596,25 +1619,6 @@ body[data-treatment="shiny"] .dia-fill { fill: rgba(200, 196, 187, 0.15); stroke
   color: var(--silver-bright);
 }
 .dplate__rule { flex: 1; height: 1px; background: var(--line-faint); align-self: center; }
-.dplate__tag {
-  font-family: var(--font-mono);
-  font-size: 8.5px;
-  letter-spacing: 0.22em;
-  color: var(--faint);
-  border: 1px dashed var(--line);
-  border-radius: 3px;
-  padding: 4px 9px;
-  white-space: nowrap;
-}
-.dplate__tag--dev {
-  border-style: solid;
-  color: var(--silver);
-  border-color: var(--line-strong);
-}
-body[data-treatment="shiny"] .dplate__tag--dev {
-  color: var(--halo-a, var(--silver));
-  border-color: color-mix(in srgb, var(--halo-a, #8b7bff) 50%, transparent);
-}
 
 /* dossier rhythm (DESIGN_TOKENS): quiet → medium → medium → LOUD →
    medium → quiet → LOUD finale. Loudness = spacing, scale, contrast —
@@ -1631,6 +1635,17 @@ body[data-treatment="shiny"] .dplate__tag--dev {
   margin-top: 14px;
   background: rgba(233, 229, 220, 0.022);
   border-top-color: rgba(233, 229, 220, 0.18);
+  border-left: 2px solid var(--line-strong); /* LOUD-plate ledger edge */
+}
+.dossier__inner .dplate:nth-of-type(4) .dplate__spine,
+.dossier__inner .dplate:nth-of-type(7) .dplate__spine {
+  font-size: 28px;
+  color: var(--t-meta);
+}
+/* Halo: the Oracle (07) left edge is the one sanctioned surround accent.
+   Specificity (0,3,1) beats the LOUD rule's (0,3,0) so the tint actually paints. */
+body[data-treatment="shiny"] .dossier__inner .dplate--oracle {
+  border-left-color: color-mix(in srgb, var(--halo-a, #8b7bff) 30%, transparent);
 }
 
 /* 01 + 06 — record grids */
@@ -1877,10 +1892,7 @@ body[data-treatment="shiny"] .dhidden__val { color: var(--halo-a, var(--t-displa
 /* 06 — mint record */
 .dplate--mint {
   border-color: var(--line);
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.03) 0%, rgba(0, 0, 0, 0.12) 100%);
-}
-body[data-treatment="shiny"] .dplate--mint {
-  border-color: color-mix(in srgb, var(--halo-a, #8b7bff) 35%, transparent);
+  background: rgba(233, 229, 220, 0.012); /* flat — accent stays on the Halo Oracle edge only */
 }
 .dmint__note {
   margin-top: 16px;
@@ -2462,6 +2474,9 @@ body[data-view="room"] .dev { display: none; }
   .dboard { grid-template-columns: 1fr; }
   .dstats, .dfitaura, .drecord { grid-template-columns: 1fr; }
   .dhidden { flex-direction: column; text-align: center; gap: 14px; }
+  /* collapse the counting-spine gutter on narrow screens */
+  .dplate { grid-template-columns: 1fr; column-gap: 0; }
+  .dplate__spine { font-size: 13px; color: var(--t-meta); margin-bottom: 8px; }
   .menu__brand { font-size: 23px; letter-spacing: 0.26em; }
   /* Free Pull mock stacks: image slab on top, label below */
   .fpwrap { width: 100%; }

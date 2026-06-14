@@ -6,6 +6,29 @@ Last updated: 2026-06-14.
 
 ## Active
 
+- **Dossier de-dull v1 (counting spine · threshold · ledger edges · cut tag)** (2026-06-14 / BR-S048, app.js +
+  styles.css): made the 7-plate dossier read as THE RECORD OF THIS CARD via flat line+number+type only —
+  `LAYUP_RESEARCH_V1` Task #3 (dossier half). **(a)** pulled the plate numeral into a pinned 44px LEFT counting
+  spine (`.dplate__spine`, 22px mono `--t-ghost`, 28px/`--t-meta` on LOUD plates 04/07) by making `.dplate` itself
+  a `44px 1fr` grid with a `.dplate__body` right column — `.dplate` STAYS the direct child of `.dossier__inner`
+  so the `:nth-of-type(1/4/6/7)` rhythm is untouched (LAYUP §5's literal "wrap each plate in a row" would have
+  BROKEN it). **(b)** room→archive threshold: `.dossier` top rule promoted 1px→**2px `--line-strong`** + the
+  `.dossier__cue` restyled as a centered flanked label (`::before/::after` hairlines). **(c)** LOUD plates 04/07
+  get a 2px `--line-strong` LEFT ledger edge; in **Halo only**, the Oracle (07) edge becomes the one sanctioned
+  surround accent (per-source halo tint ≤30% mix) — accent selector specificity raised to (0,3,1) so it actually
+  paints over the LOUD rule. **(d)** **CUT** the blanket per-plate `ARCHIVE PULL / DEVELOPED` tag (un-smears the
+  single back-seam gate per `UNIVERSE_ZONE_MAP_V1` §3; supersedes LAYUP §5's "de-chrome" line) + flattened
+  plate-06's mint gradient/shiny-tint so accent stays solely on the Oracle edge. State stays legible via existing
+  per-plate copy. **Built via a 12-agent workflow** (4 critique lenses → 3 plans → synth → 4 adversarial
+  verifiers); the verifiers caught + I fixed a real cascade bug (the accent would have LOST the cascade to the
+  LOUD rule) and a desktop oracle-centering break. **No data.js change.** **Verified live** (1600×900 + narrow,
+  DOM/getComputedStyle — screenshots time out): 7 spines 01–07; rhythm pad 1/6=20·26·22 + LOUD 4/7=38·36·40;
+  threshold 2px line-strong; 0 legacy tag/numeral; Oracle accent paints per-source (copper SRC-01 / frost SRC-02)
+  only in shiny, neutral in free/mint; plates 04+06 neutral; oracle centered Δ1px; narrow gutter collapses;
+  free/shiny/mint × both sources + `?dev=halo-gate` (dossier built, correctly hidden) + bare menu all render;
+  console clean. **Completed.** **Next up:** Right polish (LAYUP Task #3b). *(Deferred: top-edge shutter reveal =
+  Engineered Technique Pass #2, its own commit.)*
+
 - **Security review playbook v1 (`docs/security/`)** (2026-06-14 / BR-S047, docs only — new `docs/security/`
   folder + FILE_MAP + DECISION_LOG; shipped together with BR-S046 as one scaffolding commit): staged
   `docs/security/SECURITY_REVIEW_PLAYBOOK.md` — the ordered, gate-by-gate security go-through to run WHEN a
@@ -509,7 +532,7 @@ Last updated: 2026-06-14.
 
 > **Builder-set near-term sequence (updated 2026-06-14, BR-S044):** dev-nav (DONE, BR-S040) →
 > Menu Re-frame (DONE, BR-S041) → /cleanup whole-repo (DONE, BR-S042) → Left redesign (Source merge) (DONE, BR-S044)
-> → **Below redesign (Dossier de-dull) (NEXT)** → Right polish. Grounded by the direction-synthesis workflow + research:
+> → Below redesign (Dossier de-dull) (DONE, BR-S048) → **Right polish (NEXT)**. Grounded by the direction-synthesis workflow + research:
 > - **Menu Re-frame v1 (DONE, BR-S041)** — built Direction A "Sealed Pull" (one complete card, ladder
 >   killed, sealed caption). Originally specced: the "layup" fix. `FREE_PAID_MODEL_V1` verdict: the
 >   complete-front/sealed-back model is LOCKED and right; the defect is tier-ladder
@@ -525,8 +548,10 @@ Last updated: 2026-06-14.
 >   ladder on the in-room "Develops:" CTA + the 7× ARCHIVE-PULL plate tags.)
 > - **Left redesign — Source merge (DONE, BR-S044)** = `LAYUP_RESEARCH_V1` Task #4 (collapsed Source into
 >   Diagram as CLEAN|ANNOTATED, deleted the redundant Capture Record, re-pointed ?tab=source → diagram).
-> - **Below redesign — Dossier de-dull (NEXT)** = LAYUP Task #3a (counting-spine gutter, room→archive
->   threshold rule, shutter reveal). **Right polish** = LAYUP Task #3b (later; "medium", not "lacking").
+> - **Below redesign — Dossier de-dull (DONE, BR-S048)** = LAYUP Task #3 dossier half (counting-spine gutter,
+>   room→archive threshold, LOUD ledger edges, CUT the blanket plate tag). The shutter reveal was DEFERRED to
+>   Engineered Technique Pass #2 (its own commit). **Right polish (NEXT)** = LAYUP Task #3b (right-panel index
+>   gutter, section labels, tiered weight via line only, aura-chips-as-ledger; "medium", not "lacking").
 > - **Set aside (builder, BR-S040):** a full Halo card "example" — a populated stats-card
 >   trips the magnetism kill-rule; revisit later (sealed-back only if shown). Deeper
 >   "essence / marketing / value-stacking / existence-framing" = a FUTURE research pass, not now.

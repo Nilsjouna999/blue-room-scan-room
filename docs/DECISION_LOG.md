@@ -280,3 +280,21 @@ trust boundary, no client secrets, CSP) are NOT relaxable by this doc — they i
 "the code is secure." Docs only; no scan run, no runtime change.
 Revisit: run the playbook (and re-trigger per its §4) before wiring the uploaded-photo engine / any backend /
 payment / first public deploy, or on any new param/external script/`innerHTML`/`esc()`/contract change.
+
+**2026-06-14 / Dossier de-dull: counting spine + threshold + CUT the blanket plate tag / ACTIVE (impl of a researched fix)**
+Why: the 7-plate dossier read as loose equal-gravity plates, not one record. Per `LAYUP_RESEARCH_V1` Task #3
+(dossier half) it now reads as THE RECORD OF THIS CARD via flat line+number+type only — a pinned 44px left
+counting spine (the numeral gutter), a 2px `--line-strong` room→archive threshold rule + a flanked `.dossier__cue`
+label, and 2px `--line-strong` LEFT ledger edges on the LOUD plates 04/07. `.dplate` became a `44px 1fr` grid
+(numeral → `.dplate__spine`, head+body → `.dplate__body`) while STAYING the direct child of `.dossier__inner`, so
+the `:nth-of-type(1/4/6/7)` rhythm is preserved — LAYUP §5's literal "wrap each plate in a row" was deliberately
+NOT followed (it would break the rhythm). **Tag decision:** the blanket per-plate `ARCHIVE PULL / DEVELOPED` tag
+was **CUT** (not de-chromed) — it smeared the single back-seam gate that `UNIVERSE_ZONE_MAP_V1` §3 concentrates at
+Card Record, and its shiny variant was a per-plate accent-budget violation. **This supersedes
+`LAYUP_RESEARCH_V1` §5's "de-chrome dplate__tag to ghost mono" line**, per the ZONE_MAP §3 free/paid fork;
+free-vs-developed state stays legible via existing per-plate copy. The Halo Oracle (07) left edge is now the one
+sanctioned surround accent (per-source tint ≤30%); plate-06's mint gradient + shiny tint were flattened so accent
+lives only there. Built + adversarially verified via a 12-agent workflow (the verifiers caught a real CSS cascade
+bug — the accent would have lost specificity to the LOUD rule — and a desktop oracle-centering break, both fixed);
+runtime-verified in-browser, no data.js change.
+Revisit: with Right polish (LAYUP #3b) and the deferred top-edge shutter reveal (Engineered Technique Pass #2).

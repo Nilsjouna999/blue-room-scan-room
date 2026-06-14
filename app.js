@@ -651,15 +651,19 @@ function renderReadingPanel(src, treatment) {
    Free state reads as undeveloped archive material — never a paywall. */
 
 function dplate(no, title, paid, body, extraClass = "") {
+  /* paid retained in the signature (callers pass it); the per-plate develop/
+     archive tag was CUT (BR-S048) — the single back-seam gate concentrates at
+     Card Record, and per-plate copy carries free-vs-developed state. */
   return `
     <section class="dplate ${extraClass}">
-      <header class="dplate__head">
-        <span class="dplate__no">${no}</span>
-        <h3 class="dplate__title">${esc(title)}</h3>
-        <span class="dplate__rule"></span>
-        <span class="dplate__tag ${paid ? "dplate__tag--dev" : ""}">${paid ? "DEVELOPED" : "ARCHIVE PULL"}</span>
-      </header>
-      ${body}
+      <span class="dplate__spine" aria-hidden="true">${no}</span>
+      <div class="dplate__body">
+        <header class="dplate__head">
+          <h3 class="dplate__title">${esc(title)}</h3>
+          <span class="dplate__rule"></span>
+        </header>
+        ${body}
+      </div>
     </section>`;
 }
 
