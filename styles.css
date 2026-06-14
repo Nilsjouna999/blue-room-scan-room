@@ -465,6 +465,17 @@ body {
   z-index: 3;
 }
 
+/* Engineered edge (Shiny Technique #1, CARD_TECH_LAB §20) — chamfered
+   "machined-cut" corners on the master card geometry. Additive + @supports-
+   gated so browsers without corner-shape keep the existing square radius;
+   restyle-not-relayout (radius magnitude unchanged, only the corner shape).
+   Applies to every treatment. Revert = delete this block. */
+@supports (corner-shape: bevel) {
+  .card { corner-shape: bevel; }
+  .card__plate { corner-shape: bevel; }
+  .card__plate::before { corner-shape: bevel; }
+}
+
 .corner { position: absolute; width: 14px; height: 14px; pointer-events: none; z-index: 4; }
 .corner::before, .corner::after { content: ""; position: absolute; background: var(--line-strong); }
 .corner::before { width: 14px; height: 1px; }

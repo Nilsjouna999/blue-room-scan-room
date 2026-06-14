@@ -185,6 +185,21 @@ payment/Halo/upload analysis). GPT_REVIEW_GUIDE + TASK_QUEUE + SESSION_BRIEF
 note the folder. Roadmap unchanged beyond this checkpoint — next product task
 stays **Free Pull Mock Polish v1**.
 
+## Engineered Technique Pass v1 — #1 Card corner-shape edge (2026-06-14 / BR-S037, styles.css)
+
+Ranked build program from the deep-scout research (5 web-standard techniques;
+**one technique = one commit** for granular revert against `baseline-v1`). **#1 of 5:
+CSS `corner-shape` chamfered card corners.** Added an `@supports(corner-shape: bevel)`
+block setting `corner-shape: bevel` on `.card` / `.card__plate` / `.card__plate::before`
+— the master card now reads as a machined-cut object on every treatment; browsers
+without `corner-shape` keep the square 12px radius. **Restyle-not-relayout:**
+border-radius magnitude and card box dimensions are unchanged (verified live: card
+440×~722, `corner-shape:bevel` computed, console clean; chamfer confirmed via
+headless-Edge screenshots at 1×/2×). Additive — revert = delete the block (or
+`git checkout baseline-v1 -- styles.css`). **Remaining ranked (each its own commit):**
+#2 scroll-driven dossier reveal · #3 `@property` stat-band fill · #4 SVG line-draw
+(Diagram) · #5 pointer spotlight (Lab) — #4/#5 held pending a visual/value check.
+
 ## Revert Playbook + baseline-v1 tag (2026-06-14, docs only + git tag)
 
 Added `docs/REVERT_PLAYBOOK.md` (FILE_MAP registers it) so "revert / roll back /

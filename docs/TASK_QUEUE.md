@@ -6,6 +6,19 @@ Last updated: 2026-06-14.
 
 ## Active
 
+- **Engineered Technique Pass v1** (2026-06-14 / BR-S037, in progress — styles.css):
+  ranked build program from the deep code-design scout (5 web-standard, zero-dep,
+  reduced-motion-safe techniques, each mapped to an existing surface). **One
+  technique = one commit** for granular revert against `baseline-v1`. **#1 SHIPPED:
+  CSS `corner-shape` chamfered "machined-cut" card corners** (`@supports`-gated on
+  `.card`/`.card__plate`; square-radius fallback; geometry unchanged; verified via
+  headless-Edge screenshots + DOM; console clean). Ranked remainder: **#2 scroll-
+  driven dossier reveal**, **#3 `@property` stat-band fill** (both high value-
+  confidence), **#4 SVG line-draw (Diagram)** + **#5 pointer spotlight (Lab)** (held
+  pending a visual/value check — gimmick/soft-SaaS risk on #5). Candidates +
+  rationale: deep-scout research result; copy-safe/revert guidance in
+  `docs/REVERT_PLAYBOOK.md`. **Next up:** technique #2 (scroll-driven dossier reveal).
+
 - **Three Shiny Material Prototypes v1** (2026-06-14 / BR-S036, data.js + app.js +
   styles.css): built CARD_TECH_LAB §20's three card-finish studies — **Cold Foil ·
   Black Star · Night Gloss** — switchable in the **Lab state** for screenshot
@@ -366,19 +379,39 @@ Last updated: 2026-06-14.
    Star / Night Gloss) filed in CARD_TECH_LAB §20. Built as an overlay, NOT §20
    #4's new `data-treatment` (avoids the `TREATMENTS`-lookup crash + gating churn).
    Formal winner pick deferred to "Final Halo material decision". See Active.)*
-0. **Halo Dossier Schema v1** (NEXT) — schema FIRST, not the full route/build.
-   Define the data shape for the sealed Halo dossier (the card back) per
-   `docs/halo/HALO_GATE_BOUNDARY_V1.md` §D (its 7 candidate modules are
-   "production notes — define, do NOT build"), reusing the audited artifact-safe
-   language; no runtime build, no payment/AI/unlock/upload.
+   *(Engineered Technique Pass #1 — Card corner-shape edge — SHIPPED BR-S037; see
+   Active. The pass is now the active program ahead of Halo Dossier Schema, per the
+   user's direction to pursue the scouted techniques.)*
+0. **Engineered Technique Pass #2 — scroll-driven dossier reveal** (NEXT) — per-plate
+   entrance via `animation-timeline: view()` + `clip-path: inset()` (mechanical
+   shutter, not a soft fade) on the 7 dossier plates. Zero-JS, off-main-thread.
+   *Done when:* each `.dplate` reveals on scroll, `@supports`-gated, `prefers-reduced-
+   motion` → fully shown; dossier still renders in both states; geometry/console clean.
+1. **Engineered Technique Pass #3 — `@property` stat-band fill** — register `--fill`
+   as `<percentage>`, animate `0% → band` on the stat bars (smooth gauge interpolation).
+   *Done when:* bars interpolate; NO 0–100 number ever surfaces (tierBand words only);
+   reduced-motion neutralized; free/halo unaffected.
+2. **Engineered Technique Pass #4 — SVG line-draw (Diagram)** *(held — visual/value
+   check first)* — `stroke-dashoffset` draw on the Diagram-tab overlays on tab
+   activation; RM → drawn. Watch existing dash hairlines (use `pathLength`/separate layer).
+3. **Engineered Technique Pass #5 — pointer spotlight (Lab)** *(held — visual/value
+   check first; gimmick/soft-SaaS risk)* — pointer-tracked radial-gradient (`--x/--y`)
+   with `mix-blend-mode: soft-light` over the Lab card photo; rAF-throttled, re-centers
+   on leave; the only one adding JS.
+4. **Halo Dossier Schema v1** — schema FIRST, not the full route/build. Define the
+   data shape for the sealed Halo dossier (the card back) per
+   `docs/halo/HALO_GATE_BOUNDARY_V1.md` §D (7 candidate modules are "production notes
+   — define, do NOT build"), reusing the audited artifact-safe language; no runtime
+   build, no payment/AI/unlock/upload. *(Deferred behind the technique pass per user
+   direction; still the right "schema-not-route" framing when it comes up.)*
    *Done when:* a Halo dossier schema spec exists (fields + safety rules + the
    Free/Halo reveal model), FILE_MAP registers it, runtime unchanged.
-1. **Dossier plate material polish** — taste debt from the 2026-06-12
+5. **Dossier plate material polish** — taste debt from the 2026-06-12
    review: plates read flat next to the card; let the material accent
    bleed in (Mint Record plate already does).
    *Done when:* Halo dossier plates carry a restrained material accent;
    free stays matte; screenshots regenerated.
-2. **Route label in Source Record** — the last remnant of v2 surfacing:
+6. **Route label in Source Record** — the last remnant of v2 surfacing:
    one row in the dossier Source Record showing `scan.route` +
    `scanStatus` (e.g. "HUMAN_SOLO · accepted"), legacy-safe when v2
    absent. Tiny app.js change.

@@ -10,6 +10,51 @@ coding session; the assistant must respect it. Files not listed under
 does not match the user's current task — **stop and ask** before doing
 anything. (GOVERNANCE_OS anti-drift.)
 
+## Active session — BR-S037
+
+**Date / Session ID:** 2026-06-14 / BR-S037
+
+**Today's task:** Engineered Technique Pass v1 (ranked, one technique = one commit)
+
+**Why:** Apply the deep code-design scout's 5 web-standard techniques to raise the
+"engineered object" feel, sequenced one-at-a-time (one-job-per-session law + clean
+per-feature revert against `baseline-v1`), each verified with a real headless-Edge
+screenshot before commit. Held #4/#5 pending a visual/value check.
+
+**Read:** docs/PROJECT_OS.md · docs/CARD_TECH_LAB.md (§16/§20) · docs/DESIGN_TOKENS.md
+· docs/PERFORMANCE_BUDGET.md · docs/REVERT_PLAYBOOK.md · docs/CHANGE_MAP.md ·
+docs/TASK_QUEUE.md · styles.css · app.js
+
+**Edit (per technique, separately):** styles.css (and app.js only for #5's pointer JS)
+· docs/CHANGE_MAP.md · docs/TASK_QUEUE.md · docs/SESSION_BRIEF.md
+
+**Do not open:** C:\Users\nilsj\OneDrive\Documents\blue-room
+
+**Authority affected:** ACTIVE SPECS implementation (CARD_TECH_LAB §20 candidates) —
+visual only; no CORE LAW change.
+
+**Locked constraints:** treatments restyle, never re-layout (geometry LOCKED) ·
+animate only transform/opacity/clip-path/single custom prop — NO animated blur/filter
+core · no WebGL/Three/heavy libs · reduced-motion safe · `@supports`-gated + additive
+(revert = delete the block) · no public 0–100 · no dark patterns · no payment/AI/
+backend/upload · free + paid `shiny` must stay intact · one technique = one commit.
+
+**Known current state:** Three Shiny Material Prototypes v1 (9a5ffb0); Revert Playbook
++ `baseline-v1` tag (e323159); preview = Chrome 148 (supports all 5 techniques);
+headless-Edge screenshot pipeline works (`capture-screens.ps1` pattern) for real
+visual sign-off (the MCP screenshot tool times out).
+
+**Definition of done (per technique):** technique renders + verified via headless-Edge
+screenshot + DOM; `@supports`/reduced-motion fallbacks correct; geometry/free/shiny
+intact; console clean; CHANGE_MAP/TASK_QUEUE/SESSION_BRIEF updated; its own commit + push.
+
+**Verification:** headless-Edge screenshot at 1×/2× + preview-MCP DOM/computed-style +
+console sweep, per technique. #1 corner-shape: `corner-shape:bevel` computed, radius
+12px + card box unchanged (440×~722), chamfer visible in screenshots, console clean.
+
+**Final response format:** confidence · per-technique commit hash · what shipped/held ·
+verification (incl. screenshot) · next technique · rollback.
+
 ## Active session — BR-S036
 
 **Date / Session ID:** 2026-06-14 / BR-S036
