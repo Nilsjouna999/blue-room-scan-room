@@ -185,6 +185,21 @@ payment/Halo/upload analysis). GPT_REVIEW_GUIDE + TASK_QUEUE + SESSION_BRIEF
 note the folder. Roadmap unchanged beyond this checkpoint — next product task
 stays **Free Pull Mock Polish v1**.
 
+## Free / Paid Model v1 (2026-06-14, docs only — research)
+
+Saved `docs/research/FREE_PAID_MODEL_V1.md` (RESEARCH; FILE_MAP registers it) from an
+11-agent White Death on the free/paid question (4 grounded inspectors → Opus audit → 5
+scouts → Opus rank). Finding: the boundary is sound (complete front / sealed back); the
+defect is **tier-ladder FRAMING** on the menu compare-tiles, the in-room "Develops:" CTA,
+and the 7× ARCHIVE-PULL plate tags — which is why Free reads as the raw leftover. Holds:
+the sharpened question (affordance+copy, not what's gated), 5 decision-axes (design /
+data kind-vs-amount / visual complete-but-matte / funnel-timing / per-zone one-gate), the
+model shortlist (KEEP front/back; the user's raw→structured instinct folds in as DILUTE;
+3 kills incl. "same data re-skinned"), a concrete 5-step MENU FIX, and native analogies
+(contact-sheet vs finished print; TCG base + holo + first-edition stamp). The menu fix is
+the recommended first pull (restyle/recopy only, upholds the locked model). Pull on
+demand; implements nothing.
+
 ## Universe Map v1 (2026-06-14, docs only — research)
 
 Saved `docs/research/UNIVERSE_MAP_V1.md` (RESEARCH; FILE_MAP registers it) from a White
