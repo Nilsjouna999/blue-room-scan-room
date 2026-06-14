@@ -185,6 +185,19 @@ payment/Halo/upload analysis). GPT_REVIEW_GUIDE + TASK_QUEUE + SESSION_BRIEF
 note the folder. Roadmap unchanged beyond this checkpoint — next product task
 stays **Free Pull Mock Polish v1**.
 
+## Revert Playbook + baseline-v1 tag (2026-06-14, docs only + git tag)
+
+Added `docs/REVERT_PLAYBOOK.md` (FILE_MAP registers it) so "revert / roll back /
+undo / go back to before X" is unambiguous and self-locating: the three restore-point
+kinds (named `baseline-*` tags · per-task commits indexed by this CHANGE_MAP +
+TASK_QUEUE · the working tree), a symptom→target→command table for SPOTTING what to
+revert, when each git command is safe (`git revert` preferred on main; `checkout
+<tag> -- <file>` for file restore; `reset --hard` destructive/branch-only), and the
+pre-big-change ritual (tag a `baseline-vN` + push, or branch `experiment/<name>`,
+prefer additive-behind-Lab, one idea = one commit). Also stamped the annotated git
+tag **`baseline-v1` → `9a5ffb0`** (pushed) = the state before the shiny-technique
+experiments. No runtime change.
+
 ## Three Shiny Material Prototypes v1 (2026-06-14 / BR-S036, data.js + app.js + styles.css)
 
 Built the CARD_TECH_LAB §20 / TASK_QUEUE Ready #0 prototype: three controlled

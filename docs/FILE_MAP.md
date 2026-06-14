@@ -59,6 +59,7 @@ implementation (GOVERNANCE_OS funnel).
 | `docs/TASK_QUEUE.md` | Ranked work queue | Logging out-of-scope findings; picking next work | — |
 | `docs/SESSION_BRIEF.md` | Per-session scope template + example | Start of every session | — |
 | `docs/GOVERNANCE_OS.md` | Authority layers, statuses, change reviews, promotion funnel, anti-drift/clutter rules | A change touches LOCKED/ACTIVE authority; resolving conflicts | To excuse skipping the funnel |
+| `docs/REVERT_PLAYBOOK.md` | How to undo changes + identify the target: baseline tags (`baseline-v1` = pre shiny-technique experiments), per-task commits indexed by CHANGE_MAP/TASK_QUEUE, symptom→command table, safe `git revert`/`checkout` vs destructive reset, pre-big-change tag/branch ritual | The user says "revert / roll back / undo / go back to before X"; before a huge new idea (tag a baseline first) | Keeping literal backup copies of files (use git tags/commits instead) |
 | `docs/SCAN_ROUTING_SPEC.md` | ACTIVE spec: intake gate, routes, reject/limited copy, Free/Halo routing split | Building intake/routing; writing route copy | — |
 | `docs/SCAN_ENGINE_SPEC.md` | ACTIVE spec: lens engine, stat visibility (4 free / deeper Halo), confidence shrinkage, receipts | Building scoring/receipts; any stat-visibility question | — |
 | `docs/SCAN_ENGINE_CONTRACT.md` | ACTIVE spec: future **uploaded-photo** result shape + safety boundaries (red lines, lifecycle, Free/Halo reveal, engine-connection gates) | Designing/validating the uploaded-photo engine; before connecting any analysis | — |
