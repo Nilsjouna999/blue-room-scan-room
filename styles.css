@@ -336,6 +336,7 @@ body {
 }
 .scanframe__meta--tl { top: 9px; left: 9px; }
 .scanframe__meta--br { bottom: 9px; right: 9px; }
+.scanframe__meta--bl { bottom: 9px; left: 9px; }
 
 .marker {
   position: absolute;
@@ -1338,6 +1339,18 @@ body[data-treatment="shiny"] .stagezone {
 /* ---- diagram tab: scan sheet overlay ---- */
 
 .scanframe--diagram .scanframe__img { filter: saturate(0.65) brightness(0.78); }
+
+/* Source merged into Diagram (BR-S044): ANNOTATED = overlay read + desaturated photo
+   (default); CLEAN = raw full-saturation photo + numbered markers + legend. Flat toggle. */
+.diagtoggle { display: flex; gap: 4px; margin: 0 0 10px; }
+.diagtoggle .tabbar__btn { flex: 0 0 auto; padding: 4px 12px; }
+.diagwrap.is-clean .scanframe--diagram .scanframe__img { filter: none; }
+.diagwrap.is-clean .diagsvg, .diagwrap.is-clean .diaglabels { display: none; }
+.diagwrap:not(.is-clean) .marker { display: none; }
+.diagwrap:not(.is-clean) .markerlegend { display: none; }
+.diagwrap .markerlegend { margin-top: 11px; }
+.notes__sub { font-family: var(--font-mono); font-size: 8px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--silver-dim); margin-bottom: 8px; }
+.notes--diagram { margin-top: 11px; padding-top: 11px; border-top: 1px solid var(--line-faint); }
 
 .diagsvg {
   position: absolute;

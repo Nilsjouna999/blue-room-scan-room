@@ -41,7 +41,7 @@ function tierBand(v) {
   return "Muted";
 }
 
-const state = { source: 0, treatment: "free", tab: "source", view: "menu", draftGate: false, dev: null, labMaterial: null };
+const state = { source: 0, treatment: "free", tab: "diagram", view: "menu", draftGate: false, dev: null, labMaterial: null, diagramView: "annotated" };
 
 /* Deep-link support: ?src=1|2&t=free|shiny|mint&tab=source|diagram|metrics
    (used by reviewers and the screenshot pipeline). Any of these params
@@ -52,7 +52,10 @@ const state = { source: 0, treatment: "free", tab: "source", view: "menu", draft
   const s = parseInt(q.get("src"), 10);
   if (s === 1 || s === 2) state.source = s - 1;
   if (["free", "shiny", "mint"].includes(q.get("t"))) state.treatment = q.get("t");
-  if (["source", "diagram", "metrics"].includes(q.get("tab"))) state.tab = q.get("tab");
+  /* Source merged into Diagram (BR-S044): legacy ?tab=source re-points to diagram. */
+  const tabParam = q.get("tab");
+  if (["source", "diagram", "metrics"].includes(tabParam)) state.tab = tabParam === "source" ? "diagram" : tabParam;
+  if (["clean", "annotated"].includes(q.get("dv"))) state.diagramView = q.get("dv");
   /* Lab material study (CARD_TECH_LAB §20) — reproducible-capture deep link.
      Applies ONLY in the Lab state (t=mint); ignored otherwise. Does not, on its
      own, open the room — only t/src/tab do that (below). */
@@ -121,75 +124,24 @@ function imgOrPlaceholder(src, cls, extra = "") {
 /* ---------- left panel: tabbed analysis (Source / Diagram / Metrics) ---------- */
 
 function renderLeftPanel(src, treatment, tab) {
+  const t2 = tab === "source" ? "diagram" : tab; // Source merged into Diagram (BR-S044)
   const tabbar = `
     <div class="tabbar" role="tablist" aria-label="Analysis tabs">
-      ${["source", "diagram", "metrics"]
+      ${["diagram", "metrics"]
         .map(
           (t) =>
-            `<button type="button" class="tabbar__btn ${t === tab ? "is-active" : ""}" data-tab="${t}">${
+            `<button type="button" class="tabbar__btn ${t === t2 ? "is-active" : ""}" data-tab="${t}">${
               t[0].toUpperCase() + t.slice(1)
             }</button>`
         )
         .join("")}
     </div>`;
-  const body =
-    tab === "diagram"
-      ? renderDiagramTab(src, treatment)
-      : tab === "metrics"
-      ? renderMetricsTab(src, treatment)
-      : renderSourceTab(src);
+  const body = t2 === "metrics" ? renderMetricsTab(src, treatment) : renderDiagramTab(src, treatment);
   return tabbar + body;
 }
 
-/* ---------- tab 1: source ---------- */
-
-function renderSourceTab(src) {
-  const markers = src.markers
-    .map(
-      (m, i) => `
-      <span class="marker" style="left:${m.x}%; top:${m.y}%;">
-        <span class="marker__ring"></span><span class="marker__no">${i + 1}</span>
-      </span>`
-    )
-    .join("");
-  const horizon = src.horizon == null ? "" : `<span class="horizonline" style="top:${src.horizon}%"></span>`;
-
-  return `
-    <div class="module">
-      ${moduleHead(src.label)}
-      <div class="scanframe" data-imgwrap>
-        ${imgOrPlaceholder(src.file, "scanframe__img")}
-        <span class="scanframe__corners"></span>
-        ${horizon}
-        ${markers}
-        <span class="scanframe__meta scanframe__meta--tl">BR-SRC ${pad2(src.no)}</span>
-        <span class="scanframe__meta scanframe__meta--br">${esc(src.capture.code)}</span>
-      </div>
-      <ul class="markerlegend">
-        ${src.markers.map((m, i) => `<li><span class="markerlegend__no">${i + 1}</span>${esc(m.label)}</li>`).join("")}
-      </ul>
-    </div>
-
-    <div class="module">
-      ${moduleHead("Capture Record")}
-      <dl class="kv">
-        <div><dt>Source</dt><dd>${esc(src.capture.code)}</dd></div>
-        <div><dt>Lens</dt><dd>${esc(src.capture.lens)}</dd></div>
-        <div><dt>Light</dt><dd>${esc(src.capture.light)}</dd></div>
-        <div><dt>Locale</dt><dd>${esc(src.capture.locale)}</dd></div>
-        <div><dt>Recorded</dt><dd>REC ${esc(src.capture.rec)}</dd></div>
-      </dl>
-    </div>
-
-    <div class="module">
-      ${moduleHead("Frame Analysis")}
-      <ul class="notes">
-        ${src.analysis.map((n) => `<li>${esc(n)}</li>`).join("")}
-      </ul>
-    </div>`;
-}
-
-/* ---------- tab 2: diagram (visual scan sheet) ---------- */
+/* ---------- tab 1: diagram (visual scan sheet — Source merged in BR-S044:
+   CLEAN = raw photo + numbered markers + legend; ANNOTATED = overlays) ---------- */
 
 /* Lines/shapes live in a stretched SVG (viewBox 0..100 both axes,
    preserveAspectRatio none) with non-scaling strokes; labels are
@@ -198,6 +150,11 @@ function renderDiagramTab(src, treatment) {
   const full = treatment !== "free";
   const d = src.diagram;
   const focal = src.markers[0];
+  const clean = state.diagramView === "clean"; // CLEAN = raw + markers; ANNOTATED = overlays (BR-S044)
+  const markers = src.markers
+    .map((m, i) => `<span class="marker" style="left:${m.x}%; top:${m.y}%;"><span class="marker__ring"></span><span class="marker__no">${i + 1}</span></span>`)
+    .join("");
+  const horizon = src.horizon == null ? "" : `<span class="horizonline" style="top:${src.horizon}%"></span>`;
   /* The overlay SVG is stretched to the image (preserveAspectRatio
      none), so circular shapes must be drawn as ellipses with the
      y-radius divided by the displayed aspect, and angles computed
@@ -302,18 +259,36 @@ function renderDiagramTab(src, treatment) {
   return `
     <div class="module">
       ${moduleHead(`${src.label} — Diagram`)}
-      <div class="scanframe scanframe--diagram" data-imgwrap>
-        ${imgOrPlaceholder(src.file, "scanframe__img")}
-        <svg class="diagsvg" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">${svg}</svg>
-        <span class="diaglabels">${labels}</span>
-        <span class="scanframe__meta scanframe__meta--tl">SCAN SHEET ${pad2(src.no)}</span>
+      <div class="diagtoggle" role="group" aria-label="Frame view">
+        <button type="button" class="tabbar__btn ${!clean ? "is-active" : ""}" data-diagview="annotated">Annotated</button>
+        <button type="button" class="tabbar__btn ${clean ? "is-active" : ""}" data-diagview="clean">Clean</button>
+      </div>
+      <div class="diagwrap ${clean ? "is-clean" : ""}">
+        <div class="scanframe scanframe--diagram" data-imgwrap>
+          ${imgOrPlaceholder(src.file, "scanframe__img")}
+          <span class="scanframe__corners"></span>
+          ${horizon}
+          ${markers}
+          <svg class="diagsvg" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">${svg}</svg>
+          <span class="diaglabels">${labels}</span>
+          <span class="scanframe__meta scanframe__meta--tl">${clean ? `BR-SRC ${pad2(src.no)}` : `SCAN SHEET ${pad2(src.no)}`}</span>
+          <span class="scanframe__meta scanframe__meta--br">${esc(src.capture.code)}</span>
+          <span class="scanframe__meta scanframe__meta--bl">${esc(src.capture.lens)} · ${esc(src.capture.light)}</span>
+        </div>
+        <ul class="markerlegend">
+          ${src.markers.map((m, i) => `<li><span class="markerlegend__no">${i + 1}</span>${esc(m.label)}</li>`).join("")}
+        </ul>
       </div>
       ${devnote}
     </div>
 
     <div class="module">
       ${moduleHead("Diagram Notes")}
+      <p class="notes__sub">Frame Read</p>
       <ul class="notes">
+        ${src.analysis.map((n) => `<li>${esc(n)}</li>`).join("")}
+      </ul>
+      <ul class="notes notes--diagram">
         ${d.notes.map((n) => `<li>${esc(n)}</li>`).join("")}
       </ul>
     </div>`;
@@ -981,7 +956,7 @@ function renderDevnav() {
     b("view:menu", "Menu"), b("view:room", "Room"), sep,
     b("src:0", "SRC 01"), b("src:1", "SRC 02"), sep,
     b("treat:free", "Free"), b("treat:shiny", "Halo"), b("treat:mint", "Lab"), sep,
-    b("tab:source", "Source"), b("tab:diagram", "Diagram"), b("tab:metrics", "Metrics"), sep,
+    b("tab:diagram", "Diagram"), b("tab:metrics", "Metrics"), sep,
     b("dev:free-scan-sim", "Free Sim"), b("dev:halo-gate", "Halo Gate"),
     b("dev:uploaded-result", "Uploaded"), b("dev:uploaded-blocked", "Blocked"),
   ].join("");
@@ -1751,6 +1726,15 @@ document.getElementById("sourcePanel").addEventListener("click", (e) => {
   const btn = e.target.closest("button[data-tab]");
   if (!btn) return;
   state.tab = btn.dataset.tab;
+  render();
+});
+
+/* CLEAN | ANNOTATED toggle inside the merged Diagram tab (BR-S044) — raw photo +
+   markers vs the overlay read; re-renders the panel (state-backed, survives re-render). */
+document.getElementById("sourcePanel").addEventListener("click", (e) => {
+  const btn = e.target.closest("button[data-diagview]");
+  if (!btn) return;
+  state.diagramView = btn.dataset.diagview;
   render();
 });
 
