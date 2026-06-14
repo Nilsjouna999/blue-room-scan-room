@@ -693,7 +693,6 @@ function renderDossier(src, treatment) {
   const d = src.dossier;
   const c = src.card;
   const scan = getScanResult(src);
-  const tierOut = getTierOutput(scan, treatment);
   const freeVals = scan?.stats.freeVisible || c.stats;
   const haloX = scan?.stats.haloExtended;
 
