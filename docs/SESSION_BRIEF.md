@@ -52,8 +52,7 @@ deep-link bypass + sealed/offline Local Draft flow.
 
 **Known current state:** BR-S040 (dev-nav, `7c9d57b`) shipped + pushed. `renderMenu` (app.js ~928-983)
 renders the compare ladder; menu CSS at styles.css ~1935-2031. `shot()` helper produces
-`.mtile__shot/__img/__scrim/__stamp`. Pre-existing latent typo at app.js:977 (`<\button>` in the
-resume branch) — out of scope; flagged for /cleanup.
+`.mtile__shot/__img/__scrim/__stamp`.
 
 **Definition of done:** the menu shows ONE complete full-saturation Free Pull card (reused `shot()`),
 the caption "The front is complete. The same card has a sealed back." below it, NO compare ladder /

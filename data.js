@@ -417,8 +417,8 @@ const SOURCES = [
 /* =============================================================
    ScanResult v2 — stable data shape per SCAN_ROUTING_SPEC +
    SCAN_ENGINE_SPEC (2026-06-12). Append-only: existing SOURCES
-   fields are MAPPED, not duplicated. Not yet read by app.js —
-   this is the shape for later Free/Halo rendering, kept alongside
+   fields are MAPPED, not duplicated. Read by app.js via
+   getScanResult() for v2 Free/Halo rendering, kept alongside
    legacy data for full compatibility.
 ============================================================= */
 

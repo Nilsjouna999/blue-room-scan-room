@@ -6,6 +6,23 @@ Last updated: 2026-06-14.
 
 ## Active
 
+- **Repo cleanup pass v1 (safe /cleanup)** (2026-06-14 / BR-S042, styles.css + app.js + data.js +
+  docs): ran the saved `/cleanup` routine over all tracked source files — behavior-preserving, one
+  category per commit, every deletion grep-confirmed zero-reference. **Removed (AUTO):** dead CSS — the
+  orphaned compare-ladder (`.msample__compare`, `.mtile` base, `.mtile--free/--halo`,
+  `.mtile__stamp--halo/__cap/__tier/__tier--halo/__chips`, `.msample__arrow` + its responsive override)
+  plus pre-existing dead `.draftcard__note`/`.draftinfo__meta`/`.fpcard__vrow/__vno/__vbody/__vname`
+  (`5f3a776`); the unused `tierOut` local in `renderDossier` (`adebc87`); comment/doc accuracy — data.js
+  v2 header ("Not yet read by app.js" → it IS read) + corrected a mistaken `<\button>` typo claim in the
+  BR-S041 docs (grep showed the resume branch is correctly `</button>` — no such typo). **KEPT** the live
+  `.mtile__shot/__img/__scrim/__stamp` + `.fpcard__vault/__vaulthead/__vaultmark/__vaulttag/__vreason/
+  __vsealed`, and the scan-contract DEV_FIXTURE intent comments (they explain *why* a fixture is invalid).
+  **Verified live** after each category (menu card + free-scan-sim vault + 7-plate dossier render; console
+  clean). **Proposed — not applied (user's call):** remove now-uncalled `getTierOutput`/`getActiveScan`
+  (effectively-global helpers); drop dead `sim`-truthy branches in `renderUploadedScanResultDev`; drop
+  the unread `gestureAuthority` field in `toScanResultV2`. **Completed.** **Next up:** Left redesign
+  (Source merge).
+
 - **Menu Re-frame v1 — Direction A "Sealed Pull"** (2026-06-14 / BR-S041, app.js renderMenu +
   styles.css): the "layup" fix — turned the landing page from a Free-vs-Halo tier ladder into ONE
   complete Free Pull card (free-as-hero). Removed `.msample__compare` (both tiles + the "→ develops"
@@ -19,9 +36,9 @@ Last updated: 2026-06-14.
   (ACTIVE impl of a researched fix). **Verified live**: bare URL → one full-saturation card (filter
   none, no scrim), FREE PULL stamp, sealed caption, no ladder; 360×270 card in a 500px column; deep
   links bypass to the room; `?devnav=1` rail + Enter/Add intact; console clean. **Completed.**
-  **Next up:** run /cleanup on the menu diff (app.js + styles.css — incl. the now-dead `.mtile--free/
-  --halo/__compare/__arrow/__chips` CSS + the latent `<\button>` typo at app.js resume branch), then
-  Left redesign (Source merge).
+  **Next up:** Left redesign (Source merge). *(/cleanup ran — see BR-S042 — removing the now-dead
+  `.mtile--free/--halo/__compare/__arrow/__chips` + draft/fpcard CSS; no markup typo existed, the
+  resume branch is correctly `</button>`.)*
 
 - **Dev Nav Rail v1** (2026-06-14 / BR-S040, index.html + app.js + styles.css): a dev-only
   on-screen state-jumper revealed ONLY by `?devnav=1` — Menu/Room · SRC 01/02 · Free/Halo/Lab ·
@@ -416,8 +433,8 @@ Last updated: 2026-06-14.
 
 ## Ready (supported by current docs, clear definition of done)
 
-> **Builder-set near-term sequence (updated 2026-06-14, BR-S041):** dev-nav (DONE, BR-S040) →
-> Menu Re-frame (DONE, BR-S041) → **/cleanup the menu diff (NEXT)** → **Left redesign (Source merge)**
+> **Builder-set near-term sequence (updated 2026-06-14, BR-S042):** dev-nav (DONE, BR-S040) →
+> Menu Re-frame (DONE, BR-S041) → /cleanup whole-repo (DONE, BR-S042) → **Left redesign (Source merge) (NEXT)**
 > → Below redesign (Dossier de-dull) → Right polish. Grounded by the direction-synthesis workflow + research:
 > - **Menu Re-frame v1 (DONE, BR-S041)** — built Direction A "Sealed Pull" (one complete card, ladder
 >   killed, sealed caption). Originally specced: the "layup" fix. `FREE_PAID_MODEL_V1` verdict: the

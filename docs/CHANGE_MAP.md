@@ -206,6 +206,23 @@ banned/hype-word sweep now clean across all states.
 - **Test:** `?devnav=1` shows the rail and each button lands its state; a clean URL
   (no `?devnav`) shows NO rail (`display:none`, body has no `data-devnav`, rail unfilled).
 
+## Repo cleanup pass v1 — safe /cleanup (2026-06-14 / BR-S042, styles.css + app.js + data.js + docs)
+
+Ran the saved `/cleanup` routine across all tracked source files — behavior-preserving, every deletion
+grep-confirmed zero-reference, one category per commit. **Dead CSS removed** (`5f3a776`): the orphaned
+compare-ladder selectors (`.msample__compare`, `.mtile` base, `.mtile--free/--halo`,
+`.mtile__stamp--halo/__cap/__tier/__tier--halo/__chips`, `.msample__arrow` + responsive override) +
+pre-existing dead `.draftcard__note`, `.draftinfo__meta`, `.fpcard__vrow/__vno/__vbody/__vname`; KEPT the
+live `.mtile__shot/__img/__scrim/__stamp` + `.fpcard__vault/…`. **Unused local removed** (`adebc87`):
+`tierOut` in `renderDossier` (its source `getTierOutput` is pure, so the discarded call was safe to drop).
+**Comment/doc accuracy**: data.js v2 header corrected (it IS read by app.js); the mistaken `<\button>`
+typo claim removed from the BR-S041 docs (grep showed the resume branch is correctly `</button>` — no
+typo existed). Verified live after each category (menu card / free-scan-sim vault / 7-plate dossier
+render; console clean). **Proposed — not applied (user's call):** remove now-uncalled
+`getTierOutput`/`getActiveScan`; drop the dead `sim`-truthy branches in `renderUploadedScanResultDev`
+(unreachable after the early `if (sim) return …`); drop the unread `gestureAuthority` field in
+`toScanResultV2`. Next: Left redesign (Source merge).
+
 ## Menu Re-frame v1 — Direction A "Sealed Pull" (2026-06-14 / BR-S041, app.js renderMenu + styles.css)
 
 The "layup" fix from `FREE_PAID_MODEL_V1`: the complete-front/sealed-back model is LOCKED-right;
@@ -221,8 +238,7 @@ copy untouched. **Direction chosen** via a 16-agent design pass (5 Haiku / 8 Son
 synth → adversarial safety = SAFE, 0 fixes); builder picked A ("inviting + balanced") keeping B's
 caption. No DECISION_LOG (ACTIVE implementation of a researched fix). **Dead CSS left for the queued
 /cleanup pass:** `.mtile--free/--halo`, `.msample__compare`, `.msample__arrow`, `.mtile__chips/__tier/
-__cap` are now unused — but `.mtile__shot/__img/__scrim/__stamp` STAY (reused by `shot()`). Latent
-pre-existing typo flagged: app.js resume branch `<\button>` → `</button>`. **Verified live**: bare URL →
+__cap` are now unused — but `.mtile__shot/__img/__scrim/__stamp` STAY (reused by `shot()`). **Verified live**: bare URL →
 one full-saturation card (filter:none, no scrim), FREE PULL stamp, the sealed caption, no compare/
 arrow/chips; 360×270 card in a 500px column; deep links still bypass to the room; `?devnav=1` rail +
 Enter/Add still work; console clean. **Next up:** run /cleanup on the menu diff, then Left redesign
