@@ -185,6 +185,26 @@ payment/Halo/upload analysis). GPT_REVIEW_GUIDE + TASK_QUEUE + SESSION_BRIEF
 note the folder. Roadmap unchanged beyond this checkpoint — next product task
 stays **Free Pull Mock Polish v1**.
 
+## Layup / Around-the-Card Redesign Research v1 (2026-06-14, docs only — research)
+
+Saved `docs/research/LAYUP_RESEARCH_V1.md` (RESEARCH authority — informs, never
+implements; FILE_MAP registers it) from a 9-agent layup-research workflow run against
+the user's verbatim design feedback (card + diagram are the keepers; Source feels
+redundant; Metrics too dull; everything around the card is dull; wants non-obvious
+moves, a real nav/button frame, and the technical lines de-emphasized). Governing
+principle: **"the room is a ruled instrument sheet; the card is the only object on
+it"** — de-dull the surroundings via structure / numbering / line-weight / type /
+rhythm, **never** depth/glow/material (which would steal card primacy / read
+soft-SaaS). Holds: flatness budgets (depth = card only; accent = lines + the one
+Oracle-edge moment; motion = transform/opacity/clip-path), do/don't, **5 ranked
+tasks** (Dim technical lines → Buttons+rail → Right+dossier de-dull → Source merge →
+Metrics redesign — each leverage/risk/effort + done-when), per-surface specs, the
+dim-technical-lines treatment (step DOWN a tier, keep every datum), and a non-obvious
+pattern bank (oscilloscope ticks, blueprint leaders, banknote micro-rule, museum
+labels, datasheet § breaks, mission-control header, blueprint grid, rotated chapter
+index, spectrum-analyzer bars). **Pull on demand** — each task graduates via the
+normal pre-edit critique, one commit behind `baseline-v1`. No runtime change.
+
 ## Engineered Technique Pass v1 — #1 Card corner-shape edge (2026-06-14 / BR-S037, styles.css)
 
 Ranked build program from the deep-scout research (5 web-standard techniques;

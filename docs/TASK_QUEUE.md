@@ -335,6 +335,16 @@ Last updated: 2026-06-14.
 
 ## Ready (supported by current docs, clear definition of done)
 
+> **Around-the-Card Redesign program (pull on demand)** — the prioritized redesign
+> for everything around the card lives in **`docs/research/LAYUP_RESEARCH_V1.md`**
+> (RESEARCH). 5 ranked tasks: **1 Dim technical lines · 2 Unify buttons + top-bar
+> rail · 3 Right panel + dossier de-dull · 4 Source merge · 5 Metrics redesign**
+> (keepers: card + diagram). Pull one when we want more — run it through the normal
+> pre-edit critique, one commit behind `baseline-v1`. The loose "Engineered Technique
+> Pass" items below (scroll-driven reveal, `@property` fill, line-draw, spotlight) are
+> **folded into** that plan (reveal → task 3, line-draw → diagram refine, etc.) — track
+> the redesign from the research doc, not as separate technique items.
+
    *(Scan Contract Validator Stub v1 — completed by BR-S019 Scan Engine
    Foundation v1; see Active.)*
    *(Card System Fixture Upgrade v1 — completed by BR-S024 for the
