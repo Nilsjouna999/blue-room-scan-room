@@ -1982,8 +1982,10 @@ body[data-view="room"] .dev { display: none; }
 .msample__solo .mtile__shot { width: 100%; border: 1px solid var(--line); }
 .msample__seal { font-family: var(--font-mono); font-size: 9.5px; letter-spacing: 0.12em; line-height: 1.6; color: var(--t-meta); max-width: 300px; }
 
-.msample__compare { margin-top: 12px; display: flex; align-items: center; justify-content: center; gap: 22px; flex-wrap: wrap; }
-.mtile { display: grid; gap: 11px; width: 224px; }
+/* Sample card shot — shared markup emitted by shot() in renderMenu (the single
+   Sealed-Pull card). The compare-ladder modifiers (.mtile--free/--halo,
+   .mtile__cap/__tier/__chips, .msample__compare/__arrow) were removed in BR-S041
+   and the now-dead rules cleaned out in the BR-S042 cleanup pass. */
 .mtile__shot { position: relative; aspect-ratio: 4 / 3; overflow: hidden; border-radius: var(--r-plate); }
 .mtile__img { width: 100%; height: 100%; object-fit: cover; object-position: var(--pos, 50% 45%); display: block; }
 .mtile__scrim { position: absolute; inset: 0; pointer-events: none; }
@@ -1992,27 +1994,6 @@ body[data-view="room"] .dev { display: none; }
   font-family: var(--font-mono); font-size: 8px; letter-spacing: 0.2em; text-transform: uppercase;
   padding: 3px 7px; border-radius: 3px; background: rgba(8, 7, 5, 0.7); color: var(--silver); border: 1px solid var(--line);
 }
-/* Free = flat plate, matte / undeveloped */
-.mtile--free .mtile__shot { border: 1px solid var(--line); }
-.mtile--free .mtile__img { filter: saturate(0.72) brightness(0.9) contrast(1.02); }
-.mtile--free .mtile__scrim { background: linear-gradient(180deg, rgba(10, 9, 7, 0.18), rgba(10, 9, 7, 0.44)); }
-/* Halo = developed artifact: the source's own material edge + restrained depth */
-.mtile--halo .mtile__shot {
-  border: 1px solid color-mix(in srgb, var(--halo-a, var(--violet)) 55%, transparent);
-  box-shadow:
-    0 0 0 1px color-mix(in srgb, var(--halo-a, var(--violet)) 18%, transparent),
-    0 10px 26px -14px rgba(0, 0, 0, 0.82);
-}
-.mtile__stamp--halo { color: var(--t-display); border-color: color-mix(in srgb, var(--halo-a, var(--violet)) 50%, transparent); }
-.mtile__cap { display: grid; gap: 5px; justify-items: center; }
-.mtile__tier { font-size: 12px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--silver-bright); }
-.mtile__tier--halo {
-  background: linear-gradient(90deg, var(--violet), var(--cyan), var(--halo-green));
-  -webkit-background-clip: text; background-clip: text; color: transparent;
-}
-.mtile__chips { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.05em; line-height: 1.5; color: var(--t-meta); max-width: 210px; }
-.msample__arrow { display: grid; justify-items: center; gap: 2px; font-family: var(--font-mono); font-size: 17px; line-height: 1; color: var(--silver-dim); }
-.msample__arrow span { font-size: 7.5px; letter-spacing: 0.24em; text-transform: uppercase; color: var(--faint); }
 
 .menu__actions { display: grid; justify-items: center; gap: 12px; margin-top: 2px; }
 .menu__enter {
@@ -2092,17 +2073,13 @@ body[data-view="room"] .dev { display: none; }
 .draftcard__sub { font-family: var(--font-mono); font-size: 8.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--faint); }
 .draftcard__archline { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; }
 .draftcard__archrule { height: 1px; flex: 1; max-width: 56px; background: var(--line); }
-.draftcard__arch { font-family: var(--font-mono); font-size: 8px; letter-spacing: 0.2em; color: var(--silver-dim); white-space: nowrap; }
-.draftcard__note { font-family: var(--font-display); font-style: italic; font-size: 13px; line-height: 1.45; color: var(--t-body); }
-.draftcard__strip { display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--line-faint); padding-top: 11px; }
+.draftcard__arch { font-family: var(--font-mono); font-size: 8px; letter-spacing: 0.2em; color: var(--silver-dim); white-space: nowrap; }.draftcard__strip { display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--line-faint); padding-top: 11px; }
 .draftcard__stripstate { font-family: var(--font-mono); font-size: 8px; letter-spacing: 0.2em; color: var(--silver-dim); border: 1px dashed var(--line); border-radius: 3px; padding: 3px 7px; }
 .draftcard__stripmeta { font-family: var(--font-mono); font-size: 8px; letter-spacing: 0.14em; color: var(--faint); }
 
 .draftinfo { display: grid; gap: 7px; max-width: 460px; }
 .draftinfo__line { font-family: var(--font-display); font-size: 15px; line-height: 1.45; color: var(--t-primary); }
-.draftinfo__sub { font-size: 11.5px; line-height: 1.5; color: var(--t-meta); }
-.draftinfo__meta { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.06em; color: var(--faint); }
-.draftinfo__warn { color: var(--moss-bright); }
+.draftinfo__sub { font-size: 11.5px; line-height: 1.5; color: var(--t-meta); }.draftinfo__warn { color: var(--moss-bright); }
 
 .draft__actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 4px; }
 .draft__sample, .draft__back {
@@ -2368,12 +2345,7 @@ body[data-view="room"] .dev { display: none; }
 .fpcard__vault { display: grid; gap: 9px; padding: 13px 15px; border-radius: var(--r-plate); border: 1px dashed var(--line); background: rgba(8, 10, 12, 0.35); }
 .fpcard__vaulthead { display: flex; align-items: center; gap: 8px; font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--silver-dim); }
 .fpcard__vaultmark { color: var(--silver-dim); }
-.fpcard__vaulttag { margin-left: auto; font-size: 7.5px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--faint); border: 1px solid var(--line-faint); border-radius: 999px; padding: 2px 8px; }
-.fpcard__vrow { display: grid; grid-template-columns: auto 1fr; gap: 11px; align-items: start; }
-.fpcard__vno { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.1em; color: var(--t-ghost); }
-.fpcard__vbody { display: grid; gap: 3px; }
-.fpcard__vname { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.08em; color: var(--silver-bright); }
-.fpcard__vreason { font-size: 11px; line-height: 1.4; color: var(--t-meta); }
+.fpcard__vaulttag { margin-left: auto; font-size: 7.5px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--faint); border: 1px solid var(--line-faint); border-radius: 999px; padding: 2px 8px; }.fpcard__vreason { font-size: 11px; line-height: 1.4; color: var(--t-meta); }
 .fpcard__vsealed { font-family: var(--font-mono); font-size: 8px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--faint); }
 
 .fpcard__scope { font-family: var(--font-display); font-style: italic; font-size: 13px; line-height: 1.45; color: var(--t-body); }
@@ -2478,7 +2450,6 @@ body[data-view="room"] .dev { display: none; }
   .dstats, .dfitaura, .drecord { grid-template-columns: 1fr; }
   .dhidden { flex-direction: column; text-align: center; gap: 14px; }
   .menu__brand { font-size: 23px; letter-spacing: 0.26em; }
-  .msample__arrow { transform: rotate(90deg); }
   /* Free Pull mock stacks: image slab on top, label below */
   .fpwrap { width: 100%; }
   .fpcard__grid { grid-template-columns: 1fr; }
