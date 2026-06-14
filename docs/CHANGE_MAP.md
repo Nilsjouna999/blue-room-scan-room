@@ -206,6 +206,38 @@ banned/hype-word sweep now clean across all states.
 - **Test:** `?devnav=1` shows the rail and each button lands its state; a clean URL
   (no `?devnav`) shows NO rail (`display:none`, body has no `data-devnav`, rail unfilled).
 
+## Source→Diagram Merge v1 — Left redesign (2026-06-14 / BR-S044, app.js + styles.css)
+
+`LAYUP_RESEARCH_V1` Task #4: collapsed the **Source tab into Diagram** (3 tabs → 2). The scanframe now carries
+a flat **Annotated | Clean toggle** — `state.diagramView` (default `annotated`; `?dv=` deep link), applied as
+a state class on `.diagwrap`. **CLEAN** = the old Source frame (full-saturation raw photo + numbered markers +
+legend); **ANNOTATED** = desaturated photo + the SVG diagram overlay. **No data.js change**; free/halo overlay
+gating is unchanged (orthogonal to clean/annotated). Deleted the redundant **Capture Record** module (the
+Source ID/code that duplicated the card + dossier Plate 01); **Lens + Light** kept as a hairline `scanframe`
+meta line. The 5 Frame Analysis lines moved under a **"Frame Read"** sub-label in Diagram Notes. Legacy
+**`?tab=source` redirects to `diagram`** (no 404) and the dev-nav Source button was dropped.
+**To work on the merged frame:** the Diagram/scanframe render + the `diagramView` toggle + the
+`?tab=source`→`diagram` redirect live in `app.js`; the clean/annotated visual states + scanframe meta live in
+`styles.css` (the `.diagwrap` block). Pre-edit 4-lens critique → GO_WITH_CHANGES. **Per commit, verified
+live** (2 tabs, both toggle states, the redirect, free gating, src2, Metrics + card + 7 plates, console clean;
+temp index.html cache-bust used + reverted). Rollback: `git revert 93027fb`.
+
+## Human-Read Line copy sweep v1 (2026-06-14 / BR-S043, data.js)
+
+The do-now safety fix from the `/gods-finger` audit (per `docs/HUMAN_READ_LINE_V1.md`): **9 sample-copy
+rewrites across 8 lines** in `data.js` (8 ins / 8 del) so every visible reading names the **re-authorable
+image-act, not the permanent person**. Removed anatomy-as-composition ("the cap and beard do quiet structural
+work", "beard … build a stable mass"), trait grammar ("the posture of someone who decides / plans to be
+here"), dispositional energy ("Slow-burn output"), authenticity-as-trait ("nothing performed for the lens",
+"less like a pose"), and the character aura chips ("Slow-Burn" / "Load-Bearing" → "Auger-Braced" /
+"Low-Horizon"). Each rewrite names a visible cue and makes the photo the grammatical subject.
+**To change this copy:** it lives in `data.js` (the per-source reading / aura / evidence / stance fields) —
+keep the photo as the grammatical subject and avoid permanent-person grammar (the Human-Read Line). No new
+fields; voice preserved. **Per commit, verified live** (room + 7 plates render, aura chips updated, no leak
+strings, console clean). **Note:** the Backlog (a) bullet in TASK_QUEUE + the `HUMAN_READ_LINE_V1`
+§enforcement-gap leak example still quote these now-removed strings (stale-by-omission); update when guards
+(b)/(c) land. Rollback: `git revert 989d131`.
+
 ## Repo cleanup pass v1 — safe /cleanup (2026-06-14 / BR-S042, styles.css + app.js + data.js + docs)
 
 Ran the saved `/cleanup` routine across all tracked source files — behavior-preserving, every deletion

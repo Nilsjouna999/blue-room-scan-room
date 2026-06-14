@@ -10,6 +10,74 @@ coding session; the assistant must respect it. Files not listed under
 does not match the user's current task — **stop and ask** before doing
 anything. (GOVERNANCE_OS anti-drift.)
 
+## Active session — BR-S044  *(retrospective — reconstructed post-hoc; this session shipped without a brief)*
+
+**Date / Session ID:** 2026-06-14 / BR-S044
+
+**Today's task:** Source→Diagram Merge v1 (Left redesign) — `LAYUP_RESEARCH_V1` Task #4
+
+**Why:** Collapse the redundant Source tab into Diagram so the room reads as one ruled instrument sheet with
+the card as the only object — the builder's **Left redesign (Source merge)** step (LAYUP Task #4).
+
+**Edit (actual):** app.js (Diagram/scanframe render + `state.diagramView` toggle + `?tab=source`→`diagram`
+redirect + dev-nav Source button removed) · styles.css (`.diagwrap` clean/annotated states + scanframe meta).
+*(No data.js / index.html / scan-contract.js change — `2 files changed`, commit `93027fb`.)*
+
+**Authority affected:** ACTIVE SPECS implementation (LAYUP redesign, runtime). No CORE LAW / spec /
+DECISION_LOG change.
+
+**What shipped:** tabs 3→2; one `scanframe` with a flat **Annotated | Clean** toggle (`state.diagramView`,
+default annotated; `?dv=` deep link; a CSS class on `.diagwrap`) — CLEAN = full-saturation raw photo +
+numbered markers + legend (the old Source frame), ANNOTATED = desaturated photo + the SVG overlay; free/halo
+overlay gating unchanged (orthogonal). The redundant **Capture Record** module deleted (Lens+Light kept as a
+hairline `scanframe` meta line); the 5 Frame Analysis lines moved under a **"Frame Read"** sub-label in
+Diagram Notes; legacy `?tab=source` → diagram (no 404).
+
+**Pre-edit critique:** 4-lens, all GO_WITH_CHANGES (critic-approved).
+
+**Verification (per commit):** 2 tabs; Annotated default (overlays shown, markers hidden, photo desaturated,
+Frame Read + Lens·Light meta); Clean (full saturation, markers + legend, overlays hidden, BR-SRC meta);
+`?tab=source` redirects; free overlays gated + devnote; src2 ok; Metrics + card + 7 plates intact; console
+clean. (Temp index.html cache-bust used for verification, reverted.)
+
+**Next task:** Below redesign (Dossier de-dull) = LAYUP Task #3a. **Rollback:** `git revert 93027fb`.
+
+## Active session — BR-S043  *(retrospective — reconstructed post-hoc; this session shipped without a brief)*
+
+**Date / Session ID:** 2026-06-14 / BR-S043
+
+**Today's task:** Human-Read Line copy sweep v1 (the do-now safety fix)
+
+**Why:** The `/gods-finger` audit flagged sample copy that reads the PERMANENT person, not the re-authorable
+image-act (Backlog item (a), safety-critical). Sweep the live leaking strings in data.js per
+`docs/HUMAN_READ_LINE_V1.md`.
+
+**Edit (actual):** data.js only — 8 ins / 8 del (9 rewrites across 8 lines; one line carried two).
+*(No app.js / styles.css change — commit `989d131`.)*
+
+**Authority affected:** ACTIVE runtime copy fix (safety). No CORE LAW / spec / DECISION_LOG change.
+
+**What shipped:** removed anatomy-as-composition ("the cap and beard do quiet structural work", "beard … build
+a stable mass"), trait grammar ("the posture of someone who decides / plans to be here"), dispositional energy
+("Slow-burn output"), authenticity-as-trait ("nothing performed for the lens", "less like a pose"), and the
+character aura chips ("Slow-Burn" / "Load-Bearing" → "Auger-Braced" / "Low-Horizon"). Each rewrite names a
+visible cue and makes the photo the grammatical subject; caught one evidence clause the audit missed. No new
+fields; voice preserved.
+
+**Scope note:** sweeps the **live-copy half of Backlog item (a)** only — every leaking string that actually
+shipped in data.js is gone (the audit's "nobody crouches by accident" was illustrative, never live copy). The
+Backlog (a) bullet + the `HUMAN_READ_LINE_V1` §enforcement-gap leak example still quote the now-removed
+strings (stale-by-omission); the validator/aggregate guards (b)/(c) remain engine-phase Backlog.
+
+**Verification (per commit):** room + 7 plates render, aura chips updated, no leak strings, console clean.
+
+**Next task:** Source→Diagram merge (Left redesign) = LAYUP Task #4 (shipped next as BR-S044).
+**Rollback:** `git revert 989d131`.
+
+*(No BR-S042 brief: the `/cleanup` pass shipped without one — it is recorded in TASK_QUEUE (Active) +
+CHANGE_MAP, not back-filled here. Likewise BR-S045 (Universe/Zone Map) is a docs/spec commit governed via
+FILE_MAP + DECISION_LOG, so it carries no SESSION_BRIEF / CHANGE_MAP block by design.)*
+
 ## Active session — BR-S041
 
 **Date / Session ID:** 2026-06-14 / BR-S041

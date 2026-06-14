@@ -19,7 +19,39 @@ Last updated: 2026-06-14.
   a moat); folded the §7 pointer into the HUMAN_READ_LINE_V1 Forbidden · Aggregation bullet (without
   altering the "currently UNENFORCED in code" clause). **Runtime untouched** — no AI/backend/upload/
   payment/route; aspirational Vault/Codex stay BACKLOG (PROJECT_OS §15), not promoted. **Completed.**
-  **Next up:** Left redesign (Source merge).
+  **Next up:** Below redesign (Dossier de-dull).
+
+- **Source→Diagram Merge v1 (Left redesign)** (2026-06-14 / BR-S044, app.js + styles.css):
+  `LAYUP_RESEARCH_V1` Task #4 — collapsed the **Source tab into Diagram** (tabs 3→2). One `scanframe` now
+  carries a flat **Annotated | Clean toggle** (`state.diagramView`, default `annotated`; `?dv=` deep link;
+  applied as a CSS class on `.diagwrap`): CLEAN = the old Source frame (full-saturation raw photo + numbered
+  markers + legend); ANNOTATED = desaturated photo + the SVG overlay read. **No data.js change**; free/halo
+  overlay gating unchanged (orthogonal to clean/annotated). Deleted the redundant **Capture Record** module
+  (the Source ID/code that duplicated the card + dossier Plate 01); **Lens + Light** kept as a hairline
+  `scanframe` meta line. The 5 Frame Analysis lines moved under a **"Frame Read"** sub-label in Diagram Notes.
+  Legacy **`?tab=source` → diagram** (no 404) and the dev-nav Source button dropped. **Critic-approved**
+  (4-lens pre-edit, all GO_WITH_CHANGES). **Per commit, verified live**: 2 tabs; Annotated default (overlays
+  shown, markers hidden, photo desaturated, Frame Read + Lens·Light meta); Clean (full saturation, markers +
+  legend, overlays hidden, BR-SRC meta); `?tab=source` redirects; free overlays gated + devnote; src2 ok;
+  Metrics + card + 7 plates intact; console clean (temp index.html cache-bust used + reverted). **Completed**
+  — ships the **Left redesign (Source merge)**; clears LAYUP Task #4. **Next up:** Below redesign (Dossier
+  de-dull) = LAYUP Task #3a.
+
+- **Human-Read Line copy sweep v1** (2026-06-14 / BR-S043, data.js — 8 ins / 8 del): the **do-now safety
+  fix** from the `/gods-finger` audit (Backlog item (a)) — **9 rewrites across 8 lines** (one line carried
+  two) so visible sample copy reads the **re-authorable image-act, not the permanent person** (per
+  `docs/HUMAN_READ_LINE_V1.md`). Removed anatomy-as-composition ("the cap and beard do quiet structural
+  work", "beard … build a stable mass"), trait grammar ("the posture of someone who decides / plans to be
+  here"), dispositional energy ("Slow-burn output"), authenticity-as-trait ("nothing performed for the lens",
+  "less like a pose"), and the character aura chips ("Slow-Burn" / "Load-Bearing" → "Auger-Braced" /
+  "Low-Horizon"; "Sun-Struck" kept). Each rewrite names a visible cue, makes the photo the grammatical
+  subject, and clears the connotation-strip; caught one evidence clause the audit missed. No new fields; voice
+  preserved. **Per commit, verified live**: room + 7 plates render, aura chips updated, no leak strings,
+  console clean. **Completed** — sweeps the **live-copy half of Backlog item (a)** ("Leaking-copy sweep — DO
+  NOW"): every leaking string that actually shipped in `data.js` is gone (the audit's "nobody crouches by
+  accident" example was never live copy). Still open: the Backlog (a) bullet + the `HUMAN_READ_LINE_V1`
+  §enforcement-gap leak example still quote the now-removed strings (stale-by-omission), and the validator/
+  aggregate guards (b)/(c) stay engine-phase Backlog. **Next up:** Left redesign (Source merge).
 
 - **Repo cleanup pass v1 (safe /cleanup)** (2026-06-14 / BR-S042, styles.css + app.js + data.js +
   docs): ran the saved `/cleanup` routine over all tracked source files — behavior-preserving, one
@@ -448,9 +480,9 @@ Last updated: 2026-06-14.
 
 ## Ready (supported by current docs, clear definition of done)
 
-> **Builder-set near-term sequence (updated 2026-06-14, BR-S042):** dev-nav (DONE, BR-S040) →
-> Menu Re-frame (DONE, BR-S041) → /cleanup whole-repo (DONE, BR-S042) → **Left redesign (Source merge) (NEXT)**
-> → Below redesign (Dossier de-dull) → Right polish. Grounded by the direction-synthesis workflow + research:
+> **Builder-set near-term sequence (updated 2026-06-14, BR-S044):** dev-nav (DONE, BR-S040) →
+> Menu Re-frame (DONE, BR-S041) → /cleanup whole-repo (DONE, BR-S042) → Left redesign (Source merge) (DONE, BR-S044)
+> → **Below redesign (Dossier de-dull) (NEXT)** → Right polish. Grounded by the direction-synthesis workflow + research:
 > - **Menu Re-frame v1 (DONE, BR-S041)** — built Direction A "Sealed Pull" (one complete card, ladder
 >   killed, sealed caption). Originally specced: the "layup" fix. `FREE_PAID_MODEL_V1` verdict: the
 >   complete-front/sealed-back model is LOCKED and right; the defect is tier-ladder
@@ -464,9 +496,9 @@ Last updated: 2026-06-14.
 >   complete artifact (not a tier ladder); no Halo inventory list / "→develops" arrow;
 >   boundary copy untouched; routes + console clean. (Deferred sibling: soften the same
 >   ladder on the in-room "Develops:" CTA + the 7× ARCHIVE-PULL plate tags.)
-> - **Left redesign — Source merge** = `LAYUP_RESEARCH_V1` Task #4 (collapse Source into
->   Diagram as CLEAN|ANNOTATED, delete the redundant Capture Record, re-point ?tab=source).
-> - **Below redesign — Dossier de-dull** = LAYUP Task #3a (counting-spine gutter, room→archive
+> - **Left redesign — Source merge (DONE, BR-S044)** = `LAYUP_RESEARCH_V1` Task #4 (collapsed Source into
+>   Diagram as CLEAN|ANNOTATED, deleted the redundant Capture Record, re-pointed ?tab=source → diagram).
+> - **Below redesign — Dossier de-dull (NEXT)** = LAYUP Task #3a (counting-spine gutter, room→archive
 >   threshold rule, shutter reveal). **Right polish** = LAYUP Task #3b (later; "medium", not "lacking").
 > - **Set aside (builder, BR-S040):** a full Halo card "example" — a populated stats-card
 >   trips the magnetism kill-rule; revisit later (sealed-back only if shown). Deeper
