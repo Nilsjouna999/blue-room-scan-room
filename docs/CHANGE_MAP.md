@@ -185,6 +185,23 @@ payment/Halo/upload analysis). GPT_REVIEW_GUIDE + TASK_QUEUE + SESSION_BRIEF
 note the folder. Roadmap unchanged beyond this checkpoint — next product task
 stays **Free Pull Mock Polish v1**.
 
+## Depth + Interconnection Model v1 (2026-06-14, docs only — research)
+
+Saved `docs/research/DEPTH_MODEL_V1.md` (RESEARCH; FILE_MAP registers it) from an 8-agent
+White Death SCOUT (7 Sonnet over instill/interconnect/gloss → Opus FIT+ECHO rank), bar =
+ECHO not accumulate, CONFIDENT/STRONG only (19→7 survivors, 14 killed). Finding: depth comes
+from naming/enforcing connections already in the copy+data, on two backbones — **serial = the
+photo-grounded person-neutral join key** (masked Free → revealed Halo already carries the
+latent→developed physics) and **archetype class = the content axis** (class→family→lens→hidden-
+stat governs what each surface says). Holds: the shared spine, the link grammar incl. the
+**Two-Track Attachment Law** (photo→card READ on plates 01–05/07 vs declared-lore→serial FILE
+on Plate 06; forbidden cross — the rule that lets zodiac/numerology attach without inference),
+Codex(class-indexed)-vs-Journal(time-ordered), the gloss system (two-tier hover, Artifact-Test
+destination, Oracle left mysterious), and 7 KEEP/High layers (serial spine, two-track law,
+class→family axis, field-token through-thread, filing-event chain, sealed-stat payoff, gloss).
+Pull on demand; implements nothing. Completes the 5-doc scope spine (universe · free-paid ·
+layup · layering · depth).
+
 ## Layering Model v1 (2026-06-14, docs only — research)
 
 Saved `docs/research/LAYERING_MODEL_V1.md` (RESEARCH; FILE_MAP registers it) from a
