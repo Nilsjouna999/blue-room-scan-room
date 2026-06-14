@@ -186,7 +186,7 @@ const SOURCES = [
         { k: "Focal Lock", read: "Face locks the left third with the palm as second anchor — the lens never wanders.", free: false },
       ],
       statNotes: {
-        presence: { evidence: "Cap brim, beard and red layer build a stable mass the wide lens can't dilute.", note: "Holds a vehicle's worth of clutter still." },
+        presence: { evidence: "Cap brim and red layer stack a vertical block the wide lens can't dilute.", note: "First read survives the cabin clutter." },
         frame: { evidence: "Wide-angle barrel and dashboard intrusion tax the composition; the window band claws back the right third." },
         signal: { evidence: "A raised palm is the most legible gesture in the archive — this one is textbook.", note: "Sits near the top of the archive band for cabin shots." },
         charge: { evidence: "Engine-off energy: warm, contained, ten seconds from motion." },
@@ -225,7 +225,7 @@ const SOURCES = [
     },
     reads: {
       presence:
-        "Holds the frame from the driver's seat without leaning on it. The cap and the beard do quiet structural work.",
+        "Holds the frame from the driver's seat without leaning on it. The cap brim and red layer keep a clean vertical edge in a cluttered cabin.",
       frame:
         "Action-lens barrel and cabin clutter tax the composition. The fjord out the window rescues the right third.",
       signal:
@@ -236,7 +236,7 @@ const SOURCES = [
     aura: ["Idle-Engine", "Open-Palm", "Northbound"],
     sceneRole: "The pause the trip gets measured by.",
     stance:
-      "One arm holding the wheel's territory, the other raised flat to the lens — half stop-sign, half salute. The posture of someone who decides when the journey resumes.",
+      "One arm holding the wheel's territory, the other raised flat to the lens — half stop-sign, half salute. The two-arm split holds the frame in suspension: neither departing nor stationary.",
     fit: "If the setting is formal, this card stays in the glovebox. On the road, it's the membership card.",
     impact: { value: 64, label: "Disarming" },
     lore: { value: 72, label: "Dense" },
@@ -340,7 +340,7 @@ const SOURCES = [
       },
       evidence: [
         { k: "Field Pressure", read: "The snow plane owns three quarters of the frame and donates all of it to the silhouette.", free: true },
-        { k: "Subject Mass", read: "Crouched mass centered low — the posture of someone who plans to be here a while.", free: true },
+        { k: "Subject Mass", read: "Crouched mass centered low — the stance locks weight into the frame's lower half, closing off any read of departure.", free: true },
         { k: "Horizon Lock", read: "The birch treeline rules the upper quarter in one clean band. Nothing argues with it.", free: true },
         { k: "Tool Axis", read: "The auger runs a hard diagonal into the ice — the only straight line the subject brought along.", free: false },
         { k: "Light Direction", read: "Low hard sun from the left; the snow throws it back up and erases every shadow excuse.", free: false },
@@ -350,12 +350,12 @@ const SOURCES = [
         presence: { evidence: "A black silhouette on a white field is the strongest contrast the archive can record.", note: "The snow does the staging; the silhouette accepts the terms." },
         frame: { evidence: "Treeline band, entry tracks, centered mass — near-editorial discipline for a working photo." },
         signal: { evidence: "Hood, beanie and sunglasses qualify the expression; the auger receives the eye contact instead." },
-        charge: { evidence: "Slow-burn output — the energy is in the rotation, not the expression." },
+        charge: { evidence: "The auger grip and crouched brace contain the motion — rotation is the only active vector in the frame." },
       },
       hidden: {
         name: "Field Silence",
         value: 91,
-        read: "The subject reads less like a pose and more like evidence from a cold operation. Nothing here was performed for the lens.",
+        read: "The frame reads like field evidence: crouched brace, task-directed gaze, no gesture aimed at the lens. The image organizes around the work, not the recording.",
         tease: "A silence reading was detected in the field layer. It develops with the mint.",
       },
       mint: {
@@ -392,9 +392,9 @@ const SOURCES = [
       signal:
         "Hood, beanie and sunglasses qualify the expression — the face is present, but eye contact redirects to the task.",
       charge:
-        "Slow-burn output. The energy is in the rotation of the auger, not in anything performed for the lens.",
+        "The auger is the only moving part in the frame. The crouched brace converts all of the image's energy into a single downward vector.",
     },
-    aura: ["Slow-Burn", "Sun-Struck", "Load-Bearing"],
+    aura: ["Auger-Braced", "Sun-Struck", "Low-Horizon"],
     sceneRole: "Proof the lake was work, not wallpaper.",
     stance:
       "Crouched at full commitment, both gloves stacked on the brace, weight exactly where it should be. Nothing performed — the auger doesn't care, and the frame doesn't pretend otherwise.",
