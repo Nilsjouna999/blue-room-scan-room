@@ -1,7 +1,7 @@
 # BLUE ROOM — File Map (session router)
 
 Permanent router for future Fable / Claude / GPT coding sessions.
-Read this before opening anything else. Last verified: 2026-06-12.
+Read this before opening anything else. Last verified: 2026-06-14.
 
 ## Scope rules (non-negotiable)
 
@@ -75,6 +75,7 @@ implementation (GOVERNANCE_OS funnel).
 | `docs/PERFORMANCE_BUDGET.md` | ACTIVE spec: cost law (Free cheap), effects law, testing checklist | Adding any effect or runtime cost | — |
 | `docs/DESIGN_TOKENS.md` | ACTIVE spec: Room/Plate/Artifact grammar, color/type/depth laws, dossier rhythm | Visual changes — read before styles.css | — |
 | `docs/HUMAN_READ_LINE_V1.md` | ACTIVE spec (revisable): the image-act-vs-permanent safety line — read the performed/re-authorable (posture/gesture/role), never the permanent (worth/identity); the 3 gates; ruby-tier readings; raw→user-facing transformation; the aggregate-layer harm + enforcement gaps. Refines/supersedes the too-absolute "never the person" | Writing/auditing any read, stat, archetype, receipt, or copy that touches the human-in-frame | Relaxing it toward person rating/ranking/identity-inference; treating it as enforced (it is asserted — see TASK_QUEUE) |
+| `docs/UNIVERSE_ZONE_MAP_V1.md` | ACTIVE spec (revisable): promotes the universe-scope research into a working spec — the Archive frame, the five-zone map (Lobby/Scan Room/Card Record/Vault/Codex), the NOW/LATER fork decisions, the LIVE/PARTIAL/ASPIRATIONAL split (§6 premature-ship guard), and the §7 aggregate-refusal wall (no person-key join; re-derive fresh per scan; serial = OBJECT address). Implements nothing by existing | Planning universe/zone direction; checking what is LIVE vs aspirational before building a zone | Building/stubbing/linking Vault, Codex, or a standalone Card Record route (aspirational, §6 premature-ship guard); relaxing the §7 no-aggregate / no-person-key wall (LOCKED-grade by safety inheritance) |
 | `docs/GOLDEN_NUGGETS.md` | CANON: the distilled core one-liners that drive precise planning (the 5-point bar + 7 LOCKED core + strong/watch + the spotlight). Fire `/gods-finger` to test a new candidate against the bar | Planning/deciding direction; checking a move against the core | Adding weak/non-core lines (default KILL); re-litigating the LOCKED core |
 | `docs/research/SPINE.md` | Top-of-research filtered spine — high-signal product principles awaiting promotion | Distilling raw research; planning a promotion into a spec | During daily coding unless SESSION_BRIEF says so |
 | `docs/research/RESEARCH_SYNTHESIS_V1.md` | RESEARCH CANON (the index/reconciliation layer over all research; 19-agent White Death AUDIT of all 15 docs). Verdict: the research COHERES (64 high-confidence survivors, 62 killed; every clash is a CSS/copy/spec reconciliation not a model contradiction). Holds the 9 coherent systems, 2 merges, the full conflicts-with-resolutions list (plate-depth, free-counts, 0-100-vs-bands, accent, token-ramp, base-bg, warm-vs-cool, glow-keyed-to-paid, Halo-by-AI, + tensions), and the build-now-vs-later split | START HERE before building any surface; resolving a clash between research docs; deciding what to build next | Re-litigating a decided conflict; treating it as approved-to-implement |

@@ -32,6 +32,13 @@ The wall moved from "around the human" to "around the permanent."
   "every outcome is a win").
 - **Aggregation** — many pulls of one person reconstructing a stable trait. THE single read
   can be safe while the accumulation is the harm. This layer is currently UNENFORCED in code.
+  The rule is now recorded as the load-bearing architectural wall in `UNIVERSE_ZONE_MAP_V1`
+  §7: no scan output may be joined by an uploader / person key; archetype, hidden stat, and
+  aura are re-derived fresh per scan — no streaks, no counts, no history across a person's
+  pulls; the cross-pull surface (Vault, Codex, any future roster) must be structurally
+  incapable of reconstructing a stable trait, and the serial is an OBJECT address (Object →
+  Scan → Card → Mint), never a person address. It ships WITH the uploaded-photo engine, never
+  after. Still asserted, not enforced — see the Enforcement gap below.
 
 ## Ruby-tier readings (feature these)
 Stance Read · the diagram gesture/posture line + signal-direction arrow · gaze/eye-line as

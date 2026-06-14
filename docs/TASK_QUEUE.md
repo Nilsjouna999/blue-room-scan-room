@@ -6,6 +6,21 @@ Last updated: 2026-06-14.
 
 ## Active
 
+- **Universe/Zone Map v1 committed + governance trail** (2026-06-14 / BR-S045, docs only —
+  UNIVERSE_ZONE_MAP_V1 + FILE_MAP + DECISION_LOG + HUMAN_READ_LINE_V1 + TASK_QUEUE): committed the
+  already-written, reviewed-good `docs/UNIVERSE_ZONE_MAP_V1.md` (was untracked) — the ACTIVE
+  (revisable) universe/zone spec: Archive frame, five-zone map (Lobby/Scan Room/Card Record/Vault/
+  Codex), NOW/LATER forks, the LIVE/PARTIAL/ASPIRATIONAL split (§6 premature-ship guard), and the §7
+  aggregate-refusal wall. **Mandatory pre-edit critique** (4-lens workflow → GO_WITH_CHANGES) caught
+  and **fixed two internal section-ref errors in the spec in the same commit** before adding it
+  (§6→§7 for the wall on the intro line; PROJECT_OS §3→§15 for the Vault/Codex backlog). Registered
+  the spec in FILE_MAP (new row + "Last verified" → 2026-06-14); logged the commit + the load-bearing
+  §7 wall in DECISION_LOG (asserted-not-enforced; gates the future "weight on the internet" reach, not
+  a moat); folded the §7 pointer into the HUMAN_READ_LINE_V1 Forbidden · Aggregation bullet (without
+  altering the "currently UNENFORCED in code" clause). **Runtime untouched** — no AI/backend/upload/
+  payment/route; aspirational Vault/Codex stay BACKLOG (PROJECT_OS §15), not promoted. **Completed.**
+  **Next up:** Left redesign (Source merge).
+
 - **Repo cleanup pass v1 (safe /cleanup)** (2026-06-14 / BR-S042, styles.css + app.js + data.js +
   docs): ran the saved `/cleanup` routine over all tracked source files — behavior-preserving, one
   category per commit, every deletion grep-confirmed zero-reference. **Removed (AUTO):** dead CSS — the
@@ -461,6 +476,10 @@ Last updated: 2026-06-14.
 >   currently shows only the one raw photo/card — it does NOT yet show, explain, or HINT what Blue Room is
 >   about. A later pass adds a brief "what this is" hint/explanation in the darkroom-thesis voice (no hype,
 >   no overreach, no tier ladder). Deliberately deferred — not part of the current left/below work.
+> - **Universe NOW items fold into the existing tracks (noted BR-S045):** the universe NOW items (topbar
+>   zone label, floor wash, provenance verb thread, "Archive" cosmology copy) fold into the existing
+>   Left-redesign / Dossier-de-dull work — NOT a separate universe track. Each still graduates through its
+>   own pre-edit critique, one commit behind `baseline-v1` (`UNIVERSE_ZONE_MAP_V1` §5/§6).
 
 > **Around-the-Card Redesign program (pull on demand)** — the prioritized redesign
 > for everything around the card lives in **`docs/research/LAYUP_RESEARCH_V1.md`**
@@ -585,6 +604,8 @@ Last updated: 2026-06-14.
   - **(c) Aggregate no-persistence guard — engine phase (highest leverage):** re-derive archetype/hidden-stat/
     aura FRESH per scan, no person-key joining pulls, no streaks/counts; the cross-pull layer must
     structurally refuse to reconstruct a stable trait. Gates the future "weight on the internet" ambition.
+    The canonical rule + asserted-not-enforced status now live in `UNIVERSE_ZONE_MAP_V1` §7 (the
+    load-bearing wall); this remains the engine-phase guard that actually builds it.
 
 
 - **Final Halo material decision** — after Three Shiny Material Prototypes v1

@@ -241,3 +241,20 @@ Supersedes the too-absolute reading of "never the person". NOTE: this is the RUL
 ASSERTED, not enforced — validator/copy/aggregate gaps logged in TASK_QUEUE (safety-critical).
 Surfaced + adversary-tested via the `/gods-finger` pass.
 Revisit: when the uploaded-photo engine is built (the aggregate guard ships with it).
+
+**2026-06-14 / Universe/Zone Map v1 committed + aggregate-refusal wall recorded / ACTIVE (revisable; §7 LOCKED-grade by safety inheritance)**
+Why: promotes the universe-scope research (`research/UNIVERSE_MAP_V1`, `FREE_PAID_MODEL_V1`)
+into a working ACTIVE spec — the Archive frame, the five-zone map (Lobby/Scan Room/Card
+Record/Vault/Codex), the fork decisions, and the LIVE/PARTIAL/ASPIRATIONAL split (§6
+premature-ship guard) — and records the load-bearing §7 aggregate-refusal wall: no scan
+output joined by an uploader/person key; archetype, hidden stat, and aura re-derived fresh
+per scan; no streaks, no counts, no history across a person's pulls; the serial is an OBJECT
+address (Object → Scan → Card → Mint), never a person address. Single-read is enforced today
+(no upload/backend/person key exists); the aggregate layer is the UNBUILT wall — it ships
+WITH the uploaded-photo engine or the engine does not ship. A safety floor, asserted-not-
+enforced; it gates the future "weight on the internet" reach, not a moat. Aspirational
+Vault/Codex stay BACKLOG (PROJECT_OS §15; not promoted by this doc — GOVERNANCE_OS §3 funnel
+respected). Docs only — runtime untouched. Two internal section-ref errors in the spec fixed
+in the same commit (§6→§7 for the wall; PROJECT_OS §3→§15 for the Vault/Codex backlog).
+Revisit: when the uploaded-photo engine is built — the aggregate guard ships in the same
+change, or the engine does not ship.
