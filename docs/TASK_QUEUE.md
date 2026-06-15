@@ -2,9 +2,32 @@
 
 Ranked work queue, not a dream backlog. One Active item at a time.
 Out-of-scope findings from any session get logged here, not patched.
-Last updated: 2026-06-14.
+Last updated: 2026-06-15.
 
 ## Active
+
+- **Right-panel polish v1 — R.NN index gutter + readhead tighten** (2026-06-15 / BR-S049, styles.css only):
+  de-dulled the right reading panel (`LAYUP_RESEARCH_V1` Task #3b) with FLAT moves only. **(a)** a quiet
+  right-edge **index gutter** — a CSS counter (`rmod`) numbers the reading-RECORD modules `R.01..R.NN` as 12px
+  mono `--t-ghost` tabular-nums marks pinned in a carved 46px right lane (echoes the dossier counting-record
+  system, BR-S048). `counter-increment` + `::before` share ONE selector
+  `.panel--reading .module:not(.unlock):not(:has(.maxbadge))` — numbers Stat/Aura/Scene + the deep reads + the 3
+  free archive teasers; EXCLUDES the Develop CTA + Lab tease (`.unlock`) and the empty Halo badge wrapper
+  (`:has(.maxbadge)`); `details.receipts` is naturally skipped. **(b)** **readhead tagline** demoted 12px
+  `--t-meta` → 9.5px mono `--t-ghost` telemetry (the 24px title stays the sole display element; the chip + module
+  labels untouched). **NO markup change, no data.js** (pure CSS, `:has()` exclusion). **Built via a 12-agent
+  workflow** (4 critique lenses → 3 plans → synth → 4 adversarial verifiers, NARROW_SCOPE); the verifiers caught
+  and I fixed a real geometry overflow (a 22px mark would have spilled ~26px over the right-aligned values —
+  dropped to 12px to fit the lane, also closer to LAYUP §5's subtle right-index intent). **Verified live**
+  (1600×900 + narrow 900px, DOM/getComputedStyle — screenshots time out): free → R.01–R.06 (records + 3 locked
+  teasers, CTA excluded); shiny/mint → R.01–R.10 (badge wrapper + Lab tease excluded); left panel un-numbered
+  (counter isolated to `.panel--reading`); numeral clears the right-aligned values (~5px gap); tagline 9.5px mono
+  ghost, chip/labels unchanged; `?dev=halo-gate` room hidden (no leak); narrow gutter collapses on the 1120px
+  breakpoint; console clean. **Completed.** Closes the builder-set sequence (dev-nav → menu → cleanup → source
+  merge → dossier de-dull → Right polish). *(Deferred to their own commits: right-panel 3-tier line weight
+  [border LONGHAND only — avoid the BR-S048 cascade trap]; section-regrouping [ghost OBSERVATION/INTERPRETATION/
+  ARTIFACT READ/RECORD labels]; aura-chips-as-ledger [scope via a `.module--aura` class so the archetype chip is
+  untouched].)*
 
 - **Dossier de-dull v1 (counting spine · threshold · ledger edges · cut tag)** (2026-06-14 / BR-S048, app.js +
   styles.css): made the 7-plate dossier read as THE RECORD OF THIS CARD via flat line+number+type only —
@@ -532,7 +555,7 @@ Last updated: 2026-06-14.
 
 > **Builder-set near-term sequence (updated 2026-06-14, BR-S044):** dev-nav (DONE, BR-S040) →
 > Menu Re-frame (DONE, BR-S041) → /cleanup whole-repo (DONE, BR-S042) → Left redesign (Source merge) (DONE, BR-S044)
-> → Below redesign (Dossier de-dull) (DONE, BR-S048) → **Right polish (NEXT)**. Grounded by the direction-synthesis workflow + research:
+> → Below redesign (Dossier de-dull) (DONE, BR-S048) → Right polish (DONE, BR-S049). **Builder-set sequence COMPLETE.** Grounded by the direction-synthesis workflow + research:
 > - **Menu Re-frame v1 (DONE, BR-S041)** — built Direction A "Sealed Pull" (one complete card, ladder
 >   killed, sealed caption). Originally specced: the "layup" fix. `FREE_PAID_MODEL_V1` verdict: the
 >   complete-front/sealed-back model is LOCKED and right; the defect is tier-ladder
@@ -550,8 +573,10 @@ Last updated: 2026-06-14.
 >   Diagram as CLEAN|ANNOTATED, deleted the redundant Capture Record, re-pointed ?tab=source → diagram).
 > - **Below redesign — Dossier de-dull (DONE, BR-S048)** = LAYUP Task #3 dossier half (counting-spine gutter,
 >   room→archive threshold, LOUD ledger edges, CUT the blanket plate tag). The shutter reveal was DEFERRED to
->   Engineered Technique Pass #2 (its own commit). **Right polish (NEXT)** = LAYUP Task #3b (right-panel index
->   gutter, section labels, tiered weight via line only, aura-chips-as-ledger; "medium", not "lacking").
+>   Engineered Technique Pass #2 (its own commit). **Right polish (DONE, BR-S049)** = LAYUP Task #3b — shipped the
+>   right-panel R.NN index gutter + readhead tighten. DEFERRED to their own commits: 3-tier line weight (border
+>   LONGHAND only — avoid the BR-S048 cascade trap), section-regrouping (ghost section labels), aura-chips-as-ledger
+>   (scope via a `.module--aura` class so the archetype chip is untouched).
 > - **Set aside (builder, BR-S040):** a full Halo card "example" — a populated stats-card
 >   trips the magnetism kill-rule; revisit later (sealed-back only if shown). Deeper
 >   "essence / marketing / value-stacking / existence-framing" = a FUTURE research pass, not now.

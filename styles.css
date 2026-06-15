@@ -1075,9 +1075,11 @@ body[data-treatment="shiny"] .stagezone {
 }
 .readhead__meta { display: flex; gap: 8px; align-items: center; }
 .readhead__line {
-  font-size: 12px;
+  font-family: var(--font-mono); /* mono telemetry — quiets the tagline, mirrors the index gutter */
+  font-size: 9.5px;
+  letter-spacing: 0.04em;
   line-height: 1.5;
-  color: var(--t-meta);
+  color: var(--t-ghost); /* decorative TREATMENTS tagline -> ghost (LAYUP sec6: floor is for functional labels) */
   padding-bottom: 10px;
 }
 .readhead__chip {
@@ -1117,6 +1119,33 @@ body[data-treatment="shiny"] .stagezone {
   border-radius: var(--r-plate);
   background: rgba(233, 229, 220, 0.015);
   padding: 15px 16px 16px;
+}
+
+/* index gutter — quiet R.NN record numbering down the right edge, echoing the
+   dossier's numbered records (BR-S048) as one instrument-sheet system. Numbers
+   READING-RECORD modules only (incl. the 3 free .module--locked archive teasers);
+   the Develop CTA / Lab tease (.unlock) and the empty Halo badge wrapper
+   (:has(.maxbadge)) are conversion/state chrome and stay OUTSIDE the record.
+   details.receipts is not a .module so it is naturally skipped. counter-increment
+   + ::before share ONE selector so the count and the printed mark never desync. */
+.panel--reading { counter-reset: rmod; }
+.panel--reading .module:not(.unlock):not(:has(.maxbadge)) {
+  counter-increment: rmod;
+  position: relative;
+  padding-right: 46px; /* carve the right-edge index lane */
+}
+.panel--reading .module:not(.unlock):not(:has(.maxbadge))::before {
+  content: "R." counter(rmod, decimal-leading-zero);
+  position: absolute;
+  top: 15px;
+  right: 12px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1;
+  letter-spacing: 0.06em;
+  color: var(--t-ghost); /* structural numbering = ghost (LAYUP §6) */
+  font-variant-numeric: tabular-nums; /* R.09 -> R.10 must not jitter */
+  pointer-events: none;
 }
 .panel--reading .module__label {
   font-size: 11.5px;
@@ -2477,6 +2506,9 @@ body[data-view="room"] .dev { display: none; }
   /* collapse the counting-spine gutter on narrow screens */
   .dplate { grid-template-columns: 1fr; column-gap: 0; }
   .dplate__spine { font-size: 13px; color: var(--t-meta); margin-bottom: 8px; }
+  /* collapse the reading-panel index gutter on the same breakpoint */
+  .panel--reading .module:not(.unlock):not(:has(.maxbadge)) { padding-right: 16px; }
+  .panel--reading .module:not(.unlock):not(:has(.maxbadge))::before { display: none; }
   .menu__brand { font-size: 23px; letter-spacing: 0.26em; }
   /* Free Pull mock stacks: image slab on top, label below */
   .fpwrap { width: 100%; }
