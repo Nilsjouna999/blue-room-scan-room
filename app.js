@@ -920,6 +920,8 @@ function renderMenu() {
         <p class="menu__trust">Image-as-artifact scan — it reads frame, gesture and signal, never the person.</p>
       </header>
 
+      <p class="menu__hint">One indexed institution — an archive of developed photographs. Each scan files one card.</p>
+
       <section class="msample" style="--halo-a:${esc(s.halo.a)}; --halo-b:${esc(s.halo.b)}; --halo-c:${esc(s.halo.c)};">
         <div class="msample__cap">
           <span class="msample__label">Sample Scan</span>

@@ -2039,6 +2039,8 @@ body[data-view="room"] .dev { display: none; }
 .menu__mark { color: var(--silver-dim); font-size: 17px; }
 .menu__thesis { font-family: var(--font-display); font-size: 19px; line-height: 1.4; color: var(--t-primary); }
 .menu__trust { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.11em; color: var(--t-meta); }
+/* "what this is" hint — deadpan Archive frame, type+spacing only (no depth/accent) */
+.menu__hint { font-family: var(--font-mono); font-size: 9.5px; letter-spacing: 0.08em; line-height: 1.6; color: var(--t-meta); max-width: 360px; margin: 14px auto 0; }
 
 .msample {
   width: 100%;
