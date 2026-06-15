@@ -318,3 +318,17 @@ Runtime unchanged — data.js, app.js, styles.css untouched.
 Revisit: when the dossier renderer is built (separate task) — the `modules.*` field migration to
 both sample fixtures is its prerequisite. Extend `scan-contract.js` with a `validateHaloDossier`
 export at the same time.
+
+**2026-06-15 / Tier-ratio re-derivation v1: `--ink-900` re-anchored to `#100f0c` vs the locked base / ACTIVE (gated follow-up to Base-Hex Lock v1)**
+Why: the deferred tier-ratio task (gated behind BR-S039). Against the new HIGHER locked base `#0a0b0d`,
+legacy `--ink-900` `#0d0c0a` was a near-invisible +0.00037-luminance step whose HSL-L equalled the base —
+collapsing the floor→body separation, and it read faintly cool. Re-anchored `#0d0c0a → #100f0c`: re-warms
+(R `10` > B `0c`, warm-neutral per the lock's own revisit clause) and restores a strictly monotonic warm
+ramp (lum 950 0.00333 → 900 0.00478 → 850 0.00519 → 800 0.00663 → 700 0.00996, all ascending). **NARROW_SCOPE:**
+only `--ink-900` changed; 850/800/700 are already warm-neutral above the floor with no AA-critical text, left
+as-is. `--ink-900` doubles as dark-on-light chip text — re-verified AA in-browser: **15.25 / 11.02 / 5.97:1**
+on `--silver-bright` / `--silver` / `--silver-dim` (all clear AA 4.5; the two brighter clear AAA). The LOCKED
+**Muted/Clean/Strong/Charged/Peak** ladder is untouched — tier bands are WORDS via the `--t-*` ramp; no
+`--ink-900` in any band rule. Built + adversarially verified (17-agent backlog workflow, opus planner + opus
+skeptic reproduced the full color math). Pure CSS token + comment; no markup/data.js.
+Revisit: with the sibling Plate-bg consolidation, and any future re-derivation of 850/800/700.

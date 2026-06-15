@@ -17,10 +17,14 @@
 
   /* room — warm dark stage. --ink-950 is the LOCKED base hex #0a0b0d
      (Base-Hex + Warm-Ramp Lock v1) — the deepest shadow FLOOR only; warm-neutral
-     still governs lighter surfaces. Upper stops (900/850/800/700) re-derive vs
-     this base in the deferred tier-ratio task. */
+     governs every lighter surface. Tier-ratio re-derivation v1 (BR-S055): --ink-900
+     re-anchored #0d0c0a → #100f0c so the first surface above the cool floor re-warms
+     (R>B) and keeps a monotonic luminance step (lum 0.00333 → 0.00478 → 0.00519 →
+     0.00663 → 0.00996, strictly ascending). 850/800/700 already warm-neutral above the
+     floor with no AA-critical text — left as-is. --ink-900 also serves as dark-on-light
+     chip text (worst case 5.97:1 on --silver-dim; all three chips clear AA). */
   --ink-950: #0a0b0d;
-  --ink-900: #0d0c0a;
+  --ink-900: #100f0c;
   --ink-850: #11100d;
   --ink-800: #151310;
   --ink-700: #1c1915;
