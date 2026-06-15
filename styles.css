@@ -1181,6 +1181,19 @@ body[data-treatment="shiny"] .stagezone {
 /* accent economy: aura chips stay neutral in every state — the card
    carries the material, the plates stay quiet */
 
+/* Aura Profile module: scoped ledger entries (bottom rule, flat). Column so each
+   aura word is its OWN full-width ruled row, not side-by-side underlined words.
+   Scoped to .module--aura so the Artifact Archetype chip + dossier Plate 05 aura
+   stay pills. */
+.module--aura .aura { flex-direction: column; gap: 0; }
+.module--aura .aura__chip {
+  border: none;
+  border-bottom: 1px solid var(--line);
+  border-radius: 0;
+  padding: 5px 0;
+  background: none;
+}
+
 .impact { display: flex; align-items: center; gap: 12px; }
 .impact__label {
   font-size: 11px;

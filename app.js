@@ -520,7 +520,7 @@ function renderReadingPanel(src, treatment) {
     </div>`;
 
   const aura = `
-    <div class="module">
+    <div class="module module--aura">
       ${moduleHead("Aura Profile")}
       <div class="aura">${src.aura.map((a) => `<span class="aura__chip">${esc(a)}</span>`).join("")}</div>
     </div>`;
