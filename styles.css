@@ -1272,6 +1272,22 @@ body[data-treatment="shiny"] .stagezone {
   border-radius: var(--r-plate);
   padding: 14px 16px;
 }
+/* 3-tier line weight — Oracle: heavier top edge; Stat Reading + Mint Record: a 2px
+   left ledger rule; the rest stay --line-faint. ALL border LONGHAND (width/style/color):
+   a shorthand would silently reset the plate-light border-top-color rgba(233,229,220,.12)
+   set on .panel--reading .module (the BR-S048 cascade lesson). Same specificity (0,2,0) as
+   the base rule — wins by SOURCE ORDER (placed after the base block). No accent, no fill. */
+.panel--reading .module--oracle {
+  border-top-width: 2px;
+  border-top-style: solid;
+  border-top-color: var(--line-strong);
+}
+.panel--reading .module--ledger {
+  border-left-width: 2px;
+  border-left-style: solid;
+  border-left-color: var(--line);
+}
+
 .undeveloped__line {
   font-size: 12.5px;
   font-style: italic;

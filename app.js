@@ -499,7 +499,7 @@ function renderReadingPanel(src, treatment) {
     </div>`;
 
   const statReads = `
-    <div class="module">
+    <div class="module module--ledger">
       ${moduleHead("Stat Reading")}
       <div class="reads">
         ${(() => {
@@ -560,7 +560,7 @@ function renderReadingPanel(src, treatment) {
       ${moduleHead("Oracle Read")}
       <p class="oracle">“${esc(src.oracle)}”</p>
     </div>
-    <div class="module">
+    <div class="module module--ledger">
       ${moduleHead("Mint Record")}
       <dl class="kv">
         <div><dt>Serial</dt><dd>${esc(c.serial)}</dd></div>
