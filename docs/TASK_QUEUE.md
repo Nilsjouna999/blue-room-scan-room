@@ -6,6 +6,32 @@ Last updated: 2026-06-15.
 
 ## Active
 
+- **Backlog batch v1 — 7 items via a 17-agent plan/de-risk workflow** (2026-06-15 / BR-S050…S056, app.js +
+  styles.css + docs): planned + adversarially de-risked 8 queued items in parallel (8 planners [3 on haiku for
+  speed] + 8 verifiers + 1 sequencer = 17 agents; all returned GO-now, none needing a decision), then shipped 7
+  as focused, individually-verified commits (one job each, explicit staging):
+  · **BR-S050 aura-ledger** — Aura Profile chips → flat full-width ledger rows (`.module--aura` + the missing
+    `flex-direction:column` container fix a verifier caught); the archetype chip + dossier Plate 05 stay pills.
+  · **BR-S051 Halo Dossier Schema v1** — committed `docs/HALO_DOSSIER_SCHEMA_V1.md` (data shape for the sealed
+    card back: 7 §D modules, LOCKED §4 safety, Free/Halo reveal table) + FILE_MAP/DECISION_LOG; one JSONC
+    "Exactly 3" contradiction reworded.
+  · **BR-S052 right-panel 3-tier line weight** — Oracle 2px `--line-strong` top edge + Stat/Mint 2px `--line`
+    left ledger (`.module--ledger`), border LONGHAND (no BR-S048 shorthand clobber; plate-light verified intact).
+  · **BR-S053 menu hint** — a deadpan Archive-frame "what this is" line on the menu (draft second-person → 3rd).
+  · **BR-S054 scroll-driven dossier reveal** (Technique Pass #2) — `animation-timeline:view()` top-edge shutter,
+    `@supports`-gated + reduced-motion fully-shown (the missing override folded in).
+  · **BR-S055 tier-ratio re-derivation** (gated token) — `--ink-900` `#0d0c0a→#100f0c`; monotonic warm ramp + AA
+    re-verified (15.25/11.02/5.97:1); the LOCKED Muted/Clean/Strong/Charged/Peak ladder untouched.
+  · **BR-S056 plate-bg consolidation** (gated token) — default `.card__plate` terminal stop → `--ink-950`; the 5
+    material plates + frost unchanged (verified).
+  Each verified live (1600×900 + narrow, DOM/getComputedStyle — screenshots time out); console clean; no data.js.
+  **Completed.** **Still deferred (its own session):** right-panel **section-labels** (ghost OBSERVATION /
+  INTERPRETATION / ARTIFACT READ / RECORD grouping) — a verifier found 5 structural edge cases (first-of-type vs
+  the readhead, conditional archetype section, splitting Mint Record out of the `deep` template, the free CTA
+  inside INTERPRETATION, shinyTease homing); a ready fix-plan exists, but it is high-churn markup surgery best
+  done focused, NOT at the tail of a batch. Clears Ready #0 (scroll reveal), #4 (Halo schema), #6 (tier-ratio),
+  #7 (plate-bg), and the Menu v2 hint. **Next up:** section-labels, OR Ready #1 (`@property` stat-band fill).
+
 - **Right-panel polish v1 — R.NN index gutter + readhead tighten** (2026-06-15 / BR-S049, styles.css only):
   de-dulled the right reading panel (`LAYUP_RESEARCH_V1` Task #3b) with FLAT moves only. **(a)** a quiet
   right-edge **index gutter** — a CSS counter (`rmod`) numbers the reading-RECORD modules `R.01..R.NN` as 12px
