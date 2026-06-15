@@ -298,3 +298,23 @@ lives only there. Built + adversarially verified via a 12-agent workflow (the ve
 bug — the accent would have lost specificity to the LOUD rule — and a desktop oracle-centering break, both fixed);
 runtime-verified in-browser, no data.js change.
 Revisit: with Right polish (LAYUP #3b) and the deferred top-edge shutter reveal (Engineered Technique Pass #2).
+
+**2026-06-15 / Halo Dossier Schema v1 — data shape for the sealed card back / ACTIVE**
+Why: `HALO_GATE_BOUNDARY_V1` §D listed the 7 production-note modules as "define; do NOT build."
+This schema is that definition — the field-level contract the future dossier renderer, fixture
+upgrade, and validator must satisfy, written before any runtime work so the schema, not the build,
+draws the boundary. The 7 modules (The Read · Strongest Lever · Three Active Levers · Keep This ·
+Two Variant Routes · One Reduce · Next Pull Setup) are each framed strictly as **artifact production
+notes / image reads** — never person-truth, never self-improvement, never "better you." Extends the
+existing `data.js` `dossier.*` predecessor shape (record · evidence · statNotes · hidden · mint ·
+oracle) with the new `modules.*` object. LOCKED safety rules (§4.1–4.7 of the schema): framing law
+(image-only / Artifact Test); variant language law (another card, never a better self); Next Pull law
+(camera choices only; no "stand differently / look more confident"); inflate-never rule (count only
+confidently evidenced levers / routes); oracle safety (mythic flavour, never an identity claim);
+safetyFlags gate (all five must be false to render). Free/Halo reveal table (§3) governs what
+lives where: module bodies, lever counts, and full evidence are post-unlock only; the Free front
+and Halo Gate get qualitative sealed-back language per `HALO_GATE_BOUNDARY_V1` §B/§C.
+Runtime unchanged — data.js, app.js, styles.css untouched.
+Revisit: when the dossier renderer is built (separate task) — the `modules.*` field migration to
+both sample fixtures is its prerequisite. Extend `scan-contract.js` with a `validateHaloDossier`
+export at the same time.
