@@ -459,7 +459,7 @@ body {
 .card__plate {
   position: relative;
   border-radius: calc(var(--card-radius) - 1px);
-  background: linear-gradient(180deg, var(--ink-800) 0%, var(--ink-850) 55%, var(--ink-900) 100%);
+  background: linear-gradient(180deg, var(--ink-800) 0%, var(--ink-850) 55%, var(--ink-950) 100%); /* Plate-bg consolidation v1 (BR-S056): terminal stop --ink-900 -> --ink-950 (LOCKED base #0a0b0d); warm upper stops 800/850 deferred to tier-ratio */
   padding: var(--card-pad);
   overflow: hidden;
   box-shadow: inset 0 1px 0 rgba(233, 229, 220, 0.055); /* artifact top light */

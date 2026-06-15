@@ -332,3 +332,17 @@ on `--silver-bright` / `--silver` / `--silver-dim` (all clear AA 4.5; the two br
 `--ink-900` in any band rule. Built + adversarially verified (17-agent backlog workflow, opus planner + opus
 skeptic reproduced the full color math). Pure CSS token + comment; no markup/data.js.
 Revisit: with the sibling Plate-bg consolidation, and any future re-derivation of 850/800/700.
+
+**2026-06-15 / Plate-bg consolidation v1: default `.card__plate` terminal stop → LOCKED base `#0a0b0d` / ACTIVE (gated follow-up to Base-Hex Lock v1)**
+Why: the deferred Plate-bg consolidation (gated behind BR-S039). Unify ONLY the base/default `.card__plate`
+gradient against the locked base. **NARROW_SCOPE:** the single warm bottom stop (`var(--ink-900)` at 100%) was
+re-pointed to `var(--ink-950)` (`#0a0b0d`) so the default plate's deepest tone IS the locked room floor; the two
+warm upper stops (`--ink-800` 0%, `--ink-850` 55%) were left untouched — re-deriving the warm ramp is the sibling
+tier-ratio task. The 5 LOCKED per-source/material plates (mint/cold-foil/black-star/night-gloss/shiny) + the frost
+carve-out each override `background` WHOLESALE at higher specificity — verified visually unchanged in-browser
+(byte-identical computed backgrounds). Restyle-not-relayout: gradient angle / stop-positions / `::before` inset
+frame unchanged; the shifted stop sits at the 100% terminal under the inset frame (sub-1% luminance shift, no text
+on it). The engraved text-shadow re-tune was deliberately SKIPPED (the 3 shadows sit on photo/scrim surfaces, not
+the plate) and NO letterpress pair was invented. Built + adversarially verified (opus planner + opus skeptic).
+Pure CSS one-stop swap; no markup/data.js.
+Revisit: when the warm upper-stop ramp (800/850) is re-derived, or a card-family system needs per-family floors.
