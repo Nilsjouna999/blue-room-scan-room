@@ -1,7 +1,7 @@
 # BLUE ROOM — File Map (session router)
 
 Permanent router for future Fable / Claude / GPT coding sessions.
-Read this before opening anything else. Last verified: 2026-06-14.
+Read this before opening anything else. Last verified: 2026-06-16.
 
 ## Scope rules (non-negotiable)
 
@@ -18,7 +18,10 @@ Read this before opening anything else. Last verified: 2026-06-14.
 
 ## Source-of-truth docs, priority order
 
-1. `docs/SESSION_BRIEF.md` — today's scope (wins for "what to do now")
+1. `docs/SESSION_BRIEF.md` — per-session scope (can lag; some sessions
+   ship without a brief). For the live "what shipped / what's next"
+   picture read `docs/TASK_QUEUE.md` (Completed + Ready) +
+   `docs/DECISION_LOG.md` + `git log`, not SESSION_BRIEF (per GOVERNANCE_OS)
 2. `docs/FILE_MAP.md` — this file (wins for "where things live")
 3. `docs/GOVERNANCE_OS.md` — authority layers, statuses, change reviews,
    research promotion funnel
@@ -41,9 +44,10 @@ implementation (GOVERNANCE_OS funnel).
 
 | File | What it does | Touch when | Do NOT touch when |
 | --- | --- | --- | --- |
+| `README.md` | Human run-guide for the prototype: how to run (open `index.html` or `python -m http.server 8743`), the source images, controls + keys, the scroll layout (three-column hero + 7-plate dossier), treatments + stats summary | The run steps, controls, or top-level layout/treatment/stats summary change | Governance or spec content (lives in `docs/`); copy values (data.js) |
 | `index.html` | Page shell: top bar, source/treatment toggles, three panel mounts, dossier mount | Adding a toggle button or mount point (rare) | Any content/copy/style task — content lives in data.js, looks in styles.css |
 | `styles.css` | Entire visual system: tokens, layout grid (hero capped at 1060px), card shell, treatment skins (free/mint-lab/shiny via `--halo-a/b/c`), tabs, dossier plates | Visual changes within existing structure | Copy changes; adding layouts (one master card base is LOCKED) |
-| `app.js` | State (`source/treatment/tab` + URL params `?src&t&tab`), all rendering (left tabs, card, right panel, dossier), delegated `[data-goto]` click handler, keyboard (1/2, F/H, M=lab) | Structure/gating/wiring changes | Copy tweaks (data.js) and pure styling (styles.css) |
+| `app.js` | State (`state` obj app.js:70 — source/treatment/tab/view + draftGate/dev/labMaterial/diagramView). URL params: product `?src&t&tab` (legacy `?tab=source` re-points to Diagram — Source merged in BR-S044) + `?dv` diagram-view + `?lab` Lab material; dev-only `?dev` harness routes (uploaded-result/-blocked, free-scan-sim, halo-gate) & `?devnav=1` dev rail (never paints for a real user). All rendering (left tabs, card, right panel, dossier); delegated `[data-goto]` + `[data-devnav]` handlers; keyboard 1/2 source · F free · H/S Halo · M Lab · `[`/`]` Lab finish-cycle · Enter open-room · Esc step-back | Structure/gating/wiring changes | Copy tweaks (data.js) and pure styling (styles.css) |
 | `data.js` | ALL content: 2 ScanResults (card text, stats, reads, aura…), `photoTuning`, `diagram`, `metrics`, `dossier` (record/evidence/statNotes/hidden/mint/oracle), `halo` materials, `FORMULAS`, `TREATMENTS` labels | Any copy/values/content change — the safest file | Renaming the four stats without a DECISION_LOG entry |
 | `scan-contract.js` | Pure non-AI **safety valve** (`window.BlueRoomScanContract`): `validateUploadedScanResult` + `createBlockedScanState` + `DEV_FIXTURES`, per `docs/SCAN_ENGINE_CONTRACT.md`. Loaded before app.js; NOT wired to normal flow | Validating a future uploaded-photo result; tightening the contract guard | Generating analysis; making the local draft produce stats; calling AI |
 | `assets/source-01.jpg` | SRC-01 Driver photo (landscape) | Never edited; replaced only by user decision | — |
