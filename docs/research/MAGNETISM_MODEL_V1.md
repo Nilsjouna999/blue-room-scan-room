@@ -8,8 +8,8 @@ compulsion — any exploit mechanic = instant KILL, however well it works.** 22 
 one commit behind `baseline-v1`.
 
 ## The definition (the bar)
-> **Magnetism is pull by GIVING MORE; compulsion is pull by EXPLOITING. We build only the
-> first. Magnetism is provenance, not rarity.** A surface earns return because the world is
+> **Canonical definition — see `GOLDEN_NUGGETS` #7** ("magnetism is pull by giving, not
+> exploiting — provenance made legible, never scarcity/streaks"). We build only that. A surface earns return because the world is
 > genuinely larger and more coherent — real structure made legible (a typed class, a numbered
 > manifest, the latent→developed law), an honest artifact completed (the front is whole; the
 > back is a different *mode*, not a withheld answer), or a place that feels like a SOMEWHERE

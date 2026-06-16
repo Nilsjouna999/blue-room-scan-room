@@ -383,8 +383,9 @@ archive? Good. Does it read like an app judging a face? Delete it.
 All **BACKLOG** — not current build:
 
 - scroll-down deep scan dossier
-- Profile Layers (MBTI / zodiac / numerology / Chinese zodiac) → parked in
-  `docs/PARKED_IDEAS.md` (the Codex / info-hub idea; user-provided, never inferred)
+- Profile Layers (MBTI / zodiac / numerology / Chinese zodiac) — Backlog mechanism
+  (user-declared lore, never inferred; canon `GOLDEN_NUGGETS` #9). The wilder
+  Codex / info-hub *vision* is parked in `docs/PARKED_IDEAS.md`.
 - vault (paid cards, 12-slot grid, active card)
 - paid mint flow ($7 single Signature Mint, no subscriptions V1)
 - export/share card

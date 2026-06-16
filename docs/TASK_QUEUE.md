@@ -790,8 +790,8 @@ Last updated: 2026-06-15.
   direction passes the "I want my own card" test.
 - **Deterministic ScanResult engine** (Phase 3), **AI-assisted reading**
   (Phase 4), **$7 mint flow** (Phase 5), **Vault** (Phase 6).
-- **Profile layers** (MBTI/zodiac/etc.) — user-provided only, never
-  inferred; needs activation decision.
+- **Profile layers** (MBTI/zodiac/etc.) — user-declared lore, never inferred
+  (canon `GOLDEN_NUGGETS` #9); the Backlog *mechanism* the parked Codex vision would use; needs activation decision.
 - **Mobile pass** — currently basic fallback by decision; needs a "now
   it matters" call.
 - **COPY_SYSTEM §4 residual second-person** (logged BR-S035, not patched) —

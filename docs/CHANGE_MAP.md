@@ -358,7 +358,7 @@ nothing. This is the index for the whole research body.
 Saved `docs/research/MAGNETISM_MODEL_V1.md` (RESEARCH; FILE_MAP registers it) from a 14-agent
 White Death (8 Sonnet axes → 2 Haiku compulsion-sweep + 2 Opus magnetism/FIT judges → Opus
 consolidate → Opus rank), bar = magnetism-not-compulsion (any exploit mechanic = instant kill).
-22→8 CONFIDENT survivors, 8 killed. Definition: pull by GIVING MORE (provenance, not rarity);
+22→8 CONFIDENT survivors, 8 killed. Definition (canon: GOLDEN_NUGGETS #7): pull by giving, not exploiting;
 the operating copy-test = it dies the instant wording shifts from "this was partial / assigned
 on Develop" to "unlock your score / you missed something better." The 8 survivors are all
 copy/CSS framing of LIVE state (serial spine, archetype class made legible, latent→developed
@@ -1298,8 +1298,7 @@ before building).
 
 ## To add profile layers later (BACKLOG)
 
-- **Principle:** *the photo creates the card; the profile adds the lore.*
-  User-provided only, never inferred.
+- **Principle (canon: `GOLDEN_NUGGETS` #9):** user-declared lore, never inferred.
 - **Where it would live:** new optional `profile` object per source in
   `data.js`; rendered as additional right-panel modules (and later dossier
   sections) — **not** on the card front beyond, at most, a tiny stamp.

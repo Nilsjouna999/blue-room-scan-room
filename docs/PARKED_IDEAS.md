@@ -8,9 +8,10 @@ Parked ideas — solid, not ranked, not for action until core (scan→mint) ship
 ## The ideas
 
 - **Codex / info hub** — numerology, zodiac, Chinese zodiac, and MBTI as serious content (a real
-  info/lore layer, not a gimmick). Carries the former PROJECT_OS §15 "Profile Layers" note:
-  **user-provided / declared, never inferred from the photo** — "the photo creates the card; the
-  profile adds the lore."
+  info/lore layer, not a gimmick). The *mechanism* it would use — **Profile Layers** (user-declared
+  lore, never inferred) — is a decided Backlog feature (`TASK_QUEUE` Backlog; DECISION_LOG
+  2026-06-12), not parked; this pen holds only the wilder codex/info-hub *vision*. Principle
+  canon: `GOLDEN_NUGGETS` #9.
 - **Card autobattler with friend cards** — minted cards become pieces in a small battler; interactive
   and/or combat, undecided.
 - **Social presence** — connect with others, online/offline, messaging; shape undecided.

@@ -85,8 +85,8 @@ For each zone: what it is · what it is for · what exists today · the card's r
 ### Codex — LATER
 - **What it is.** The class taxonomy (archetype classes → families) + the **declared**
   Track-B lore layer (zodiac / numerology / MBTI as *user-declared*, never inferred).
-- **For.** Discovery-by-class and the optional lore layer — "the photo creates the card;
-  the profile adds the lore" (PROJECT_OS §15).
+- **For.** Discovery-by-class and the optional lore layer — the two-track attachment law
+  (canon: `GOLDEN_NUGGETS` #9; mechanism: Profile Layers, `TASK_QUEUE` Backlog).
 - **Today.** Not built. Aspirational.
 - **Card's role.** **Class citizen.** A card belongs to a class in the Codex; the class
   **label** may recur as the join, but lore attaches to the *serial* by declaration —

@@ -41,8 +41,8 @@ copy and data** — not new content. Two backbones carry the whole universe.
    - **Forbidden cross:** no declared lore may appear on any photo-read plate; the Oracle may
      not absorb it; aura/archetype/stats may **never** be recalculated by it. Declared lore
      *files against the serial after Develop* — the system never computes it from the photo.
-     (Echoes the LOCKED DECISION_LOG rule: *the photo creates the card; the profile adds the
-     lore; never inferred.*)
+     (Canon: `GOLDEN_NUGGETS` #9, LOCKED via DECISION_LOG 2026-06-12 — *the photo creates the
+     card; the profile adds the lore; never inferred.*)
 3. **Class axis** — one-to-one within a card, one-to-many across surfaces (one class governs
    its Codex page, journal register, oracle flavour, reading emphasis). The class is the card's
    photo-derived identity — NOT where declared profile data attaches (that is Track B).
