@@ -5,6 +5,32 @@
    One master card base; treatments restyle, never re-layout.
 ============================================================= */
 
+/* =============================================================
+   SECTION MAP — one file, no modules. Grep a function name to jump.
+   Full grain + line refs: docs/map/04_CODE_MAP.md.
+
+   CORE SEAM (audit v1): getScanResult() is the SINGLE read boundary.
+   Renderers consume the legacy SOURCES shape with a v2 overlay
+   (getScanResult(src)?.x || legacy src.x). The future uploaded-v1
+   engine wires in HERE via one adapter (uploaded-v1 -> render-model)
+   — do not scatter engine reads through the render functions.
+
+   helpers       esc · pad2 · STAT_LABELS/statLabel · tierBand
+   state+routing state{} · URL-param parse · DEVNAV gate
+   scan access   getScanResult · getActiveScan · getTierOutput   (the seam)
+   shared        moduleHead · miniStat · imgOrPlaceholder
+   left panel    renderLeftPanel · renderDiagramTab · renderMetricsTab · statDiamond
+   center card   renderCard
+   right panel   lockedModule · renderReadingPanel
+   dossier       dplate · renderDossier   (7 plates)
+   menu          renderMenu · mountMenu
+   devnav        renderDevnav
+   draft/gate    renderDraft · renderGate · renderBlockedScan · loadDraftFile
+   dev harness   mountDev · renderUploadedScanResultDev · renderFreePullMock · renderHaloGateMock
+   master paint  render
+   handlers      applyView · keydown · delegated [data-*] listeners
+============================================================= */
+
 function esc(s) {
   return String(s)
     .replace(/&/g, "&amp;")

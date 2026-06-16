@@ -17,6 +17,32 @@ globals directly and reaches `scan-contract.js` only through
 
 ---
 
+## Core seam — the card shape (Codebase Health Audit v1, 2026-06-15)
+
+THE single structural risk to know before the real engine lands. There is **no one card
+object** — the "thing a user makes" is assembled at render time from THREE shapes:
+
+| Shape | Where | Role |
+| --- | --- | --- |
+| **legacy `SOURCES[i]`** | `data.js:90` | the REAL container — all visible content (card, reads, aura, dossier, diagram, metrics) |
+| **v2 `SCAN_RESULTS_V2`** | `data.js:458` `toScanResultV2()` → `:533` | a derived PROJECTION of legacy into a stable shape (stats / receipts / tierOutputs); portable but incomplete |
+| **`uploaded-v1`** | `scan-contract.js:18` | the FUTURE engine's result shape (evidenceBoard / safetyFlags / artifact); validated, **not wired**, renderers do not consume it |
+
+**The seam.** Every renderer reads the **legacy** shape with a v2 overlay —
+`getScanResult(src)?.x || legacy src.x` (e.g. `app.js:454`). So `getScanResult` (`app.js:82`)
+is the **single read boundary**. When the real engine is greenlit, build **ONE adapter
+there** — `uploaded-v1 → render-model` — so the renderers keep reading one shape. Do NOT
+scatter `uploaded-v1` reads through the render functions, and do NOT unify the three shapes
+pre-emptively (the engine shape isn't decided). Cost-to-fix-later if ignored: **MEDIUM-HIGH**
+(the legacy reads are spread across `app.js`).
+
+**The join is by stringified index.** `getScanResult` matches v2 ↔ legacy on
+`SRC-${pad2(src.no)}` (`app.js:84`). If `src.no` / the `SRC-NN` format ever drifts, the
+lookup returns `null` and **silently** falls back to legacy — a real break would be masked.
+A 3rd photo means hand-authoring BOTH `SOURCES` and `V2_EXTRAS` (`data.js:426`).
+
+---
+
 ## 1. `data.js` — the fixture corpus (534 lines)
 
 Two hardcoded scans built from the two provided photos. No generation, no
