@@ -383,12 +383,8 @@ archive? Good. Does it read like an app judging a face? Delete it.
 All **BACKLOG** — not current build:
 
 - scroll-down deep scan dossier
-- optional **Profile Layers** — *"The photo creates the card. The profile
-  adds the lore."* User-provided, never inferred:
-  - Type Echo / MBTI layer
-  - Zodiac layer
-  - Numerology layer
-  - Chinese zodiac layer
+- Profile Layers (MBTI / zodiac / numerology / Chinese zodiac) → parked in
+  `docs/PARKED_IDEAS.md` (the Codex / info-hub idea; user-provided, never inferred)
 - vault (paid cards, 12-slot grid, active card)
 - paid mint flow ($7 single Signature Mint, no subscriptions V1)
 - export/share card
