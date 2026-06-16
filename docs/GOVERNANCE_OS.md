@@ -74,6 +74,15 @@ picture, read **`docs/TASK_QUEUE.md` (Completed + Ready) + `docs/DECISION_LOG.md
   research principles → `research/SPINE.md`. No new capture doc (anti-clutter rule below).
 - Stale info: verify against current files before repeating any claim;
   superseded claims get corrected at the source, not re-litigated.
+- **One canonical statement per principle.** A principle has exactly ONE
+  canonical home — precedence **CORE LAW** (LOCKED `DECISION_LOG`/`PROJECT_OS`)
+  **> CANON** (`GOLDEN_NUGGETS`) **> ACTIVE > RESEARCH**. Every other mention
+  must CITE it, never restate it. (Append-only `DECISION_LOG` decision *records*
+  are authoritative sources, not restatements — never rewrite them to pointers.)
+- **Decided ⇒ Backlog, not Parked.** An item with a governing `DECISION_LOG`
+  decision belongs in `TASK_QUEUE` Backlog/roadmap, never `PARKED_IDEAS`.
+  `PARKED_IDEAS` holds only wild, far-from-core directions with no decision to
+  pursue them yet.
 
 ## Anti-clutter rules
 
