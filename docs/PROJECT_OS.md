@@ -1,6 +1,6 @@
 # BLUE ROOM — Project OS
 
-Last updated: 2026-06-12
+Last updated: 2026-06-15
 Status labels used throughout:
 
 - **LOCKED** — core rule; avoid changing unless there is a clearly stronger reason
@@ -413,10 +413,12 @@ All **BACKLOG** — not current build:
 
 ## 17. Next Build Priorities
 
-1. Audit all 18 states (2 sources × 3 treatments × 3 tabs)
-2. Improve top hero clarity
-3. Improve free-to-paid CTA
-4. Improve right panel hierarchy
-5. Polish Diagram/Metrics readability
+The live priority order lives in `docs/TASK_QUEUE.md` (**Ready** = queued next ·
+**Backlog / needs decision** = deferred) — read it there, not here, to avoid a drifting
+duplicate. As of 2026-06-15 the builder-set redesign sequence (dev-nav → menu re-frame →
+cleanup → source merge → dossier de-dull → right-panel polish) is complete; the original
+2026-06-12 list is **retired** as done/superseded (18-state audit BR-S033 · CTA/menu
+BR-S041 · right-panel hierarchy BR-S049/S050/S052 · Diagram merged BR-S044 — Metrics
+redesign is the one still open).
 6. Only then consider the scroll-down dossier
 7. Only later add upload / AI / checkout

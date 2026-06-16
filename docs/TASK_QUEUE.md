@@ -4,7 +4,11 @@ Ranked work queue, not a dream backlog. One Active item at a time.
 Out-of-scope findings from any session get logged here, not patched.
 Last updated: 2026-06-15.
 
-## Active
+## Completed (shipped tasks, newest first)
+
+> This section is the COMPLETED-TASK LOG, not pending work. The current/next active item
+> is the head of **Ready** (below) — one at a time (this file's intro rule). For the
+> authoritative "what shipped" trail, cross-check `docs/DECISION_LOG.md` + `git log`.
 
 - **Backlog batch v1 — 7 items via a 17-agent plan/de-risk workflow** (2026-06-15 / BR-S050…S056, app.js +
   styles.css + docs): planned + adversarially de-risked 8 queued items in parallel (8 planners [3 on haiku for
@@ -673,7 +677,7 @@ Last updated: 2026-06-15.
    *(Engineered Technique Pass #1 — Card corner-shape edge — SHIPPED BR-S037; see
    Active. The pass is now the active program ahead of Halo Dossier Schema, per the
    user's direction to pursue the scouted techniques.)*
-0. **Engineered Technique Pass #2 — scroll-driven dossier reveal** (NEXT) — per-plate
+0. **Engineered Technique Pass #2 — scroll-driven dossier reveal** ✓ DONE (BR-S054) — per-plate
    entrance via `animation-timeline: view()` + `clip-path: inset()` (mechanical
    shutter, not a soft fade) on the 7 dossier plates. Zero-JS, off-main-thread.
    *Done when:* each `.dplate` reveals on scroll, `@supports`-gated, `prefers-reduced-
@@ -689,7 +693,7 @@ Last updated: 2026-06-15.
    check first; gimmick/soft-SaaS risk)* — pointer-tracked radial-gradient (`--x/--y`)
    with `mix-blend-mode: soft-light` over the Lab card photo; rAF-throttled, re-centers
    on leave; the only one adding JS.
-4. **Halo Dossier Schema v1** — schema FIRST, not the full route/build. Define the
+4. **Halo Dossier Schema v1** ✓ DONE (BR-S051) — schema FIRST, not the full route/build. Define the
    data shape for the sealed Halo dossier (the card back) per
    `docs/halo/HALO_GATE_BOUNDARY_V1.md` §D (7 candidate modules are "production notes
    — define, do NOT build"), reusing the audited artifact-safe language; no runtime
@@ -702,7 +706,7 @@ Last updated: 2026-06-15.
    bleed in (Mint Record plate already does).
    *Done when:* Halo dossier plates carry a restrained material accent;
    free stays matte; screenshots regenerated.
-6. **Tier-ratio re-derivation v1** *(gated behind Base-Hex + Warm-Ramp Lock v1, BR-S039)* —
+6. **Tier-ratio re-derivation v1** ✓ DONE (BR-S055) *(was gated behind Base-Hex + Warm-Ramp Lock v1, BR-S039)* —
    re-derive the upper `--ink-*` surface stops (900/850/800/700) and the public tier-band
    lightness ratios against the now-locked base `#0a0b0d`, so the warm dark ramp and the bands
    compute from canon rather than the legacy `#0a0907` floor (canon "re-derive the tier ratios
@@ -711,7 +715,7 @@ Last updated: 2026-06-15.
    2026-06-13) is preserved — no collapse/reorder/rename; `--ink-900`'s dark-on-light chip uses
    (`.toggle__btn.is-active`, `.marker__no`, `.markerlegend__no`) keep AA in the OPPOSITE
    direction from the substrate; verified via `getComputedStyle` contrast deltas; console clean.
-7. **Plate-bg consolidation v1** *(gated behind BR-S039; do AFTER #6)* — unify only the
+7. **Plate-bg consolidation v1** ✓ DONE (BR-S056) *(was gated behind BR-S039)* — unify only the
    **base/default** `.card__plate` gradient against the locked base; **preserve the LOCKED
    per-source Copper/Frost material plates** (mint `#171a20`, cold-foil `#141a23`, night-gloss
    `#0c121b`, black-star, shiny — DECISION_LOG 2026-06-12) and the frost cool carve-out. Its

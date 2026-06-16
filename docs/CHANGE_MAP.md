@@ -1,7 +1,9 @@
 # BLUE ROOM — Change Map
 
 Practical "where do I change this?" guide for `blue-room-scan-room/`.
-Read the matching section *before* editing. Last updated: 2026-06-12.
+Read the matching section *before* editing. Last updated: 2026-06-14.
+(How-to sections are current; the dated changelog blocks below run through BR-S044 —
+BR-S045–S056 are docs / small-CSS, tracked in `TASK_QUEUE.md` + `DECISION_LOG.md`.)
 
 General test loop for any change:
 `python -m http.server 8743` in the project folder → open

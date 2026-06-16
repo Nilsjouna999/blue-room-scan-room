@@ -1,7 +1,7 @@
 # BLUE ROOM — Governance OS
 
 Compact rules for how this solo project changes. Built for one builder
-working with Fable/Claude/GPT sessions. Last updated: 2026-06-12.
+working with Fable/Claude/GPT sessions. Last updated: 2026-06-15.
 
 ## Authority layers (4)
 
@@ -56,6 +56,11 @@ That's it.
 3. Only the docs the brief lists under Read
 Daily coding sessions do **not** open raw research unless the brief says so.
 
+**Source-of-truth for live state:** SESSION_BRIEF is *per-session scope* and can lag
+(some sessions ship without a brief). For the authoritative "what shipped / what's next"
+picture, read **`docs/TASK_QUEUE.md` (Completed + Ready) + `docs/DECISION_LOG.md` +
+`git log`** — not SESSION_BRIEF.
+
 ## Anti-drift rules
 
 - Fable obeys SESSION_BRIEF scope. No file outside its Edit list changes.
@@ -63,7 +68,10 @@ Daily coding sessions do **not** open raw research unless the brief says so.
   match the user's current ask: **stop and ask.**
 - If instructions conflict (chat vs docs, doc vs doc): **stop and name
   the conflict.** Do not pick silently.
-- Issues found outside scope go to TASK_QUEUE, not into code.
+- Issues found outside scope go to TASK_QUEUE, not into code. **Capture/promotion map:**
+  observations + deferred work → `TASK_QUEUE.md` Backlog; security/privacy/upload/payment
+  findings → `docs/security/SECURITY_REVIEW_PLAYBOOK.md` §3; law changes → `DECISION_LOG.md`;
+  research principles → `research/SPINE.md`. No new capture doc (anti-clutter rule below).
 - Stale info: verify against current files before repeating any claim;
   superseded claims get corrected at the source, not re-litigated.
 

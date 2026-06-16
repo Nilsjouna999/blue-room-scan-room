@@ -10,6 +10,11 @@ coding session; the assistant must respect it. Files not listed under
 does not match the user's current task — **stop and ask** before doing
 anything. (GOVERNANCE_OS anti-drift.)
 
+> **This brief lags HEAD.** The newest filled block is BR-S044 (2026-06-14); BR-S045–S056
+> shipped without briefs (docs / a docs+CSS batch). For the live "what shipped / what's
+> next" state, read `docs/TASK_QUEUE.md` + `docs/DECISION_LOG.md` + `git log` — this file
+> is the per-session scope template + history, not the source of current state.
+
 ## Active session — BR-S044  *(retrospective — reconstructed post-hoc; this session shipped without a brief)*
 
 **Date / Session ID:** 2026-06-14 / BR-S044
