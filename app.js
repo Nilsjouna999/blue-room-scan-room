@@ -604,7 +604,7 @@ function renderReadingPanel(src, treatment) {
         <div class="formulas__head">Interpretive Formula — scan recipe, not a measurement</div>
         ${FORMULAS.map(
           (f) =>
-            `<div class="formulas__row"><span class="formulas__k">${esc(f.k)}</span><span class="formulas__v">derived from: ${esc(f.v)}</span></div>`
+            `<div class="formulas__row"><span class="formulas__k">${esc(f.k)}</span><span class="formulas__v">read through: ${esc(f.v)}</span></div>`
         ).join("")}
       </div>
     </details>`;

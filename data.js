@@ -10,17 +10,17 @@
    placeholder.
 ============================================================= */
 
-/* House scan recipe — interpretive formulas shown in Technical
+/* House read method — the interpretive lenses shown in Technical
    Receipts (paid). Same for every card: it's the method, not a
-   measurement. Keep the language soft ("derived from"), never
-   fake-scientific. */
+   measurement. Phrase as what the read looks THROUGH (rendered as
+   "read through: …"), never as a derivation or fake-scientific formula. */
 const FORMULAS = [
-  { k: "Frame Presence", v: "focal clarity + posture stability + scene anchoring" },
-  { k: "Frame", v: "composition balance + crop pressure + background control" },
-  { k: "Signal", v: "gesture readability + eye-line clarity + styling distinctness" },
-  { k: "Scene Charge", v: "motion potential + contrast + scene temperature" },
-  { k: "Lore Density", v: "setting specificity + unresolved story + object cues" },
-  { k: "Fit Coherence", v: "styling + setting + posture + gesture alignment" },
+  { k: "Frame Presence", v: "focal clarity · posture stability · scene anchoring" },
+  { k: "Frame", v: "composition balance · crop pressure · background control" },
+  { k: "Signal", v: "gesture readability · eye-line clarity · styling distinctness" },
+  { k: "Scene Charge", v: "motion potential · contrast · scene temperature" },
+  { k: "Lore Density", v: "setting specificity · unresolved story · object cues" },
+  { k: "Fit Coherence", v: "styling · setting · posture · gesture alignment" },
 ];
 
 /* Customer-facing hierarchy (2026-06-12): Free Pull / Halo Mint.
