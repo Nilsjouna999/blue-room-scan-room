@@ -860,9 +860,26 @@ Last updated: 2026-06-15.
   (form open) · **Socials** (deferred-conditional — only if non-redundant). Guard: object-keyed, never
   person-keyed. **Builder (2026-06-17): Vault + Profile are the named next-after-menu brainstorm** — both
   undone + interlinked; settle what they CONTAIN, their PURPOSE, and the FEELING before building.
+  **Idle Room→Kingdom CAUTION (builder, 2026-06-17):** must NOT take the spotlight or take over Blue Room; its
+  videogame tone is a brand RISK — at most a careful, non-dominant cousin-concept, never a lead build.
+  **Menu-fork idea (builder, 2026-06-17):** the main menu may fork into TWO doors — **Free Pull** (downloadable ·
+  shareable · self-contained, conveys the concept, stays COMPLETE on its own) and the **Paid Universe** (a
+  multiplicative, high-functioning space that MULTIPLIES the free artifact, never "finishes" it).
 - **One paid reading** (decided paid spine — bounded: free → ONE paid card reading, not a tier) +
   **Referral → earns the paid reading** (builder idea; magnetism-by-giving, kept bounded — one clean
   referral → one reading, no streaks/leaderboards, object-keyed). Build-side when engine/payment is greenlit.
+  **RE-OPENED + extended (builder, 2026-06-17):** the bounded-single-action spine is NO LONGER settled — paid
+  could be a **subscription** (access model OPEN; access vs minting are two layers — access may recur, minting
+  stays scarce). And scarcity is **not fully banned**: **scarcity-as-meaningful-play** is allowed — finite/
+  precious minting so you genuinely CHOOSE "I want THIS card / THIS memory minted" (worth by intention), never
+  dark-arts FOMO/urgency; middle/logical scarcity is fine. This deliberately re-examines the LOCKED magnetism
+  (`GOLDEN_NUGGETS` #7) / Halo-Gate no-scarcity canon — draw the line in the deep research, do NOT change canon
+  yet. **DEEP RESEARCH-LATER (builder-named):** *"the WORTH / value of the minted artifact"* — a deep
+  sweep+synth on the scarcity-as-play economy of meaning + how the referral system helps + links to paid.
+  Relates to the chance-rarity open decision + the warrant-debt #1 magnetism edge.
+- **Branding / identity research doc** (builder-named, 2026-06-17 — later / when important): a research pass on
+  how Blue Room wants to BRAND + portray itself (identity, positioning, voice). Pairs with the already-noted
+  future "marketing / portrayal / value-stacking / existence-framing" research pass. Not now.
 - **Scan-room-below (dossier) stress-test** + **universe navigation** (real movement between rooms,
   beyond the dev buttons) — both builder-named (2026-06-17), later.
 - **Safety hardening — Human-Read Line enforcement** (from the `/gods-finger` audit, 2026-06-14,
