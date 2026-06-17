@@ -17,12 +17,13 @@ working with Fable/Claude/GPT sessions. Last updated: 2026-06-15.
 4. **ARCHIVE** — retired decisions, `_OLD_ARCHIVE_DO_NOT_USE`, stale
    audits. Read-only history. Never resurrect silently.
 
-## Statuses (4)
+## Statuses (5)
 
 - **LOCKED** — core law; change only via Core Change Review.
 - **ACTIVE** — current direction; change via Spec Change Review.
 - **DRAFT** — proposed, not yet binding.
 - **RETIRED** — kept for history; do not build from it.
+- **ASSERTED-NOT-ENFORCED** (suffix `-STATE-A`/`-STATE-B`) — a LOCKED-grade safety rule enforced today only by absence (no engine) is `LOCKED-STATE-A`; it flips to `-STATE-B` in place when the engine ships. Entry: the home spec explicitly distinguishes the two states (e.g. the `UNIVERSE_ZONE_MAP_V1` §7 aggregate wall).
 
 ## Research promotion funnel
 
@@ -83,6 +84,21 @@ picture, read **`docs/TASK_QUEUE.md` (Completed + Ready) + `docs/DECISION_LOG.md
   decision belongs in `TASK_QUEUE` Backlog/roadmap, never `PARKED_IDEAS`.
   `PARKED_IDEAS` holds only wild, far-from-core directions with no decision to
   pursue them yet.
+
+## Signal Map — altitude placement rule (sources `SIGNAL_MAP_TABLE.md`)
+
+An item's **altitude** is the widest thing that breaks if it is removed or changed, scored against its **designed** scope (not runtime reach). Five bands, highest first:
+
+- **L1 Project-Law** — whole-product law / safety / versioning, across all surfaces.
+- **L2 System/Subsystem-Spec** — one named authored subsystem's whole spec.
+- **L3 Surface-Spec** — one surface, zone, or panel.
+- **L4 Element/Technique** — one component / technique / stat / treatment, or a mechanism for an unbuilt zone-feature.
+- **L5 Detail-Cue** — one copy line, token value, or micro-cue.
+
+**Evaluate** L1→L5, stop at first yes. **Tie:** a blast-radius spanning two adjacent bands places at the **higher** band; authority/status/lifecycle/kind tiebreak *within* a band, never across.
+**Intended-scope:** an asserted-but-unenforced safety rule keeps its designed altitude (§7 is L1 though runtime-vacuous today). **Status-source:** read the token from the item's highest-grade governing home, never a downstream prose mention.
+**Separability:** a compound splits into sibling rows only if inner parts' blast-radii are independently computable AND ≥1 band apart; a **non-split override** (the source titles the parts as one unit, or binds them in one sentence) outranks the split — except a part ≥1 band *above* the container forces a split; a not-split row takes the **container's own** scope.
+**Meta:** this rule + the table place once in the table's reserved META row; the table holds **pointers + status only**, canon stays at the source. *(Worked example: `SIGNAL_MAP_TABLE.md` preamble.)*
 
 ## Anti-clutter rules
 
