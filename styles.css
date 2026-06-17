@@ -116,6 +116,11 @@ body {
   padding: 3px;
   background: rgba(255, 255, 255, 0.02);
 }
+/* Treatment toggle (Free|Halo grade pill) retired from customer chrome (BR-S064) —
+   the develop act lives at the in-room "Develop this scan" CTA, not a tier selector.
+   Dev-only via ?devnav (where the rest of the dev rail lives). */
+.toggle--treatment { display: none; }
+body[data-devnav="1"] .toggle--treatment { display: inline-flex; }
 .toggle__btn {
   font-family: var(--font-ui);
   font-size: 11px;

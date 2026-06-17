@@ -10,6 +10,21 @@ Last updated: 2026-06-15.
 > is the head of **Ready** (below) — one at a time (this file's intro rule). For the
 > authoritative "what shipped" trail, cross-check `docs/DECISION_LOG.md` + `git log`.
 
+- **Topbar zone label + treatment toggle retired from customer chrome** (2026-06-18 / BR-S064, index.html +
+  styles.css + app.js): build-first steps 1–2 of the architecture (BR-S063). (1) Gated the **Free|Halo treatment
+  toggle** (`#treatmentToggle`, the grade-ladder pill) behind `?devnav` via CSS (`.toggle--treatment` display:none;
+  shown only under `body[data-devnav="1"]`) — element + its DIRECT click handler kept (removing the node would
+  throw at app.js:1778), so devs still switch via the toggle + the `?devnav` rail + F/H/M keys. (2) Replaced the
+  static "SCAN ROOM · PROTOTYPE 002" brand sub-label with a live **zone label** off `state.view` (`#zoneLabel`, set
+  in `applyView`): "ARCHIVE · SCAN ROOM" (room) / "ARCHIVE · LOBBY" (menu) — realizes the `UNIVERSE_ZONE_MAP` §5
+  zone-nav NOW fork + retires the PROTOTYPE label. Menu↔room back loop already existed (index.html:63), kept.
+  Forward-develop path (the "Develop this scan" CTA) untouched. **Verified live** (DOM/getComputedStyle via
+  dev-live): room shows "ARCHIVE · SCAN ROOM"; toggle display:none for customers, flips visible under `?devnav`;
+  source toggle + develop CTA + back button intact; console clean. **Interim gap (intentional, flagged):** a
+  developed customer has no VISIBLE reverse-to-front until the Develop Ceremony's "settle back to the front" lands
+  (step 3) — reload/F-key reset meanwhile. **Completed.** **Next up:** step 3 — the **Develop Ceremony** (develop
+  = an event where NEW MATERIAL opens, keep the LOCKED "Develop this scan" verb), then step 4 (crown-by-demotion
+  + de-smear the dossier).
 - **Free finish LOCKED — Letterpress Archive Edition (Free's default)** (2026-06-17 / BR-S060, styles.css +
   app.js + data.js): the builder picked **Letterpress** over Sun Ledger (BR-S059 live fork) + asked for a touch
   more depth. Promoted from dev preview to Free's shipped default: warm-graphite uncoated EDITION BOARD —

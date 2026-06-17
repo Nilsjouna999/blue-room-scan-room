@@ -923,8 +923,14 @@ function renderDossier(src, treatment) {
    from SOURCES[0] + the tier stamps — no stats, no fabricated analysis,
    no new asset. */
 
+/* Topbar zone label off state.view (UNIVERSE_ZONE_MAP zone-nav fork; BR-S064).
+   The topbar only renders in the room view, so "ARCHIVE · SCAN ROOM" is what shows;
+   the others are set for correctness if the topbar ever surfaces in another view. */
+const ZONE_LABELS = { menu: "ARCHIVE · LOBBY", room: "ARCHIVE · SCAN ROOM", draft: "ARCHIVE · LOCAL DRAFT", dev: "ARCHIVE · DEV" };
 function applyView() {
   document.body.dataset.view = state.view;
+  const zl = document.getElementById("zoneLabel");
+  if (zl) zl.textContent = ZONE_LABELS[state.view] || "ARCHIVE";
 }
 
 function renderMenu() {
