@@ -44,6 +44,13 @@
   --r-plate: 4px;
   --moss: #5e6f60;            /* free-pull dark green, muted */
   --moss-bright: #7e937f;
+  /* Free Pull dev matte finishes (dev-only, ?free=; BR-S058) — own archive material tokens */
+  --free-tooth: rgba(233, 229, 220, 0.05);   /* baked paper fleck */
+  --free-silver: #b8b3a8;                     /* matte serial ink, dimmer than --silver */
+  --sl-paper-hi: #1a2630;                     /* Sun Ledger cyanotype paper ramp */
+  --sl-paper-mid: #121b24;
+  --sl-paper-lo: #0b1016;
+  --sl-ink: #9fb4c2;
   --violet: #8b7bff;
   --cyan: #5fd4e0;
   --halo-green: #6fe09f;
@@ -791,13 +798,72 @@ body {
 .card__halo { position: absolute; inset: -40px; z-index: -1; opacity: 0; pointer-events: none; }
 
 /* -------------------------------------------------------------
-   TREATMENT: Free Pull — mellow archive scan
+   TREATMENT: Free Pull — its own matte archive finish
 ------------------------------------------------------------- */
 
-/* Free borrows a touch of the Lab-mint silver quality so the preview
-   never feels dead — still matte/archive, clearly below Halo Mint. */
+/* Free Pull is its OWN matte archive finish — a different KIND than Halo
+   (complete on its own), NOT "Halo minus shine". The base rule below is the
+   shipped default; dev-only finishes (?free=letterpress|sun-ledger, DEVNAV-gated,
+   BR-S058) attach via [data-free-finish] and never alter the default. */
 .card[data-treatment="free"] .photo { --tb: 0.95; --tc: 1.02; --ts: 0.84; }
 .card[data-treatment="free"] .photo__tone { opacity: 0.7; }
+
+/* Free dev finish — Letterpress Archive Edition (?free=letterpress): warm-graphite
+   uncoated edition board; paper tooth baked into the plate; struck deboss stamp + real serial. */
+.card[data-treatment="free"][data-free-finish="letterpress"] {
+  background: linear-gradient(168deg, #322d27 0%, #211d18 30%, #1b1813 70%, #2e2922 100%);
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.55), 0 44px 90px rgba(0, 0, 0, 0.62), 0 10px 28px rgba(0, 0, 0, 0.5);
+}
+.card[data-treatment="free"][data-free-finish="letterpress"] .card__plate {
+  background:
+    radial-gradient(1px 1px at 18% 24%, var(--free-tooth) 50%, transparent 51%),
+    radial-gradient(1px 1px at 64% 18%, var(--free-tooth) 50%, transparent 51%),
+    radial-gradient(1.2px 1.2px at 82% 60%, var(--free-tooth) 50%, transparent 51%),
+    radial-gradient(1px 1px at 38% 76%, var(--free-tooth) 50%, transparent 51%),
+    repeating-linear-gradient(96deg, rgba(0, 0, 0, 0.03) 0 1px, transparent 1px 3px),
+    linear-gradient(180deg, #1a1813 0%, #14120f 55%, #0e0d0b 100%);
+}
+.card[data-treatment="free"][data-free-finish="letterpress"] .card__plate::before { border-color: rgba(94, 111, 96, 0.22); }
+.card[data-treatment="free"][data-free-finish="letterpress"] .photo { --tb: 0.97; --tc: 1.0; --ts: 0.92; }
+.card[data-treatment="free"][data-free-finish="letterpress"] .photo__tone { opacity: 0.6; }
+.card[data-treatment="free"][data-free-finish="letterpress"] .corner::before,
+.card[data-treatment="free"][data-free-finish="letterpress"] .corner::after { background: rgba(94, 111, 96, 0.5); }
+.card[data-treatment="free"][data-free-finish="letterpress"] .card__rarity { color: var(--moss); }
+.card[data-treatment="free"][data-free-finish="letterpress"] .mintstrip__state--free {
+  color: #b9b4aa; border: 1px solid rgba(94, 111, 96, 0.5); border-style: solid; background: none;
+  text-shadow: 0 1px 0 rgba(233, 229, 220, 0.16), 0 -1px 1px rgba(0, 0, 0, 0.78);
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.55), inset 0 -1px 0 rgba(233, 229, 220, 0.06);
+}
+.card[data-treatment="free"][data-free-finish="letterpress"] .mintstrip__serial--ghost {
+  color: var(--free-silver); text-shadow: 0 1px 0 rgba(233, 229, 220, 0.12), 0 -1px 1px rgba(0, 0, 0, 0.6);
+}
+.card[data-treatment="free"][data-free-finish="letterpress"] .barcode--ghost { opacity: 0.55; }
+
+/* Free dev finish — Sun Ledger / cyanotype contact print (?free=sun-ledger): cool iron-blue
+   light-fixed print; greyscale fiber grain + cool cast + exposure ramp baked into the plate. */
+.card[data-treatment="free"][data-free-finish="sun-ledger"] {
+  background: linear-gradient(168deg, #2c3a44 0%, #14202a 32%, #14202a 68%, #2c3a44 100%);
+  box-shadow: 0 2px 0 rgba(5, 9, 13, 0.85), 0 44px 90px rgba(0, 0, 0, 0.62), 0 10px 28px rgba(0, 0, 0, 0.5);
+}
+.card[data-treatment="free"][data-free-finish="sun-ledger"] .card__plate {
+  background:
+    linear-gradient(180deg, rgba(150, 176, 196, 0.06), transparent 60%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.10'/%3E%3C/svg%3E"),
+    linear-gradient(178deg, var(--sl-paper-hi) 0%, var(--sl-paper-mid) 55%, var(--sl-paper-lo) 100%);
+}
+.card[data-treatment="free"][data-free-finish="sun-ledger"] .card__plate::before { border-color: rgba(150, 176, 196, 0.16); }
+.card[data-treatment="free"][data-free-finish="sun-ledger"] .photo { --tb: 0.97; --tc: 1.06; --ts: 0.9; }
+.card[data-treatment="free"][data-free-finish="sun-ledger"] .photo__tone { opacity: 0.5; background: rgba(26, 38, 48, 0.22); }
+.card[data-treatment="free"][data-free-finish="sun-ledger"] .corner::before,
+.card[data-treatment="free"][data-free-finish="sun-ledger"] .corner::after { background: #8aa0b0; }
+.card[data-treatment="free"][data-free-finish="sun-ledger"] .card__rarity { color: #8aa0b0; }
+.card[data-treatment="free"][data-free-finish="sun-ledger"] .mintstrip__state--free {
+  color: #cdd8e0; border: 1px solid rgba(159, 180, 194, 0.4); border-style: solid; background: none;
+  text-shadow: 0 1px 0 rgba(5, 9, 13, 0.9);
+  box-shadow: inset 0 1px 1px rgba(5, 9, 13, 0.55), inset 0 -1px 0 rgba(150, 176, 196, 0.18);
+}
+.card[data-treatment="free"][data-free-finish="sun-ledger"] .mintstrip__serial--ghost { color: var(--sl-ink); }
+.card[data-treatment="free"][data-free-finish="sun-ledger"] .barcode--ghost { opacity: 0.5; }
 
 /* -------------------------------------------------------------
    TREATMENT: Signature Mint — internal Lab state (keyboard M),

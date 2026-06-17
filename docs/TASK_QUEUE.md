@@ -10,6 +10,29 @@ Last updated: 2026-06-15.
 > is the head of **Ready** (below) — one at a time (this file's intro rule). For the
 > authoritative "what shipped" trail, cross-check `docs/DECISION_LOG.md` + `git log`.
 
+- **Free finish dev previews v1 — Letterpress + Sun Ledger** (2026-06-17 / BR-S059, styles.css + app.js +
+  dev-live.html): the CARD DESIGN MISSION's first build — Free Pull's OWN matte archive finish (a different
+  KIND than Halo, NOT Halo-minus-shine), as TWO switchable dev-only directions for a live taste pick, mirroring
+  the BR-S036 Lab-material pattern. **Letterpress Archive Edition** — warm-graphite uncoated board: paper tooth
+  (4 radial flecks + repeating-linear weave) baked into `.card__plate`, hard `0 2px 0` object shadow, struck
+  solid-border deboss "FREE PULL EDITION" stamp, moss frame/corners. **Sun Ledger / cyanotype** — cool iron-blue
+  contact print: verbatim greyscale `.photo__grain` noise + cool cast + exposure ramp baked into the plate,
+  pewter deckle. Both surface a REAL object serial (SRC-01 `BR-001-DRV-0001` / SRC-02 `BR-002-ICE-0001`; Sun
+  Ledger adds a FIXED `EXP 01` address token, never a /N count) + per-finish copy (ARCHIVE EDITION / SUN LEDGER
+  EDITION) via a gated `FREE_FINISH_COPY` map. **Switch:** `?free=letterpress|sun-ledger` (DEVNAV-gated) or the
+  dev-live.html Free chips. **100% gated** — `state.freeFinish` only sets under `?devnav`, the attr only emits at
+  `t=free`, and ALL copy/serial/badge changes are behind it, so the shipped default Free stays **byte-identical**
+  (verified VM-0). Restyle-only (scoped `[data-free-finish]`; the 5 LOCKED material plates + frost + master
+  geometry untouched); pure static CSS, reduced-motion-safe. Designed via an 11-agent fit-filtered workflow
+  (ground → 4 directions → judge → 3 adversarial stress lenses → finalize; the stress pass caught + folded a
+  shared-copy collision, a default-stability leak, and the SVG-noise "tint verbatim" contradiction). **Verified
+  live** (DOM/getComputedStyle — screenshots unreliable at this DPR; temp index.html cache-bust used + reverted):
+  both finishes render baked plates + struck stamps + real serials; DEVNAV gate holds (clean `?free` inert);
+  shiny/mint locked plates + geometry intact; console clean. **No winner locked / no DECISION_LOG / no PROJECT_OS
+  promotion** — deferred to the builder's live taste pick (BR-S036 precedent). **Completed.** **Next up:** builder
+  picks Letterpress vs Sun Ledger (+ accent/serial-wording forks); a follow-up commit then locks the winner into
+  Free's shipped default (promote the plate block + gated copy/serial/stamp into the bare
+  `.card[data-treatment="free"]`, retiring "UNMINTED · ARCHIVE PREVIEW").
 - **WARRANT PEN audit → warrant-audit rule adopted, full loop held** (2026-06-17 / BR-S058, docs only —
   GOVERNANCE_OS + DECISION_LOG + TASK_QUEUE): audited the builder's forged WARRANT PEN draft via a 14-agent
   workflow (2 ground → 6 adversarial lenses → synth → 4 stress incl. an independent kill-advocate → finalize).
@@ -780,7 +803,9 @@ Last updated: 2026-06-15.
   `dev-live.html` (deferred). **GATE ✓ DONE (BR-S057, 2026-06-17):** PROJECT_OS reconciled to LOCKED
   `GOLDEN_NUGGETS #5` — Free = the complete front (whole at its scope); the dossier/back is the deeper
   latent layer Halo develops (added depth, a mode not a grade). Free craft choices now ship against an
-  aligned doc. Next: design Free's own matte finish + the Halo crown structure from `research/CARD_CRAFT_FIT_V1.md`.
+  aligned doc. Free's matte finish: built as 2 switchable dev previews (Letterpress + Sun Ledger, BR-S059) —
+  awaiting the builder's live taste pick + winner-lock. Then: the Halo crown structure (replace the conic,
+  don't retint) from `research/CARD_CRAFT_FIT_V1.md`.
 - **Place-once sweep — Free-Pull "preview/incomplete" siblings** (logged BR-S057, 2026-06-17): downstream
   mentions still frame Free as preview/incomplete and should CITE `GOLDEN_NUGGETS` #5 rather than restate —
   `GPT_REVIEW_GUIDE.md:38` ("archive preview"), `research/SPINE.md:74/391` ("archive preview / first scan"),
