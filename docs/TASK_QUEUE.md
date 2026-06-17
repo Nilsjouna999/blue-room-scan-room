@@ -10,6 +10,21 @@ Last updated: 2026-06-15.
 > is the head of **Ready** (below) — one at a time (this file's intro rule). For the
 > authoritative "what shipped" trail, cross-check `docs/DECISION_LOG.md` + `git log`.
 
+- **WARRANT PEN audit → warrant-audit rule adopted, full loop held** (2026-06-17 / BR-S058, docs only —
+  GOVERNANCE_OS + DECISION_LOG + TASK_QUEUE): audited the builder's forged WARRANT PEN draft via a 14-agent
+  workflow (2 ground → 6 adversarial lenses → synth → 4 stress incl. an independent kill-advocate → finalize).
+  **Verdict DOWNSCOPE/FOLD:** the control-vs-warrant axis is genuine + uncovered (THE GATE catches contradiction,
+  `-STATE-A/-B` enforcement; nothing asks whether a rule's breadth is earned), but the full capture→pool→metabolize
+  loop delegates its clock (Signal Map), pile-judgment (`/white-death`) and routing (DECISION_LOG/Backlog) — after
+  subtraction it rests on one insight + FREEZE on a single already-parked seed: by its own kill-gate, warrant-debt.
+  **Shipped the warranted part only:** a ~6-line **warrant-audit pointer** in GOVERNANCE_OS (control vs warrant;
+  capture-on-friction → `warrant-debt` Backlog; FREEZE as a corollary of build-from-ACTIVE-only). Logged **GN #11**
+  as the first real capture (not the parked magnetism seed). Held the full loop as a redesigned DRAFT in `.claude/tmp`
+  (untracked) on an **expiry clock** — auto-drops to the pointer if <3 non-seed captures by BR-S +8 (the hold can't
+  rot into cruft). Fixed the draft's faults (magnetism→GN #7; real 4-BR-S clock not "~2"; closed Signal-Map columns
+  respected; genus-among-species taxonomy collapsed; tripwire-not-sweeper named). No standalone doc (unearned); no
+  runtime/code change. **Completed.** **Next up:** the CARD DESIGN MISSION (Free's matte finish + Halo crown), gate
+  cleared by BR-S057.
 - **Free-completeness spec reconcile — THE GATE** (2026-06-17 / BR-S057, docs only — PROJECT_OS +
   DECISION_LOG + TASK_QUEUE): the CARD DESIGN MISSION's mandated first move. Reconciled PROJECT_OS's stale
   CURRENT prose (§2, §4 line 107, §8, §10 banner/description/Free-Pull-rule, §16 Q1) — which framed Free as
@@ -771,6 +786,13 @@ Last updated: 2026-06-15.
   `GPT_REVIEW_GUIDE.md:38` ("archive preview"), `research/SPINE.md:74/391` ("archive preview / first scan"),
   `CARD_TECH_LAB.md:74` ("Useful but incomplete"). Low-grade (RESEARCH/reference/TESTING), not load-bearing;
   align in a hygiene pass. (`research/FREE_PAID_MODEL_V1.md` is already aligned — the canonical research source.)
+- **`warrant-debt` capture #1 — GN #11 "never add machinery" has no operational edge** (BR-S058, 2026-06-17,
+  warrant-audit rule): `[GOLDEN_NUGGETS #11 (machinery-vs-surfacing edge)]` — #11 ("the magnetism is already built —
+  surface live state, never add machinery") is wielded to kill proposed mechanisms but draws no line between
+  "machinery" and "surfacing legible state"; it could not decide whether the WARRANT PEN itself is banned machinery.
+  Rides the 4-BR-S holding-age clock; resolve by SHARPEN (draw the edge → `GOLDEN_NUGGETS`) or DECIDE (→ DECISION_LOG).
+  FREEZE: #11's bare edge can't be the SOLE veto of a proposed mechanism until drawn. First real capture under the
+  GOVERNANCE_OS warrant-audit rule (held loop spec: `.claude/tmp/WARRANT_PEN_DRAFT_V1.md`, DRAFT/unratified).
 - **Menu redesign v3** (builder, 2026-06-17): the main menu is not final — criticize it deeply +
   stress-test directions until one wins (BR-S041 reframed it once; this is a fresh deep pass).
 - **Universe ideas → surfaces the card flows into** (`PARKED_IDEAS.md`, structured 2026-06-17):

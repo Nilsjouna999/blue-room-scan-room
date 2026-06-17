@@ -100,6 +100,14 @@ An item's **altitude** is the widest thing that breaks if it is removed or chang
 **Separability:** a compound splits into sibling rows only if inner parts' blast-radii are independently computable AND ≥1 band apart; a **non-split override** (the source titles the parts as one unit, or binds them in one sentence) outranks the split — except a part ≥1 band *above* the container forces a split; a not-split row takes the **container's own** scope.
 **Meta:** this rule + the table place once in the table's reserved META row; the table holds **pointers + status only**, canon stays at the source. *(Worked example: `SIGNAL_MAP_TABLE.md` preamble.)*
 
+## Warrant audit — control vs warrant (bare-rule check; full spec a held DRAFT, unratified)
+
+A rule's CONTROL (altitude) can outrun its WARRANT; THE GATE (contradiction) and `-STATE-A/-B`
+(enforcement) both miss it. When a rule **fails to cleanly decide a live case**, log it to `TASK_QUEUE`
+Backlog as `warrant-debt` [rule-pointer + trigger-case]; it rides the 4-BR-S holding-age clock and
+resolves via `DECISION_LOG` / Backlog. Corollary of build-from-ACTIVE-only — a bare rule can't be the
+SOLE deciding ground until its basis is drawn (strike it from the `DECISION_LOG` **Why**; if the verdict collapses, it was the decider). Flags, never auto-demotes; full loop stays RESEARCH, auto-dropping to this line if unearned (≥3 non-seed captures) by BR-S +8.
+
 ## Anti-clutter rules
 
 - No new doc without a FILE_MAP entry and explicit approval.

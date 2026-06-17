@@ -363,3 +363,19 @@ DESIGN MISSION owns Free's own matte finish. Forged via a 3-lens pre-edit critiq
 completeness/drift · canon-fidelity → all GO_WITH_CHANGES, fixes folded in). Docs only; no runtime change.
 Unblocks the CARD DESIGN MISSION gate (TASK_QUEUE Backlog).
 Revisit: when the card-design task changes Free's finish/stamp/serial — update §10's visual descriptors then.
+
+**2026-06-17 / Warrant-audit rule adopted (control vs warrant); full WARRANT PEN loop held DRAFT on an expiry clock / ACTIVE (Spec Change — new governance rule, no Core Review)**
+Why: nothing in the regime asks whether a rule's BREADTH is earned — THE GATE catches contradiction, `-STATE-A/-B` catches
+enforcement; a broad/load-bearing rule resting on little, colliding with nothing, trips neither. Forged from the builder's
+WARRANT PEN draft via a 14-agent audit (ground → 6 adversarial lenses → synth → stress incl. an independent kill-advocate →
+finalize); verdict DOWNSCOPE/FOLD. Adopted ONLY the warranted artifact: a ~6-line **warrant-audit pointer** in GOVERNANCE_OS
+(control vs warrant; capture-on-adjudication-friction → `TASK_QUEUE` Backlog as `warrant-debt`; rides the 4-BR-S holding-age
+clock; resolves via DECISION_LOG/Backlog; FREEZE as a corollary of build-from-ACTIVE-only — a bare rule may not be the SOLE
+deciding ground until drawn, tested by striking it from the `Why`). The full capture→pool→metabolize LOOP is held as a
+redesigned DRAFT in `.claude/tmp/` (untracked, unratified): it delegates clock/pile-judgment(`/white-death`)/routing to
+existing machinery, so after subtraction it rests on one insight + FREEZE — itself warrant-debt until captures recur. First
+real capture logged: GN #11 ("never add machinery" has no machinery-vs-surfacing edge). No standalone doc (unearned), no
+Signal Map column (closed set), no runtime change.
+Revisit: ratify the full loop (write `docs/governance/WARRANT_PEN.md` + FILE_MAP row, mirroring READING_DOCTRINE) after ≥3
+distinct non-seed `warrant-debt` captures survive one metabolize cycle; else it auto-drops to the GOVERNANCE_OS pointer alone
+by BR-S +8.
