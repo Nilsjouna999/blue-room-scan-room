@@ -10,6 +10,23 @@ Last updated: 2026-06-15.
 > is the head of **Ready** (below) — one at a time (this file's intro rule). For the
 > authoritative "what shipped" trail, cross-check `docs/DECISION_LOG.md` + `git log`.
 
+- **Rule × Layer Map v1 — un-blur which layer each rule binds** (2026-06-18 / BR-S066, docs only —
+  new `docs/governance/RULE_LAYER_MAP_V1.md` + FILE_MAP + DECISION_LOG + TASK_QUEUE): the handoff's START-HERE
+  task. Built the rule × layer map that extends the Reading Doctrine's two walls into ONE index: every safety/canon
+  rule → the layer(s) it binds (BACK-END / BASELINE / FRONT-FACING / PAINTING-PHRASING) → **OUTPUT-ONLY vs
+  BINDS-DEEP** → an honest **CO-EQUAL enforcement column** (a DEEP cell is NOT coverage). Fixes the BLURRED-LINE
+  over-restriction (an OUTPUT rule dragged onto the engine to ban legit deep compute) AND the inverse laundering
+  (a DEEP rule softened to display — H1). **Flagship resolved as a deliberate 2-row split:** never-RATE-in-output
+  (OUTPUT-ONLY) vs Tier-B never-COMPUTE-worth (BINDS-DEEP). The `scan-contract.js` floor → OUTPUT-ONLY (a
+  post-inference filter proves nothing about upstream compute); Gate 3 → BINDS-DEEP (harm survives non-display).
+  **Forged via a 10-agent workflow** (5 source-readers → over-restriction / laundering-trap / honest-status /
+  kill-advocate lenses → synth); 86 rules → 29 deduped rows; line/section citations spot-verified (incl. me reading
+  `scan-contract.js` to vouch for the enforced floor: 26 FORBIDDEN_TERMS, 5 PERSON_TRUTH regexes over 2 paths, 4
+  safetyFlags). **NO Core Change** — the map changes no LOCKED rule's scope (splits are reconciliations, not
+  relaxations); persisted as honest-status **DRAFT** (sibling to READING_DOCTRINE). **Docs only; runtime
+  untouched** ⇒ no browser verify. Two `warrant-debt` follow-ups logged (gate-1 / gate-3 duplicate-id reconciliation
+  at the source docs). **Completed.** **Next up (the key decision):** ratify DRAFT → adopted, or hold; then resume
+  the BUILD sequence — step 3, the **Develop Ceremony** (the lane-transform / new-material-opens event).
 - **Topbar zone label + treatment toggle retired from customer chrome** (2026-06-18 / BR-S064, index.html +
   styles.css + app.js): build-first steps 1–2 of the architecture (BR-S063). (1) Gated the **Free|Halo treatment
   toggle** (`#treatmentToggle`, the grade-ladder pill) behind `?devnav` via CSS (`.toggle--treatment` display:none;
@@ -881,6 +898,16 @@ Last updated: 2026-06-15.
   Rides the 4-BR-S holding-age clock; resolve by SHARPEN (draw the edge → `GOLDEN_NUGGETS`) or DECIDE (→ DECISION_LOG).
   FREEZE: #11's bare edge can't be the SOLE veto of a proposed mechanism until drawn. First real capture under the
   GOVERNANCE_OS warrant-audit rule (held loop spec: `.claude/tmp/WARRANT_PEN_DRAFT_V1.md`, DRAFT/unratified).
+- **`warrant-debt` capture #2 — Gate-1 / Gate-3 duplicate ids bind at conflicting layers** (BR-S066, 2026-06-18,
+  Rule × Layer Map): `[HUMAN_READ_LINE_V1 gate 1/3 vs READING_DOCTRINE gate 1/3]` — the same gate ids carry OPPOSITE
+  layer bindings across the two docs. **Gate 1**: `hrl-gate1` = BINDS-DEEP (the cue a read KEYS ON, back-end) vs
+  `rd-gate1` = OUTPUT-ONLY (the FORBIDDEN_TERMS lexicon delivery backstop) — split into gate1-CONCEPT vs
+  gate1-CODEFLOOR so a consumer can't collapse the deep keying rule into an output word-check. **Gate 3**:
+  `hrl-gate3` (DEEP) vs `rd-gate3` (OUTPUT) — merge to DEEP (the fixed-disposition inference survives non-display;
+  it is the deepest UN-running seam). The Map already applies both fixes in its own rows; this debt is to reconcile
+  the **source docs** (HUMAN_READ_LINE_V1 + READING_DOCTRINE) so the duplicate ids stop colliding. Rides the 4-BR-S
+  holding clock; resolve by SHARPEN (edit both source docs) or DECIDE (→ DECISION_LOG). Pointer:
+  `docs/governance/RULE_LAYER_MAP_V1.md` §scope-conflicts.
 - **Menu redesign v3** (builder, 2026-06-17): the main menu is not final — criticize it deeply +
   stress-test directions until one wins (BR-S041 reframed it once; this is a fresh deep pass).
   **Gated (builder, 2026-06-17):** do this AFTER the Free/Paid funnel + scan-room layout are solid — those set

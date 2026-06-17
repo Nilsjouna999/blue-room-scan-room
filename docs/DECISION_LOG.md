@@ -416,3 +416,18 @@ premium design.
 Revisit: the SPECIFIC paid-layer differences (what it offers, mood/colors/layout, copy) are deferred — "paint/word it later"
 via the paid-space brainstorm + the worth-of-the-minted-artifact research; canon copy (GOLDEN_NUGGETS #5, PROJECT_OS §10,
 FREE_PAID_MODEL_V1) gets reconciled to this framing when that lands.
+
+**2026-06-18 / Rule × Layer Map added as DRAFT — un-blurs which layer each rule binds / DRAFT (descriptive reconciliation — NO Core Change; changes no rule's scope)**
+Why: rules were applied with BLURRED LINES — an OUTPUT rule ("never SHOW a worth rating") was dragged onto the engine to ban
+legitimate deep computation (over-restriction), while DEEP rules ("never COMPUTE worth", "no person-key join") risked being
+softened to display rules (the H1 profiler's alibi). New DRAFT `docs/governance/RULE_LAYER_MAP_V1.md` extends READING_DOCTRINE:
+maps every safety/canon rule to the layer(s) it binds (BACK-END / BASELINE / FRONT-FACING / PAINTING-PHRASING), marks each
+OUTPUT-ONLY vs BINDS-DEEP via a bidirectional binding test, and keeps enforcement a CO-EQUAL column (a DEEP cell is NOT
+coverage). Flagship resolved as a DELIBERATE 2-row split: never-RATE-in-output (OUTPUT-ONLY) vs Tier-B never-COMPUTE-worth
+(BINDS-DEEP). The `scan-contract.js` floor is OUTPUT-ONLY (a post-inference filter proves nothing about upstream compute);
+Gate 3 is BINDS-DEEP (harm survives non-display). Forged via a 10-agent workflow (gather → over-restriction/laundering-trap/
+honest-status/kill-advocate lenses → synth); 86 rules → 29 rows. No LOCKED rule's scope changes — splits are reconciliations,
+not relaxations — so no Core Change Review. Two `warrant-debt` follow-ups (gate-1/gate-3 duplicate-id reconciliation at the
+source docs) logged to TASK_QUEUE Backlog.
+Revisit: ratify DRAFT → adopted once the binding test survives real use; if a reader ever sorts/filters by `binding` and treats
+DEEP as "handled", FOLD this map back into READING_DOCTRINE (its unique value is the cross-doc dedup, not the taxonomy).
