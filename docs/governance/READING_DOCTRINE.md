@@ -65,7 +65,7 @@ Tier A's honest one-line: *a partial, path-limited, synonym-evadable never-surfa
 ## TIER B — the never-COMPUTE / never-CONSTITUTE list (the wall that WOULD carry the load) — POLICY, not guarantee
 Designated never-compute, even privately, even un-surfaced:
 1. The PERMANENT set (HUMAN_READ_LINE): age, ethnicity, gender-as-essence, orientation, health, hardwired personality, any human-as-evaluable score.
-2. Any attractiveness / human-worth / biology rating.
+2. Any human-worth / biology rating. **(ATTRACTIVENESS carved out to OUTPUT-ONLY per `DECISION_LOG` 2026-06-18 — never SURFACED, but no longer claimed never-computed: a standard encoder entangles it (see §two states, State B), so the honest, enforceable wall is the never-SHOW one. Worth + biology REMAIN never-compute.)**
 3. Any PERSON-KEYED join (the aggregate — see below).
 4. Any cross-session stable-trait derivation (S1: the invariant across many photos IS the person).
 

@@ -25,7 +25,10 @@ Last updated: 2026-06-15.
   safetyFlags). **NO Core Change** — the map changes no LOCKED rule's scope (splits are reconciliations, not
   relaxations); persisted as honest-status **DRAFT** (sibling to READING_DOCTRINE). **Docs only; runtime
   untouched** ⇒ no browser verify. Two `warrant-debt` follow-ups logged (gate-1 / gate-3 duplicate-id reconciliation
-  at the source docs). **Completed.** **Next up (the key decision):** ratify DRAFT → adopted, or hold; then resume
+  at the source docs). **Builder review folded in (same day):** attractiveness reclassified OUTPUT-ONLY (DECISION_LOG
+  2026-06-18 — READING_DOCTRINE Tier B item 2 carved; the LOCKED never-rate-in-output rule unchanged); the Free/paid row
+  precised ("genuinely more — deeper/stronger scan or variation", not "the same scan"); the H5 retention row plain-worded.
+  **Completed.** **Next up (the key decision):** ratify DRAFT → adopted, or hold; then resume
   the BUILD sequence — step 3, the **Develop Ceremony** (the lane-transform / new-material-opens event).
 - **Topbar zone label + treatment toggle retired from customer chrome** (2026-06-18 / BR-S064, index.html +
   styles.css + app.js): build-first steps 1–2 of the architecture (BR-S063). (1) Gated the **Free|Halo treatment

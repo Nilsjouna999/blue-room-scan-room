@@ -431,3 +431,18 @@ not relaxations — so no Core Change Review. Two `warrant-debt` follow-ups (gat
 source docs) logged to TASK_QUEUE Backlog.
 Revisit: ratify DRAFT → adopted once the binding test survives real use; if a reader ever sorts/filters by `binding` and treats
 DEEP as "handled", FOLD this map back into READING_DOCTRINE (its unique value is the cross-doc dedup, not the taxonomy).
+
+**2026-06-18 / Attractiveness reclassified OUTPUT-ONLY (never SHOW) — no longer never-COMPUTE / ACTIVE (DRAFT-doctrine reconcile; safety-adjacent, logged with Core-Change care)**
+Why: surfaced by the Rule × Layer Map review (BR-S066). The source docs disagreed — HUMAN_READ_LINE frames attractiveness as
+never-RATE (output), READING_DOCTRINE Tier B as never-COMPUTE (deep). Builder chose **output-only**: any standard vision encoder
+entangles attractiveness in its embedding (the doctrine's own H3/S2 concession), so "never compute" was always an unenforceable
+aspiration; the honest, enforceable wall is **never-SHOW**. Fits the builder's standing thesis (the scan may read all the way; the
+test is the delivered output). The LOCKED rule "no face-rating / attractiveness / social comparison, ever" is OUTPUT-framed and
+**UNCHANGED** — attractiveness is still never surfaced, code-backed (scan-contract.js FORBIDDEN_TERMS "attractiveness" +
+`containsAttractivenessScoring` flag + the never-rate-in-output rule). What changed: the never-COMPUTE claim for attractiveness
+(which lived ONLY in the DRAFT READING_DOCTRINE Tier B item 2) is dropped — so this is NOT a LOCKED relaxation, logged with
+Core-Change care for safety-adjacency. SCOPE: attractiveness ONLY — worth, biology, age, ethnicity, gender, orientation, health,
+hardwired-personality REMAIN never-compute (worth stays the flagship deep+output split). Reconciled same commit: READING_DOCTRINE
+Tier B item 2 carved; RULE_LAYER_MAP_V1 row 4 + flagship note + scope-conflict updated.
+Revisit: when a real engine ships, the never-SHOW wall is now the SOLE attractiveness wall — confirm its enforcement is actually
+wired and cannot silently fail; if attractiveness compute ever feeds a person-key/aggregate, the §7 wall still BINDS-DEEP.

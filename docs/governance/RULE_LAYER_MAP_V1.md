@@ -84,10 +84,16 @@ The word **"worth"** lives at two layers and is **two rules**, deliberately kept
 | | Rule | Binding |
 |---|---|---|
 | **Output** | Never RATE/RANK the person in what is **surfaced** | **OUTPUT-ONLY** — the scan reading deeply is *not* the violation; the test is the delivered claim |
-| **Deep** | Never COMPUTE a worth / attractiveness / biology rating (Tier B) | **BINDS-DEEP** — violated by the derivation itself, surfaced or not |
+| **Deep** | Never COMPUTE a worth / biology rating (Tier B) | **BINDS-DEEP** — violated by the derivation itself, surfaced or not |
 
 This split **is the artifact's reason to exist.** Collapsing it either over-restricts the
 engine or under-protects the deep harm.
+
+> **Attractiveness (2026-06-18 decision):** unlike worth, attractiveness binds **OUTPUT-ONLY** —
+> the engine may compute it (any vision model entangles it anyway); it is just **never surfaced**.
+> The never-SHOW wall is the real one (code-backed by the forbidden-terms scan + the
+> `containsAttractivenessScoring` flag); the never-compute claim is dropped as unenforceable.
+> Worth + biology stay DEEP. See `DECISION_LOG` 2026-06-18.
 
 ---
 
@@ -98,12 +104,12 @@ engine or under-protects the deep harm.
 | **Two walls, stated honestly** — commit to never-COMPUTE AND never-SURFACE; always say which is real when; surfacing-discipline is never the whole ethic. *The governor of the whole map.* | BE·BL·FF·PP | DEEP | POLICY_PROMISED (State A = ENFORCED_BY_ABSENCE) | READING_DOCTRINE §one-line claim, §two states, §H1 |
 | **Aggregate-refusal wall** — no person-key join; archetype/stat/aura re-derived fresh per scan; no streaks/counts/history; cross-pull surfaces structurally unable to rebuild a stable trait. | BL·BE (+FF) | DEEP | SHIP_GATED · today ENFORCED_BY_ABSENCE · the one legit *structural* future guarantee | UNIVERSE_ZONE_MAP §7; HUMAN_READ_LINE Forbidden·4; READING_DOCTRINE Tier B·3 |
 | **Serial = OBJECT address**, never a person address — Object→Scan→Card→Mint; serial-as-join-key is safe *only* because it's an object key. | BL (+BE) | DEEP | SHIP_GATED · today by absence | UNIVERSE_ZONE_MAP §7/§4; GOLDEN_NUGGETS #8 |
-| **Tier B permanent set** — never COMPUTE age/ethnicity/gender-as-essence/orientation/health/hardwired-personality or any worth/attractiveness/biology rating, even privately. | BE (+BL) | DEEP | POLICY_PROMISED in State B (a standard encoder entangles these; needs an orthogonalized encoder that doesn't exist) | READING_DOCTRINE Tier B·1–2; HUMAN_READ_LINE Forbidden·2 |
+| **Tier B permanent set** — never COMPUTE age/ethnicity/gender-as-essence/orientation/health/hardwired-personality or any worth/biology rating, even privately. *(Attractiveness moved to OUTPUT-ONLY — DECISION_LOG 2026-06-18.)* | BE (+BL) | DEEP | POLICY_PROMISED in State B (a standard encoder entangles these; needs an orthogonalized encoder that doesn't exist) | READING_DOCTRINE Tier B·1–2; HUMAN_READ_LINE Forbidden·2 |
 | **Image-act vs permanent split** — read the re-authorable image-act (posture/gesture/gaze/crop/light/styling/role) **freely and deeply on a single photo**; never key on the permanent. *Licenses deep reading; only the permanent half binds.* | BE (+FF·PP for the permanent half) | DEEP | ASSERTED_NOT_ENFORCED · image-act half is an affirmative LICENSE | HUMAN_READ_LINE §reframe; READING_DOCTRINE Layer 1; GOLDEN_NUGGETS #1 |
 | **Gate 1 — re-authorable cue (concept)** — a read may key only on the performed set, not body/face/build. *(The cue it KEYS ON — distinct from the output lexicon backstop below.)* | BE | DEEP | ASSERTED_NOT_ENFORCED | HUMAN_READ_LINE §line·gate 1 |
 | **Gate 3 — connotation-strip** — strip the photo-noun; if a stable disposition remains, the read has in substance computed a PERMANENT. Rewording does not cure it. *The deepest unguarded seam.* | BE (+FF·PP: the test runs on the surfaced predicate) | DEEP | ASSERTED_NOT_ENFORCED · **Gate 3 does not run in code at all** | HUMAN_READ_LINE §line·gate 3; READING_DOCTRINE Gate 3 + §S6 |
 | **Mints the artifact / never inferred** — develop only what the photo ALREADY held; the photo makes the card, declared lore attaches to the serial — never derived by the engine. | BE·BL | DEEP | ASSERTED_NOT_ENFORCED (no engine today) | GOLDEN_NUGGETS #2 + #9 |
-| **Single-record retention (H5)** — retain a per-scan record only if object-keyed + no cross-join AND knowing one deep read of an identifiable self-portrait is itself a risk; minimize + time-bound. | BL·BE | DEEP | POLICY_PROMISED · no code minimizes/time-bounds retention | READING_DOCTRINE §H5 |
+| **Single-record retention (H5)** — *plain: even ONE stored deep read of a recognizable selfie is sensitive, because the photo itself identifies the person.* So when uploads exist: store little, keep it short-lived, key it to the object, never look it up by person. (A future storage rule — nothing is stored today.) | BL·BE | DEEP | POLICY_PROMISED · no code minimizes/time-bounds retention | READING_DOCTRINE §H5 |
 | **One master card base** — one base layout; treatments restyle, never re-lay-out (a new layout violates it before any user sees it). | BL (+FF) | DEEP | LOCKED_CANON · not checked in code | PROJECT_OS §4/§10 |
 
 ## The map — MIXED (keep the halves separate)
@@ -126,7 +132,7 @@ engine or under-protects the deep harm.
 | **Insult-via-framing ban / every outcome a win** — a low read surfaces as a *different kind* of artifact, never a worse person. Engine may compute a low band; the duty is reframe-as-win. | FF·PP | OUTPUT | ASSERTED_NOT_ENFORCED | HUMAN_READ_LINE Forbidden·3; GOLDEN_NUGGETS #12 |
 | **Recognition vs judgment boundary** — judgment only about the photograph-as-made (re-authorable, win-neutral, receipt-defensible), never the person-as-fixed. *Its only separator is Gate 3 (deep, does not run) — inherits that deep dependency.* | FF·PP | OUTPUT | ASSERTED_NOT_ENFORCED · governed by contract, not mechanism | READING_DOCTRINE §S6 |
 | **Reframe is camera direction** — phrased as direction to the SHOOT (camera/crop/light), never advice to improve the person. | FF·PP | OUTPUT | ASSERTED_NOT_ENFORCED | GOLDEN_NUGGETS #14 |
-| **Kind not amount / paid = developed deeper** — Free is the COMPLETE front (never a crippled teaser); paid is the same scan developed deeper, a MODE not a grade. **Affirmatively LICENSES deeper paid compute** — BE deliberately omitted. | FF·PP | OUTPUT | LOCKED_CANON (asserted) | GOLDEN_NUGGETS #5; HALO_GATE_BOUNDARY core/§A; PROJECT_OS §10 |
+| **Free complete / paid = genuinely more** — Free is the COMPLETE front (never a crippled teaser); paid funds real resources → genuinely MORE: a deeper/stronger scan, a variation, or a bigger output/space — *not necessarily the identical scan re-run*. **Affirmatively LICENSES deeper/stronger paid compute** — BE deliberately omitted. | FF·PP | OUTPUT | LOCKED_CANON (asserted) — #5 "mode not grade" refined by the 2026-06-18 framing (payment buys real *more*) | GOLDEN_NUGGETS #5; **DECISION_LOG 2026-06-18 (Free/Paid framing)**; HALO_GATE_BOUNDARY core/§A; PROJECT_OS §10 |
 | **Latent→developed / no paywall language** — sealed reads "not yet developed", never "withheld"; CTA "Develop this scan", never Upgrade/Unlock/Premium/Reveal. Tiered compute untouched; only the framing binds. | PP·FF | OUTPUT | LOCKED_CANON (review-enforced) | GOLDEN_NUGGETS #6; PROJECT_OS §4/§10; HALO_GATE_BOUNDARY §C |
 | **No exact pre-unlock counts** — Free front + pre-unlock gate use qualitative sealed-back language, no enumerated locked inventory. Counts exist and ARE shown post-unlock ("drop quantification, not truthfulness"). | FF·PP | OUTPUT | LOCKED_CANON (review-enforced) | HALO_GATE_BOUNDARY §B |
 | **No public 0–100 / bands only** — public stats are tier bands (Muted/Clean/Strong/Charged/Peak); internal keys stay numeric. The engine may HOLD raw numbers. **The reference OUTPUT-ONLY case — resist every pull toward DEEP.** | FF·PP | OUTPUT | LOCKED_CANON · ASSERTED_NOT_ENFORCED in code (no band check; dev fixtures legitimately store `presence:78`) | PROJECT_OS §7/§9/§10 |
@@ -145,6 +151,15 @@ just names the layer) · `WARRANT_DEBT` (a duplicate-id / collapse needs reconci
 source docs → TASK_QUEUE, rides the holding clock) · `CORE_CHANGE` (would change a LOCKED
 rule's scope → **none**).
 
+- **✓ RESOLVED (builder, 2026-06-18) — ATTRACTIVENESS binds OUTPUT-ONLY.** The two source docs
+  disagreed (HUMAN_READ_LINE = never-RATE / output; READING_DOCTRINE Tier B = never-COMPUTE /
+  deep). Builder chose **output-only**: the engine may compute attractiveness (a vision model
+  entangles it regardless), but it is **never surfaced** — the never-SHOW wall is the real,
+  code-backed one; the never-compute claim is dropped as unenforceable. Reconciled this commit:
+  row 4 drops attractiveness, the flagship note added, READING_DOCTRINE Tier B item 2 carved,
+  DECISION_LOG 2026-06-18 logged. **Formally lighter than a Core Change** — never-compute-
+  attractiveness lived only in the DRAFT doctrine; the LOCKED "no attractiveness rating, ever"
+  rule is output-framed and unchanged. **Worth + biology stay DEEP.** *(was CORE_CHANGE candidate.)*
 - **`scan-contract.js` floor: DEEP vs OUTPUT** — one code mechanism was tagged both ways
   across docs. Resolved **OUTPUT-ONLY** (it runs over the already-formed object). Never
   co-cite `CODE_ENFORCED` with a DEEP/BE claim for it. *(CLARIFICATION_ONLY)*
