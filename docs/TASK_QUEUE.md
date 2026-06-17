@@ -10,6 +10,14 @@ Last updated: 2026-06-15.
 > is the head of **Ready** (below) — one at a time (this file's intro rule). For the
 > authoritative "what shipped" trail, cross-check `docs/DECISION_LOG.md` + `git log`.
 
+- **Governance + Signal Map + card-craft research day** (2026-06-17, docs only — multi-agent
+  workflows; ~12 commits local, unpushed): persisted the **Reading Doctrine** (DRAFT, `docs/governance/`);
+  **FORMULAS** copy honesty fix (read-through, not derived-from); **place-once cleanup** (2 GOVERNANCE_OS
+  rules — one-canonical-statement + decided⇒Backlog-not-Parked — plus magnetism/two-track restatements →
+  citations, Profile Layers → Backlog); the **Signal Map** (3-gate forge → altitude-placement rule in
+  GOVERNANCE_OS + seeded `docs/SIGNAL_MAP_TABLE.md`); the **card-craft fit research**
+  (`research/CARD_CRAFT_FIT_V1.md`); and the `PARKED_IDEAS` universe ideas structured. No runtime change.
+  **Completed.** **Next up:** the CARD DESIGN MISSION (Backlog) — gated on the PROJECT_OS Free-text reconcile.
 - **Backlog batch v1 — 7 items via a 17-agent plan/de-risk workflow** (2026-06-15 / BR-S050…S056, app.js +
   styles.css + docs): planned + adversarially de-risked 8 queued items in parallel (8 planners [3 on haiku for
   speed] + 8 verifiers + 1 sequencer = 17 agents; all returned GO-now, none needing a decision), then shipped 7
@@ -731,6 +739,25 @@ Last updated: 2026-06-15.
 
 ## Backlog / needs decision
 
+- **CARD DESIGN MISSION** (next major arc — from `research/CARD_CRAFT_FIT_V1.md`, 2026-06-17): craft
+  Free's own matte archive finish (own palette + struck "Free Pull Edition" stamp + real serial, NOT
+  Halo-minus-glow) and the Halo CROWN's baked-in material structure (the inseparability test; replace the
+  conic+holo-spin, don't retint). Black Star vs Night Gloss = a taste call from real side-by-side in
+  `dev-live.html` (deferred). **GATE / do first:** reconcile `PROJECT_OS §66/§107/§299` ("Free =
+  undeveloped/partial/incomplete | CURRENT") with LOCKED `GOLDEN_NUGGETS #5` ("Free is the complete
+  front") — else every Free craft choice ships against a live, contradicting doc (quick spec-hygiene fix).
+- **Menu redesign v3** (builder, 2026-06-17): the main menu is not final — criticize it deeply +
+  stress-test directions until one wins (BR-S041 reframed it once; this is a fresh deep pass).
+- **Universe ideas → surfaces the card flows into** (`PARKED_IDEAS.md`, structured 2026-06-17):
+  **Profile + Vault** (the interconnection is the design object) · **Idle Room → Kingdom** (card placed →
+  its stats drive an idle reactive place) · **Friends** · **Codex vs Blogs/Journals** · **Autobattler**
+  (form open) · **Socials** (deferred-conditional — only if non-redundant). Guard: object-keyed, never
+  person-keyed.
+- **One paid reading** (decided paid spine — bounded: free → ONE paid card reading, not a tier) +
+  **Referral → earns the paid reading** (builder idea; magnetism-by-giving, kept bounded — one clean
+  referral → one reading, no streaks/leaderboards, object-keyed). Build-side when engine/payment is greenlit.
+- **Scan-room-below (dossier) stress-test** + **universe navigation** (real movement between rooms,
+  beyond the dev buttons) — both builder-named (2026-06-17), later.
 - **Safety hardening — Human-Read Line enforcement** (from the `/gods-finger` audit, 2026-06-14,
   safety-critical): the safety line (`docs/HUMAN_READ_LINE_V1.md`) is asserted, not enforced. Three fixes:
   - **(a) Leaking-copy sweep — DO NOW (live on the page):** rewrite sample copy in `data.js` that reads the
