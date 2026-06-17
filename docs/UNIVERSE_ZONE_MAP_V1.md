@@ -92,6 +92,14 @@ For each zone: what it is · what it is for · what exists today · the card's r
   **label** may recur as the join, but lore attaches to the *serial* by declaration —
   never read off the photo (the two-track attachment law, `DEPTH_MODEL_V1`).
 
+**Reserved placeholders (X) — present in the structure, fill TBD (builder, 2026-06-17).** Marked only so
+sketches/plans include them as existing spots without designing them yet (no code stubs — the §6
+premature-ship guard still holds):
+- **Codex · blog / journal / notes** — a reading/writing facet within (or beside) the Codex. Reserved-X.
+- **Special Readings** — zodiac / Chinese zodiac / numerology, as **its own task/space** (X). Canon-bound: a
+  read *fuelled by* a user-DECLARED sign (you give the sign → you receive the read), never inferred off the
+  photo (the Codex declared-lore law + `GOLDEN_NUGGETS` #9); object-keyed, the §7 aggregate wall holds.
+
 ---
 
 ## 3. The fork decisions

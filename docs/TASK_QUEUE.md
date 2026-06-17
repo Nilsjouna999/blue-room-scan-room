@@ -865,6 +865,10 @@ Last updated: 2026-06-15.
   **Menu-fork idea (builder, 2026-06-17):** the main menu may fork into TWO doors — **Free Pull** (downloadable ·
   shareable · self-contained, conveys the concept, stays COMPLETE on its own) and the **Paid Universe** (a
   multiplicative, high-functioning space that MULTIPLIES the free artifact, never "finishes" it).
+  **Reserved-X (builder, 2026-06-17):** Codex·blog/journal/notes + **Special Readings** (zodiac / chinese-zodiac
+  / numerology — its OWN task/space) are marked PRESENT in the structure with fill TBD (`UNIVERSE_ZONE_MAP_V1`
+  §2 Codex) — so sketches include them without designing them. Special Readings stays declared-input → received,
+  never inferred (#9).
 - **One paid reading** (decided paid spine — bounded: free → ONE paid card reading, not a tier) +
   **Referral → earns the paid reading** (builder idea; magnetism-by-giving, kept bounded — one clean
   referral → one reading, no streaks/leaderboards, object-keyed). Build-side when engine/payment is greenlit.
