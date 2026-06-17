@@ -33,11 +33,11 @@ pre-edit critique. `(LATER)` in a label = a committed-but-deferred build beat.
 | META | ACTIVE | This map + its altitude rule — placed once here, never altitude-placed | — | `docs/GOVERNANCE_OS.md` (Signal Map rule) | — |
 | L1 Project-Law | LOCKED | No-face-rating law [GOLDEN_NUGGETS #1] | — | `docs/GOLDEN_NUGGETS.md` · `docs/DECISION_LOG.md` (2026-06-12) | — |
 | L1 Project-Law | LOCKED-STATE-A | Aggregate-refusal wall — no person-key join [UNIVERSE_ZONE_MAP_V1 §7] | — | `docs/UNIVERSE_ZONE_MAP_V1.md` §7 · elab `docs/governance/READING_DOCTRINE.md` | — |
+| L1 Project-Law | LOCKED | Serial = the address — object-keyed join spine (forced-split from provenance-arc) [GOLDEN_NUGGETS #8] | — | `docs/GOLDEN_NUGGETS.md` · `docs/UNIVERSE_ZONE_MAP_V1.md` §7 | — |
 | L1 Project-Law | ACTIVE | Human-Read Line — image-act vs permanent; gates 1/2/3 (NOT-SPLIT) [HUMAN_READ_LINE_V1] | — | `docs/HUMAN_READ_LINE_V1.md` | — |
-| L1 Project-Law | ACTIVE | Serial = the address — object-keyed join spine (forced-split from provenance-arc) [GOLDEN_NUGGETS #8] | — | `docs/GOLDEN_NUGGETS.md` · `docs/UNIVERSE_ZONE_MAP_V1.md` | — |
 | L2 System/Subsystem-Spec | LOCKED | Halo Gate Boundary Lock [HALO_GATE_BOUNDARY_V1] | — | `docs/halo/HALO_GATE_BOUNDARY_V1.md` · `docs/DECISION_LOG.md` (2026-06-13) | — |
 | L2 System/Subsystem-Spec | LOCKED | Base-Hex + Warm-Ramp Lock (parent of the two children below) [DECISION_LOG BR-S039] | — | `docs/DECISION_LOG.md` (2026-06-14) | — |
-| L2 System/Subsystem-Spec | CONTEST | Final Halo material contest [CARD_TECH_LAB §20] | **[Black Star](docs/CARD_TECH_LAB.md)** · **[Night Gloss](docs/CARD_TECH_LAB.md)** · [Cold Foil](docs/CARD_TECH_LAB.md) | `docs/CARD_TECH_LAB.md` §20 · `docs/TASK_QUEUE.md` Backlog | ≥4 BR-S (due) |
+| L3 Surface-Spec | CONTEST | Final Halo material contest [CARD_TECH_LAB §20] | **[Black Star](docs/CARD_TECH_LAB.md)** · **[Night Gloss](docs/CARD_TECH_LAB.md)** · [Cold Foil](docs/CARD_TECH_LAB.md) | `docs/CARD_TECH_LAB.md` §20 · `docs/TASK_QUEUE.md` Backlog | ≥4 BR-S (due) |
 | L3 Surface-Spec | ACTIVE | Dossier de-dull — record reads as one filed object [DECISION_LOG BR-S048] | — | `docs/DECISION_LOG.md` (BR-S048) · `docs/research/LAYUP_RESEARCH_V1.md` | — |
 | L4 Element/Technique | ACTIVE | Provenance verb thread (child of provenance-arc split) [UNIVERSE_ZONE_MAP_V1 §3] | — | `docs/UNIVERSE_ZONE_MAP_V1.md` §3 | — |
 | L4 Element/Technique | ACTIVE | Tier-ratio re-derivation (child of Base-Hex lock) [DECISION_LOG BR-S055] | — | `docs/DECISION_LOG.md` (BR-S055) | — |
