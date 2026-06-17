@@ -10,6 +10,25 @@ Last updated: 2026-06-15.
 > is the head of **Ready** (below) — one at a time (this file's intro rule). For the
 > authoritative "what shipped" trail, cross-check `docs/DECISION_LOG.md` + `git log`.
 
+- **Free-completeness spec reconcile — THE GATE** (2026-06-17 / BR-S057, docs only — PROJECT_OS +
+  DECISION_LOG + TASK_QUEUE): the CARD DESIGN MISSION's mandated first move. Reconciled PROJECT_OS's stale
+  CURRENT prose (§2, §4 line 107, §8, §10 banner/description/Free-Pull-rule, §16 Q1) — which framed Free as
+  "incomplete / archive preview / should seduce / teaser" — to LOCKED canon `GOLDEN_NUGGETS` #5 ("Free is the
+  complete front; paid is the same scan developed deeper, a mode not a grade") + the LOCKED Halo Gate Boundary
+  Lock v1. Free now reads as the COMPLETE FRONT (whole at its scope); the dossier/back is the deeper latent
+  layer Halo develops (added depth / a different kind of record — never withheld or paywalled). PROJECT_OS now
+  CITES #5/#6 (place-once), drops the banned word "withheld" from the §10 table, corrects the stale §8 blur-veil
+  line + §16 Q1's stale "Signature Mint" → "Halo Mint". **Slim Spec Change** — aligns CURRENT text to already-
+  LOCKED canon, so no Core Change Review. **Mandatory pre-edit critique** = a 3-lens adversarial workflow
+  (over-reach/process · completeness/drift · canon-fidelity) → all **GO_WITH_CHANGES**; folded in: the §16 Q1 +
+  table "withheld" fixes, the "added depth / a different kind, not the same thing brighter" counterweight (so
+  "complete" can't be misread as "same content dimmed" — the killed model), and stripping the non-canon term
+  "read-scope" the handoff coined (canon's word is "mode" / "the read"). One critic mis-flagged "blur-veil
+  retired" as unbacked — it is recorded at this file's Retired list; the shipped wording is true to both the
+  code (dashed `.module--locked`, no blur) and that record. Scope: completeness framing ONLY — Free's muted
+  palette / dashed UNMINTED stamp / ghost serial stand (the design task owns Free's finish). No runtime/code
+  change; docs-only ⇒ no browser verify. **Completed.** **Next up:** design Free's own matte finish + the Halo
+  crown structure (`research/CARD_CRAFT_FIT_V1.md`) — the rest of the CARD DESIGN MISSION.
 - **Governance + Signal Map + card-craft research day** (2026-06-17, docs only — multi-agent
   workflows; ~12 commits local, unpushed): persisted the **Reading Doctrine** (DRAFT, `docs/governance/`);
   **FORMULAS** copy honesty fix (read-through, not derived-from); **place-once cleanup** (2 GOVERNANCE_OS
@@ -743,9 +762,15 @@ Last updated: 2026-06-15.
   Free's own matte archive finish (own palette + struck "Free Pull Edition" stamp + real serial, NOT
   Halo-minus-glow) and the Halo CROWN's baked-in material structure (the inseparability test; replace the
   conic+holo-spin, don't retint). Black Star vs Night Gloss = a taste call from real side-by-side in
-  `dev-live.html` (deferred). **GATE / do first:** reconcile `PROJECT_OS §66/§107/§299` ("Free =
-  undeveloped/partial/incomplete | CURRENT") with LOCKED `GOLDEN_NUGGETS #5` ("Free is the complete
-  front") — else every Free craft choice ships against a live, contradicting doc (quick spec-hygiene fix).
+  `dev-live.html` (deferred). **GATE ✓ DONE (BR-S057, 2026-06-17):** PROJECT_OS reconciled to LOCKED
+  `GOLDEN_NUGGETS #5` — Free = the complete front (whole at its scope); the dossier/back is the deeper
+  latent layer Halo develops (added depth, a mode not a grade). Free craft choices now ship against an
+  aligned doc. Next: design Free's own matte finish + the Halo crown structure from `research/CARD_CRAFT_FIT_V1.md`.
+- **Place-once sweep — Free-Pull "preview/incomplete" siblings** (logged BR-S057, 2026-06-17): downstream
+  mentions still frame Free as preview/incomplete and should CITE `GOLDEN_NUGGETS` #5 rather than restate —
+  `GPT_REVIEW_GUIDE.md:38` ("archive preview"), `research/SPINE.md:74/391` ("archive preview / first scan"),
+  `CARD_TECH_LAB.md:74` ("Useful but incomplete"). Low-grade (RESEARCH/reference/TESTING), not load-bearing;
+  align in a hygiene pass. (`research/FREE_PAID_MODEL_V1.md` is already aligned — the canonical research source.)
 - **Menu redesign v3** (builder, 2026-06-17): the main menu is not final — criticize it deeply +
   stress-test directions until one wins (BR-S041 reframed it once; this is a fresh deep pass).
 - **Universe ideas → surfaces the card flows into** (`PARKED_IDEAS.md`, structured 2026-06-17):

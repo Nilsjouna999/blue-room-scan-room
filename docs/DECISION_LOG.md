@@ -346,3 +346,20 @@ on it). The engraved text-shadow re-tune was deliberately SKIPPED (the 3 shadows
 the plate) and NO letterpress pair was invented. Built + adversarially verified (opus planner + opus skeptic).
 Pure CSS one-stop swap; no markup/data.js.
 Revisit: when the warm upper-stop ramp (800/850) is re-derived, or a card-family system needs per-family floors.
+
+**2026-06-17 / Free-completeness framing in PROJECT_OS reconciled to LOCKED canon / ACTIVE (Spec Change — no Core Review)**
+Why: PROJECT_OS CURRENT prose (§2, §4 line 107, §8, §10 banner/description/Free-Pull-rule, §16 Q1) still framed
+Free as "incomplete / archive preview / should seduce / teaser" — contradicting LOCKED canon `GOLDEN_NUGGETS` #5
+("Free is the complete front; paid is the same scan developed deeper, a mode not a grade") + the LOCKED Halo Gate
+Boundary Lock v1 (2026-06-13). Precedence (CANON/LOCKED > CURRENT) fixes the direction: Free = the complete front,
+whole at its scope; the dossier/back is the deeper layer, latent ("not yet developed", #6), released by Halo as
+added depth / a different kind of record — never withheld or paywalled. PROJECT_OS now CITES #5/#6 (place-once
+rule), drops the banned word "withheld" from the §10 visibility table, corrects the stale §8 blur-veil line
+("undeveloped archive plates", per TASK_QUEUE Retired) and §16 Q1's stale "Signature Mint" → "Halo Mint". The
+non-canon term "read-scope" (coined in a session handoff) was deliberately NOT introduced — canon's word is
+"mode" / "the read". **Scope: completeness framing ONLY** — does NOT change "Free deliberately un-magical"
+(2026-06-12 treatment split); Free's muted palette / dashed UNMINTED stamp / ghost serial stand, and the CARD
+DESIGN MISSION owns Free's own matte finish. Forged via a 3-lens pre-edit critique (over-reach/process ·
+completeness/drift · canon-fidelity → all GO_WITH_CHANGES, fixes folded in). Docs only; no runtime change.
+Unblocks the CARD DESIGN MISSION gate (TASK_QUEUE Backlog).
+Revisit: when the card-design task changes Free's finish/stamp/serial — update §10's visual descriptors then.
