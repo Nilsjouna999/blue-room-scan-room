@@ -838,6 +838,22 @@ Last updated: 2026-06-15.
   NOT final." Wants a real layout/design pass. Prior partial work: `research/LAYUP_RESEARCH_V1.md` (Metrics
   redesign still open). *Done when:* a researched layout direction wins + ships; the room reads final, not
   placeholder.
+- **Architecture / navigation — the coherent picture (BR-S063, 2026-06-18; docs-capture, no code):** the COMMON
+  STRING that keeps all planning coherent — *one object, developed; the **serial is its address** (an OBJECT,
+  never a person)*: latent→developed is the verb · serial is the address · the Archive is the world ·
+  pull-by-giving is why you return. STRUCTURE = **one Archive, one spine, one gate**: Lobby → Scan Room → the
+  **Develop Seam** (the SINGLE free/paid gate) → Card Record (by serial); Vault/Codex/Profile are later **views
+  over the same card**, not new zones. NAV = flat, felt-not-traversed, anti-sprawl (~5 zones + 1 card + 1 axis);
+  the menu↔room back loop ALREADY exists (`index.html:63`) — the real gap is a "you are here" NAME.
+  **BUILD-FIRST (live, no engine/decision):** (1) remove the customer Free|Halo treatment toggle (the quality
+  ladder; move behind `?devnav`) → (2) ship the `state.view` **zone label** + keep the back loop, paired with the
+  floor-wash + provenance verb-thread → (3) **the Develop Ceremony** (replace the toggle-swap with a develop
+  EVENT — payoff is NEW MATERIAL opening, not a brighter card; keep the LOCKED "Develop this scan" verb, change
+  only what it DOES) → (4) crown-by-demotion (floor wash + radial light-pool — change the page's GRAVITY) +
+  de-smear the dossier to ONE threshold. **DECIDE-FIRST (research, not buildable):** the paid access-vs-minting +
+  scarcity-as-play line (the worth research; re-opens magnetism #7), and the artifact-centric social spec.
+  Everything aspirational stays paper-only-until-built (only `data-view-to` + the `#dossierMount` anchor may exist
+  in code today).
 - **Place-once sweep — Free-Pull "preview/incomplete" siblings** (logged BR-S057, 2026-06-17): downstream
   mentions still frame Free as preview/incomplete and should CITE `GOLDEN_NUGGETS` #5 rather than restate —
   `GPT_REVIEW_GUIDE.md:38` ("archive preview"), `research/SPINE.md:74/391` ("archive preview / first scan"),
@@ -869,6 +885,16 @@ Last updated: 2026-06-15.
   / numerology — its OWN task/space) are marked PRESENT in the structure with fill TBD (`UNIVERSE_ZONE_MAP_V1`
   §2 Codex) — so sketches include them without designing them. Special Readings stays declared-input → received,
   never inferred (#9).
+  **Architecture brainstorm — the social layer (BR-S063, 2026-06-18):** Profile / Friends / (maybe) Messaging +
+  Music are RESERVED but **blocked** — design none into the funnel/nav now. Canon shape: **Profile** = a filtered
+  PUBLIC sub-view of your Vault (rows you unseal; NO header-level owner-summary); **Friends** = ONE verb, *visit
+  this published shelf* (read another's public cards by serial — never compare / leaderboard / who-has-rarer);
+  **Messaging** = highest-risk, **wait / likely-cut** (free text re-imports comparison; if ever, artifact-notes by
+  serial only). **BLOCKING — a dedicated artifact-centric SOCIAL SPEC must precede any social build** and answer
+  the load-bearing UNKNOWN: serial-keying the *storage* does NOT solve §7's real harm = **viewer-side
+  aggregation** ("these are X's pulls" is itself a reconstructable person-trait). Do NOT adopt a "serial-shelf"
+  canon line until resolved. **Music:** silence = default; ever-present? = open question, atmosphere-not-feature,
+  later (never a shareable/configurable object — that re-opens person-keying).
 - **One paid reading** (decided paid spine — bounded: free → ONE paid card reading, not a tier) +
   **Referral → earns the paid reading** (builder idea; magnetism-by-giving, kept bounded — one clean
   referral → one reading, no streaks/leaderboards, object-keyed). Build-side when engine/payment is greenlit.
