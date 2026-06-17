@@ -400,3 +400,19 @@ Revisit: Free is REDESIGNABLE — grain/depth are tunable numbers; revisit with 
 NOTE (builder, 2026-06-17): the Halo crown is approved AS-IS (dark/sleek/minimal); the CARD_CRAFT_FIT conic-replacement is
 NOT pursued now (revisit card material/texture only with a concrete new-card concept). Roadmap pivots to the scan-room
 layout + the Free/Paid funnel redesign.
+
+**2026-06-18 / Free/Paid framing resolved: Free = a complete light CHOICE; Paid = earned premium (payment funds real depth) / ACTIVE (refines GOLDEN_NUGGETS #5 — the re-opened mode-not-grade question, now drawn)**
+Why: the builder closed the long-re-opened mode-not-grade tension pragmatically (and explicitly asked not to overthink it).
+**Free is a complete, valid CHOICE, not a deficiency** — choosing Free = getting what you wanted for a LIGHT purpose (fish a
+fun stat/headline out of your photo to meme friends, share it, or just try it); the result of the free IS what you wanted.
+**Paid is premium and that is honest/earned**: you paid → that funds real resources → we genuinely do MORE (deeper engine /
+richer reading / the bigger "real space"), not an artificial gate or a crippled free side. So neither "free is secretly the
+same, dimmed" NOR "free is the broken cheap version" — Free is a complete light thing for a light job; Paid is a genuinely
+deeper space the payment makes possible (pull-by-VALUE, not a dark pattern). This REFINES the strict #5 "a mode, not a grade"
+reading (re-examination logged 2026-06-17): paid may read as genuinely more/premium because the money buys real additional
+work. The "real mint" the builder referenced = this premium SPACE (the develop/paid lane), distinct from minting-as-scarcity-
+play (separate; the worth research). The CARD stays one master base (LOCKED, never re-lays-out); the ROOM may be a separate
+premium design.
+Revisit: the SPECIFIC paid-layer differences (what it offers, mood/colors/layout, copy) are deferred — "paint/word it later"
+via the paid-space brainstorm + the worth-of-the-minted-artifact research; canon copy (GOLDEN_NUGGETS #5, PROJECT_OS §10,
+FREE_PAID_MODEL_V1) gets reconciled to this framing when that lands.

@@ -922,6 +922,9 @@ Last updated: 2026-06-15.
   yet. **DEEP RESEARCH-LATER (builder-named):** *"the WORTH / value of the minted artifact"* — a deep
   sweep+synth on the scarcity-as-play economy of meaning + how the referral system helps + links to paid.
   Relates to the chance-rarity open decision + the warrant-debt #1 magnetism edge.
+  **Framing RESOLVED (builder, 2026-06-18 — see DECISION_LOG):** Free = a complete light CHOICE (meme/share/try-it-out, the
+  result of the free is what you wanted); Paid = earned premium because payment funds real depth (pull-by-value, not a dark
+  pattern). Closes the re-opened mode-not-grade knot. The SPECIFIC paid differences ("paint/word it later") stay deferred.
 - **Branding / identity research doc** (builder-named, 2026-06-17 — later / when important): a research pass on
   how Blue Room wants to BRAND + portray itself (identity, positioning, voice). Pairs with the already-noted
   future "marketing / portrayal / value-stacking / existence-framing" research pass. Not now.
