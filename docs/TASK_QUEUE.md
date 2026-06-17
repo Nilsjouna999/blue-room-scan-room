@@ -10,6 +10,22 @@ Last updated: 2026-06-15.
 > is the head of **Ready** (below) — one at a time (this file's intro rule). For the
 > authoritative "what shipped" trail, cross-check `docs/DECISION_LOG.md` + `git log`.
 
+- **Free finish LOCKED — Letterpress Archive Edition (Free's default)** (2026-06-17 / BR-S060, styles.css +
+  app.js + data.js): the builder picked **Letterpress** over Sun Ledger (BR-S059 live fork) + asked for a touch
+  more depth. Promoted from dev preview to Free's shipped default: warm-graphite uncoated EDITION BOARD —
+  organic baked paper-fiber grain (SVG fractalNoise, soft-light) + lit surface depth (directional light + corner
+  falloff + a recessed inner shadow), a struck solid-border "FREE PULL EDITION" deboss, and a REAL object serial
+  on the Free front. **Retired** the stale "UNMINTED · ARCHIVE PREVIEW" / "FREE PULL" copy (contradicted
+  GOLDEN_NUGGETS #5) → rarity "ARCHIVE EDITION", stamp/strip "FREE PULL EDITION", new tagline, right-panel badge
+  border dashed→solid. **Dropped** the Sun Ledger preview + the whole dev-toggle scaffolding (`state.freeFinish`
+  / `?free=` parse / `data-free-finish` attr / `FREE_FINISH_COPY`) — Letterpress is the unconditional
+  `.card[data-treatment="free"]` look; no dead code. Restyle-only (5 LOCKED material plates + frost + geometry
+  untouched); pure static CSS, reduced-motion-safe. **Verified live** (DOM/getComputedStyle): default Free =
+  board + grain + depth + struck stamp + real serial + ARCHIVE EDITION + solid badge; no PREVIEW/UNMINTED
+  strings; Halo/Lab plates + geometry intact; console clean; no orphan refs. DECISION_LOG entry added (Free
+  stays redesignable). **Completed.** **Next up (builder re-scope 2026-06-17):** the live card work is settled —
+  Halo crown stays as-is (builder approves the current dark/sleek shiny). Roadmap pivots to the SCAN-ROOM LAYOUT
+  + the FREE/PAID FUNNEL redesign (see the Backlog roadmap).
 - **Free finish dev previews v1 — Letterpress + Sun Ledger** (2026-06-17 / BR-S059, styles.css + app.js +
   dev-live.html): the CARD DESIGN MISSION's first build — Free Pull's OWN matte archive finish (a different
   KIND than Halo, NOT Halo-minus-shine), as TWO switchable dev-only directions for a live taste pick, mirroring
@@ -796,16 +812,32 @@ Last updated: 2026-06-15.
 
 ## Backlog / needs decision
 
-- **CARD DESIGN MISSION** (next major arc — from `research/CARD_CRAFT_FIT_V1.md`, 2026-06-17): craft
-  Free's own matte archive finish (own palette + struck "Free Pull Edition" stamp + real serial, NOT
-  Halo-minus-glow) and the Halo CROWN's baked-in material structure (the inseparability test; replace the
-  conic+holo-spin, don't retint). Black Star vs Night Gloss = a taste call from real side-by-side in
-  `dev-live.html` (deferred). **GATE ✓ DONE (BR-S057, 2026-06-17):** PROJECT_OS reconciled to LOCKED
-  `GOLDEN_NUGGETS #5` — Free = the complete front (whole at its scope); the dossier/back is the deeper
-  latent layer Halo develops (added depth, a mode not a grade). Free craft choices now ship against an
-  aligned doc. Free's matte finish: built as 2 switchable dev previews (Letterpress + Sun Ledger, BR-S059) —
-  awaiting the builder's live taste pick + winner-lock. Then: the Halo crown structure (replace the conic,
-  don't retint) from `research/CARD_CRAFT_FIT_V1.md`.
+> **Builder roadmap (re-scoped 2026-06-17).** The live CARD work is settled: Free finish LOCKED (Letterpress,
+> BR-S060) and the Halo crown is approved AS-IS (dark/sleek/minimal — no rework now). Next, as a PAIR: **(1) the
+> Free/Paid funnel + mode-integration redesign** and **(2) the scan-room layout redesign** — a solid FINAL
+> free/paid system + layout then sets the scope for **(3) the main-menu redesign** (Menu v3, gated below). Then
+> **(4) Vault + Profile** (brainstorm, interlinked). The **deterministic engine** (Phase 3) stays the biggest,
+> eventual build. Card material/texture research resumes only with a concrete NEW-card concept (undefined; waits).
+
+- **CARD DESIGN arc — Free DONE; Halo crown PARKED** (from `research/CARD_CRAFT_FIT_V1.md`): the GATE (BR-S057)
+  + Free's own finish (Letterpress Archive Edition, locked BR-S060) are DONE. **Halo crown: the builder likes the
+  current dark/sleek/minimal shiny as-is — no issues; the CARD_CRAFT_FIT conic-replacement / inseparability rework
+  is NOT pursued now.** Card material/texture research waits for a concrete NEW-card concept (undefined). Live card
+  work settled. *(This effectively resolves the "Final Halo material decision" item toward keep-current.)*
+- **Free/Paid funnel + mode-integration redesign** (builder, 2026-06-17 — TOP priority, pair with the layout):
+  how Free → Halo (paid) is funneled is NOT final. The single "Develop this scan" CTA reads as "poor design,
+  lacking imagination"; the sync/integration of the two modes is "wack and dull." Re-imagine the funnel, the
+  develop moment, and how the two modes relate on the page. **Canon guardrails:** Free = complete front · Halo =
+  the same scan developed deeper (a mode, not a grade, `GOLDEN_NUGGETS` #5) · magnetism = pull-by-giving (no
+  scarcity/urgency, #7) · "Develop this scan" is a LOCKED CTA (`DECISION_LOG` 2026-06-12) — revisiting it is a
+  Spec Change, log it · framing only (no payment/engine). Research base: `research/FREE_PAID_MODEL_V1.md`.
+  *Done when:* a researched, stress-tested funnel direction wins; the develop CTA + mode-integration are
+  redesigned; verified live; canon intact.
+- **Scan-room layout redesign (around the card)** (builder, 2026-06-17 — pair with the funnel above): the scan
+  page around the card — left (Diagram|Metrics) · center stage · right reading panel — "looks solid + decent but
+  NOT final." Wants a real layout/design pass. Prior partial work: `research/LAYUP_RESEARCH_V1.md` (Metrics
+  redesign still open). *Done when:* a researched layout direction wins + ships; the room reads final, not
+  placeholder.
 - **Place-once sweep — Free-Pull "preview/incomplete" siblings** (logged BR-S057, 2026-06-17): downstream
   mentions still frame Free as preview/incomplete and should CITE `GOLDEN_NUGGETS` #5 rather than restate —
   `GPT_REVIEW_GUIDE.md:38` ("archive preview"), `research/SPINE.md:74/391` ("archive preview / first scan"),
@@ -820,11 +852,14 @@ Last updated: 2026-06-15.
   GOVERNANCE_OS warrant-audit rule (held loop spec: `.claude/tmp/WARRANT_PEN_DRAFT_V1.md`, DRAFT/unratified).
 - **Menu redesign v3** (builder, 2026-06-17): the main menu is not final — criticize it deeply +
   stress-test directions until one wins (BR-S041 reframed it once; this is a fresh deep pass).
+  **Gated (builder, 2026-06-17):** do this AFTER the Free/Paid funnel + scan-room layout are solid — those set
+  the menu's scope.
 - **Universe ideas → surfaces the card flows into** (`PARKED_IDEAS.md`, structured 2026-06-17):
   **Profile + Vault** (the interconnection is the design object) · **Idle Room → Kingdom** (card placed →
   its stats drive an idle reactive place) · **Friends** · **Codex vs Blogs/Journals** · **Autobattler**
   (form open) · **Socials** (deferred-conditional — only if non-redundant). Guard: object-keyed, never
-  person-keyed.
+  person-keyed. **Builder (2026-06-17): Vault + Profile are the named next-after-menu brainstorm** — both
+  undone + interlinked; settle what they CONTAIN, their PURPOSE, and the FEELING before building.
 - **One paid reading** (decided paid spine — bounded: free → ONE paid card reading, not a tier) +
   **Referral → earns the paid reading** (builder idea; magnetism-by-giving, kept bounded — one clean
   referral → one reading, no streaks/leaderboards, object-keyed). Build-side when engine/payment is greenlit.

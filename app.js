@@ -67,7 +67,7 @@ function tierBand(v) {
   return "Muted";
 }
 
-const state = { source: 0, treatment: "free", tab: "diagram", view: "menu", draftGate: false, dev: null, labMaterial: null, freeFinish: null, diagramView: "annotated" };
+const state = { source: 0, treatment: "free", tab: "diagram", view: "menu", draftGate: false, dev: null, labMaterial: null, diagramView: "annotated" };
 
 /* Deep-link support: ?src=1|2&t=free|shiny|mint&tab=source|diagram|metrics
    (used by reviewers and the screenshot pipeline). Any of these params
@@ -86,9 +86,6 @@ const state = { source: 0, treatment: "free", tab: "diagram", view: "menu", draf
      Applies ONLY in the Lab state (t=mint); ignored otherwise. Does not, on its
      own, open the room — only t/src/tab do that (below). */
   if (q.get("t") === "mint" && ["cold-foil", "black-star", "night-gloss"].includes(q.get("lab"))) state.labMaterial = q.get("lab");
-  /* Free Pull dev finish study (BR-S058) — DEVNAV-gated so a clean ?free link is inert;
-     applies ONLY at t=free; never opens the room on its own (not in the room-open list below). */
-  if (q.get("t") === "free" && q.has("devnav") && ["letterpress", "sun-ledger"].includes(q.get("free"))) state.freeFinish = q.get("free");
   /* Dev-only harness route (NOT a product feature): ?dev=uploaded-result |
      uploaded-blocked renders a validated DEV fixture, never a user scan.
      free-scan-sim = Free Pull mock · halo-gate = sealed card-back mock. */
@@ -423,26 +420,12 @@ function renderMetricsTab(src, treatment) {
     <p class="metriccap metriccap--foot">◆ weighted read · interpretive formula, not a measurement</p>`;
 }
 
-/* Free Pull dev-finish copy (BR-S058) — per-finish stamp/rarity/serial so the dev
-   side-by-side reads as distinct KINDs. Gated on state.freeFinish; null => default Free
-   (TREATMENTS.free) renders byte-identical. "EXP 01" is a fixed object-address token, never a run count. */
-const FREE_FINISH_COPY = {
-  letterpress: { rarity: "ARCHIVE EDITION", stamp: "FREE PULL EDITION", strip: "FREE PULL EDITION" },
-  "sun-ledger": { rarity: "SUN LEDGER EDITION", stamp: "FREE PULL EDITION", strip: "EXP 01 · SUN LEDGER" },
-};
-
 /* ---------- center: the card (one master base) ---------- */
 
 function renderCard(src, treatment) {
   const t = TREATMENTS[treatment];
   const c = src.card;
   const minted = treatment !== "free";
-  /* Active dev finish (free only) restyles copy; falls back to TREATMENTS.free when none. */
-  const fc = (treatment === "free" && state.freeFinish && FREE_FINISH_COPY[state.freeFinish]) || null;
-  const stamp = fc ? fc.stamp : t.stamp;
-  const rarity = fc ? fc.rarity : t.rarity;
-  const strip = fc ? fc.strip : t.strip;
-  const showSerial = minted || (treatment === "free" && state.freeFinish);
   /* Lab material overlay (CARD_TECH_LAB §20): a visual finish study, active
      ONLY in the internal Lab state ("mint"). Never on free/shiny — so the paid
      and free cards stay byte-identical. Drives a card-scoped data-lab-material
@@ -453,7 +436,7 @@ function renderCard(src, treatment) {
       : null;
 
   return `
-    <article class="card" data-treatment="${treatment}" data-material="${esc(src.halo.material)}"${labMat ? ` data-lab-material="${esc(labMat.key)}"` : ""}${state.freeFinish && treatment === "free" ? ` data-free-finish="${esc(state.freeFinish)}"` : ""}
+    <article class="card" data-treatment="${treatment}" data-material="${esc(src.halo.material)}"${labMat ? ` data-lab-material="${esc(labMat.key)}"` : ""}
       style="--halo-a:${esc(src.halo.a)}; --halo-b:${esc(src.halo.b)}; --halo-c:${esc(src.halo.c)};">
       <span class="card__halo" aria-hidden="true"></span>
       <div class="card__plate">
@@ -463,7 +446,7 @@ function renderCard(src, treatment) {
 
         <header class="card__head">
           <span class="card__house">◆ BLUE ROOM ARCHIVE</span>
-          <span class="card__rarity">${esc(labMat ? `${rarity} · ${labMat.label}` : rarity)}</span>
+          <span class="card__rarity">${esc(labMat ? `${t.rarity} · ${labMat.label}` : t.rarity)}</span>
         </header>
 
         <figure class="photo" data-imgwrap
@@ -504,10 +487,8 @@ function renderCard(src, treatment) {
         <p class="signature">${esc(c.signature)}</p>
 
         <div class="mintstrip">
-          <span class="mintstrip__state ${minted ? "" : "mintstrip__state--free"}">${esc(stamp)}</span>
-          <span class="mintstrip__serial ${minted ? "" : "mintstrip__serial--ghost"}">${
-            showSerial ? `${esc(c.serial)} · ${esc(strip)}` : esc(strip)
-          }</span>
+          <span class="mintstrip__state ${minted ? "" : "mintstrip__state--free"}">${esc(t.stamp)}</span>
+          <span class="mintstrip__serial ${minted ? "" : "mintstrip__serial--ghost"}">${esc(c.serial)} · ${esc(t.strip)}</span>
           <span class="barcode ${minted ? "" : "barcode--ghost"}" aria-hidden="true"></span>
         </div>
       </div>
@@ -530,7 +511,7 @@ function renderReadingPanel(src, treatment) {
   const free = treatment === "free";
   const c = src.card;
 
-  const stateBadge = free ? (state.freeFinish ? "Archive Edition" : "Archive Preview") : treatment === "mint" ? "Lab · Signature Mint" : "Developed · Halo Mint";
+  const stateBadge = free ? "Archive Edition" : treatment === "mint" ? "Lab · Signature Mint" : "Developed · Halo Mint";
   const header = `
     <div class="readhead">
       <h2 class="readhead__title">Scan Reading</h2>

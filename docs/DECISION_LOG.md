@@ -379,3 +379,24 @@ Signal Map column (closed set), no runtime change.
 Revisit: ratify the full loop (write `docs/governance/WARRANT_PEN.md` + FILE_MAP row, mirroring READING_DOCTRINE) after ≥3
 distinct non-seed `warrant-debt` captures survive one metabolize cycle; else it auto-drops to the GOVERNANCE_OS pointer alone
 by BR-S +8.
+
+**2026-06-17 / Free Pull finish locked: Letterpress Archive Edition (the Free default) / ACTIVE (Spec Change — Free stays redesignable)**
+Why: the CARD DESIGN MISSION's Free build. After a 2-direction live fork (Letterpress vs Sun Ledger, BR-S059) the builder
+chose **Letterpress** + a touch more depth. Promoted from dev preview to Free's shipped default: a warm-graphite uncoated
+EDITION BOARD — organic baked paper-fiber grain (SVG fractalNoise, soft-light blend) + lit surface depth (directional light +
+corner falloff + a recessed inner shadow), a struck solid-border "FREE PULL EDITION" deboss, and a REAL object serial
+(`card.serial`, e.g. BR-001-DRV-0001) now surfaced on the Free front. Realizes CARD_CRAFT_FIT's Free prescription (Free's OWN
+finish, a different KIND than Halo — NOT "Halo minus shine"). **Supersedes** the "Free borrows a touch of Lab-mint silver"
+treatment + the stale "UNMINTED · ARCHIVE PREVIEW" copy (which contradicted GOLDEN_NUGGETS #5): rarity → "ARCHIVE EDITION",
+stamp/strip → "FREE PULL EDITION", tagline → "The complete archive front, filed as scanned. Halo develops the same scan
+deeper.", right-panel badge border dashed → solid. **Dropped** the Sun Ledger preview + the entire dev-toggle scaffolding
+(`state.freeFinish` / `?free=` parse / `data-free-finish` attr / `FREE_FINISH_COPY`) — Letterpress is the unconditional
+`.card[data-treatment="free"]` look now, no dead code. Restyle-only (the 5 LOCKED material plates + frost + master geometry
+untouched); pure static CSS, reduced-motion-safe; per-source warmth rides the existing photo `--halo-a` (non-person cue); no
+scarcity/grade/person-rating. Verified live (DOM/getComputedStyle): default Free = board + grain + depth + struck stamp + real
+serial + ARCHIVE EDITION + solid badge; no "ARCHIVE PREVIEW"/"UNMINTED" anywhere; Halo/Lab plates + geometry intact; console
+clean; no orphan refs.
+Revisit: Free is REDESIGNABLE — grain/depth are tunable numbers; revisit with a card-family system or a real serial scheme.
+NOTE (builder, 2026-06-17): the Halo crown is approved AS-IS (dark/sleek/minimal); the CARD_CRAFT_FIT conic-replacement is
+NOT pursued now (revisit card material/texture only with a concrete new-card concept). Roadmap pivots to the scan-room
+layout + the Free/Paid funnel redesign.

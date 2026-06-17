@@ -243,11 +243,12 @@ Customer-facing hierarchy (CURRENT, decided 2026-06-12):
 > **Free Pull = the complete card front. Halo Mint = the same scan developed deeper.**
 
 **Free Pull (CURRENT)**
-The complete card front. Graphite / charcoal / muted grey / moss accent, with a
-touch of the old Signature-Mint silver quality folded in so free never
-feels dead. Toned, scrimmed photo. Dashed UNMINTED stamp, ghost serial.
-Screenshot-worthy and whole at its scope; the deeper read stays latent (not
-yet developed), released by Halo as the same scan — added depth, a mode not a grade.
+The complete card front — its own matte **Letterpress Archive Edition** finish (locked
+2026-06-17 / BR-S060): a warm-graphite uncoated edition board (baked paper-fiber grain +
+lit surface depth), a struck "FREE PULL EDITION" deboss, and a real object serial. A
+different KIND than Halo, not "Halo minus shine"; Free stays redesignable. Toned, scrimmed
+photo. Screenshot-worthy and whole at its scope; the deeper read stays latent (not yet
+developed), released by Halo as the same scan — added depth, a mode not a grade.
 
 **Halo Mint (CURRENT tier · TESTING visuals)**
 The main paid transformation. Unlocks everything: full right-panel

@@ -30,10 +30,10 @@ const FORMULAS = [
 const TREATMENTS = {
   free: {
     label: "Free Pull",
-    rarity: "ARCHIVE PREVIEW",
-    stamp: "FREE PULL",
-    strip: "UNMINTED · ARCHIVE PREVIEW",
-    tagline: "First pull — the surface scan. The card already exists; it has not been developed.",
+    rarity: "ARCHIVE EDITION",
+    stamp: "FREE PULL EDITION",
+    strip: "FREE PULL EDITION",
+    tagline: "The complete archive front, filed as scanned. Halo develops the same scan deeper.",
   },
   mint: {
     label: "Lab · Signature Mint",
