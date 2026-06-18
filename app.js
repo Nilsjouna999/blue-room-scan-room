@@ -556,7 +556,7 @@ function renderReadingPanel(src, treatment) {
     </div>`;
 
   const deep = `
-    <div class="module">
+    <div class="module module--lead" data-lead="1">
       ${moduleHead("Stance Read")}
       <p class="module__prose module__prose--serif">${esc(src.stance)}</p>
     </div>
@@ -564,7 +564,7 @@ function renderReadingPanel(src, treatment) {
       ${moduleHead("Fit Coherence")}
       <p class="module__line module__line--fit">${esc(src.fit)}</p>
     </div>
-    <div class="module">
+    <div class="module module--lead" data-lead="2">
       ${moduleHead("Frame Impact")}
       <div class="impact">
         <span class="impact__label">${esc(src.impact.label)}</span>
@@ -617,9 +617,9 @@ function renderReadingPanel(src, treatment) {
       <p class="unlock__line">The full reading is already written into this image. Minting develops it.</p>
       <button type="button" class="unlock__btn unlock__btn--shiny" data-goto="shiny">
         <span class="unlock__name">Develop this scan</span>
-        <span class="unlock__desc">Into Halo Mint · the card finishes developing</span>
+        <span class="unlock__desc">the card finishes developing in place</span>
       </button>
-      <p class="unlock__more">◆ &nbsp;Develops: the hidden stat · structured evidence · full diagram &amp; metrics · mint record · the full oracle</p>
+      <p class="unlock__more">◆ &nbsp;The sealed back of this card develops with the mint — added depth, not a hidden result.</p>
     </div>
     ${lockedModule("Stance Read", "Evidence layer pending — develops with Halo Mint.")}
     ${lockedModule("Fit Coherence", "Coherence read recorded, undeveloped. Full record develops with mint.")}
@@ -667,7 +667,8 @@ function renderReadingPanel(src, treatment) {
     </div>`;
   })();
 
-  return `${header}${statReads}${aura}${sceneRole}${free ? lockedDeep : archetypeModule + deep + shinyTease + shinyBadge}`;
+  const forkContent = free ? lockedDeep : archetypeModule + deep + shinyTease + shinyBadge;
+  return `${header}${statReads}${aura}${sceneRole}<div class="readseam" data-open="${free ? 0 : 1}">${forkContent}</div>`;
 }
 
 /* ---------- scroll dossier (below the hero) ----------
@@ -717,13 +718,15 @@ function renderDossier(src, treatment) {
   if (scan?.archetype?.class) fileSteps.push(`<span class="dfiling__step"><span class="dfiling__arr">↳</span> filed as · <b>${esc(scan.archetype.class)}</b></span>`);
 
   const lineageRows = [
-    ["Object", esc(d.record.objectNo), false],
-    ...(scan?.scanId ? [["Scan", esc(scan.scanId), false]] : []),
-    ["Card", paid ? esc(c.serial) : "····", !paid],
-    ["Mint", paid ? esc(scan?.tierOutputs?.halo?.mintSerial || d.mint.serial) : "····", !paid],
+    ["Object", esc(d.record.objectNo), false, false],
+    ...(scan?.scanId ? [["Scan", esc(scan.scanId), false, false]] : []),
+    ["Card", paid ? esc(c.serial) : "····", !paid, true],
+    ["Mint", paid ? esc(scan?.tierOutputs?.halo?.mintSerial || d.mint.serial) : "····", !paid, true],
   ];
+  /* `id` marks the develop-assigned address rows (Card/Mint) — the ceremony's
+     climax wipe (.is-developing-dossier .dlineage__v--id) plays on them. */
   const lineageHtml = lineageRows
-    .map(([k, v, ghost]) => `<div class="dlineage__row"><span class="dlineage__k">${k}</span><span class="dlineage__v${ghost ? " dlineage__v--ghost" : ""}">${v}</span></div>`)
+    .map(([k, v, ghost, id]) => `<div class="dlineage__row"><span class="dlineage__k">${k}</span><span class="dlineage__v${ghost ? " dlineage__v--ghost" : ""}${id ? " dlineage__v--id" : ""}">${v}</span></div>`)
     .join("");
 
   const record = dplate("01", "Source Record", paid, `
@@ -774,7 +777,7 @@ function renderDossier(src, treatment) {
           ? ""
           : `<div class="receipt receipt--undeveloped">
               <span class="receipt__k">· · ·</span>
-              <p class="receipt__read">${hiddenN} receipts undeveloped — archive pull. Development pending.</p>
+              <p class="receipt__read">Further receipts undeveloped — archive pull. Development pending.</p>
             </div>`
       }
     </div>`;
@@ -797,7 +800,7 @@ function renderDossier(src, treatment) {
           ? ""
           : `<div class="receipt receipt--undeveloped">
               <span class="receipt__k">· · ·</span>
-              <p class="receipt__read">${hiddenCount} receipts undeveloped — archive pull. Development pending.</p>
+              <p class="receipt__read">Further receipts undeveloped — archive pull. Development pending.</p>
             </div>`
       }
     </div>`;
@@ -887,7 +890,14 @@ function renderDossier(src, treatment) {
       <div><dt>Archive Status</dt><dd>Developed</dd></div>
       <div><dt>Mint Serial</dt><dd>${esc(scan?.tierOutputs.halo.mintSerial || d.mint.serial)}</dd></div>
     </dl>
-    <p class="dmint__note">“${esc(d.mint.note)}”</p>`
+    <p class="dmint__note">“${esc(d.mint.note)}”</p>
+    <div class="dmint__rest">
+      <p class="dmint__rest-line">The print already exists in full.</p>
+      <button type="button" class="dmint__return" data-goto="free">
+        <span class="dmint__return-name">Step back</span>
+        <span class="dmint__return-desc">Return to the Free card front</span>
+      </button>
+    </div>`
     : `
     <dl class="drecord drecord--mint">
       <div><dt>Archive Status</dt><dd>Archive pull · full artifact not minted</dd></div>
@@ -897,7 +907,7 @@ function renderDossier(src, treatment) {
     </dl>
     <button type="button" class="unlock__btn unlock__btn--shiny dmint__cta" data-goto="shiny">
       <span class="unlock__name">Develop this scan</span>
-      <span class="unlock__desc">The card finishes developing · ${esc(src.halo.material).toLowerCase()} · first print</span>
+      <span class="unlock__desc">the card finishes developing in place</span>
     </button>`;
   const mintRecord = dplate("06", "Mint Record", paid, mintBody, "dplate--mint");
 
@@ -1682,6 +1692,7 @@ function render() {
     renderCard(src, state.treatment) +
     `<a class="stagecue" href="#dossierMount">▼ &nbsp;SCAN DOSSIER BELOW</a>`;
   document.getElementById("readingPanel").innerHTML = renderReadingPanel(src, state.treatment);
+  document.getElementById("readingPanel").setAttribute("data-mode", state.treatment === "free" ? "archive" : "developed");
   document.getElementById("dossierMount").innerHTML = renderDossier(src, state.treatment);
 
   /* page-level halo material accents (used by body-scoped shiny rules) */
@@ -1698,13 +1709,85 @@ function render() {
 
 }
 
-/* Delegated once — survives re-renders, no per-render binding. */
+/* ---------- the Develop ceremony: in-place treatment flip ----------
+   The develop click (and the reverse) re-skin the PERSISTENT card node —
+   never re-mounting #stageZone — so the finish tweens, the card-in pop does
+   not re-fire, and the dossier serial resolves '····'→address in place.
+   render() stays the path for boot / source / view / devnav / deep-link init. */
+const MOTION_OFF = window.matchMedia
+  ? window.matchMedia("(prefers-reduced-motion: reduce)").matches
+  : false;
+
+function patchCardFront(src, treatment) {
+  const card = document.querySelector("#stageZone .card");
+  if (!card) return;
+  const c = src.card;
+  const t = TREATMENTS[treatment];
+  const minted = treatment !== "free";
+  card.dataset.treatment = treatment;
+  const rarity = card.querySelector(".card__rarity");
+  if (rarity) rarity.textContent = t.rarity;
+  const stamp = card.querySelector(".mintstrip__state");
+  if (stamp) { stamp.textContent = t.stamp; stamp.classList.toggle("mintstrip__state--free", !minted); }
+  const serial = card.querySelector(".mintstrip__serial");
+  if (serial) { serial.textContent = `${c.serial} · ${t.strip}`; serial.classList.toggle("mintstrip__serial--ghost", !minted); }
+  const bar = card.querySelector(".barcode");
+  if (bar) bar.classList.toggle("barcode--ghost", !minted);
+}
+
+function runDevelopChoreography() {
+  if (MOTION_OFF) return; // static rules already show the final developed state
+  const card = document.querySelector("#stageZone .card");
+  const dossier = document.getElementById("dossierMount");
+  if (!card) return;
+  card.classList.remove("is-developing");
+  if (dossier) dossier.classList.remove("is-developing-dossier");
+  void card.offsetWidth; // one intentional reflow — restart-safe replay
+  card.classList.add("is-developing");
+  if (dossier) dossier.classList.add("is-developing-dossier");
+  card.addEventListener("animationend", function done(ev) {
+    if (ev.target !== card || ev.animationName !== "develop-run") return;
+    card.classList.remove("is-developing");
+    if (dossier) dossier.classList.remove("is-developing-dossier");
+    card.removeEventListener("animationend", done);
+  });
+}
+
+/* In-place re-skin: flip the treatment without rebuilding the card node. */
+function applyTreatment(next) {
+  state.treatment = next;
+  if (next !== "mint") state.labMaterial = null;
+  const src = SOURCES[state.source];
+
+  document.body.dataset.treatment = next;
+
+  /* page-level halo material accents (parity with render) */
+  document.body.style.setProperty("--halo-a", src.halo.a);
+  document.body.style.setProperty("--halo-b", src.halo.b);
+  document.body.style.setProperty("--halo-c", src.halo.c);
+
+  /* card front: flip the finish + patch the treatment-dependent text in place */
+  patchCardFront(src, next);
+
+  /* re-render the content panels (NEVER #stageZone — the card must persist) */
+  document.getElementById("sourcePanel").innerHTML = renderLeftPanel(src, next, state.tab);
+  const reading = document.getElementById("readingPanel");
+  reading.innerHTML = renderReadingPanel(src, next);
+  reading.setAttribute("data-mode", next === "free" ? "archive" : "developed");
+  document.getElementById("dossierMount").innerHTML = renderDossier(src, next);
+
+  document.querySelectorAll("#treatmentToggle button").forEach((b) =>
+    b.classList.toggle("is-active", b.dataset.treatment === next));
+
+  /* one-shot ceremony only when developing; the reverse is a quiet recede */
+  if (next !== "free") runDevelopChoreography();
+}
+
+/* Delegated once — the develop CTA and the reverse both carry [data-goto]. */
 document.addEventListener("click", (e) => {
   const btn = e.target.closest("[data-goto]");
   if (!btn) return;
-  state.treatment = btn.dataset.goto;
-  if (state.treatment !== "mint") state.labMaterial = null;
-  render();
+  applyTreatment(btn.dataset.goto);
 });
 
 /* View switch: front-door menu ⇄ scan room. Separate attribute from
