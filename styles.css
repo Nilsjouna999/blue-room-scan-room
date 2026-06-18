@@ -1019,17 +1019,19 @@ body[data-devnav="1"] .toggle--treatment { display: inline-flex; }
    grade. The ceremony owns motion via .is-developing (below). (BR-S067)
 ------------------------------------------------------------- */
 .card[data-treatment="shiny"] {
-  background: linear-gradient(160deg,
-    color-mix(in srgb, var(--halo-a) 16%, #1d2a3b) 0%,
-    #0a121d 28%, #03070d 54%,
-    color-mix(in srgb, var(--halo-b) 14%, #0e1c2c) 80%,
-    color-mix(in srgb, var(--halo-a) 12%, #1a2a3d) 100%);
-  /* persistent node: no card-in re-entrance, no idle loops */
+  /* deeper premium navy with more tonal depth (builder, BR-S068): a lit blue
+     top edge falling to a near-black core, source-tinted at the corners */
+  background: linear-gradient(158deg,
+    color-mix(in srgb, var(--halo-a) 22%, #142539) 0%,
+    #0a1422 22%, #050d18 48%, #02070f 70%,
+    color-mix(in srgb, var(--halo-b) 18%, #0a1828) 100%);
+  /* the CARD BASE stays still — it is strong on its own; the breathing halo
+     (below) is added richness, never a crutch (no card-in re-entrance) */
   animation: none;
   box-shadow:
-    0 34px 90px rgba(0, 0, 0, 0.66),
-    0 0 0 1px rgba(46, 64, 90, 0.6),   /* neutral ring — no --halo escapes to the room */
-    0 6px 22px rgba(0, 0, 0, 0.6);
+    0 36px 92px rgba(0, 0, 0, 0.7),
+    0 0 0 1px rgba(58, 84, 120, 0.55),   /* neutral ring — no --halo escapes to the room */
+    0 6px 22px rgba(0, 0, 0, 0.62);
 }
 .card[data-treatment="shiny"] .card__plate {
   background: linear-gradient(178deg, #0c121b 0%, #070c13 52%, #03070d 100%);
@@ -1062,8 +1064,25 @@ body[data-devnav="1"] .toggle--treatment { display: inline-flex; }
   background: linear-gradient(180deg, color-mix(in srgb, var(--halo-a) 12%, transparent), transparent);
 }
 .card[data-treatment="shiny"] .barcode { opacity: 0.8; }
-/* .card__halo + .card__sparkles stay at base opacity:0 — the room spends
-   zero depth (subtractive crown); no behind-card glow, no sparkles. */
+/* the pulsating halo — builder-restored (BR-S068). The card is strong on its
+   own (above); the halo is the card's OWN added richness — it belongs to the
+   card's depth budget, NOT the room (floor/panels still spend zero). One gentle
+   blurred glow that fades in on develop then breathes; opacity/transform only
+   (compositor-cheap); reduced-motion stills it (block at file end). Sparkles
+   stay OFF (the twinkle was the yippi offender, not the halo). */
+.card[data-treatment="shiny"] .card__halo {
+  opacity: 1;
+  background:
+    radial-gradient(48% 40% at 50% 34%, color-mix(in srgb, var(--halo-a) 20%, transparent) 0%, transparent 70%),
+    radial-gradient(54% 46% at 50% 64%, color-mix(in srgb, var(--halo-b) 14%, transparent) 0%, transparent 72%);
+  filter: blur(7px);
+  animation: halo-fadein 600ms ease-out both, halo-breathe 5.5s ease-in-out infinite 600ms;
+}
+@keyframes halo-fadein { from { opacity: 0; } to { opacity: 0.78; } }
+@keyframes halo-breathe {
+  0%, 100% { opacity: 0.78; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.035); }
+}
 
 /* -------------------------------------------------------------
    Subtractive crown — the card crowns because the room RECEDES, never
