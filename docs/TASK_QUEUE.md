@@ -10,6 +10,30 @@ Last updated: 2026-06-20.
 > is the head of **Ready** (below) — one at a time (this file's intro rule). For the
 > authoritative "what shipped" trail, cross-check `docs/DECISION_LOG.md` + `git log`.
 
+- **Share Canon Boundary Spec v1 (BR-S077)** (2026-06-20, docs only — new `docs/SHARE_CANON_BOUNDARY_V1.md` +
+  FILE_MAP + DECISION_LOG): the dedicated share/canon pass BR-S076 recommended — locks the safety boundary for
+  **shareable** cards BEFORE any customer share trigger / export / social / payment ships. **Docs-only** (no
+  runtime / share / export / payment). **Forged via a 3-lens adversarial workflow** (side-by-side mechanics ·
+  scarcity/rank labels · over-safety/strongest-safe-variant → reconcile; held BOTH guards — strong enough to stop
+  person-ranking, not so broad it sands off Blue Room's charge). **Core ruling:** the share harm is EMERGENT +
+  RELATIONAL — the display-time sibling of the `UNIVERSE_ZONE_MAP_V1` §7 aggregate wall (single-card bands are
+  safe per GN#12; the JOIN of two person-anchored cards is the harm). The wall goes around the RELATION + the
+  PERMANENT/VALUE, never around the single card's language. **LOCKED NOW:** share card reads photograph→artifact
+  never person→verdict; no leaderboard / sort-by-tier / versus / person-comparison; bands are photo-state not
+  achievement ("Peak" reframed, NOT removed); provenance/serial = identity not value (Edition couples to the
+  develop-state, never an ordinal); paid never upgrades the person; self-framing + a PEAK-band pre-ship visual
+  test; share/export is single-card. **Anti-bland law:** safety = move the grammatical subject to the photograph +
+  ONE deadpan clarifier — the single card keeps PEAK, the full ladder, serial/First-Print provenance, the develop
+  ceremony, and scene-force reads at full charge (a "Strongest safe variant" §H spells out the most exciting safe
+  direction). **OPEN (owner decision, when the real surface exists):** whether literal "Peak" / "FIRST PRINT" print
+  on a bare share card; whether bands are shown / hidden / clarified; whether multiple cards may share one frame.
+  **Flagged constraint (code deferred):** the dormant `UNCOMMON PULL` fixture (scan-contract.js ~414) may never
+  reach a share surface — rename-before-reuse + share-path lint is a future coding task. **Honesty:** the boundary
+  is ASSERTED not ENFORCED — the aggregate guard ships WITH the uploaded-photo engine. Registered in FILE_MAP +
+  DECISION_LOG (2026-06-20). **Docs only ⇒ no browser verify** (no runtime change). **One commit, local only
+  (builder pushes).** **Completed.** **Next up (builder decision):** resolve the OPEN owner decisions when a real
+  share/export surface is designed (run the PEAK-band pre-ship test), or proceed to the parked commercial-systems
+  planning.
 - **Desktop Flow / Copy / Safety Polish Audit (BR-S076)** (2026-06-20, app.js only): walked the visible desktop
   spine via `?dev=review-map` (Menu → Free Pull → Develop/Halo → Before/After → dev mocks/harness) and tightened
   seams before the commercial-systems phase — audit + small fixes only, no new systems. **Forged as a 6-agent audit
