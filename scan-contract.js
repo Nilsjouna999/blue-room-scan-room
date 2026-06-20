@@ -336,12 +336,17 @@
       confidence: { overall: 0.7, band: "high" },
       artifact: { title: "DEV FIXTURE ARTIFACT", archetypeClass: "The Threshold", rarity: "free", editionLabel: "Dev Print", generatedAt: "2026-06-13T00:00:00Z" },
       stats: {
+        /* legacy ?dev=uploaded-result harness: KEEPS the old presence/frame/
+           signal/charge + 0-100 to exercise the legacy render path (the renderer
+           hardcodes these four). The migrated-taxonomy fixture is
+           validFreeSimulationResult below (already presence/frame/signal/visualImpact).
+           Only the stale rarity-derivedFrom residue is cleaned here. */
         freeVisible: { presence: 61, frame: 70, signal: 55, charge: 48 },
         haloExtended: {
           loreDensity: { value: 64, label: "Dense" },
           fitCoherence: { value: 72, label: "Aligned" },
           stanceRead: { value: 58, label: "Low Triangle" },
-          visualImpact: { value: 60, label: "Steady", derived: true, derivedFrom: ["charge", "presence", "frame", "rarity"] },
+          visualImpact: { value: 60, label: "Steady", derived: true, derivedFrom: ["presence", "frame", "signal"] },
         },
       },
       evidenceBoard: [

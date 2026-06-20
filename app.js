@@ -68,6 +68,13 @@ function tierBand(v) {
   return "Muted";
 }
 
+/* Public stat bars carry ONLY the band, never raw 0-100: snap fill width to one
+   of five discrete band positions so two values in the same band look identical
+   and bar length cannot recover the underlying number (BR-S070). The Metrics tab
+   keeps its raw numeric diagnostic (mixRow) — that is the documented carve-out. */
+const BAND_PCT = { Muted: 14, Clean: 36, Strong: 56, Charged: 76, Peak: 96 };
+const bandPct = (v) => BAND_PCT[tierBand(v)] || 0;
+
 const state = { source: 0, treatment: "free", tab: "diagram", view: "menu", draftGate: false, dev: null, labMaterial: null, diagramView: "annotated" };
 
 /* Deep-link support: ?src=1|2&t=free|shiny|mint&tab=source|diagram|metrics
@@ -134,7 +141,7 @@ function miniStat(name, value) {
     <div class="ministat">
       <span class="ministat__name">${esc(name)}</span>
       <span class="ministat__val ministat__val--tier">${esc(tierBand(value))}</span>
-      <span class="ministat__track"><span class="ministat__fill" style="--v:${value}%"></span></span>
+      <span class="ministat__track"><span class="ministat__fill" style="--v:${bandPct(value)}%"></span></span>
     </div>`;
 }
 
@@ -569,7 +576,7 @@ function renderReadingPanel(src, treatment) {
       ${moduleHead("Frame Impact")}
       <div class="impact">
         <span class="impact__label">${esc(src.impact.label)}</span>
-        <span class="impact__track"><span class="impact__fill" style="--v:${src.impact.value}%"></span></span>
+        <span class="impact__track"><span class="impact__fill" style="--v:${bandPct(src.impact.value)}%"></span></span>
         <span class="impact__val impact__val--tier">${esc(tierBand(src.impact.value))}</span>
       </div>
     </div>
@@ -577,7 +584,7 @@ function renderReadingPanel(src, treatment) {
       ${moduleHead("Lore Density")}
       <div class="impact">
         <span class="impact__label">${esc(src.lore.label)}</span>
-        <span class="impact__track"><span class="impact__fill impact__fill--dash" style="--v:${src.lore.value}%"></span></span>
+        <span class="impact__track"><span class="impact__fill impact__fill--dash" style="--v:${bandPct(src.lore.value)}%"></span></span>
         <span class="impact__val impact__val--tier">${esc(tierBand(src.lore.value))}</span>
       </div>
     </div>
@@ -816,7 +823,7 @@ function renderDossier(src, treatment) {
       <div class="dstat">
         <div class="dstat__head">
           <span class="dstat__name">${esc(statLabel(k))}</span>
-          <span class="dstat__track"><span class="dstat__fill" style="--v:${freeVals[k]}%"></span></span>
+          <span class="dstat__track"><span class="dstat__fill" style="--v:${bandPct(freeVals[k])}%"></span></span>
           <span class="dstat__val dstat__val--tier">${esc(tierBand(freeVals[k]))}</span>
         </div>
         <p class="dstat__why">${esc(src.reads[k])}</p>
@@ -867,8 +874,8 @@ function renderDossier(src, treatment) {
           const vi = haloX?.visualImpact || src.impact;
           const lo = haloX?.loreDensity || src.lore;
           return `
-        <div class="impact"><span class="impact__label">Frame Impact · ${esc(vi.label)}</span><span class="impact__track"><span class="impact__fill" style="--v:${vi.value}%"></span></span><span class="impact__val impact__val--tier">${esc(tierBand(vi.value))}</span></div>
-        <div class="impact"><span class="impact__label">Lore · ${esc(lo.label)}</span><span class="impact__track"><span class="impact__fill impact__fill--dash" style="--v:${lo.value}%"></span></span><span class="impact__val impact__val--tier">${esc(tierBand(lo.value))}</span></div>`;
+        <div class="impact"><span class="impact__label">Frame Impact · ${esc(vi.label)}</span><span class="impact__track"><span class="impact__fill" style="--v:${bandPct(vi.value)}%"></span></span><span class="impact__val impact__val--tier">${esc(tierBand(vi.value))}</span></div>
+        <div class="impact"><span class="impact__label">Lore · ${esc(lo.label)}</span><span class="impact__track"><span class="impact__fill impact__fill--dash" style="--v:${bandPct(lo.value)}%"></span></span><span class="impact__val impact__val--tier">${esc(tierBand(lo.value))}</span></div>`;
         })()}
       </div>
     </div>`

@@ -203,7 +203,9 @@ const SOURCES = [
         trigger2: "Cabin frame",
         family: "Halo Mint · Gesture Class",
         note: "Minted from the exact moment between farewell and blessing.",
-        serial: "BR-SRC01-HM-0007",
+        /* mint serial shares the card's OWN object family (BR-001-DRV-0001) so
+           Card and Mint read as one object's lineage, not two unrelated serials */
+        serial: "BR-001-DRV-0001-HM",
       },
       oracle: {
         full: "This card belongs to the rare class of images where the subject appears to be both leaving the group chat and blessing the vehicle.",
@@ -370,7 +372,8 @@ const SOURCES = [
         trigger2: "Treeline horizon",
         family: "Halo Mint · Field Class",
         note: "Minted from two feet of ice and the patience to get through it.",
-        serial: "BR-SRC02-HM-0008",
+        /* mint serial shares the card's OWN object family (BR-002-ICE-0001) */
+        serial: "BR-002-ICE-0001-HM",
       },
       oracle: {
         full: "This card does not explain itself. It arrives as field evidence and lets the snow do most of the talking.",
@@ -521,8 +524,10 @@ function toScanResultV2(src) {
         receiptsShown: x.receipts.slice(0, 3),
         reading: src.card.note,
         oracle: src.dossier.oracle.short,
-        /* must match the legacy rendered string exactly (BR-SRC01, no dash) */
-        serial: `Reserved · BR-SRC${String(src.no).padStart(2, "0")}-HM-····`,
+        /* honest tease: show the card's OWN object address (the same family the
+           developed card front shows) with only the mint tail reserved — develop
+           reveals the same string's mint suffix (…-HM), not an unrelated serial */
+        serial: `Reserved · ${src.card.serial}-··`,
       },
       halo: {
         statsShown: ["presence", "frame", "signal", "visualImpact", "charge", "loreDensity", "fitCoherence"],

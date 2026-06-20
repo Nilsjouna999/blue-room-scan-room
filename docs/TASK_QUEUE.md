@@ -10,6 +10,27 @@ Last updated: 2026-06-15.
 > is the head of **Ready** (below) — one at a time (this file's intro rule). For the
 > authoritative "what shipped" trail, cross-check `docs/DECISION_LOG.md` + `git log`.
 
+- **C-prep: make the Free surface honest — serial family + band-quantized bars + dev-fixture align** (2026-06-18 /
+  BR-S070, data.js + app.js + scan-contract.js): the bounded pre-layout sweep from Scope Skeleton v3 (the slice of
+  "B" that must precede the funnel build). **(1) Honest serial:** the dual-serial lie is fixed — the mint serial now
+  shares the card's OWN object family (`BR-001-DRV-0001-HM` / `BR-002-ICE-0001-HM`, was the unrelated `BR-SRC01-HM-…`)
+  and the Free reserved tease masks the card's own address (`Reserved · BR-001-DRV-0001-··`), so the Plate-01 lineage
+  reads as ONE object (Object→Scan→Card `BR-001-DRV-0001`→Mint `…-HM`) and the develop reveal is the same string's
+  mint tail. NOT a full serial collapse (Card/Mint stay distinct rungs — that mechanism is still OPEN). **(2)
+  Band-quantized bars:** added `bandPct()` (5 discrete widths 14/36/56/76/96 keyed to tierBand) and applied it to all
+  public stat bars (card ministat, Frame Impact, Lore, Stat Dossier, Halo Plate-05) so bar LENGTH carries only the
+  band, never the raw 0-100; two values in one band render identical. The Metrics-tab `mixRow` numeric diagnostic
+  (documented carve-out) is deliberately left raw. **(3) Dev-fixture align:** dropped the stale `rarity` from the
+  legacy fixture's `visualImpact.derivedFrom`; LEFT its `freeVisible` on the old four (presence/frame/signal/charge)
+  because the `?dev=uploaded-result` legacy renderer hardcodes those — `validFreeSimulationResult` already carries
+  `visualImpact` and satisfies the migrated-taxonomy acceptance (verified live: migrating the legacy fixture broke its
+  Charge slot, so reverted). **Verified live @1600×900** (DOM; cache-bust used + reverted): Free reserved serial +
+  card front share the BR-001-DRV family; all bars ∈ {14/36/56/76/96}%, two Strong stats both 56%; scan-contract 3
+  valid OK / 4 invalid rejected; `?dev=uploaded-result` renders Charge 48; console clean; no styles.css change (halo
+  CSS untouched); no layout/payment/referral. **One commit.** **Not done (per scope):** full serial collapse;
+  rarity→editionLabel key rename; rarity-band system; PERSON_TRUTH/Gate-3 backend; DOSSIER_PACING superseded mark;
+  PHOTO_CUE_TAXONOMY.md left untracked (builder commits). **Completed.** **Next up:** the scan-room layout + Free/Paid
+  funnel + price BUILD pair (Skeleton v3 piece C) — Diagram stays as the evidence layer (DECISION_LOG 2026-06-18).
 - **Card System Fixture Upgrade v1 — migrate Free stats + safety copy** (2026-06-18 / BR-S069, data.js + app.js +
   scan-contract.js): executes the mint/stat mission's buildable chunk (reframed-piece A) — aligns the live fixtures to
   the LOCKED CARD_SYSTEM_V1 §2 taxonomy + folds a bounded safety micro-sweep. **Stat migration:** Free-front four are now
