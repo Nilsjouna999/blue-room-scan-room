@@ -976,7 +976,7 @@ function renderMenu() {
       <section class="msample" style="--halo-a:${esc(s.halo.a)}; --halo-b:${esc(s.halo.b)}; --halo-c:${esc(s.halo.c)};">
         <div class="msample__cap">
           <span class="msample__label">Sample Scan</span>
-          <span class="msample__type">Human Sample · Archive</span>
+          <span class="msample__type">Sample Photo · Archive</span>
         </div>
         <h2 class="msample__title">${esc(c.title)}</h2>
         <p class="msample__arch">◆ &nbsp;${esc(c.archetype)}</p>
@@ -1337,7 +1337,7 @@ function renderBeforeAfter() {
       <footer class="ba__foot">
         <span class="ba__id">${esc(c.title)} &nbsp;·&nbsp; ${esc(c.archetype)}</span>
         <span class="ba__serial">${esc(c.serial)}</span>
-        <span class="ba__honest">Capture surface · sample. The archetype is a photo role, not a person type.</span>
+        <span class="ba__honest">Capture surface · sample. The archetype is a photo role, not a person type. Tier bands read the photograph, not a person — never a ranking between cards.</span>
       </footer>
     </div>`;
 }
@@ -1644,7 +1644,7 @@ function renderFreePullMock(result) {
           <span class="fpcard__vaultmark" aria-hidden="true">◇</span>Sealed back
           <span class="fpcard__vaulttag">in conservation</span>
         </div>
-        <p class="fpcard__vreason">This card has a sealed back. The dossier layer is archived — additional production notes held in conservation.</p>
+        <p class="fpcard__vreason">The dossier layer is archived — additional production notes held in conservation.</p>
         <span class="fpcard__vsealed">Back face sealed · opens with Halo</span>
       </div>`;
 

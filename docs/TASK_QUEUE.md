@@ -2,7 +2,7 @@
 
 Ranked work queue, not a dream backlog. One Active item at a time.
 Out-of-scope findings from any session get logged here, not patched.
-Last updated: 2026-06-15.
+Last updated: 2026-06-20.
 
 ## Completed (shipped tasks, newest first)
 
@@ -10,6 +10,40 @@ Last updated: 2026-06-15.
 > is the head of **Ready** (below) — one at a time (this file's intro rule). For the
 > authoritative "what shipped" trail, cross-check `docs/DECISION_LOG.md` + `git log`.
 
+- **Desktop Flow / Copy / Safety Polish Audit (BR-S076)** (2026-06-20, app.js only): walked the visible desktop
+  spine via `?dev=review-map` (Menu → Free Pull → Develop/Halo → Before/After → dev mocks/harness) and tightened
+  seams before the commercial-systems phase — audit + small fixes only, no new systems. **Forged as a 6-agent audit
+  workflow** (2 flow/copy finders + 2 adversarial safety critics [share-surface · band-ladder] + 1 dev-surface/route
+  walker → adversarial synth that re-challenged every proposed fix): 28 raw findings → **3 confirmed small-safe
+  fixes**, the rest flagged as LOCKED-canon or latent. **Shipped (3 copy edits, app.js only):** (1) entrance sample
+  label **"Human Sample · Archive" → "Sample Photo · Archive"** (renderMenu ~979 — the one entrance string that
+  framed a *person* as the sampled object, rubbing the adjacent "never the person" trust line); (2) **before/after
+  share footer** now also disclaims the bands — appended "Tier bands read the photograph, not a person — never a
+  ranking between cards." (renderBeforeAfter `.ba__honest` ~1340) — the explicit non-canon LOCAL mitigation for the
+  BR-S074 share-comparison risk, scoped to one dev surface, does NOT touch the ladder/`tierBand`/"Peak"/card system;
+  (3) **free-sim vault dedup** — dropped the redundant "This card has a sealed back." lead from the vreason
+  (renderFreePullMock ~1647; the sealed-back idea is still carried by the vault head + halo edge). **No styles.css /
+  data.js / index.html change.** **Verified live @1600×900** (DOM; cache-bust via `fetch(cache:'reload')` — NO file
+  cache-bust to revert): full route list walked (menu · free · halo · before-after · review-map [3-col under fresh
+  CSS] · halo-gate · free-scan-sim · uploaded-result · uploaded-blocked); all 3 edits render; "Human Sample" gone;
+  band clarifier present + not clipped (8.5px); vreason de-duped; Free Pull intact (7 plates, complete CTA, price at
+  develop-intent, tier bands, no public 0-100); console error-free. **Band-ladder verdict: FLAG-TO-CANON-OWNER**
+  (concur) — not severe+local+non-canon (the Muted..Peak ordering is LOCKED [BR-S029] + feeds every card statzone;
+  the person-comparison risk is EMERGENT but LATENT — no customer share trigger/export exists; the only juxtaposition
+  surface is the gated dev route on sample sources). Shipped the local clarifier line instead of rewriting canon.
+  **Flagged for the canon owner (logged here, NOT patched — locked/latent):** (a) the Peak/band-ladder comparison
+  vector on juxtaposed share-cards; (b) the Develop-door landing on the Free front — **BY DESIGN per BR-S072** (both
+  doors enter the room so develop happens in-place at the in-room CTA); only a copy-over-promise *taste* call remains;
+  (c) "FIRST PRINT · DEVELOPED" strip + "Edition · First Print" + `…-0001` serials reading as an edition-ordinal
+  (edition/serial canon); (d) the face→arrow→graded-card visual grammar (needs the share-trigger decision); (e) the
+  dormant **"UNCOMMON PULL"** rarity band in the free-sim fixture (`scan-contract.js:414`, INERT — renderFreePullMock
+  never reads it — a latent landmine for a future re-wire); (f) the documented Metrics-tab + `?dev=uploaded-result`
+  raw-0-100 carve-outs (DECISION_LOG-locked, dev-only); (g) stale-cached `styles.css` on direct nav (report-only — a
+  permanent `?v=` wants a build step; dev-live.html / hard-refresh already cover the reviewer path). **Missing screens
+  (later — do NOT build now):** customer-facing share trigger/export · profile/record/vault · real upload+scan engine
+  · develop-intent payment + onboarding. **One commit, local only (builder pushes).** **Completed.** **Next up
+  (builder decision):** a dedicated share/canon pass to resolve the Peak/ladder + FIRST PRINT questions BEFORE any
+  real share/export ships — or proceed to the parked commercial-systems planning.
 - **Desktop review map UI polish (BR-S075b)** (2026-06-20, app.js + styles.css): BR-S075's `?dev=review-map` worked
   but rendered as an unstyled inline link list (partly the structure — no badges/route-strings/buttons — partly the
   recurring stale-cached styles.css on direct nav). Rebuilt as a proper DEV **dashboard**: header (title "BLUE ROOM —
