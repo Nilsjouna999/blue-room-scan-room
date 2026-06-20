@@ -173,7 +173,26 @@ body[data-devnav="1"] .toggle--treatment { display: inline-flex; }
   scrollbar-width: thin;
   scrollbar-color: var(--ink-700) transparent;
 }
-.panel--source { border-right: 1px solid var(--line-faint); }
+/* Left panel pins the Diagram|Metrics nav and scrolls only the evidence body,
+   so Diagram stays reachable on short viewports (BR-S071). Scoped to
+   .panel--source — the shared .panel rule still governs the right reading panel. */
+.panel--source {
+  border-right: 1px solid var(--line-faint);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.panel--source .panel__nav { flex: 0 0 auto; margin-bottom: 18px; }
+.panel--source .panel__scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  display: grid;
+  gap: 22px;
+  align-content: start;
+  scrollbar-width: thin;
+  scrollbar-color: var(--ink-700) transparent;
+}
 .panel--reading { border-left: 1px solid var(--line-faint); }
 .panel::-webkit-scrollbar { width: 8px; }
 .panel::-webkit-scrollbar-thumb { background: var(--ink-700); border-radius: 8px; }
@@ -1418,6 +1437,17 @@ body[data-treatment="shiny"] .panel--reading .readseam > .module { opacity: 1; }
   border: 1px dashed var(--line-faint);
   border-radius: var(--r-plate);
   padding: 8px 11px;
+}
+/* price MOMENT lives only here, at develop-intent (Free .readseam only); the
+   figure/model is intentionally absent — quiet honest framing, the only price
+   chrome (BR-S071). */
+.unlock__price {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.05em;
+  line-height: 1.5;
+  color: var(--faint);
+  margin-top: 1px;
 }
 .unlock__btn {
   display: grid;

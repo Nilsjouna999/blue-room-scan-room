@@ -171,7 +171,9 @@ function renderLeftPanel(src, treatment, tab) {
         .join("")}
     </div>`;
   const body = t2 === "metrics" ? renderMetricsTab(src, treatment) : renderDiagramTab(src, treatment);
-  return tabbar + body;
+  /* pin the Diagram|Metrics nav, scroll only the evidence body (CSS scoped to
+     .panel--source) so Diagram stays reachable on short viewports — BR-S071 */
+  return `<div class="panel__nav">${tabbar}</div><div class="panel__scroll">${body}</div>`;
 }
 
 /* ---------- tab 1: diagram (visual scan sheet — Source merged in BR-S044:
@@ -424,7 +426,7 @@ function renderMetricsTab(src, treatment) {
     ? lockedModule("Fit Coherence Matrix", "Matrix extracted, development pending. Develops with Halo Mint.")
     : `<div class="module">${moduleHead("Fit Coherence Matrix")}${fitBody}</div>`;
 
-  return `${diamond}${mix}${pressure}${fit}
+  return `<p class="metriccap metriccap--head">why the four stats landed — receipts, not a second score</p>${diamond}${mix}${pressure}${fit}
     <p class="metriccap metriccap--foot">◆ weighted read · interpretive formula, not a measurement</p>`;
 }
 
@@ -622,12 +624,13 @@ function renderReadingPanel(src, treatment) {
   const lockedDeep = `
     <div class="module unlock unlock--spine">
       ${moduleHead("Develop This Scan")}
-      <p class="unlock__line">The full reading is already written into this image. Minting develops it.</p>
+      <p class="unlock__line">This card is complete as it is. Develop opens its sealed back — the same scan, a deeper record, when you want it.</p>
       <button type="button" class="unlock__btn unlock__btn--shiny" data-goto="shiny">
         <span class="unlock__name">Develop this scan</span>
         <span class="unlock__desc">the card finishes developing in place</span>
       </button>
       <p class="unlock__more">◆ &nbsp;The sealed back of this card develops with the mint — added depth, not a hidden result.</p>
+      <p class="unlock__price">One-time develop · this scan only · dev mock — no real payment in this build</p>
     </div>
     ${lockedModule("Stance Read", "Evidence layer pending — develops with Halo Mint.")}
     ${lockedModule("Fit Coherence", "Coherence read recorded, undeveloped. Full record develops with mint.")}

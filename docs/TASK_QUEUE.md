@@ -10,6 +10,29 @@ Last updated: 2026-06-15.
 > is the head of **Ready** (below) — one at a time (this file's intro rule). For the
 > authoritative "what shipped" trail, cross-check `docs/DECISION_LOG.md` + `git log`.
 
+- **Scan-room layout + Free/Paid funnel + price — bounded refine (BR-S071)** (2026-06-20, app.js + styles.css):
+  the layout build, scoped as a REFINE of the existing 3-panel structure (it already ships), not a rebuild. Forged via
+  a short critique/spec workflow (layout architect + material/reduced-motion scout → anti-yippi + scope/price critics
+  → bounded spec; verdict: no serious conflict). **Shipped:** (1) **Pinned the Diagram|Metrics nav** — wrapped the
+  left panel as `.panel__nav` (pinned) + `.panel__scroll` (the evidence body scrolls), scoped to `.panel--source`
+  only (flex column; the shared `.panel` rule still governs the right panel), so Diagram stays reachable on short
+  viewports. (2) **Free reads as a complete choice** — retuned the develop CTA line from "the full reading is already
+  written… Minting develops it" (implied lack) to "This card is complete as it is. Develop opens its sealed back — the
+  same scan, a deeper record, when you want it." (3) **Price at develop-intent** — added a quiet `.unlock__price`
+  sub-line inside the Free `.unlock` CTA only ("One-time develop · this scan only · dev mock — no real payment in this
+  build"), **no figure** (canon forbids a number now); gated solely by the existing `.readseam[data-open=0]`, so it is
+  absent on the card front, the developed state, and any pre-intent gate. (4) **Metrics stays receipts, not a
+  dashboard** — added one head caption "why the four stats landed — receipts, not a second score" (the numeric weights
+  + "interpretive formula, not a measurement" carve-out already framed it). **Diagram permanent** (DECISION_LOG
+  2026-06-20) honored; **halo CSS untouched**; subtractive crown holds; no new animated layer; no sparkle/rainbow/
+  shimmer. **Verified live @1600×900** (DOM; cache-bust used + reverted): nav pinned + body scrollable; Diagram default;
+  complete-choice copy; price line present Free / gone on develop / not on card front / no digit; Metrics caption +
+  receipts intact; develop ceremony re-skins in place; scan-contract 3 valid / 4 invalid; console clean. **One
+  commit.** **Deferred + flagged:** the per-source structural shadow (its own card-material micro-task — box-shadow
+  fence/redeclare/tween risks make it bloat this layout task; both stress lenses said defer); the **price FIGURE +
+  per-card-vs-subscription MODEL** stays an OPEN builder decision (drops into the `.unlock__price` slot trivially).
+  **Completed.** **Next up (builder decision):** pick the price figure/model; then the per-source shadow prototype, or
+  the menu redesign.
 - **C-prep: make the Free surface honest — serial family + band-quantized bars + dev-fixture align** (2026-06-18 /
   BR-S070, data.js + app.js + scan-contract.js): the bounded pre-layout sweep from Scope Skeleton v3 (the slice of
   "B" that must precede the funnel build). **(1) Honest serial:** the dual-serial lie is fixed — the mint serial now
@@ -894,6 +917,21 @@ Last updated: 2026-06-15.
    both states, legacy-safe via optional-chaining guards. Superset of this item.)*
 
 ## Backlog / needs decision
+
+- **Per-source structural shadow (card-material micro-task, deferred from BR-S071)** (2026-06-20): a tiny STATIC,
+  card-only, scan-cued shadow whose weight falls OPPOSITE the key light, derived from `data.js diagram.light.x`
+  (SRC-01 x:88 → shadow LEFT · SRC-02 x:10 → shadow RIGHT) — the one real per-source MATERIAL-STRUCTURE gap from the
+  technique sweep (SRC-01/02 currently share too much retinted gradient). Deferred because `box-shadow` paints OUTSIDE
+  the border box (shares the shiny halo's inset:-40px zone → fence-breach risk on the key-opposite side), is REDECLARED
+  per treatment (base/free/shiny styles.css:458/813/1031 → must be threaded into all three or it dies/tweens on
+  develop), and `light.x` is a 0-100% frame coord needing a px scaling constant prototyped at 1600×900. Own micro-task:
+  re-declare the directional offset inside the free AND shiny box-shadow chains, cap offset ≤3px soft spread, mandatory
+  1600×900 check it doesn't fight the halo glow. Static only · no animation · reduced-motion-trivial · inseparability:
+  must visibly differentiate the two sources without squinting. Do NOT bundle into a layout task.
+- **Price figure + model (OPEN builder decision)** (2026-06-20): BR-S071 shipped the price MOMENT + framing at
+  develop-intent with NO figure (canon forbids a number now; `$7` exists only as a backlog narrator note, never in
+  DECISION_LOG). Decide the dev-mock FIGURE + the per-card-vs-subscription MODEL (access vs minting are two layers);
+  it drops into the `.unlock__price` slot trivially. Relates to the worth-of-the-minted-artifact economy research.
 
 > **Builder roadmap (re-scoped 2026-06-17).** The live CARD work is settled: Free finish LOCKED (Letterpress,
 > BR-S060) and the Halo crown is approved AS-IS (dark/sleek/minimal — no rework now). Next, as a PAIR: **(1) the
