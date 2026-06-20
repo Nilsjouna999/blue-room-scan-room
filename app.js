@@ -98,7 +98,7 @@ const state = { source: 0, treatment: "free", tab: "diagram", view: "menu", draf
      uploaded-blocked renders a validated DEV fixture, never a user scan.
      free-scan-sim = Free Pull mock · halo-gate = sealed card-back mock. */
   const dev = q.get("dev");
-  if (["uploaded-result", "uploaded-blocked", "free-scan-sim", "halo-gate"].includes(dev)) { state.view = "dev"; state.dev = dev; }
+  if (["uploaded-result", "uploaded-blocked", "free-scan-sim", "halo-gate", "before-after"].includes(dev)) { state.view = "dev"; state.dev = dev; }
   else if (q.has("src") || q.has("t") || q.has("tab")) state.view = "room";
 }
 
@@ -1259,9 +1259,52 @@ function renderBlockedScan(b, actionsHtml) {
    fixture renders the safe blocked state, so an invalid result can never
    display as a valid card. Every surface is labelled DEV HARNESS / NOT USER SCAN. */
 
+/* ---------- BR-S074: before/after share view (dev/capture surface) ----------
+   A screenshot-clean composition — the source PHOTOGRAPH develops into the CARD,
+   the transformation visible in one frame. Native DOM/CSS, no export library, no
+   generated download, no new product zone: a capture surface reached via
+   ?dev=before-after (sample sources only; ?src toggles). Artifact language only —
+   no score / rank / value / public 0-100 / person reading. The card reuses the
+   master renderCard (bands only). */
+function renderBeforeAfter() {
+  const src = SOURCES[state.source];
+  const c = src.card;
+  return `
+    <div class="ba">
+      <header class="ba__head">
+        <span class="ba__mark">◆ BLUE ROOM</span>
+        <p class="ba__thesis">Every photo is already a card. Blue Room develops it.</p>
+        <p class="ba__line">The room reads the photograph — frame, light, gesture — never the person.</p>
+      </header>
+      <div class="ba__stage">
+        <figure class="ba__before" data-imgwrap style="--pos:${esc(src.photoTuning.pos)};">
+          ${imgOrPlaceholder(src.file, "ba__img")}
+          <figcaption class="ba__tag">The photograph</figcaption>
+        </figure>
+        <div class="ba__seam" aria-hidden="true">
+          <span class="ba__arrow">→</span>
+          <span class="ba__verb">developed</span>
+        </div>
+        <div class="ba__after">
+          ${renderCard(src, "shiny")}
+          <span class="ba__tag ba__tag--after">The same frame, filed as a card</span>
+        </div>
+      </div>
+      <footer class="ba__foot">
+        <span class="ba__id">${esc(c.title)} &nbsp;·&nbsp; ${esc(c.archetype)}</span>
+        <span class="ba__serial">${esc(c.serial)}</span>
+        <span class="ba__honest">Capture surface · sample. The archetype is a photo role, not a person type.</span>
+      </footer>
+    </div>`;
+}
+
 function mountDev() {
   const C = window.BlueRoomScanContract;
   const F = (C && C.DEV_FIXTURES) || {};
+  if (state.dev === "before-after") {
+    document.getElementById("devView").innerHTML = renderBeforeAfter();
+    return;
+  }
   if (state.dev === "halo-gate") {
     document.getElementById("devView").innerHTML = renderHaloGateMock();
     return;

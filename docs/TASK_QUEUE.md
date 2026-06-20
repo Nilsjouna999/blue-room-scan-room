@@ -10,6 +10,27 @@ Last updated: 2026-06-15.
 > is the head of **Ready** (below) — one at a time (this file's intro rule). For the
 > authoritative "what shipped" trail, cross-check `docs/DECISION_LOG.md` + `git log`.
 
+- **Before/After Share View MVP (BR-S074)** (2026-06-20, app.js + styles.css + docs/research/DOSSIER_PACING):
+  the first growth-facing surface — a screenshot-clean **capture view** composing the source PHOTOGRAPH → the
+  DEVELOPED CARD in one frame. Built as the smallest safe form: a **dev/capture route `?dev=before-after`** (reuses
+  the existing `?dev` mock pattern + mountDev; NO new customer zone/route/view, no library, no backend, no generated
+  download, no canvas). `renderBeforeAfter()` reuses the master `renderCard(src,"shiny")` (bands only, no 0-100) +
+  the raw source photo; sample sources only (`?src` toggles). **Adversarial safety pass (Opus) caught a real
+  visual-syntax risk:** every word was photo-honest but the raw face→arrow→graded-card layout read as person-scoring
+  once a screenshot leaves the app. **Fixed at the framing level** so it reads as ONE photograph in two states
+  (negative→print), not person→verdict: promoted "The room reads the photograph … never the person" into the
+  header eye-path; seam verb "develops"→"developed"; after-tag "Developed card"→"The same frame, filed as a card";
+  before-tag "The photograph"; footer names "the archetype is a photo role, not a person type." **Micro-sweep
+  bundled:** marked `docs/research/DOSSIER_PACING_MINTED_NUMBERS.md` numeric register **SUPERSEDED** (its BAN /
+  0-100-gauge "minted number" typography contradicts bands-only; the number-agnostic rhythm/colophon/serial
+  guidance stays). **Verified live @1600×900** (DOM): photo + developed card both render, balanced (430/arrow/430);
+  card stats are tier bands (Charged/Strong/Peak/Strong), **no public 0-100/score**; serial one-family
+  BR-001-DRV-0001; menu (2 doors) + room + develop + Diagram|Metrics all intact; scan-contract 3 valid/4 invalid;
+  console clean; halo CSS untouched; no sparkle/rainbow/shimmer. **One commit, NOT pushed (builder review).**
+  **Out of scope (held):** image-export download (lib/backend), social/referral, Record page, payment, price figure,
+  engine, customer-facing trigger into the view (trivial later add). **Flagged for the canon owner (not changed —
+  locked):** the band word "Peak" + the 5-band ladder become a person-comparison vector the moment two share-cards
+  meet (Opus #2/#4) — consider for a future share/canon pass. **Completed — awaiting builder review.**
 - **Menu Redesign v3 + Two-Door Fork (BR-S072)** (2026-06-20, app.js + styles.css): evolved the one-door menu
   (BR-S041) into a two-door fork that matches the refined room — **Free-primary / Develop-subordinate**, NOT a compare
   ladder. Kept the hero sample card (proof), thesis/trust copy, "Add your photo" + resume + dev routes, and all of

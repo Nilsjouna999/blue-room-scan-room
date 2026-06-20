@@ -1,5 +1,14 @@
 # Blue Room: A Pacing Spec & "Minted Number" Typography System for the Archive Dossier
 
+> **⚠ SUPERSEDED (numeric register) — 2026-06-20 (BR-S074).** The "Minted Number" half of this doc —
+> BAN / "Big-Ass Number" hero stats, 0/25/50/75/100 calibration-tick gauges, and big-value-over-tiny-label
+> numeric stat readings (TL;DR bullets 2–3; findings #3, #6, #7, #10) — is **SUPERSEDED** by LOCKED canon:
+> **no public 0–100; tier bands only** (PROJECT_OS §9 · HALO_GATE_BOUNDARY · reaffirmed by BR-S070's
+> band-discrete bars and BR-S071's no-figure price). Do **not** build minted-number hero stats or 0–100
+> gauges from this doc. STILL VALID (number-agnostic): the 8-pt rhythm + loud/quiet pacing, content-width
+> measures, the narrative arc + climax placement, the colophon end-record, and serial typography
+> (monospace · wide tracking · leading zeros). Use only those.
+
 ## TL;DR
 - **Fix the rhythm by breaking uniformity in three dimensions at once: width (narrow prose ~62ch / medium tables ~820px / wide breakouts), vertical gap (a loud/quiet sequence built on multiples of 8 — 96px standard, up to 256px before climaxes), and loudness (treat the 7 plates as a narrative arc, not a list).** Put the Hidden Stat climax at ~75–80% of the scroll (plate 04 of 7 is correct) and let the Oracle be a short, isolated denouement.
 - **Make numbers feel "minted," not typed, with three moves: (1) tabular lining figures via `font-variant-numeric: tabular-nums lining-nums`, (2) an engraved text-shadow recipe tuned for dark backgrounds (dark shadow above, faint light below), and (3) extreme value-vs-label contrast** — the value 4–8× the label size, bold, in a high-contrast warm-white; the label tiny, uppercase, letter-spaced, and muted. Inter and IBM Plex Mono both ship true tabular figures and slashed zeros; Cormorant Garamond's figures are oldstyle/proportional by default and should not be used for aligned data.
