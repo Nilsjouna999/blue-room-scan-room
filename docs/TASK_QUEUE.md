@@ -10,6 +10,21 @@ Last updated: 2026-06-15.
 > is the head of **Ready** (below) — one at a time (this file's intro rule). For the
 > authoritative "what shipped" trail, cross-check `docs/DECISION_LOG.md` + `git log`.
 
+- **Desktop review map (BR-S075)** (2026-06-20, app.js + styles.css): a DEV-ONLY `?dev=review-map` — a categorized,
+  clickable index of the current desktop spine so the surfaces are reviewable without guessing routes. Reuses the
+  `?dev` pattern + mountDev (gated → customers never reach it; not product UI). Four labeled groups linking the REAL
+  routes (invents nothing): **Real product surface** (Menu `index.html`, Free Pull `?src=1|2&t=free`, Developed/Halo
+  `?src=1|2&t=shiny`), **Share/capture** (`?dev=before-after[&src=2]`), **Dev mock** (`?dev=halo-gate`,
+  `?dev=free-scan-sim`), **Validation harness** (`?dev=uploaded-result`, `?dev=uploaded-blocked`); footer notes the
+  `?devnav=1` state-jumper rail + the internal `?t=mint` Lab. **Verified live @1600×900** (DOM): map renders, 4 groups
+  / 11 real links, zero banned words in the map text; halo-gate (pre-existing harness) still dispatches after the
+  mountDev edits; Free room audit — Diagram nav pinned + tabs intact, price line Free-only/no-figure, hidden tease
+  qualitative ("Sealed reading", no count), tier bands only (no public 0-100); scan-contract 3 valid/4 invalid;
+  console clean. **Product-law audit (walking the spine): PASS** — no numeric score, no person-judgement, no
+  paid-pressure (price only at develop-intent), no exact sealed-count; the before/after share surface was reframed +
+  Opus-audited in BR-S074 and the map only links to it. **One commit, local only (Part 2 had no push instruction).**
+  Out of scope held: payment/email/mobile/backend/export/social/Record/engine — none touched; no new product promise.
+  **Completed.**
 - **Before/After Share View MVP (BR-S074)** (2026-06-20, app.js + styles.css + docs/research/DOSSIER_PACING):
   the first growth-facing surface — a screenshot-clean **capture view** composing the source PHOTOGRAPH → the
   DEVELOPED CARD in one frame. Built as the smallest safe form: a **dev/capture route `?dev=before-after`** (reuses

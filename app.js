@@ -98,7 +98,7 @@ const state = { source: 0, treatment: "free", tab: "diagram", view: "menu", draf
      uploaded-blocked renders a validated DEV fixture, never a user scan.
      free-scan-sim = Free Pull mock · halo-gate = sealed card-back mock. */
   const dev = q.get("dev");
-  if (["uploaded-result", "uploaded-blocked", "free-scan-sim", "halo-gate", "before-after"].includes(dev)) { state.view = "dev"; state.dev = dev; }
+  if (["uploaded-result", "uploaded-blocked", "free-scan-sim", "halo-gate", "before-after", "review-map"].includes(dev)) { state.view = "dev"; state.dev = dev; }
   else if (q.has("src") || q.has("t") || q.has("tab")) state.view = "room";
 }
 
@@ -1259,6 +1259,45 @@ function renderBlockedScan(b, actionsHtml) {
    fixture renders the safe blocked state, so an invalid result can never
    display as a valid card. Every surface is labelled DEV HARNESS / NOT USER SCAN. */
 
+/* ---------- BR-S075: dev review map (?dev=review-map) ----------
+   A DEV-ONLY, categorized index of the current desktop surfaces so they can be
+   reviewed without guessing routes. Gated by ?dev (customers never reach it).
+   Plain <a> links to the REAL existing routes — invents nothing. Not product UI. */
+function renderReviewMap() {
+  const link = (href, label, sub) =>
+    `<a class="rmap__link" href="${href}"><span class="rmap__route">${esc(label)}</span><span class="rmap__sub">${esc(sub)}</span></a>`;
+  const group = (kind, cls, items) =>
+    `<section class="rmap__group rmap__group--${cls}"><h2 class="rmap__kind">${esc(kind)}</h2><div class="rmap__links">${items.join("")}</div></section>`;
+  return `
+    <div class="rmap">
+      <header class="rmap__head">
+        <span class="rmap__tag">◆ DEV REVIEW · not a product surface</span>
+        <h1 class="rmap__title">BLUE ROOM — desktop spine</h1>
+        <p class="rmap__note">A dev-only index of the current surfaces (needs <b>?dev</b> — customers never see it). Each link opens a real route.</p>
+      </header>
+      ${group("Real product surface", "real", [
+        link("index.html", "Menu — two-door fork", "the entrance · Free Pull + Develop doors"),
+        link("?src=1&t=free", "Free Pull · Driver (SRC-01)", "complete card front + reading + 7-plate dossier"),
+        link("?src=2&t=free", "Free Pull · Ice Field (SRC-02)", "complete card front · second source"),
+        link("?src=1&t=shiny", "Developed / Halo · Driver", "sealed back opened in-place · price only at develop-intent"),
+        link("?src=2&t=shiny", "Developed / Halo · Ice Field", "developed · second source"),
+      ])}
+      ${group("Share / capture view", "share", [
+        link("?dev=before-after", "Before / After · Driver", "the photograph → the same frame, filed as a card"),
+        link("?dev=before-after&src=2", "Before / After · Ice Field", "second source"),
+      ])}
+      ${group("Dev mock", "mock", [
+        link("?dev=halo-gate", "Halo Gate mock", "sealed card-back gate · not payment, not analysis"),
+        link("?dev=free-scan-sim", "Free scan sim", "Free Pull mock fixture"),
+      ])}
+      ${group("Validation harness", "harness", [
+        link("?dev=uploaded-result", "Uploaded result · valid", "scan-contract valid fixture render"),
+        link("?dev=uploaded-blocked", "Uploaded blocked · invalid", "scan-contract rejection / safe blocked state"),
+      ])}
+      <footer class="rmap__foot">State-jumper rail: append <b>?devnav=1</b> to any route (incl. the internal <b>?t=mint</b> Lab). · The card is the artifact — the room reads the photograph, never the person.</footer>
+    </div>`;
+}
+
 /* ---------- BR-S074: before/after share view (dev/capture surface) ----------
    A screenshot-clean composition — the source PHOTOGRAPH develops into the CARD,
    the transformation visible in one frame. Native DOM/CSS, no export library, no
@@ -1301,6 +1340,10 @@ function renderBeforeAfter() {
 function mountDev() {
   const C = window.BlueRoomScanContract;
   const F = (C && C.DEV_FIXTURES) || {};
+  if (state.dev === "review-map") {
+    document.getElementById("devView").innerHTML = renderReviewMap();
+    return;
+  }
   if (state.dev === "before-after") {
     document.getElementById("devView").innerHTML = renderBeforeAfter();
     return;

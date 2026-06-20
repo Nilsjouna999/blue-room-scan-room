@@ -2321,6 +2321,29 @@ body[data-view="room"] .dev { display: none; }
 .ba__id { font-family: var(--font-display); font-size: 16px; font-weight: 600; color: var(--t-display); }
 .ba__serial { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.16em; color: var(--silver-dim); }
 .ba__honest { font-family: var(--font-mono); font-size: 8.5px; letter-spacing: 0.1em; color: var(--faint); }
+
+/* ============================================================
+   BR-S075 — dev review map (?dev=review-map). DEV-ONLY index, never
+   product UI. Plain links to existing routes; quiet left-edge accent
+   distinguishes the four surface kinds.
+============================================================ */
+.rmap { max-width: 880px; margin: 0 auto; padding: 40px 28px 56px; display: grid; gap: 22px; }
+.rmap__head { display: grid; gap: 7px; }
+.rmap__tag { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--moss-bright); }
+.rmap__title { font-family: var(--font-display); font-size: 22px; font-weight: 600; color: var(--t-display); }
+.rmap__note { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.04em; line-height: 1.6; color: var(--t-meta); }
+.rmap__group { display: grid; gap: 9px; }
+.rmap__kind { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.24em; text-transform: uppercase; color: var(--faint); border-bottom: 1px solid var(--line-faint); padding-bottom: 5px; }
+.rmap__links { display: grid; gap: 7px; }
+.rmap__link { display: grid; gap: 2px; padding: 10px 13px; border: 1px solid var(--line); border-left: 2px solid var(--line); border-radius: 7px; background: rgba(255, 255, 255, 0.015); text-decoration: none; transition: border-color 140ms ease, background 140ms ease; }
+.rmap__link:hover { border-color: var(--line-strong); background: rgba(255, 255, 255, 0.04); }
+.rmap__route { font-family: var(--font-ui); font-size: 13px; font-weight: 600; color: var(--silver); }
+.rmap__sub { font-family: var(--font-mono); font-size: 9.5px; letter-spacing: 0.03em; color: var(--t-meta); }
+.rmap__foot { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.05em; line-height: 1.6; color: var(--faint); border-top: 1px solid var(--line-faint); padding-top: 12px; }
+.rmap__group--real .rmap__link { border-left-color: var(--silver-dim); }
+.rmap__group--share .rmap__link { border-left-color: var(--moss-bright); }
+.rmap__group--mock .rmap__link,
+.rmap__group--harness .rmap__link { border-left-color: var(--line-strong); }
 @media (max-width: 900px) {
   .ba__stage { grid-template-columns: 1fr; gap: 14px; }
   .ba__seam { transform: rotate(90deg); }
