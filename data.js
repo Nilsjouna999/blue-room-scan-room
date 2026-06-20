@@ -190,12 +190,13 @@ const SOURCES = [
         frame: { evidence: "Wide-angle barrel and dashboard intrusion tax the composition; the window band claws back the right third." },
         signal: { evidence: "A raised palm is the most legible gesture in the archive — this one is textbook.", note: "Sits near the top of the archive band for cabin shots." },
         charge: { evidence: "Engine-off energy: warm, contained, ten seconds from motion." },
+        visualImpact: { evidence: "One bright gesture against a busy cabin — the eye resolves the image in a single read." },
       },
       hidden: {
         name: "Gesture Geometry",
         value: 88,
         read: "The raised palm turns the image from selfie into encounter — the frame addresses the lens directly, not the other way around.",
-        tease: "A second reading was detected in the gesture layer. It develops with the mint.",
+        tease: "A sealed reading is held on the back of this card. It develops with the mint.",
       },
       mint: {
         trigger1: "Raised palm",
@@ -207,7 +208,7 @@ const SOURCES = [
       oracle: {
         full: "This card belongs to the rare class of images where the subject appears to be both leaving the group chat and blessing the vehicle.",
         short: "The palm says stop. The card kept going.",
-        timeline: "In another timeline: noir still · winter field report · dashboard prophet",
+        timeline: "Adjacent in the archive — noir still · winter field report · dashboard prophet",
       },
     },
     card: {
@@ -215,7 +216,10 @@ const SOURCES = [
       archetype: "Open-Window Operator",
       note: "The hand says stop, the face says welcome. The card never resolves it — and doesn't need to.",
       signature: "Filed from the driver's seat, engine off.",
-      stats: { presence: 67, frame: 52, signal: 84, charge: 70 },
+      /* Free-front four = presence(Frame Presence)/frame/signal/visualImpact
+         (CARD_SYSTEM_V1 §2). charge(Scene Charge) is Halo-depth now — kept here
+         only as the source for the Metrics diagnostic tab, never a Free-front stat. */
+      stats: { presence: 67, frame: 52, signal: 84, visualImpact: 64, charge: 70 },
       /* archive/card serial — the dossier mint serial (BR-SRC01-HM-…) is
          the separate Halo Mint development serial */
       serial: "BR-001-DRV-0001",
@@ -232,6 +236,8 @@ const SOURCES = [
         "Direct eye line plus a five-finger palm — the most legible gesture in the archive. Nothing here needs decoding.",
       charge:
         "Idle-engine energy. Warm, contained, ready to pull back onto the road the moment the shutter closes.",
+      visualImpact:
+        "Lands in one glance — the raised palm and the red layer carry the frame before the cabin clutter registers.",
     },
     aura: ["Idle-Engine", "Open-Palm", "Northbound"],
     sceneRole: "The pause the trip gets measured by.",
@@ -351,12 +357,13 @@ const SOURCES = [
         frame: { evidence: "Treeline band, entry tracks, centered mass — near-editorial discipline for a working photo." },
         signal: { evidence: "Hood, beanie and sunglasses qualify the expression; the auger receives the eye contact instead." },
         charge: { evidence: "The auger grip and crouched brace contain the motion — rotation is the only active vector in the frame." },
+        visualImpact: { evidence: "Maximum contrast, minimal noise — the frame delivers its whole argument at a glance." },
       },
       hidden: {
         name: "Field Silence",
         value: 91,
         read: "The frame reads like field evidence: crouched brace, task-directed gaze, no gesture aimed at the lens. The image organizes around the work, not the recording.",
-        tease: "A silence reading was detected in the field layer. It develops with the mint.",
+        tease: "A sealed reading is held on the back of this card. It develops with the mint.",
       },
       mint: {
         trigger1: "Auger silhouette",
@@ -368,7 +375,7 @@ const SOURCES = [
       oracle: {
         full: "This card does not explain itself. It arrives as field evidence and lets the snow do most of the talking.",
         short: "The snow kept the minutes. The card signed them.",
-        timeline: "In another timeline: cold expedition card · winter field report · quiet operator still",
+        timeline: "Adjacent in the archive — cold expedition card · winter field report · quiet operator still",
       },
     },
     card: {
@@ -376,7 +383,9 @@ const SOURCES = [
       archetype: "Frost Surveyor",
       note: "Crouched over a hole that isn't there yet. The commitment is in the kneel, not the catch.",
       signature: "Signed in snow, countersigned by the sun.",
-      stats: { presence: 71, frame: 83, signal: 56, charge: 62 },
+      /* Free-front four = presence/frame/signal/visualImpact (CARD_SYSTEM_V1 §2);
+         charge(Scene Charge) is Halo-depth, kept only for the Metrics diagnostic tab. */
+      stats: { presence: 71, frame: 83, signal: 56, visualImpact: 58, charge: 62 },
       /* archive/card serial — distinct from the Halo Mint development
          serial in dossier.mint */
       serial: "BR-002-ICE-0001",
@@ -393,6 +402,8 @@ const SOURCES = [
         "Hood, beanie and sunglasses qualify the expression — the face is present, but eye contact redirects to the task.",
       charge:
         "The auger is the only moving part in the frame. The crouched brace converts all of the image's energy into a single downward vector.",
+      visualImpact:
+        "Reads instantly — a black silhouette on a white field needs no second look to land.",
     },
     aura: ["Auger-Braced", "Sun-Struck", "Low-Horizon"],
     sceneRole: "Proof the lake was work, not wallpaper.",
@@ -476,7 +487,7 @@ function toScanResultV2(src) {
     scanStatus: x.scanStatus, // accepted | limited | rejected
     confidence: x.confidence, // { overall: 0..1, band: high|medium|low }
     stats: {
-      freeVisible: { ...src.card.stats }, // Presence / Frame / Signal / Charge — exactly 4
+      freeVisible: { ...src.card.stats }, // Free four = Frame Presence / Frame / Signal / Visual Impact (charge is Halo-depth)
       haloExtended: {
         loreDensity: { value: src.lore.value, label: src.lore.label },
         fitCoherence: { value: fitAvg, label: fitAvg >= 80 ? "Locked" : "Aligned" },
@@ -485,7 +496,7 @@ function toScanResultV2(src) {
           value: src.impact.value,
           label: src.impact.label,
           derived: true,
-          derivedFrom: ["charge", "presence", "frame", "rarity"], // never independently scored
+          derivedFrom: ["presence", "frame", "signal"], // composition/signal feel; never rarity, never independently scored
         },
       },
     },
@@ -506,7 +517,7 @@ function toScanResultV2(src) {
     },
     tierOutputs: {
       free: {
-        statsShown: ["presence", "frame", "signal", "charge"],
+        statsShown: ["presence", "frame", "signal", "visualImpact"],
         receiptsShown: x.receipts.slice(0, 3),
         reading: src.card.note,
         oracle: src.dossier.oracle.short,
@@ -514,7 +525,7 @@ function toScanResultV2(src) {
         serial: `Reserved · BR-SRC${String(src.no).padStart(2, "0")}-HM-····`,
       },
       halo: {
-        statsShown: ["presence", "frame", "signal", "charge", "loreDensity", "fitCoherence", "visualImpact"],
+        statsShown: ["presence", "frame", "signal", "visualImpact", "charge", "loreDensity", "fitCoherence"],
         receiptsShown: x.receipts,
         reading: src.stance,
         oracle: src.dossier.oracle.full,

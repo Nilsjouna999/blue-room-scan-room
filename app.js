@@ -50,6 +50,7 @@ const STAT_LABELS = {
   presence: "Frame Presence",
   frame: "Frame",
   signal: "Signal",
+  visualImpact: "Visual Impact",
   charge: "Scene Charge",
 };
 const statLabel = (key) => STAT_LABELS[key] || key;
@@ -478,7 +479,7 @@ function renderCard(src, treatment) {
             /* v2 freeVisible is the source of truth for the 4 public
                stats (SCAN_ENGINE_SPEC); legacy card.stats as fallback */
             const s = getScanResult(src)?.stats.freeVisible || c.stats;
-            return ["presence", "frame", "signal", "charge"]
+            return ["presence", "frame", "signal", "visualImpact"]
               .map((k) => miniStat(statLabel(k), s[k]))
               .join("");
           })()}
@@ -528,7 +529,7 @@ function renderReadingPanel(src, treatment) {
       <div class="reads">
         ${(() => {
           const scan = getScanResult(src);
-          const shown = scan?.tierOutputs.free.statsShown || ["presence", "frame", "signal", "charge"];
+          const shown = scan?.tierOutputs.free.statsShown || ["presence", "frame", "signal", "visualImpact"];
           const vals = scan?.stats.freeVisible || c.stats;
           return shown
             .map(
@@ -808,7 +809,7 @@ function renderDossier(src, treatment) {
   const board = dplate("02", "Evidence Board", paid, boardBody);
 
   /* 03 — Stat Dossier (values + visibility from v2 when present) */
-  const statRows = (scan?.tierOutputs.free.statsShown || ["presence", "frame", "signal", "charge"])
+  const statRows = (scan?.tierOutputs.free.statsShown || ["presence", "frame", "signal", "visualImpact"])
     .map((k) => {
       const n = d.statNotes[k];
       return `
@@ -843,7 +844,7 @@ function renderDossier(src, treatment) {
     <div class="dhidden dhidden--tease">
       <div class="dhidden__score">
         <span class="dhidden__val">··</span>
-        <span class="dhidden__name">${esc(d.hidden.name)}</span>
+        <span class="dhidden__name">Sealed reading</span>
         <span class="dhidden__seal">Sealed · development pending</span>
       </div>
       <p class="dhidden__read">${esc(d.hidden.tease)}</p>

@@ -340,7 +340,7 @@
         haloExtended: {
           loreDensity: { value: 64, label: "Dense" },
           fitCoherence: { value: 72, label: "Aligned" },
-          stanceRead: { value: 58, label: "Braced" },
+          stanceRead: { value: 58, label: "Low Triangle" },
           visualImpact: { value: 60, label: "Steady", derived: true, derivedFrom: ["charge", "presence", "frame", "rarity"] },
         },
       },
