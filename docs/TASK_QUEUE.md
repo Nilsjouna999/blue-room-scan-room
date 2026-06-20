@@ -10,6 +10,23 @@ Last updated: 2026-06-15.
 > is the head of **Ready** (below) — one at a time (this file's intro rule). For the
 > authoritative "what shipped" trail, cross-check `docs/DECISION_LOG.md` + `git log`.
 
+- **Menu Redesign v3 + Two-Door Fork (BR-S072)** (2026-06-20, app.js + styles.css): evolved the one-door menu
+  (BR-S041) into a two-door fork that matches the refined room — **Free-primary / Develop-subordinate**, NOT a compare
+  ladder. Kept the hero sample card (proof), thesis/trust copy, "Add your photo" + resume + dev routes, and all of
+  BR-S071 (scan room untouched). **Free Pull door** = solid primary ("Enter Scan Room · Scan a photo into a complete
+  card — yours to keep and share"). **Develop door** = a subordinate DASHED companion ("Develop a scan · Open the
+  sealed back of the same card — the same scan, read deeper" + the dev-mock note "one-time develop · this scan only ·
+  dev mock, no payment", **no figure**). Stacked (not side-by-side) so it reads as primary-then-secondary, never two
+  grades; the dashed border echoes the sealed/undeveloped motif so Develop reads as opening the sealed back, not buying
+  a better card. Both doors `data-view-to="room"` (develop is a verb on a scan — it happens in-place in the room, where
+  the develop CTA + the BR-S071 price line live). Replaced the old `.menu__enter` button in renderMenu (the class is
+  KEPT — still used by renderHaloGateMock). New `.menu__doors`/`.menu__door*` CSS (static borders + the existing
+  translateY hover; no new effect). **Verified live @1600×900** (DOM; cache-bust used + reverted): menu shows 2 doors,
+  Free solid / Develop dashed, no price digit; both enter the room; Develop door → room → develop CTA → in-place
+  develop still works (shiny, price gone); Diagram|Metrics nav pinned + tabs intact (BR-S071 held); scan-contract 3
+  valid / 4 invalid; console clean; halo CSS untouched; no compare ladder; no sparkle/rainbow/shimmer. **One commit,
+  NOT pushed (builder review).** **Out of scope (held):** real payment, price figure/model, backend/AI, referral,
+  Record/Vault/Profile/social, rarity ladder, new effects, scan-room redesign. **Completed — awaiting builder review.**
 - **Scan-room layout + Free/Paid funnel + price — bounded refine (BR-S071)** (2026-06-20, app.js + styles.css):
   the layout build, scoped as a REFINE of the existing 3-panel structure (it already ships), not a rebuild. Forged via
   a short critique/spec workflow (layout architect + material/reduced-motion scout → anti-yippi + scope/price critics

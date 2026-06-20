@@ -987,8 +987,21 @@ function renderMenu() {
         </figure>
       </section>
 
+      <div class="menu__doors">
+        <button type="button" class="menu__door menu__door--free" data-view-to="room">
+          <span class="menu__door-kicker">Free Pull</span>
+          <span class="menu__door-name">Enter Scan Room</span>
+          <span class="menu__door-desc">Scan a photo into a complete card — yours to keep and share.</span>
+        </button>
+        <button type="button" class="menu__door menu__door--develop" data-view-to="room">
+          <span class="menu__door-kicker">Develop</span>
+          <span class="menu__door-name">Develop a scan</span>
+          <span class="menu__door-desc">Open the sealed back of the same card — the same scan, read deeper.</span>
+          <span class="menu__door-note">one-time develop · this scan only · dev mock, no payment</span>
+        </button>
+      </div>
+
       <div class="menu__actions">
-        <button type="button" class="menu__enter" data-view-to="room">Enter Scan Room</button>
         <button type="button" class="menu__add" data-draft-pick>${draft ? "Replace your photo" : "Add your photo"}<span class="menu__add-tag"> · local draft</span></button>
         ${draft ? `<button type="button" class="menu__resume" data-view-to="draft">Resume local draft →</button>` : ""}
         <p class="pickmsg" role="status" aria-live="polite"></p>
