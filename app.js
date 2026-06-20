@@ -956,13 +956,6 @@ function applyView() {
 
 function renderMenu() {
   const s = SOURCES[0];
-  const c = s.card;
-  const shot = (stamp, stampCls) => `
-    <div class="mtile__shot" data-imgwrap style="--pos:${esc(s.photoTuning.pos)};">
-      ${imgOrPlaceholder(s.file, "mtile__img")}
-      <span class="mtile__scrim"></span>
-      <span class="mtile__stamp ${stampCls}">${esc(stamp)}</span>
-    </div>`;
   return `
     <div class="menu__inner">
       <header class="menu__head">
@@ -971,43 +964,39 @@ function renderMenu() {
         <p class="menu__trust">Image-as-artifact scan — it reads frame, gesture and signal, never the person.</p>
       </header>
 
-      <p class="menu__hint">One indexed institution — an archive of developed photographs. Each scan files one card.</p>
-
-      <section class="msample" style="--halo-a:${esc(s.halo.a)}; --halo-b:${esc(s.halo.b)}; --halo-c:${esc(s.halo.c)};">
+      <section class="menu__stage">
         <div class="msample__cap">
           <span class="msample__label">Sample Scan</span>
-          <span class="msample__type">Sample Photo · Archive</span>
+          <span class="msample__type">SRC-01 · Archive</span>
         </div>
-        <h2 class="msample__title">${esc(c.title)}</h2>
-        <p class="msample__arch">◆ &nbsp;${esc(c.archetype)}</p>
-
-        <figure class="msample__solo">
-          ${shot(TREATMENTS.free.stamp, "")}
-          <p class="msample__seal">The front is complete. The same card has a sealed back.</p>
-        </figure>
+        <div class="msample__card">${renderCard(s, "free")}</div>
       </section>
 
-      <div class="menu__doors">
-        <button type="button" class="menu__door menu__door--free" data-view-to="room">
-          <span class="menu__door-kicker">Free Pull</span>
-          <span class="menu__door-name">Enter Scan Room</span>
-          <span class="menu__door-desc">Scan a photo into a complete card — yours to keep and share.</span>
-        </button>
-        <button type="button" class="menu__door menu__door--develop" data-view-to="room">
-          <span class="menu__door-kicker">Develop</span>
-          <span class="menu__door-name">Develop a scan</span>
-          <span class="menu__door-desc">Open the sealed back of the same card — the same scan, read deeper.</span>
-          <span class="menu__door-note">one-time develop · this scan only · dev mock, no payment</span>
-        </button>
-      </div>
+      <div class="menu__controls">
+        <span class="menu__rule" aria-hidden="true"></span>
+        <p class="msample__seal">The front is complete. The same card has a sealed back.</p>
 
-      <div class="menu__actions">
-        <button type="button" class="menu__add" data-draft-pick>${draft ? "Replace your photo" : "Add your photo"}<span class="menu__add-tag"> · local draft</span></button>
-        ${draft ? `<button type="button" class="menu__resume" data-view-to="draft">Resume local draft →</button>` : ""}
-        <p class="pickmsg" role="status" aria-live="polite"></p>
-      </div>
+        <div class="menu__doors">
+          <button type="button" class="menu__door menu__door--free" data-view-to="room">
+            <span class="menu__door-kicker">Free Pull</span>
+            <span class="menu__door-name">Enter Scan Room</span>
+            <span class="menu__door-desc">Scan a photo into a complete card — yours to keep and share.</span>
+          </button>
+          <button type="button" class="menu__door menu__door--develop" data-view-to="room">
+            <span class="menu__door-kicker">Develop</span>
+            <span class="menu__door-name">Develop a scan</span>
+            <span class="menu__door-note">one-time develop · this scan only · dev mock, no payment</span>
+          </button>
+        </div>
 
-      <p class="menu__foot">One sample · SRC-01 · Driver.</p>
+        <div class="menu__actions">
+          <button type="button" class="menu__add" data-draft-pick>${draft ? "Replace your photo" : "Add your photo"}<span class="menu__add-tag"> · local draft</span></button>
+          ${draft ? `<button type="button" class="menu__resume" data-view-to="draft">Resume local draft →</button>` : ""}
+          <p class="pickmsg" role="status" aria-live="polite"></p>
+        </div>
+
+        <p class="menu__foot">One sample · SRC-01 · Driver.</p>
+      </div>
     </div>`;
 }
 

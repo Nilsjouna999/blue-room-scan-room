@@ -2,7 +2,7 @@
 
 Ranked work queue, not a dream backlog. One Active item at a time.
 Out-of-scope findings from any session get logged here, not patched.
-Last updated: 2026-06-20.
+Last updated: 2026-06-21.
 
 ## Completed (shipped tasks, newest first)
 
@@ -10,6 +10,56 @@ Last updated: 2026-06-20.
 > is the head of **Ready** (below) — one at a time (this file's intro rule). For the
 > authoritative "what shipped" trail, cross-check `docs/DECISION_LOG.md` + `git log`.
 
+- **Menu upgrade — real Free card → Archive Desk (BR-S079 / S081 / S083, one folded commit)** (2026-06-21, app.js +
+  styles.css): the menu entrance, rebuilt across three folded passes (one unpushed commit). The hero shows the
+  **actual reduced Free card**, not a flat photo tile, so the entrance makes
+  "every photo is already a card" literally true on screen (the menu had been showing the *before*, the room the
+  *after*). **Swapped** the `.msample__solo` photo tile (`shot()` / `.mtile`) for `renderCard(SOURCES[0], "free")`
+  in a `.msample__card` wrapper, scaled to ~301px visual via **`zoom: 0.7` of a 430px-natural render** — a width-only
+  squeeze distorted the card's fixed chrome (ratio 2.31 vs the room's 1.56); zoom preserves the room proportions and
+  430 is the proven before/after width. Rendered **free only** (complete front: ARCHIVE EDITION, FREE PULL EDITION
+  stamp, ghost serial `····`/`BR-001-DRV-0001`, tier bands) — never a developed/Halo grade; the seal line "The front
+  is complete. The same card has a sealed back." bridges to the subordinate dashed Develop door (Free door stays the
+  solid hero). **Removed** the redundant `.msample__title`/`.msample__arch` (now carried by the card) + the
+  `.menu__hint` institution line (the card embodies it) to reclaim fold; let the card **float** (dropped the
+  `.msample` box border/bg) so it reads as the object, not a box-in-a-box. **Deleted** the now-dead `shot()` helper +
+  `.mtile__*` / `.msample__solo` / `__title` / `__arch` / `.menu__hint` CSS (menu-only, grep-confirmed). **No data.js
+  / index.html / scan-contract.js change; `renderCard` untouched.** **Verified live @1600×900** (DOM/getComputedStyle;
+  cache-bust via `fetch(cache:'reload')` then reload — NO file cache-bust to revert; screenshot tool times out on this
+  DPR, per memory): menu card renders proportional (301×498, zoom 0.7) + legible (title 1 line · 4 stats 1 row ·
+  mintstrip unclipped; the only "overflow" is the invisible opacity-0 halo/shimmer layers, same as the room card);
+  Free door in-fold (primary), Develop door at the fold (subordinate); old tile/hint gone. Room card unaffected
+  (493px, zoom 1 — the zoom is scoped to `.msample__card`); before/after card 430 + BR-S076 clarifier intact; Halo
+  developed + badge + 7 plates; review-map 4 groups / 11 cards; Develop door enters the room (BR-S072 flow);
+  scan-contract 3 valid / 4 invalid; no public 0-100; console error-free. **Product-law: PASS** — ONE free card only
+  (no person-comparison; BR-S077 single-card-intense, no two-grades; the developed card is NOT shown on the menu);
+  the free card is static (halo/sparkles opacity 0 — no animation/flash added); reduced-motion N/A (nothing animates).
+  **Caveat:** `zoom` is the pragmatic box-collapsing scale (Chrome/Edge/Safari/FF126+ — desktop-first, fine for this
+  prototype). **Then rebuilt as the ARCHIVE DESK (ex-BR-S081 fold-fix + ex-BR-S083 layout/clarity, all folded into this
+  one unpushed commit).** A centered fold-compression + a dual-face depth-cue (`::before` back-panel) were tried and
+  **REVERSED** — the cue read as an odd offset rectangle, not thickness (removed, per the documented fallback), and the
+  centered stack hit a geometric ceiling: the ~498px card stacked ON TOP of the doors (~980px) can't fit a 900px
+  viewport without shrinking the card, which the builder VETOED. BR-S080's 16-agent brainstorm + a BR-S082
+  architect/funnel-adversary/judge pass concluded **card-RIGHT / ledger-LEFT**: side-by-side replaces the height SUM
+  with the MAX, so the menu fits 1600×900 with **NO scroll** AND the card **GROWS** (zoom 0.7→0.92, 296×498 →
+  **390×652**, +32%). `.menu__inner` is now a desk grid (`min(1180px,92vw)`, `360px 1fr`, gap 72px, 4-row areas that
+  center the head+controls unit beside the card); `renderMenu` split into `.menu__head` + `.menu__stage` (cap + card) +
+  `.menu__controls` (hairline rule, the seal line as the doors' preamble, Free+Develop doors, add-photo, footer). Card =
+  the largest object (~60/40 mass), the eye lands on it first; the doors are quiet **shadowless ledger entries**, not
+  CTAs; a `@media(max-width:1199px)` fallback restores the centered single-column stack (brand→card→doors, zoom 0.7).
+  **Clarity polish:** brightened the dim ledger text (trust/seal/door-desc/note/kicker → `t-body`/`silver`, +1–1.5px)
+  and made the door borders clearly visible (Free **1.5px solid `--silver-dim`**, Develop **dashed 0.34α**) — readable +
+  spottable, Free-solid-hero > Develop-dashed-subordinate hierarchy intact. **No data.js / index.html / scan-contract.js
+  change; `renderCard` untouched; NO annotation / telemetry / callout code — the card stays clean.** **Verified live
+  @1600×900** (DOM + real **headless-Chrome screenshots** — the working capture side-channel, now that the MCP
+  `preview_screenshot` is confirmed broken in this env): NO scroll (docHeight 900); card 390×652 (bigger than the
+  centered 296×498); both doors in-fold; room card 493 unaffected; before/after 430 + BR-S076 clarifier; review-map
+  4/11; Develop door enters the room; scan-contract 3 valid / 4 invalid; no public 0-100; console error-free; 1366×768
+  overflows ~3px (negligible). **Product-law: PASS** — ONE complete Free card only (no second card / depth cue / source
+  photo / person-comparison); Free primary, Develop subordinate (STACKED, not a side-by-side grade pair); no
+  price/accent/glow on the doors; static, reduced-motion-safe. **One commit, local only — NOT pushed (builder approves
+  the push).** **Completed.** **Next up (builder decision):** push this menu commit; then Dossier Reading Mode / sticky
+  archive plate (the other BR-S078 build; GO-WITH-CARE — the `.dstream` selector-rewrite + the person-dossier-gestalt guard).
 - **Share Canon Boundary Spec v1 (BR-S077)** (2026-06-20, docs only — new `docs/SHARE_CANON_BOUNDARY_V1.md` +
   FILE_MAP + DECISION_LOG): the dedicated share/canon pass BR-S076 recommended — locks the safety boundary for
   **shareable** cards BEFORE any customer share trigger / export / social / payment ships. **Docs-only** (no
