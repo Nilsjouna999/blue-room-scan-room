@@ -2323,27 +2323,37 @@ body[data-view="room"] .dev { display: none; }
 .ba__honest { font-family: var(--font-mono); font-size: 8.5px; letter-spacing: 0.1em; color: var(--faint); }
 
 /* ============================================================
-   BR-S075 — dev review map (?dev=review-map). DEV-ONLY index, never
-   product UI. Plain links to existing routes; quiet left-edge accent
-   distinguishes the four surface kinds.
+   BR-S075b — dev review map (?dev=review-map). A DEV-ONLY review
+   DASHBOARD (never product UI): cards with name + type badge +
+   description + visible route + Open affordance, in a responsive grid.
+   Dark surface, quiet borders, restrained left-edge category accent.
+   No shimmer / rainbow / sparkle / glow.
 ============================================================ */
-.rmap { max-width: 880px; margin: 0 auto; padding: 40px 28px 56px; display: grid; gap: 22px; }
-.rmap__head { display: grid; gap: 7px; }
-.rmap__tag { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--moss-bright); }
-.rmap__title { font-family: var(--font-display); font-size: 22px; font-weight: 600; color: var(--t-display); }
-.rmap__note { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.04em; line-height: 1.6; color: var(--t-meta); }
-.rmap__group { display: grid; gap: 9px; }
-.rmap__kind { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.24em; text-transform: uppercase; color: var(--faint); border-bottom: 1px solid var(--line-faint); padding-bottom: 5px; }
-.rmap__links { display: grid; gap: 7px; }
-.rmap__link { display: grid; gap: 2px; padding: 10px 13px; border: 1px solid var(--line); border-left: 2px solid var(--line); border-radius: 7px; background: rgba(255, 255, 255, 0.015); text-decoration: none; transition: border-color 140ms ease, background 140ms ease; }
-.rmap__link:hover { border-color: var(--line-strong); background: rgba(255, 255, 255, 0.04); }
-.rmap__route { font-family: var(--font-ui); font-size: 13px; font-weight: 600; color: var(--silver); }
-.rmap__sub { font-family: var(--font-mono); font-size: 9.5px; letter-spacing: 0.03em; color: var(--t-meta); }
-.rmap__foot { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.05em; line-height: 1.6; color: var(--faint); border-top: 1px solid var(--line-faint); padding-top: 12px; }
-.rmap__group--real .rmap__link { border-left-color: var(--silver-dim); }
-.rmap__group--share .rmap__link { border-left-color: var(--moss-bright); }
-.rmap__group--mock .rmap__link,
-.rmap__group--harness .rmap__link { border-left-color: var(--line-strong); }
+.rmap { max-width: 1060px; margin: 0 auto; padding: 44px 32px 64px; display: grid; gap: 30px; }
+.rmap__head { display: grid; gap: 11px; justify-items: start; }
+.rmap__devtag { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--moss-bright); border: 1px solid color-mix(in srgb, var(--moss-bright) 38%, var(--line)); border-radius: 999px; padding: 5px 12px; }
+.rmap__title { font-family: var(--font-display); font-size: 26px; font-weight: 600; color: var(--t-display); }
+.rmap__note { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.03em; line-height: 1.6; color: var(--t-meta); max-width: 640px; }
+.rmap__group { display: grid; gap: 12px; }
+.rmap__kind { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--silver-dim); border-bottom: 1px solid var(--line-faint); padding-bottom: 6px; }
+.rmap__cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; }
+.rmap__card { display: grid; gap: 9px; align-content: start; padding: 16px 17px; border: 1px solid var(--line); border-left: 2px solid var(--line); border-radius: 9px; background: rgba(255, 255, 255, 0.018); text-decoration: none; transition: border-color 150ms ease, background 150ms ease, transform 150ms ease; }
+.rmap__card:hover { border-color: var(--line-strong); background: rgba(255, 255, 255, 0.045); transform: translateY(-1px); }
+.rmap__cardtop { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.rmap__name { font-family: var(--font-ui); font-size: 14px; font-weight: 600; color: var(--silver-bright); }
+.rmap__badge { font-family: var(--font-mono); font-size: 8px; letter-spacing: 0.16em; text-transform: uppercase; padding: 3px 7px; border-radius: 4px; border: 1px solid var(--line); color: var(--t-meta); white-space: nowrap; }
+.rmap__badge--real { color: var(--silver-dim); border-color: color-mix(in srgb, var(--silver-dim) 45%, var(--line)); }
+.rmap__badge--share { color: var(--moss-bright); border-color: color-mix(in srgb, var(--moss-bright) 45%, var(--line)); }
+.rmap__desc { font-family: var(--font-display); font-size: 12.5px; line-height: 1.5; color: var(--muted); }
+.rmap__cardfoot { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 2px; }
+.rmap__route { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.02em; color: var(--t-meta); background: rgba(0, 0, 0, 0.25); border: 1px solid var(--line-faint); border-radius: 4px; padding: 3px 7px; }
+.rmap__open { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.06em; color: var(--silver-dim); white-space: nowrap; }
+.rmap__card:hover .rmap__open { color: var(--silver-bright); }
+.rmap__foot { font-family: var(--font-mono); font-size: 9.5px; letter-spacing: 0.04em; line-height: 1.7; color: var(--faint); border-top: 1px solid var(--line-faint); padding-top: 14px; }
+.rmap__foot b { color: var(--silver-dim); font-weight: 600; }
+.rmap__card--real { border-left-color: var(--silver-dim); }
+.rmap__card--share { border-left-color: var(--moss-bright); }
+.rmap__card--mock, .rmap__card--harness { border-left-color: var(--line-strong); }
 @media (max-width: 900px) {
   .ba__stage { grid-template-columns: 1fr; gap: 14px; }
   .ba__seam { transform: rotate(90deg); }

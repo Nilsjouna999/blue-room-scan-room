@@ -1264,37 +1264,42 @@ function renderBlockedScan(b, actionsHtml) {
    reviewed without guessing routes. Gated by ?dev (customers never reach it).
    Plain <a> links to the REAL existing routes — invents nothing. Not product UI. */
 function renderReviewMap() {
-  const link = (href, label, sub) =>
-    `<a class="rmap__link" href="${href}"><span class="rmap__route">${esc(label)}</span><span class="rmap__sub">${esc(sub)}</span></a>`;
-  const group = (kind, cls, items) =>
-    `<section class="rmap__group rmap__group--${cls}"><h2 class="rmap__kind">${esc(kind)}</h2><div class="rmap__links">${items.join("")}</div></section>`;
+  const BADGE = { real: "REAL", share: "SHARE", mock: "MOCK", harness: "HARNESS" };
+  const card = (kind, href, route, name, desc) =>
+    `<a class="rmap__card rmap__card--${kind}" href="${href}">
+      <div class="rmap__cardtop"><span class="rmap__name">${esc(name)}</span><span class="rmap__badge rmap__badge--${kind}">${BADGE[kind]}</span></div>
+      <p class="rmap__desc">${esc(desc)}</p>
+      <div class="rmap__cardfoot"><code class="rmap__route">${esc(route)}</code><span class="rmap__open">Open →</span></div>
+    </a>`;
+  const group = (kind, cards) =>
+    `<section class="rmap__group"><h2 class="rmap__kind">${esc(kind)}</h2><div class="rmap__cards">${cards.join("")}</div></section>`;
   return `
     <div class="rmap">
       <header class="rmap__head">
-        <span class="rmap__tag">◆ DEV REVIEW · not a product surface</span>
-        <h1 class="rmap__title">BLUE ROOM — desktop spine</h1>
-        <p class="rmap__note">A dev-only index of the current surfaces (needs <b>?dev</b> — customers never see it). Each link opens a real route.</p>
+        <span class="rmap__devtag">DEV REVIEW · not a product surface</span>
+        <h1 class="rmap__title">BLUE ROOM — desktop review map</h1>
+        <p class="rmap__note">A local map for walking the current desktop spine. Dev-only (needs <b>?dev</b>) — customers never see it. Each card opens a real route.</p>
       </header>
-      ${group("Real product surface", "real", [
-        link("index.html", "Menu — two-door fork", "the entrance · Free Pull + Develop doors"),
-        link("?src=1&t=free", "Free Pull · Driver (SRC-01)", "complete card front + reading + 7-plate dossier"),
-        link("?src=2&t=free", "Free Pull · Ice Field (SRC-02)", "complete card front · second source"),
-        link("?src=1&t=shiny", "Developed / Halo · Driver", "sealed back opened in-place · price only at develop-intent"),
-        link("?src=2&t=shiny", "Developed / Halo · Ice Field", "developed · second source"),
+      ${group("Real product surface", [
+        card("real", "index.html", "/", "Menu — two-door fork", "the entrance · Free Pull + Develop doors"),
+        card("real", "?src=1&t=free", "?src=1&t=free", "Free Pull · Driver (SRC-01)", "complete card front + reading + 7-plate dossier"),
+        card("real", "?src=2&t=free", "?src=2&t=free", "Free Pull · Ice Field (SRC-02)", "complete card front · second source"),
+        card("real", "?src=1&t=shiny", "?src=1&t=shiny", "Developed / Halo · Driver", "sealed back opened in-place · price only at develop-intent"),
+        card("real", "?src=2&t=shiny", "?src=2&t=shiny", "Developed / Halo · Ice Field", "developed · second source"),
       ])}
-      ${group("Share / capture view", "share", [
-        link("?dev=before-after", "Before / After · Driver", "the photograph → the same frame, filed as a card"),
-        link("?dev=before-after&src=2", "Before / After · Ice Field", "second source"),
+      ${group("Share / capture view", [
+        card("share", "?dev=before-after", "?dev=before-after", "Before / After · Driver", "the photograph → the same frame, filed as a card"),
+        card("share", "?dev=before-after&src=2", "?dev=before-after&src=2", "Before / After · Ice Field", "second source"),
       ])}
-      ${group("Dev mock", "mock", [
-        link("?dev=halo-gate", "Halo Gate mock", "sealed card-back gate · not payment, not analysis"),
-        link("?dev=free-scan-sim", "Free scan sim", "Free Pull mock fixture"),
+      ${group("Dev mock", [
+        card("mock", "?dev=halo-gate", "?dev=halo-gate", "Halo Gate mock", "sealed card-back gate · not payment, not analysis"),
+        card("mock", "?dev=free-scan-sim", "?dev=free-scan-sim", "Free scan sim", "Free Pull mock fixture"),
       ])}
-      ${group("Validation harness", "harness", [
-        link("?dev=uploaded-result", "Uploaded result · valid", "scan-contract valid fixture render"),
-        link("?dev=uploaded-blocked", "Uploaded blocked · invalid", "scan-contract rejection / safe blocked state"),
+      ${group("Validation harness", [
+        card("harness", "?dev=uploaded-result", "?dev=uploaded-result", "Uploaded result · valid", "scan-contract valid fixture render"),
+        card("harness", "?dev=uploaded-blocked", "?dev=uploaded-blocked", "Uploaded blocked · invalid", "scan-contract rejection / safe blocked state"),
       ])}
-      <footer class="rmap__foot">State-jumper rail: append <b>?devnav=1</b> to any route (incl. the internal <b>?t=mint</b> Lab). · The card is the artifact — the room reads the photograph, never the person.</footer>
+      <footer class="rmap__foot">Append <b>?devnav=1</b> to any route for the dev state-jumper rail. <b>?t=mint</b> is the internal Lab. · The card is the artifact — Blue Room reads the photograph, never the person.</footer>
     </div>`;
 }
 

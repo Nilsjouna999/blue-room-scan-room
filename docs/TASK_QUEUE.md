@@ -10,6 +10,19 @@ Last updated: 2026-06-15.
 > is the head of **Ready** (below) — one at a time (this file's intro rule). For the
 > authoritative "what shipped" trail, cross-check `docs/DECISION_LOG.md` + `git log`.
 
+- **Desktop review map UI polish (BR-S075b)** (2026-06-20, app.js + styles.css): BR-S075's `?dev=review-map` worked
+  but rendered as an unstyled inline link list (partly the structure — no badges/route-strings/buttons — partly the
+  recurring stale-cached styles.css on direct nav). Rebuilt as a proper DEV **dashboard**: header (title "BLUE ROOM —
+  desktop review map" + a "DEV REVIEW · not a product surface" pill + the one-line explainer), four labeled group
+  sections, and each route now a **card** in a responsive grid (`repeat(auto-fill, minmax(300px,1fr))` → 3-up at
+  1600×900) with name + **type badge** (REAL/SHARE/MOCK/HARNESS) + description + a **visible route string** (`<code>`)
+  + an "Open →" affordance + a quiet left-edge category accent. Same real routes (invents none); still `?dev`-gated
+  (never customer UI); BLUE ROOM tokens (dark, quiet borders, no shimmer/rainbow/sparkle/glow). **Verified live
+  @1600×900** (DOM): 4 groups / 11 cards, 3-col grid (no inline dump), all four badge kinds, route strings visible;
+  clicking "Free Pull · Driver" lands on `?src=1&t=free` (room, Diagram nav intact); zero banned words in the map;
+  scan-contract 3 valid/4 invalid; console clean. No real product routes/behavior touched. **Follow-up commit (d67c6ad
+  already pushed — no history rewrite).** Note: direct nav may serve stale cached CSS — open via dev-live.html or
+  hard-refresh to see it. **Completed.**
 - **Desktop review map (BR-S075)** (2026-06-20, app.js + styles.css): a DEV-ONLY `?dev=review-map` — a categorized,
   clickable index of the current desktop spine so the surfaces are reviewable without guessing routes. Reuses the
   `?dev` pattern + mountDev (gated → customers never reach it; not product UI). Four labeled groups linking the REAL
