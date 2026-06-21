@@ -138,6 +138,16 @@ browser console is clean (F12).
   unlock card lists the rest) — keep gating consistent with PROJECT_OS §8.
 - **Test:** free vs mint vs shiny right panel; develop buttons still switch
   treatment.
+- **BR-S088 register + subtraction law:** the PAID panel is a tight VOICE/SUMMARY
+  column (Oracle → Stat Reading → Scene Role → Artifact Archetype → Technical
+  Receipts) — it must NOT re-render the dossier's deeper material. Stance / Fit /
+  Frame Impact / Lore Density / Mint Record / (paid) Aura were cut from the panel;
+  the dossier (Plate 05 Fit + Aura, Plate 06 Mint Record) is their sole home. When
+  adding a panel module, ask: is this a VOICE/summary beat, or does it belong in the
+  dossier? Interpretive verdict prose uses the serif register (`.dstat__evidence`,
+  `.module__line` → `--font-display` ~15px `--text`); admin/proof (key-value grids,
+  mono receipts, serials, bars/tier chips) stays the quiet flat cue. Free is
+  unaffected by the cuts (free renders `lockedDeep`) — keep it that way.
 
 ## Product clarity pass (2026-06-12, data.js + app.js + tiny CSS)
 

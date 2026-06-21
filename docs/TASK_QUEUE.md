@@ -10,6 +10,25 @@ Last updated: 2026-06-21.
 > is the head of **Ready** (below) — one at a time (this file's intro rule). For the
 > authoritative "what shipped" trail, cross-check `docs/DECISION_LOG.md` + `git log`.
 
+- **Paid Reading Register + Subtraction Pass (BR-S088)** (2026-06-21, app.js + styles.css + docs): implements the
+  BR-S087 diagnosis (paid reading dry from register flattening + duplication). **(1) Register lift (styles.css):**
+  interpretive verdict prose now renders in the serif lead register — `.dstat__evidence` 12.5px/--muted/caption-indent
+  → 15px `--font-display`/--text/breathing; `.module__line` 14px sans → 15px serif (scene role + archetype read).
+  Admin/proof (key-value grids, mono receipts, serials, bars/tier chips) stays the quiet flat cue. **(2) Subtraction
+  (app.js, PAID-ONLY):** cut the panel's analytical deep modules — Stance Read, Fit Coherence, Frame Impact, Lore
+  Density, Mint Record, and paid Aura Profile — which were verbatim re-renders of dossier Plate 05/06. The PAID panel
+  is now a tight VOICE/SUMMARY column (Oracle → Stat Reading → Scene Role → Artifact Archetype → Technical Receipts);
+  the dossier is the sole home of the deeper Stance/Fit/Aura/Impact/Lore/Mint material. **Builder ruling: do NOT
+  restore Stance — keep the panel tight, dossier owns the depth.** Step 1 (`.dstat__evidence`) was the validated
+  checkpoint (evidence reads as a written verdict, not an admin caption). DEFERRED: dossier plate re-tier + register-
+  strip legibility + `--halo-a` accent (→ BR-S089); no colour/motion/reveal added this pass. **Free UNTOUCHED** (free
+  renders lockedDeep — Aura + Develop CTA + 3 teasers intact). **Verified live @desktop:** paid panel = the 5-beat
+  column (DOM-confirmed); 7 `section.dplate` intact; Free complete; console clean; zero banned words; no 0–100 / rank /
+  worth / person framing; layout stable; reduced-motion safe. Runtime: app.js + styles.css only. No payment / backend /
+  upload / email / share / mobile / profile work. **NEXT:** BR-S089 — dossier plate-tier + neighborhood legibility
+  (widen LOUD/quiet plate delta, demote Source Record, mark the panel→dossier seam, lift the 9.5px register strips to
+  ~11px + a rule); then, only if still needed, restrained `--halo-a` accent on the two hero sections.
+
 - **Paid Reading Value / Visual-Reward stress-test (BR-S087)** (2026-06-21, DOCS ONLY — new
   `docs/BR-S087_PAID_READING_SPEC.md` + FILE_MAP + DECISION_LOG + this queue): a 13-role read-only design
   pipeline (suspects withheld from a cold diagnostician to defeat confirmation bias) diagnosed why the

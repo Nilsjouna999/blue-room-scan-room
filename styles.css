@@ -272,7 +272,9 @@ body[data-devnav="1"] .toggle--treatment { display: inline-flex; }
   white-space: nowrap;
 }
 .module__rule { flex: 1; height: 1px; background: var(--line-faint); }
-.module__line { font-size: 14px; line-height: 1.55; color: var(--text); }
+/* BR-S088 register lift: module lines carry interpretive verdicts (scene role,
+   archetype read) — serif/lead so they read as written lines, not admin metadata. */
+.module__line { font-family: var(--font-display); font-size: 15px; line-height: 1.55; color: var(--text); }
 .module__line--fit {
   font-style: italic;
   color: var(--muted);
@@ -2024,12 +2026,15 @@ body[data-treatment="shiny"] .dossier__inner .dplate--oracle {
    number is the plate's one accent moment */
 .dstat__val { font-family: var(--font-mono); font-size: 13px; color: var(--silver-bright); }
 .dstat__why { font-size: 13px; line-height: 1.6; color: var(--t-body); }
+/* BR-S088 register lift: the per-stat evidence sentence is card-keyed interpretive
+   prose — render it as a written verdict (serif/lead, brighter, breathing), not an
+   indented admin caption. The tier chip + bar in .dstat__head stay the quiet cue. */
 .dstat__evidence {
-  font-size: 12.5px;
+  font-family: var(--font-display);
+  font-size: 15px;
   line-height: 1.55;
-  color: var(--muted);
-  border-left: 2px solid var(--line);
-  padding-left: 11px;
+  color: var(--text);
+  margin-top: 7px;
 }
 .dstat__note {
   font-family: var(--font-mono);

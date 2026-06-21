@@ -565,40 +565,15 @@ function renderReadingPanel(src, treatment) {
       <p class="module__line">${esc(src.sceneRole)}</p>
     </div>`;
 
-  const deep = `
-    <div class="module module--lead" data-lead="1">
-      ${moduleHead("Stance Read")}
-      <p class="module__prose module__prose--serif">${esc(src.stance)}</p>
-    </div>
-    <div class="module">
-      ${moduleHead("Fit Coherence")}
-      <p class="module__line module__line--fit">${esc(src.fit)}</p>
-    </div>
-    <div class="module module--lead" data-lead="2">
-      ${moduleHead("Frame Impact")}
-      <div class="impact">
-        <span class="impact__label">${esc(src.impact.label)}</span>
-        <span class="impact__track"><span class="impact__fill" style="--v:${bandPct(src.impact.value)}%"></span></span>
-        <span class="impact__val impact__val--tier">${esc(tierBand(src.impact.value))}</span>
-      </div>
-    </div>
-    <div class="module">
-      ${moduleHead("Lore Density")}
-      <div class="impact">
-        <span class="impact__label">${esc(src.lore.label)}</span>
-        <span class="impact__track"><span class="impact__fill impact__fill--dash" style="--v:${bandPct(src.lore.value)}%"></span></span>
-        <span class="impact__val impact__val--tier">${esc(tierBand(src.lore.value))}</span>
-      </div>
-    </div>
-    <div class="module module--ledger">
-      ${moduleHead("Mint Record")}
-      <dl class="kv">
-        <div><dt>Serial</dt><dd>${esc(c.serial)}</dd></div>
-        <div><dt>Edition</dt><dd>${esc(c.edition)}</dd></div>
-        <div><dt>Batch</dt><dd>${esc(c.batch)}</dd></div>
-        <div><dt>Minted</dt><dd>${esc(c.minted)}</dd></div>
-      </dl>
-    </div>
+  /* BR-S088 subtraction (paid-only): the panel's analytical deep modules
+     (Stance Read / Fit Coherence / Frame Impact / Lore Density / Mint Record)
+     were verbatim re-renders of dossier Plate 05 (Fit + Aura Layer) and Plate 06
+     (Mint Record) — cut from the PAID panel so it reads as a tight VOICE/SUMMARY
+     column (Oracle → Stat Reading → Scene Role → Archetype → Receipts), not a
+     second copy of the dossier. All of that content still lives in the dossier
+     (its richer home). Free is untouched — free renders lockedDeep, not this.
+     What remains in the panel from the old deep block: the Technical Receipts. */
+  const panelReceipts = `
     <details class="receipts">
       <summary><span class="module__label">Technical Receipts</span><span class="receipts__caret">▸</span></summary>
       <dl class="receipts__list">
@@ -686,9 +661,11 @@ function renderReadingPanel(src, treatment) {
       ${moduleHead("Oracle Read")}
       <p class="oracle">“${esc(src.oracle)}”</p>
     </div>`;
-  const forkContent = free ? lockedDeep : archetypeModule + deep + shinyTease + shinyBadge;
+  const forkContent = free ? lockedDeep : archetypeModule + panelReceipts + shinyTease + shinyBadge;
   const panelLead = free ? "" : oracleFirst;
-  return `${header}${panelLead}${statReads}${aura}${sceneRole}<div class="readseam" data-open="${free ? 0 : 1}">${forkContent}</div>`;
+  /* Aura Profile is dropped from the PAID panel (it's on the card front + dossier
+     Plate 05) so the developed column doesn't echo the dossier; Free keeps it. */
+  return `${header}${panelLead}${statReads}${free ? aura : ""}${sceneRole}<div class="readseam" data-open="${free ? 0 : 1}">${forkContent}</div>`;
 }
 
 /* ---------- scroll dossier (below the hero) ----------
