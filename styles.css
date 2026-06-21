@@ -1040,18 +1040,29 @@ body[data-devnav="1"] .toggle--treatment { display: inline-flex; }
    grade. The ceremony owns motion via .is-developing (below). (BR-S067)
 ------------------------------------------------------------- */
 .card[data-treatment="shiny"] {
-  /* deeper premium navy with more tonal depth (builder, BR-S068): a lit blue
-     top edge falling to a near-black core, source-tinted at the corners */
-  background: linear-gradient(158deg,
-    color-mix(in srgb, var(--halo-a) 22%, #142539) 0%,
-    #0a1422 22%, #050d18 48%, #02070f 70%,
-    color-mix(in srgb, var(--halo-b) 18%, #0a1828) 100%);
-  /* the CARD BASE stays still — it is strong on its own; the breathing halo
-     (below) is added richness, never a crutch (no card-in re-entrance) */
-  animation: none;
+  /* BR-S097 — the LED EDGE. The card is a 1px frame with the opaque plate on top,
+     so the card background shows ONLY as a line tracing the edge. Make that line a
+     conic gradient with two bright per-source points and spin it slowly → a light
+     travels around the card's edge (the "ledish halo like a light" the builder
+     meant — NOT the behind-card smoke). 2px frame so the line reads. Per-source
+     --halo-a/b only, never the old rainbow. A TIGHT edge bloom (small radius, hugs
+     the silhouette) gives "light," not a room-washing cloud. reduced-motion stills
+     the spin (frozen tinted edge). */
+  padding: 2px;
+  background: conic-gradient(from var(--holo-angle),
+    color-mix(in srgb, var(--halo-a) 20%, #0c1626) 0deg,
+    color-mix(in srgb, var(--halo-a) 92%, #e7f0fb) 38deg,
+    color-mix(in srgb, var(--halo-a) 22%, #0c1626) 92deg,
+    color-mix(in srgb, var(--halo-b) 28%, #0c1626) 178deg,
+    color-mix(in srgb, var(--halo-b) 90%, #e7f0fb) 218deg,
+    color-mix(in srgb, var(--halo-b) 24%, #0c1626) 276deg,
+    color-mix(in srgb, var(--halo-a) 20%, #0c1626) 360deg);
+  animation: holo-spin 7s linear infinite;
   box-shadow:
     0 36px 92px rgba(0, 0, 0, 0.7),
-    0 0 0 1px rgba(58, 84, 120, 0.55),   /* neutral ring — no --halo escapes to the room */
+    0 0 0 1px color-mix(in srgb, var(--halo-a) 36%, rgba(58, 84, 120, 0.55)),
+    0 0 9px -1px color-mix(in srgb, var(--halo-a) 42%, transparent),
+    0 0 16px -5px color-mix(in srgb, var(--halo-b) 30%, transparent),
     0 6px 22px rgba(0, 0, 0, 0.62);
 }
 .card[data-treatment="shiny"] .card__plate {
@@ -1091,33 +1102,23 @@ body[data-devnav="1"] .toggle--treatment { display: inline-flex; }
    blurred glow that fades in on develop then breathes; opacity/transform only
    (compositor-cheap); reduced-motion stills it (block at file end). Sparkles
    stay OFF (the twinkle was the yippi offender, not the halo). */
-/* BR-S096 — builder asked for the "pulsating semi-spinning LED-ish" rim back
-   (the BR-S067-killed holo-spin). RECONCILED so it does not re-trip the
-   magnetic-not-yippi law: (1) per-source --halo-a/b ONLY, never the old
-   violet/cyan/green rainbow; (2) ONE soft rotating rim behind the card
-   (z-index:-1), never the whole-card conic wash ("the card got brighter");
-   (3) it runs ALONE over the BR-S095 base glow — sparkles / twinkle /
-   shimmer-sweep stay OFF (those were the busy offenders); (4) slow 8s spin +
-   gentle breathe = pulsating-not-frantic; reduced-motion stills it (file end).
-   Still the card's OWN depth — no --halo on floor/panels (BR-S067 crown holds). */
+/* BR-S097 — the rotating LED now lives on the card EDGE (above). This behind-card
+   layer is just a FAINT soft ambient aura — the builder's "softer ambient version
+   with low-opacity variation," NOT the BR-S096 smoke: low opacity (0.3–0.46),
+   gentle pulse, NO spin, no conic. Still the card's own depth (no --halo on
+   floor/panels; BR-S067 subtractive crown holds). reduced-motion stills it. */
 @property --holo-angle { syntax: "<angle>"; initial-value: 0deg; inherits: false; }
 @keyframes holo-spin { to { --holo-angle: 360deg; } }
 .card[data-treatment="shiny"] .card__halo {
-  opacity: 1;
-  background:
-    conic-gradient(from var(--holo-angle),
-      transparent 0deg,
-      color-mix(in srgb, var(--halo-a) 44%, transparent) 38deg,
-      transparent 110deg,
-      color-mix(in srgb, var(--halo-b) 36%, transparent) 190deg,
-      transparent 262deg,
-      color-mix(in srgb, var(--halo-a) 40%, transparent) 320deg,
-      transparent 360deg),
-    radial-gradient(98% 86% at 50% 50%, color-mix(in srgb, var(--halo-a) 18%, transparent) 0%, color-mix(in srgb, var(--halo-b) 12%, transparent) 56%, transparent 100%);
-  filter: blur(18px);
-  animation: halo-fadein 600ms ease-out both, holo-spin 8s linear infinite, halo-breathe 6s ease-in-out infinite 600ms;
+  opacity: 0.4;
+  background: radial-gradient(74% 62% at 50% 50%,
+    color-mix(in srgb, var(--halo-a) 16%, transparent) 0%,
+    color-mix(in srgb, var(--halo-b) 9%, transparent) 55%, transparent 100%);
+  filter: blur(30px);
+  animation: halo-fadein 600ms ease-out both, halo-soft-breathe 7s ease-in-out infinite 600ms;
 }
-@keyframes halo-fadein { from { opacity: 0; } to { opacity: 0.82; } }
+@keyframes halo-fadein { from { opacity: 0; } to { opacity: 0.4; } }
+@keyframes halo-soft-breathe { 0%, 100% { opacity: 0.3; } 50% { opacity: 0.46; } }
 @keyframes halo-breathe {
   0%, 100% { opacity: 0.78; transform: scale(1); }
   50% { opacity: 1; transform: scale(1.035); }

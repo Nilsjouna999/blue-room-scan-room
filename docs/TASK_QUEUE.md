@@ -10,6 +10,22 @@ Last updated: 2026-06-21.
 > is the head of **Ready** (below) — one at a time (this file's intro rule). For the
 > authoritative "what shipped" trail, cross-check `docs/DECISION_LOG.md` + `git log`.
 
+- **BR-S097 — halo corrected to the LED EDGE line (styles.css)** (2026-06-21, styles.css + docs): BR-S096
+  built the wrong mechanism — a soft blurred conic BEHIND the card ("smokey"), which the builder rejected. The
+  effect they meant is the original "first halo": a crisp light tracing the card's EDGE like an LED line going
+  around it. Mechanism (matches the pre-BR-S067 original): the card is a thin frame (`.card` padding) with the
+  opaque `.card__plate` on top, so the card background shows ONLY as a line at the edge. **Fix:** set
+  `.card[data-treatment="shiny"]` background to a conic-gradient with two bright per-source points + `holo-spin
+  7s` and bump the frame to `padding:2px` → a light travels around the card's edge; a TIGHT colored box-shadow
+  bloom (small radius, hugs the silhouette) gives "light," not a room-washing cloud. The behind-card `.card__halo`
+  is dialed to a FAINT low-opacity ambient aura (0.3–0.46 gentle pulse, no spin, no conic) — the "softer ambient
+  with low-opacity variation" the builder said would be okay. Per-source `--halo-a/b` only (no rainbow); sparkles
+  / twinkle / shimmer stay OFF; floor/panel zero-halo holds; reduced-motion stills the spin (frozen tinted edge).
+  **Verified live @1600×900** (headless capture + computed: card bg conic, padding 2px, animation holo-spin 7s,
+  colored edge box-shadow; `.card__halo` opacity ~0.42 radial-only, halo-soft-breathe). Supersedes the BR-S096
+  behind-card mechanism. Speed (7s) / point brightness / 2px line thickness / ambient opacity are eyeball-tunable.
+  Runtime: styles.css only. ONE commit "BR-S097: halo as LED edge line"; not pushed without approval.
+
 - **BR-S096 — rotating halo rim restored on the developed card, reconciled (styles.css)** (2026-06-21,
   styles.css + docs): the builder asked for the "pulsating semi-spinning LED-ish" rim back — the `holo-spin`
   (rotating conic-gradient light around the card edge) that BR-S067 killed as the lead "yippi offender."
