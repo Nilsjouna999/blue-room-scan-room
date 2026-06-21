@@ -2305,13 +2305,7 @@ body[data-view="room"] .dev { display: none; }
   transition: border-color 160ms ease, background 160ms ease, transform 160ms ease;
 }
 .menu__enter:hover { border-color: var(--silver-dim); background: rgba(255, 255, 255, 0.07); transform: translateY(-1px); }
-.menu__add {
-  font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
-  color: var(--silver-dim); padding: 8px 16px; border: 1px dashed var(--line); border-radius: 6px;
-  background: none; cursor: pointer; transition: border-color 160ms ease, color 160ms ease;
-}
-.menu__add:hover { border-color: var(--line-strong); color: var(--silver); }
-.menu__add-tag { color: var(--faint); }
+/* (.menu__add small-link styles removed — BR-S090: Add Your Photo is now the primary door.) */
 .menu__resume {
   font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
   color: var(--silver-dim); padding: 7px 14px; border: 1px solid var(--line); border-radius: 6px;
@@ -2319,10 +2313,10 @@ body[data-view="room"] .dev { display: none; }
 }
 .menu__resume:hover { border-color: var(--line-strong); color: var(--silver); }
 
-/* Menu v3 two-door fork (BR-S072): the Free Pull door is the solid hero; the
-   Develop door is a subordinate dashed companion that reads as the sealed back
-   opening — NOT a co-equal paid grade, NOT a comparison ladder (stacked, Free
-   first). Both enter the room; develop happens in-place there. */
+/* BR-S090 two-door fork (door truth): Add Your Photo is the solid hero (the real beginning —
+   staging the user's own image); View Sample Card is the subordinate dashed companion (a
+   clearly-labelled demo, not the user's result). Develop is NOT a menu door (it only exists
+   inside a real Free card, which needs the unbuilt scan engine). */
 .menu__doors { display: grid; gap: 10px; width: 100%; max-width: 360px; margin: 0; }
 .menu__door {
   display: grid; gap: 4px; text-align: left; padding: 11px 16px; border-radius: 8px;
@@ -2333,14 +2327,13 @@ body[data-view="room"] .dev { display: none; }
 .menu__door-kicker { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.26em; text-transform: uppercase; color: var(--t-meta); }
 .menu__door-name { font-family: var(--font-ui); font-size: 14.5px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--t-display); }
 .menu__door-desc { font-family: var(--font-display); font-size: 13.5px; line-height: 1.5; color: var(--silver); }
-.menu__door-note { font-family: var(--font-mono); font-size: 9.5px; letter-spacing: 0.05em; line-height: 1.55; color: var(--t-meta); margin-top: 3px; }
-/* primary — the Free hero door */
-.menu__door--free { border: 1.5px solid var(--silver-dim); background: rgba(255, 255, 255, 0.05); }
-.menu__door--free:hover { border-color: var(--silver); background: rgba(255, 255, 255, 0.08); }
-/* subordinate — the Develop companion (quieter, dashed = the sealed/undeveloped motif) */
-.menu__door--develop { border: 1px dashed rgba(233, 229, 220, 0.34); }
-.menu__door--develop:hover { border-color: var(--silver-dim); }
-.menu__door--develop .menu__door-name { font-size: 12.5px; color: var(--silver-dim); }
+/* primary — the Add Your Photo hero door */
+.menu__door--add { border: 1.5px solid var(--silver-dim); background: rgba(255, 255, 255, 0.05); }
+.menu__door--add:hover { border-color: var(--silver); background: rgba(255, 255, 255, 0.08); }
+/* subordinate — the View Sample Card companion (quieter, dashed) */
+.menu__door--sample { border: 1px dashed rgba(233, 229, 220, 0.34); }
+.menu__door--sample:hover { border-color: var(--silver-dim); }
+.menu__door--sample .menu__door-name { font-size: 12.5px; color: var(--silver-dim); }
 .pickmsg { font-family: var(--font-mono); font-size: 9.5px; letter-spacing: 0.06em; color: var(--moss-bright); min-height: 12px; margin-top: 2px; }
 .menu__foot { font-family: var(--font-mono); font-size: 8.5px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--faint); margin-top: auto; }
 

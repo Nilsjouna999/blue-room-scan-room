@@ -941,11 +941,23 @@ function renderDossier(src, treatment) {
 /* Topbar zone label off state.view (UNIVERSE_ZONE_MAP zone-nav fork; BR-S064).
    The topbar only renders in the room view, so "ARCHIVE · SCAN ROOM" is what shows;
    the others are set for correctness if the topbar ever surfaces in another view. */
-const ZONE_LABELS = { menu: "ARCHIVE · LOBBY", room: "ARCHIVE · SCAN ROOM", draft: "ARCHIVE · LOCAL DRAFT", dev: "ARCHIVE · DEV" };
+const ZONE_LABELS = { menu: "ARCHIVE · LOBBY", room: "ARCHIVE · SAMPLE CARD", draft: "ARCHIVE · LOCAL DRAFT", dev: "ARCHIVE · DEV" };
 function applyView() {
   document.body.dataset.view = state.view;
   const zl = document.getElementById("zoneLabel");
-  if (zl) zl.textContent = ZONE_LABELS[state.view] || "ARCHIVE";
+  if (!zl) return;
+  if (state.view === "room") {
+    /* BR-S090 SAMPLE marker (derived per source). Every room today renders a SOURCES
+       sample — there is no scan engine, so no real user card exists — and the topbar must
+       say so, per-source, so a demo card is never mistaken for the user's own result.
+       TRACKING (stopgap): this marks ALL rooms SAMPLE because all rooms are SOURCES samples
+       now. When a real user-card render path ships (engine), it must set its own non-sample
+       label here rather than reuse this branch. */
+    const src = SOURCES[state.source];
+    zl.textContent = `ARCHIVE · SAMPLE · SRC-${pad2(src.no)} · NOT YOUR PHOTO`;
+  } else {
+    zl.textContent = ZONE_LABELS[state.view] || "ARCHIVE";
+  }
 }
 
 function renderMenu() {
@@ -970,21 +982,25 @@ function renderMenu() {
         <span class="menu__rule" aria-hidden="true"></span>
         <p class="msample__seal">The front is complete. The same card has a sealed back.</p>
 
+        <!-- BR-S090 door truth: exactly two honest doors. PRIMARY = Add Your Photo (the real
+             beginning → local-draft intake; no card is promised, the engine is offline).
+             SECONDARY = View Sample Card (the SRC-01 sample, explicitly not the user's photo).
+             Develop is intentionally NOT a menu door — it is an in-card action that only exists
+             after a real Free card, which needs the (unbuilt) scan engine. -->
         <div class="menu__doors">
-          <button type="button" class="menu__door menu__door--free" data-view-to="room">
-            <span class="menu__door-kicker">Free Pull</span>
-            <span class="menu__door-name">Enter Scan Room</span>
-            <span class="menu__door-desc">Scan a photo into a complete card — yours to keep and share.</span>
+          <button type="button" class="menu__door menu__door--add" data-draft-pick>
+            <span class="menu__door-kicker">Your Photo</span>
+            <span class="menu__door-name">${draft ? "Replace your photo" : "Add your photo"}</span>
+            <span class="menu__door-desc">Stage your image as a local draft. The scan engine isn't connected yet — nothing reads it.</span>
           </button>
-          <button type="button" class="menu__door menu__door--develop" data-view-to="room">
-            <span class="menu__door-kicker">Develop</span>
-            <span class="menu__door-name">Develop a scan</span>
-            <span class="menu__door-note">one-time develop · this scan only · dev mock, no payment</span>
+          <button type="button" class="menu__door menu__door--sample" data-view-to="room">
+            <span class="menu__door-kicker">Sample</span>
+            <span class="menu__door-name">View sample card</span>
+            <span class="menu__door-desc">See a finished developed card — SRC-01. A sample, not your photo.</span>
           </button>
         </div>
 
         <div class="menu__actions">
-          <button type="button" class="menu__add" data-draft-pick>${draft ? "Replace your photo" : "Add your photo"}<span class="menu__add-tag"> · local draft</span></button>
           ${draft ? `<button type="button" class="menu__resume" data-view-to="draft">Resume local draft →</button>` : ""}
           <p class="pickmsg" role="status" aria-live="polite"></p>
         </div>
@@ -1783,7 +1799,7 @@ function render() {
   const stageIntro = `
     <div class="stageintro">
       <p class="stageintro__line">Every photo is already a card. The room develops it.</p>
-      <span class="stageintro__cue">Sample scan · ${pad2(src.no)} / ${pad2(SOURCES.length)}</span>
+      <span class="stageintro__cue">SAMPLE · SRC-${pad2(src.no)} · not your photo</span>
     </div>`;
   document.getElementById("stageZone").innerHTML =
     stageIntro +

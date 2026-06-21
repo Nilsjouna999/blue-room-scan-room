@@ -168,6 +168,28 @@ browser console is clean (F12).
 - **Test:** shiny src1/src2 + free src1 + the normal-scroll seam + the full dossier; 7
   `section.dplate`; register strips still `<div>`; console clean.
 
+## To change the Archive Desk menu / doors / routing (BR-S090 door truth)
+
+- **Edit:** `app.js` → `renderMenu` (the two `.menu__door` buttons + `.menu__actions`), `applyView`
+  + `ZONE_LABELS` (the room SAMPLE marker), `render` (the `.stageintro__cue`); `styles.css`
+  `.menu__door--add` / `.menu__door--sample`.
+- **Door-truth law (BR-S090):** exactly TWO menu doors — PRIMARY "Add Your Photo" (`data-draft-pick`
+  → local-draft intake; the real beginning) and SECONDARY "View Sample Card" (`data-view-to="room"`
+  → SRC-01, clearly a sample). Develop is NOT a menu door (it only exists inside a real Free card,
+  which needs the unbuilt engine). No door may promise a scan / card / keepable result from the
+  user's own photo while the engine is offline.
+- **SAMPLE marker:** the room is marked SAMPLE per-source (topbar zone label + `.stageintro__cue`,
+  both derived from `SOURCES[state.source]`). STOPGAP: every room is a SOURCES sample today; when a
+  real user-card render path ships, it must set its own non-sample label in `applyView` rather than
+  reuse the room branch.
+- **Can break / don't:** the intake + gate are honest by design — do NOT dilute `renderDraftIntake` /
+  `renderGate` copy. `data-draft-pick` is attribute-delegated (works on the door). Keep "Free Pull"
+  off the doors (it remains only as the card edition stamp + the in-room treatment toggle = card/room
+  identity, not a door).
+- **Test:** menu (two doors only, no Develop) + sample room (per-source SAMPLE marker, SRC-01/02) +
+  draft route + draft-exists ("Replace your photo" + "Resume local draft →") @1600×900; console clean;
+  no false engine/scan/card promise; developed-reading arc unchanged.
+
 ## Product clarity pass (2026-06-12, data.js + app.js + tiny CSS)
 
 State taglines added to `TREATMENTS` (free: "First pull — the surface

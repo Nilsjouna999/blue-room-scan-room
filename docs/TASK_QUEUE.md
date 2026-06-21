@@ -10,6 +10,29 @@ Last updated: 2026-06-21.
 > is the head of **Ready** (below) — one at a time (this file's intro rule). For the
 > authoritative "what shipped" trail, cross-check `docs/DECISION_LOG.md` + `git log`.
 
+- **Archive Desk Intake Flow + Door Truth (BR-S090)** (2026-06-21, app.js + styles.css + docs): made the
+  entrance truthful (audited E-prime). The Archive Desk now has EXACTLY TWO doors: PRIMARY **Add Your Photo**
+  (hero, `data-draft-pick` → local-draft intake — the real beginning; sub-line "the scan engine isn't
+  connected yet — nothing reads it") and SECONDARY **View Sample Card** (dashed, `data-view-to="room"` →
+  SRC-01, "A sample, not your photo"). **Removed** the Develop door ("Develop a scan") + the old "Enter Scan
+  Room / Free Pull" door (both false — both routed to the sample; Develop was premature with no card and read
+  pay-first) + the redundant small "Add your photo" link. **SAMPLE marker** now derived per-source — topbar
+  zone label ("ARCHIVE · SAMPLE · SRC-0N · NOT YOUR PHOTO") + in-room `.stageintro__cue` ("SAMPLE · SRC-0N ·
+  not your photo") — so a demo card can't be mistaken for the user's own (STOPGAP tracked in code: every room
+  is a SOURCES sample today; a future real-card path must set its own non-sample label). CSS door modifiers
+  renamed `--free`→`--add` / `--develop`→`--sample`; orphaned `.menu__add` / `.menu__door-note` rules removed.
+  **Untouched:** `renderDraftIntake` / `renderGate` copy (honest no-engine core); data.js / index.html /
+  scan-contract.js; the BR-S088/S089 reading arc. "Free Pull" remains only as the card edition stamp + the
+  treatment toggle (card/room identity, not a door) — the Free-Pull→Free-Card rename is PARKED. **Verified
+  live @1600×900** (DOM + headless): two doors only (no Develop); Add → intake; View Sample → SRC-01 with the
+  per-source SAMPLE marker (SRC-01 + SRC-02); 7 `section.dplate` + developed reading unchanged; console clean;
+  no false scan/card/keepable promise; no face/person/worth/rank/hidden-score/rarity/paywall language; no
+  card-finish/anomaly/rarity/schema work. Draft-exists branch (door → "Replace your photo" + "Resume local
+  draft →") code-verified (a file-pick can't be auto-triggered headless). **NEXT (parked, future no-code
+  design):** the Card Finish / Surface Variant / Archive Anomaly brainstorm; the scan ENGINE / real
+  upload→card path remains the eventual structural lane that unlocks a real Card Room + in-card Develop
+  ("Open Card Back").
+
 - **Dossier Plate-Tier + Neighborhood Legibility (BR-S089)** (2026-06-21, styles.css + docs): post-BR-S088 the
   dossier was the bottleneck (7 equal dark boxes). One styles.css-ONLY hierarchy pass (app.js untouched), 4
   checkpoints: (1) SEAM — `.dossier__cue` lifted 9px/--faint → 11px/--t-body + brighter hairlines so the
