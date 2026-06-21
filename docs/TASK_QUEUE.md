@@ -10,6 +10,26 @@ Last updated: 2026-06-21.
 > is the head of **Ready** (below) — one at a time (this file's intro rule). For the
 > authoritative "what shipped" trail, cross-check `docs/DECISION_LOG.md` + `git log`.
 
+- **Paid Reading Value / Visual-Reward stress-test (BR-S087)** (2026-06-21, DOCS ONLY — new
+  `docs/BR-S087_PAID_READING_SPEC.md` + FILE_MAP + DECISION_LOG + this queue): a 13-role read-only design
+  pipeline (suspects withheld from a cold diagnostician to defeat confirmation bias) diagnosed why the
+  developed/PAID reading reads dry. **Verdict (builder-agreed): NOT primarily colour or reveal — REGISTER
+  FLATTENING + DUPLICATION.** The prose/content is already STRONGER than expected but rendered like admin/
+  document text (vivid card-keyed sentences at the same ~13-14px grey as field rows — only the Oracle escapes
+  via its distinct serif/quote register), AND the paid PANEL re-renders the dossier verbatim (stance/fit/impact/
+  lore/aura/scene-role/mint-record) → one peak + 6-7 flat echoes. K1 "IOU content" REJECTED for paid (the
+  "develops with the mint" placeholders are free-only). Direction = treat the reading as a VOICE DOCUMENT:
+  register-lift the card-keyed sentences + CUT the panel duplicates + re-tier the dossier + mark the
+  panel→dossier seam + COMPLETE (not invent) the existing `--halo-a` accent (colour Option D; reveal Option A /
+  no new motion); forced-KILL the cold/silver/blue "Mint mood" instinct. Full section audit, Hidden Stat/Oracle
+  treatments, Mint identity, six-instinct stress-test, safety table, and impl spec live in the doc. **No
+  runtime, no app.js/styles.css, no prototype, no commit of code.** **NEXT (gated on explicit builder approval —
+  do NOT auto-start):** the SMALLEST validation prototype ONLY — restyle `.dstat__evidence` (app.js:852 /
+  styles.css ~2027) to read as a written verdict (≈15px serif/display at `var(--text)`, breathing, demote the
+  tier-chip/bar) to test "register contrast = aliveness" on one section; CSS-only, Free-safe, zero layout-shift.
+  The FULL implementation (panel-duplicate cuts + dossier re-tier + accent) is DEFERRED and must not become the
+  next lane until the prototype validates.
+
 - **Developed Reading Rhythm — oracle-first + cue→effect + archive header (BR-S086)** (2026-06-21, app.js +
   styles.css + this queue): Phase 1 of the developed-reading de-dull (BR-S085 diagnosis: boring = a CONTENT/RHYTHM
   problem, not layout). Four scoped changes, conservative-hybrid form, **zero new pacing machinery**: **(1) Oracle-first**
