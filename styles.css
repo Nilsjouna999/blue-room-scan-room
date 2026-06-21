@@ -2493,9 +2493,33 @@ body[data-view="room"] .dev { display: none; }
 .draft__sample:hover, .draft__back:hover { border-color: var(--line-strong); color: var(--silver); }
 .draft__back { border-style: dashed; }
 
-/* Develop-scan CTA on the local-draft intake — the quiet next step. */
+/* Build-Local-Card CTA on the local-draft intake — the quiet filing step (BR-S092). */
 .draft__develop { display: grid; justify-items: center; gap: 7px; margin-top: 2px; }
 .draft__developsub { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--faint); }
+
+/* ---------- LOCAL FRONT CARD (BR-S092) — the filed local card ----------
+   A filed sibling of the draft card: same plate grammar, marked as FILED by a
+   firmer frame plus an archival id/timestamp and a compact safe-facts ledger.
+   Reading-free — it surfaces container facts only, never a scan reading. */
+.draftcard--local .draftcard__plate {
+  border-color: var(--line-strong);
+  box-shadow: 0 18px 50px -24px rgba(0, 0, 0, 0.85), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+.lcard__id {
+  font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.14em; color: var(--silver);
+  border: 1px dashed var(--line); border-radius: 4px; padding: 4px 10px; word-break: break-all; max-width: 100%;
+}
+.lcard__filed { font-family: var(--font-mono); font-size: 8.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--t-meta); }
+.lcard__prov { font-family: var(--font-mono); font-size: 8px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--faint); }
+.lcard__facts {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 6px 14px; width: 100%;
+  border-top: 1px solid var(--line-faint); border-bottom: 1px solid var(--line-faint);
+  padding: 9px 0; margin-top: 1px;
+}
+.lcard__fact { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+.lcard__factk { font-family: var(--font-mono); font-size: 7.5px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--faint); white-space: nowrap; }
+.lcard__factv { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.04em; color: var(--t-meta); text-align: right; word-break: break-word; }
+.lcard__back { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.03em; line-height: 1.4; color: var(--faint); margin-top: 1px; }
 
 /* Scan Development Gate — a sealed development step for a staged local
    draft. A locked chamber, not a SaaS modal: flat plate, static ledger,

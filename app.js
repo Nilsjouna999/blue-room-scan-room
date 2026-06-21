@@ -955,6 +955,10 @@ function applyView() {
        label here rather than reuse this branch. */
     const src = SOURCES[state.source];
     zl.textContent = `ARCHIVE · SAMPLE · SRC-${pad2(src.no)} · NOT YOUR PHOTO`;
+  } else if (state.view === "draft" && draft && draft.scan_state === "unscanned") {
+    /* BR-S092: a filed LOCAL FRONT CARD is the user's OWN photo, browser-only.
+       Never the SAMPLE branch above (that is SOURCES demos) and never "SAMPLE". */
+    zl.textContent = "ARCHIVE · YOUR PHOTO · LOCAL ONLY";
   } else {
     zl.textContent = ZONE_LABELS[state.view] || "ARCHIVE";
   }
@@ -1001,7 +1005,7 @@ function renderMenu() {
         </div>
 
         <div class="menu__actions">
-          ${draft ? `<button type="button" class="menu__resume" data-view-to="draft">Resume local draft →</button>` : ""}
+          ${draft ? `<button type="button" class="menu__resume" data-view-to="draft">${draft.scan_state === "unscanned" ? "Resume local card →" : "Resume local draft →"}</button>` : ""}
           <p class="pickmsg" role="status" aria-live="polite"></p>
         </div>
 
@@ -1031,13 +1035,21 @@ function renderDevnav() {
   ].join("");
 }
 
-/* ---------- local draft intake (browser-only, no upload, no analysis) ----------
-   The chosen image never leaves the browser and never receives a scan.
-   `draft` is a plain object — NOT a ScanResult — and carries no stats,
-   receipts, oracle, or hidden stat. renderDraft() must never read sample
-   scan data: if a number ever appears on the draft, that is a bug. */
+/* ---------- local draft + local front card (browser-only, no upload, no analysis) ----------
+   The chosen image never leaves the browser and never receives a scan. `draft`
+   is a plain object — NOT a ScanResult — and carries no stats, receipts, oracle,
+   hidden stat, score, rarity or finish. It holds only SAFE container facts (file
+   type/size + image dimensions/orientation/aspect, all derived from the file or
+   the <img> element — never from pixel content) and, once filed, a LOCAL card id +
+   staging timestamp. scan_state walks 'draft' (loaded, unfiled) → 'unscanned'
+   (filed LOCAL FRONT CARD). renderDraft()/renderLocalCard() must never read sample
+   scan data: if a stat, score or reading ever appears on the draft, that is a bug. */
 
-let draft = null; // { url, name, sizeLabel, warn } | null
+let draft = null;
+// { url, name, mime, typeLabel, sizeLabel, sizeBytes, warn,
+//   width, height, orientation, aspectLabel,     // safe container geometry (async-decoded)
+//   scan_state: 'draft' | 'unscanned',
+//   card_id, staged_at, staged_at_ms }  |  null   // filing identity, minted at Build Local Card
 
 function humanSize(bytes) {
   if (bytes >= 1024 * 1024) return (bytes / (1024 * 1024)).toFixed(1) + " MB";
@@ -1057,6 +1069,23 @@ function cleanFileLabel(name) {
   const ext = dot > 0 ? safe.slice(dot) : "";
   const base = dot > 0 ? safe.slice(0, dot) : safe;
   return base.length <= 16 ? safe : base.slice(0, 8) + "…" + base.slice(-3) + ext;
+}
+
+/* Safe container geometry + local filing helpers (BR-S092). Everything here is
+   derived from the file or the decoded <img> element — never from pixel content.
+   These produce container facts and a local id/timestamp only; never a reading. */
+function gcdInt(a, b) { a = Math.abs(a); b = Math.abs(b); while (b) { const t = b; b = a % b; a = t; } return a || 1; }
+function orientationLabel(w, h) { if (!w || !h) return ""; if (w === h) return "Square"; return w > h ? "Landscape" : "Portrait"; }
+function aspectLabel(w, h) {
+  if (!w || !h) return "";
+  const g = gcdInt(w, h), a = w / g, b = h / g;
+  if (a <= 50 && b <= 50) return `${a}:${b}`;
+  return w >= h ? `${(w / h).toFixed(2)}:1` : `1:${(h / w).toFixed(2)}`;
+}
+function rand4hex() { return Math.floor(Math.random() * 0x10000).toString(16).toUpperCase().padStart(4, "0"); }
+function stagedStamp(dt) {
+  const p = (n) => String(n).padStart(2, "0");
+  return `${dt.getFullYear()}-${p(dt.getMonth() + 1)}-${p(dt.getDate())} ${p(dt.getHours())}:${p(dt.getMinutes())} local`;
 }
 
 const DRAFT_LARGE_FILE = 25 * 1024 * 1024; // gentle-warning threshold; still previews
@@ -1083,13 +1112,62 @@ function loadDraftFile(file) {
   draft = {
     url: URL.createObjectURL(file),
     name: file.name || "untitled image",
+    mime: file.type || "",
+    typeLabel: fileTypeLabel(file.name),
     sizeLabel: humanSize(file.size || 0),
+    sizeBytes: file.size || 0,
     warn: file.size > DRAFT_LARGE_FILE ? "Large file — the preview may take a moment to render in this browser." : "",
+    width: null, height: null, orientation: "", aspectLabel: "", // safe geometry, filled by async decode
+    scan_state: "draft", // 'draft' (loaded, unfiled) → 'unscanned' (filed local card)
+    card_id: null, staged_at: "", staged_at_ms: null, // minted at Build Local Card
   };
   state.view = "draft";
-  state.draftGate = false; // a fresh / replaced draft always starts at intake, not the gate
+  state.draftGate = false; // a fresh / replaced draft always starts at intake — never the gate or a filed card
   document.getElementById("draftView").innerHTML = renderDraft();
   mountMenu(); // the menu now offers "Resume local draft"
+  applyView();
+  window.scrollTo(0, 0);
+  decodeDraftDimensions(draft); // safe container geometry only — browser-only, no pixel read
+}
+
+/* Decode the image's intrinsic pixel dimensions from the <img> element — a SAFE
+   container fact (width/height/orientation/aspect), never a read of pixel content.
+   Async + graceful: if decode fails, the fields stay empty and the card omits
+   them. Guards against a stale decode landing on a newer / replaced draft. */
+function decodeDraftDimensions(target) {
+  const probe = new Image();
+  probe.onload = () => {
+    if (draft !== target) return; // a newer / replaced draft superseded this one
+    const w = probe.naturalWidth || 0, h = probe.naturalHeight || 0;
+    if (!w || !h) return;
+    target.width = w; target.height = h;
+    target.orientation = orientationLabel(w, h);
+    target.aspectLabel = aspectLabel(w, h);
+    /* Only the filed local card surfaces dimensions — re-render it if it is the
+       screen currently shown (covers a fast Build click that beat the decode). */
+    if (state.view === "draft" && target.scan_state === "unscanned") {
+      document.getElementById("draftView").innerHTML = renderDraft();
+    }
+  };
+  probe.onerror = () => {}; // graceful: leave geometry empty
+  probe.src = target.url;
+}
+
+/* Build Local Card — the FILING event (beat two). Mints the local card identity
+   ONCE: a browser-local card id + a staging timestamp, sealing the already-known
+   safe facts into a filed LOCAL FRONT CARD. It runs NO scan and generates NO
+   reading (no stats / receipts / oracle / hidden stat / score / rarity / finish);
+   it only walks scan_state 'draft' → 'unscanned' and routes to renderLocalCard. */
+function buildLocalCard() {
+  if (!draft) return;
+  if (draft.scan_state !== "unscanned") { // mint once; never regenerate per render
+    draft.card_id = "BR-LOCAL-" + Date.now() + "-" + rand4hex();
+    draft.staged_at_ms = Date.now();
+    draft.staged_at = stagedStamp(new Date());
+    draft.scan_state = "unscanned";
+  }
+  document.getElementById("draftView").innerHTML = renderDraft();
+  mountMenu(); // the menu's resume label now reflects a filed local card
   applyView();
   window.scrollTo(0, 0);
 }
@@ -1098,7 +1176,9 @@ function loadDraftFile(file) {
    and the sealed Scan Development Gate. Neither generates any analysis. */
 function renderDraft() {
   if (!draft) return "";
-  return state.draftGate ? renderGate() : renderDraftIntake();
+  if (state.draftGate) return renderGate();              // dormant future-engine step (no product door now)
+  if (draft.scan_state === "unscanned") return renderLocalCard(); // beat two: the filed LOCAL FRONT CARD
+  return renderDraftIntake();                            // beat one: the loaded, unfiled LOCAL DRAFT
 }
 
 /* The draft card reuses the Room/Plate/Artifact grammar but shows ZERO
@@ -1150,9 +1230,90 @@ function renderDraftIntake() {
       </section>
 
       <div class="draft__develop">
-        <button type="button" class="menu__enter" data-gate="open">Develop scan</button>
-        <p class="draft__developsub">Stage artifact for future scan engine.</p>
+        <button type="button" class="menu__enter" data-build-card>Build Local Card</button>
+        <p class="draft__developsub">Files your image as a local card — image facts only, no scan; the engine is not connected.</p>
       </div>
+
+      <div class="draft__actions">
+        <button type="button" class="draft__sample" data-draft-pick>Replace image</button>
+        <button type="button" class="draft__sample" data-view-to="room">Enter sample scan room</button>
+        <button type="button" class="draft__back" data-view-to="menu">Main menu</button>
+      </div>
+
+      <p class="pickmsg" role="status" aria-live="polite"></p>
+    </div>`;
+}
+
+/* LOCAL FRONT CARD (BR-S092) — the filed local card (beat two). Reading-free:
+   it NEVER routes through renderCard (which carries fixture reading content) and
+   reads ONLY `draft`. It shows the staged image in the card shell plus the FILED
+   identity (local card id + staging timestamp) and SAFE container facts only
+   (dimensions, orientation, aspect, file type, file size, browser-only source).
+   It generates NOTHING — no stats / receipts / oracle / hidden stat / score /
+   rarity / finish / serial — and never touches SOURCES, SCAN_RESULTS_V2,
+   getActiveScan() or getScanResult(). The card back stays closed because no scan
+   exists: there is no reading and no Develop / Open-Card-Back action, only a
+   static honesty line. */
+function renderLocalCard() {
+  const d = draft;
+  const dims = (d.width && d.height) ? `${d.width} × ${d.height} px` : "Not available";
+  const orient = d.orientation || "—";
+  const aspect = d.aspectLabel || "—";
+  const fact = (k, v) => `<div class="lcard__fact"><span class="lcard__factk">${esc(k)}</span><span class="lcard__factv">${esc(v)}</span></div>`;
+  return `
+    <div class="draft__inner">
+      <div class="draft__cue">◆ &nbsp;BLUE ROOM · LOCAL FRONT CARD</div>
+
+      <article class="draftcard draftcard--local" aria-label="Local front card">
+        <div class="draftcard__plate">
+          <header class="draftcard__head">
+            <span class="draftcard__house">◆ BLUE ROOM ARCHIVE</span>
+            <span class="draftcard__state">LOCAL CARD · FRONT</span>
+          </header>
+
+          <figure class="draftcard__photo">
+            <img class="draftcard__img" src="${esc(d.url)}" alt="Local front card"
+              onerror="this.closest('.draftcard__photo').classList.add('img-missing')" />
+            <span class="draftcard__scrim"></span>
+            <span class="draftcard__stamp">YOUR PHOTO · LOCAL CARD · FRONT ONLY · UNSCANNED</span>
+          </figure>
+
+          <div class="draftcard__body">
+            <h2 class="draftcard__title">Local card</h2>
+            <p class="lcard__id">${esc(d.card_id)}</p>
+            <p class="lcard__filed">FILED LOCALLY · ${esc(d.staged_at)}</p>
+            <p class="lcard__prov">LOCAL ONLY · THIS BROWSER · NOT UPLOADED</p>
+
+            <div class="lcard__facts">
+              ${fact("Dimensions", dims)}
+              ${fact("Orientation", orient)}
+              ${fact("Aspect", aspect)}
+              ${fact("File type", d.typeLabel || fileTypeLabel(d.name))}
+              ${fact("File size", d.sizeLabel)}
+              ${fact("Source", "Browser-only")}
+            </div>
+
+            <div class="draftcard__archline">
+              <span class="draftcard__archrule"></span>
+              <span class="draftcard__arch">◆ &nbsp;UNSCANNED ARTIFACT &nbsp;◆</span>
+              <span class="draftcard__archrule"></span>
+            </div>
+            <p class="draftcard__status">No scan has run — the engine is offline.</p>
+            <p class="lcard__back">Card back remains closed until a scan exists.</p>
+          </div>
+
+          <div class="draftcard__strip">
+            <span class="draftcard__stripstate">LOCAL CARD</span>
+            <span class="draftcard__stripmeta">NOT MINTED · NO SERIAL</span>
+          </div>
+        </div>
+      </article>
+
+      <section class="draftinfo">
+        <p class="draftinfo__line">Your image is filed as a local card.</p>
+        <p class="draftinfo__sub">This card holds your image, a local card id and safe file facts — kept in this browser only. Nothing has been uploaded, scanned or read. The reading and the sealed back exist only once the scan engine is connected.</p>
+        ${d.warn ? `<p class="draftinfo__warn">${esc(d.warn)}</p>` : ""}
+      </section>
 
       <div class="draft__actions">
         <button type="button" class="draft__sample" data-draft-pick>Replace image</button>
@@ -1945,8 +2106,17 @@ document.getElementById("draftFile").addEventListener("change", (e) => {
   loadDraftFile(e.target.files && e.target.files[0]);
 });
 
-/* Scan Development Gate: open ("Develop scan") / close ("Return to local
-   draft"). Toggles a render flag only — it never runs or generates a scan. */
+/* Build Local Card (BR-S092): the filing event — mint the local card identity
+   and route to the LOCAL FRONT CARD. Generates no scan and no reading. */
+document.addEventListener("click", (e) => {
+  if (!e.target.closest("[data-build-card]")) return;
+  buildLocalCard();
+});
+
+/* Scan Development Gate: open / close. Toggles a render flag only — it never
+   runs or generates a scan. NOTE: with BR-S092 no product surface emits
+   data-gate="open" any more (the intake CTA now Builds the Local Card), so this
+   path is dormant; renderGate is kept honest + intact for a future engine. */
 document.addEventListener("click", (e) => {
   const btn = e.target.closest("[data-gate]");
   if (!btn) return;
