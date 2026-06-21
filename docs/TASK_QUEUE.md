@@ -10,6 +10,24 @@ Last updated: 2026-06-21.
 > is the head of **Ready** (below) — one at a time (this file's intro rule). For the
 > authoritative "what shipped" trail, cross-check `docs/DECISION_LOG.md` + `git log`.
 
+- **BR-S094 — cheap_extract specificity test bench (DESIGN only)** (2026-06-21, docs only): designed the bench
+  BR-S093 §11 queued and saved it as `docs/BR-S094_CHEAP_EXTRACT_BENCH_SPEC.md`. Purpose: test whether a CHEAP
+  extraction pass can produce ONE safe, oddly-specific Blue Room artifact anchor on real photos — matchable back
+  to its photo, never reading the person, at Free-tier cost — to de-risk the cheap-Free/deep-Paid economics and
+  pin the specificity floor (BR-S093's #1 non-code risk) before any engine code. Spec carries: the 5-question
+  frame, the ~20-photo input set (subject/info-density/quality + a ~5 safety-stress subset), the single-anchor
+  strict-JSON schema (a BR-S093 contract line), scoring rubrics (valid JSON · specificity 0/1/2 · reason-safety ·
+  generic swap-test · **UNSAFE-PERSON zero-tolerance** · **blind match-rate = the proof** · cost · curiosity),
+  failure thresholds + KILL/PASS verdict logic, the blind-match leakage-control protocol, and the recording
+  format. **This is bench DESIGN ONLY** — NO runtime, NO app integration, NO scan engine, NO API calls, NO model
+  calls, NO payment / Paid Full Develop / finish-anomaly / Vault / salvage; no app.js/styles.css/scan-contract.js.
+  **The actual bench RUN is BLOCKED** until the builder (a) supplies ~20 varied photos AND (b) explicitly
+  approves running it — until both, paper design only, no execution, no cost. Registered in `FILE_MAP.md`,
+  ratified in `DECISION_LOG.md`. **NEXT (gated):** on the photo set + approval → RUN the bench (results to
+  `docs/bench/`) → read the verdict (PASS → lock Free tier + cost→price; KILL → escalate model tier / shrink Free
+  scope). **Then** the Scan Engine Spine. ONE commit "Docs: add BR-S094 cheap_extract bench spec"; not pushed
+  without approval.
+
 - **BR-S093 — Front Pull vs Full Develop: Value Ladder + Evidence Contract (no-code spec)** (2026-06-21, docs
   only): the no-code planning lane that consumes `docs/BLUE_ROOM_MASTER_SPINE.md` and produces the open deltas
   (never re-deriving locked laws). Opened on the pushed checkpoint `2c91a32`. **Added
