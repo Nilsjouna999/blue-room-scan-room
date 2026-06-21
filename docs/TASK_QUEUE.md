@@ -10,6 +10,25 @@ Last updated: 2026-06-21.
 > is the head of **Ready** (below) — one at a time (this file's intro rule). For the
 > authoritative "what shipped" trail, cross-check `docs/DECISION_LOG.md` + `git log`.
 
+- **BR-S093 — Front Pull vs Full Develop: Value Ladder + Evidence Contract (no-code spec)** (2026-06-21, docs
+  only): the no-code planning lane that consumes `docs/BLUE_ROOM_MASTER_SPINE.md` and produces the open deltas
+  (never re-deriving locked laws). Opened on the pushed checkpoint `2c91a32`. **Added
+  `docs/BR-S093_VALUE_LADDER_SPEC.md`** — a Result Map (broad lane) + the spec: current surface inventory
+  (SAMPLE model), target Free Front Pull + Paid Full Develop surfaces, the **exact Free/Paid delta = DEPTH not
+  completion** ("Free gives you the card. Paid develops its production record."), the evidence-contract per-line
+  schema (`{lens, observation, visibleCue=specificity_anchor, effect, confidence, reason}`, reason validated,
+  fail-closed on missing anchor), and the cheap_extract test-bench plan. **§5 RATIFIED (builder):** the Free↔Paid
+  choice is a **user-controlled in-room SWITCH** ("choose/switch what you want" between Free Front Pull and Full
+  Develop) — not a forced funnel; default-on-entry = Free (Free-as-hero), Full Develop pre-purchase shows the
+  intent gate (qualitative sealed-back + price, no paid content), post-purchase both views switch freely
+  (idempotent, immutable snapshot). **OPEN deltas carried** (resolve in/after the bench, not now): anomaly
+  attach-scope; price/margin anchor (provisional ~$7, = f(deep-pass cost)); specificity floor threshold
+  (empirical). Registered in `FILE_MAP.md`, ratified in `DECISION_LOG.md`. Docs only — no runtime, no scan
+  engine, no payment, no finish/anomaly, no Vault, no salvage. **NEXT lane:** the cheap_extract specificity
+  **test bench** (§11) — ~20 photos, anchor-coverage + blind match-rate + cost; design→build on explicit ask.
+  **Then** the Scan Engine Spine (built against this evidence contract). ONE commit "Docs: BR-S093 value-ladder
+  + evidence-contract spec"; not pushed without approval.
+
 - **Docs — Post-BR-S092 Master Spine saved** (2026-06-21, docs only): saved the sharpened strategic master
   to the repo so it is durable in GitHub, not only living in chat. **Added `docs/BLUE_ROOM_MASTER_SPINE.md`**
   ("BLUE ROOM — Master Spine (sharpened, post BR-S092)") — the current strategic source-of-truth: three card
