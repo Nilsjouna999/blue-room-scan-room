@@ -10,6 +10,24 @@ Last updated: 2026-06-21.
 > is the head of **Ready** (below) — one at a time (this file's intro rule). For the
 > authoritative "what shipped" trail, cross-check `docs/DECISION_LOG.md` + `git log`.
 
+- **BR-S101 — 3 prototype cards from local photos (?dev=proto-cards)** (2026-06-22, app.js + styles.css +
+  .gitignore): the builder picked 3 of their own photos as "final prototypes" and gave the gallery paths; I
+  copied them into `assets/source-03/04/05.jpg` (**gitignored** — personal faces, public repo, local-only) and
+  built a contained DEV route `?dev=proto-cards` that renders each as a card in **Free + Halo** via the master
+  `renderCard`. Three minimal SAFE source objects (`PROTO_CARDS` in app.js): file + halo{a/b/c} + photoTuning +
+  capture + card{title,archetype,note,signature,serial,stats}; `renderCard`'s stat read falls back to
+  `card.stats` (these aren't in SCAN_RESULTS_V2 → no crash). **Front-only** — NOT wired into the room/SOURCES,
+  no dossier/diagram/metrics/reading authored (avoids 3 full production datasets + a 5-source toggle rewrite +
+  crash risk). **Copy is artifact-only** (frame / composition / light / scene / held-object geometry — e.g.
+  "Held Catch, Open Shore", "Loose Run, Low Angle", "Tank Pick, House Light"), never the person, per the locked
+  law (faces in-frame). Photos are EXIF-rotated; browsers render them upright (natural 1868×4000 portrait).
+  **Verified live** (headless @1600×2400): 6 cards (3×free/halo), all photos load upright, halo shows on the
+  developed ones, no missing images, console clean. Runtime: app.js + styles.css (+ .gitignore); data.js +
+  index.html untouched; the production SOURCES/room untouched. Tunable: crops (photoTuning), copy, stats, halo
+  hues. ONE commit "BR-S101: prototype cards from local photos (dev route)"; not pushed without approval.
+  **Bigger lane if wanted:** promoting any of these to a FULL room source (per-photo dossier/diagram/metrics +
+  5-source toggle) is a separate production task — and, since faces would then be committed, a privacy decision.
+
 - **BR-S099 — original developed-card halo RESTORED verbatim + bloom tightened (styles.css)** (2026-06-22,
   styles.css + docs): across BR-S095–S098 the halo was rebuilt from scratch (around-glow → smokey conic → LED
   edge → comet current) and the builder rejected each (not-the-original / fake-gold / smokey). They asked if I

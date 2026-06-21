@@ -1,2 +1,9 @@
 ﻿Thumbs.db
 desktop.ini
+
+# BR-S101 prototype card photos — PERSONAL, LOCAL-ONLY (faces; public repo).
+# The SRC-03/04/05 prototype cards render these on the builder's machine; the
+# images are never committed/pushed. data.js references them by path.
+assets/source-03.jpg
+assets/source-04.jpg
+assets/source-05.jpg

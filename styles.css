@@ -2523,6 +2523,24 @@ body[data-view="room"] .dev { display: none; }
 .draft__sample:hover, .draft__back:hover { border-color: var(--line-strong); color: var(--silver); }
 .draft__back { border-style: dashed; }
 
+/* ---------- DEV prototype-cards gallery (?dev=proto-cards) — BR-S101 ----------
+   Dev-only surface: the 3 local prototype cards in Free + Halo, front only. */
+.proto { width: min(1180px, 94vw); margin: 0 auto; display: grid; gap: 30px; padding: 40px 0 80px; }
+.proto__head { display: grid; gap: 8px; justify-items: center; text-align: center; }
+.proto__devtag { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--moss-bright); border: 1px dashed var(--line); border-radius: 999px; padding: 4px 12px; }
+.proto__title { font-family: var(--font-display); font-size: 22px; color: var(--t-display); }
+.proto__note { font-size: 12px; line-height: 1.5; color: var(--t-meta); max-width: 660px; }
+.proto__row { display: grid; gap: 14px; border-top: 1px solid var(--line-faint); padding-top: 26px; }
+.proto__rowhead { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.proto__name { font-family: var(--font-display); font-size: 16px; color: var(--t-primary); }
+.proto__file { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--faint); }
+.proto__pair { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; justify-items: center; }
+.proto__cell { display: grid; gap: 10px; justify-items: center; }
+.proto__state { font-family: var(--font-mono); font-size: 8.5px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--silver-dim); }
+.proto__card { zoom: 0.72; }
+.proto__foot { display: flex; gap: 12px; justify-content: center; padding-top: 18px; }
+@media (max-width: 720px) { .proto__pair { grid-template-columns: 1fr; } }
+
 /* Build-Local-Card CTA on the local-draft intake — the quiet filing step (BR-S092). */
 .draft__develop { display: grid; justify-items: center; gap: 7px; margin-top: 2px; }
 .draft__developsub { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--faint); }

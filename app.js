@@ -98,7 +98,7 @@ const state = { source: 0, treatment: "free", tab: "diagram", view: "menu", draf
      uploaded-blocked renders a validated DEV fixture, never a user scan.
      free-scan-sim = Free Pull mock · halo-gate = sealed card-back mock. */
   const dev = q.get("dev");
-  if (["uploaded-result", "uploaded-blocked", "free-scan-sim", "halo-gate", "before-after", "review-map"].includes(dev)) { state.view = "dev"; state.dev = dev; }
+  if (["uploaded-result", "uploaded-blocked", "free-scan-sim", "halo-gate", "before-after", "review-map", "proto-cards"].includes(dev)) { state.view = "dev"; state.dev = dev; }
   else if (q.has("src") || q.has("t") || q.has("tab")) state.view = "room";
 }
 
@@ -1502,9 +1502,76 @@ function renderBeforeAfter() {
     </div>`;
 }
 
+/* ---------- DEV PROTOTYPE CARDS (?dev=proto-cards) — BR-S101 ----------
+   Three LOCAL prototype cards from the builder's own photos (assets/source-03/04/05.jpg,
+   gitignored — personal, never pushed). FRONT ONLY: each rendered through the master
+   renderCard in Free + Halo so the card design + the restored halo can be judged across
+   varied photos. NOT wired into the room/SOURCES (no dossier/diagram/metrics authored) —
+   a contained prototype surface gated by ?dev (customers never reach it). The renderCard
+   stat read falls back to card.stats (these sources aren't in SCAN_RESULTS_V2 → no crash).
+   COPY IS ARTIFACT-ONLY (frame / composition / light / scene / held-object geometry),
+   never the person — per the locked product law (faces are in-frame). */
+const PROTO_CARDS = [
+  { id: "proto-fish", no: 3, file: "assets/source-03.jpg",
+    halo: { material: "Cold Tide Steel", a: "#6fb3e0", b: "#8b7bff", c: "#9fe0c8" },
+    photoTuning: { pos: "50% 38%", zoom: 1, scrim: 0.12, base: { bright: 1, contrast: 1.03, sat: 1.02 } },
+    capture: { code: "FIELD / FSH", rec: "2025.05.30" },
+    card: { title: "Held Catch, Open Shore", archetype: "The Dispatch",
+      note: "The held catch cuts a hard diagonal across a calm horizon band; overcast fjord light flattens the water to a single plane.",
+      signature: "Field document · open shoreline", serial: "BR-003-FSH-0001",
+      stats: { presence: 72, frame: 80, signal: 64, visualImpact: 70 } } },
+  { id: "proto-run", no: 4, file: "assets/source-04.jpg",
+    halo: { material: "Field Green Glass", a: "#7fc8a0", b: "#6fb3e0", c: "#cfe2ee" },
+    photoTuning: { pos: "50% 45%", zoom: 1, scrim: 0.1, base: { bright: 1.02, contrast: 1.02, sat: 1.03 } },
+    capture: { code: "FIELD / RUN", rec: "2025.08.24" },
+    card: { title: "Loose Run, Low Angle", archetype: "The Encounter",
+      note: "A low lens turns the path into a leading wedge; the foreground mass breaks frame mid-stride, blurring the plane it crosses.",
+      signature: "Ground-level · motion frame", serial: "BR-004-RUN-0001",
+      stats: { presence: 68, frame: 74, signal: 82, visualImpact: 86 } } },
+  { id: "proto-tank", no: 5, file: "assets/source-05.jpg",
+    halo: { material: "Tank Glass Teal", a: "#36b6c8", b: "#8b7bff", c: "#e0a060" },
+    photoTuning: { pos: "45% 40%", zoom: 1, scrim: 0.12, base: { bright: 1, contrast: 1.04, sat: 1.05 } },
+    capture: { code: "INT / TNK", rec: "2025.10.20" },
+    card: { title: "Tank Pick, House Light", archetype: "The Encounter",
+      note: "Hard ceiling tubes rake a held subject over a tank-blue band; the painted mural flattens the depth behind into a postcard plane.",
+      signature: "Interior document · house light", serial: "BR-005-TNK-0001",
+      stats: { presence: 76, frame: 70, signal: 78, visualImpact: 80 } } },
+];
+
+function renderProtoCards() {
+  const row = (src) => `
+    <section class="proto__row">
+      <div class="proto__rowhead">
+        <span class="proto__name">${esc(src.card.title)}</span>
+        <span class="proto__file">SRC-${pad2(src.no)} · local · ${esc(src.capture.code)}</span>
+      </div>
+      <div class="proto__pair">
+        <div class="proto__cell"><span class="proto__state">FREE PULL</span><div class="proto__card">${renderCard(src, "free")}</div></div>
+        <div class="proto__cell"><span class="proto__state">HALO MINT · DEVELOPED</span><div class="proto__card">${renderCard(src, "shiny")}</div></div>
+      </div>
+    </section>`;
+  return `
+    <div class="proto">
+      <header class="proto__head">
+        <span class="proto__devtag">DEV · PROTOTYPE CARDS — not a product surface</span>
+        <h1 class="proto__title">Prototype cards — local photos, front only</h1>
+        <p class="proto__note">Three local photos rendered through the master card in Free + Halo, to judge the card design and the restored halo across varied images. Front only — no reading or dossier authored. Local-only (gitignored); reads the photograph as artifact, never the person.</p>
+      </header>
+      ${PROTO_CARDS.map(row).join("")}
+      <footer class="proto__foot">
+        <button type="button" class="draft__back" data-view-to="menu">Main menu</button>
+        <button type="button" class="draft__sample" data-view-to="room">Sample scan room</button>
+      </footer>
+    </div>`;
+}
+
 function mountDev() {
   const C = window.BlueRoomScanContract;
   const F = (C && C.DEV_FIXTURES) || {};
+  if (state.dev === "proto-cards") {
+    document.getElementById("devView").innerHTML = renderProtoCards();
+    return;
+  }
   if (state.dev === "review-map") {
     document.getElementById("devView").innerHTML = renderReviewMap();
     return;
