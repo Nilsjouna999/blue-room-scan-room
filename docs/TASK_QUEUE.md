@@ -10,6 +10,26 @@ Last updated: 2026-06-21.
 > is the head of **Ready** (below) — one at a time (this file's intro rule). For the
 > authoritative "what shipped" trail, cross-check `docs/DECISION_LOG.md` + `git log`.
 
+- **Docs — Post-BR-S092 Master Spine saved** (2026-06-21, docs only): saved the sharpened strategic master
+  to the repo so it is durable in GitHub, not only living in chat. **Added `docs/BLUE_ROOM_MASTER_SPINE.md`**
+  ("BLUE ROOM — Master Spine (sharpened, post BR-S092)") — the current strategic source-of-truth: three card
+  states (Local Front Card / Free Front Pull / Paid Full Develop), the Free/Paid relationship (Dependency ·
+  Continuity · Consistency), the hero sentence ("Free gives you the card. Paid develops its production
+  record."), the canonical `card_record`, the evidence-contract + specificity-anchor + reason-field laws,
+  economics/persistence (vendor-agnostic model tiers, immutable snapshots, no re-call/re-roll), finish/anomaly
+  + salvage PARKING, and the roadmap. **Corrected the chat draft's header**: latest pushed HEAD is the docs
+  commit `60a5c75 — Docs: record BR-S092 local front card lane` (chat draft wrongly named `b11ccd0`); `b11ccd0`
+  is the runtime commit underneath. **Confirms BR-S092 is the current pushed source.** Registered in
+  `docs/FILE_MAP.md` (table row + strategic-spine pointer) and ratified in `docs/DECISION_LOG.md`. Governance
+  note (read-only Opus critic, NO blockers): the master's Dependency law ("Paid does not require Free") refines
+  the older locked "Develop = sealed back of the SAME card the user already holds / Free-first" framing —
+  preserved verbatim, the refinement logged in DECISION_LOG, with the lawful **Paid-only entry flow** flagged as
+  an OPEN delta for BR-S093 (the anti-paywall laws stay intact via Consistency + the hero sentence). **NEXT:**
+  BR-S093 is **no-code** — *Front Pull vs Full Develop: Value Ladder + Evidence Contract* — and must consume
+  this master, producing only open deltas (never re-deriving locked laws). **Scan engine + the cheap_extract
+  test bench remain NOT started** (parked behind BR-S093). Docs only — no runtime change. ONE commit "Docs: add
+  post-BR-S092 master spine"; not pushed without explicit approval.
+
 - **Draft → Local Front Card (BR-S092)** (2026-06-21, app.js + styles.css; shipped LOCALLY as `b11ccd0`): the
   first truthful, buildable-now step where a user's OWN photo becomes a held card object — without faking a scan.
   **Two-beat decision (ratified A, from the BR-S091 honesty spine):** pick photo → **LOCAL DRAFT** (loaded, unfiled
