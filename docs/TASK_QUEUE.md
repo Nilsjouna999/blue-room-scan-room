@@ -10,6 +10,23 @@ Last updated: 2026-06-21.
 > is the head of **Ready** (below) — one at a time (this file's intro rule). For the
 > authoritative "what shipped" trail, cross-check `docs/DECISION_LOG.md` + `git log`.
 
+- **BR-S096 — rotating halo rim restored on the developed card, reconciled (styles.css)** (2026-06-21,
+  styles.css + docs): the builder asked for the "pulsating semi-spinning LED-ish" rim back — the `holo-spin`
+  (rotating conic-gradient light around the card edge) that BR-S067 killed as the lead "yippi offender."
+  Recovered the original from git history (`1c6c328^`: a `@property --holo-angle` conic on the whole `.card`
+  background + `holo-spin 7s` + violet/cyan/green rainbow + shimmer-sweep + twinkle sparkles). **Restored
+  RECONCILED** (on the BR-S095 `.card__halo`, not the whole-card wash): (1) per-source `--halo-a/b` ONLY — never
+  the violet/cyan/green rainbow; (2) ONE soft rotating rim behind the card (z-index:-1) over the BR-S095 base
+  glow, NOT the card-background conic ("the card got brighter"); (3) runs ALONE — sparkles / twinkle /
+  shimmer-sweep stay OFF (the genuinely busy offenders); (4) slow 8s spin + gentle breathe = pulsating-not-
+  frantic; reduced-motion stills it (existing block). Floor/panel zero-halo + "no --halo escapes to room"
+  box-shadow ring (BR-S067 subtractive crown) untouched. **Verified live @1600×900** (headless capture +
+  computed): `animationName: halo-fadein, holo-spin, halo-breathe` (8s), conic + radial base present, blur 18,
+  sparkles opacity 0; per-source rotating rim visibly sweeps the shiny SRC-01 card. Reverses the BR-S067
+  spin-removal **by builder request** (logged in DECISION_LOG). Speed / intensity / palette are eyeball-tunable;
+  literal rainbow + sparkles remain opt-in (advised against). Runtime: styles.css only. ONE commit "BR-S096:
+  restore reconciled rotating halo rim"; not pushed without approval.
+
 - **BR-S095 — halo glow around the developed card (styles.css)** (2026-06-21, styles.css + docs): the builder
   noticed the halo wasn't reading as a glow AROUND the developed card — confirmed real. The shiny `.card__halo`
   (builder-restored BR-S068, z-index:-1 behind the card) bloomed in the CENTRE and faded transparent (~70%)

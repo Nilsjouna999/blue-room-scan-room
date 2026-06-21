@@ -1091,20 +1091,31 @@ body[data-devnav="1"] .toggle--treatment { display: inline-flex; }
    blurred glow that fades in on develop then breathes; opacity/transform only
    (compositor-cheap); reduced-motion stills it (block at file end). Sparkles
    stay OFF (the twinkle was the yippi offender, not the halo). */
+/* BR-S096 — builder asked for the "pulsating semi-spinning LED-ish" rim back
+   (the BR-S067-killed holo-spin). RECONCILED so it does not re-trip the
+   magnetic-not-yippi law: (1) per-source --halo-a/b ONLY, never the old
+   violet/cyan/green rainbow; (2) ONE soft rotating rim behind the card
+   (z-index:-1), never the whole-card conic wash ("the card got brighter");
+   (3) it runs ALONE over the BR-S095 base glow — sparkles / twinkle /
+   shimmer-sweep stay OFF (those were the busy offenders); (4) slow 8s spin +
+   gentle breathe = pulsating-not-frantic; reduced-motion stills it (file end).
+   Still the card's OWN depth — no --halo on floor/panels (BR-S067 crown holds). */
+@property --holo-angle { syntax: "<angle>"; initial-value: 0deg; inherits: false; }
+@keyframes holo-spin { to { --holo-angle: 360deg; } }
 .card[data-treatment="shiny"] .card__halo {
   opacity: 1;
-  /* BR-S095 halo-around-the-card fix: the old gradients bloomed in the CENTER and
-     faded to transparent (~70%) BEFORE the card silhouette — so the colored glow
-     sat hidden BEHIND the opaque card (z-index:-1) and the perimeter ring (the
-     visible part beyond the card edge) was empty → "no halo around the card".
-     Now the bloom carries colour OUT to ~100% of the +40px box and blurs softly,
-     so a per-source-tinted halo actually rings the developed card. Still the
-     card's own depth (z-index:-1, behind the card; no --halo on floor/panels). */
   background:
-    radial-gradient(96% 84% at 50% 48%, color-mix(in srgb, var(--halo-a) 34%, transparent) 0%, color-mix(in srgb, var(--halo-a) 20%, transparent) 58%, transparent 100%),
-    radial-gradient(106% 92% at 50% 60%, color-mix(in srgb, var(--halo-b) 22%, transparent) 0%, transparent 100%);
-  filter: blur(22px);
-  animation: halo-fadein 600ms ease-out both, halo-breathe 5.5s ease-in-out infinite 600ms;
+    conic-gradient(from var(--holo-angle),
+      transparent 0deg,
+      color-mix(in srgb, var(--halo-a) 44%, transparent) 38deg,
+      transparent 110deg,
+      color-mix(in srgb, var(--halo-b) 36%, transparent) 190deg,
+      transparent 262deg,
+      color-mix(in srgb, var(--halo-a) 40%, transparent) 320deg,
+      transparent 360deg),
+    radial-gradient(98% 86% at 50% 50%, color-mix(in srgb, var(--halo-a) 18%, transparent) 0%, color-mix(in srgb, var(--halo-b) 12%, transparent) 56%, transparent 100%);
+  filter: blur(18px);
+  animation: halo-fadein 600ms ease-out both, holo-spin 8s linear infinite, halo-breathe 6s ease-in-out infinite 600ms;
 }
 @keyframes halo-fadein { from { opacity: 0; } to { opacity: 0.82; } }
 @keyframes halo-breathe {
