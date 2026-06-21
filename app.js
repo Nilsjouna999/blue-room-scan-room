@@ -84,7 +84,7 @@ const state = { source: 0, treatment: "free", tab: "diagram", view: "menu", draf
 {
   const q = new URLSearchParams(location.search);
   const s = parseInt(q.get("src"), 10);
-  if (s === 1 || s === 2) state.source = s - 1;
+  if (s >= 1 && s <= SOURCES.length) state.source = s - 1;
   if (["free", "shiny", "mint"].includes(q.get("t"))) state.treatment = q.get("t");
   /* Source merged into Diagram (BR-S044): legacy ?tab=source re-points to diagram. */
   const tabParam = q.get("tab");
@@ -2235,8 +2235,7 @@ document.addEventListener("keydown", (e) => {
     }
     return;
   }
-  if (e.key === "1") state.source = 0;
-  else if (e.key === "2") state.source = 1;
+  if (/^[1-9]$/.test(e.key) && Number(e.key) <= SOURCES.length) state.source = Number(e.key) - 1;
   else if (e.key.toLowerCase() === "f") { state.treatment = "free"; state.labMaterial = null; }
   else if (e.key.toLowerCase() === "m") state.treatment = "mint";
   else if (e.key.toLowerCase() === "h" || e.key.toLowerCase() === "s") { state.treatment = "shiny"; state.labMaterial = null; }
@@ -2251,7 +2250,20 @@ document.addEventListener("keydown", (e) => {
   render();
 });
 
+/* Data-driven source toggle (BR-S103): build the SRC buttons from SOURCES so the
+   rail auto-scales to N sources. Replaces the 2 hardcoded index.html buttons at
+   init; the is-active sync (in render) + the [data-source] click handler are
+   already generic. */
+function renderSourceToggle() {
+  const el = document.getElementById("sourceToggle");
+  if (!el) return;
+  el.innerHTML = SOURCES.map((s, i) =>
+    `<button type="button" data-source="${i}" class="toggle__btn${i === state.source ? " is-active" : ""}">SRC ${pad2(s.no)} · ${esc(s.short || s.label)}</button>`
+  ).join("");
+}
+
 mountMenu();
+renderSourceToggle();
 /* DEV NAV: fill + reveal the dev rail only behind ?devnav=1; sets the
    body attribute the CSS gates on. Inert (display:none) on any clean URL. */
 if (DEVNAV) {

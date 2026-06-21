@@ -10,6 +10,26 @@ Last updated: 2026-06-21.
 > is the head of **Ready** (below) — one at a time (this file's intro rule). For the
 > authoritative "what shipped" trail, cross-check `docs/DECISION_LOG.md` + `git log`.
 
+- **BR-S103 — 3 photos promoted to FULL room sources (SRC-03/04/05)** (2026-06-22, data.js + app.js + docs):
+  the builder wanted the 3 local photos in the live room "as the 2 original", to feel how varied images sit
+  across the whole project. Authored via a 6-agent workflow (3 authors, one per photo reading its own image →
+  full `SOURCES` object + `V2_EXTRAS`; 3 safety/schema gates). **Safety gate: ALL 3 SAFE, zero person-reading
+  violations** (the "schemaGaps" it raised were a different future-dossier spec, N/A to the current shape). I
+  assembled the data.js literals from the agents' JSON (so no agent syntax could break data.js) + cleaned voice
+  (ALL-CAPS titles → "Shore Dispatch" / "Stride Break" / "Spiny Encounter"; serial strings that landed in
+  signature/mint.note → real sentences) + supplied the identity fields the schema omitted (serial, objectNo,
+  edition, minted, mint.serial, batch) + the gate's route fix (SRC-04 canine subject → `ANIMAL_COMPANION`).
+  Wiring: data-driven source toggle (`renderSourceToggle` from SOURCES → auto 5 buttons), URL `?src=1..N`,
+  keyboard `1..N`, `short` labels on all 5 (Driver/Ice Field/Shore/Run/Tank). **Verified live @1600×900**
+  (headless, console clean): all 5 sources; each new card renders free + developed — card + photo (EXIF-upright)
+  + halo + Diagram panel + Oracle/Stat reading + 7-plate dossier; `getScanResult` resolves SRC-03/04/05;
+  `toScanResultV2` maps without crashing (V2_EXTRAS present). **Privacy:** the 3 images stay GITIGNORED
+  (local-only, never pushed); data.js text is committable, so the room works on the builder's machine. Copy is
+  artifact-only throughout. Runtime: data.js + app.js (index.html static toggle buttons left as a no-JS
+  fallback, overwritten at init). ONE commit "BR-S103: 3 photos as full room sources (SRC-03/04/05)"; not
+  pushed without approval. Diagram coords are best-effort (EXIF rotation) — tunable. The `?dev=proto-cards`
+  route (BR-S101) is now superseded by the full-room sources (left in place, harmless).
+
 - **BR-S101 — 3 prototype cards from local photos (?dev=proto-cards)** (2026-06-22, app.js + styles.css +
   .gitignore): the builder picked 3 of their own photos as "final prototypes" and gave the gallery paths; I
   copied them into `assets/source-03/04/05.jpg` (**gitignored** — personal faces, public repo, local-only) and
