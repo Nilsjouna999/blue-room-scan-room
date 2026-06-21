@@ -10,6 +10,21 @@ Last updated: 2026-06-21.
 > is the head of **Ready** (below) — one at a time (this file's intro rule). For the
 > authoritative "what shipped" trail, cross-check `docs/DECISION_LOG.md` + `git log`.
 
+- **BR-S099 — original developed-card halo RESTORED verbatim + bloom tightened (styles.css)** (2026-06-22,
+  styles.css + docs): across BR-S095–S098 the halo was rebuilt from scratch (around-glow → smokey conic → LED
+  edge → comet current) and the builder rejected each (not-the-original / fake-gold / smokey). They asked if I
+  had the original; I recovered it from **git `1c6c328^`** (the commit before BR-S067 deleted it) and restored
+  it **VERBATIM**: the rotating 3-hue conic edge (per-source `--halo-a/b/c` — for SRC-01 copper(a) broken up by
+  periwinkle(b) + amber(c) = the "changing hues" feel), the wide colored bloom, the 5s breathe, and the drifting
+  star-specks. Builder confirmed "yes this is the one." **BR-S100 (folded in):** tightened the one off-note — the
+  wide 44/80px colored bloom ("cloud around the lining") → a tight 11/22px hug, keeping the rotating LINE the
+  star; builder approved ("its good now this halo"). Kept holo-spin, dropped the original card-in (so the in-place
+  develop still tweens); reduced-motion stills all of it. This is a **builder-directed reversal of the BR-S067
+  spin/sparkle removal** — the magnetic-not-yippi concern is explicitly overridden for the developed card's
+  signature look. **Verified live @1600×900** (headless, both sources). Runtime: styles.css only. ONE commit
+  "BR-S099: restore + tighten original developed-card halo"; not pushed without approval. Builder noted "a bit
+  editing after" — minor tweaks may follow.
+
 - **BR-S097 — halo corrected to the LED EDGE line (styles.css)** (2026-06-21, styles.css + docs): BR-S096
   built the wrong mechanism — a soft blurred conic BEHIND the card ("smokey"), which the builder rejected. The
   effect they meant is the original "first halo": a crisp light tracing the card's EDGE like an LED line going
