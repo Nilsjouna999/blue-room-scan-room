@@ -1093,13 +1093,20 @@ body[data-devnav="1"] .toggle--treatment { display: inline-flex; }
    stay OFF (the twinkle was the yippi offender, not the halo). */
 .card[data-treatment="shiny"] .card__halo {
   opacity: 1;
+  /* BR-S095 halo-around-the-card fix: the old gradients bloomed in the CENTER and
+     faded to transparent (~70%) BEFORE the card silhouette — so the colored glow
+     sat hidden BEHIND the opaque card (z-index:-1) and the perimeter ring (the
+     visible part beyond the card edge) was empty → "no halo around the card".
+     Now the bloom carries colour OUT to ~100% of the +40px box and blurs softly,
+     so a per-source-tinted halo actually rings the developed card. Still the
+     card's own depth (z-index:-1, behind the card; no --halo on floor/panels). */
   background:
-    radial-gradient(48% 40% at 50% 34%, color-mix(in srgb, var(--halo-a) 20%, transparent) 0%, transparent 70%),
-    radial-gradient(54% 46% at 50% 64%, color-mix(in srgb, var(--halo-b) 14%, transparent) 0%, transparent 72%);
-  filter: blur(7px);
+    radial-gradient(96% 84% at 50% 48%, color-mix(in srgb, var(--halo-a) 34%, transparent) 0%, color-mix(in srgb, var(--halo-a) 20%, transparent) 58%, transparent 100%),
+    radial-gradient(106% 92% at 50% 60%, color-mix(in srgb, var(--halo-b) 22%, transparent) 0%, transparent 100%);
+  filter: blur(22px);
   animation: halo-fadein 600ms ease-out both, halo-breathe 5.5s ease-in-out infinite 600ms;
 }
-@keyframes halo-fadein { from { opacity: 0; } to { opacity: 0.78; } }
+@keyframes halo-fadein { from { opacity: 0; } to { opacity: 0.82; } }
 @keyframes halo-breathe {
   0%, 100% { opacity: 0.78; transform: scale(1); }
   50% { opacity: 1; transform: scale(1.035); }

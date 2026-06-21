@@ -10,6 +10,20 @@ Last updated: 2026-06-21.
 > is the head of **Ready** (below) — one at a time (this file's intro rule). For the
 > authoritative "what shipped" trail, cross-check `docs/DECISION_LOG.md` + `git log`.
 
+- **BR-S095 — halo glow around the developed card (styles.css)** (2026-06-21, styles.css + docs): the builder
+  noticed the halo wasn't reading as a glow AROUND the developed card — confirmed real. The shiny `.card__halo`
+  (builder-restored BR-S068, z-index:-1 behind the card) bloomed in the CENTRE and faded transparent (~70%)
+  BEFORE the card silhouette, so the colour sat hidden behind the opaque card and the visible perimeter ring was
+  empty. Fix (one rule, `.card[data-treatment="shiny"] .card__halo`): carry the per-source-tinted bloom out to
+  ~100% of the +40px box + `blur(22px)` so a soft halo actually rings the card; fade-in peak 0.78→0.82. Still the
+  CARD's own depth (z-index:-1, behind it) — **NOT** touched: the "no --halo escapes to the room" box-shadow ring
+  (styles.css ~1052), the floor/panel zero-halo law, sparkles/rainbow/loops (stay OFF). Reduced-motion stills it
+  (existing block). **Verified live @1600×900** (headless-Chrome capture, since MCP screenshot is broken):
+  per-source halo now visibly rings the shiny SRC-01 card; computed `blur(22px)` + gradient + opacity ~1 + ~50px
+  ring on all sides; free card unaffected (halo opacity 0). Intensity is eyeball-tunable. Runtime: styles.css
+  only (app.js/data.js/index.html/scan-contract.js untouched). ONE commit "BR-S095: halo glow around developed
+  card"; not pushed without approval.
+
 - **BR-S094 — cheap_extract specificity test bench (DESIGN only)** (2026-06-21, docs only): designed the bench
   BR-S093 §11 queued and saved it as `docs/BR-S094_CHEAP_EXTRACT_BENCH_SPEC.md`. Purpose: test whether a CHEAP
   extraction pass can produce ONE safe, oddly-specific Blue Room artifact anchor on real photos — matchable back
