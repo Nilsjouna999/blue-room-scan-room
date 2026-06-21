@@ -423,7 +423,7 @@ function renderMetricsTab(src, treatment) {
         .join("")}
     </div>`;
   const fit = free
-    ? lockedModule("Fit Coherence Matrix", "Matrix extracted, development pending. Develops with Halo Mint.")
+    ? lockedModule("Fit Coherence Matrix", "Matrix extracted — the full coherence grid develops with the mint.")
     : `<div class="module">${moduleHead("Fit Coherence Matrix")}${fitBody}</div>`;
 
   return `<p class="metriccap metriccap--head">why the four stats landed — receipts, not a second score</p>${diamond}${mix}${pressure}${fit}
@@ -590,10 +590,6 @@ function renderReadingPanel(src, treatment) {
         <span class="impact__val impact__val--tier">${esc(tierBand(src.lore.value))}</span>
       </div>
     </div>
-    <div class="module module--oracle">
-      ${moduleHead("Oracle Read")}
-      <p class="oracle">“${esc(src.oracle)}”</p>
-    </div>
     <div class="module module--ledger">
       ${moduleHead("Mint Record")}
       <dl class="kv">
@@ -632,9 +628,9 @@ function renderReadingPanel(src, treatment) {
       <p class="unlock__more">◆ &nbsp;The sealed back of this card develops with the mint — added depth, not a hidden result.</p>
       <p class="unlock__price">One-time develop · this scan only · dev mock — no real payment in this build</p>
     </div>
-    ${lockedModule("Stance Read", "Evidence layer pending — develops with Halo Mint.")}
-    ${lockedModule("Fit Coherence", "Coherence read recorded, undeveloped. Full record develops with mint.")}
-    ${lockedModule("Oracle Read", "The full read develops with Halo Mint. One line survives the preview — see the dossier below.")}`;
+    ${lockedModule("Stance Read", "The stance layer is latent here — it develops with the mint.")}
+    ${lockedModule("Fit Coherence", "The coherence read sits in the negative, undeveloped — it develops with the mint.")}
+    ${lockedModule("Oracle Read", "The oracle's full read develops with the mint.")}`;
 
   const shinyTease =
     treatment === "mint"
@@ -678,8 +674,21 @@ function renderReadingPanel(src, treatment) {
     </div>`;
   })();
 
+  /* Developed panel OPENS on the card's VOICE: the oracle is hoisted ABOVE the
+     stat table as panelLead (BR-S086 amend) so first contact is the spoken line,
+     not the key/value ledger. archetype + the analytical deep reads follow in the
+     readseam. Free is unaffected — panelLead is empty and it renders lockedDeep;
+     the short oracle still lives in dossier plate 07. (The hoisted oracle sits
+     OUTSIDE .readseam, so it stays present at rest, not gated behind the seam-open
+     reveal — styles.css keeps it lit in shiny.) */
+  const oracleFirst = `
+    <div class="module module--oracle">
+      ${moduleHead("Oracle Read")}
+      <p class="oracle">“${esc(src.oracle)}”</p>
+    </div>`;
   const forkContent = free ? lockedDeep : archetypeModule + deep + shinyTease + shinyBadge;
-  return `${header}${statReads}${aura}${sceneRole}<div class="readseam" data-open="${free ? 0 : 1}">${forkContent}</div>`;
+  const panelLead = free ? "" : oracleFirst;
+  return `${header}${panelLead}${statReads}${aura}${sceneRole}<div class="readseam" data-open="${free ? 0 : 1}">${forkContent}</div>`;
 }
 
 /* ---------- scroll dossier (below the hero) ----------
@@ -710,6 +719,15 @@ function renderDossier(src, treatment) {
   const scan = getScanResult(src);
   const freeVals = scan?.stats.freeVisible || c.stats;
   const haloX = scan?.stats.haloExtended;
+
+  /* Unified archive identity header — a non-plate strip naming the artifact's
+     record id + edition state, bound across both states (BR-S086). Serial masked
+     '····' on free (latent→developed law). Edition label tracks the treatment's
+     canonical name — ARCHIVE EDITION on free, never the developed state dangled in
+     front of the free reader. <div>, NOT <section>, so the .dplate nth-of-type
+     dossier rhythm is untouched. */
+  const editionLabel = treatment === "free" ? "ARCHIVE EDITION" : treatment === "mint" ? "SIGNATURE MINT" : "HALO MINT";
+  const recordGate = `<div class="drecord-gate">◆ ARTIFACT RECORD · ${paid ? esc(c.serial) : "····"} · ${editionLabel}</div>`;
 
   /* 01 — Source Record (full in both states: the factual hook).
      Below the record grid, two flat caption blocks (plates stay flat —
@@ -788,7 +806,7 @@ function renderDossier(src, treatment) {
           ? ""
           : `<div class="receipt receipt--undeveloped">
               <span class="receipt__k">· · ·</span>
-              <p class="receipt__read">Further receipts undeveloped — archive pull. Development pending.</p>
+              <p class="receipt__read">Further receipts sit on the card's developed back.</p>
             </div>`
       }
     </div>`;
@@ -811,7 +829,7 @@ function renderDossier(src, treatment) {
           ? ""
           : `<div class="receipt receipt--undeveloped">
               <span class="receipt__k">· · ·</span>
-              <p class="receipt__read">Further receipts undeveloped — archive pull. Development pending.</p>
+              <p class="receipt__read">Further receipts sit on the card's developed back.</p>
             </div>`
       }
     </div>`;
@@ -829,7 +847,6 @@ function renderDossier(src, treatment) {
           <span class="dstat__track"><span class="dstat__fill" style="--v:${bandPct(freeVals[k])}%"></span></span>
           <span class="dstat__val dstat__val--tier">${esc(tierBand(freeVals[k]))}</span>
         </div>
-        <p class="dstat__why">${esc(src.reads[k])}</p>
         ${
           paid
             ? `<p class="dstat__evidence">${esc(n.evidence)}</p>${n.note ? `<p class="dstat__note">${esc(n.note)}</p>` : ""}`
@@ -855,7 +872,7 @@ function renderDossier(src, treatment) {
       <div class="dhidden__score">
         <span class="dhidden__val">··</span>
         <span class="dhidden__name">Sealed reading</span>
-        <span class="dhidden__seal">Sealed · development pending</span>
+        <span class="dhidden__seal">Sealed · on the card's developed back</span>
       </div>
       <p class="dhidden__read">${esc(d.hidden.tease)}</p>
     </div>`);
@@ -931,9 +948,9 @@ function renderDossier(src, treatment) {
     "dplate--oracle");
 
   return `
-    <div class="dossier__cue">SCAN DOSSIER — FULL RECORD</div>
+    <div class="dossier__cue">CARD BACK — ARTIFACT RECORD</div>
     <div class="dossier__inner">
-      ${record}${board}${statDossier}${hidden}${fitAura}${mintRecord}${oracle}
+      ${recordGate}${record}${board}${statDossier}<div class="dossier__register">DEVELOPED RECORD</div>${hidden}${fitAura}${mintRecord}<div class="dossier__register">ARTIFACT PROVENANCE</div>${oracle}
       <p class="dossier__end">◆ &nbsp;END OF RECORD · ${esc(src.label).toUpperCase()} · BLUE ROOM ARCHIVE</p>
     </div>`;
 }

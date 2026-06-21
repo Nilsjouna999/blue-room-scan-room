@@ -10,6 +10,73 @@ Last updated: 2026-06-21.
 > is the head of **Ready** (below) — one at a time (this file's intro rule). For the
 > authoritative "what shipped" trail, cross-check `docs/DECISION_LOG.md` + `git log`.
 
+- **Developed Reading Rhythm — oracle-first + cue→effect + archive header (BR-S086)** (2026-06-21, app.js +
+  styles.css + this queue): Phase 1 of the developed-reading de-dull (BR-S085 diagnosis: boring = a CONTENT/RHYTHM
+  problem, not layout). Four scoped changes, conservative-hybrid form, **zero new pacing machinery**: **(1) Oracle-first**
+  — the `module--oracle` block is lifted out of `deep` into `oracleFirst`; the DEVELOPED right-panel fork now opens on
+  the card's VOICE (oracle → archetype → analytical deep), not the stat ledger. Free untouched (renders `lockedDeep`;
+  the short oracle still lives in dossier plate 07). The three free-fork teasers rewritten to artifact-subject grammar
+  ("The stance layer is latent…", "The coherence read sits in the negative, undeveloped…", "The oracle's full read
+  develops with the mint") and the reader-denied "One line survives the preview — see the dossier" clause deleted.
+  **(2) Cue→effect weight-split** (CSS only) — `.reads__name` desaturated to `--t-meta`, `.reads__val--tier` to
+  `--faint` (the CUE / measurement recedes); `.reads__item p` brightened to `--t-primary` weight 500 (the EFFECT /
+  read leads). No new data, no authored cue. **(3) De-dupe plate 03** — deleted the `.dstat__why` line (`src.reads[k]`)
+  duplicated verbatim from the right-panel Stat Reading; the read now lives once (panel), the dossier carries the
+  evidence layer (paid) / develop-state line (free). **(4) Archive record header** — a non-`<section>` `.drecord-gate`
+  strip (`◆ ARTIFACT RECORD · serial · EDITION`) as the first child of `.dossier__inner`, binding both states with one
+  archive identity; serial masked `····` on free. **Copy-safety correction (the one deviation from the handoff
+  literal):** the edition label is STATE-AWARE — free → `ARCHIVE EDITION`, shiny → `HALO MINT`, lab → `SIGNATURE MINT`
+  — matching the existing `stateBadge` precedent. The handoff hard-coded `HALO MINT` on both states; on free that
+  dangles the developed state's name in front of the free reader (tier-ladder framing the BANNED reveal-grammar +
+  free-as-hero taste forbid), so the truthful per-state name ships instead. **No data.js / index.html /
+  scan-contract.js change.** The `<div>` (not `<section>`) keeps the `.dplate:nth-of-type` dossier rhythm intact; no
+  animation/motion code touched. **Verified live @1600×900** (DOM/getComputedStyle + headless-Chrome screenshots; MCP
+  screenshot broken per memory): (a) `section.dplate` === 7; (b) plates 04/07 still LOUD (38px air + 2px ledger edge);
+  (c) `.dplate--oracle` still halo-tinted under `data-treatment="shiny"`; (d) developed fork opens Oracle → Artifact
+  Archetype → Stance; (e) free entry unchanged — record header `···· · ARCHIVE EDITION`, plate 03 still a 4-stat
+  ledger (not thin), zero withholding copy in the changed areas; (f) reduced-motion structurally safe (no animation
+  added; header is a non-`.dplate` static `<div>`). Console error-free. **Product-law: PASS** — Free stays COMPLETE
+  (every stat tier + read + aura + scene role on first paint; short oracle in dossier); no person/status framing; no
+  public 0–100; develop CTA + sealed-back grammar held; latent→developed physics preserved.
+  **AMENDMENT (panel-driven, folded into the same local commit) — feel fix:** a 20-agent critique panel (18 lenses
+  → Opus reconciler → Opus safety gate, strong consensus, all 7 changes gate-APPROVED) found the original
+  "oracle-first" was false at the PANEL level — the readseam renders after statReads/aura/sceneRole, so the developed
+  panel still OPENED on the stat table (oracle ~4th). Fix: **(B/hook)** hoist the oracle ABOVE the stat table as a
+  `panelLead` (developed only; free `panelLead=""`), de-cage + scale it (18→22px, left-aligned, `--silver-bright`,
+  border/bg removed) so the panel opens on the card's VOICE; a new shiny rule keeps the hoisted `> .module--oracle`
+  lit (the recede rule at styles.css ~1126 dims direct-child modules to 0.74 — the seam-only re-light didn't cover it).
+  **(A/copy)** removed every banned "Development pending" string in the live reading: the two Evidence-Board receipt
+  tails + the Hidden-Stat seal ("…sit on the card's developed back" / "Sealed · on the card's developed back") AND the
+  Metrics-tab Fit Matrix locked line. **(E/header)** lifted the `.drecord-gate` (10→11px; color `--t-meta`→`--t-body`
+  — corrected from the panel's `--silver-dim`, which is a no-op ALIAS of `--t-meta`). DEFERRED by the panel (logged):
+  C register labels + D dossier table-wall simplification (the dossier is still dense — the second-order drag); F
+  reveal buttons + G card-left slab REJECTED. **Verified live @1600×900** (DOM + headless-Chrome shots, SRC-01/02 ·
+  shiny/free · source+metrics tabs): developed panel now opens Scan Reading → **Oracle Read** → Stat Reading (both
+  sources); free panel unchanged (no oracle lead); 7 dplates; LOUD 04/07 + shiny dossier oracle tint unchanged;
+  record gate `#b1ada4` legible; **zero banned words** across free source+metrics+dossier; console clean;
+  reduced-motion untouched. The Halo Gate dev-mock "Development pending" (app.js ~1209, `?dev=halo-gate`) is LEFT
+  untouched — LOCKED surface + it denotes the offline scan ENGINE ("Ready for future scan engine"), not user paywall.
+  **BR-S086C — dossier table-wall reduction (folded into THIS same single local commit per the builder's "amend
+  BR-S086 only" instruction):** a 30-agent panel (9 Haiku speed + 17 deep + Opus reconcile/boundary/gate) targeted the
+  lower 7-plate dossier. Shipped: `.dossier__inner` gap 26→48px (plate breathing); `.drecord` row padding 9→16px +
+  `dt` color `--faint`→`--t-meta` (Source-Record breathing + label/value hierarchy); the section cue renamed
+  `SCAN DOSSIER — FULL RECORD` → **`CARD BACK — ARTIFACT RECORD`** (reframe as card interior, state-agnostic so no
+  develop-word leaks to free); TWO non-`<section>` register dividers that **introduce** their groups —
+  **`DEVELOPED RECORD`** (before plate 04, fronts Hidden Stat / Fit+Aura / Mint) and **`ARTIFACT PROVENANCE`** (before
+  plate 07, fronts the closing Oracle); the first zone (Source / Evidence / Stat) is opened by the cue + record-gate,
+  no label. Four contrast-only legibility lifts off the sub-10px floor: `.dossier__register` 8.5→9.5px, `.dfile__kick`
+  8.5→10px, `.dlineage__k` 9→10px, `.receipt__conf` 7.5→9px, all `--faint`/`--t-ghost`→`--t-meta`. Builder REJECTED the
+  agent's original labels ("Scan Reading" dup'd the panel title; "Production Record" mislabeled the Oracle); used the
+  2-label fallback (dropped a 3rd "SCAN EVIDENCE" — it stacked under the cue+gate, tripping the restraint rule).
+  **Verified live @1600×900** (DOM + headless-Chrome dossier shots, shiny SRC-01/02 + free; a Screenshot-Judge agent):
+  exactly 7 `section.dplate`; registers are `<div>` (nth-of-type rhythm intact); LOUD 04/07 + shiny `.dplate--oracle`
+  tint unchanged; zero banned words in free; console clean; reduced-motion untouched. **Feel verdict:** the record now
+  reads as separated neighborhoods with breathing + legible labels — materially less table-wall — though Source Record's
+  intra-plate grid is the surviving dense object (deferred; the structural restructure was rejected this pass).
+  **PROCESS NOTE:** a workflow subagent autonomously committed this work as a stray separate commit (`e52de16`) during
+  a critique-only run; it was soft-reset and FOLDED into this single BR-S086 commit per the builder's instruction
+  (one clean local reading-engagement commit). Never pushed.
+
 - **Menu upgrade — real Free card → Archive Desk (BR-S079 / S081 / S083, one folded commit)** (2026-06-21, app.js +
   styles.css): the menu entrance, rebuilt across three folded passes (one unpushed commit). The hero shows the
   **actual reduced Free card**, not a flat photo tile, so the entrance makes
@@ -1092,6 +1159,32 @@ Last updated: 2026-06-21.
 
 ## Backlog / needs decision
 
+- **Developed-reading Phase 1.5 — zone-register LABELS (deferred from BR-S086, gated behind the BR-S086 verify
+  checkpoint)** (2026-06-21): add non-`<section>` register labels naming the developed reading's zones (voice /
+  evidence / identity / collectible) WITHOUT a 2-col reparent — adopted from the zones idea as register cues only,
+  never a layout. Must stay `<div>`/label-level so the `.dplate:nth-of-type` rhythm is untouched. Do NOT add or move a
+  `<section>`. Its own task + pre-edit critique.
+- **Developed-reading Phase 2 texture (deferred from BR-S086)** (2026-06-21): (a) paid-only `<details>` accordion on
+  dossier plate 03 (Stat Dossier) for the evidence/note layer; (b) full 2-col zone layout — needs a class-scoped
+  selector rewrite REPLACING `.dplate:nth-of-type` in the SAME commit (nth-of-type counts by element TYPE, so a
+  reparent silently breaks the LOUD/quiet rhythm); (c) card-left slab collectibility experiment (kill criterion).
+  Each its own task + pre-edit critique.
+- **"development pending" copy sweep — RESOLVED for the live reading (BR-S086 amend, 2026-06-21):** the two Evidence
+  Board receipt tails + the Hidden Stat seal + the Metrics-tab Fit Matrix line were all rewritten to artifact-subject,
+  "pending"-free grammar in the BR-S086 amendment. ONE instance remains, deliberately NOT touched: the Halo Gate
+  dev-mock `.gatepanel__pending` "Development pending" (app.js ~1209, route `?dev=halo-gate`) — it sits in the LOCKED
+  `renderHaloGateMock` surface and denotes the offline scan ENGINE ("Ready for future scan engine"), not user paywall
+  pressure, so it is a different meaning and out of bounds. Revisit only if/when the Halo Gate mock is reworked.
+- **Developed reading — Source Record intra-plate density (residue after BR-S086C)** (2026-06-21): BR-S086C broke the
+  BETWEEN-plate table-wall (48px gaps + 2 register neighborhoods + cue rename + contrast lifts — candidate C + B-spacing
+  DONE). The surviving dense object is WITHIN plate-01 Source Record — a wide multi-column `dl` of small key/value pairs
+  that still reads as a spreadsheet (Screenshot-Judge + the panel agree). Candidate D's STRUCTURAL half (intra-plate
+  grouping: fewer columns / a gutter splitting it into 2 sub-clusters / sub-headers) was REJECTED this pass (invents a
+  visual dialect no other plate uses; ragged on a 1fr 1fr grid). Revisit as its own task IF the builder still feels
+  plate-01 fatigue: try a calmer 2-cluster grouping WITHOUT border-dividers. Watch: `d.record.eligibility` reused at
+  app.js ~929; keep 7 `section.dplate`; any new label stays `<div>`. Also minor: the `.dossier__register`
+  `margin-bottom:-26px` hack depends on the 48px `.dossier__inner` gap (fragile if the gap changes); and the seam above
+  the Oracle reads slightly emptier than other gaps — eyeball if touched again.
 - **Per-source structural shadow (card-material micro-task, deferred from BR-S071)** (2026-06-20): a tiny STATIC,
   card-only, scan-cued shadow whose weight falls OPPOSITE the key light, derived from `data.js diagram.light.x`
   (SRC-01 x:88 → shadow LEFT · SRC-02 x:10 → shadow RIGHT) — the one real per-source MATERIAL-STRUCTURE gap from the
