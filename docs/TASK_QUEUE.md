@@ -10,6 +10,34 @@ Last updated: 2026-06-21.
 > is the head of **Ready** (below) — one at a time (this file's intro rule). For the
 > authoritative "what shipped" trail, cross-check `docs/DECISION_LOG.md` + `git log`.
 
+- **Draft → Local Front Card (BR-S092)** (2026-06-21, app.js + styles.css; shipped LOCALLY as `b11ccd0`): the
+  first truthful, buildable-now step where a user's OWN photo becomes a held card object — without faking a scan.
+  **Two-beat decision (ratified A, from the BR-S091 honesty spine):** pick photo → **LOCAL DRAFT** (loaded, unfiled
+  intake) → press **Build Local Card** → **LOCAL FRONT CARD**. Filing is the press, not the load: `buildLocalCard`
+  mints a browser-local card id (`BR-LOCAL-<ts>-<rand4hex>`) + a staging timestamp ONCE (never regenerated per
+  render) and walks `draft.scan_state` `'draft'`→`'unscanned'`; the router gained an `unscanned` branch →
+  `renderLocalCard`. The **Local Front Card is explicitly UNSCANNED / FRONT-ONLY — it is NOT a Free Card** and the
+  words "Free Card"/"complete" never appear on it. **Safe facts only = provenance / file / geometry:** dimensions /
+  orientation / aspect / file type / file size / browser-only source, decoded async from the `<img>` element with a
+  graceful fallback — **no pixel-content read, no EXIF** (no date/GPS/camera). **Generates NOTHING:** no reading, no
+  stats, no oracle, no archetype, no finish/anomaly, no Develop/Halo, no serial, no "complete"; the card back stays
+  closed ("Card back remains closed until a scan exists.", builder-set copy). **`renderCard` was NOT reused** (it
+  carries fixture reading content) — `renderLocalCard` is a new reading-free sibling of the `.draftcard` shell.
+  `applyView` labels a filed card "ARCHIVE · YOUR PHOTO · LOCAL ONLY" (never the SAMPLE branch). Folded honesty
+  niceties: the intake CTA "Develop scan"→"Build Local Card"; the menu resume label →"Resume local card →" once
+  filed. **No data.js / index.html / scan-contract.js change.** **Validation PASSED (live @1600×900, console clean
+  throughout — MCP `preview_screenshot` broken per memory, verified via accessibility snapshot + DOM assertions):**
+  two-beat state walk + zone labels correct; card id format ok + stable across re-render; geometry units correct
+  (16:9 / 4:5 / 8:5 / odd→decimal); all honesty labels present; banned-copy sweep = 0 hits; **no Develop/Open-Card-
+  Back button**; **two menu doors intact, per-source sample marker intact, 7 `section.dplate` intact**, intake CTA
+  swapped cleanly. **Parked copy nit (NOT fixed this lane — track for a future copy-law cleanup):** the now-DORMANT
+  `renderGate` still contains "Development pending" (banned word); BR-S092 removed the gate's only product door so
+  it is no longer user-reachable, and `renderGate` is kept honest + intact for a future engine. **NEXT (parked, no
+  code without explicit ask):** the SCAN ENGINE / real upload→card path remains the structural lane that turns the
+  LOCAL FRONT CARD into the engine-gated true Free Card + Develop/Halo back + payment — build it against the BR-S091
+  contract, never before. Card Finish / Surface Variant / Archive Anomaly stays a future no-code design (attaches
+  ONLY to the engine's true Free Card front, never the local card).
+
 - **Archive Desk Intake Flow + Door Truth (BR-S090)** (2026-06-21, app.js + styles.css + docs): made the
   entrance truthful (audited E-prime). The Archive Desk now has EXACTLY TWO doors: PRIMARY **Add Your Photo**
   (hero, `data-draft-pick` → local-draft intake — the real beginning; sub-line "the scan engine isn't

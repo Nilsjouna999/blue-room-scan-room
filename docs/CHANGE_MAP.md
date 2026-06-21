@@ -1,9 +1,9 @@
 # BLUE ROOM — Change Map
 
 Practical "where do I change this?" guide for `blue-room-scan-room/`.
-Read the matching section *before* editing. Last updated: 2026-06-14.
+Read the matching section *before* editing. Last updated: 2026-06-21.
 (How-to sections are current; the dated changelog blocks below run through BR-S044 —
-BR-S045–S056 are docs / small-CSS, tracked in `TASK_QUEUE.md` + `DECISION_LOG.md`.)
+BR-S045–S092 are docs / small-CSS / scoped app.js, tracked in `TASK_QUEUE.md` + `DECISION_LOG.md`.)
 
 General test loop for any change:
 `python -m http.server 8743` in the project folder → open
@@ -202,27 +202,50 @@ developing"; module laundry-list replaced with a prioritized hook line
 Gesture" → "Lead Gesture"; one analysis note reworded — full
 banned/hype-word sweep now clean across all states.
 
-## To change the local draft intake
+## To change the local draft intake / Local Front Card (BR-S092 two-beat)
 
-- **Edit:** structure/content in `app.js` → `renderDraft()` + the
-  `loadDraftFile()` / `pickPhoto()` / `humanSize()` helpers and the
-  `draft` module var (a plain object — NOT a ScanResult). Styling in
-  `styles.css` (`.draft*`, `.draftcard*`). The mount (`#draftView`) and
-  the hidden `<input type="file" accept="image/*">` live in `index.html`.
-- **View model:** `state.view` gains a third value `draft`; `applyView()`
-  + the `body[data-view]` visibility matrix show exactly one of
-  menu/room/draft. Reached only by a user file pick (`[data-draft-pick]`)
-  — never via URL. `URL.createObjectURL` preview, revoked on replace.
-- **Hard rule:** the draft shows NO analysis — no stats, receipts,
-  oracle, hidden stat, score, or serial. If a number appears on the draft
-  card it is a bug. No upload, no storage, no AI.
-- **Develop Scan gate:** the intake's "Develop scan" CTA flips
-  `state.draftGate` and re-renders `#draftView` via `renderGate()` — a
-  sealed, generate-nothing chamber (`[data-gate="open|close"]`). Same hard
-  rule: no analysis, no numbers, no sample-data calls.
-- **Test:** Add your photo → Local Draft preview; non-image rejected;
-  replace revokes the old object URL; Replace / Enter sample room / Main
-  menu / Resume all work; deep links still bypass to the room.
+- **Edit:** structure/content in `app.js` → `renderDraft()` (the router) +
+  `renderDraftIntake()` (beat one) + `renderLocalCard()` (beat two, the filed
+  card) + the `loadDraftFile()` / `decodeDraftDimensions()` / `buildLocalCard()`
+  / `pickPhoto()` / `humanSize()` and geometry helpers (`orientationLabel` /
+  `aspectLabel` / `gcdInt` / `rand4hex` / `stagedStamp`) and the enriched `draft`
+  module var (a plain object — NOT a ScanResult). Styling in `styles.css`
+  (`.draft*`, `.draftcard*`, `.draftcard--local` + the `.lcard*` facts ledger).
+  The mount (`#draftView`) + the hidden `<input type="file" accept="image/*">`
+  live in `index.html`.
+- **Two-beat flow (the honesty ladder, BR-S091 spine):** pick photo → **LOCAL
+  DRAFT** (`renderDraftIntake`, `scan_state:'draft'`) → press **Build Local Card**
+  (`[data-build-card]` → `buildLocalCard()`) → **LOCAL FRONT CARD**
+  (`renderLocalCard`, `scan_state:'unscanned'`). The router branches on
+  `draft.scan_state`. Filing is the PRESS, not the load: `buildLocalCard` mints
+  `draft.card_id` (`BR-LOCAL-<ts>-<rand4hex>`) + `draft.staged_at` ONCE (idempotent —
+  guarded by `scan_state !== 'unscanned'`; NEVER regenerate per render).
+- **View model:** `state.view==='draft'`; `applyView()` labels a filed card
+  "ARCHIVE · YOUR PHOTO · LOCAL ONLY" (the `scan_state:'unscanned'` branch — NEVER the
+  room SAMPLE branch), else "ARCHIVE · LOCAL DRAFT". Reached only by a user file pick
+  (`[data-draft-pick]`) — never via URL. `URL.createObjectURL` preview, revoked on replace.
+- **Safe-facts law:** the Local Front Card carries provenance / file / GEOMETRY only —
+  dimensions / orientation / aspect / file type / size / browser-only source. Geometry is
+  decoded async from the `<img>` element (`decodeDraftDimensions`, graceful fallback) —
+  **never a pixel-content read, never EXIF** (no date/GPS/camera). It is explicitly
+  **UNSCANNED / FRONT-ONLY — NOT a Free Card**; the words "Free Card" / "complete" must
+  never appear on it.
+- **Hard rule (no engine = no reading):** the draft AND the local card show NO reading —
+  no stats, receipts, oracle, hidden stat, archetype, finish/anomaly, score, Develop/Halo,
+  or serial. If a stat/score/reading appears on either, it is a bug. `renderLocalCard` must
+  NEVER route through `renderCard` (it carries fixture reading content). No upload, no
+  storage, no AI. The card back stays closed via a STATIC line ("Card back remains closed
+  until a scan exists.") — no Develop / Open-Card-Back button.
+- **Dormant gate:** `renderGate()` (the old "Develop scan" → `state.draftGate` → sealed
+  chamber, `[data-gate]`) lost its only product door in BR-S092 (the intake CTA now Builds
+  the Local Card). It is kept honest + intact for a future engine but is no longer
+  user-reachable. PARKED nit: it still contains "Development pending" (banned word) — a
+  future copy-law cleanup (now low-risk since the surface is unreachable).
+- **Test:** Add your photo → Local Draft (CTA "Build Local Card"); press → Local Front Card
+  (card id + staging timestamp + facts ledger, "YOUR PHOTO · LOCAL ONLY" zone, no Develop
+  button, no banned/"Free Card"/"complete" copy); non-image rejected; replace revokes the
+  old object URL + resets to a fresh draft; Replace / Enter sample room / Main menu / Resume
+  ("Resume local card →" once filed) all work; deep links still bypass to the room; console clean.
 
 ## To change the front-door menu
 
