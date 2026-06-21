@@ -10,6 +10,22 @@ Last updated: 2026-06-21.
 > is the head of **Ready** (below) — one at a time (this file's intro rule). For the
 > authoritative "what shipped" trail, cross-check `docs/DECISION_LOG.md` + `git log`.
 
+- **BR-S104 — live-card audit + improvement plan (analysis, no-code)** (2026-06-22, docs only): 9-agent
+  read-only audit of all 5 live cards (free + developed) against the builder's bar — expectation-capture,
+  interesting/precise/grounded/funny/addicting/correct/accurate/coherent, backend-leak hunt, boring-mitigation.
+  Saved `docs/BR-S104_LIVE_CARD_AUDIT.md`. **Verdict ~6.5/10 of the dream:** artifact-not-person discipline holds
+  flawlessly + the voice-first paid open is right, but the gap is "precision without the turn" (3 cards lead the
+  free-front note with diagram geometry; the turn is paid-only), the back is read-once with no payoff, and raw
+  engine tokens leak onto LIVE customer surfaces. **P0 leaks (ship today, law-adjacent):** dossier filing chain
+  `route · HUMAN_SOLO/ANIMAL_COMPANION` + `scan status · accepted` + `filed as · class`, `Subject lock · 0.83/0.88`
+  receipts, Evidence-Board `Signal ↑/Frame ↓` arrows + `high/medium` confidence chips — all with file:lines + fixes
+  in the doc. Weakest axes = FUNNY (3–5) + ADDICTING (5–7). Plan: P0 leak fix → P1 rewrite the 3 failing front
+  notes + one hero payoff line per card → P2 output variance (wire the already-computed routeLogic) + collection
+  hook (timeline → sibling 3-up) → P3 de-dup the paid panel + accuracy/voice cleanups. Registered in FILE_MAP.
+  Docs only — no runtime change. ONE commit "Docs: BR-S104 live-card audit + improvement plan"; not pushed without
+  approval. **NEXT (on builder go):** BR-S105 P0 leak fix, then BR-S106 front-note + hero-line pass (the audit
+  supplies the exact replacement lines).
+
 - **BR-S103 — 3 photos promoted to FULL room sources (SRC-03/04/05)** (2026-06-22, data.js + app.js + docs):
   the builder wanted the 3 local photos in the live room "as the 2 original", to feel how varied images sit
   across the whole project. Authored via a 6-agent workflow (3 authors, one per photo reading its own image →
