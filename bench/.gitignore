@@ -1,0 +1,12 @@
+# BR-S094 bench input photos are PERSONAL and LOCAL-ONLY.
+# NEVER commit/push real photos to the (public) repo. Only the text results
+# (artifact anchors + scores, which read the photograph-as-artifact, never the
+# person) are publishable — and they live in bench/results/, not here.
+inputs/*.jpg
+inputs/*.jpeg
+inputs/*.png
+inputs/*.webp
+inputs/*.heic
+inputs/*.heif
+inputs/*.mp4
+inputs/*.mov
