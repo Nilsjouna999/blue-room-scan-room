@@ -1739,10 +1739,13 @@ body[data-treatment="shiny"] .dia-fill { fill: rgba(200, 196, 187, 0.15); stroke
   gap: 16px;
   text-align: center;
   font-family: var(--font-mono);
-  font-size: 9px;
-  letter-spacing: 0.3em;
-  color: var(--faint);
-  padding: 16px 0 34px;
+  /* BR-S089 seam: the room→card-back threshold must be FELT — lifted off the 9px
+     ghost floor to the proven-legible .drecord-gate register (11px / --t-body) so
+     "CARD BACK — ARTIFACT RECORD" reads as a gate, not whitespace. */
+  font-size: 11px;
+  letter-spacing: 0.28em;
+  color: var(--t-body);
+  padding: 18px 0 34px;
 }
 /* flanking hairlines make the cue read as the record threshold label */
 .dossier__cue::before,
@@ -1750,7 +1753,7 @@ body[data-treatment="shiny"] .dia-fill { fill: rgba(200, 196, 187, 0.15); stroke
   content: "";
   flex: 0 1 120px;
   height: 1px;
-  background: var(--line-faint);
+  background: var(--line);
 }
 .dossier__inner {
   max-width: 1040px;
@@ -1792,13 +1795,15 @@ body[data-treatment="shiny"] .dia-fill { fill: rgba(200, 196, 187, 0.15); stroke
    <section>, so they are invisible to .dplate:nth-of-type() rhythm selectors. */
 .dossier__register {
   font-family: var(--font-mono);
-  font-size: 9.5px;
-  letter-spacing: 0.3em;
+  /* BR-S089: lifted to the proven-legible .drecord-gate floor (11px / --t-body) so the
+     two neighborhood stamps actually partition the stack (were 9.5px/--t-meta = sub-noise). */
+  font-size: 11px;
+  letter-spacing: 0.28em;
   text-transform: uppercase;
-  color: var(--t-meta);
-  border-top: 1px solid var(--line-faint);
-  padding-top: 10px;
-  margin-bottom: -26px; /* pull the following plate up to halve the gap above it */
+  color: var(--t-body);
+  border-top: 1px solid var(--line);
+  padding-top: 11px;
+  margin-bottom: -24px; /* pull the following plate up; a touch more air after the size bump */
 }
 
 /* archive plate — one screenshot-sized section */
@@ -1847,8 +1852,12 @@ body[data-treatment="shiny"] .dia-fill { fill: rgba(200, 196, 187, 0.15); stroke
 .dossier__inner .dplate:nth-of-type(6) {
   padding: 20px 26px 22px; /* quiet plates sit tighter */
 }
+/* BR-S089 widen delta (scale + contrast only): quiet filing plates (Source/Mint)
+   recede — smaller title + numeral + a step down in title brightness. */
 .dossier__inner .dplate:nth-of-type(1) .dplate__title,
-.dossier__inner .dplate:nth-of-type(6) .dplate__title { font-size: 19px; }
+.dossier__inner .dplate:nth-of-type(6) .dplate__title { font-size: 17px; color: var(--silver); }
+.dossier__inner .dplate:nth-of-type(1) .dplate__spine,
+.dossier__inner .dplate:nth-of-type(6) .dplate__spine { font-size: 18px; }
 .dossier__inner .dplate:nth-of-type(4),
 .dossier__inner .dplate:nth-of-type(7) {
   padding: 38px 36px 40px; /* LOUD plates get air */
@@ -1857,6 +1866,10 @@ body[data-treatment="shiny"] .dia-fill { fill: rgba(200, 196, 187, 0.15); stroke
   border-top-color: rgba(233, 229, 220, 0.18);
   border-left: 2px solid var(--line-strong); /* LOUD-plate ledger edge */
 }
+/* BR-S089: LOUD payoff plates (Hidden Stat 04, Oracle 07) win the title scale too,
+   so the finale reads terminal in BOTH free and halo without any colour/accent. */
+.dossier__inner .dplate:nth-of-type(4) .dplate__title,
+.dossier__inner .dplate:nth-of-type(7) .dplate__title { font-size: 24px; }
 .dossier__inner .dplate:nth-of-type(4) .dplate__spine,
 .dossier__inner .dplate:nth-of-type(7) .dplate__spine {
   font-size: 28px;
@@ -1890,8 +1903,12 @@ body[data-treatment="shiny"] .dossier__inner .dplate--oracle {
   white-space: nowrap;
 }
 .drecord dd {
-  font-size: 13px;
-  color: var(--text);
+  /* BR-S089: record values demoted one ramp step (--text → --t-body) so the Source
+     Record (01) + Mint Record (06) filing grids read as quiet provenance, not the loud
+     opening wall. Rows/structure untouched — demoted by tone, not deletion. The
+     .drecord__material accent (below) keeps its own colour. */
+  font-size: 12.5px;
+  color: var(--t-body);
   text-align: right;
 }
 .drecord__material { color: var(--halo-a, var(--silver)); font-weight: 500; }
@@ -1922,7 +1939,7 @@ body[data-treatment="shiny"] .dossier__inner .dplate--oracle {
   color: var(--t-meta);
 }
 .dfiling__step { display: block; }
-.dfiling__chain b { color: var(--text); font-weight: 500; letter-spacing: 0.05em; }
+.dfiling__chain b { color: var(--t-body); font-weight: 500; letter-spacing: 0.05em; } /* BR-S089: filing values quieted to provenance */
 .dfiling__arr { color: var(--faint); padding-right: 4px; }
 .dlineage {
   display: grid;
@@ -1932,7 +1949,7 @@ body[data-treatment="shiny"] .dossier__inner .dplate--oracle {
 }
 .dlineage__row { display: flex; align-items: baseline; gap: 12px; font-family: var(--font-mono); font-size: 11px; }
 .dlineage__k { width: 46px; flex: none; font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--t-meta); }
-.dlineage__v { color: var(--text); letter-spacing: 0.04em; }
+.dlineage__v { color: var(--t-body); letter-spacing: 0.04em; } /* BR-S089: lineage values quieted to provenance */
 .dlineage__v--ghost { color: var(--faint); }
 
 /* 02 — evidence board */

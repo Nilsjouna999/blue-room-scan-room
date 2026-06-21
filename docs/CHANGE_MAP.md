@@ -149,6 +149,25 @@ browser console is clean (F12).
   mono receipts, serials, bars/tier chips) stays the quiet flat cue. Free is
   unaffected by the cuts (free renders `lockedDeep`) — keep it that way.
 
+## To change dossier hierarchy / neighborhood legibility (BR-S089)
+
+- **Edit:** `styles.css` dossier block — `.dossier__cue` (the room→card-back seam threshold),
+  `.dossier__register` (the DEVELOPED RECORD / ARTIFACT PROVENANCE strips), `.dossier__inner
+  .dplate:nth-of-type(1/4/6/7)` (the quiet/LOUD rhythm: padding + title + spine scale + the one
+  2px `--line-strong` ledger edge), and `.drecord dd` / `.dfiling*` / `.dlineage*` (Source 01 +
+  Mint 06 record tone). Content/order lives in `app.js renderDossier`.
+- **Affects:** the Card Back / Artifact Record pacing. Target read: quiet filing (Source 01 / Mint
+  06) → medium (Evidence 02 / Stat 03 / Fit 05) → LOUD payoff (Hidden Stat 04 / Oracle 07).
+- **Can break:** the `nth-of-type(1/4/6/7)` rhythm is POSITIONAL — reordering / adding / removing a
+  `.dplate`, or changing `.dossier__register` / `.dossier__cue` from `<div>` to `<section>`, silently
+  re-indexes every quiet/LOUD selector. Keep the strips `<div>`; keep exactly 7 plates.
+- **Law:** loudness = spacing + type-scale + contrast + the single existing `--line-strong` ledger
+  edge — NEVER a new edge/tint/glow/gradient or a 3rd accent site. The two `--halo-a` moments
+  (Hidden Stat value, Oracle edge) are the whole accent economy. No reveal/motion. Demote by tone,
+  never by deleting record rows. Free stays complete (shared CSS may improve Free legibility only).
+- **Test:** shiny src1/src2 + free src1 + the normal-scroll seam + the full dossier; 7
+  `section.dplate`; register strips still `<div>`; console clean.
+
 ## Product clarity pass (2026-06-12, data.js + app.js + tiny CSS)
 
 State taglines added to `TREATMENTS` (free: "First pull — the surface

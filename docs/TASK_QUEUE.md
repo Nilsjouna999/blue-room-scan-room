@@ -10,6 +10,19 @@ Last updated: 2026-06-21.
 > is the head of **Ready** (below) — one at a time (this file's intro rule). For the
 > authoritative "what shipped" trail, cross-check `docs/DECISION_LOG.md` + `git log`.
 
+- **Dossier Plate-Tier + Neighborhood Legibility (BR-S089)** (2026-06-21, styles.css + docs): post-BR-S088 the
+  dossier was the bottleneck (7 equal dark boxes). One styles.css-ONLY hierarchy pass (app.js untouched), 4
+  checkpoints: (1) SEAM — `.dossier__cue` lifted 9px/--faint → 11px/--t-body + brighter hairlines so the
+  room→card-back threshold is felt; (2) REGISTER STRIPS — `.dossier__register` 9.5→11px/--t-body so DEVELOPED
+  RECORD / ARTIFACT PROVENANCE partition the stack (kept `<div>`); (3) DEMOTE SOURCE RECORD — `.drecord dd` +
+  filing/lineage values → --t-body so Source Record (01) + Mint Record (06) read as quiet provenance (rows
+  untouched, re-toned not deleted); (4) WIDEN DELTA — quiet titles 17px/--silver + spine 18px, LOUD titles
+  24px, giving quiet-17 / medium-22 / LOUD-24 so Oracle reads terminal in both states. **Accent GATED OFF**
+  (no --halo-a change, no colour/reveal/motion — hierarchy alone solved it). **Verified** @1600×900: 7 dplates;
+  strips are `<div>`; seam felt; Source Record quieter than Evidence Board; Oracle terminal; Free complete +
+  unchanged; console clean; no banned/0–100/rank/worth/person/locked-counts; reduced-motion safe. Runtime:
+  styles.css only. No payment/backend/upload/email/share/mobile/profile. Closes the BR-S087 dossier lane.
+
 - **Paid Reading Register + Subtraction Pass (BR-S088)** (2026-06-21, app.js + styles.css + docs): implements the
   BR-S087 diagnosis (paid reading dry from register flattening + duplication). **(1) Register lift (styles.css):**
   interpretive verdict prose now renders in the serif lead register — `.dstat__evidence` 12.5px/--muted/caption-indent
