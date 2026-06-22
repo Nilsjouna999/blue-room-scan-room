@@ -974,7 +974,7 @@ const SCAN_RESULTS_V2 = SOURCES.map(toScanResultV2);
    source id (read by app.js renderReadingPanel/renderDossier).
    Lens purity is the law: C = light/color/surface only,
    D = scene/provenance only, B = gesture/subject only,
-   E = essence as badges/placement (never a verdict). NO geometry
+   E = the card's CLASS as ONE struck designation (never a verdict). NO geometry
    prose anywhere here (geometry lives only in Diagram/Metrics);
    NO person-reads (gesture/surface only). Spec: BR-S107_SECTION_
    ARCHITECTURE_SPEC.md v2.
@@ -1006,11 +1006,14 @@ const S107_SECTIONS = {
       read: "One hand is up at the lens; the other never left the wheel. For all the greeting, nobody in this frame is getting out.",
       tease: "A sealed reading is held on the card's developed back.",
     },
-    // E — placement as badges, never a verdict
+    // E — the card's CLASS, struck as ONE designation (type-specimen): genus-species
+    // + variant on one engraved line, then a shelf-line that says WHERE it files,
+    // never what the photo shows (that is the Oracle's). NO code — codes read as
+    // filing here, owned by Source Record (DECISION_LOG 2026-06-22, BR-S109).
     fitAura: {
-      family: "Gesture Class",
-      chips: ["Open-Palm", "Idle-Engine", "Northbound"],
-      placement: "Stays in the glovebox at a formal table; on the road, it's the membership card.",
+      type: "A Gesture-Class Hold",
+      variant: "Northbound Variant",
+      shelf: "Files between the salute and the stop-sign.",
     },
     sceneCharge: { label: "Idling" },
   },
@@ -1038,9 +1041,9 @@ const S107_SECTIONS = {
       tease: "A sealed reading is held on the card's developed back.",
     },
     fitAura: {
-      family: "Field Class",
-      chips: ["Auger-Braced", "Sun-Struck", "Low-Horizon"],
-      placement: "Where patience is currency it appreciates; in rooms that demand noise, it waits.",
+      type: "A Field-Class Vigil",
+      variant: "Auger-Braced Variant",
+      shelf: "Files with the cold-patience work, not the rooms that ask for noise.",
     },
     sceneCharge: { label: "Contained" },
   },
@@ -1069,9 +1072,9 @@ const S107_SECTIONS = {
       tease: "A sealed reading is held on the card's developed back.",
     },
     fitAura: {
-      family: "Dispatch Class",
-      chips: ["Catch-Held", "Shore-Filed", "Overcast"],
-      placement: "Files cleanly in a field archive; out of place anywhere staged.",
+      type: "A Dispatch-Class Document",
+      variant: "Shore-Filed Variant",
+      shelf: "Files with the field records, never with anything staged.",
     },
     sceneCharge: { label: "Filed" },
   },
@@ -1098,9 +1101,9 @@ const S107_SECTIONS = {
       tease: "A sealed reading is held on the card's developed back.",
     },
     fitAura: {
-      family: "Arrival Class",
-      chips: ["Closing", "Contact", "Lens-Direct"],
-      placement: "At home in motion; it never sits still long enough to file.",
+      type: "An Arrival-Class Approach",
+      variant: "Contact Variant",
+      shelf: "Shelved with the things caught mid-stride.",
     },
     sceneCharge: { label: "Closing" },
   },
@@ -1128,9 +1131,9 @@ const S107_SECTIONS = {
       tease: "A sealed reading is held on the card's developed back.",
     },
     fitAura: {
-      family: "Encounter Class",
-      chips: ["Carapace", "Fluorescent", "Cyan-Tank"],
-      placement: "Belongs to the moment of choosing; out of place once the water's still again.",
+      type: "An Encounter-Class Lift",
+      variant: "Fluorescent Variant",
+      shelf: "Files among the lifted specimens, never the still-water records.",
     },
     sceneCharge: { label: "Selecting" },
   },

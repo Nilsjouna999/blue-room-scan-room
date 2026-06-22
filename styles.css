@@ -1299,20 +1299,63 @@ body[data-treatment="shiny"] .panel--reading > .module--oracle { opacity: 1; }
 }
 .dswatch__proof { font-size: 12.5px; line-height: 1.45; color: var(--t-body); }
 
-/* Fit + Aura (back · E) — badge-set + placement line (no verdict prose) */
-.dfitaura--badges { display: grid; gap: 12px; }
-.badges { display: flex; flex-wrap: wrap; gap: 7px; }
-.badge {
-  font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.05em;
-  padding: 4px 9px; border-radius: 999px;
-  border: 1px solid var(--line); color: var(--t-body);
-  background: rgba(233, 229, 220, 0.02);
+/* Fit + Aura (back · E) — ONE struck CLASS designation — a type-specimen plate (BR-S109) */
+/* This plate is DELIBERATELY dimensional — the one minted/struck object in an
+   otherwise-flat dossier. Its job is the card's CHARACTER, stamped: a real deboss
+   (beveled face + engraved designation) so it reads MINTED, not printed. Monochrome
+   only — the weight is in relief, never colour/glow. */
+.dfaplate {
+  position: relative;
+  border: 1px solid var(--line-strong);
+  border-top-color: rgba(233, 229, 220, 0.22);   /* top edge catches light */
+  border-bottom-color: rgba(10, 11, 13, 0.7);     /* bottom edge in shadow */
+  border-left: 2px solid var(--line-strong);      /* struck shelf-edge */
+  border-radius: 3px;
+  background:
+    linear-gradient(180deg,
+      rgba(233, 229, 220, 0.055) 0%,
+      rgba(233, 229, 220, 0.01) 58%,
+      rgba(10, 11, 13, 0.16) 100%);               /* a metal face, lit from above */
+  box-shadow:
+    inset 0 1px 0 rgba(233, 229, 220, 0.13),      /* top inner highlight (the burr) */
+    inset 0 -1px 0 rgba(10, 11, 13, 0.66),        /* bottom inner shadow (the cut) */
+    inset 0 0 24px rgba(10, 11, 13, 0.22),        /* faint struck vignette */
+    0 1px 2px rgba(0, 0, 0, 0.46);                /* the plate sits proud of the page */
+  padding: 18px 22px 16px;
 }
-.badge--family {
-  color: var(--t-display); border-color: var(--line-strong);
-  background: rgba(233, 229, 220, 0.05);
+.dfaplate__type {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 25px;
+  line-height: 1.12;
+  color: var(--t-display);
+  /* engraved: a dark cut below the letterform + a light burr on its top edge =
+     the type reads pressed INTO the metal, not printed onto it. */
+  text-shadow:
+    0 1px 0 rgba(10, 11, 13, 0.92),
+    0 2px 1px rgba(0, 0, 0, 0.5),
+    0 -1px 0 rgba(233, 229, 220, 0.09);
 }
-.dfitaura__place { font-size: 13px; line-height: 1.5; color: var(--t-meta); font-style: italic; }
+.dfaplate__var { color: var(--t-body); }            /* the sub-type, one shade quieter */
+.dfaplate__shelf {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 13.5px;
+  line-height: 1.45;
+  color: var(--t-meta);
+  margin-top: 8px;
+}
+.dfaplate__home {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--t-ghost);
+  margin-top: 13px;
+  border-top: 1px solid var(--line-faint);
+  padding-top: 11px;
+  text-shadow: 0 1px 0 rgba(10, 11, 13, 0.6);      /* the lockup is struck-in too */
+}
 
 /* Sealed reveal (Hidden Stat + Oracle) — the shape IS the withholding;
    a FREE tap-to-develop beat, never a paywall. */

@@ -558,3 +558,26 @@ grade visual (post readiness-gate), not filled with throwaway.
 Revisit: the grade thresholds / visual-tiers + free-vs-developed grade boundary calibrate once the readiness gate
 passes; the reserved developed-rail zone is where the grade visual lands. Deferred (logged): Set Wall · the two
 minor prose/row rhymes · the other 3 cards to mintable · the grade VISUAL build.
+
+**2026-06-22 / BR-S109 — Fit + Aura is ONE struck CLASS designation; codes belong ONLY to Source Record / CURRENT**
+Decision: the back-dossier "Fit + Aura" (plate 04) is redesigned from a 4-tag badge row (Class badge + 3 aura
+chips + a placement line — which read as FILING, i.e. a second Source Record) into ONE struck "type-specimen"
+plate: a single CLASS designation (genus-species + variant, e.g. "A Gesture-Class Hold, Northbound Variant"),
+a shelf-line that CLASSIFIES (where it files — never narrates the photo, that's the Oracle's), and a struck
+home lockup. Real deboss/relief carries the "minted, not printed" weight (the one deliberately dimensional plate
+in an otherwise-flat dossier). Chosen BY EYE from a 4-form menu (Seal / Crest / Plate / Spine) scored by an
+adversarial 3-lens panel against three tests — singular over plural · stamped weight · classification not
+verdict. Plate won (means 3.7 / 3.3 / 3.7, only form to score 5 on singular); Spine disqualified (its structural
+call-number address relapses into filing).
+GENERAL PRINCIPLE (the kill-shot, now a law): **in this dossier a CODE reads as FILING, because filing already
+owns codes.** Source Record (plate 03) carries the filing-event chain + serial lineage (Object → Scan → Card →
+Mint, e.g. BR-001-DRV-0001). Therefore NO other section may render a code / call-number / serial-like address;
+doing so re-runs the "this is just another Source Record" failure the redesign exists to kill. Every code on the
+menu's losing forms (Seal/Crest/Spine) failed this exact way. Fit + Aura asserts its archive HOME by struck seat
++ a DISTINCT lockup ("Shelf-placement · Blue Room Archive") — never a code, and never the Mint plate's exact
+"Filed & sealed" lockup (kept distinct so adjacent plates 04/05 don't rhyme).
+Why: the section's job is the card's CHARACTER (singular identity), not a second filing slip; both codes and
+tag-rows collapse character into filing. A single struck designation is singular by construction and classifies
+the object without stealing the Oracle's verdict.
+Revisit: if a future section genuinely needs an identifier, it must look unmistakably UNLIKE a Source Record
+serial (different grammar + placement) and earn a ratified exception here first.

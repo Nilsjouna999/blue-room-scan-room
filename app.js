@@ -782,14 +782,24 @@ function renderDossier(src, treatment) {
     </details>`);
 
   /* 05 — Fit + Aura Layer */
-  /* 04 — Fit + Aura (BR-S107 Push #1: lens E PLACEMENT as badges — family · aura
+  /* 04 — Fit + Aura — SUPERSEDED by BR-S109 (now a struck CLASS plate; see note at
+     the render below). The original BR-S107 note: lens E PLACEMENT as badges — family · aura
      chips · where it fits. NEVER a verdict; the verdict is the Oracle's alone.
      Always open (grounding floor). Stance/impact/lore retired from here. */
-  const fa = sec.fitAura || { family: d.mint.family, chips: src.aura, placement: src.fit };
+  /* BR-S109: the badge row (Class badge + 3 aura chips + placement line = four tags
+     reading as FILING) is REPLACED by ONE struck "type-specimen" plate — a single
+     CLASS designation (genus-species + variant), a shelf-line that CLASSIFIES (where
+     it files), and a struck home lockup. NO code (codes = filing, owned by Source
+     Record). Real deboss in .dfaplate carries the "minted, not printed" weight.
+     The home lockup is deliberately "Shelf-placement", NOT the Mint plate's "Filed &
+     sealed", so adjacent plates 04/05 don't rhyme. */
+  const fa = sec.fitAura || { type: d.mint.family, variant: "", shelf: src.fit };
+  const faVar = fa.variant ? `, <span class="dfaplate__var">${esc(fa.variant)}</span>` : "";
   const fitAura = dplate("04", "Fit + Aura Layer", paid, `
-    <div class="dfitaura dfitaura--badges">
-      <div class="badges"><span class="badge badge--family">${esc(fa.family)}</span>${(fa.chips || []).map((ch) => `<span class="badge">${esc(ch)}</span>`).join("")}</div>
-      <p class="dfitaura__place">${esc(fa.placement)}</p>
+    <div class="dfaplate">
+      <p class="dfaplate__type">${esc(fa.type)}${faVar}</p>
+      <p class="dfaplate__shelf">${esc(fa.shelf)}</p>
+      <div class="dfaplate__home">◆ Shelf-placement · Blue Room Archive</div>
     </div>`);
 
   /* 06 — Mint Record */
