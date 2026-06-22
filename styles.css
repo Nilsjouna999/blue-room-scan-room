@@ -1263,6 +1263,88 @@ body[data-treatment="shiny"] .panel--reading > .module--oracle { opacity: 1; }
   background: linear-gradient(100deg, var(--halo-a, var(--violet)) 0%, var(--halo-b, var(--cyan)) 55%, var(--halo-c, var(--halo-green)) 100%);
 }
 
+/* ============================================================
+   BR-S107 — Section Architecture forms (the form/shape layer).
+   Each section is a different KIND of object: swatches, badges,
+   sealed reveals, centered Oracle. Existing tokens only. */
+
+/* Light & Surface (front · C) — palette at a glance */
+.module--swatch .swatches { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 2px; }
+.swatch { display: inline-flex; align-items: center; gap: 7px; }
+.swatch__chip {
+  width: 16px; height: 16px; border-radius: 4px; flex: none;
+  background: var(--sw, #555);
+  border: 1px solid var(--line-strong);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.35);
+}
+.swatch__label {
+  font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.04em;
+  color: var(--t-meta);
+}
+.module__line--cool { color: var(--t-body); font-size: 13.5px; line-height: 1.5; }
+
+/* Surface Record (back · C) — palette + per-chip proof-noun (a different object) */
+.dswatches { display: grid; gap: 10px; }
+.dswatch { display: grid; grid-template-columns: 22px 1fr; gap: 11px; align-items: start; }
+.dswatch__chip {
+  width: 22px; height: 22px; border-radius: 5px; margin-top: 1px;
+  background: var(--sw, #555);
+  border: 1px solid var(--line-strong);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.4);
+}
+.dswatch__body { display: grid; gap: 2px; }
+.dswatch__label {
+  font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.05em;
+  text-transform: uppercase; color: var(--t-primary);
+}
+.dswatch__proof { font-size: 12.5px; line-height: 1.45; color: var(--t-body); }
+
+/* Fit + Aura (back · E) — badge-set + placement line (no verdict prose) */
+.dfitaura--badges { display: grid; gap: 12px; }
+.badges { display: flex; flex-wrap: wrap; gap: 7px; }
+.badge {
+  font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.05em;
+  padding: 4px 9px; border-radius: 999px;
+  border: 1px solid var(--line); color: var(--t-body);
+  background: rgba(233, 229, 220, 0.02);
+}
+.badge--family {
+  color: var(--t-display); border-color: var(--line-strong);
+  background: rgba(233, 229, 220, 0.05);
+}
+.dfitaura__place { font-size: 13px; line-height: 1.5; color: var(--t-meta); font-style: italic; }
+
+/* Sealed reveal (Hidden Stat + Oracle) — the shape IS the withholding;
+   a FREE tap-to-develop beat, never a paywall. */
+details.seal { border: 1px dashed var(--line); border-radius: var(--r-plate, 8px); overflow: hidden; }
+details.seal[open] { border-style: solid; border-color: var(--line-faint); }
+.seal__cue {
+  display: flex; align-items: center; gap: 9px; cursor: pointer; list-style: none;
+  padding: 11px 13px; user-select: none;
+}
+.seal__cue::-webkit-details-marker { display: none; }
+.seal__dot { color: var(--t-meta); font-size: 10px; }
+.seal__name {
+  font-family: var(--font-mono); font-size: 11.5px; letter-spacing: 0.05em;
+  text-transform: uppercase; color: var(--t-primary); flex: 1;
+}
+.seal__act {
+  font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--t-meta);
+}
+details.seal[open] .seal__act { opacity: 0.4; }
+.seal .dhidden__read { padding: 0 13px 13px; margin: 0; color: var(--t-body); line-height: 1.5; }
+
+/* Oracle — centered, large, alone (shape = importance) */
+.seal--oracle { border: none; text-align: center; }
+.seal--oracle .seal__cue { justify-content: center; }
+.seal__cue--oracle .seal__name { flex: none; }
+.doracle--centered {
+  margin: 14px auto 6px; max-width: 38ch; padding: 0 8px;
+  font-size: 19px; line-height: 1.5; color: var(--t-display);
+  border: none; text-align: center;
+}
+
 /* every reading module sits in its own card */
 .panel--reading .module {
   border: 1px solid var(--line-faint);

@@ -940,7 +940,7 @@ function toScanResultV2(src) {
     },
     tierOutputs: {
       free: {
-        statsShown: ["presence", "frame", "signal", "visualImpact"],
+        statsShown: ["presence", "signal", "visualImpact", "charge"],
         receiptsShown: x.receipts.slice(0, 3),
         reading: src.card.note,
         oracle: src.dossier.oracle.short,
@@ -967,3 +967,171 @@ function toScanResultV2(src) {
 }
 
 const SCAN_RESULTS_V2 = SOURCES.map(toScanResultV2);
+
+/* =============================================================
+   BR-S107 — Section Architecture (the fuel-split). Per-source
+   content refueled to ONE lens per section, additive + keyed by
+   source id (read by app.js renderReadingPanel/renderDossier).
+   Lens purity is the law: C = light/color/surface only,
+   D = scene/provenance only, B = gesture/subject only,
+   E = essence as badges/placement (never a verdict). NO geometry
+   prose anywhere here (geometry lives only in Diagram/Metrics);
+   NO person-reads (gesture/surface only). Spec: BR-S107_SECTION_
+   ARCHITECTURE_SPEC.md v2.
+============================================================= */
+const S107_SECTIONS = {
+  "driver-salute": {
+    // C front — palette at a glance
+    lightSurface: {
+      swatches: [
+        { hex: "#a83f29", label: "Red layer" },
+        { hex: "#6d7174", label: "Cabin grey" },
+        { hex: "#8295a0", label: "Fjord band" },
+      ],
+      line: "Flat overcast through the glass, no specular anywhere — one warm red against cold cabin grey, the fjord a pale band behind.",
+    },
+    // C back — palette + the proof-noun that earned each chip
+    surfaceRecord: {
+      swatches: [
+        { hex: "#a83f29", label: "Red layer", proof: "the jacket — the only saturated surface in the cabin" },
+        { hex: "#6d7174", label: "Cabin grey", proof: "moulded dash and headliner, matte, no sheen" },
+        { hex: "#8295a0", label: "Fjord band", proof: "pale blue-grey through the right window glass" },
+        { hex: "#cfd4d6", label: "Overcast key", proof: "soft light, rear-left fill, no hotspot on the glass" },
+      ],
+    },
+    sceneRole: "Parked at a roadside pullout, engine off, northbound — a fjord held in the right window.",
+    // B — the one non-obvious gesture/subject read
+    hiddenStat: {
+      name: "The Raised Palm",
+      read: "A flat palm at the lens turns the moment from a picture taken into a greeting given — the gesture addresses the camera before the camera addresses it.",
+      tease: "A sealed reading is held on the card's developed back.",
+    },
+    // E — placement as badges, never a verdict
+    fitAura: {
+      family: "Gesture Class",
+      chips: ["Open-Palm", "Idle-Engine", "Northbound"],
+      placement: "Stays in the glovebox at a formal table; on the road, it's the membership card.",
+    },
+    sceneCharge: { label: "Idling" },
+  },
+  "ice-auger": {
+    lightSurface: {
+      swatches: [
+        { hex: "#f2f4f6", label: "Snow field" },
+        { hex: "#15171a", label: "Silhouette" },
+        { hex: "#9fb9c9", label: "Cold sky" },
+      ],
+      line: "Low hard sun off the left, thrown straight back up by the snow — the brightest field the archive records; everything reads black-on-white, the sky a thin cold blue.",
+    },
+    surfaceRecord: {
+      swatches: [
+        { hex: "#f2f4f6", label: "Snow plane", proof: "+1.2 EV floor lift, highlights held" },
+        { hex: "#15171a", label: "Black silhouette", proof: "the hardest contrast the archive can record" },
+        { hex: "#9fb9c9", label: "Cold sky", proof: "thin blue, hard sun unfiltered" },
+        { hex: "#3a4a52", label: "Treeline", proof: "the only mid-tone — birch against snow" },
+      ],
+    },
+    sceneRole: "A frozen lake on an open plateau, late March, hard sun — a treeline the only witness.",
+    hiddenStat: {
+      name: "Eyes on the Work",
+      read: "Hood, beanie and glasses hand the eye-line down to the auger — the gaze is given to the task, not the lens, so the frame reads as field evidence rather than a portrait.",
+      tease: "A sealed reading is held on the card's developed back.",
+    },
+    fitAura: {
+      family: "Field Class",
+      chips: ["Auger-Braced", "Sun-Struck", "Low-Horizon"],
+      placement: "Where patience is currency it appreciates; in rooms that demand noise, it waits.",
+    },
+    sceneCharge: { label: "Contained" },
+  },
+  "shore-catch": {
+    lightSurface: {
+      swatches: [
+        { hex: "#b9c0c4", label: "Overcast flat" },
+        { hex: "#9a8f7e", label: "Mottled scale" },
+        { hex: "#6f8794", label: "Fjord" },
+      ],
+      line: "Flat overcast, no hard shadow — the kind of light that hides nothing. Every scale on the catch reads; the water behind goes a soft grey-blue.",
+    },
+    surfaceRecord: {
+      swatches: [
+        { hex: "#9a8f7e", label: "Dorsal mottle", proof: "the scale pattern, fully resolved in flat light" },
+        { hex: "#cdd2cf", label: "Pale flank", proof: "the silver lateral band, no specular rivalry" },
+        { hex: "#6f8794", label: "Fjord water", proof: "soft grey-blue, receding" },
+        { hex: "#8a8073", label: "Gravel + driftwood", proof: "matte shore texture, field-document ground" },
+        { hex: "#e9eef0", label: "Snow ridge", proof: "streaked white, coastal-remote" },
+      ],
+    },
+    sceneRole: "A remote fjord shoreline — gravel, driftwood, water and a snow-streaked ridge. Field-document ground, not a backdrop.",
+    hiddenStat: {
+      name: "Held as Evidence",
+      read: "The catch is turned face-up and flat, its whole length to the sky, as if submitted rather than shown off — the hold files a report before a word is said.",
+      tease: "A sealed reading is held on the card's developed back.",
+    },
+    fitAura: {
+      family: "Dispatch Class",
+      chips: ["Catch-Held", "Shore-Filed", "Overcast"],
+      placement: "Files cleanly in a field archive; out of place anywhere staged.",
+    },
+    sceneCharge: { label: "Filed" },
+  },
+  "loose-run": {
+    lightSurface: {
+      swatches: [
+        { hex: "#8a8276", label: "Coat tone" },
+        { hex: "#b6b8b5", label: "Overcast plate" },
+        { hex: "#7c7a6f", label: "Gravel path" },
+      ],
+      line: "Overcast, no directional shadow — the coat reads in full tonal range, nothing blown out; path and sky a flat working grey.",
+    },
+    surfaceRecord: {
+      swatches: [
+        { hex: "#8a8276", label: "Coat", proof: "full tonal range, no specular blow-out" },
+        { hex: "#7c7a6f", label: "Gravel", proof: "matte path, working grey" },
+        { hex: "#b6b8b5", label: "Overcast sky", proof: "flat diffuse plate, no hotspot" },
+      ],
+    },
+    sceneRole: "A gravel-grass path under flat cloud — a working outdoor run, no studio anywhere in it.",
+    hiddenStat: {
+      name: "Running At, Not Past",
+      read: "All four legs at full stretch, aimed straight down the lens — the dog isn't crossing the frame, it's arriving in it. A different contract than a photo of a dog going by.",
+      tease: "A sealed reading is held on the card's developed back.",
+    },
+    fitAura: {
+      family: "Encounter Class",
+      chips: ["Closing", "Contact", "Lens-Direct"],
+      placement: "At home in motion; it never sits still long enough to file.",
+    },
+    sceneCharge: { label: "Closing" },
+  },
+  "tank-pick": {
+    lightSurface: {
+      swatches: [
+        { hex: "#e8e4d6", label: "Fluorescent top" },
+        { hex: "#1fb6c4", label: "Cyan tank" },
+        { hex: "#b5652f", label: "Warm shell" },
+      ],
+      line: "Hard fluorescent top, no fill — house light, not a studio. A cyan tank band cuts cold across the warm orange-brown of the shell.",
+    },
+    surfaceRecord: {
+      swatches: [
+        { hex: "#b5652f", label: "Carapace", proof: "mottled orange-brown, banded, a hard specular catch on the dorsal shell" },
+        { hex: "#1fb6c4", label: "Tank band", proof: "saturated cyan, the cool counterweight" },
+        { hex: "#e8e4d6", label: "Fluorescent", proof: "hard overhead tube, no fill, no mercy" },
+        { hex: "#7a8f6a", label: "Painted mural", proof: "a painted aquatic wall, echoing the live tank" },
+      ],
+    },
+    sceneRole: "A live-tank seafood interior under fluorescent house light, a painted aquatic wall behind — someone else's water.",
+    hiddenStat: {
+      name: "Picked, Held Up for Proof",
+      read: "Lifted by the antennae, the full carapace turned face-out to the light — a selection shown, not a specimen studied. The tank behind is now one short.",
+      tease: "A sealed reading is held on the card's developed back.",
+    },
+    fitAura: {
+      family: "Encounter Class",
+      chips: ["Carapace", "Fluorescent", "Cyan-Tank"],
+      placement: "Belongs to the moment of choosing; out of place once the water's still again.",
+    },
+    sceneCharge: { label: "Selecting" },
+  },
+};

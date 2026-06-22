@@ -488,7 +488,7 @@ function renderCard(src, treatment) {
             /* v2 freeVisible is the source of truth for the 4 public
                stats (SCAN_ENGINE_SPEC); legacy card.stats as fallback */
             const s = getScanResult(src)?.stats.freeVisible || c.stats;
-            return ["presence", "frame", "signal", "visualImpact"]
+            return ["presence", "signal", "visualImpact", "charge"]
               .map((k) => miniStat(statLabel(k), s[k]))
               .join("");
           })()}
@@ -532,25 +532,15 @@ function renderReadingPanel(src, treatment) {
       <p class="readhead__line">${esc(TREATMENTS[treatment].tagline)}</p>
     </div>`;
 
-  const statReads = `
-    <div class="module module--ledger">
-      ${moduleHead("Stat Reading")}
-      <div class="reads">
-        ${(() => {
-          const scan = getScanResult(src);
-          const shown = scan?.tierOutputs.free.statsShown || ["presence", "frame", "signal", "visualImpact"];
-          const vals = scan?.stats.freeVisible || c.stats;
-          return shown
-            .map(
-              (k) => `
-          <div class="reads__item">
-            <div class="reads__top"><span class="reads__name">${esc(statLabel(k))}</span><span class="reads__val reads__val--tier">${esc(tierBand(vals[k]))}</span></div>
-            <p>${esc(src.reads[k])}</p>
-          </div>`
-            )
-            .join("");
-        })()}
-      </div>
+  const sec = (typeof S107_SECTIONS !== "undefined" && S107_SECTIONS[src.id]) || {};
+  /* BR-S107: Stat Reading KILLED (it was geometry-as-prose). Its slot is now
+     Light & Surface (lens C · front) — the palette at a glance + one cool line.
+     Geometry lives only in Diagram/Metrics now. */
+  const lightSurface = `
+    <div class="module module--swatch">
+      ${moduleHead("Light & Surface")}
+      <div class="swatches">${(sec.lightSurface?.swatches || []).map((sw) => `<span class="swatch"><span class="swatch__chip" style="--sw:${esc(sw.hex)}"></span><span class="swatch__label">${esc(sw.label)}</span></span>`).join("")}</div>
+      <p class="module__line module__line--cool">${esc(sec.lightSurface?.line || "")}</p>
     </div>`;
 
   const aura = `
@@ -562,7 +552,7 @@ function renderReadingPanel(src, treatment) {
   const sceneRole = `
     <div class="module">
       ${moduleHead("Scene Role")}
-      <p class="module__line">${esc(src.sceneRole)}</p>
+      <p class="module__line">${esc(sec.sceneRole || src.sceneRole)}</p>
     </div>`;
 
   /* BR-S088 subtraction (paid-only): the panel's analytical deep modules
@@ -661,11 +651,16 @@ function renderReadingPanel(src, treatment) {
       ${moduleHead("Oracle Read")}
       <p class="oracle">“${esc(src.oracle)}”</p>
     </div>`;
-  const forkContent = free ? lockedDeep : archetypeModule + panelReceipts + shinyTease + shinyBadge;
+  /* BR-S107 Push #1: front Archetype module DROPPED (it duplicated the Card tag).
+     Front essence = the Card's archetype tag only. */
+  const forkContent = free ? lockedDeep : panelReceipts + shinyTease + shinyBadge;
   const panelLead = free ? "" : oracleFirst;
   /* Aura Profile is dropped from the PAID panel (it's on the card front + dossier
      Plate 05) so the developed column doesn't echo the dossier; Free keeps it. */
-  return `${header}${panelLead}${statReads}${free ? aura : ""}${sceneRole}<div class="readseam" data-open="${free ? 0 : 1}">${forkContent}</div>`;
+  /* BR-S107 front panel: Light & Surface (C) replaces the killed Stat Reading;
+     front Aura dropped (Push #1 — front essence is the Card tag only; aura lives
+     in back Fit+Aura). Order: header · oracle(paid) · Light&Surface · Scene Role · seam. */
+  return `${header}${panelLead}${lightSurface}${sceneRole}<div class="readseam" data-open="${free ? 0 : 1}">${forkContent}</div>`;
 }
 
 /* ---------- scroll dossier (below the hero) ----------
@@ -704,6 +699,7 @@ function renderDossier(src, treatment) {
      front of the free reader. <div>, NOT <section>, so the .dplate nth-of-type
      dossier rhythm is untouched. */
   const editionLabel = treatment === "free" ? "ARCHIVE EDITION" : treatment === "mint" ? "SIGNATURE MINT" : "HALO MINT";
+  const sec = (typeof S107_SECTIONS !== "undefined" && S107_SECTIONS[src.id]) || {};
   const recordGate = `<div class="drecord-gate">◆ ARTIFACT RECORD · ${paid ? esc(c.serial) : "····"} · ${editionLabel}</div>`;
 
   /* 01 — Source Record (full in both states: the factual hook).
@@ -813,7 +809,15 @@ function renderDossier(src, treatment) {
       }
     </div>`;
   }
-  const board = dplate("02", "Evidence Board", paid, boardBody);
+  /* 02 — BR-S107: Evidence Board → Surface Record (refueled to lens C). Full
+     swatch set, each chip annotated with the proof-noun that earned it. The old
+     cue/effect/basis receipts (incl. the effect arrows) are retired with it. */
+  const srSwatches = sec.surfaceRecord?.swatches || [];
+  const board = dplate("02", "Surface Record", paid, paid
+    ? `<div class="dswatches">${srSwatches.map((sw) => `
+        <div class="dswatch"><span class="dswatch__chip" style="--sw:${esc(sw.hex)}"></span><div class="dswatch__body"><span class="dswatch__label">${esc(sw.label)}</span><span class="dswatch__proof">${esc(sw.proof)}</span></div></div>`).join("")}</div>`
+    : `<div class="dswatches dswatches--tease">${srSwatches.slice(0, 3).map((sw) => `
+        <div class="dswatch"><span class="dswatch__chip" style="--sw:${esc(sw.hex)}"></span><div class="dswatch__body"><span class="dswatch__label">${esc(sw.label)}</span></div></div>`).join("")}<p class="dstat__undeveloped">Surface proofs develop with the mint.</p></div>`);
 
   /* 03 — Stat Dossier (values + visibility from v2 when present) */
   const statRows = (scan?.tierOutputs.free.statsShown || ["presence", "frame", "signal", "visualImpact"])
@@ -834,54 +838,30 @@ function renderDossier(src, treatment) {
       </div>`;
     })
     .join("");
-  const statDossier = dplate("03", "Stat Dossier", paid, `
-    <div class="dstats">${statRows}</div>
-    <p class="dossier__cap">weighted reads against the scan-room prototype benchmark — interpretive, not measured</p>`);
+  /* 03 — BR-S107: Stat Dossier KILLED (geometry-as-prose, a second time). Its
+     numbers live only in Metrics now; nothing renders here. */
+  const statDossier = "";
 
   /* 04 — Hidden Stat (v2 conditionalStats preferred; tease stays legacy) */
   const hid = scan?.conditionalStats?.[0] || d.hidden;
-  const hidden = dplate("04", "Hidden Stat", paid, paid
-    ? `
-    <div class="dhidden">
-      <div class="dhidden__score"><span class="dhidden__val dhidden__val--tier">${esc(tierBand(hid.value))}</span><span class="dhidden__name">${esc(hid.name)}</span></div>
-      <p class="dhidden__read">${esc(hid.read)}</p>
-    </div>`
-    : `
-    <div class="dhidden dhidden--tease">
-      <div class="dhidden__score">
-        <span class="dhidden__val">··</span>
-        <span class="dhidden__name">Sealed reading</span>
-        <span class="dhidden__seal">Sealed · on the card's developed back</span>
-      </div>
-      <p class="dhidden__read">${esc(d.hidden.tease)}</p>
-    </div>`);
+  /* 03 — Hidden Stat (BR-S107: lens B · the non-obvious gesture read, behind a
+     FREE tap-to-develop seal — the shaped-hole interaction, never a paywall). */
+  const hs = sec.hiddenStat || { name: d.hidden.name, read: d.hidden.read };
+  const hidden = dplate("03", "Hidden Stat", paid, `
+    <details class="seal" ${paid ? "open" : ""}>
+      <summary class="seal__cue"><span class="seal__dot">◆</span><span class="seal__name">${esc(hs.name)}</span><span class="seal__act">tap to develop</span></summary>
+      <p class="dhidden__read">${esc(hs.read)}</p>
+    </details>`);
 
   /* 05 — Fit + Aura Layer */
-  const fitAura = dplate("05", "Fit + Aura Layer", paid, paid
-    ? `
-    <div class="dfitaura">
-      <div class="dfitaura__col">
-        <div class="aura">${src.aura.map((a) => `<span class="aura__chip">${esc(a)}</span>`).join("")}</div>
-        <p class="module__line"><b>Scene Role</b> — ${esc(src.sceneRole)}</p>
-        <p class="module__prose--serif dfitaura__stance">${esc(src.stance)}</p>
-      </div>
-      <div class="dfitaura__col">
-        <p class="module__line--fit dfitaura__fit">${esc(src.fit)}</p>
-        ${(() => {
-          /* Halo deeper stats from v2 haloExtended (Visual Impact is
-             derived, Lore Density carried) — legacy fallback */
-          const vi = haloX?.visualImpact || src.impact;
-          const lo = haloX?.loreDensity || src.lore;
-          return `
-        <div class="impact"><span class="impact__label">Frame Impact · ${esc(vi.label)}</span><span class="impact__track"><span class="impact__fill" style="--v:${bandPct(vi.value)}%"></span></span><span class="impact__val impact__val--tier">${esc(tierBand(vi.value))}</span></div>
-        <div class="impact"><span class="impact__label">Lore · ${esc(lo.label)}</span><span class="impact__track"><span class="impact__fill impact__fill--dash" style="--v:${bandPct(lo.value)}%"></span></span><span class="impact__val impact__val--tier">${esc(tierBand(lo.value))}</span></div>`;
-        })()}
-      </div>
-    </div>`
-    : `
-    <div class="dfitaura dfitaura--tease">
-      <div class="aura">${src.aura.map((a) => `<span class="aura__chip">${esc(a)}</span>`).join("")}</div>
-      <p class="dstat__undeveloped">Aura markers visible. Full aura interpretation develops with Halo Mint.</p>
+  /* 04 — Fit + Aura (BR-S107 Push #1: lens E PLACEMENT as badges — family · aura
+     chips · where it fits. NEVER a verdict; the verdict is the Oracle's alone.
+     Always open (grounding floor). Stance/impact/lore retired from here. */
+  const fa = sec.fitAura || { family: d.mint.family, chips: src.aura, placement: src.fit };
+  const fitAura = dplate("04", "Fit + Aura Layer", paid, `
+    <div class="dfitaura dfitaura--badges">
+      <div class="badges"><span class="badge badge--family">${esc(fa.family)}</span>${(fa.chips || []).map((ch) => `<span class="badge">${esc(ch)}</span>`).join("")}</div>
+      <p class="dfitaura__place">${esc(fa.placement)}</p>
     </div>`);
 
   /* 06 — Mint Record */
@@ -916,14 +896,18 @@ function renderDossier(src, treatment) {
       <span class="unlock__name">Develop this scan</span>
       <span class="unlock__desc">the card finishes developing in place</span>
     </button>`;
-  const mintRecord = dplate("06", "Mint Record", paid, mintBody, "dplate--mint");
+  const mintRecord = dplate("05", "Mint Record", paid, mintBody, "dplate--mint");
 
   /* 07 — Oracle Read */
-  const oracle = dplate("07", "Oracle Read", paid, `
-    <blockquote class="doracle">“${esc(
-      paid ? scan?.readings.oracle || d.oracle.full : scan?.tierOutputs.free.oracle || d.oracle.short
-    )}”</blockquote>
-    ${paid ? `<p class="doracle__timeline">${esc(d.oracle.timeline)}</p>` : `<p class="doracle__timeline doracle__timeline--ghost">full read develops with the mint</p>`}`,
+  /* 06 — Oracle Read (BR-S107: the ONLY verdict; sealed behind a FREE tap-to-
+     develop reveal; centered/large/alone form). */
+  const oracleText = paid ? (scan?.readings.oracle || d.oracle.full) : (scan?.tierOutputs.free.oracle || d.oracle.short);
+  const oracle = dplate("06", "Oracle Read", paid, `
+    <details class="seal seal--oracle" ${paid ? "open" : ""}>
+      <summary class="seal__cue seal__cue--oracle"><span class="seal__dot">◆</span><span class="seal__name">The verdict</span><span class="seal__act">tap to develop</span></summary>
+      <blockquote class="doracle doracle--centered">“${esc(oracleText)}”</blockquote>
+      ${paid ? `<p class="doracle__timeline">${esc(d.oracle.timeline)}</p>` : ""}
+    </details>`,
     "dplate--oracle");
 
   return `
