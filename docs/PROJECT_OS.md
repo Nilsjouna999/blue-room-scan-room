@@ -164,6 +164,11 @@ the card's own content, upload UI, anything biometric-flavored.
   (Muted/Clean/Strong/Charged/Peak), never as public 0–100 numbers
   (Artifact Language Stabilization v1, 2026-06-13; internal data keys stay
   `presence/frame/signal/charge`)
+  - **Refined (BR-S108.2, 2026-06-22):** the ban is on public 0-100 **SCORES** —
+    a score RANKS the photo/person. **Measurement proportions** (pixel/colour
+    composition, counts — e.g. the Colour Field "61% overcast sky") **ARE
+    permitted as scan readings**: they DESCRIBE the artifact, never rank it.
+    See DECISION_LOG 2026-06-22 (BR-S108.2).
 - short signal note
 - signature line
 - treatment / rarity / serial / barcode / mint stamp

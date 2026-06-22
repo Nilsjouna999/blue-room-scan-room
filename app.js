@@ -551,7 +551,7 @@ function renderReadingPanel(src, treatment) {
     <div class="module module--cfield">
       ${moduleHead("Colour Field")}
       <div class="cfbar">${cf.map((c) => `<span class="cfbar__seg" style="--sw:${esc(c.hex)}; --pct:${c.pct}%"></span>`).join("")}</div>
-      <div class="cflegend">${cf.map((c) => `<span class="cflegend__item"><span class="cflegend__dot" style="--sw:${esc(c.hex)}"></span>${esc(c.label)} <b>${c.pct}%</b></span>`).join("")}</div>
+      <div class="cfkey">${cf.map((c) => `<span class="cfkey__item">${esc(c.label)} <b>${c.pct}%</b></span>`).join("")}</div>
     </div>`;
 
 
@@ -637,7 +637,25 @@ function renderReadingPanel(src, treatment) {
      now opens on Light & Surface, not a duplicated verdict.
      BR-S107 Push #1: front Archetype module DROPPED (it duplicated the Card tag);
      front essence = the Card's archetype tag only. */
-  const forkContent = free ? lockedDeep : panelReceipts + shinyTease + shinyBadge;
+  /* BR-S108.2 (C): the developed rail must GAIN, not deflate. The free state's
+     develop-teasers vanish on develop and leave a hole; the Finish plate fills it
+     (the material stated with weight). The REST of this rail is RESERVED for the
+     grade/charge visual (post readiness-gate) — do not fill it with throwaway. */
+  /* The finish swatch must read as the MATERIAL it names, not the holo-rim accents
+     (which are blue-ish for several sources — the re-audit caught "Field Green Glass"
+     showing blue). A per-material base hex + a full-width glass-sheen bar = real weight,
+     no dead gap, right colour. */
+  const FINISH_HEX = { "Warm Glass Copper": "#b07a4a", "Cold Prism Frost": "#9ed3dd", "Cold Tide Steel": "#7d8b92", "Field Green Glass": "#6f8f5c", "Tank Glass Teal": "#2f9fa8" };
+  const fhex = FINISH_HEX[src.halo.material] || src.halo.a || "#888888";
+  const finishPlate = free ? "" : `
+    <div class="module module--finish">
+      ${moduleHead("Finish")}
+      <div class="finish" style="--fhex:${esc(fhex)};">
+        <span class="finish__bar" aria-hidden="true"></span>
+        <span class="finish__name">${esc(src.halo.material)}</span>
+      </div>
+    </div>`;
+  const forkContent = free ? lockedDeep : finishPlate + panelReceipts + shinyTease + shinyBadge;
   const panelLead = "";
   /* Aura Profile is dropped from the PAID panel (it's on the card front + dossier
      Plate 05) so the developed column doesn't echo the dossier; Free keeps it. */

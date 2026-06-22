@@ -522,3 +522,39 @@ Revisit: promoting any prototype to a FULL room source (per-photo dossier/diagra
 **2026-06-22 / BR-S103 — 3 photos promoted to FULL room sources (SRC-03/04/05); source set 2→5; toggle made data-driven / ACTIVE (runtime data.js+app.js; supersedes the BR-S101 dev-route prototype)**
 Why: the builder asked for the 3 photos in the live room "as the 2 original" — to evaluate how varied images sit across the whole project (card + panels + dossier + halo), not a dev gallery. Authored via a 6-agent workflow (3 per-photo authors reading their own image → full SOURCES object + V2_EXTRAS, artifact-only; 3 safety/schema gates). **Safety: all 3 gated SAFE with ZERO person-reading violations** — every line takes the frame/scene/held-object as grammatical subject (the gate's "schemaGaps" referenced a different future HALO_DOSSIER schema, not the live data.js shape, and were N/A). Integration done in the main loop (not by agents): I built the data.js object literals + V2_EXTRAS from the agents' validated JSON (so no agent-authored syntax could break the module), cleaned voice to match SRC-01/02 (Title-Case card titles; sentence signatures + mint.notes; 1-word impact/lore labels; Title-Case aura), and SUPPLIED the identity fields the workflow schema deliberately omitted (card.serial/edition/minted/batch, dossier.record.objectNo, dossier.mint.serial). Applied the gate's one substantive fix: SRC-04's primary subject is the canine, so v2 route HUMAN_SOLO → ANIMAL_COMPANION. Wiring: `renderSourceToggle()` builds the SRC rail from SOURCES (auto-scales to N); URL `?src=1..N` + keyboard `1..N` generalized from the hardcoded 2; `short` labels added to all five. **PRIVACY (standing):** SRC-03/04/05 are the builder's own personal photos and the repo is public, so `assets/source-03/04/05.jpg` stay GITIGNORED (local-only, never pushed) — the data.js text is committed, so the cards render on the builder's machine but show image-less for a public clone (acceptable; these are local design fixtures). The SAMPLE zone label still marks every room "NOT YOUR PHOTO" (BR-S090 stopgap) — these are demo fixtures, not the user's scanned result, so the honesty spine (no engine = no reading on a real upload) is untouched. Verified live @1600×900 (headless, console clean): 5 sources; each new card renders free + developed (card + EXIF-upright photo + restored halo + Diagram + Oracle/Stat panel + 7-plate dossier); toScanResultV2 maps without crashing.
 Revisit: diagram coords are best-effort (EXIF-rotated source files → authored for the upright view) — tunable per photo if the Diagram tab matters. The BR-S101 `?dev=proto-cards` route is superseded by these full sources (left in place, harmless; prune in a cleanup pass). If these are ever to ship publicly, the gitignored faces need an explicit decision (owned-stock vs personal). Copy/crops/stats are tunable; the builder may refine per card.
+
+**2026-06-22 / BR-S108.2: measurement-vs-score carve-out · Colour Field % keep · Run Hidden-Stat keep · grade principles folded / ACTIVE (Core Change to the stat law; grade principles LOCKED, calibration HELD OPEN)**
+Why: consolidate the held conflict-report decisions + fold the grade honesty-contract before it drifts.
+**A2 — STAT LAW REFINED (supersedes "No public 0–100 (tier bands only)"):** **No public 0–100 SCORES** — a score
+RANKS the photo/person, and stays banned. **Measurement proportions — pixel/colour composition, counts — ARE
+permitted as scan readings**, because they DESCRIBE the artifact, never rank it. The bright line stays bright on
+scores; the measurement carve-out is explicit so a future pass neither deletes a legitimate measurement nor
+loosens the score ban sloppily. (PROJECT_OS §7/§9 stat-law text updated to match in the same commit.)
+**A1 — Colour Field % KEPT** under A2: "61% overcast sky" etc. is a colour-composition measurement of the frame,
+not a stat score.
+**A3 — Run Hidden Stat "The Man Let It Go" — CONSCIOUS KEEP:** it reads the man's performed / re-authorable ACTION
+(in release), an IMAGE-ACT read allowed by `HUMAN_READ_LINE_V1` (never worth / identity / body / character); both
+audit agents confirmed it on the right side of the person-reading line. Deliberate, not an accident.
+**D — GRADE PRINCIPLES folded as LOCKED** (thresholds / visual-tiers HELD OPEN until the readiness gate passes):
+  · AXIS: a card's grade measures the CHARGE the photo offered, read honestly — never worth, never "good photo",
+    never the person.
+  · SHARED CONTRACT: the card is a collaboration; the user brings a photo with a moment, Blue Room's duty is to
+    never miss the ones that count. Honesty both ways — never inflate the flat one, never flatten the brilliant one.
+  · P1: grade = photo charge; read-completeness is the room's CONSTANT DUTY, never a grade input (a thin read of a
+    rich photo is a bug, never a low grade).
+  · P2: charge ≠ quality ≠ worth; common = honest, never lesser.
+  · P3: common is COMPLETE; rare has MORE; common is never a degraded rare (obeys free-is-complete).
+  · P4: stated in the receipt, never chased (no scarcity / streak / countdown — obeys no-magnetism).
+  · P5: reads the frame, never the person, never the story.
+  · THREE ORTHOGONAL AXES kept legible + non-overlapping: finish family (treatment) · 1% anomaly (stochastic) ·
+    grade (charge tier).
+  · HELD OPEN (do NOT lock): thresholds, tier count / names (archival not gamey), visual tiers, the grade's
+    free-vs-developed boundary — calibrate ONLY after the readiness gate (strong photos reliably read high-charge,
+    flat read low; same test as mint-readiness).
+RUNTIME (B + C, same commit): Colour Field collapsed to ONE representation (thin 7px scan-readout bar + minimal
+text key; duplicate legend dots cut); a Finish plate added to the DEVELOPED rail (material stated with weight,
+e.g. Field Green Glass) so develop GAINS instead of deflating; the rest of that rail is RESERVED in code for the
+grade visual (post readiness-gate), not filled with throwaway.
+Revisit: the grade thresholds / visual-tiers + free-vs-developed grade boundary calibrate once the readiness gate
+passes; the reserved developed-rail zone is where the grade visual lands. Deferred (logged): Set Wall · the two
+minor prose/row rhymes · the other 3 cards to mintable · the grade VISUAL build.
