@@ -1,9 +1,6 @@
 ﻿Thumbs.db
 desktop.ini
 
-# BR-S101 prototype card photos — PERSONAL, LOCAL-ONLY (faces; public repo).
-# The SRC-03/04/05 prototype cards render these on the builder's machine; the
-# images are never committed/pushed. data.js references them by path.
-assets/source-03.jpg
-assets/source-04.jpg
-assets/source-05.jpg
+# BR-S111: SRC-03/04/05 prototype photos are now PUBLISHED for the public web
+# deploy (GitHub Pages) — owner authorized public faces 2026-06-23. Previously
+# gitignored as personal/local-only; that hold is lifted by explicit consent.
