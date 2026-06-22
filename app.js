@@ -719,8 +719,10 @@ function renderDossier(src, treatment) {
          '····' on Free, assigned on Develop (latent→developed law). objectNo
          lives once now, as the spine head (removed from the grid above). */
   const fileSteps = [`<span class="dfiling__step">capture · <b>${esc(src.capture.code)}</b></span>`];
-  if (scan?.route) fileSteps.push(`<span class="dfiling__step"><span class="dfiling__arr">↳</span> route · <b>${esc(scan.route)}</b></span>`);
-  if (scan?.scanStatus) fileSteps.push(`<span class="dfiling__step"><span class="dfiling__arr">↳</span> scan status · <b>${esc(scan.scanStatus)}</b></span>`);
+  // route (HUMAN_SOLO/ANIMAL_COMPANION) intentionally NOT surfaced — classifying the
+  // subject on a live surface is law-adjacent (BR-S106). It stays internal as the
+  // routing mechanism only; never rendered.
+  if (scan?.scanStatus) fileSteps.push(`<span class="dfiling__step"><span class="dfiling__arr">↳</span> scan · <b>complete</b></span>`);
   if (scan?.archetype?.class) fileSteps.push(`<span class="dfiling__step"><span class="dfiling__arr">↳</span> filed as · <b>${esc(scan.archetype.class)}</b></span>`);
 
   const lineageRows = [
@@ -772,7 +774,7 @@ function renderDossier(src, treatment) {
         .map(
           (r) => `
         <div class="receipt">
-          <div class="receipt__top"><span class="receipt__effect">${esc(r.effect)}</span><span class="receipt__conf">${esc(r.confidence)}</span></div>
+          <div class="receipt__top"><span class="receipt__effect">${esc(r.effect)}</span></div>
           <p class="receipt__read">${esc(r.cue)}</p>
           <span class="receipt__basis">${esc(r.basis)}</span>
         </div>`

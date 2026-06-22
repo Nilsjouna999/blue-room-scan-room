@@ -217,7 +217,7 @@ const SOURCES = [
     card: {
       title: "Checkpoint Wave",
       archetype: "Open-Window Operator",
-      note: "The hand says stop, the face says welcome. The card never resolves it — and doesn't need to.",
+      note: "A flat palm, five fingers, raised straight at the lens. Out the side glass, the fjord.",
       signature: "Filed from the driver's seat, engine off.",
       /* Free-front four = presence(Frame Presence)/frame/signal/visualImpact
          (CARD_SYSTEM_V1 §2). charge(Scene Charge) is Halo-depth now — kept here
@@ -254,7 +254,6 @@ const SOURCES = [
       { k: "Lens profile", v: "Action-wide, corrected −40%" },
       { k: "Key light", v: "Overcast, rear-left" },
       { k: "Gesture", v: "Palm, 5-finger spread" },
-      { k: "Subject lock", v: "0.83" },
       { k: "Cabin clutter index", v: "Moderate" },
       { k: "Horizon", v: "Occluded (interior)" },
       { k: "Brand Trace", v: "Volvo wheel confirmed — a clean brand cue in the cabin frame" },
@@ -386,7 +385,7 @@ const SOURCES = [
     card: {
       title: "Two Feet of Quiet",
       archetype: "Frost Surveyor",
-      note: "Crouched over a hole that isn't there yet. The commitment is in the kneel, not the catch.",
+      note: "Crouched on the ice, both gloves stacked on the auger. Low hard sun — the snow keeps no shadow.",
       signature: "Signed in snow, countersigned by the sun.",
       /* Free-front four = presence/frame/signal/visualImpact (CARD_SYSTEM_V1 §2);
          charge(Scene Charge) is Halo-depth, kept only for the Metrics diagnostic tab. */
@@ -422,7 +421,6 @@ const SOURCES = [
       { k: "Sun elevation", v: "Low, hard, unfiltered" },
       { k: "Snow albedo", v: "+1.2 EV floor lift" },
       { k: "Tool state", v: "Hand auger, pre-cut" },
-      { k: "Subject lock", v: "0.88" },
       { k: "Horizon placement", v: "Upper quarter, honest" },
       { k: "Wind", v: "Calm, inferred" },
       { k: "Expression Band", v: "Mouth turns up at the brace — a small warm cue in a cold frame" },
@@ -522,7 +520,7 @@ const SOURCES = [
     card: {
       title: "Shore Dispatch",
       archetype: "The Dispatch",
-      note: "A transverse catch held across the full frame against a compressed fjord depth stack. Overcast light exposes every scale; the driftwood below rhymes the axis.",
+      note: "The salmon is held flat across the chest, face-up to the sky. In the grass below, the second one.",
       signature: "Filed flat on the gravel, countersigned by the fjord.",
       stats: { presence: 81, frame: 74, signal: 88, visualImpact: 83, charge: 72 },
       serial: "BR-003-FSH-0001",
@@ -648,7 +646,7 @@ const SOURCES = [
     card: {
       title: "Stride Break",
       archetype: "The Encounter",
-      note: "A low-angle foreground break on a gravel-grass path: mid-stride at peak extension, lens-direct. The path wedge supplies depth; the overcast plate diffuses the coat into full tonal range.",
+      note: "The dog leaves the ground. Everything behind it — the path, the fence, the man — is just run-up.",
       signature: "Logged at ankle height, the instant before contact.",
       stats: { presence: 87, frame: 79, signal: 91, visualImpact: 84, charge: 88 },
       serial: "BR-004-RUN-0001",
@@ -774,7 +772,7 @@ const SOURCES = [
     card: {
       title: "Spiny Encounter",
       archetype: "The Encounter",
-      note: "A full carapace presented over a live tank under hard fluorescent top light, the painted mural supplying depth behind the glass. The cyan tank band counterweights the warm shell.",
+      note: "The lobster is held up by the antennae, full carapace turned to the fluorescent light. Behind it, the tank is one short.",
       signature: "Filed under house light, over someone else's water.",
       stats: { presence: 82, frame: 74, signal: 86, visualImpact: 79, charge: 88 },
       serial: "BR-005-TNK-0001",
