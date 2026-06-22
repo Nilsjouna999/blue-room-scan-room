@@ -377,7 +377,7 @@ const SOURCES = [
         serial: "BR-002-ICE-0001-HM",
       },
       oracle: {
-        full: "This card does not explain itself. It arrives as field evidence and lets the snow do most of the talking.",
+        full: "The fish were optional. The silence was the catch.",
         short: "The snow kept the minutes. The card signed them.",
         timeline: "Adjacent in the archive — cold expedition card · winter field report · quiet operator still",
       },
@@ -519,9 +519,9 @@ const SOURCES = [
     },
     card: {
       title: "Shore Dispatch",
-      archetype: "The Dispatch",
+      archetype: "Catch Filer",
       note: "The salmon is held flat across the chest, face-up to the sky. In the grass below, the second one.",
-      signature: "Filed flat on the gravel, countersigned by the fjord.",
+      signature: "Filed flat on the gravel, the fjord standing witness.",
       stats: { presence: 81, frame: 74, signal: 88, visualImpact: 83, charge: 72 },
       serial: "BR-003-FSH-0001",
       batch: "Field Batch 03",
@@ -771,7 +771,7 @@ const SOURCES = [
     },
     card: {
       title: "Spiny Encounter",
-      archetype: "The Encounter",
+      archetype: "Wrong-Light Lift",
       note: "The lobster is held up by the antennae, full carapace turned to the fluorescent light. Behind it, the tank is one short.",
       signature: "Filed under house light, over someone else's water.",
       stats: { presence: 82, frame: 74, signal: 86, visualImpact: 79, charge: 88 },
@@ -1037,7 +1037,7 @@ const S107_SECTIONS = {
     sceneRole: "A frozen lake on an open plateau, late March, hard sun — a treeline the only witness.",
     hiddenStat: {
       name: "Eyes on the Work",
-      read: "Hood, beanie and glasses hand the eye-line down to the auger — the gaze is given to the task, not the lens, so the frame reads as field evidence rather than a portrait.",
+      read: "Hood, beanie and glasses stack over the eyes, and what little eye-line gets through still drops to the auger, not the lens. Three layers against the cold, and not one of them turned toward the camera.",
       tease: "A sealed reading is held on the card's developed back.",
     },
     fitAura: {
@@ -1067,8 +1067,8 @@ const S107_SECTIONS = {
     },
     sceneRole: "A remote fjord shoreline — gravel, driftwood, water and a snow-streaked ridge. Field-document ground, not a backdrop.",
     hiddenStat: {
-      name: "Held as Evidence",
-      read: "The catch is turned face-up and flat, its whole length to the sky, as if submitted rather than shown off — the hold files a report before a word is said.",
+      name: "The Second Catch",
+      read: "The first catch is the one raised to the lens. The second lies in the grass below, unraised, never presented. The shore takes the one offered and keeps the one held back.",
       tease: "A sealed reading is held on the card's developed back.",
     },
     fitAura: {
@@ -1124,10 +1124,10 @@ const S107_SECTIONS = {
         { hex: "#7a8f6a", label: "Painted mural", proof: "a painted aquatic wall, echoing the live tank" },
       ],
     },
-    sceneRole: "A live-tank seafood interior under fluorescent house light, a painted aquatic wall behind — someone else's water.",
+    sceneRole: "A live-tank seafood interior under fluorescent house light, a painted aquatic wall behind.",
     hiddenStat: {
-      name: "Picked, Held Up for Proof",
-      read: "Lifted by the antennae, the full carapace turned face-out to the light — a selection shown, not a specimen studied. The tank behind is now one short.",
+      name: "The Painted Sea",
+      read: "Behind the live tank, the wall is painted — palm fronds and a flat sea that never moves. The shell is held up in front of it, lifted from one water and posed against another that was only ever paint.",
       tease: "A sealed reading is held on the card's developed back.",
     },
     fitAura: {
