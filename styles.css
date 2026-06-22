@@ -1227,10 +1227,10 @@ body[data-treatment="shiny"] .panel--reading > .module--oracle { opacity: 1; }
 .readhead__meta { display: flex; gap: 8px; align-items: center; }
 .readhead__line {
   font-family: var(--font-mono); /* mono telemetry — quiets the tagline, mirrors the index gutter */
-  font-size: 9.5px;
-  letter-spacing: 0.04em;
-  line-height: 1.5;
-  color: var(--t-ghost); /* decorative TREATMENTS tagline -> ghost (LAYUP sec6: floor is for functional labels) */
+  font-size: 11px;
+  letter-spacing: 0.03em;
+  line-height: 1.55;
+  color: var(--t-body); /* BR-S108.3 #4: pushed to READ (was ghost 9.5px = the painful middle); free-only now */
   padding-bottom: 10px;
 }
 .readhead__chip {
@@ -1365,16 +1365,27 @@ details.seal[open] .seal__act { opacity: 0.4; }
 .cfkey__item b { color: var(--t-body); font-weight: 500; font-variant-numeric: tabular-nums; }
 
 /* BR-S108.2 (C): Finish plate — the developed rail gains the material with weight */
-.module--finish .finish { display: grid; gap: 9px; }
-.finish__bar {
-  height: 22px; border-radius: 5px;
-  background: linear-gradient(100deg, rgba(255, 255, 255, 0.16) 0%, transparent 42%), var(--fhex, #888);
-  border: 1px solid var(--line-strong); box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.25);
+/* BR-S108.3 (#2): de-bulked — thin material chip + name, matching Colour Field restraint */
+.module--finish .finish { display: flex; align-items: center; gap: 10px; }
+.finish__chip {
+  width: 16px; height: 16px; border-radius: 4px; flex: none;
+  background: var(--fhex, #888);
+  border: 1px solid var(--line-strong); box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.3);
 }
 .finish__name {
   font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.06em;
   text-transform: uppercase; color: var(--t-display);
 }
+
+/* BR-S108.3 (#5): Mint Record reads as a stamped certificate — the bottom seal
+   gives the weight of permanence (it's a MINT record). */
+.dmint__seal {
+  display: flex; align-items: center; justify-content: center; gap: 11px;
+  margin-top: 16px; padding-top: 14px; border-top: 2px solid var(--line-strong);
+  font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.24em;
+  text-transform: uppercase; color: var(--t-body);
+}
+.dmint__seal-mark { color: var(--t-meta); font-size: 9px; }
 
 /* Back: per-surface measured rows + proof (a different object from the front bar) */
 .cfdeep { display: grid; gap: 12px; }

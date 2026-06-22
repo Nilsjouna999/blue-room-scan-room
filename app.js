@@ -536,7 +536,7 @@ function renderReadingPanel(src, treatment) {
         <span class="readhead__chip">${esc(src.capture.code)}</span>
         <span class="readhead__badge readhead__badge--${treatment}">${esc(stateBadge)}</span>
       </div>
-      <p class="readhead__line">${esc(TREATMENTS[treatment].tagline)}</p>
+      ${free ? `<p class="readhead__line">${esc(TREATMENTS[treatment].tagline)}</p>` : ""}
     </div>`;
 
   const sec = (typeof S107_SECTIONS !== "undefined" && S107_SECTIONS[src.id]) || {};
@@ -651,7 +651,7 @@ function renderReadingPanel(src, treatment) {
     <div class="module module--finish">
       ${moduleHead("Finish")}
       <div class="finish" style="--fhex:${esc(fhex)};">
-        <span class="finish__bar" aria-hidden="true"></span>
+        <span class="finish__chip" aria-hidden="true"></span>
         <span class="finish__name">${esc(src.halo.material)}</span>
       </div>
     </div>`;
@@ -735,7 +735,7 @@ function renderDossier(src, treatment) {
     .map(([k, v, ghost, id]) => `<div class="dlineage__row"><span class="dlineage__k">${k}</span><span class="dlineage__v${ghost ? " dlineage__v--ghost" : ""}${id ? " dlineage__v--id" : ""}">${v}</span></div>`)
     .join("");
 
-  const record = dplate("01", "Source Record", paid, `
+  const record = dplate("03", "Source Record", paid, `
     <dl class="drecord">
       <div><dt>Source ID</dt><dd>${esc(src.capture.code)} · SRC-${pad2(src.no)}</dd></div>
     </dl>
@@ -761,8 +761,10 @@ function renderDossier(src, treatment) {
      (measured bar + share + the proof-noun that earned it). A different object
      from the front's single stacked bar. */
   const cf = (typeof S108_EXTRAS !== "undefined" && (S108_EXTRAS[src.id] || {}).colourField) || [];
-  const cfRow = (c, withProof) => `<div class="cfdeep__row"><span class="cfdeep__bar" style="--sw:${esc(c.hex)}; --pct:${c.pct}%"></span><div class="cfdeep__body"><span class="cfdeep__head"><span class="cfdeep__label">${esc(c.label)}</span><span class="cfdeep__pct">${c.pct}%</span></span>${withProof ? `<span class="cfdeep__proof">${esc(c.proof)}</span>` : ""}</div></div>`;
-  const board = dplate("02", "Surface Record", paid, paid
+  /* BR-S108.3 (#1): Surface Record DROPS the % — Colour Field owns the measurement,
+     Surface Record owns the annotated palette (named surface + what it is). */
+  const cfRow = (c, withProof) => `<div class="cfdeep__row"><span class="cfdeep__bar" style="--sw:${esc(c.hex)}"></span><div class="cfdeep__body"><span class="cfdeep__label">${esc(c.label)}</span>${withProof ? `<span class="cfdeep__proof">${esc(c.proof)}</span>` : ""}</div></div>`;
+  const board = dplate("01", "Surface Record", paid, paid
     ? `<div class="cfdeep">${cf.map((c) => cfRow(c, true)).join("")}</div>`
     : `<div class="cfdeep">${cf.slice(0, 3).map((c) => cfRow(c, false)).join("")}<p class="dstat__undeveloped">Surface proofs develop with the mint.</p></div>`);
 
@@ -773,7 +775,7 @@ function renderDossier(src, treatment) {
   /* 03 — Hidden Stat (BR-S107: lens B · the non-obvious gesture read, behind a
      FREE tap-to-develop seal — the shaped-hole interaction, never a paywall). */
   const hs = sec.hiddenStat || { name: d.hidden.name, read: d.hidden.read };
-  const hidden = dplate("03", "Hidden Stat", paid, `
+  const hidden = dplate("02", "Hidden Stat", paid, `
     <details class="seal" ${paid ? "open" : ""}>
       <summary class="seal__cue"><span class="seal__dot">◆</span><span class="seal__name">${esc(hs.name)}</span><span class="seal__act">tap to develop</span></summary>
       <p class="dhidden__read">${esc(hs.read)}</p>
@@ -800,6 +802,7 @@ function renderDossier(src, treatment) {
       <div><dt>Mint Serial</dt><dd>${esc(scan?.tierOutputs.halo.mintSerial || d.mint.serial)}</dd></div>
     </dl>
     <p class="dmint__note">“${esc(d.mint.note)}”</p>
+    <div class="dmint__seal"><span class="dmint__seal-mark">◆</span><span class="dmint__seal-txt">Filed &amp; sealed · Blue Room Archive</span><span class="dmint__seal-mark">◆</span></div>
     <div class="dmint__rest">
       <button type="button" class="dmint__return" data-goto="free">
         <span class="dmint__return-name">Step back</span>
@@ -834,7 +837,7 @@ function renderDossier(src, treatment) {
   return `
     <div class="dossier__cue">CARD BACK — ARTIFACT RECORD</div>
     <div class="dossier__inner">
-      ${recordGate}${record}${board}${statDossier}<div class="dossier__register">DEVELOPED RECORD</div>${hidden}${fitAura}${mintRecord}<div class="dossier__register">ARTIFACT PROVENANCE</div>${oracle}
+      ${recordGate}${board}${hidden}<div class="dossier__register">THE RECORD</div>${record}${fitAura}${mintRecord}<div class="dossier__register">THE ORACLE</div>${oracle}
       <p class="dossier__end">◆ &nbsp;END OF RECORD · ${esc(src.label).toUpperCase()} · BLUE ROOM ARCHIVE</p>
     </div>`;
 }
