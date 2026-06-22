@@ -426,7 +426,14 @@ function renderMetricsTab(src, treatment) {
     ? lockedModule("Fit Coherence Matrix", "Matrix extracted — the full coherence grid develops with the mint.")
     : `<div class="module">${moduleHead("Fit Coherence Matrix")}${fitBody}</div>`;
 
-  return `<p class="metriccap metriccap--head">why the four stats landed — receipts, not a second score</p>${diamond}${mix}${pressure}${fit}
+  /* BR-S107.1: the orphaned Halo deeper stats (Lore Density + Frame Impact) —
+     homeless after Fit+Aura became badges — routed here as NUMERIC rows (Metrics
+     stays numeric: labels + figures only). */
+  const haloDepth = free
+    ? lockedModule("Halo Depth", "Lore density and frame impact extract on develop.")
+    : `<div class="module">${moduleHead("Halo Depth")}<div class="mixrows">${mixRow("Lore density", src.lore.value)}${mixRow("Frame impact", src.impact.value)}</div></div>`;
+
+  return `<p class="metriccap metriccap--head">why the four stats landed — receipts, not a second score</p>${diamond}${mix}${pressure}${fit}${haloDepth}
     <p class="metriccap metriccap--foot">◆ weighted read · interpretive formula, not a measurement</p>`;
 }
 
@@ -540,14 +547,8 @@ function renderReadingPanel(src, treatment) {
     <div class="module module--swatch">
       ${moduleHead("Light & Surface")}
       <div class="swatches">${(sec.lightSurface?.swatches || []).map((sw) => `<span class="swatch"><span class="swatch__chip" style="--sw:${esc(sw.hex)}"></span><span class="swatch__label">${esc(sw.label)}</span></span>`).join("")}</div>
-      <p class="module__line module__line--cool">${esc(sec.lightSurface?.line || "")}</p>
     </div>`;
 
-  const aura = `
-    <div class="module module--aura">
-      ${moduleHead("Aura Profile")}
-      <div class="aura">${src.aura.map((a) => `<span class="aura__chip">${esc(a)}</span>`).join("")}</div>
-    </div>`;
 
   const sceneRole = `
     <div class="module">
@@ -587,15 +588,15 @@ function renderReadingPanel(src, treatment) {
       ${moduleHead("Develop This Scan")}
       <p class="unlock__line">This card is complete as it is. Develop opens its sealed back — the same scan, a deeper record, when you want it.</p>
       <button type="button" class="unlock__btn unlock__btn--shiny" data-goto="shiny">
-        <span class="unlock__name">Develop this scan</span>
+        <span class="unlock__name">Open the developed back</span>
         <span class="unlock__desc">the card finishes developing in place</span>
       </button>
       <p class="unlock__more">◆ &nbsp;The sealed back of this card develops with the mint — added depth, not a hidden result.</p>
       <p class="unlock__price">One-time develop · this scan only · dev mock — no real payment in this build</p>
     </div>
-    ${lockedModule("Stance Read", "The stance layer is latent here — it develops with the mint.")}
-    ${lockedModule("Fit Coherence", "The coherence read sits in the negative, undeveloped — it develops with the mint.")}
-    ${lockedModule("Oracle Read", "The oracle's full read develops with the mint.")}`;
+    ${lockedModule("Surface Record", "The colour palette shows now — each surface's proof develops with the mint.")}
+    ${lockedModule("Composition & Fit", "Pressure, coherence and halo-depth grids extract on develop.")}
+    ${lockedModule("Halo Material", "The developed material and mint serial resolve with the mint.")}`;
 
   const shinyTease =
     treatment === "mint"
@@ -624,37 +625,15 @@ function renderReadingPanel(src, treatment) {
      fallback — the instance label already lives on the card). The class is
      scoped at the chip ("Artifact class · …") so it reads as a photo role, not
      a person typology. Fulfils the Halo half of the PROJECT_OS §10 promise. */
-  const archetypeModule = (() => {
-    const scan = getScanResult(src);
-    const cls = scan?.archetype?.class;
-    const note = cls && typeof ARCHETYPE_NOTES !== "undefined" ? ARCHETYPE_NOTES[cls] : null;
-    if (!note) return "";
-    return `
-    <div class="module">
-      ${moduleHead("Artifact Archetype")}
-      <div class="aura"><span class="aura__chip">${esc(`Artifact class · ${cls}`)}</span></div>
-      <p class="module__line">${esc(note.line)}</p>
-      <p class="module__line--fit">${esc(note.discovery)}</p>
-      <p class="metriccap">artifact archetype · a photo role, not a person</p>
-    </div>`;
-  })();
+  /* BR-S107.1: dead archetypeModule (front Archetype section, dropped in Push #1) removed. */
 
-  /* Developed panel OPENS on the card's VOICE: the oracle is hoisted ABOVE the
-     stat table as panelLead (BR-S086 amend) so first contact is the spoken line,
-     not the key/value ledger. archetype + the analytical deep reads follow in the
-     readseam. Free is unaffected — panelLead is empty and it renders lockedDeep;
-     the short oracle still lives in dossier plate 07. (The hoisted oracle sits
-     OUTSIDE .readseam, so it stays present at rest, not gated behind the seam-open
-     reveal — styles.css keeps it lit in shiny.) */
-  const oracleFirst = `
-    <div class="module module--oracle">
-      ${moduleHead("Oracle Read")}
-      <p class="oracle">“${esc(src.oracle)}”</p>
-    </div>`;
-  /* BR-S107 Push #1: front Archetype module DROPPED (it duplicated the Card tag).
-     Front essence = the Card's archetype tag only. */
+  /* BR-S107.1 (loop D): the Oracle lands ONCE — in the back dossier Oracle seal.
+     The paid panel-lead repeat (oracleFirst, BR-S086) is KILLED; the paid panel
+     now opens on Light & Surface, not a duplicated verdict.
+     BR-S107 Push #1: front Archetype module DROPPED (it duplicated the Card tag);
+     front essence = the Card's archetype tag only. */
   const forkContent = free ? lockedDeep : panelReceipts + shinyTease + shinyBadge;
-  const panelLead = free ? "" : oracleFirst;
+  const panelLead = "";
   /* Aura Profile is dropped from the PAID panel (it's on the card front + dossier
      Plate 05) so the developed column doesn't echo the dossier; Free keeps it. */
   /* BR-S107 front panel: Light & Surface (C) replaces the killed Stat Reading;
@@ -737,13 +716,9 @@ function renderDossier(src, treatment) {
     <dl class="drecord">
       <div><dt>Source ID</dt><dd>${esc(src.capture.code)} · SRC-${pad2(src.no)}</dd></div>
       <div><dt>Capture Type</dt><dd>${esc(d.record.captureType)}</dd></div>
-      <div><dt>Lead Gesture</dt><dd>${esc(d.record.gesture)}</dd></div>
       <div><dt>Scene Container</dt><dd>${esc(d.record.container)}</dd></div>
-      <div><dt>Primary Signal</dt><dd>${esc(d.record.primarySignal)}</dd></div>
-      <div><dt>Background Role</dt><dd>${esc(d.record.backgroundRole)}</dd></div>
-      <div><dt>Treatment Eligibility</dt><dd>${esc(d.record.eligibility)}</dd></div>
       <div><dt>Provenance</dt><dd>${esc(d.record.provenance)}</dd></div>
-      <div><dt>Markings</dt><dd>${esc(d.record.markings)}</dd></div>
+      <div><dt>Treatment Eligibility</dt><dd>${esc(d.record.eligibility)}</dd></div>
     </dl>
     <div class="dfile">
       <div class="dfiling">
@@ -756,59 +731,6 @@ function renderDossier(src, treatment) {
       </div>
     </div>`);
 
-  /* 02 — Evidence Board — v2 structured receipts (cue/effect/basis/
-     confidence) preferred; legacy prose receipts as fallback. Effects
-     render as quiet mono marks, never a dashboard. */
-  let boardBody;
-  if (scan?.receipts?.length) {
-    const all = scan.receipts;
-    const shownR = paid ? all : scan.tierOutputs.free.receiptsShown || all.slice(0, 3);
-    const hiddenN = all.length - shownR.length;
-    boardBody = `
-    <div class="dboard">
-      ${shownR
-        .map(
-          (r) => `
-        <div class="receipt">
-          <div class="receipt__top"><span class="receipt__effect">${esc(r.effect)}</span></div>
-          <p class="receipt__read">${esc(r.cue)}</p>
-          <span class="receipt__basis">${esc(r.basis)}</span>
-        </div>`
-        )
-        .join("")}
-      ${
-        paid || hiddenN <= 0
-          ? ""
-          : `<div class="receipt receipt--undeveloped">
-              <span class="receipt__k">· · ·</span>
-              <p class="receipt__read">Further receipts sit on the card's developed back.</p>
-            </div>`
-      }
-    </div>`;
-  } else {
-    const shown = paid ? d.evidence : d.evidence.filter((e) => e.free);
-    const hiddenCount = d.evidence.length - shown.length;
-    boardBody = `
-    <div class="dboard">
-      ${shown
-        .map(
-          (e) => `
-        <div class="receipt">
-          <span class="receipt__k">◆ ${esc(e.k)}</span>
-          <p class="receipt__read">${esc(e.read)}</p>
-        </div>`
-        )
-        .join("")}
-      ${
-        paid
-          ? ""
-          : `<div class="receipt receipt--undeveloped">
-              <span class="receipt__k">· · ·</span>
-              <p class="receipt__read">Further receipts sit on the card's developed back.</p>
-            </div>`
-      }
-    </div>`;
-  }
   /* 02 — BR-S107: Evidence Board → Surface Record (refueled to lens C). Full
      swatch set, each chip annotated with the proof-noun that earned it. The old
      cue/effect/basis receipts (incl. the effect arrows) are retired with it. */
@@ -819,31 +741,10 @@ function renderDossier(src, treatment) {
     : `<div class="dswatches dswatches--tease">${srSwatches.slice(0, 3).map((sw) => `
         <div class="dswatch"><span class="dswatch__chip" style="--sw:${esc(sw.hex)}"></span><div class="dswatch__body"><span class="dswatch__label">${esc(sw.label)}</span></div></div>`).join("")}<p class="dstat__undeveloped">Surface proofs develop with the mint.</p></div>`);
 
-  /* 03 — Stat Dossier (values + visibility from v2 when present) */
-  const statRows = (scan?.tierOutputs.free.statsShown || ["presence", "frame", "signal", "visualImpact"])
-    .map((k) => {
-      const n = d.statNotes[k];
-      return `
-      <div class="dstat">
-        <div class="dstat__head">
-          <span class="dstat__name">${esc(statLabel(k))}</span>
-          <span class="dstat__track"><span class="dstat__fill" style="--v:${bandPct(freeVals[k])}%"></span></span>
-          <span class="dstat__val dstat__val--tier">${esc(tierBand(freeVals[k]))}</span>
-        </div>
-        ${
-          paid
-            ? `<p class="dstat__evidence">${esc(n.evidence)}</p>${n.note ? `<p class="dstat__note">${esc(n.note)}</p>` : ""}`
-            : `<p class="dstat__undeveloped">— evidence layer develops with the mint.</p>`
-        }
-      </div>`;
-    })
-    .join("");
   /* 03 — BR-S107: Stat Dossier KILLED (geometry-as-prose, a second time). Its
      numbers live only in Metrics now; nothing renders here. */
   const statDossier = "";
 
-  /* 04 — Hidden Stat (v2 conditionalStats preferred; tease stays legacy) */
-  const hid = scan?.conditionalStats?.[0] || d.hidden;
   /* 03 — Hidden Stat (BR-S107: lens B · the non-obvious gesture read, behind a
      FREE tap-to-develop seal — the shaped-hole interaction, never a paywall). */
   const hs = sec.hiddenStat || { name: d.hidden.name, read: d.hidden.read };

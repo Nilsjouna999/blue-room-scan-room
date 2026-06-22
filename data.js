@@ -1002,8 +1002,8 @@ const S107_SECTIONS = {
     sceneRole: "Parked at a roadside pullout, engine off, northbound — a fjord held in the right window.",
     // B — the one non-obvious gesture/subject read
     hiddenStat: {
-      name: "The Raised Palm",
-      read: "A flat palm at the lens turns the moment from a picture taken into a greeting given — the gesture addresses the camera before the camera addresses it.",
+      name: "The Other Hand",
+      read: "One hand is up at the lens; the other never left the wheel. For all the greeting, nobody in this frame is getting out.",
       tease: "A sealed reading is held on the card's developed back.",
     },
     // E — placement as badges, never a verdict
