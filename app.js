@@ -543,10 +543,15 @@ function renderReadingPanel(src, treatment) {
   /* BR-S107: Stat Reading KILLED (it was geometry-as-prose). Its slot is now
      Light & Surface (lens C · front) — the palette at a glance + one cool line.
      Geometry lives only in Diagram/Metrics now. */
+  /* BR-S108.1: Light & Surface -> COLOUR FIELD. The swatch becomes a MEASUREMENT —
+     one stacked proportion bar (each surface's share of the frame) + a legend.
+     Reads only pixels: a colour proportion, not a person-read and not a stat score. */
+  const cf = (typeof S108_EXTRAS !== "undefined" && (S108_EXTRAS[src.id] || {}).colourField) || [];
   const lightSurface = `
-    <div class="module module--swatch">
-      ${moduleHead("Light & Surface")}
-      <div class="swatches">${(sec.lightSurface?.swatches || []).map((sw) => `<span class="swatch"><span class="swatch__chip" style="--sw:${esc(sw.hex)}"></span><span class="swatch__label">${esc(sw.label)}</span></span>`).join("")}</div>
+    <div class="module module--cfield">
+      ${moduleHead("Colour Field")}
+      <div class="cfbar">${cf.map((c) => `<span class="cfbar__seg" style="--sw:${esc(c.hex)}; --pct:${c.pct}%"></span>`).join("")}</div>
+      <div class="cflegend">${cf.map((c) => `<span class="cflegend__item"><span class="cflegend__dot" style="--sw:${esc(c.hex)}"></span>${esc(c.label)} <b>${c.pct}%</b></span>`).join("")}</div>
     </div>`;
 
 
@@ -715,11 +720,11 @@ function renderDossier(src, treatment) {
   const record = dplate("01", "Source Record", paid, `
     <dl class="drecord">
       <div><dt>Source ID</dt><dd>${esc(src.capture.code)} · SRC-${pad2(src.no)}</dd></div>
-      <div><dt>Capture Type</dt><dd>${esc(d.record.captureType)}</dd></div>
-      <div><dt>Scene Container</dt><dd>${esc(d.record.container)}</dd></div>
-      <div><dt>Provenance</dt><dd>${esc(d.record.provenance)}</dd></div>
-      <div><dt>Treatment Eligibility</dt><dd>${esc(d.record.eligibility)}</dd></div>
     </dl>
+    <div class="dsource2">
+      <p class="dsource2__prov">${esc(((typeof S108_EXTRAS !== "undefined" && (S108_EXTRAS[src.id] || {}).sourceTwoLine) || {}).prov || d.record.provenance)}</p>
+      <p class="dsource2__cond">${esc(((typeof S108_EXTRAS !== "undefined" && (S108_EXTRAS[src.id] || {}).sourceTwoLine) || {}).cond || d.record.eligibility)}</p>
+    </div>
     <div class="dfile">
       <div class="dfiling">
         <div class="dfile__kick">Filing event</div>
@@ -734,12 +739,14 @@ function renderDossier(src, treatment) {
   /* 02 — BR-S107: Evidence Board → Surface Record (refueled to lens C). Full
      swatch set, each chip annotated with the proof-noun that earned it. The old
      cue/effect/basis receipts (incl. the effect arrows) are retired with it. */
-  const srSwatches = sec.surfaceRecord?.swatches || [];
+  /* BR-S108.1: Surface Record = the COLOUR FIELD at depth — per-surface rows
+     (measured bar + share + the proof-noun that earned it). A different object
+     from the front's single stacked bar. */
+  const cf = (typeof S108_EXTRAS !== "undefined" && (S108_EXTRAS[src.id] || {}).colourField) || [];
+  const cfRow = (c, withProof) => `<div class="cfdeep__row"><span class="cfdeep__bar" style="--sw:${esc(c.hex)}; --pct:${c.pct}%"></span><div class="cfdeep__body"><span class="cfdeep__head"><span class="cfdeep__label">${esc(c.label)}</span><span class="cfdeep__pct">${c.pct}%</span></span>${withProof ? `<span class="cfdeep__proof">${esc(c.proof)}</span>` : ""}</div></div>`;
   const board = dplate("02", "Surface Record", paid, paid
-    ? `<div class="dswatches">${srSwatches.map((sw) => `
-        <div class="dswatch"><span class="dswatch__chip" style="--sw:${esc(sw.hex)}"></span><div class="dswatch__body"><span class="dswatch__label">${esc(sw.label)}</span><span class="dswatch__proof">${esc(sw.proof)}</span></div></div>`).join("")}</div>`
-    : `<div class="dswatches dswatches--tease">${srSwatches.slice(0, 3).map((sw) => `
-        <div class="dswatch"><span class="dswatch__chip" style="--sw:${esc(sw.hex)}"></span><div class="dswatch__body"><span class="dswatch__label">${esc(sw.label)}</span></div></div>`).join("")}<p class="dstat__undeveloped">Surface proofs develop with the mint.</p></div>`);
+    ? `<div class="cfdeep">${cf.map((c) => cfRow(c, true)).join("")}</div>`
+    : `<div class="cfdeep">${cf.slice(0, 3).map((c) => cfRow(c, false)).join("")}<p class="dstat__undeveloped">Surface proofs develop with the mint.</p></div>`);
 
   /* 03 — BR-S107: Stat Dossier KILLED (geometry-as-prose, a second time). Its
      numbers live only in Metrics now; nothing renders here. */
@@ -770,17 +777,12 @@ function renderDossier(src, treatment) {
     ? `
     <dl class="drecord drecord--mint">
       <div><dt>Developed From</dt><dd>SRC-${pad2(src.no)} · ${esc(src.capture.code)}</dd></div>
-      <div><dt>Treatment</dt><dd>Halo Mint</dd></div>
-      <div><dt>Primary Artifact Trigger</dt><dd>${esc((scan?.tierOutputs.halo.triggers || [d.mint.trigger1, d.mint.trigger2])[0])}</dd></div>
-      <div><dt>Secondary Trigger</dt><dd>${esc((scan?.tierOutputs.halo.triggers || [d.mint.trigger1, d.mint.trigger2])[1])}</dd></div>
+      <div><dt>Triggers</dt><dd>${esc((scan?.tierOutputs.halo.triggers || [d.mint.trigger1, d.mint.trigger2])[0])} · ${esc((scan?.tierOutputs.halo.triggers || [d.mint.trigger1, d.mint.trigger2])[1])}</dd></div>
       <div><dt>Material</dt><dd class="drecord__material">${esc(scan?.tierOutputs.halo.material || src.halo.material)}</dd></div>
-      <div><dt>Treatment Family</dt><dd>${esc(d.mint.family)}</dd></div>
-      <div><dt>Archive Status</dt><dd>Developed</dd></div>
       <div><dt>Mint Serial</dt><dd>${esc(scan?.tierOutputs.halo.mintSerial || d.mint.serial)}</dd></div>
     </dl>
     <p class="dmint__note">“${esc(d.mint.note)}”</p>
     <div class="dmint__rest">
-      <p class="dmint__rest-line">The print already exists in full.</p>
       <button type="button" class="dmint__return" data-goto="free">
         <span class="dmint__return-name">Step back</span>
         <span class="dmint__return-desc">Return to the Free card front</span>

@@ -203,7 +203,7 @@ const SOURCES = [
         trigger1: "Raised palm",
         trigger2: "Cabin frame",
         family: "Halo Mint · Gesture Class",
-        note: "Minted from the exact moment between farewell and blessing.",
+        note: "Minted from the moment the hand went up and the engine stayed off.",
         /* mint serial shares the card's OWN object family (BR-001-DRV-0001) so
            Card and Mint read as one object's lineage, not two unrelated serials */
         serial: "BR-001-DRV-0001-HM",
@@ -640,15 +640,15 @@ const SOURCES = [
         visualImpact: { evidence: "Tricolor coat against pale gravel; overcast diffusion preserves full tonal range; the path diagonal carries the eye from corner to subject." },
       },
       hidden: { name: "Stride Geometry", value: 91, read: "Four-point extension captured at peak stride — leading foreleg, trailing hindleg, suspended mass — forms a precise diagonal that recurs rarely even in high-volume motion capture.", tease: "A sealed reading is held on the back of this card. It develops with the mint." },
-      mint: { trigger1: "Motion-direct foreground break", trigger2: "Path-wedge depth axis confirmed", family: "Halo Mint · Encounter Class", note: "Minted from the single stride that aimed itself at the lens.", serial: "BR-004-RUN-0001-HM" },
+      mint: { trigger1: "Motion-direct foreground break", trigger2: "Path-wedge depth axis confirmed", family: "Halo Mint · Arrival Class", note: "One stride from contact, and holding.", serial: "BR-004-RUN-0001-HM" },
       oracle: { full: "The frame builds its depth from the ground up — path first, then form, then sky. The foreground breaks the plane without warning; the path wedge had already prepared the eye for arrival. What the frame keeps is the instant before contact, held by overcast light that refuses to cast a shadow.", short: "The path set the condition; the stride executed it.", timeline: "Adjacent in the archive — path geometry · motion break · depth channel" },
     },
     card: {
-      title: "Stride Break",
-      archetype: "The Encounter",
+      title: "Closing Distance",
+      archetype: "Lens-Direct",
       note: "The dog leaves the ground. Everything behind it — the path, the fence, the man — is just run-up.",
       signature: "Logged at ankle height, the instant before contact.",
-      stats: { presence: 87, frame: 79, signal: 91, visualImpact: 84, charge: 88 },
+      stats: { presence: 84, frame: 79, signal: 91, visualImpact: 68, charge: 76 },
       serial: "BR-004-RUN-0001",
       batch: "Field Batch 04",
       edition: "First Print",
@@ -862,7 +862,7 @@ const V2_EXTRAS = {
     route: "ANIMAL_COMPANION",
     scanStatus: "accepted",
     confidence: { overall: 0.87, band: "high" },
-    archetypeClass: "The Encounter",
+    archetypeClass: "The Arrival",
     warnings: ["EXIF rotation present — coordinates authored for the upright portrait view", "Secondary figure compressed behind the foreground mass — mid-ground read is partial"],
     receipts: [
       { cue: "foreground mass breaks the plane at close focal distance", effect: "Signal ↑", basis: "mass owns the central third; background reduced to a band", confidence: "high" },
@@ -1093,12 +1093,12 @@ const S107_SECTIONS = {
     },
     sceneRole: "A gravel-grass path under flat cloud — a working outdoor run, no studio anywhere in it.",
     hiddenStat: {
-      name: "Running At, Not Past",
-      read: "All four legs at full stretch, aimed straight down the lens — the dog isn't crossing the frame, it's arriving in it. A different contract than a photo of a dog going by.",
+      name: "The Man Let It Go",
+      read: "The figure in the background is already in release — not reaching, not calling, stance open. Whatever command existed has been rescinded by the stride. The dog is operating on its own authority now, and the frame caught the handover.",
       tease: "A sealed reading is held on the card's developed back.",
     },
     fitAura: {
-      family: "Encounter Class",
+      family: "Arrival Class",
       chips: ["Closing", "Contact", "Lens-Direct"],
       placement: "At home in motion; it never sits still long enough to file.",
     },
@@ -1133,5 +1133,73 @@ const S107_SECTIONS = {
       placement: "Belongs to the moment of choosing; out of place once the water's still again.",
     },
     sceneCharge: { label: "Selecting" },
+  },
+};
+
+/* =============================================================
+   BR-S108.1 — colour-as-measurement (the Proportion Strip) + the
+   2-line Source Record. colourField: each surface as a measured
+   share (dominant first), filled in its own hex; reads only pixels
+   (no person-read, no 0-100 number). sourceTwoLine: provenance +
+   condition, replacing the label:value grid. Spec: BR-S108_FLEET_AUDIT.md.
+============================================================= */
+const S108_EXTRAS = {
+  "driver-salute": {
+    colourField: [
+      { label: "Cabin grey", hex: "#6d7174", pct: 79, proof: "moulded dash and headliner, matte" },
+      { label: "Fjord band", hex: "#8295a0", pct: 13, proof: "pale blue-grey through the right window glass" },
+      { label: "Red layer", hex: "#a83f29", pct: 8, proof: "the jacket — the only saturated surface in the cabin" },
+    ],
+    sourceTwoLine: {
+      prov: "Cabin, driver's seat. Engine off, fjord held in the right window.",
+      cond: "Gesture-triggered · cabin light, no hotspot on the glass.",
+    },
+  },
+  "ice-auger": {
+    colourField: [
+      { label: "Snow plane", hex: "#f2f4f6", pct: 78, proof: "+1.2 EV floor lift, highlights held" },
+      { label: "Cold sky", hex: "#9fb9c9", pct: 14, proof: "thin blue, hard sun unfiltered" },
+      { label: "Black silhouette", hex: "#15171a", pct: 6, proof: "the hardest contrast the archive can record" },
+      { label: "Treeline", hex: "#3a4a52", pct: 2, proof: "the only mid-tone — birch against snow" },
+    ],
+    sourceTwoLine: {
+      prov: "Frozen lake, open plateau, late March. Hard sun, -12° inferred.",
+      cond: "Field-triggered · high contrast, highlights held.",
+    },
+  },
+  "shore-catch": {
+    colourField: [
+      { label: "Fjord water", hex: "#6f8794", pct: 58, proof: "soft grey-blue, receding" },
+      { label: "Gravel shore", hex: "#8a8073", pct: 21, proof: "matte shore texture, field-document ground" },
+      { label: "Mottled scale", hex: "#9a8f7e", pct: 13, proof: "the scale pattern, fully resolved in flat light" },
+      { label: "Snow ridge", hex: "#e9eef0", pct: 8, proof: "streaked white, coastal-remote" },
+    ],
+    sourceTwoLine: {
+      prov: "Shore-side gravel, open fjord. Catch held transverse, overcast.",
+      cond: "Dispatch-triggered · flat light, full resolution.",
+    },
+  },
+  "loose-run": {
+    colourField: [
+      { label: "Overcast sky", hex: "#b6b8b5", pct: 61, proof: "flat diffuse plate, no hotspot" },
+      { label: "Gravel path", hex: "#7c7a6f", pct: 23, proof: "matte path, working grey" },
+      { label: "Coat", hex: "#8a8276", pct: 16, proof: "full tonal range, no specular blow-out" },
+    ],
+    sourceTwoLine: {
+      prov: "Gravel-grass path, outdoor. Low angle, candid.",
+      cond: "Approach-triggered · overcast plate, no shadow cast.",
+    },
+  },
+  "tank-pick": {
+    colourField: [
+      { label: "Cyan tank", hex: "#1fb6c4", pct: 44, proof: "saturated cyan, the cool counterweight" },
+      { label: "Painted wall", hex: "#7a8f6a", pct: 23, proof: "a painted aquatic wall, echoing the live tank" },
+      { label: "Carapace", hex: "#b5652f", pct: 21, proof: "mottled orange-brown, banded, a hard specular catch on the dorsal shell" },
+      { label: "Fluorescent", hex: "#e8e4d6", pct: 12, proof: "hard overhead tube, no fill, no mercy" },
+    ],
+    sourceTwoLine: {
+      prov: "Seafood tank interior. Specimen held to fluorescent.",
+      cond: "Gesture-triggered · hard overhead, no fill.",
+    },
   },
 };
