@@ -1,6 +1,6 @@
 # BR-S107 — Section Architecture Rebuild Spec (the fuel-split)
 
-**STATUS: PROPOSED — awaiting builder green-light. No line is rebuilt until this is approved.**
+**STATUS: v2 — APPROVED TO BUILD (amendments folded in).** v2 changelog: (1) the two C-sections are split at the FORM level — Light & Surface (front) = palette-at-a-glance, Surface Record (back) = palette + per-chip proof-noun annotations; (2) Metrics stays strictly numeric. Build runs under execute → report → HOLD; nothing pushes until the builder's "push it".
 **BOUNDARY:** this is the architecture spec only (dependency layer 1). It defines *what each section is*
 (fuel · job · register · form · reveal-state) and the kills/merges. It does NOT write the final copy
 (layer 2), wire the reveals (layer 3), or tune mood (layer 4) — those fill in on top, in order.
@@ -46,7 +46,7 @@ enforcement; when an engine exists, the five lenses become data fields and the s
 | **4 face-stats** (on the card) | **A/B/C/D-E** (diversified — §5) | the at-a-glance vital signs — appear ONCE, here | stat labels / tier bands only | stat block | always open |
 | **Diagram** (left toggle) | **A** | **POINT** — composition, spatially, on the photo | terse technical labels | lines on the photo | always open |
 | **Metrics** (left toggle) | **A** | **THE RECIPE** — quantify how the read was weighted | numbers, minimal words | bars + figures | always open |
-| **Light & Surface** (right col — replaces Stat Reading) | **C** | what the light, color, and surface are doing | cool, anti-sentimental, photo-as-object | swatches + one line | always open |
+| **Light & Surface** (right col — replaces Stat Reading) | **C** | what the light, color, and surface are doing | cool, anti-sentimental, photo-as-object | 2-3 swatches + one cool line (the palette at a glance) | always open |
 | **Scene Role** (right col) | **D** | where this sits — what the setting is doing | clerical-spatial | a filed line | always open |
 
 **The front carries all five lenses, geometry confined to Diagram/Metrics/stats.** Essence appears on the
@@ -59,7 +59,7 @@ Each back section is the **deep** version of one stream — never a repeat of th
 | # | Section | Fuel | Job | Register | Form | Reveal |
 |---|---|---|---|---|---|---|
 | 01 | **Source Record** | **D** | **THE FILING** — full provenance, the clerical record | clerical / flat honesty | filed form (label:value) | always open |
-| 02 | **Surface Record** *(was Evidence Board, refueled)* | **C** | the deep physical-evidence read — light, color, material, proof-nouns | forensic, proof-noun | swatches | always open |
+| 02 | **Surface Record** *(was Evidence Board, refueled)* | **C** | the deep physical-evidence read — light, color, material, proof-nouns | forensic, proof-noun | full swatch set, each chip annotated with its proof-noun | always open |
 | 03 | **Hidden Stat** | **B** | **REVEAL** — the one non-obvious thing about the subject/gesture | withheld-then-sprung | sealed reveal | **SEALED** (tap to develop — free) |
 | 04 | **Fit + Aura Layer** | **E** | **PLACEMENT** — where it sits · its family · its aura chips (NOT a verdict) | declarative-minimal, badge | badge-set | always open |
 | 05 | **Mint Record** | **F** | the card-as-object record — finish, serial, tier | neutral / informative | receipt (monospace) | always open |
@@ -87,7 +87,7 @@ is now Metrics.
 - **Stat Reading (front right) — KILLED.** It was geometry reworded as prose. Its slot becomes **Light &
   Surface** (lens C).
 - **Stat Dossier (back) — KILLED / merged into Metrics.** Geometry-prose a second time; the numbers live in
-  Metrics, any deep annotation goes there.
+  Metrics. **Metrics stays NUMERIC — labels and figures only, never prose annotation. Any content that wants to be sentences is not Metrics; it does not exist (geometry-prose stays killed).**
 - **Evidence Board → Surface Record (refueled).** Same slot, new fuel (C); stops being geometry-with-arrows,
   becomes the light/color/surface deep read in **swatch** form.
 - **Technical Receipts ↔ Source Record — DE-OVERLAPPED.** Technical Receipts = collapsed **raw capture spec**
@@ -136,7 +136,8 @@ here:
 | Section | Form |
 |---|---|
 | Source Record | a **filed form** — label:value pairs, document-like |
-| Surface Record | **swatches** — color/light as small visual chips, not a paragraph |
+| Light & Surface *(front · taste)* | **2-3 swatches + one cool line** — the palette at a glance |
+| Surface Record *(back · depth)* | **the full swatch set, each chip annotated with the proof-noun that earned it** — the palette with its evidence (specular band on the shell, +1.2 EV snow floor). Visibly a different object from the front palette, not the same box. |
 | Diagram | **lines on the photo** — spatial |
 | Metrics | **bars + figures** — numeric |
 | Hidden Stat | a **sealed reveal** — one line behind a tap; the shape IS the withholding |
@@ -165,16 +166,16 @@ register (drawn from `BR-CRAFT-INSIGHT-BANK.md`) and form. Claude Code writes fr
   turn on an in-frame thing; end on the object; withhold the verdict; survive the swap test. **Never** lead
   with composition/axes/geometry. *Register: GREET/withhold-and-point. Form: one line on the card.*
 - **Light & Surface (front · C):** only light quality, color anchors, specular, surface material. **Never**
-  geometry/gesture/scene. *Register: cool, anti-sentimental, photo-as-object. Form: swatches + one line.*
+  geometry/gesture/scene. *Register: cool, anti-sentimental, photo-as-object. Form: 2-3 swatches + one cool line — the palette at a glance (taste).*
 - **Scene Role (front · D):** only where/when/container/capture context. **Never** geometry/gesture/light.
   *Register: clerical-spatial. Form: a filed line.*
-- **Diagram + Metrics (front · A):** the ONLY geometry homes. Visual lines / numeric bars; minimal words.
+- **Diagram + Metrics (front · A):** the ONLY geometry homes. Visual lines / numeric bars; minimal words. **Metrics is labels + figures only — never prose annotation (including the merged Stat Dossier content); anything that wants to be a sentence does not exist.**
   *No prose geometry exists anywhere else.*
 - **Source Record (back · D):** full provenance, clerical record (the filing narrative). **Never** the raw
   capture spec (that's Technical Receipts). *Register: clerical / flat honesty. Form: filed form.*
 - **Surface Record (back · C):** the deep physical-evidence read — material, light, color, proof-nouns
   (name the object that earned the read). **Never** geometry, **no** effect-arrows. *Register: forensic,
-  proof-noun. Form: swatches.*
+  proof-noun. Form: the full swatch set, each chip annotated with the proof-noun that earned it — the palette with its evidence (depth). A visibly different object from the front Light & Surface palette.*
 - **Hidden Stat (back · B):** the one non-obvious gesture/subject read; withheld then sprung. *Register:
   REVEAL / info-gap. Form: sealed reveal.*
 - **Fit + Aura (back · E):** placement only — where it fits · family · aura chips, as badges. **Never** a
