@@ -1,9 +1,9 @@
 # BLUE ROOM — Session Handoff
 
 For a fresh Claude Code session to resume with zero context loss. **You are the BUILDER** (you hold the repo and
-make changes). A separate planning-Claude (chat) writes specs/prompts the user pastes here. Grounded in the repo
-— verify line numbers by re-grepping (they drift). Last written: **2026-06-23**, code at HEAD `19df546` (this
-handoff is a docs commit on top).
+make the changes). The user pastes specs/designs from a separate planning chat. Grounded in the repo — **re-grep
+line numbers, they drift** (this session shifted them a lot). Last written: **2026-06-23**, code at HEAD
+`55e42dc` (BR-S117), **pushed + live**.
 
 ---
 
@@ -11,150 +11,151 @@ handoff is a docs commit on top).
 A PC photo→card "scan room". **Core law:** *"Every uploaded photo is already a card; Blue Room develops it."*
 The card reads the photo **AS ARTIFACT** (frame / composition / gesture / scene / light / provenance / role).
 
-- **Reads the artifact, never the person.** SHARPENED this session — **Read-boundary (BR-S113, LOCKED):** five
-  absolute no's — never state or imply a person's ① worth/character · ② health/body · ③ ranking vs others ·
-  ④ identity (job/class/status/relationships/story-as-fact) · ⑤ **attributed private feeling/mood** ("he feels
-  lonely"). **One allowance:** *performed gesture-intent* — what the action publicly does in the frame ("the palm
-  stops the lens"). The test: *the intent the gesture performs (allowed) vs a claim about hidden feeling (banned).*
-  Governs all card copy + the aura build. [DECISION_LOG 2026-06-23]
+- **Reads the artifact, never the person.** **Read-boundary (BR-S113, LOCKED):** five absolute no's — never state
+  or imply a person's ① worth/character · ② health/body · ③ ranking vs others · ④ identity (job/class/status/
+  relationships/story-as-fact) · ⑤ **attributed private feeling/mood**. **One allowance:** *performed gesture-intent*
+  — what the action publicly does in-frame ("the palm stops the lens"). Test: the intent the gesture performs
+  (allowed) vs a claim about hidden feeling (banned). Governs ALL card copy + metrics + aura. [DECISION_LOG]
 - **Free is COMPLETE; Develop/Halo opens the sealed back of the SAME card** — added depth, a mode not a grade.
-- **No-magnetism:** no scarcity / streak / countdown / loot-box. Pull is by giving, not pressure.
+- **No-magnetism:** no scarcity / streak / countdown / loot-box. Pull is by giving, not pressure. No cheese/"yippi".
 - **No engine** (no backend / upload / AI / payment). A user's own photo → LOCAL FRONT CARD only.
-- **Banned visible copy:** locked / unlock / premium / paywall / pending / rarity / worth / rank; person-grammar.
+- **Diagram is a SILVER instrument; the card alone carries the material** (styles.css law comment). Metrics may use
+  the material accent (it's the interpretive read).
 - **Hard lines (NEVER override):** child-safety · the person-reading bans · engine-token-leak bans.
 
-Authority order: `docs/PROJECT_OS.md` (laws) · `docs/GOVERNANCE_OS.md` · `docs/DECISION_LOG.md` (append-only
-ratifications — check before contradicting) · `docs/FILE_MAP.md` (router — **read first**) · **NEW**
-`docs/BR-AURA-RESEARCH.md` (the ground for the next build).
+Authority: `docs/PROJECT_OS.md` (laws) · `docs/GOVERNANCE_OS.md` · `docs/DECISION_LOG.md` (append-only — check
+before contradicting) · `docs/TASK_QUEUE.md` (newest-first shipped log + Ready head) · `docs/FILE_MAP.md` (router).
 
 ---
 
 ## 2 · Where the build is NOW
-**Code HEAD = `19df546` · origin/main = `19df546` · PUSHED, 0/0.** **LIVE** at
-**https://nilsjouna999.github.io/blue-room-scan-room/** (GitHub Pages, `main`/root — **push = deploy**; the 5
-photos are PUBLIC by owner consent — don't re-gitignore). Plain HTML/CSS/JS, no build, node NOT installed.
+**HEAD = origin/main = `55e42dc` (BR-S117) · pushed, in sync.** **LIVE** at
+**https://nilsjouna999.github.io/blue-room-scan-room/** (GitHub Pages, `main`/root — **push = deploy**, ~50–80s;
+the 5 photos are PUBLIC by owner consent — don't re-gitignore). Plain HTML/CSS/JS, no build, **node NOT installed**.
 
-**This session's commit arc (oldest→newest):**
-- `30cca16` BR-S109 Fit+Aura → struck CLASS designation plate (+ the no-code law)
-- `8109fd5` BR-S110 Ice/Shore/Tank → mint:yes (recipe pass)
-- `3a49bc9` BR-S111 publish SRC-03/04/05 photos for the public deploy
-- `0af566d` BR-S113 sharpened read-boundary rule (docs) · `4fff138` BR-S113 aura research doc (docs)
-- `1d54b96` BR-S112 Colour Field dedup · struck Mint certificate · rail end-mark
-- `19df546` BR-S113 Lane 1 Source Record → Tech Receipts · Colour Field whisper · serial mask
+**Commit arc since the last handoff (oldest→newest):**
+- `cf43266` BR-S114 — Metrics 4-plate read + Diagram-notes design folded into the REAL tabs (from the user's two
+  "dc" mockup files); dossier restructure (Hidden Stat removed, Fit+Aura→Aura, Archetype stub).
+- `23ba04d` BR-S115 — Metrics "register reel" + **Source** tab + photo lightbox + ◆ BLUE ROOM→menu + Finish standalone.
+- `28b0267` BR-S116 — reel polish (breathing room + soft LED) + brand-hitbox fix + Finish-top reposition +
+  authored Metrics for the other 3 cards + safe cleanup (dead JS/CSS + junk temp files). *(15-agent workflow.)*
+- `55e42dc` BR-S117 — **fluid Surface Record** (2 forms to compare) + **combined "Surface"** module. *(4-agent panel.)*
 
-**Dossier (card back) — now 5 plates (Source Record KILLED in BR-S113):**
-recordGate strip · **01 Surface Record** (C — annotated palette: chip · name · **%** · proof; the canonical
-colour read) · **02 Hidden Stat** (B — sealed, free tap-to-develop) · `— THE RECORD —` · **03 Fit + Aura** (E —
-a **struck CLASS designation** plate `.dfaplate`: genus-species + variant + a shelf-line, never a verdict, NO
-code) · **04 Mint Record** (F — a **struck certificate** `.dplate--mint`, seal centred under a rule) ·
-`— THE ORACLE —` · **05 Oracle** (E — the verdict, sealed, centred). **Technical Receipts** (right reading panel,
-developed, collapsed) now also carries the **absorbed provenance one-liner + pre-mint lineage (Object/Scan/Card)**
-— it is the **codes-home** now (no other section renders a code).
+**Left panel = THREE tabs now: Source · Diagram · Metrics** (data-tab; the tabbar pins, the body scrolls):
+- **Source** — the original photo, whole + clean (no overlays). Click → a centred **lightbox** (X / backdrop /
+  Esc closes; body-level `#lightbox` in index.html). `renderSourceTab`.
+- **Diagram** — the **silver-instrument** figure that was always there (overlays: grid/mass/focal/gesture/axis/
+  arrow/light + labels + SCAN SHEET corner + capture strip). **Always annotated** (the Clean toggle was removed;
+  the clean view is now the Source tab). Below: the **Diagram Notes** two-block design — **Frame Read** (`analysis`,
+  DERIVED, dotted leaders) + **Overlay Markings** (`diagram.notes`, ◇ ON SHEET). `renderDiagramTab` + `diagSplit`.
+- **Metrics** — a **REGISTER REEL**: a fixed "Diagnostic Receipts" mast + a window that CLIPS while a transform
+  track translateY's **ONE plate at a time** (Frame Signature silhouette-not-score · Signal Mix proportion-of-a-
+  whole · Composition Field drift node + tier bands · Frame Event act + tier bands). Advance by wheel (one gesture
+  = one step; scrolls within a tall plate first) / ◤◢ arrows / 4 ticks / `NN / 04` counter. Off-centre dim; a
+  source-coloured landing glint; hover-deepen; reduced-motion = instant swap. **All 5 cards have a hand-authored
+  `frame` block** in data.js (signature radii/class/note/band, field node/weight/balance, tier words, event).
+  `renderMetricsTab` + `metPlate`/`metTier`/`metSmoothPath` + `mountMetricsReel`.
 
-**Front (Scan Reading rail):** the Card · 4 face-stats as tier bands (never 0-100) · **Colour Field** = a LIGHT
-teaser now (bar + "full palette develops below" — the % moved to the back Surface Record, so % lives in exactly
-ONE place) · Scene Role. Developed rail closes with `◆ end of scan reading ◆`; the empty zone below it is
-**RESERVED for the future grade visual — do NOT fill it.**
+**Right reading panel (`renderReadingPanel`):** header · **combined "Surface" module** (BR-S117: Finish + Colour
+Field fused — the colour-field proportion bar is the hero, the material chip caps its left, name + character note
+on one foot line; free = bar + teaser, no material; paid = chip + bar + foot) · Scene Role · seam(Technical
+Receipts). `.module--surface` / `.surface__*`.
 
-**Mintable status:** **ALL 5 cards are mint:yes** — Driver "Checkpoint Wave" · Run "Closing Distance" · Ice
-Field "Two Feet of Quiet" · Shore "Shore Dispatch" (archetype Catch Filer) · Tank "Spiny Encounter" (archetype
-Wrong-Light Lift). The mintable **recipe is proven across photos** (the bar generalised).
+**Dossier (card back, 5 plates) — `renderDossier`:** recordGate · **01 Surface Record** (BR-S117: the **fluid
+pigment vessel** — the palette as live pigment suspended in developer fluid; `renderSurfaceRecord` + canvas, run by
+`mountSurfaceRecords()`; **column** form on Driver/Shore/Tank, **tray** form on Ice Field/Run via `src.surfaceVariant`;
+paid only — free keeps the `.cfdeep` teaser) · **02 Archetype** (empty stub) · `THE RECORD` · **03 Aura** (empty
+stub) · **04 Mint Record** (struck `.dplate--mint`) · `THE ORACLE` · **05 Oracle Read**.
 
----
-
-## 3 · Locked rules / decisions (don't re-litigate)
-- **Read-boundary sharpened (BR-S113):** 5 no's + 1 allowance (§1). LOCKED — sharpen only, never loosen.
-- **No-code law (BR-S109, updated BR-S113):** a code reads as FILING; codes live in exactly ONE home =
-  **Technical Receipts** (was Source Record, moved when the plate was killed). No other section renders a
-  code / serial / call-number.
-- **Fit + Aura = ONE struck CLASS designation** (BR-S109): genus-species + variant + a shelf-line that
-  CLASSIFIES (where it files), never a verdict (the Oracle's job), NO code. Chosen by-eye from a 4-form menu
-  (Seal/Crest/Plate/Spine) → Plate won. `.dfaplate` struck physicality.
-- **Score-vs-measurement (BR-S108.2):** public 0-100 SCORES banned (tier bands only); measurement PROPORTIONS
-  (the Colour Field %) permitted — they describe, never rank.
-- **Front-note voice (BR-CRAFT-INSIGHT-BANK):** name the subject · land ONE turn · point-don't-pronounce ·
-  end on the object · survive the SWAP TEST. Per-surface registers.
-- **Mintable recipe (BR-S110) = the bar all 5 cleared:** distinct archetype (no bare class word) · stats form a
-  podium (not a wall of one tier word) · a Hidden Stat that HIDES (reveals a layer the front note doesn't state,
-  never restates it) · the ONE idea bends every line (not stated-once-then-generic, not restated verbatim) ·
-  craft-bank voice + swap test · all laws.
-- **Honesty/grade spec (held open until the readiness gate):** grade = the CHARGE the photo offered; thresholds /
-  tier names / visual / free-vs-developed boundary all HELD OPEN.
+**Brand:** only `◆ BLUE ROOM` (wrapped in `.brand__hit` with `data-view-to="menu"`) jumps to the menu — the zone
+sub-label is inert.
 
 ---
 
-## 4 · Open threads (priority order)
-Big progress this session: Fit+Aura redesigned (was the weak section), all 5 cards mintable, Source Record
-cleaned up, the page deduped + the Mint struck. The user's standing priority: **page completion before** grade /
-Set-Wall / mint — and the page is close.
-
-1. **AURA SECTION — the next major build.** Design it from **`docs/BR-AURA-RESEARCH.md`** (research is DONE; this
-   is design-next). Use: the revised lenses (LIGHT · PUNCTUM · Vector · Temperature · Contradiction · Spatial-
-   Pressure · Grain/Era + whole-field TUNING + SOURCE), the **unrepeatability SCALE** (slick stock frame = floor,
-   once-only seized event = ceiling — rankable without ranking the person), the **8-step extract procedure**
-   (squint → light → value → temperature → gesture-event → spatial-pressure → contradiction → punctum → name),
-   the describe-moves, and the kill-on-sight list. **Compute the surface, author the read** (never a computed
-   emotion label). Governed by the BR-S113 read-boundary. *(No spec written yet — the user said "no task yet".)*
-2. **Readiness gate** — feed ~10 strong + ~10 flat photos; confirm the 4 face-stats grade both directions
-   honestly. **Gates** the grade visual.
-3. **Grade visual** — builds into the RESERVED developed-rail zone (the end-mark closes it now), post-gate.
-4. **Set Wall** — a collection doorway (5 faces + a cross-card proportion read).
-5. **Mobile** — desktop-first; mobile is a basic stacked fallback. Newly relevant — the site is public.
-6. **Polish (low priority):** Shore leans hard on the filing/document conceit (clears the bar, but saturated);
-   dead CSS after the Source-Record kill (`.dsource2 .dfile .dfiling .dlineage`) + the now-unused `.cfkey` —
-   trivial cleanup; the two minor prose/row rhymes logged earlier.
+## 3 · Open decisions / follow-ups (priority order)
+1. **Surface Record FORM — builder to pick: column vs tray.** Both are live (column on Driver/Shore/Tank, tray on
+   Ice Field/Run). Compare on the developed dossier; once chosen, set every card's `src.surfaceVariant` to the winner.
+2. **Aura plate (dossier 03) content** — currently an empty reserved stub. Design from `docs/BR-AURA-RESEARCH.md`
+   (research DONE). The right-panel "Surface" module now carries the material/finish; Aura is parked.
+3. **Ice Field Metrics copy** (BR-S116, MY draft — "Plateau" signature etc.) — builder review vs their own words.
+   Driver/Shore/Run/Tank metrics: Driver from the user's mockup, the rest authored + opus-safety-passed.
+4. **"Surface" label on FREE** — the combined module reads "Surface" in both states now (was "Colour Field" on
+   free). Judge said one stable name is better; confirm or branch the moduleHead arg.
+5. **Dead-CSS sweep (conservative, deferred):** now-orphaned `.module--finish`/`.finish*`/`.module--cfield`/`.cfbar`
+   (container)/`.cfcaption` (BR-S117) + `.diamond`/`.dia-*`/`.impact*` (orphaned when statDiamond/mixRow were
+   removed BR-S116) + `.metriccap--foot` (pending a `docs/map/03_SURFACES.md` check). `.cfbar__seg` + `.cfdeep` are
+   STILL used — keep.
+6. **Image optimization** — `source-02..05.jpg` are ~11 MB 4000px JPEGs shown ≤1472px; re-save ~2000px@90% on
+   COPIES (irreversible lossy) with the originals safe in git. Flagged, not done — needs the builder's go.
+7. **Older standing threads:** readiness gate (feed strong+flat photos, confirm the stats grade both ways) → grade
+   visual (into the reserved developed-rail zone) → Set Wall → mobile fallback.
 
 ---
 
-## 5 · How this project works (operating rules)
-- **Execute → report → HOLD.** Commit to `main` when the user directs; **nothing PUSHES until the user literally
-  says "push it".** One coherent task per session. **Mandatory pre-edit critique** (push back when the premise is
-  off). End multi-step work with the session-end report (critique verdict · commit hash · changed files ·
-  verification · flags · next · rollback · push status).
-- **Flag rule-conflicts, don't silently override** — build the intent, report the conflict, HOLD. Hard lines (§1)
-  are never overridden — comply + flag as a spec bug.
-- **Reporting style:** the user runs a **"Build Narrator"** output style — one status-marker headline · one aside ·
-  one compact table · the dense full report kept COLLAPSED + copy-ready (a fenced block in a `<details>`), never
-  inlined. Translate (what the code is FOR), don't transcribe.
-- **Planner vs builder:** a separate planning-Claude (chat) authors specs; the user pastes them here; you (this
-  Claude Code) hold the repo and build. The user also runs a parallel Claude chat — to show it visuals, capture
-  localhost via headless Edge and hand them PNGs in `blue-room-visuals/` (chat can't reach localhost).
+## 4 · How this project works (operating rules)
+- **Execute → report → HOLD by default**, BUT this user often says **"push it, i want live"** — then commit to
+  `main` + push (= deploy) in the same turn. One coherent task per session; **mandatory pre-edit critique** (push
+  back when the premise is off). End multi-step work with a session-end report: commit hash · changed files ·
+  verification · flags · rollback (`git revert <hash>`).
+- **Reporting style = "Build Narrator"** output style: one status-marker headline (`●`/`✓`/`■`) · one aside · one
+  compact table · the dense full report kept COLLAPSED + copy-ready (a fenced block in `<details>`), never inlined.
+  Translate (what the code is FOR), don't transcribe.
+- **Agents:** the user asks for them explicitly and sometimes by exact count ("8 haiku, 5 sonnet, 2 opus"). Use a
+  **Workflow** (scout → build/author → opus-verify). **Panels MUST be READ-ONLY** — agents return findings/authored
+  data/CSS; YOU apply + verify + commit in the main loop (a past agent committed mid-run — never again). Wire the
+  safety floor + a conservative opus gate into any authoring.
+- **Decisions:** surface the ONE key decision per turn with a recommendation; fold the rest. Use AskUserQuestion
+  only for genuine forks. The user dislikes back-and-forth — investigate first, then ask sharply.
 
 ---
 
-## 6 · Build gotchas (learned, load-bearing)
-- **Edit tool BREAKS on `·` (U+00B7 middle dot), en-dash `–`, and nbsp** — anchor `old_string` on ASCII that
-  avoids them. Em-dash `—` (U+2014) is fine. For lines laced with middle-dots (the Source Record, serials), use
-  a **Python script** (read/replace/write, `encoding='utf-8', newline=''`) — it handles any Unicode. This session
-  used Python to kill the Source Record and to split the co-mingled BR-S112/S113 commits (reverse-then-commit).
-- **Commits:** write the message to a temp file + `git commit -F <file> --no-verify`. PowerShell here-strings
-  break on `->`/quotes (use a Bash heredoc). LF→CRLF warnings are benign (OneDrive/Windows).
-- **Preview:** `preview_start` name `"scanroom"` (python http.server 8743). The preview server **DROPS often —
-  just restart it.** `preview_screenshot` is BROKEN → headless Edge: `msedge --headless=old --disable-gpu
-  --hide-scrollbars --user-data-dir=<temp> --window-size=W,H --virtual-time-budget=4500 --screenshot=<out> <url>`
-  → Read the PNG. Cache: `fetch('data.js',{cache:'reload'})` (+ app.js, styles.css) then navigate with `?cb=rand`.
-- **Python on Windows can't write Git Bash's `/tmp`** — write scratch to `.claude/tmp/`.
-- **"Two cards" artifact:** a SAMPLE Driver card renders first in the DOM; bare `.card` selectors grab it — scope
-  to `#stageZone` (front) / `#dossierMount` (back) / `#readingPanel` (rail).
-- **Deep links:** `?src=1..5&t=free|shiny` (src 1-indexed: 1 Driver · 2 Ice · 3 Shore · 4 Run · 5 Tank).
-- **What renders (indirection):** `toScanResultV2` (data.js) maps the fields — developed dossier Oracle =
-  `dossier.oracle.full`, free = `.short`; Hidden Stat = `S107_SECTIONS[id].hiddenStat`; front note = `card.note`;
-  archetype tag = `card.archetype`; Scene Role = `S107.sceneRole`. The top-level `src.oracle` and the legacy
-  `dossier.hidden` are NOT rendered (fallbacks).
-- **Deploy:** push = deploy (Pages live). Poll `gh api repos/Nilsjouna999/blue-room-scan-room/pages/builds/latest`
-  until `built`. Toggle cmds + the photos-public decision are in the `blue-room-live-deploy` memory.
+## 5 · Build gotchas (learned this session — load-bearing)
+- **getComputedStyle LIES about composited transitions here** — it returns the START value of a running opacity/
+  transform transition (read 0.35 / 0 while the screen showed 1). HUGE time-sink. **Verify renders by SCREENSHOT +
+  `document.elementFromPoint` hit-testing**, not getComputedStyle of opacity/transform. (To test a static rule,
+  set `transition:none` first.)
+- **Preview viewport is often DEGENERATE** (`window.innerHeight` reported as **13px**) → vh layout + flex heights
+  go wild. **`preview_resize` to 1600×900 BEFORE judging any layout.**
+- **Headless Chrome localhost access is INTERMITTENT** (sometimes a DNS/connection error page). Retry; `curl`
+  always works for content checks. Use **Chrome** (`C:\Program Files\Google\Chrome\Application\chrome.exe`), old
+  `--headless`, isolated `--user-data-dir`, output to `$env:TEMP` (per the `verify-blue-room-in-browser` memory).
+- **The Metrics reel = TRANSFORM TRACK, not native scroll.** A nested-flex `overflow-y:auto` **will not paginate**
+  here (it grew to content / wouldn't scroll). The window clips (`overflow:hidden`); `.met-plates` is the track
+  (`translateY(-i*slotH)`); slot height read ONCE in `setActive` (plate-height + transform use the same value);
+  re-sync on **`window.resize` + `document.fonts.ready`**, **NOT a ResizeObserver on the window** (it loops →
+  perpetual transition restart). `.is-centred` opacity:1 is real (the 0.35 reads were the quirk above).
+- **PowerShell `>` is REDIRECTION, not comparison** — `$x.Count>0` writes a file named `0`. Use `-gt`/`-eq`. (A
+  stray `0` file got created + deleted this way.) Also `2>&1` on native exe wraps stderr as errors — don't.
+- **Canvas (`mountSurfaceRecords`)**: rAF per `[data-surface-canvas]`, swatches passed via `esc(JSON.stringify(...))`
+  data-attr, re-mounted after each dossier render (rafs cancelled on re-mount), reduced-motion = one frame then stop.
+- **Preview server DROPS** between turns — just `preview_start "scanroom"` again. Bust cache:
+  `await Promise.all(['app.js','styles.css','data.js','index.html'].map(f=>fetch(f,{cache:'reload'})))` THEN navigate.
+- **Commits:** Bash heredoc `git commit -F -` (PowerShell here-strings break on `->`/quotes). End with the
+  `Co-Authored-By: Claude Opus 4.8` trailer. LF→CRLF warnings are benign. Stage ONLY intended files (leave the
+  untracked `.claude/`, `dev-live.html`, the two untracked `docs/*.md`).
+- **Deep links:** `?src=1..5&t=free|shiny|mint&tab=source|diagram|metrics` (src 1-indexed: 1 Driver · 2 Ice Field ·
+  3 Shore · 4 Run · 5 Tank). `?mode=` is gone (Diagram has no Clean toggle).
+- **Deploy poll:** after push, `curl` the live `app.js` for a new marker until it appears (~50–80s), or
+  `gh api repos/Nilsjouna999/blue-room-scan-room/commits/main`.
 
 ---
 
-## 7 · Key files
-- **`data.js`** — `SOURCES[0..4]` (card content: title/archetype/note/signature/stats/reads/aura/sceneRole/oracle/
-  receipts + `dossier{hidden,mint,oracle,record}`) · `S107_SECTIONS` (lens content: lightSurface/surfaceRecord/
-  sceneRole/hiddenStat/fitAura) · `S108_EXTRAS` (colourField + sourceTwoLine) · `toScanResultV2` (the v2 mapping).
-- **`app.js`** — `renderCard` · `renderReadingPanel` (front rail: header · Colour Field · Scene Role · fork
-  [free = lockedDeep teasers / paid = Finish + Technical Receipts + end-mark]) · `renderDossier` (back plates
-  01-05) · `dplate()` helper · `tierBand`/`miniStat` · `FINISH_HEX`.
-- **`styles.css`** — `:root` tokens (warm sand ramp) · `.dfaplate` (struck Fit+Aura) · `.dplate--mint` (struck
-  Mint) · `.cfbar`/`.cfcaption` (front Colour Field teaser) · `.cfdeep` (back Surface Record + `.cfdeep__pct`) ·
-  `.readend` (rail end-mark) · `.receipts__prov`/`.dmint__reserve`.
-- **`docs/BR-AURA-RESEARCH.md`** — the aura design ground · **`docs/DECISION_LOG.md`** — ratifications ·
-  **`docs/FILE_MAP.md`** — the where-do-I-change-this router.
+## 6 · Key files
+- **`data.js`** — `SOURCES[0..4]` (ids: driver-salute · ice-auger · shore-catch · loose-run · tank-pick; each:
+  card{title,archetype,note,...} · markers · diagram · analysis · metrics.signalMix · **`frame`{signature,field,
+  event}** [BR-S116/117] · halo{material,a,b,c} · **`surfaceVariant`** "column"|"tray" [BR-S117] · aura · sceneRole
+  · dossier{...}) · `S107_SECTIONS` · `S108_EXTRAS` (`colourField` {label,hex,pct,proof} — the Surface palette) ·
+  `toScanResultV2`.
+- **`app.js`** (re-grep, lines drift): `renderLeftPanel` (Source/Diagram/Metrics switch) · `renderSourceTab` ·
+  `renderDiagramTab`+`diagSplit` · `renderMetricsTab`+`metPlate`/`metTier`/`metSmoothPath` · `mountMetricsReel`
+  (the reel controller) · `renderReadingPanel` (combined `surfacePlate`) · `renderSurfaceRecord`/`srMakeBlobs`/
+  `mountSurfaceRecords` (the fluid Surface Record) · `renderDossier` (5 plates) · `dplate` · event delegation +
+  `mountMetricsReel()`/`mountSurfaceRecords()` after each panel/dossier render.
+- **`index.html`** — topbar (`.brand__hit`→menu, source toggle, treatment toggle) · room (3 panels) · `#dossierMount`
+  · body-level `#lightbox`.
+- **`styles.css`** — `:root` warm-sand tokens · `.met-reel*`/`.met-plate*` (reel) · `.dnotes*` (diagram notes) ·
+  `.met-*` (metrics plates) · `.module--surface`/`.surface__*` (combined) · `.lightbox*` · `.srcphoto*` · `.dplate*`
+  /`.dfaplate`/`.dplate--mint` (dossier) · `.cfdeep`/`.cfbar__seg` (kept). The fluid Surface Record is INLINE-styled
+  (no classes — ported from the JSX).
+- **Docs:** `TASK_QUEUE.md` (shipped log) · `DECISION_LOG.md` (ratifications) · `BR-AURA-RESEARCH.md` (aura ground)
+  · `FILE_MAP.md` (router). The user's source design for BR-S117 was `C:\Users\nilsj\Downloads\SurfaceRecord.jsx`.
