@@ -135,6 +135,16 @@ function moduleHead(label) {
   return `<div class="module__head"><span class="module__label">${esc(label)}</span><span class="module__rule"></span></div>`;
 }
 
+/* Diagram Notes: split a marking string into term + qualifier on the first
+   separator, for the dotted-leader rows (term ···· QUALIFIER). */
+function diagSplit(str) {
+  for (const sep of [" — ", " · ", ": "]) {
+    const i = str.indexOf(sep);
+    if (i !== -1) return { term: str.slice(0, i), qual: str.slice(i + sep.length) };
+  }
+  return { term: str, qual: "" };
+}
+
 function miniStat(name, value) {
   /* public stat: artifact-safe tier band (no 0-100), bar still shows magnitude */
   return `
@@ -320,13 +330,16 @@ function renderDiagramTab(src, treatment) {
 
     <div class="module">
       ${moduleHead("Diagram Notes")}
-      <p class="notes__sub">Frame Read</p>
-      <ul class="notes">
-        ${src.analysis.map((n) => `<li>${esc(n)}</li>`).join("")}
-      </ul>
-      <ul class="notes notes--diagram">
-        ${d.notes.map((n) => `<li>${esc(n)}</li>`).join("")}
-      </ul>
+      <div class="dnotes">
+        <div class="dnotes__blk">
+          <div class="dnotes__hd"><span class="dnotes__lab">Frame Read</span><span class="dnotes__ln"></span><span class="dnotes__tag">DERIVED</span></div>
+          ${src.analysis.map((n, i) => { const p = diagSplit(n); return `<div class="dnotes__row"><span class="dnotes__idx">${String(i + 1).padStart(2, "0")}</span><span class="dnotes__term">${esc(p.term)}</span><span class="dnotes__lead"></span><span class="dnotes__qual">${esc(p.qual)}</span></div>`; }).join("")}
+        </div>
+        <div class="dnotes__blk dnotes__blk--mark">
+          <div class="dnotes__hd"><span class="dnotes__lab">Overlay Markings</span><span class="dnotes__ln"></span><span class="dnotes__tag">ON SHEET</span></div>
+          ${d.notes.map((n) => { const p = diagSplit(n); return `<div class="dnotes__row"><span class="dnotes__dia">◇</span><span class="dnotes__term">${esc(p.term)}</span><span class="dnotes__lead"></span><span class="dnotes__qual">${esc(p.qual)}</span></div>`; }).join("")}
+        </div>
+      </div>
     </div>`;
 }
 
@@ -370,71 +383,131 @@ function mixRow(k, v) {
     </div>`;
 }
 
+/* ---------- tab: metrics (4-plate diagnostic read — Frame Signature ·
+   Signal Mix · Composition Field · Frame Event). Frame Signature is a
+   silhouette-not-score; Signal Mix stays a proportion-of-a-whole; tier
+   words are labels, never 0-100. All values hand-authored per card
+   (src.frame + card.title/archetype/note + sceneRole + aura + signalMix). ---------- */
+const MET_TIER_FILL = { Peak: 5, Charged: 4, Strong: 3, Clean: 2, Muted: 1 };
+function metRgba(hex, a) {
+  const h = hex.replace("#", "");
+  return `rgba(${parseInt(h.slice(0, 2), 16)},${parseInt(h.slice(2, 4), 16)},${parseInt(h.slice(4, 6), 16)},${a})`;
+}
+function metMatText(mat) { return `color-mix(in srgb, ${mat} 72%, var(--silver))`; }
+function metSmoothPath(radii, cx, cy, R) {
+  const n = radii.length;
+  const pts = radii.map((r, i) => { const a = -Math.PI / 2 + (i * 2 * Math.PI) / n; return [cx + R * r * Math.cos(a), cy + R * r * Math.sin(a)]; });
+  let d = `M ${pts[0][0].toFixed(2)} ${pts[0][1].toFixed(2)} `;
+  for (let i = 0; i < n; i++) {
+    const p0 = pts[(i - 1 + n) % n], p1 = pts[i], p2 = pts[(i + 1) % n], p3 = pts[(i + 2) % n];
+    const c1x = p1[0] + (p2[0] - p0[0]) / 6, c1y = p1[1] + (p2[1] - p0[1]) / 6;
+    const c2x = p2[0] - (p3[0] - p1[0]) / 6, c2y = p2[1] - (p3[1] - p1[1]) / 6;
+    d += `C ${c1x.toFixed(2)} ${c1y.toFixed(2)} ${c2x.toFixed(2)} ${c2y.toFixed(2)} ${p2[0].toFixed(2)} ${p2[1].toFixed(2)} `;
+  }
+  return d + "Z";
+}
+function metTier(name, tier, mat) {
+  const fill = MET_TIER_FILL[tier] || 3;
+  const segs = Array.from({ length: 5 }, (_, i) => `<span class="met-tier__seg" style="${i < fill ? `background:${metRgba(mat, 0.85)};` : ""}"></span>`).join("");
+  return `<div class="met-tier"><div class="met-tier__top"><span class="met-tier__n">${esc(name)}</span><span class="met-tier__v" style="color:${metMatText(mat)};">${esc(tier)}</span></div><div class="met-tier__meter">${segs}</div></div>`;
+}
+function metPlate(no, title, mat, body) {
+  return `<section class="met-plate" style="border-left-color:${metRgba(mat, 0.5)};"><header class="met-plate__h"><span class="met-plate__no">${no}</span><h3 class="met-plate__t">${esc(title)}</h3></header>${body}</section>`;
+}
+
 function renderMetricsTab(src, treatment) {
-  /* TODO(v2-render): signalMix / pressure / fitMatrix are not part of
-     ScanResult v2 yet — this tab stays on legacy src.metrics. */
-  const free = treatment === "free";
-  const m = src.metrics;
+  const fr = src.frame;
+  const c = src.card;
+  const mat = src.halo.a;
+  const mt = metMatText(mat);
+  /* Defensive: sources without an authored frame block (not yet live) get a notice
+     rather than a crash. The two live sources (Driver · Ice Field) carry full data. */
+  if (!fr) return `<p class="metriccap metriccap--head">Diagnostic read develops for this source.</p>`;
 
-  const diamond = `
-    <div class="module">
-      ${moduleHead("Stat Diamond")}
-      ${statDiamond(src.card.stats, treatment)}
-    </div>`;
+  /* 01 — Frame Signature (silhouette, not score) */
+  const glyph = metSmoothPath(fr.signature.radii, 130, 120, 100);
+  const rings = [20, 40, 60, 80, 100].map((r) => `<circle cx="130" cy="120" r="${r}" fill="none" stroke="rgba(233,229,220,${r === 100 ? 0.12 : r >= 60 ? 0.08 : 0.07})" stroke-width="1"/>`).join("");
+  const sig = metPlate("01", "Frame Signature", mat, `
+    <p class="met-lede">This photograph's signature shape — its gestalt, not five numbers. The silhouette is the read: where it reaches toward the outer ring the frame carries, where it pulls inward it withholds.</p>
+    <div class="met-sig">
+      <svg viewBox="0 0 260 240" class="met-sig__svg" aria-hidden="true">${rings}
+        <text x="130" y="16" text-anchor="middle" class="met-svglab">PEAK</text>
+        <text x="130" y="116" text-anchor="middle" class="met-svglab met-svglab--mid">MUTED</text>
+        <g class="met-anim">
+          <path d="${glyph}" fill="none" stroke="${metRgba(mat, 0.22)}" stroke-width="7" stroke-linejoin="round"/>
+          <path d="${glyph}" fill="${metRgba(mat, 0.2)}" stroke="${mat}" stroke-width="2.1" stroke-linejoin="round"/>
+          <circle cx="130" cy="120" r="1.6" fill="var(--t-ghost)"/>
+        </g>
+      </svg>
+      <div class="met-sig__side">
+        <div><div class="met-kicker">Signature class</div><div class="met-sig__class">${esc(fr.signature.class)}</div></div>
+        <p class="met-sig__note">${esc(fr.signature.note)}</p>
+        <div class="met-sig__reach"><span class="met-kicker">Reach</span><span class="met-sig__band" style="color:${mt};">${esc(fr.signature.band)}</span></div>
+      </div>
+    </div>`);
 
-  const mix = `
-    <div class="module">
-      ${moduleHead("Signal Mix")}
-      <p class="metriccap">scan recipe — how the read was weighted</p>
-      <div class="mixrows">${m.signalMix.map((r) => mixRow(r.k, r.v)).join("")}</div>
-    </div>`;
+  /* 02 — Signal Mix (proportion of a whole — the one plate that keeps numbers) */
+  const mixSorted = src.metrics.signalMix.slice().sort((a, b) => b.v - a.v);
+  const mixRows = mixSorted.map((mr) => `
+    <div class="met-mix__row">
+      <span class="met-mix__nm">${esc(mr.k)}</span>
+      <span class="met-mix__track"><span class="met-mix__lead" style="left:calc(${mr.v}% + 8px);"></span><span class="met-mix__fill" style="width:${mr.v}%; background:${metRgba(mat, 0.55)};"></span></span>
+      <span class="met-mix__pct">${mr.v}%</span>
+    </div>`).join("");
+  const mixPlate = metPlate("02", "Signal Mix", mat, `
+    <p class="met-lede">Where the frame's signal comes from, ranked by share — the one instrument that keeps its numbers, because a proportion of a whole describes how the image is built, not how it scores.</p>
+    <div>${mixRows}</div>`);
 
-  const balancePos = 50 + m.pressure.balance; // -50..50 → 0..100
-  const pressureBody = `
-    <div class="balance">
-      <span class="balance__cap">L</span>
-      <span class="balance__track">
-        <span class="balance__center"></span>
-        <span class="balance__dot" style="left:${balancePos}%"></span>
-      </span>
-      <span class="balance__cap">R</span>
+  /* 03 — Composition Field (drift node + tier bands) */
+  const FRR = 86, ccx = 130, ccy = 120;
+  const nx = +(ccx + fr.field.node.x * FRR).toFixed(2), ny = +(ccy + fr.field.node.y * FRR).toFixed(2);
+  const nodePts = `${nx},${(ny - 6).toFixed(2)} ${(nx + 6).toFixed(2)},${ny} ${nx},${(ny + 6).toFixed(2)} ${(nx - 6).toFixed(2)},${ny}`;
+  const field = metPlate("03", "Composition Field", mat, `
+    <p class="met-lede">How the frame pushes the eye. The diamond marks the centre of visual weight; the line is its drift from a balanced frame — direction and pull, never a verdict.</p>
+    <div class="met-field">
+      <svg viewBox="0 0 260 240" class="met-field__svg" aria-hidden="true">
+        <rect x="44" y="34" width="172" height="172" fill="none" stroke="var(--line)" rx="3"/>
+        <line x1="130" y1="34" x2="130" y2="206" stroke="rgba(233,229,220,0.06)" stroke-width="1"/>
+        <line x1="44" y1="120" x2="216" y2="120" stroke="rgba(233,229,220,0.06)" stroke-width="1"/>
+        <circle cx="130" cy="120" r="43" fill="none" stroke="rgba(233,229,220,0.06)" stroke-width="1"/>
+        <circle cx="130" cy="120" r="86" fill="none" stroke="rgba(233,229,220,0.045)" stroke-width="1"/>
+        <text x="130" y="27" text-anchor="middle" class="met-svglab">LENS</text>
+        <text x="130" y="220" text-anchor="middle" class="met-svglab">GROUND</text>
+        <g class="met-anim">
+          <line x1="130" y1="120" x2="${nx}" y2="${ny}" stroke="${mat}" stroke-width="1.4"/>
+          <circle cx="${nx}" cy="${ny}" r="17" fill="${metRgba(mat, 0.22)}"/>
+          <circle cx="130" cy="120" r="2.4" fill="var(--t-ghost)"/>
+          <polygon points="${nodePts}" fill="${mat}"/>
+        </g>
+      </svg>
+      <div class="met-field__side">
+        <div><div class="met-kicker">Centre of weight</div><div class="met-field__v">${esc(fr.field.weight)}</div></div>
+        <div><div class="met-kicker">Balance</div><div class="met-field__v">${esc(fr.field.balance)}</div></div>
+      </div>
     </div>
-    <p class="metriccap">frame weight sits ${m.pressure.balance === 0 ? "dead center" : Math.abs(m.pressure.balance) + "% " + (m.pressure.balance < 0 ? "left" : "right") + " of center"}</p>
-    <div class="mixrows">
-      ${mixRow("Center pull", m.pressure.centerPull)}
-      ${mixRow("Background noise", m.pressure.noise)}
-      ${mixRow("Focal clarity", m.pressure.clarity)}
-    </div>`;
-  const pressure = free
-    ? lockedModule("Composition Pressure", "Pressure graph recorded, undeveloped. Develops with Halo Mint.")
-    : `<div class="module">${moduleHead("Composition Pressure")}${pressureBody}</div>`;
+    <div class="met-bands">${metTier("Drift", fr.field.drift, mat)}${metTier("Clarity", fr.field.clarity, mat)}${metTier("Depth", fr.field.depth, mat)}</div>`);
 
-  const fitBody = `
-    <div class="fitgrid">
-      ${m.fitMatrix
-        .map(
-          (f) => `
-        <div class="fitcell">
-          <span class="fitcell__k">${esc(f.k)}</span>
-          <span class="fitcell__state">${esc(f.state)}</span>
-          <span class="fitcell__v">${f.v}</span>
-        </div>`
-        )
-        .join("")}
-    </div>`;
-  const fit = free
-    ? lockedModule("Fit Coherence Matrix", "Matrix extracted — the full coherence grid develops with the mint.")
-    : `<div class="module">${moduleHead("Fit Coherence Matrix")}${fitBody}</div>`;
+  /* 04 — Frame Event (the act in the image — never a person read) */
+  const event = metPlate("04", "Frame Event", mat, `
+    <p class="met-lede">The single event the frame is built around — read as an act in the image, not a quality of the person. What happened inside the rectangle.</p>
+    <div class="met-event">
+      <div class="met-event__thumb">${imgOrPlaceholder(src.file, "met-event__img")}</div>
+      <div class="met-event__main">
+        <div class="met-event__lab"><span class="met-kicker">Event</span><span class="met-event__v" style="color:${mt};">${esc(fr.event.label)}</span></div>
+        <p class="met-event__note">${esc(c.note)}</p>
+      </div>
+    </div>
+    <p class="met-event__filed">Filed as <b>${esc(c.archetype)}</b> — ${esc(src.sceneRole)}</p>
+    <div class="met-bands">${metTier("Legibility", fr.event.legibility, mat)}${metTier("Charge", fr.event.charge, mat)}${metTier("Containment", fr.event.containment, mat)}</div>`);
 
-  /* BR-S107.1: the orphaned Halo deeper stats (Lore Density + Frame Impact) —
-     homeless after Fit+Aura became badges — routed here as NUMERIC rows (Metrics
-     stays numeric: labels + figures only). */
-  const haloDepth = free
-    ? lockedModule("Halo Depth", "Lore density and frame impact extract on develop.")
-    : `<div class="module">${moduleHead("Halo Depth")}<div class="mixrows">${mixRow("Lore density", src.lore.value)}${mixRow("Frame impact", src.impact.value)}</div></div>`;
-
-  return `<p class="metriccap metriccap--head">why the four stats landed — receipts, not a second score</p>${diamond}${mix}${pressure}${fit}${haloDepth}
-    <p class="metriccap metriccap--foot">◆ weighted read · interpretive formula, not a measurement</p>`;
+  return `
+    <header class="met-hd">
+      <h1 class="met-hd__title">Diagnostic Receipts</h1>
+      <div class="met-hd__id"><span class="met-chip" style="color:${mt};">${esc(c.archetype)}</span><span class="met-hd__ln"></span><span class="met-hd__read">Reading ${esc(c.title)}</span></div>
+      <p class="met-hd__lede">Four interpretive instruments for <b>${esc(c.title)}</b> — the read of how the frame is built. Records of the photograph, never measurements of the person who stood in it.</p>
+    </header>
+    <div class="met-plates">${sig}${mixPlate}${field}${event}</div>
+    <p class="met-foot">◆ BLUE ROOM · ARCHIVE · SCAN ROOM — ${esc(src.halo.material)}</p>`;
 }
 
 /* ---------- center: the card (one master base) ---------- */
@@ -742,34 +815,27 @@ function renderDossier(src, treatment) {
      numbers live only in Metrics now; nothing renders here. */
   const statDossier = "";
 
-  /* 03 — Hidden Stat (BR-S107: lens B · the non-obvious gesture read, behind a
-     FREE tap-to-develop seal — the shaped-hole interaction, never a paywall). */
-  const hs = sec.hiddenStat || { name: d.hidden.name, read: d.hidden.read };
-  const hidden = dplate("02", "Hidden Stat", paid, `
-    <details class="seal" ${paid ? "open" : ""}>
-      <summary class="seal__cue"><span class="seal__dot">◆</span><span class="seal__name">${esc(hs.name)}</span><span class="seal__act">tap to develop</span></summary>
-      <p class="dhidden__read">${esc(hs.read)}</p>
-    </details>`);
+  /* 02 — Archetype (empty stub): a reserved placeholder plate for a future archetype
+     read. The Card tag still carries the live archetype; this is scaffold only.
+     Replaces the removed Hidden Stat plate. HELD draft. */
+  const archetype = dplate("02", "Archetype", paid, `
+    <p class="dstat__undeveloped">Archetype read — reserved. Develops in a later pass.</p>`);
 
-  /* 05 — Fit + Aura Layer */
-  /* 04 — Fit + Aura — SUPERSEDED by BR-S109 (now a struck CLASS plate; see note at
-     the render below). The original BR-S107 note: lens E PLACEMENT as badges — family · aura
-     chips · where it fits. NEVER a verdict; the verdict is the Oracle's alone.
-     Always open (grounding floor). Stance/impact/lore retired from here. */
-  /* BR-S109: the badge row (Class badge + 3 aura chips + placement line = four tags
-     reading as FILING) is REPLACED by ONE struck "type-specimen" plate — a single
-     CLASS designation (genus-species + variant), a shelf-line that CLASSIFIES (where
-     it files), and a struck home lockup. NO code (codes = filing, owned by Source
-     Record). Real deboss in .dfaplate carries the "minted, not printed" weight.
-     The home lockup is deliberately "Shelf-placement", NOT the Mint plate's "Filed &
-     sealed", so adjacent plates 04/05 don't rhyme. */
-  const fa = sec.fitAura || { type: d.mint.family, variant: "", shelf: src.fit };
-  const faVar = fa.variant ? `, <span class="dfaplate__var">${esc(fa.variant)}</span>` : "";
-  const fitAura = dplate("03", "Fit + Aura Layer", paid, `
-    <div class="dfaplate">
-      <p class="dfaplate__type">${esc(fa.type)}${faVar}</p>
-      <p class="dfaplate__shelf">${esc(fa.shelf)}</p>
-      <div class="dfaplate__home">◆ Shelf-placement · Blue Room Archive</div>
+  /* 03 — Aura (refocused from the old "Fit + Aura Layer" CLASS plate to the artifact's
+     developed AURA: the material/spectral cast + its aura tags. Latent '····' on free
+     (develops with the mint), struck on paid. Artifact-not-person — the aura tags are
+     image-acts / scene cast, never a person read. Reuses the struck .dfaplate language.
+     HELD draft. */
+  const auraChips = (src.aura || []).map((t) => `<span>${esc(t)}</span>`).join("");
+  const aura = dplate("03", "Aura", paid, paid
+    ? `<div class="dfaplate">
+      <p class="dfaplate__type">${esc(src.halo.material)}</p>
+      <div class="dfaplate__aura">${auraChips}</div>
+      <div class="dfaplate__home">◆ Aura layer · Blue Room Archive</div>
+    </div>`
+    : `<div class="dfaplate">
+      <p class="dfaplate__type dfaplate__type--latent">····</p>
+      <p class="dstat__undeveloped">The aura develops with the mint.</p>
     </div>`);
 
   /* 06 — Mint Record */
@@ -817,7 +883,7 @@ function renderDossier(src, treatment) {
   return `
     <div class="dossier__cue">CARD BACK — ARTIFACT RECORD</div>
     <div class="dossier__inner">
-      ${recordGate}${board}${hidden}<div class="dossier__register">THE RECORD</div>${fitAura}${mintRecord}<div class="dossier__register">THE ORACLE</div>${oracle}
+      ${recordGate}${board}${archetype}<div class="dossier__register">THE RECORD</div>${aura}${mintRecord}<div class="dossier__register">THE ORACLE</div>${oracle}
       <p class="dossier__end">◆ &nbsp;END OF RECORD · ${esc(src.label).toUpperCase()} · BLUE ROOM ARCHIVE</p>
     </div>`;
 }

@@ -162,6 +162,28 @@ const SOURCES = [
         { k: "Gesture", state: "Loud", v: 92 },
       ],
     },
+    /* Metrics v2 — the 4-plate diagnostic read (Frame Signature · Composition Field ·
+       Frame Event). Hand-authored, never computed. Signature radii draw the silhouette;
+       tier words are labels, not scores. Reuses card.title / card.archetype / card.note /
+       sceneRole / aura / metrics.signalMix for the rest. */
+    frame: {
+      signature: {
+        class: "Comet — a single spike",
+        note: "Signal-led and frame-light. The whole charge collects in one gesture; everything else pulls quiet and lets it carry.",
+        band: "Charged",
+        radii: [0.90, 0.52, 0.41, 0.45, 0.60, 0.97, 0.70, 0.49, 0.66],
+      },
+      field: {
+        node: { x: 0.42, y: -0.34 },
+        weight: "Upper right — toward the raised palm",
+        balance: "Lean right",
+        drift: "Charged", clarity: "Charged", depth: "Clean",
+      },
+      event: {
+        label: "Raised palm",
+        legibility: "Peak", charge: "Charged", containment: "Strong",
+      },
+    },
     /* Halo Mint material identity — accents derived from the photo
        (red jacket, cabin warmth, window light). */
     halo: { material: "Warm Glass Copper", a: "#c98a5e", b: "#8b7bff", c: "#e8b27d" },
@@ -331,6 +353,26 @@ const SOURCES = [
         { k: "Styling", state: "Muted", v: 64 },
         { k: "Gesture", state: "Working", v: 73 },
       ],
+    },
+    /* Metrics v2 — 4-plate diagnostic read. Authored from the frame's own facts
+       (snow-field setting-led, low-centred crouch, max contrast). Tier words = labels. */
+    frame: {
+      signature: {
+        class: "Plateau — broad and low",
+        note: "Setting-led. The snow field carries the read; the crouched mass sits low and centred and lets the field do the staging.",
+        band: "Strong",
+        radii: [0.72, 0.55, 0.84, 0.90, 0.74, 0.50, 0.45, 0.62, 0.80],
+      },
+      field: {
+        node: { x: 0.04, y: 0.30 },
+        weight: "Lower centre — down into the crouch and the ice",
+        balance: "Centred",
+        drift: "Clean", clarity: "Peak", depth: "Strong",
+      },
+      event: {
+        label: "Crouched brace",
+        legibility: "Peak", charge: "Clean", containment: "Peak",
+      },
     },
     /* Halo Mint material identity — accents derived from the photo
        (snow field, hard sun, cold sky). */

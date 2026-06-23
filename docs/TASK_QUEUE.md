@@ -2,13 +2,15 @@
 
 Ranked work queue, not a dream backlog. One Active item at a time.
 Out-of-scope findings from any session get logged here, not patched.
-Last updated: 2026-06-21.
+Last updated: 2026-06-23.
 
 ## Completed (shipped tasks, newest first)
 
 > This section is the COMPLETED-TASK LOG, not pending work. The current/next active item
 > is the head of **Ready** (below) — one at a time (this file's intro rule). For the
 > authoritative "what shipped" trail, cross-check `docs/DECISION_LOG.md` + `git log`.
+
+- **BR-S114 — Metrics 4-plate read + Diagram-notes design folded into the REAL tabs (from the HTML mockups); dossier restructure** (2026-06-23, app.js + styles.css + data.js): the builder's two standalone "dc" mockups (Diagram, Metrics) integrated into the live app's real tabs — NOT a separate page. **Diagram:** figure unchanged (the silver-instrument system that was always there — the mockup had wrongly tinted the signal-arrow/light marker with the source material; reverted to silver per "the diagram is an instrument, the card alone carries the material"); extracted ONLY the Diagram-Notes design — two keyed blocks, Frame Read (`analysis`, DERIVED) + Overlay Markings (`diagram.notes`, ◇ ON SHEET), dotted-leader rows, kept neutral (`.dnotes-*`). **Metrics:** the whole 4-plate design — Frame Signature (silhouette-not-score) · Signal Mix (proportion, keeps %) · Composition Field (drift node + tier bands) · Frame Event (act + tier bands), `.met-*` — replacing Stat Diamond/Composition Pressure/Fit/Halo Depth. Bound to REAL card data (`card.title/archetype/note` · `sceneRole` · `metrics.signalMix` · `aura`); new per-card values in `src.frame` (signature radii/class/note/band, field node/weight/balance, 6 tier words) — Driver lifted from the mockup, **Ice Field authored**. UNGATED (full on free + paid). **Dossier (same session):** Hidden Stat plate removed; "Fit + Aura Layer" → **Aura** (refocused to the material aura + aura tags, latent on free); empty **Archetype** stub added; orphaned `.dfaplate__var/__shelf` + `.dhidden*` CSS swept; nth-of-type rhythm preserved (Surface Record 1 quiet, Mint 4 emphasis). **Verified** (fresh headless, console clean): both tabs, 2 live cards (copper/frost), free + shiny; deep-link guard; dossier 5 plates. ONE commit on main, pushed (live deploy). **Flags (open):** Ice Field metrics copy + ungated-on-free are drafts; dead code (statDiamond/mixRow/lockedModule + old metrics/notes CSS) flagged for a cleanup pass; SRC-03/04/05 need `frame` authored when toggle-live.
 
 - **BR-S104 — live-card audit + improvement plan (analysis, no-code)** (2026-06-22, docs only): 9-agent
   read-only audit of all 5 live cards (free + developed) against the builder's bar — expectation-capture,

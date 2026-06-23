@@ -602,3 +602,22 @@ Why: aura/atmosphere writing sits one step from reading the person — this draw
 stays on image-properties + performed intent. Supersedes nothing; it SHARPENS the existing artifact-not-person
 law (HUMAN_READ_LINE_V1, PROJECT_OS §1). Governs docs/BR-AURA-RESEARCH.md and all card copy from here.
 Revisit: LOCKED — sharpen only, never loosen, without explicit ratification.
+
+**2026-06-23 / BR-S114 — tab redesigns live IN the app's real tabs, not a separate page / ACTIVE**
+The Diagram + Metrics "dc" mockups are integrated into `renderDiagramTab` / `renderMetricsTab` (ONE
+project, one stack), not a standalone file. The mockups are design/copy spec only (bundler exports,
+off-stack React). Why: one app, one governance trail; a separate page read to the builder as a second site.
+Revisit: when the room's nav/layout pass decides top-pill vs left-rail (DEFERRED) — that may move the tabs
+to a fuller-width treatment than the current left panel (where the plates stack rather than sit side-by-side).
+
+**2026-06-23 / BR-S114 — the Diagram is a SILVER instrument; the card alone carries the material / REAFFIRMED**
+The Metrics-era mockup had tinted the Diagram signal-arrow + light marker with the source material
+(copper/frost). Reverted: every Diagram stroke is silver/neutral (the styles.css law comment). Metrics KEEPS
+material (its own interpretive law). Why: the builder confirmed the previous silver annotations were "perfect";
+material on the diagram reads as billboard, not instrument. Revisit: not without the builder's call.
+
+**2026-06-23 / BR-S114 — Metrics tab = the 4-plate diagnostic, ungated on free / ACTIVE (drafts open)**
+Frame Signature (silhouette-not-score) · Signal Mix (proportion, keeps %) · Composition Field · Frame Event,
+shown in full on free AND paid (the old tab gated 3 modules on free). Values hand-authored per card in
+`src.frame` (Driver from the mockup; Ice Field authored). Why: the builder wanted "the whole thing." Revisit:
+if the full diagnostic over-gives on free → gate specific plates; Ice Field copy is a draft for the builder's eye.
