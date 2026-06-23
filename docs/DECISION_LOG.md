@@ -581,3 +581,21 @@ tag-rows collapse character into filing. A single struck designation is singular
 the object without stealing the Oracle's verdict.
 Revisit: if a future section genuinely needs an identifier, it must look unmistakably UNLIKE a Source Record
 serial (different grammar + placement) and earn a ratified exception here first.
+
+**2026-06-23 / BR-S113 — Read-boundary (sharpened): five no's + one allowance / LOCKED**
+A card reads the ARTIFACT, never the PERSON. This governs aura/atmosphere writing and ALL future card copy.
+FIVE ABSOLUTE NO'S — never state or imply a person's:
+  1. worth or character;
+  2. health or body;
+  3. ranking / score against others;
+  4. identity (job, class, status, relationships, story-as-fact);
+  5. attributed private feeling or mood ("he feels lonely / proud / anxious").
+ONE EXPLICIT ALLOWANCE — PERFORMED GESTURE-INTENT: what the action publicly does in the frame ("the palm
+stops the lens," "the catch is offered up to the camera," "the body is already turning away"). This reads the
+gesture as an EVENT IN THE IMAGE, not the person's interior.
+THE TEST: is this the intent the gesture performs, or a claim about hidden feeling? The first is allowed; the
+second is banned.
+Why: aura/atmosphere writing sits one step from reading the person — this draws the exact line so the read
+stays on image-properties + performed intent. Supersedes nothing; it SHARPENS the existing artifact-not-person
+law (HUMAN_READ_LINE_V1, PROJECT_OS §1). Governs docs/BR-AURA-RESEARCH.md and all card copy from here.
+Revisit: LOCKED — sharpen only, never loosen, without explicit ratification.
