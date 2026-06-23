@@ -636,3 +636,14 @@ Re-added a Source tab (Source / Diagram / Metrics) showing the clean original ph
 Also: ◆ BLUE ROOM → main menu; the right-panel Finish is standalone (per-material character line) and the dossier
 Aura is parked as an empty stub. Why: the builder wanted to see the original whole/easily before minting, and the
 Diagram to stay the annotated scan sheet. Revisit: Aura content is a later pass.
+
+**2026-06-23 / BR-S116 — Finish tops the reading panel (Colour Field under); all 5 cards have authored Metrics; reel polished + safe cleanup / ACTIVE**
+Reading panel order (paid): Finish → Colour Field → Scene Role → seam; Colour Field is KEPT on Free (never cut —
+the opus gate caught that the naive move would drop it). The ◆ BLUE ROOM logo alone is the menu hitbox (.brand__hit),
+not the zone label after it. All five cards now carry a hand-authored Metrics `frame` (Shore/Run/Tank added — safety
+audited pass, artifact/act-only, no person-read, no 0-100). Reel plates breathe (side padding 4px→22px), the left
+material edge + landing glint softened. Dead JS (statDiamond/mixRow/lastH) + seven orphaned CSS blocks + junk temp
+files swept (conservative). Why: the builder's polish + completeness + cleanup pass, run through a 15-agent workflow
+(8 haiku scout / 5 sonnet build / 2 opus verify). Revisit (flagged, NOT done): source-02..05.jpg image optimization
+(~11 MB, deliberate tooling step on copies); .diamond/.dia-*/.impact CSS now orphaned by the statDiamond/mixRow
+removal; metriccap--foot pending a docs/map check; 'Finish top-RIGHT' as literal right-alignment is a CSS option.

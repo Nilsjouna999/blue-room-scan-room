@@ -305,24 +305,6 @@ body[data-devnav="1"] .toggle--treatment { display: inline-flex; }
   text-align: right;
 }
 
-.notes { list-style: none; display: grid; gap: 8px; }
-.notes li {
-  font-family: var(--font-mono);
-  font-size: 10.5px;
-  letter-spacing: 0.06em;
-  line-height: 1.55;
-  color: var(--muted);
-  padding-left: 15px;
-  position: relative;
-}
-.notes li::before {
-  content: "◆";
-  position: absolute;
-  left: 0;
-  top: 1px;
-  font-size: 6px;
-  color: var(--faint);
-}
 
 /* =============================================================
    LEFT — scan frame with markers
@@ -1578,9 +1560,6 @@ details.seal[open] .seal__act { opacity: 0.4; }
   border-radius: 99px;
   background: linear-gradient(90deg, #6f7480 0%, var(--silver) 100%);
 }
-.impact__fill--dash {
-  background: repeating-linear-gradient(90deg, var(--silver-dim) 0 5px, transparent 5px 8px);
-}
 .impact__val { font-family: var(--font-mono); font-size: 11.5px; color: var(--silver); }
 
 .module--oracle .oracle {
@@ -1769,15 +1748,11 @@ details.seal[open] .seal__act { opacity: 0.4; }
 
 /* Source merged into Diagram (BR-S044): ANNOTATED = overlay read + desaturated photo
    (default); CLEAN = raw full-saturation photo + numbered markers + legend. Flat toggle. */
-.diagtoggle { display: flex; gap: 4px; margin: 0 0 10px; }
-.diagtoggle .tabbar__btn { flex: 0 0 auto; padding: 4px 12px; }
 .diagwrap.is-clean .scanframe--diagram .scanframe__img { filter: none; }
 .diagwrap.is-clean .diagsvg, .diagwrap.is-clean .diaglabels { display: none; }
 .diagwrap:not(.is-clean) .marker { display: none; }
 .diagwrap:not(.is-clean) .markerlegend { display: none; }
 .diagwrap .markerlegend { margin-top: 11px; }
-.notes__sub { font-family: var(--font-mono); font-size: 8px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--silver-dim); margin-bottom: 8px; }
-.notes--diagram { margin-top: 11px; padding-top: 11px; border-top: 1px solid var(--line-faint); }
 
 .diagsvg {
   position: absolute;
@@ -1943,7 +1918,7 @@ details.seal[open] .seal__act { opacity: 0.4; }
 }
 .met-reel__window .met-plate {
   flex: 0 0 auto; height: var(--slot-h, 420px); margin: 0;
-  display: flex; flex-direction: column; justify-content: safe center; padding: 12px 4px;
+  display: flex; flex-direction: column; justify-content: safe center; padding: 14px 22px;
   overflow-y: auto; overflow-x: hidden; scrollbar-width: none;
   opacity: .35; transition: opacity .34s ease; position: relative;
 }
@@ -1956,7 +1931,7 @@ details.seal[open] .seal__act { opacity: 0.4; }
   animation: met-snap 360ms cubic-bezier(0.2, 0.7, 0.2, 1);
   will-change: transform, opacity;
 }
-@keyframes met-snap { 0% { opacity: 0; transform: translateY(-100%); } 45% { opacity: .9; } 100% { opacity: 0; transform: translateY(100%); } }
+@keyframes met-snap { 0% { opacity: 0; transform: translateY(-100%); } 45% { opacity: .34; } 100% { opacity: 0; transform: translateY(100%); } }
 /* hover deepen — only the centred (readable) plate reacts */
 .met-reel__window .met-plate.is-centred:hover {
   background: linear-gradient(180deg, color-mix(in srgb, var(--mat) 7%, var(--ink-800)) 0%, var(--ink-850) 55%, var(--ink-950) 100%);
@@ -2004,7 +1979,8 @@ details.seal[open] .seal__act { opacity: 0.4; }
 .finish__note { margin: 9px 0 0; font-size: 12px; line-height: 1.5; color: var(--t-meta); font-style: italic; }
 
 /* Clickable brand → main menu (BR-S115) */
-.brand[data-view-to] { cursor: pointer; }
+/* Only ◆ BLUE ROOM is the menu hitbox; the zone sub-label sits outside it (BR-S116). */
+.brand__hit { display: inline-flex; align-items: baseline; gap: 12px; cursor: pointer; }
 
 .devnote {
   font-family: var(--font-mono);
@@ -2039,7 +2015,6 @@ details.seal[open] .seal__act { opacity: 0.4; }
 body[data-treatment="mint"] .dia-fill,
 body[data-treatment="shiny"] .dia-fill { fill: rgba(200, 196, 187, 0.15); stroke: var(--silver); }
 
-.mixrows { display: grid; gap: 9px; }
 .metriccap {
   font-family: var(--font-mono);
   font-size: 9.5px;
@@ -2052,61 +2027,6 @@ body[data-treatment="shiny"] .dia-fill { fill: rgba(200, 196, 187, 0.15); stroke
   padding-top: 4px;
 }
 
-.balance { display: flex; align-items: center; gap: 10px; }
-.balance__cap {
-  font-family: var(--font-mono);
-  font-size: 9px;
-  color: var(--t-meta);
-}
-.balance__track {
-  flex: 1;
-  position: relative;
-  height: 4px;
-  border-radius: 99px;
-  background: rgba(255, 255, 255, 0.06);
-}
-.balance__center {
-  position: absolute;
-  left: 50%;
-  top: -3px;
-  bottom: -3px;
-  width: 1px;
-  background: rgba(226, 222, 213, 0.35);
-}
-.balance__dot {
-  position: absolute;
-  top: 50%;
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
-  background: var(--silver-bright);
-  transform: translate(-50%, -50%);
-  box-shadow: 0 0 8px rgba(0, 0, 0, 0.5);
-}
-/* accent economy: balance dot stays silver in all states */
-
-.fitgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-.fitcell {
-  display: grid;
-  gap: 3px;
-  border: 1px solid var(--line-faint);
-  border-radius: 3px;
-  padding: 10px 12px;
-  background: rgba(255, 255, 255, 0.015);
-}
-.fitcell__k {
-  font-family: var(--font-mono);
-  font-size: 8.5px;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: var(--faint);
-}
-.fitcell__state {
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--silver-bright);
-}
-.fitcell__v { font-family: var(--font-mono); font-size: 10px; color: var(--silver); }
 
 /* ---- formula receipts (right panel, inside Technical Receipts) ---- */
 

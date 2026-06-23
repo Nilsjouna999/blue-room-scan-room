@@ -19,7 +19,7 @@
    state+routing state{} · URL-param parse · DEVNAV gate
    scan access   getScanResult · getActiveScan · getTierOutput   (the seam)
    shared        moduleHead · miniStat · imgOrPlaceholder
-   left panel    renderLeftPanel · renderDiagramTab · renderMetricsTab · statDiamond
+   left panel    renderLeftPanel · renderSourceTab · renderDiagramTab · renderMetricsTab · mountMetricsReel
    center card   renderCard
    right panel   lockedModule · renderReadingPanel
    dossier       dplate · renderDossier   (7 plates)
@@ -70,8 +70,9 @@ function tierBand(v) {
 
 /* Public stat bars carry ONLY the band, never raw 0-100: snap fill width to one
    of five discrete band positions so two values in the same band look identical
-   and bar length cannot recover the underlying number (BR-S070). The Metrics tab
-   keeps its raw numeric diagnostic (mixRow) — that is the documented carve-out. */
+   and bar length cannot recover the underlying number (BR-S070). The Metrics tab's
+   Signal Mix is a proportion-of-a-whole (shares of 100%), the one allowed numeric
+   read — it describes how the image is built, not how it scores. */
 const BAND_PCT = { Muted: 14, Clean: 36, Strong: 56, Charged: 76, Peak: 96 };
 const bandPct = (v) => BAND_PCT[tierBand(v)] || 0;
 
@@ -354,46 +355,6 @@ function renderSourceTab(src) {
     </div>`;
 }
 
-/* ---------- tab 3: metrics (stylish receipts, not science) ---------- */
-
-function statDiamond(stats, treatment) {
-  const order = [
-    ["Frame Presence", stats.presence],
-    ["Frame", stats.frame],
-    ["Signal", stats.signal],
-    ["Scene Charge", stats.charge],
-  ];
-  /* P top, F right, S bottom, C left — radius 40 at value 100 */
-  const pt = (i, v) => {
-    const r = (v / 100) * 40;
-    return [[50, 50 - r], [50 + r, 50], [50, 50 + r], [50 - r, 50]][i];
-  };
-  const poly = order.map(([, v], i) => pt(i, v).join(",")).join(" ");
-  const grid = [100, 66, 33]
-    .map((g) => `<polygon class="dia-grid" points="${order.map((_, i) => pt(i, g).join(",")).join(" ")}"/>`)
-    .join("");
-  const axes = `<line class="dia-axis" x1="50" y1="10" x2="50" y2="90"/><line class="dia-axis" x1="10" y1="50" x2="90" y2="50"/>`;
-  /* axis labels: artifact-safe stat names only (no public 0-100); the radar
-     shape carries magnitude and the tier band shows on card/panel/dossier */
-  const labels = `
-    <text x="50" y="6.5" text-anchor="middle">FRAME PRESENCE</text>
-    <text x="94" y="51.5" text-anchor="start">FRAME</text>
-    <text x="50" y="97" text-anchor="middle">SIGNAL</text>
-    <text x="6" y="51.5" text-anchor="end">SCENE CHARGE</text>`;
-  return `<svg class="diamond" viewBox="-42 0 184 100">${grid}${axes}<polygon class="dia-fill" points="${poly}"/>${order
-    .map(([, v], i) => `<circle class="dia-dot" cx="${pt(i, v)[0]}" cy="${pt(i, v)[1]}" r="1.6"/>`)
-    .join("")}${labels}</svg>`;
-}
-
-function mixRow(k, v) {
-  return `
-    <div class="impact">
-      <span class="impact__label">${esc(k)}</span>
-      <span class="impact__track"><span class="impact__fill" style="--v:${v}%"></span></span>
-      <span class="impact__val">${v}</span>
-    </div>`;
-}
-
 /* ---------- tab: metrics (4-plate diagnostic read — Frame Signature ·
    Signal Mix · Composition Field · Frame Event). Frame Signature is a
    silhouette-not-score; Signal Mix stays a proportion-of-a-whole; tier
@@ -423,7 +384,7 @@ function metTier(name, tier, mat) {
   return `<div class="met-tier"><div class="met-tier__top"><span class="met-tier__n">${esc(name)}</span><span class="met-tier__v" style="color:${metMatText(mat)};">${esc(tier)}</span></div><div class="met-tier__meter">${segs}</div></div>`;
 }
 function metPlate(no, title, mat, body) {
-  return `<section class="met-plate" style="border-left-color:${metRgba(mat, 0.5)};"><header class="met-plate__h"><span class="met-plate__no">${no}</span><h3 class="met-plate__t">${esc(title)}</h3></header>${body}</section>`;
+  return `<section class="met-plate" style="border-left-color:${metRgba(mat, 0.3)};"><header class="met-plate__h"><span class="met-plate__no">${no}</span><h3 class="met-plate__t">${esc(title)}</h3></header>${body}</section>`;
 }
 
 function renderMetricsTab(src, treatment) {
@@ -549,13 +510,12 @@ function mountMetricsReel() {
   const plates = Array.prototype.slice.call(track.querySelectorAll(".met-plate"));
   if (!track || !plates.length) return;
   const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  let cur = 0, busy = false, lastH = -1;
+  let cur = 0, busy = false;
   const setActive = (i) => {
     cur = i;
     /* read the window height ONCE and use it for BOTH the slot height and the
        transform step, so plate-height and travel can never drift out of sync. */
     const h = win.clientHeight;
-    lastH = h;
     track.style.setProperty("--slot-h", h + "px");
     track.style.transform = "translateY(" + (-i * h) + "px)";
     plates.forEach((p, j) => { p.classList.toggle("is-centred", j === i); if (j === i) p.scrollTop = 0; });
@@ -841,14 +801,12 @@ function renderReadingPanel(src, treatment) {
   /* BR-S112 (3c): close the developed rail's reserved lower column with an end-mark
      so the empty space reads as a composed end, not an abandoned gap. */
   const developedEnd = free ? "" : `<div class="readend"><span class="readend__rule"></span><span class="readend__mark">◆ end of scan reading ◆</span></div>`;
-  const forkContent = free ? lockedDeep : finishPlate + panelReceipts + shinyTease + shinyBadge + developedEnd;
+  const forkContent = free ? lockedDeep : panelReceipts + shinyTease + shinyBadge + developedEnd;
   const panelLead = "";
-  /* Aura Profile is dropped from the PAID panel (it's on the card front + dossier
-     Plate 05) so the developed column doesn't echo the dossier; Free keeps it. */
-  /* BR-S107 front panel: Light & Surface (C) replaces the killed Stat Reading;
-     front Aura dropped (Push #1 — front essence is the Card tag only; aura lives
-     in back Fit+Aura). Order: header · oracle(paid) · Light&Surface · Scene Role · seam. */
-  return `${header}${panelLead}${lightSurface}${sceneRole}<div class="readseam" data-open="${free ? 0 : 1}">${forkContent}</div>`;
+  /* BR-S116: Finish (paid material) sits at the TOP of the right panel with Colour Field
+     directly under it; Colour Field is KEPT on Free too (never cut). Below: Scene Role · seam. */
+  const topRail = (free ? "" : finishPlate) + lightSurface;
+  return `${header}${panelLead}${topRail}${sceneRole}<div class="readseam" data-open="${free ? 0 : 1}">${forkContent}</div>`;
 }
 
 /* ---------- scroll dossier (below the hero) ----------

@@ -527,6 +527,13 @@ const SOURCES = [
         { k: "Light", state: "Flat", v: 74 },
       ],
     },
+    /* Metrics v2 — 4-plate diagnostic (BR-S116, authored from the frame's facts;
+       safety-audited pass). Silhouette-not-score; tier words are labels. */
+    frame: {
+      signature: { class: "Crossbar — two edges, one axis", note: "Object-led and bilaterally weighted. The held catch spans the full frame width and anchors the read at both edges; everything above and below defers to it.", band: "Strong", radii: [0.48, 0.38, 0.88, 0.72, 0.42, 0.45, 0.91, 0.70, 0.52] },
+      field: { node: { x: 0.04, y: 0.12 }, weight: "Centre — the catch holds both lateral edges and the mid-frame at once", balance: "Centred", drift: "Clean", clarity: "Peak", depth: "Strong" },
+      event: { label: "Transverse hold filed", legibility: "Peak", charge: "Strong", containment: "Peak" },
+    },
     halo: { material: "Cold Tide Steel", a: "#6fb3e0", b: "#8b7bff", c: "#9fe0c8" },
     dossier: {
       record: {
@@ -653,6 +660,12 @@ const SOURCES = [
         { k: "Depth", state: "Anchored", v: 74 },
       ],
     },
+    /* Metrics v2 — authored per card (BR-S116; safety-audited pass). */
+    frame: {
+      signature: { class: "Channel — deep and front-loaded", note: "Motion-led and depth-driven. The path wedge pulls hard from behind while the foreground break fires forward; the frame holds the whole charge in a single narrow corridor.", band: "Charged", radii: [0.82, 0.48, 0.36, 0.58, 0.94, 0.62, 0.38, 0.44, 0.75] },
+      field: { node: { x: 0.04, y: -0.12 }, weight: "Upper centre — foreground mass arriving into the lens", balance: "Centred", drift: "Charged", clarity: "Strong", depth: "Peak" },
+      event: { label: "Lens-direct stride", legibility: "Peak", charge: "Peak", containment: "Strong" },
+    },
     halo: { material: "Field Green Glass", a: "#7fc8a0", b: "#6fb3e0", c: "#cfe2ee" },
     dossier: {
       record: {
@@ -778,6 +791,13 @@ const SOURCES = [
         { k: "Light", state: "Harsh", v: 66 },
         { k: "Gesture", state: "Loud", v: 90 },
       ],
+    },
+    /* Metrics v2 — authored per card (BR-S116; safety-audited pass). The subject is a
+       tanked creature (carapace/antennae) — an artifact-animal, never a person read. */
+    frame: {
+      signature: { class: "Lantern — centred mass, antenna spike", note: "The carapace locks the axial centre and holds it; the antennae release upward-left as the one asymmetric extension. The tank band grounds the base with saturated chromatic weight, making the silhouette read top-heavy and anchored at once.", band: "Charged", radii: [0.88, 0.55, 0.62, 0.68, 0.74, 0.66, 0.60, 0.92, 0.88] },
+      field: { node: { x: -0.08, y: 0.14 }, weight: "Near centre — pulled slightly down by the tank-blue band", balance: "Centred", drift: "Charged", clarity: "Strong", depth: "Clean" },
+      event: { label: "Shell lifted", legibility: "Peak", charge: "Charged", containment: "Strong" },
     },
     halo: { material: "Tank Glass Teal", a: "#36b6c8", b: "#8b7bff", c: "#e0a060" },
     dossier: {
