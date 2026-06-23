@@ -35,7 +35,7 @@
   <section class="dev" id="devView"></section>
 
   <header class="topbar">
-    <div class="brand">
+    <div class="brand" data-view-to="menu" role="button" tabindex="0" title="Back to main menu">
       <span class="brand__mark">◆</span>
       <span class="brand__name">BLUE ROOM</span>
       <span class="brand__sub" id="zoneLabel">ARCHIVE · SCAN ROOM</span>
@@ -59,6 +59,16 @@
   </main>
 
   <section class="dossier" id="dossierMount"></section>
+
+  <!-- Source lightbox — body-level so it escapes panel overflow; opened from the
+       Source tab photo, closed by the X / backdrop / Esc. Image src set on open. -->
+  <div class="lightbox" id="lightbox" aria-hidden="true">
+    <div class="lightbox__backdrop" data-lightbox-close></div>
+    <figure class="lightbox__fig">
+      <img class="lightbox__img" id="lightboxImg" alt="" />
+      <button type="button" class="lightbox__x" data-lightbox-close aria-label="Close">×</button>
+    </figure>
+  </div>
 
   <footer class="hint"><button type="button" class="hint__back" data-view-to="menu">↑&nbsp;Menu</button>1 / 2 switch source &nbsp;·&nbsp; F free · H halo mint &nbsp;·&nbsp; M lab state</footer>
 

@@ -621,3 +621,18 @@ Frame Signature (silhouette-not-score) · Signal Mix (proportion, keeps %) · Co
 shown in full on free AND paid (the old tab gated 3 modules on free). Values hand-authored per card in
 `src.frame` (Driver from the mockup; Ice Field authored). Why: the builder wanted "the whole thing." Revisit:
 if the full diagnostic over-gives on free → gate specific plates; Ice Field copy is a draft for the builder's eye.
+
+**2026-06-23 / BR-S115 — Metrics is a "register reel" (one diagnostic plate at a time) / ACTIVE**
+The 4 Metrics plates show ONE at a time: a fixed header mast + a clipping window with a transform-translated
+track (NOT native scroll — it would not paginate in the nested-flex left panel), advanced by wheel / ◤◢ arrows /
+4 index ticks / a NN·04 counter, with a source-coloured landing glint + off-centre dim + hover-deepen; reduced-
+motion = instant swap. Why: the builder wanted a casino-reel feel translated to Blue Room restraint (a filing
+carousel, not a slot machine). Revisit: if the deferred fuller-width nav/layout pass moves the tabs out of the
+left panel, the slot sizing simplifies.
+
+**2026-06-23 / BR-S115 — Source is its own tab (the whole original photo); Diagram stays annotated / ACTIVE**
+Re-added a Source tab (Source / Diagram / Metrics) showing the clean original photo, click → a centred lightbox
+(X / backdrop / Esc to close); removed the Diagram Annotated/Clean toggle (the clean original now lives in Source).
+Also: ◆ BLUE ROOM → main menu; the right-panel Finish is standalone (per-material character line) and the dossier
+Aura is parked as an empty stub. Why: the builder wanted to see the original whole/easily before minting, and the
+Diagram to stay the annotated scan sheet. Revisit: Aura content is a later pass.

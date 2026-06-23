@@ -86,9 +86,9 @@ const state = { source: 0, treatment: "free", tab: "diagram", view: "menu", draf
   const s = parseInt(q.get("src"), 10);
   if (s >= 1 && s <= SOURCES.length) state.source = s - 1;
   if (["free", "shiny", "mint"].includes(q.get("t"))) state.treatment = q.get("t");
-  /* Source merged into Diagram (BR-S044): legacy ?tab=source re-points to diagram. */
+  /* Source is its own tab again (BR-S115): the original photo, viewable whole. */
   const tabParam = q.get("tab");
-  if (["source", "diagram", "metrics"].includes(tabParam)) state.tab = tabParam === "source" ? "diagram" : tabParam;
+  if (["source", "diagram", "metrics"].includes(tabParam)) state.tab = tabParam;
   if (["clean", "annotated"].includes(q.get("dv"))) state.diagramView = q.get("dv");
   /* Lab material study (CARD_TECH_LAB §20) — reproducible-capture deep link.
      Applies ONLY in the Lab state (t=mint); ignored otherwise. Does not, on its
@@ -168,10 +168,10 @@ function imgOrPlaceholder(src, cls, extra = "") {
 /* ---------- left panel: tabbed analysis (Source / Diagram / Metrics) ---------- */
 
 function renderLeftPanel(src, treatment, tab) {
-  const t2 = tab === "source" ? "diagram" : tab; // Source merged into Diagram (BR-S044)
+  const t2 = ["source", "diagram", "metrics"].includes(tab) ? tab : "diagram";
   const tabbar = `
     <div class="tabbar" role="tablist" aria-label="Analysis tabs">
-      ${["diagram", "metrics"]
+      ${["source", "diagram", "metrics"]
         .map(
           (t) =>
             `<button type="button" class="tabbar__btn ${t === t2 ? "is-active" : ""}" data-tab="${t}">${
@@ -180,7 +180,9 @@ function renderLeftPanel(src, treatment, tab) {
         )
         .join("")}
     </div>`;
-  const body = t2 === "metrics" ? renderMetricsTab(src, treatment) : renderDiagramTab(src, treatment);
+  const body = t2 === "metrics" ? renderMetricsTab(src, treatment)
+    : t2 === "source" ? renderSourceTab(src, treatment)
+    : renderDiagramTab(src, treatment);
   /* pin the Diagram|Metrics nav, scroll only the evidence body (CSS scoped to
      .panel--source) so Diagram stays reachable on short viewports — BR-S071 */
   return `<div class="panel__nav">${tabbar}</div><div class="panel__scroll">${body}</div>`;
@@ -196,7 +198,7 @@ function renderDiagramTab(src, treatment) {
   const full = treatment !== "free";
   const d = src.diagram;
   const focal = src.markers[0];
-  const clean = state.diagramView === "clean"; // CLEAN = raw + markers; ANNOTATED = overlays (BR-S044)
+  const clean = false; // BR-S115: Diagram is always annotated; the clean/original view moved to the Source tab
   const markers = src.markers
     .map((m, i) => `<span class="marker" style="left:${m.x}%; top:${m.y}%;"><span class="marker__ring"></span><span class="marker__no">${i + 1}</span></span>`)
     .join("");
@@ -305,10 +307,6 @@ function renderDiagramTab(src, treatment) {
   return `
     <div class="module">
       ${moduleHead(`${src.label} — Diagram`)}
-      <div class="diagtoggle" role="group" aria-label="Frame view">
-        <button type="button" class="tabbar__btn ${!clean ? "is-active" : ""}" data-diagview="annotated">Annotated</button>
-        <button type="button" class="tabbar__btn ${clean ? "is-active" : ""}" data-diagview="clean">Clean</button>
-      </div>
       <div class="diagwrap ${clean ? "is-clean" : ""}">
         <div class="scanframe scanframe--diagram" data-imgwrap>
           ${imgOrPlaceholder(src.file, "scanframe__img")}
@@ -340,6 +338,19 @@ function renderDiagramTab(src, treatment) {
           ${d.notes.map((n) => { const p = diagSplit(n); return `<div class="dnotes__row"><span class="dnotes__dia">◇</span><span class="dnotes__term">${esc(p.term)}</span><span class="dnotes__lead"></span><span class="dnotes__qual">${esc(p.qual)}</span></div>`; }).join("")}
         </div>
       </div>
+    </div>`;
+}
+
+/* ---------- tab: source (the original photo, whole — clean, no overlays;
+   click to open it full in a centred lightbox. BR-S115) ---------- */
+function renderSourceTab(src) {
+  return `
+    <div class="module srcview">
+      ${moduleHead(`${src.label} — Source`)}
+      <button type="button" class="srcphoto" data-imgwrap data-lightbox-open data-lightbox-src="${esc(src.file)}" aria-label="View the original photo full size">
+        ${imgOrPlaceholder(src.file, "srcphoto__img")}
+        <span class="srcphoto__hint" aria-hidden="true">⤢ view full</span>
+      </button>
     </div>`;
 }
 
@@ -500,14 +511,90 @@ function renderMetricsTab(src, treatment) {
     <p class="met-event__filed">Filed as <b>${esc(c.archetype)}</b> — ${esc(src.sceneRole)}</p>
     <div class="met-bands">${metTier("Legibility", fr.event.legibility, mat)}${metTier("Charge", fr.event.charge, mat)}${metTier("Containment", fr.event.containment, mat)}</div>`);
 
+  /* Register reel: the header is a fixed mast; the rail below shows ONE plate at a
+     time (scroll-snap), advanced by wheel/buttons/ticks; mountMetricsReel() wires it. */
+  const ticks = [0, 1, 2, 3].map((i) => `<button type="button" class="met-reel__tick" data-reel="${i}" aria-label="Instrument ${i + 1}"></button>`).join("");
   return `
-    <header class="met-hd">
-      <h1 class="met-hd__title">Diagnostic Receipts</h1>
-      <div class="met-hd__id"><span class="met-chip" style="color:${mt};">${esc(c.archetype)}</span><span class="met-hd__ln"></span><span class="met-hd__read">Reading ${esc(c.title)}</span></div>
-      <p class="met-hd__lede">Four interpretive instruments for <b>${esc(c.title)}</b> — the read of how the frame is built. Records of the photograph, never measurements of the person who stood in it.</p>
-    </header>
-    <div class="met-plates">${sig}${mixPlate}${field}${event}</div>
-    <p class="met-foot">◆ BLUE ROOM · ARCHIVE · SCAN ROOM — ${esc(src.halo.material)}</p>`;
+    <div class="met-reel" style="--mat:${esc(mat)};">
+      <div class="met-reel__head">
+        <header class="met-hd">
+          <h1 class="met-hd__title">Diagnostic Receipts</h1>
+          <div class="met-hd__id"><span class="met-chip" style="color:${mt};">${esc(c.archetype)}</span><span class="met-hd__ln"></span><span class="met-hd__read">Reading ${esc(c.title)}</span></div>
+          <p class="met-hd__lede">Four interpretive instruments for <b>${esc(c.title)}</b> — the read of how the frame is built. Records of the photograph, never measurements of the person who stood in it.</p>
+        </header>
+        <div class="met-reel__ctrl">
+          <button type="button" class="met-reel__arrow" data-reel="prev" aria-label="Previous instrument">&#9650;</button>
+          <span class="met-reel__count">01 / 04</span>
+          <div class="met-reel__ticks">${ticks}</div>
+          <button type="button" class="met-reel__arrow" data-reel="next" aria-label="Next instrument">&#9660;</button>
+        </div>
+      </div>
+      <div class="met-reel__window">
+        <div class="met-plates">${sig}${mixPlate}${field}${event}</div>
+      </div>
+    </div>`;
+}
+
+/* ---------- Metrics register reel controller (BR-S115) ----------
+   Native scroll-snap rail = one plate at a time; an IntersectionObserver is the
+   single source of "centred" truth (drives ticks, counter, the landing glint);
+   wheel (one gesture = one step) + arrows + ticks all reconcile through go().
+   Compositor-only; reduced-motion = instant centred swap. Re-mounts each render. */
+let _reel = null;
+function mountMetricsReel() {
+  if (_reel) { _reel.win.removeEventListener("wheel", _reel.onWheel); window.removeEventListener("resize", _reel.onResize); _reel = null; }
+  const win = document.querySelector(".met-reel__window");
+  if (!win) return;
+  const track = win.querySelector(".met-plates");
+  const plates = Array.prototype.slice.call(track.querySelectorAll(".met-plate"));
+  if (!track || !plates.length) return;
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  let cur = 0, busy = false, lastH = -1;
+  const setActive = (i) => {
+    cur = i;
+    /* read the window height ONCE and use it for BOTH the slot height and the
+       transform step, so plate-height and travel can never drift out of sync. */
+    const h = win.clientHeight;
+    lastH = h;
+    track.style.setProperty("--slot-h", h + "px");
+    track.style.transform = "translateY(" + (-i * h) + "px)";
+    plates.forEach((p, j) => { p.classList.toggle("is-centred", j === i); if (j === i) p.scrollTop = 0; });
+    const count = document.querySelector(".met-reel__count");
+    if (count) count.textContent = pad2(i + 1) + " / " + pad2(plates.length);
+    document.querySelectorAll(".met-reel__tick").forEach((t, j) => t.classList.toggle("is-on", j === i));
+    document.querySelectorAll('[data-reel="prev"]').forEach((b) => (b.disabled = i === 0));
+    document.querySelectorAll('[data-reel="next"]').forEach((b) => (b.disabled = i === plates.length - 1));
+  };
+  const go = (i) => {
+    i = Math.max(0, Math.min(plates.length - 1, i));
+    if (busy || i === cur) return;
+    busy = true;
+    setActive(i);
+    window.clearTimeout(go._t);
+    go._t = window.setTimeout(() => (busy = false), reduce ? 0 : 460);
+  };
+  /* wheel: scroll WITHIN a tall centred plate first, advance one step at its edge */
+  const onWheel = (e) => {
+    const dir = Math.sign(e.deltaY);
+    if (!dir) return;
+    const p = plates[cur];
+    if (dir > 0 && p.scrollHeight - p.clientHeight - p.scrollTop > 2) return; // room below — let it scroll within
+    if (dir < 0 && p.scrollTop > 2) return; // room above
+    if ((dir < 0 && cur === 0) || (dir > 0 && cur === plates.length - 1)) return; // at an end — let the page have it
+    e.preventDefault();
+    go(cur + dir);
+  };
+  win.addEventListener("wheel", onWheel, { passive: false });
+  /* Re-sync slot height + transform on real viewport resizes only — a window
+     'resize' listener, NOT a ResizeObserver on the window (that loops here,
+     re-running setActive and perpetually restarting the dim transition). */
+  const onResize = () => setActive(cur);
+  window.addEventListener("resize", onResize);
+  _reel = { win, onWheel, onResize, prev: () => go(cur - 1), next: () => go(cur + 1), to: (i) => go(i) };
+  setActive(0);
+  /* re-sync once layout + fonts settle (the head height can shift the window) */
+  if (window.requestAnimationFrame) requestAnimationFrame(() => setActive(cur));
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { if (_reel) setActive(cur); });
 }
 
 /* ---------- center: the card (one master base) ---------- */
@@ -731,7 +818,17 @@ function renderReadingPanel(src, treatment) {
      showing blue). A per-material base hex + a full-width glass-sheen bar = real weight,
      no dead gap, right colour. */
   const FINISH_HEX = { "Warm Glass Copper": "#b07a4a", "Cold Prism Frost": "#9ed3dd", "Cold Tide Steel": "#7d8b92", "Field Green Glass": "#6f8f5c", "Tank Glass Teal": "#2f9fa8" };
+  /* BR-S115: Finish is its own standalone module (no longer echoing the dossier Aura,
+     which is now an empty stub). A per-material character line gives it weight. */
+  const FINISH_NOTE = {
+    "Warm Glass Copper": "Cabin warmth held as a single static sheen — copper over grey glass.",
+    "Cold Prism Frost": "Diffuse overcast caught in a pale icy plate — a cold prism, no specular spike.",
+    "Cold Tide Steel": "A cool tide-steel plate — muted blue-grey, brushed flat.",
+    "Field Green Glass": "A field-green glass — moss tone sealed under a matte sheen.",
+    "Tank Glass Teal": "A tank-glass teal — fluorescent cyan held under glass.",
+  };
   const fhex = FINISH_HEX[src.halo.material] || src.halo.a || "#888888";
+  const fnote = FINISH_NOTE[src.halo.material] || "";
   const finishPlate = free ? "" : `
     <div class="module module--finish">
       ${moduleHead("Finish")}
@@ -739,6 +836,7 @@ function renderReadingPanel(src, treatment) {
         <span class="finish__chip" aria-hidden="true"></span>
         <span class="finish__name">${esc(src.halo.material)}</span>
       </div>
+      ${fnote ? `<p class="finish__note">${esc(fnote)}</p>` : ""}
     </div>`;
   /* BR-S112 (3c): close the developed rail's reserved lower column with an end-mark
      so the empty space reads as a composed end, not an abandoned gap. */
@@ -821,22 +919,11 @@ function renderDossier(src, treatment) {
   const archetype = dplate("02", "Archetype", paid, `
     <p class="dstat__undeveloped">Archetype read — reserved. Develops in a later pass.</p>`);
 
-  /* 03 — Aura (refocused from the old "Fit + Aura Layer" CLASS plate to the artifact's
-     developed AURA: the material/spectral cast + its aura tags. Latent '····' on free
-     (develops with the mint), struck on paid. Artifact-not-person — the aura tags are
-     image-acts / scene cast, never a person read. Reuses the struck .dfaplate language.
-     HELD draft. */
-  const auraChips = (src.aura || []).map((t) => `<span>${esc(t)}</span>`).join("");
-  const aura = dplate("03", "Aura", paid, paid
-    ? `<div class="dfaplate">
-      <p class="dfaplate__type">${esc(src.halo.material)}</p>
-      <div class="dfaplate__aura">${auraChips}</div>
-      <div class="dfaplate__home">◆ Aura layer · Blue Room Archive</div>
-    </div>`
-    : `<div class="dfaplate">
-      <p class="dfaplate__type dfaplate__type--latent">····</p>
-      <p class="dstat__undeveloped">The aura develops with the mint.</p>
-    </div>`);
+  /* 03 — Aura (BR-S115: emptied to a reserved stub — the standalone right-panel
+     "Finish" module now carries the material/finish read; Aura is parked for a later
+     pass. Mirrors the Archetype stub.) */
+  const aura = dplate("03", "Aura", paid, `
+    <p class="dstat__undeveloped">Aura read — reserved. Develops in a later pass.</p>`);
 
   /* 06 — Mint Record */
   const mintBody = paid
@@ -1977,6 +2064,7 @@ function render() {
   applyView();
 
   document.getElementById("sourcePanel").innerHTML = renderLeftPanel(src, state.treatment, state.tab);
+  mountMetricsReel();
   /* one quiet orientation line above the artifact — what the room does,
      stated once, plus a sample-scan cue so the demo photos read as
      fixtures, not someone's profile. */
@@ -2069,6 +2157,7 @@ function applyTreatment(next) {
 
   /* re-render the content panels (NEVER #stageZone — the card must persist) */
   document.getElementById("sourcePanel").innerHTML = renderLeftPanel(src, next, state.tab);
+  mountMetricsReel();
   const reading = document.getElementById("readingPanel");
   reading.innerHTML = renderReadingPanel(src, next);
   reading.setAttribute("data-mode", next === "free" ? "archive" : "developed");
@@ -2155,13 +2244,36 @@ document.getElementById("sourcePanel").addEventListener("click", (e) => {
   render();
 });
 
-/* CLEAN | ANNOTATED toggle inside the merged Diagram tab (BR-S044) — raw photo +
-   markers vs the overlay read; re-renders the panel (state-backed, survives re-render). */
+/* Metrics register reel controls (BR-S115): prev/next arrows + index ticks. The
+   wheel + IntersectionObserver are wired per-render in mountMetricsReel; these
+   clicks delegate off the stable #sourcePanel so they survive re-renders. */
 document.getElementById("sourcePanel").addEventListener("click", (e) => {
-  const btn = e.target.closest("button[data-diagview]");
-  if (!btn) return;
-  state.diagramView = btn.dataset.diagview;
-  render();
+  const btn = e.target.closest("[data-reel]");
+  if (!btn || !_reel) return;
+  const k = btn.dataset.reel;
+  if (k === "prev") _reel.prev();
+  else if (k === "next") _reel.next();
+  else _reel.to(Number(k));
+});
+
+/* Source lightbox (BR-S115): open from the Source-tab photo; close on the X, the
+   backdrop / around the photo, or Esc. The overlay lives at body level (index.html). */
+document.addEventListener("click", (e) => {
+  const open = e.target.closest("[data-lightbox-open]");
+  if (open) {
+    const lb = document.getElementById("lightbox"), img = document.getElementById("lightboxImg");
+    if (lb && img) { img.src = open.dataset.lightboxSrc || ""; lb.classList.add("is-open"); lb.setAttribute("aria-hidden", "false"); }
+    return;
+  }
+  if (e.target.closest("[data-lightbox-close]")) {
+    const lb = document.getElementById("lightbox");
+    if (lb) { lb.classList.remove("is-open"); lb.setAttribute("aria-hidden", "true"); }
+  }
+});
+document.addEventListener("keydown", (e) => {
+  if (e.key !== "Escape") return;
+  const lb = document.getElementById("lightbox");
+  if (lb && lb.classList.contains("is-open")) { lb.classList.remove("is-open"); lb.setAttribute("aria-hidden", "true"); }
 });
 
 document.getElementById("sourceToggle").addEventListener("click", (e) => {
