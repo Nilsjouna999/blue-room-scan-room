@@ -91,6 +91,7 @@ const SOURCES = [
   // ---- SCAN SOURCE 01 — car selfie, open palm, fjord out the window
   {
     id: "driver-salute",
+    surfaceVariant: "column", // BR-S117 — Surface Record form (column vs tray, to compare)
     no: 1,
     label: "Scan Source 01",
     short: "Driver",
@@ -285,6 +286,7 @@ const SOURCES = [
   // ---- SCAN SOURCE 02 — crouched at the auger, frozen lake, hard sun
   {
     id: "ice-auger",
+    surfaceVariant: "tray", // BR-S117 — Surface Record form (column vs tray, to compare)
     no: 2,
     label: "Scan Source 02",
     short: "Ice Field",
@@ -472,6 +474,7 @@ const SOURCES = [
   // ---- SCAN SOURCE 03 — shoreline catch held transverse, fjord + ridge (BR-S103, agent-authored, safety-gated)
   {
     id: "shore-catch",
+    surfaceVariant: "column", // BR-S117 — Surface Record form
     no: 3,
     label: "Scan Source 03",
     short: "Shore",
@@ -605,6 +608,7 @@ const SOURCES = [
   // ---- SCAN SOURCE 04 — low-angle path, canine mid-stride foreground break (BR-S103, agent-authored, safety-gated)
   {
     id: "loose-run",
+    surfaceVariant: "tray", // BR-S117 — Surface Record form
     no: 4,
     label: "Scan Source 04",
     short: "Run",
@@ -737,6 +741,7 @@ const SOURCES = [
   // ---- SCAN SOURCE 05 — held specimen over tank, fluorescent interior, mural depth (BR-S103, agent-authored, safety-gated)
   {
     id: "tank-pick",
+    surfaceVariant: "column", // BR-S117 — Surface Record form
     no: 5,
     label: "Scan Source 05",
     short: "Tank",

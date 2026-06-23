@@ -667,12 +667,6 @@ function renderReadingPanel(src, treatment) {
      one stacked proportion bar (each surface's share of the frame) + a legend.
      Reads only pixels: a colour proportion, not a person-read and not a stat score. */
   const cf = (typeof S108_EXTRAS !== "undefined" && (S108_EXTRAS[src.id] || {}).colourField) || [];
-  const lightSurface = `
-    <div class="module module--cfield">
-      ${moduleHead("Colour Field")}
-      <div class="cfbar">${cf.map((c) => `<span class="cfbar__seg" style="--sw:${esc(c.hex)}; --pct:${c.pct}%"></span>`).join("")}</div>
-      <p class="cfcaption">full palette develops below</p>
-    </div>`;
 
 
   const sceneRole = `
@@ -789,23 +783,30 @@ function renderReadingPanel(src, treatment) {
   };
   const fhex = FINISH_HEX[src.halo.material] || src.halo.a || "#888888";
   const fnote = FINISH_NOTE[src.halo.material] || "";
-  const finishPlate = free ? "" : `
-    <div class="module module--finish">
-      ${moduleHead("Finish")}
-      <div class="finish" style="--fhex:${esc(fhex)};">
-        <span class="finish__chip" aria-hidden="true"></span>
-        <span class="finish__name">${esc(src.halo.material)}</span>
+  /* BR-S117: Finish + Colour Field combined into ONE compact "Surface" module — the
+     proportion bar is the hero, the material chip caps it, the material name + character
+     note form a single foot line. Free = bar + teaser (no material); paid = chip + bar + foot. */
+  const cfBar = cf.length
+    ? `<div class="surface__bar">${cf.map((c) => `<span class="cfbar__seg" style="--sw:${esc(c.hex)}; --pct:${c.pct}%"></span>`).join("")}</div>`
+    : "";
+  const surfacePlate = `
+    <div class="module module--surface">
+      ${moduleHead("Surface")}
+      <div class="surface__bar-row">
+        ${free ? "" : `<span class="surface__chip" style="--fhex:${esc(fhex)}" aria-hidden="true"></span>`}
+        ${cfBar}
       </div>
-      ${fnote ? `<p class="finish__note">${esc(fnote)}</p>` : ""}
+      ${free
+        ? `<p class="surface__teaser">full palette develops below</p>`
+        : `<p class="surface__foot"><span class="surface__matname">${esc(src.halo.material)}</span>${fnote ? `<span class="surface__note">${esc(fnote)}</span>` : ""}</p>`}
     </div>`;
   /* BR-S112 (3c): close the developed rail's reserved lower column with an end-mark
      so the empty space reads as a composed end, not an abandoned gap. */
   const developedEnd = free ? "" : `<div class="readend"><span class="readend__rule"></span><span class="readend__mark">◆ end of scan reading ◆</span></div>`;
   const forkContent = free ? lockedDeep : panelReceipts + shinyTease + shinyBadge + developedEnd;
   const panelLead = "";
-  /* BR-S116: Finish (paid material) sits at the TOP of the right panel with Colour Field
-     directly under it; Colour Field is KEPT on Free too (never cut). Below: Scene Role · seam. */
-  const topRail = (free ? "" : finishPlate) + lightSurface;
+  /* BR-S117: the combined Surface module tops the right panel (Finish + Colour Field fused). */
+  const topRail = surfacePlate;
   return `${header}${panelLead}${topRail}${sceneRole}<div class="readseam" data-open="${free ? 0 : 1}">${forkContent}</div>`;
 }
 
@@ -828,6 +829,150 @@ function dplate(no, title, paid, body, extraClass = "") {
         ${body}
       </div>
     </section>`;
+}
+
+/* ---------- Surface Record (BR-S117): the image's palette as live pigment suspended
+   in developer fluid. Ported from SurfaceRecord.jsx to the vanilla stack + canvas.
+   Two forms — variant "column" (tall glass vessel) and "tray" (wide bath) — assigned
+   per card in data.js (src.surfaceVariant) so the two can be compared. The canvas
+   animation runs in mountSurfaceRecords() after each dossier render; reduced-motion
+   freezes it after one frame. ---------- */
+function srHexA(hex, a) { const h = hex.replace("#", ""); return `rgba(${parseInt(h.slice(0,2),16)},${parseInt(h.slice(2,4),16)},${parseInt(h.slice(4,6),16)},${a})`; }
+function srSat(hex) { const h = hex.replace("#", ""); const r = parseInt(h.slice(0,2),16), g = parseInt(h.slice(2,4),16), b = parseInt(h.slice(4,6),16); const mx = Math.max(r,g,b), mn = Math.min(r,g,b); return mx === 0 ? 0 : (mx - mn) / mx; }
+function srMakeBlobs(pal, horizontal, W, H) {
+  const blobs = [];
+  pal.forEach((p) => {
+    const share = p.share != null ? p.share : 25;
+    const n = Math.max(2, Math.round(share / (horizontal ? 5 : 6)));
+    const alpha = 0.42 + srSat(p.hex) * 0.55;
+    for (let k = 0; k < n; k++) {
+      blobs.push({ x: Math.random()*W, y: Math.random()*H,
+        r: (horizontal ? 42 : 34) + share * (horizontal ? 1.2 : 1.1) * (0.6 + Math.random()*0.7),
+        col: p.hex, a: alpha, ph1: Math.random()*6.28, ph2: Math.random()*6.28, phP: Math.random()*6.28,
+        sp1: 0.16 + Math.random()*0.26, sp2: 0.12 + Math.random()*0.22 });
+    }
+  });
+  return blobs;
+}
+function surfaceSwatches(src) {
+  const cf = (typeof S108_EXTRAS !== "undefined" && (S108_EXTRAS[src.id] || {}).colourField) || [];
+  return cf.map((c) => ({ hex: c.hex, label: c.label, proof: c.proof, pct: c.pct + "%", share: c.pct }));
+}
+function renderSurfaceRecord(src) {
+  const horizontal = src.surfaceVariant === "tray";
+  const sw = surfaceSwatches(src);
+  const mat = src.halo.a;
+  const blobData = esc(JSON.stringify(sw.map((s) => ({ hex: s.hex, share: s.share }))));
+  const bead = (hex) => `flex:none; width:${horizontal ? 14 : 16}px; height:${horizontal ? 14 : 16}px; border-radius:50%; background:${hex}; box-shadow:inset 0 1.5px 1.5px rgba(255,255,255,0.45), inset 0 -2px 3px rgba(0,0,0,0.35), 0 0 8px ${srHexA(hex, 0.5)};`;
+  const row = (s) => `
+    <div${horizontal ? "" : ` style="padding:11px 0; border-bottom:1px solid var(--line-faint);"`}>
+      <div style="display:flex; align-items:center; gap:${horizontal ? 10 : 11}px;">
+        <span style="${bead(s.hex)}"></span>
+        <span style="font-size:${horizontal ? 12.5 : 13}px; letter-spacing:0.01em; color:var(--t-body);">${esc(s.label)}</span>
+        <span style="flex:1; border-bottom:1px dotted rgba(233,229,220,0.17); transform:translateY(-2px); min-width:8px;"></span>
+        <span style="font-family:var(--font-mono); font-size:${horizontal ? 11 : 11.5}px; color:var(--silver-bright); font-variant-numeric:tabular-nums;">${esc(s.pct)}</span>
+      </div>
+      <p style="margin:4px 0 0 ${horizontal ? 24 : 27}px; font-family:var(--font-display); font-style:italic; font-size:${horizontal ? 12.5 : 13.5}px; line-height:1.4; color:var(--t-meta); text-wrap:pretty;">${esc(s.proof)}</p>
+    </div>`;
+  const intro = horizontal
+    ? "Still in the bath — the palette running as slow current, charged but not yet fixed."
+    : "Held in suspension — the frame's surfaces, each pigment named for the thing that earned it, never fully settling.";
+  const footer = `<p style="margin:18px 0 0; font-family:var(--font-mono); font-size:9px; letter-spacing:0.12em; text-transform:uppercase; color:var(--t-ghost);">Derived from sampled surface · not measured</p>`;
+  if (horizontal) {
+    const bath = `
+      <div style="position:relative; height:176px; border:1px solid rgba(233,229,220,0.15); border-radius:4px; overflow:hidden; background:#08090b; box-shadow:inset 0 1px 0 rgba(233,229,220,0.08), inset 0 0 28px rgba(0,0,0,0.45);">
+        <canvas data-surface-canvas data-variant="tray" data-material="${esc(mat)}" data-swatches="${blobData}" style="position:absolute; inset:0; width:100%; height:100%; display:block; filter:blur(5px) saturate(1.16) contrast(1.07);"></canvas>
+        <div style="position:absolute; inset:0; pointer-events:none; background:linear-gradient(90deg, rgba(8,9,11,0.6) 0%, rgba(8,9,11,0) 12%, rgba(8,9,11,0) 88%, rgba(8,9,11,0.6) 100%);"></div>
+        <div style="position:absolute; inset:0; pointer-events:none; background:linear-gradient(180deg, rgba(8,9,11,0.42) 0%, rgba(8,9,11,0) 22%, rgba(8,9,11,0) 80%, rgba(8,9,11,0.34) 100%);"></div>
+        <div style="position:absolute; top:0; left:0; right:0; height:30px; pointer-events:none; background:linear-gradient(180deg, rgba(233,229,220,0.09), rgba(233,229,220,0) 100%);"></div>
+        <span style="position:absolute; left:12px; bottom:9px; font-family:var(--font-mono); font-size:8px; letter-spacing:0.2em; text-transform:uppercase; color:var(--t-ghost);">In bath · unfixed</span>
+      </div>`;
+    return `<div style="font-family:var(--font-ui);">
+      <p style="margin:0 0 18px; font-size:12.5px; line-height:1.58; color:var(--t-meta); font-style:italic; max-width:50ch;">${intro}</p>
+      ${bath}
+      <div style="margin-top:20px; display:grid; grid-template-columns:1fr 1fr; gap:15px 30px;">${sw.map(row).join("")}</div>
+      ${footer}
+    </div>`;
+  }
+  const vessel = `
+    <div style="flex:none; width:138px; position:relative; height:320px; border:1px solid rgba(233,229,220,0.16); border-top:1px solid rgba(233,229,220,0.07); border-radius:3px 3px 11px 11px; overflow:hidden; background:#08090b; box-shadow:inset 0 1px 0 rgba(233,229,220,0.10), inset 0 0 24px rgba(0,0,0,0.5);">
+      <canvas data-surface-canvas data-variant="column" data-material="${esc(mat)}" data-swatches="${blobData}" style="position:absolute; inset:0; width:100%; height:100%; display:block; filter:blur(4px) saturate(1.16) contrast(1.07);"></canvas>
+      <div style="position:absolute; inset:0; pointer-events:none; background:linear-gradient(180deg, rgba(8,9,11,0.78) 0%, rgba(8,9,11,0) 15%, rgba(8,9,11,0) 86%, rgba(8,9,11,0.5) 100%);"></div>
+      <div style="position:absolute; top:7%; left:11px; width:13px; bottom:16%; border-radius:50%; pointer-events:none; background:linear-gradient(180deg, rgba(233,229,220,0.26), rgba(233,229,220,0.04) 55%, rgba(233,229,220,0) 100%); filter:blur(2.5px);"></div>
+      <div style="position:absolute; top:12%; right:13px; width:6px; bottom:24%; border-radius:50%; pointer-events:none; background:linear-gradient(180deg, rgba(233,229,220,0.10), rgba(233,229,220,0) 60%); filter:blur(2px);"></div>
+      <div style="position:absolute; top:0; left:0; right:0; height:34px; pointer-events:none; background:linear-gradient(180deg, rgba(233,229,220,0.10), rgba(233,229,220,0) 100%);"></div>
+      <div style="position:absolute; top:11px; left:9px; right:9px; height:9px; border-radius:50%; background:rgba(233,229,220,0.18); filter:blur(1.2px); pointer-events:none;"></div>
+      <div style="position:absolute; top:33.33%; right:0; width:9px; height:1px; background:rgba(233,229,220,0.24); pointer-events:none;"></div>
+      <div style="position:absolute; top:66.66%; right:0; width:9px; height:1px; background:rgba(233,229,220,0.24); pointer-events:none;"></div>
+    </div>`;
+  return `<div style="font-family:var(--font-ui);">
+    <p style="margin:0 0 22px; font-size:12.5px; line-height:1.58; color:var(--t-meta); font-style:italic; max-width:46ch;">${intro}</p>
+    <div style="display:flex; gap:28px; align-items:stretch;">
+      ${vessel}
+      <div style="flex:1; min-width:0; display:flex; flex-direction:column; justify-content:center;">
+        <div style="display:flex; align-items:baseline; justify-content:space-between; padding-bottom:9px; margin-bottom:3px; border-bottom:1px solid var(--line);">
+          <span style="font-family:var(--font-mono); font-size:9px; letter-spacing:0.2em; text-transform:uppercase; color:var(--t-ghost);">Surface</span>
+          <span style="font-family:var(--font-mono); font-size:9px; letter-spacing:0.2em; text-transform:uppercase; color:var(--t-ghost);">Vol</span>
+        </div>
+        ${sw.map(row).join("")}
+      </div>
+    </div>
+    ${footer}
+  </div>`;
+}
+let _surfaceRafs = [];
+let _surfaceResizeBound = false;
+function mountSurfaceRecords() {
+  _surfaceRafs.forEach((id) => cancelAnimationFrame(id));
+  _surfaceRafs = [];
+  const reduce = window.matchMedia("(prefers-reduced-motion:reduce)").matches;
+  document.querySelectorAll("[data-surface-canvas]").forEach((cv) => {
+    let pal; try { pal = JSON.parse(cv.dataset.swatches || "[]"); } catch (e) { pal = []; }
+    if (!pal.length) return;
+    const horizontal = cv.dataset.variant === "tray";
+    const SLOW = 0.55;
+    let W = 0, H = 0, ctx = null, blobs = [], baseGrad = null, t = 0;
+    const setup = () => {
+      const dpr = Math.min(1.5, window.devicePixelRatio || 1);
+      W = cv.clientWidth || (horizontal ? 520 : 138);
+      H = cv.clientHeight || (horizontal ? 176 : 320);
+      cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+      ctx = cv.getContext("2d"); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      blobs = srMakeBlobs(pal, horizontal, W, H);
+      const byShare = pal.slice().sort((a, c) => (c.share || 0) - (a.share || 0));
+      const c0 = byShare[0] || { hex: cv.dataset.material }, c1 = byShare[1] || c0;
+      baseGrad = ctx.createLinearGradient(0, 0, horizontal ? W : 0, horizontal ? 0 : H);
+      baseGrad.addColorStop(0, srHexA(c1.hex, 0.22));
+      baseGrad.addColorStop(1, srHexA(c0.hex, 0.22));
+    };
+    setup();
+    const slot = _surfaceRafs.length; _surfaceRafs.push(0);
+    const draw = () => {
+      t += 0.007;
+      ctx.clearRect(0, 0, W, H);
+      ctx.globalCompositeOperation = "source-over";
+      ctx.fillStyle = baseGrad; ctx.fillRect(0, 0, W, H);
+      ctx.globalCompositeOperation = "screen";
+      for (const b of blobs) {
+        if (horizontal) { b.x += (0.30 + Math.sin(t*b.sp2+b.ph2)*0.16) * SLOW; b.y += (Math.sin(t*b.sp1+b.ph1)*0.30) * SLOW; }
+        else { b.x += (Math.sin(t*b.sp1+b.ph1)*0.26) * SLOW; b.y += (-0.10 + Math.cos(t*b.sp2+b.ph2)*0.22) * SLOW; }
+        if (b.x < -b.r) b.x = W + b.r; if (b.x > W + b.r) b.x = -b.r;
+        if (b.y < -b.r) b.y = H + b.r; if (b.y > H + b.r) b.y = -b.r;
+        const ph = 0.5 + 0.5*Math.sin(t*1.7+b.phP);
+        const a = b.a * (0.80 + 0.32*ph), r = b.r * (0.93 + 0.11*ph);
+        const g = ctx.createRadialGradient(b.x, b.y, 0, b.x, b.y, r);
+        g.addColorStop(0, srHexA(b.col, a)); g.addColorStop(0.55, srHexA(b.col, a*0.34)); g.addColorStop(1, srHexA(b.col, 0));
+        ctx.fillStyle = g; ctx.beginPath(); ctx.arc(b.x, b.y, r, 0, 6.2832); ctx.fill();
+      }
+      ctx.globalCompositeOperation = "source-over";
+      if (!reduce) _surfaceRafs[slot] = requestAnimationFrame(draw);
+    };
+    draw();
+  });
+  if (!_surfaceResizeBound) {
+    _surfaceResizeBound = true;
+    let rt; window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(mountSurfaceRecords, 200); });
+  }
 }
 
 function renderDossier(src, treatment) {
@@ -864,7 +1009,7 @@ function renderDossier(src, treatment) {
      Surface Record owns the annotated palette (named surface + what it is). */
   const cfRow = (c, withProof) => `<div class="cfdeep__row"><span class="cfdeep__bar" style="--sw:${esc(c.hex)}"></span><div class="cfdeep__body"><div class="cfdeep__head"><span class="cfdeep__label">${esc(c.label)}</span>${withProof ? `<span class="cfdeep__pct">${c.pct}%</span>` : ""}</div>${withProof ? `<span class="cfdeep__proof">${esc(c.proof)}</span>` : ""}</div></div>`;
   const board = dplate("01", "Surface Record", paid, paid
-    ? `<div class="cfdeep">${cf.map((c) => cfRow(c, true)).join("")}</div>`
+    ? renderSurfaceRecord(src)
     : `<div class="cfdeep">${cf.slice(0, 3).map((c) => cfRow(c, false)).join("")}<p class="dstat__undeveloped">Surface proofs develop with the mint.</p></div>`);
 
   /* 03 — BR-S107: Stat Dossier KILLED (geometry-as-prose, a second time). Its
@@ -2038,6 +2183,7 @@ function render() {
   document.getElementById("readingPanel").innerHTML = renderReadingPanel(src, state.treatment);
   document.getElementById("readingPanel").setAttribute("data-mode", state.treatment === "free" ? "archive" : "developed");
   document.getElementById("dossierMount").innerHTML = renderDossier(src, state.treatment);
+  mountSurfaceRecords();
 
   /* page-level halo material accents (used by body-scoped shiny rules) */
   document.body.style.setProperty("--halo-a", src.halo.a);
@@ -2120,6 +2266,7 @@ function applyTreatment(next) {
   reading.innerHTML = renderReadingPanel(src, next);
   reading.setAttribute("data-mode", next === "free" ? "archive" : "developed");
   document.getElementById("dossierMount").innerHTML = renderDossier(src, next);
+  mountSurfaceRecords();
 
   document.querySelectorAll("#treatmentToggle button").forEach((b) =>
     b.classList.toggle("is-active", b.dataset.treatment === next));

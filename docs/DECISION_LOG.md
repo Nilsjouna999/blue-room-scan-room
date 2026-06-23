@@ -647,3 +647,14 @@ files swept (conservative). Why: the builder's polish + completeness + cleanup p
 (8 haiku scout / 5 sonnet build / 2 opus verify). Revisit (flagged, NOT done): source-02..05.jpg image optimization
 (~11 MB, deliberate tooling step on copies); .diamond/.dia-*/.impact CSS now orphaned by the statDiamond/mixRow
 removal; metriccap--foot pending a docs/map check; 'Finish top-RIGHT' as literal right-alignment is a CSS option.
+
+**2026-06-23 / BR-S117 — Surface Record is the fluid pigment vessel (2 forms to compare); Finish + Colour Field fused into one "Surface" module / ACTIVE (a form choice is pending)**
+Dossier plate 01 "Surface Record" now renders the image's palette as live pigment suspended in developer fluid
+(SurfaceRecord.jsx ported to vanilla canvas + rAF; reduced-motion frozen; re-mounted after each dossier render).
+TWO forms are live for comparison — column (tall glass vessel) on Driver/Shore/Tank, tray (wide bath) on Ice
+Field/Run (src.surfaceVariant); the builder picks one, then it goes everywhere. Paid shows the fluid + named-
+surface legend; free keeps the cfdeep teaser. The right-panel Finish + Colour Field are now ONE compact "Surface"
+module (bar-as-hero, designed via a 4-agent panel: the colour-field proportion bar is the hero, the material chip
+caps it, name + character note on one foot line; free = bar + teaser, no material). Why: the builder's new design
++ a sleeker combined surface read. Revisit: the chosen Surface Record form (apply to all 5); the "Surface" label on
+free (vs "Colour Field"); the now-orphaned .module--finish/.module--cfield/.cfbar/.cfcaption/.finish* CSS.
