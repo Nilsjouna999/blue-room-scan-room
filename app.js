@@ -551,7 +551,7 @@ function renderReadingPanel(src, treatment) {
     <div class="module module--cfield">
       ${moduleHead("Colour Field")}
       <div class="cfbar">${cf.map((c) => `<span class="cfbar__seg" style="--sw:${esc(c.hex)}; --pct:${c.pct}%"></span>`).join("")}</div>
-      <div class="cfkey">${cf.map((c) => `<span class="cfkey__item">${esc(c.label)} <b>${c.pct}%</b></span>`).join("")}</div>
+      <p class="cfcaption">full palette develops below</p>
     </div>`;
 
 
@@ -599,9 +599,9 @@ function renderReadingPanel(src, treatment) {
       <p class="unlock__more">◆ &nbsp;The sealed back of this card develops with the mint — added depth, not a hidden result.</p>
       <p class="unlock__price">One-time develop · this scan only · dev mock — no real payment in this build</p>
     </div>
-    ${lockedModule("Surface Record", "The colour palette shows now — each surface's proof develops with the mint.")}
-    ${lockedModule("Composition & Fit", "Pressure, coherence and halo-depth grids extract on develop.")}
-    ${lockedModule("Halo Material", "The developed material and mint serial resolve with the mint.")}`;
+    ${lockedModule("Surface Record", "The full colour palette, each surface named and proofed.")}
+    ${lockedModule("Composition & Fit", "The class designation and shelf-placement.")}
+    ${lockedModule("Halo Material", "The finish, serial, and mint seal.")}`;
 
   const shinyTease =
     treatment === "mint"
@@ -655,7 +655,10 @@ function renderReadingPanel(src, treatment) {
         <span class="finish__name">${esc(src.halo.material)}</span>
       </div>
     </div>`;
-  const forkContent = free ? lockedDeep : finishPlate + panelReceipts + shinyTease + shinyBadge;
+  /* BR-S112 (3c): close the developed rail's reserved lower column with an end-mark
+     so the empty space reads as a composed end, not an abandoned gap. */
+  const developedEnd = free ? "" : `<div class="readend"><span class="readend__rule"></span><span class="readend__mark">◆ end of scan reading ◆</span></div>`;
+  const forkContent = free ? lockedDeep : finishPlate + panelReceipts + shinyTease + shinyBadge + developedEnd;
   const panelLead = "";
   /* Aura Profile is dropped from the PAID panel (it's on the card front + dossier
      Plate 05) so the developed column doesn't echo the dossier; Free keeps it. */
@@ -763,7 +766,7 @@ function renderDossier(src, treatment) {
   const cf = (typeof S108_EXTRAS !== "undefined" && (S108_EXTRAS[src.id] || {}).colourField) || [];
   /* BR-S108.3 (#1): Surface Record DROPS the % — Colour Field owns the measurement,
      Surface Record owns the annotated palette (named surface + what it is). */
-  const cfRow = (c, withProof) => `<div class="cfdeep__row"><span class="cfdeep__bar" style="--sw:${esc(c.hex)}"></span><div class="cfdeep__body"><span class="cfdeep__label">${esc(c.label)}</span>${withProof ? `<span class="cfdeep__proof">${esc(c.proof)}</span>` : ""}</div></div>`;
+  const cfRow = (c, withProof) => `<div class="cfdeep__row"><span class="cfdeep__bar" style="--sw:${esc(c.hex)}"></span><div class="cfdeep__body"><div class="cfdeep__head"><span class="cfdeep__label">${esc(c.label)}</span>${withProof ? `<span class="cfdeep__pct">${c.pct}%</span>` : ""}</div>${withProof ? `<span class="cfdeep__proof">${esc(c.proof)}</span>` : ""}</div></div>`;
   const board = dplate("01", "Surface Record", paid, paid
     ? `<div class="cfdeep">${cf.map((c) => cfRow(c, true)).join("")}</div>`
     : `<div class="cfdeep">${cf.slice(0, 3).map((c) => cfRow(c, false)).join("")}<p class="dstat__undeveloped">Surface proofs develop with the mint.</p></div>`);
