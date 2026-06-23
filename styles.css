@@ -1409,6 +1409,15 @@ details.seal[open] .seal__act { opacity: 0.4; }
 /* BR-S112 (1): front Colour Field is now bar + one teaser caption (the named % key
    moved to the back Surface Record, so the % lives in exactly ONE place). */
 .cfcaption { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.05em; color: var(--t-ghost); margin-top: 3px; }
+/* BR-S113 (1B): Colour Field whispers — a sneak-peek strip, not a co-equal panel;
+   the real palette lives in Surface Record below. */
+.module--cfield { gap: 7px; }
+.panel--reading .module--cfield .module__label { font-size: 9px; font-weight: 400; color: var(--t-ghost); letter-spacing: 0.16em; }
+.module--cfield .module__rule { opacity: 0.45; }
+/* BR-S113 (1A): provenance one-liner absorbed into the developed Technical Receipts. */
+.receipts__prov { font-size: 12.5px; line-height: 1.45; color: var(--t-body); font-style: italic; margin: 0 0 12px; }
+/* BR-S113 (1B): free Mint serial — the withheld mint tail reads as a deliberate, ghosted "develops", not a truncation. */
+.dmint__reserve { color: var(--t-ghost); font-style: italic; letter-spacing: 0.03em; }
 /* BR-S112 (3c): developed Scan Reading rail end-mark — closes the reserved lower column. */
 .readend { margin-top: 22px; display: grid; gap: 12px; justify-items: center; }
 .readend__rule { width: 100%; height: 1px; background: var(--line-faint); }

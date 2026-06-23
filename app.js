@@ -569,10 +569,22 @@ function renderReadingPanel(src, treatment) {
      second copy of the dossier. All of that content still lives in the dossier
      (its richer home). Free is untouched — free renders lockedDeep, not this.
      What remains in the panel from the old deep block: the Technical Receipts. */
+  /* BR-S113 (1A): Source Record absorbed here — the provenance one-liner + the
+     pre-mint serial lineage (Object/Scan/Card). Mint serial stays in the Mint plate. */
+  const dRec = src.dossier;
+  const scanRec = getScanResult(src);
+  const provLine = (((typeof S108_EXTRAS !== "undefined" && S108_EXTRAS[src.id]) || {}).sourceTwoLine || {}).prov || dRec.record.provenance;
+  const lineageReceipts = [
+    { k: "Object", v: dRec.record.objectNo },
+    ...(scanRec?.scanId ? [{ k: "Scan", v: scanRec.scanId }] : []),
+    { k: "Card", v: c.serial },
+  ];
   const panelReceipts = `
     <details class="receipts">
       <summary><span class="module__label">Technical Receipts</span><span class="receipts__caret">▸</span></summary>
+      <p class="receipts__prov">${esc(provLine)}</p>
       <dl class="receipts__list">
+        ${lineageReceipts.map((r) => `<div><dt>${esc(r.k)}</dt><dd>${esc(r.v)}</dd></div>`).join("")}
         ${src.receipts.map((r) => `<div><dt>${esc(r.k)}</dt><dd>${esc(r.v)}</dd></div>`).join("")}
       </dl>
       <div class="formulas">
@@ -707,56 +719,11 @@ function renderDossier(src, treatment) {
   const sec = (typeof S107_SECTIONS !== "undefined" && S107_SECTIONS[src.id]) || {};
   const recordGate = `<div class="drecord-gate">◆ ARTIFACT RECORD · ${paid ? esc(c.serial) : "····"} · ${editionLabel}</div>`;
 
-  /* 01 — Source Record (full in both states: the factual hook).
-     Below the record grid, two flat caption blocks (plates stay flat —
-     edge + tone + type only):
-       • Filing event — capture → route → scan status → filed-as class,
-         a descending caption (the MAGNETISM filing-event row). Reads as a
-         completed past filing, never a Develop tease. The archetype CLASS
-         is the content-axis join shared with the Halo archetype module —
-         the prose/discovery note stays Halo-only there, not repeated here.
-       • Serial lineage — Object → Scan → Card → Mint join-key spine
-         (DEPTH/LAYERING). Card + Mint are the developed identities: masked
-         '····' on Free, assigned on Develop (latent→developed law). objectNo
-         lives once now, as the spine head (removed from the grid above). */
-  const fileSteps = [`<span class="dfiling__step">capture · <b>${esc(src.capture.code)}</b></span>`];
-  // route (HUMAN_SOLO/ANIMAL_COMPANION) intentionally NOT surfaced — classifying the
-  // subject on a live surface is law-adjacent (BR-S106). It stays internal as the
-  // routing mechanism only; never rendered.
-  if (scan?.scanStatus) fileSteps.push(`<span class="dfiling__step"><span class="dfiling__arr">↳</span> scan · <b>complete</b></span>`);
-  if (scan?.archetype?.class) fileSteps.push(`<span class="dfiling__step"><span class="dfiling__arr">↳</span> filed as · <b>${esc(scan.archetype.class)}</b></span>`);
-
-  const lineageRows = [
-    ["Object", esc(d.record.objectNo), false, false],
-    ...(scan?.scanId ? [["Scan", esc(scan.scanId), false, false]] : []),
-    ["Card", paid ? esc(c.serial) : "····", !paid, true],
-    ["Mint", paid ? esc(scan?.tierOutputs?.halo?.mintSerial || d.mint.serial) : "····", !paid, true],
-  ];
-  /* `id` marks the develop-assigned address rows (Card/Mint) — the ceremony's
-     climax wipe (.is-developing-dossier .dlineage__v--id) plays on them. */
-  const lineageHtml = lineageRows
-    .map(([k, v, ghost, id]) => `<div class="dlineage__row"><span class="dlineage__k">${k}</span><span class="dlineage__v${ghost ? " dlineage__v--ghost" : ""}${id ? " dlineage__v--id" : ""}">${v}</span></div>`)
-    .join("");
-
-  const record = dplate("03", "Source Record", paid, `
-    <dl class="drecord">
-      <div><dt>Source ID</dt><dd>${esc(src.capture.code)} · SRC-${pad2(src.no)}</dd></div>
-    </dl>
-    <div class="dsource2">
-      <p class="dsource2__prov">${esc(((typeof S108_EXTRAS !== "undefined" && (S108_EXTRAS[src.id] || {}).sourceTwoLine) || {}).prov || d.record.provenance)}</p>
-      <p class="dsource2__cond">${esc(((typeof S108_EXTRAS !== "undefined" && (S108_EXTRAS[src.id] || {}).sourceTwoLine) || {}).cond || d.record.eligibility)}</p>
-    </div>
-    <div class="dfile">
-      <div class="dfiling">
-        <div class="dfile__kick">Filing event</div>
-        <p class="dfiling__chain">${fileSteps.join("")}</p>
-      </div>
-      <div class="dlineage-wrap">
-        <div class="dfile__kick">Serial lineage</div>
-        <div class="dlineage">${lineageHtml}</div>
-      </div>
-    </div>`);
-
+  /* BR-S113 (1A): Source Record plate KILLED — it did not earn its place (Mint +
+     Technical Receipts carry the load). Its two useful bits (the provenance one-liner
+     + the pre-mint serial lineage Object/Scan/Card) are absorbed into the developed
+     Technical Receipts in renderReadingPanel; the dry filing-event ladder is dropped.
+     The Mint serial stays in the Mint plate only (no duplicated code). */
   /* 02 — BR-S107: Evidence Board → Surface Record (refueled to lens C). Full
      swatch set, each chip annotated with the proof-noun that earned it. The old
      cue/effect/basis receipts (incl. the effect arrows) are retired with it. */
@@ -798,7 +765,7 @@ function renderDossier(src, treatment) {
      sealed", so adjacent plates 04/05 don't rhyme. */
   const fa = sec.fitAura || { type: d.mint.family, variant: "", shelf: src.fit };
   const faVar = fa.variant ? `, <span class="dfaplate__var">${esc(fa.variant)}</span>` : "";
-  const fitAura = dplate("04", "Fit + Aura Layer", paid, `
+  const fitAura = dplate("03", "Fit + Aura Layer", paid, `
     <div class="dfaplate">
       <p class="dfaplate__type">${esc(fa.type)}${faVar}</p>
       <p class="dfaplate__shelf">${esc(fa.shelf)}</p>
@@ -827,19 +794,19 @@ function renderDossier(src, treatment) {
       <div><dt>Archive Status</dt><dd>Archive pull · full artifact not minted</dd></div>
       <div><dt>Treatment Eligibility</dt><dd>${esc(d.record.eligibility)}</dd></div>
       <div><dt>Material (on development)</dt><dd class="drecord__material">${esc(src.halo.material)}</dd></div>
-      <div><dt>Mint Serial</dt><dd>${esc(scan?.tierOutputs.free.serial || `Reserved · BR-SRC${pad2(src.no)}-HM-····`)}</dd></div>
+      <div><dt>Mint Serial</dt><dd>${esc(scan?.tierOutputs.free.serial || `Reserved · BR-SRC${pad2(src.no)}`)}<span class="dmint__reserve"> · develops</span></dd></div>
     </dl>
     <button type="button" class="unlock__btn unlock__btn--shiny dmint__cta" data-goto="shiny">
       <span class="unlock__name">Develop this scan</span>
       <span class="unlock__desc">the card finishes developing in place</span>
     </button>`;
-  const mintRecord = dplate("05", "Mint Record", paid, mintBody, "dplate--mint");
+  const mintRecord = dplate("04", "Mint Record", paid, mintBody, "dplate--mint");
 
   /* 07 — Oracle Read */
   /* 06 — Oracle Read (BR-S107: the ONLY verdict; sealed behind a FREE tap-to-
      develop reveal; centered/large/alone form). */
   const oracleText = paid ? (scan?.readings.oracle || d.oracle.full) : (scan?.tierOutputs.free.oracle || d.oracle.short);
-  const oracle = dplate("06", "Oracle Read", paid, `
+  const oracle = dplate("05", "Oracle Read", paid, `
     <details class="seal seal--oracle" ${paid ? "open" : ""}>
       <summary class="seal__cue seal__cue--oracle"><span class="seal__dot">◆</span><span class="seal__name">The verdict</span><span class="seal__act">tap to develop</span></summary>
       <blockquote class="doracle doracle--centered">“${esc(oracleText)}”</blockquote>
@@ -850,7 +817,7 @@ function renderDossier(src, treatment) {
   return `
     <div class="dossier__cue">CARD BACK — ARTIFACT RECORD</div>
     <div class="dossier__inner">
-      ${recordGate}${board}${hidden}<div class="dossier__register">THE RECORD</div>${record}${fitAura}${mintRecord}<div class="dossier__register">THE ORACLE</div>${oracle}
+      ${recordGate}${board}${hidden}<div class="dossier__register">THE RECORD</div>${fitAura}${mintRecord}<div class="dossier__register">THE ORACLE</div>${oracle}
       <p class="dossier__end">◆ &nbsp;END OF RECORD · ${esc(src.label).toUpperCase()} · BLUE ROOM ARCHIVE</p>
     </div>`;
 }

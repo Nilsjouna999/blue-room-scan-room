@@ -947,7 +947,7 @@ function toScanResultV2(src) {
         /* honest tease: show the card's OWN object address (the same family the
            developed card front shows) with only the mint tail reserved — develop
            reveals the same string's mint suffix (…-HM), not an unrelated serial */
-        serial: `Reserved · ${src.card.serial}-··`,
+        serial: `Reserved · ${src.card.serial}`,
       },
       halo: {
         statsShown: ["presence", "frame", "signal", "visualImpact", "charge", "loreDensity", "fitCoherence"],

@@ -581,6 +581,9 @@ tag-rows collapse character into filing. A single struck designation is singular
 the object without stealing the Oracle's verdict.
 Revisit: if a future section genuinely needs an identifier, it must look unmistakably UNLIKE a Source Record
 serial (different grammar + placement) and earn a ratified exception here first.
+[BR-S113 UPDATE] Source Record was REMOVED (its provenance + pre-mint lineage absorbed into Technical
+Receipts). The codes-home is now **Technical Receipts**. The law's intent is unchanged — codes live in exactly
+ONE home and no other section renders a code — only the section name moved (Source Record -> Technical Receipts).
 
 **2026-06-23 / BR-S113 — Read-boundary (sharpened): five no's + one allowance / LOCKED**
 A card reads the ARTIFACT, never the PERSON. This governs aura/atmosphere writing and ALL future card copy.
