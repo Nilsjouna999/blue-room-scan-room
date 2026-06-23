@@ -1839,21 +1839,21 @@ details.seal[open] .seal__act { opacity: 0.4; }
    the interpretive read); silhouette-not-score; Signal Mix = proportion.
    Fits the left panel; svg + text wrap/stack on narrow widths.
 ============================================================= */
-.met-hd { margin-bottom: 18px; }
-.met-hd__title { margin: 0 0 10px; font-family: var(--font-display); font-weight: 600; font-size: 27px; line-height: 1.05; color: var(--t-display); }
-.met-hd__id { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.met-hd { margin-bottom: 14px; }
+.met-hd__title { margin: 0 0 8px; font-family: var(--font-display); font-weight: 500; font-size: 22px; line-height: 1.1; color: var(--t-display); }
+.met-hd__id { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
 .met-chip { font-family: var(--font-mono); font-size: 9px; font-weight: 500; letter-spacing: 0.16em; text-transform: uppercase; white-space: nowrap; }
 .met-hd__ln { flex: 1; height: 1px; background: var(--line-faint); }
-.met-hd__read { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.13em; text-transform: uppercase; color: var(--t-ghost); white-space: nowrap; }
-.met-hd__lede { margin: 0; font-size: 12px; line-height: 1.55; color: var(--t-meta); }
+.met-hd__read { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--t-ghost); white-space: nowrap; }
+.met-hd__lede { margin: 0; max-width: 52ch; font-size: 11.5px; line-height: 1.5; color: var(--t-meta); }
 .met-hd__lede b { color: var(--t-body); font-weight: 400; }
 
 .met-plates { display: grid; gap: 16px; }
 .met-plate { position: relative; border: 1px solid var(--line); border-left: 2px solid var(--line-strong); border-radius: 4px; background: linear-gradient(180deg, var(--ink-800) 0%, var(--ink-850) 55%, var(--ink-950) 100%); padding: 18px; }
 .met-plate__h { display: flex; align-items: baseline; gap: 12px; margin-bottom: 12px; }
 .met-plate__no { font-family: var(--font-mono); font-size: 9.5px; letter-spacing: 0.2em; color: var(--t-ghost); flex: none; }
-.met-plate__t { margin: 0; font-family: var(--font-display); font-weight: 600; font-size: 23px; line-height: 1.05; color: var(--t-display); }
-.met-lede { margin: 0 0 14px; font-size: 11.5px; line-height: 1.5; color: var(--t-meta); font-style: italic; }
+.met-plate__t { margin: 0; font-family: var(--font-display); font-weight: 500; font-size: 18px; line-height: 1.1; color: var(--t-display); }
+.met-lede { margin: 0 0 11px; font-size: 11.5px; line-height: 1.5; color: var(--t-meta); font-style: italic; }
 .met-kicker { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--t-ghost); margin-bottom: 5px; }
 
 .met-sig { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
@@ -1861,10 +1861,10 @@ details.seal[open] .seal__act { opacity: 0.4; }
 .met-svglab { font-family: var(--font-mono); font-size: 7.5px; letter-spacing: 0.18em; fill: var(--t-ghost); }
 .met-svglab--mid { fill: rgba(233, 229, 220, 0.28); }
 .met-sig__side { flex: 1; min-width: 160px; display: grid; gap: 12px; }
-.met-sig__class { font-family: var(--font-display); font-size: 22px; line-height: 1.08; color: var(--t-display); }
+.met-sig__class { font-family: var(--font-display); font-size: 17px; line-height: 1.12; color: var(--t-display); }
 .met-sig__note { margin: 0; font-size: 12px; line-height: 1.6; color: var(--t-body); }
 .met-sig__reach { display: flex; align-items: baseline; gap: 9px; padding-top: 9px; border-top: 1px solid var(--line-faint); }
-.met-sig__band { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; }
+.met-sig__band { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.2em; text-transform: uppercase; }
 
 .met-mix__row { display: grid; grid-template-columns: 92px 1fr 38px; align-items: center; gap: 11px; padding: 8px 0; border-bottom: 1px solid var(--line-faint); }
 .met-mix__nm { font-size: 12px; color: var(--t-body); }
@@ -1876,8 +1876,8 @@ details.seal[open] .seal__act { opacity: 0.4; }
 .met-field { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
 .met-field__svg { flex: none; width: 190px; height: 175px; display: block; }
 .met-field__side { flex: 1; min-width: 150px; display: grid; gap: 12px; }
-.met-field__v { font-size: 12.5px; line-height: 1.42; color: var(--t-body); }
-.met-bands { margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--line-faint); display: grid; gap: 12px; }
+.met-field__v { font-size: 12px; line-height: 1.42; color: var(--t-body); }
+.met-bands { margin-top: 12px; padding-top: 11px; border-top: 1px solid var(--line-faint); display: grid; gap: 12px; }
 
 .met-tier__top { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin-bottom: 6px; }
 .met-tier__n { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--t-ghost); }
@@ -1890,12 +1890,10 @@ details.seal[open] .seal__act { opacity: 0.4; }
 .met-event__img { width: 100%; height: 100%; object-fit: cover; filter: saturate(.88) brightness(.8) contrast(1.03); display: block; }
 .met-event__main { flex: 1; min-width: 0; }
 .met-event__lab { display: flex; align-items: baseline; gap: 10px; margin-bottom: 10px; }
-.met-event__v { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; }
-.met-event__note { margin: 0; font-family: var(--font-display); font-size: 19px; line-height: 1.34; color: var(--t-display); font-style: italic; }
+.met-event__v { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.16em; text-transform: uppercase; }
+.met-event__note { margin: 0; font-family: var(--font-display); font-size: 17px; line-height: 1.4; color: var(--t-display); font-style: italic; }
 .met-event__filed { margin: 13px 0 0; font-size: 11.5px; line-height: 1.55; color: var(--t-meta); }
 .met-event__filed b { color: var(--t-body); font-weight: 400; }
-
-.met-foot { margin: 22px 2px 0; font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.1em; color: var(--t-ghost); text-align: center; }
 
 @keyframes met-fade { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
 .met-anim { animation: met-fade 760ms cubic-bezier(0.2, 0.7, 0.2, 1) both; }
@@ -1928,15 +1926,23 @@ details.seal[open] .seal__act { opacity: 0.4; }
 /* The window CLIPS; the track TRANSLATES (no native scroll — robust in nested flex). */
 .met-reel__window { flex: 1 1 auto; min-height: 0; overflow: hidden; position: relative; }
 .met-reel .met-plates {
-  display: flex; flex-direction: column;
+  /* gap:0 is load-bearing — the base .met-plates sets gap:16px, but the reel
+     translates the track by exactly -i*slot-h with NO gap in the math; any inherited
+     gap makes plate i sit i*gap too low (Composition Field clipped, Frame Event bleeds). */
+  display: flex; flex-direction: column; gap: 0;
   transition: transform .42s cubic-bezier(0.2, 0.7, 0.2, 1); will-change: transform;
 }
 .met-reel__window .met-plate {
   flex: 0 0 auto; height: var(--slot-h, 420px); margin: 0;
-  display: flex; flex-direction: column; justify-content: safe center; padding: 14px 22px;
+  display: flex; flex-direction: column; justify-content: flex-start; padding: 14px 22px;
   overflow-y: auto; overflow-x: hidden; scrollbar-width: none;
   opacity: .35; transition: opacity .34s ease; position: relative;
 }
+/* Centre content when it fits, top-anchor + fully scroll when it overflows — auto
+   margins resolve to 0 under overflow (engine-independent), so nothing bleeds above
+   the slot the way justify-content:center does on an overflow-y:auto flex column. */
+.met-reel__window .met-plate > :first-child { margin-top: auto; }
+.met-reel__window .met-plate > :last-child { margin-bottom: auto; }
 .met-reel__window .met-plate::-webkit-scrollbar { width: 0; height: 0; }
 .met-reel__window .met-plate.is-centred { opacity: 1; }
 /* landing glint — a thin source-coloured highlight travelling down the plate edge */
