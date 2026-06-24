@@ -18,7 +18,7 @@
    helpers       esc · pad2 · STAT_LABELS/statLabel · tierBand
    state+routing state{} · URL-param parse · DEVNAV gate
    scan access   getScanResult · getActiveScan · getTierOutput   (the seam)
-   shared        moduleHead · miniStat · imgOrPlaceholder
+   shared        moduleHead · imgOrPlaceholder
    left panel    renderLeftPanel · renderSourceTab · renderDiagramTab · renderMetricsTab · mountMetricsReel
    center card   renderCard
    right panel   lockedModule · renderReadingPanel
@@ -68,15 +68,7 @@ function tierBand(v) {
   return "Muted";
 }
 
-/* Public stat bars carry ONLY the band, never raw 0-100: snap fill width to one
-   of five discrete band positions so two values in the same band look identical
-   and bar length cannot recover the underlying number (BR-S070). The Metrics tab's
-   Signal Mix is a proportion-of-a-whole (shares of 100%), the one allowed numeric
-   read — it describes how the image is built, not how it scores. */
-const BAND_PCT = { Muted: 14, Clean: 36, Strong: 56, Charged: 76, Peak: 96 };
-const bandPct = (v) => BAND_PCT[tierBand(v)] || 0;
-
-const state = { source: 0, treatment: "free", tab: "diagram", view: "menu", draftGate: false, dev: null, labMaterial: null, diagramView: "annotated" };
+const state ={ source: 0, treatment: "free", tab: "diagram", view: "menu", draftGate: false, dev: null, labMaterial: null, diagramView: "annotated" };
 
 /* Deep-link support: ?src=1|2&t=free|shiny|mint&tab=source|diagram|metrics
    (used by reviewers and the screenshot pipeline). Any of these params
@@ -144,16 +136,6 @@ function diagSplit(str) {
     if (i !== -1) return { term: str.slice(0, i), qual: str.slice(i + sep.length) };
   }
   return { term: str, qual: "" };
-}
-
-function miniStat(name, value) {
-  /* public stat: artifact-safe tier band (no 0-100), bar still shows magnitude */
-  return `
-    <div class="ministat">
-      <span class="ministat__name">${esc(name)}</span>
-      <span class="ministat__val ministat__val--tier">${esc(tierBand(value))}</span>
-      <span class="ministat__track"><span class="ministat__fill" style="--v:${bandPct(value)}%"></span></span>
-    </div>`;
 }
 
 function imgOrPlaceholder(src, cls, extra = "") {
@@ -580,6 +562,7 @@ function renderCard(src, treatment) {
         <span class="corner corner--tl"></span><span class="corner corner--tr"></span>
         <span class="corner corner--bl"></span><span class="corner corner--br"></span>
         <span class="card__sparkles" aria-hidden="true"></span>
+        <span class="cardfinish" aria-hidden="true"></span>
 
         <header class="card__head">
           <span class="card__house">◆ BLUE ROOM ARCHIVE</span>
@@ -610,14 +593,24 @@ function renderCard(src, treatment) {
           <p class="verdict"><span class="verdict__key">Signal Note</span>${esc(c.note)}</p>
         </div>
 
-        <div class="statzone">
+        <div class="framereading">
+          <span class="framereading__key">Frame Reading</span>
           ${(() => {
-            /* v2 freeVisible is the source of truth for the 4 public
-               stats (SCAN_ENGINE_SPEC); legacy card.stats as fallback */
+            /* BR-S119: the developed "mint ledger" — name · 5 diamond pips · tier
+               WORD. v2 freeVisible is the source of truth for the 4 public stats
+               (SCAN_ENGINE_SPEC); legacy card.stats as fallback. Pips + band only,
+               NEVER a 0-100, driven by the SAME tierBand() the Metrics tab uses so
+               the card can't disagree with the reel. */
             const s = getScanResult(src)?.stats.freeVisible || c.stats;
-            return ["presence", "signal", "visualImpact", "charge"]
-              .map((k) => miniStat(statLabel(k), s[k]))
-              .join("");
+            const LADDER = ["Muted", "Clean", "Strong", "Charged", "Peak"];
+            return ["presence", "signal", "visualImpact", "charge"].map((k) => {
+              const band = tierBand(s[k]);
+              const idx = LADDER.indexOf(band);
+              const pips = [0, 1, 2, 3, 4].map((p) =>
+                `<span class="fr__pip${p <= idx ? " is-on" : ""}${p === idx && idx === 4 ? " fr__pip--peak" : ""}${p === idx && idx === 3 ? " fr__pip--charged" : ""}"></span>`
+              ).join("");
+              return `<div class="fr__row"><span class="fr__name">${esc(statLabel(k))}</span><span class="fr__pips">${pips}</span><span class="fr__tier${idx === 4 ? " fr__tier--peak" : idx === 3 ? " fr__tier--charged" : ""}">${esc(band)}</span></div>`;
+            }).join("");
           })()}
         </div>
 
