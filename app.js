@@ -606,15 +606,17 @@ function renderCard(src, treatment) {
             return ["presence", "signal", "visualImpact", "charge"].map((k) => {
               const band = tierBand(s[k]);
               const idx = LADDER.indexOf(band);
-              /* BR-S120: pips coloured BY POSITION (the builder's mockup), not by tier —
-                 positions 1-3 = one warm base; the 4th pip is purple, the 5th gold, each
-                 with a glow, but ONLY when lit. A Peak row therefore shows both accents.
-                 Halo/minted only; the free gate keeps free matte. */
+              /* BR-S120/S121: pips coloured BY POSITION (the builder's mockup). Each lit
+                 pip carries its position class p1..p5 — positions 1-3 climb a brass value
+                 ramp (shiny), the 4th is purple, the 5th gold, each glowing. Halo/minted
+                 only; the free gate flattens all of it to matte silver. The tier WORD
+                 carries its band class so it can echo the same silver→brass→purple→gold
+                 ramp (CSS); kept tier-driven (per row), independent of pip position. */
               const pips = [0, 1, 2, 3, 4].map((p) => {
                 const on = p <= idx;
-                return `<span class="fr__pip${on ? " is-on" : ""}${on && p === 3 ? " fr__pip--p4" : ""}${on && p === 4 ? " fr__pip--p5" : ""}"></span>`;
+                return `<span class="fr__pip${on ? " is-on fr__pip--p" + (p + 1) : ""}"></span>`;
               }).join("");
-              return `<div class="fr__row"><span class="fr__name">${esc(statLabel(k))}</span><span class="fr__pips">${pips}</span><span class="fr__tier${idx === 4 ? " fr__tier--peak" : idx === 3 ? " fr__tier--charged" : ""}">${esc(band)}</span></div>`;
+              return `<div class="fr__row"><span class="fr__name">${esc(statLabel(k))}</span><span class="fr__pips">${pips}</span><span class="fr__tier fr__tier--${band.toLowerCase()}">${esc(band)}</span></div>`;
             }).join("");
           })()}
         </div>
