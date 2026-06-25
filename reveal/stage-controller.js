@@ -38,10 +38,8 @@
       '<p class="reveal-stage__thesis">Every photo is already a card. Watch the room develop it.</p>' +
       "</div>" +
       '<div class="reveal-stage__body">' +
-      '<div class="reveal-stage__cardcol">' +
       '<div class="rv-cardslot"></div>' +
-      '<div class="rv-arrowslot" style="text-align:center"></div>' +
-      "</div>" +
+      '<div class="rv-arrowslot"></div>' +
       '<div class="rv-readslot"></div>' +
       "</div>";
     root.appendChild(stage);

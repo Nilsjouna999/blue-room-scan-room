@@ -19,8 +19,19 @@
     el.dataset.variant = opts.variant || "grey";
     el.setAttribute("aria-label", opts.label || "Continue");
     el.innerHTML =
-      '<svg class="rv-arrow__svg" viewBox="0 0 28 28" aria-hidden="true">' +
-      '<path d="M5.5 14 H20.5 M14 8 L20.5 14 L14 20" />' +
+      '<svg class="rv-arrow__svg" viewBox="0 0 120 120" aria-hidden="true">' +
+      '<path class="rv-arrow__out" d="M20 54 C24 28 54 14 82 26 C99 33 106 47 106 62 L120 54 L98 104 L60 80 L77 73 C76 58 66 47 51 45 C39 43 29 49 26 60 Z"/>' +
+      '<line class="rv-arrow__h" x1="28" y1="54" x2="37" y2="66"/>' +
+      '<line class="rv-arrow__h" x1="36" y1="42" x2="47" y2="56"/>' +
+      '<line class="rv-arrow__h" x1="46" y1="35" x2="57" y2="49"/>' +
+      '<line class="rv-arrow__h" x1="57" y1="31" x2="69" y2="45"/>' +
+      '<line class="rv-arrow__h" x1="69" y1="31" x2="81" y2="45"/>' +
+      '<line class="rv-arrow__h" x1="81" y1="35" x2="93" y2="49"/>' +
+      '<line class="rv-arrow__h" x1="92" y1="44" x2="102" y2="57"/>' +
+      '<line class="rv-arrow__h" x1="100" y1="53" x2="108" y2="64"/>' +
+      '<line class="rv-arrow__h" x1="72" y1="76" x2="83" y2="90"/>' +
+      '<line class="rv-arrow__h" x1="80" y1="68" x2="91" y2="82"/>' +
+      '<line class="rv-arrow__h" x1="66" y1="82" x2="75" y2="95"/>' +
       "</svg>";
     if (opts.disabled) el.setAttribute("aria-disabled", "true");
 
