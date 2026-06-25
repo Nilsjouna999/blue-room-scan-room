@@ -626,21 +626,7 @@ function renderCard(src, treatment) {
         <div class="mintstrip">
           <span class="mintstrip__state ${minted ? "" : "mintstrip__state--free"}">${esc(t.stamp)}</span>
           <span class="mintstrip__serial ${minted ? "" : "mintstrip__serial--ghost"}">${esc(c.serial)} · ${esc(t.strip)}</span>
-          <span class="mintstrip__codes">
-            <span class="barcode ${minted ? "" : "barcode--ghost"}" aria-hidden="true"></span>
-            <button type="button" class="cardqr-trig ${minted ? "" : "cardqr-trig--ghost"}" data-card-qr aria-label="Show card scan code" tabindex="${minted ? "0" : "-1"}">
-              <svg class="cardqr-trig__svg" viewBox="0 0 24 24" aria-hidden="true">
-                <rect x="1" y="1" width="7" height="7" rx="1"></rect><rect x="3.2" y="3.2" width="2.6" height="2.6"></rect>
-                <rect x="16" y="1" width="7" height="7" rx="1"></rect><rect x="18.2" y="3.2" width="2.6" height="2.6"></rect>
-                <rect x="1" y="16" width="7" height="7" rx="1"></rect><rect x="3.2" y="18.2" width="2.6" height="2.6"></rect>
-                <rect x="11" y="2" width="2" height="2"></rect><rect x="11" y="6" width="2" height="2"></rect>
-                <rect x="11" y="11" width="2" height="2"></rect><rect x="15" y="11" width="2" height="2"></rect>
-                <rect x="19" y="11" width="2" height="2"></rect><rect x="11" y="15" width="2" height="2"></rect>
-                <rect x="15" y="15" width="2" height="2"></rect><rect x="19" y="19" width="2" height="2"></rect>
-                <rect x="15" y="19" width="2" height="2"></rect><rect x="19" y="15" width="2" height="2"></rect>
-              </svg>
-            </button>
-          </span>
+          <button type="button" class="barcode ${minted ? "" : "barcode--ghost"}" data-card-qr aria-label="Show card scan code" tabindex="${minted ? "0" : "-1"}"></button>
         </div>
 
         <div class="cardqr" aria-hidden="true">
@@ -2227,9 +2213,7 @@ function patchCardFront(src, treatment) {
   const serial = card.querySelector(".mintstrip__serial");
   if (serial) { serial.textContent = `${c.serial} · ${t.strip}`; serial.classList.toggle("mintstrip__serial--ghost", !minted); }
   const bar = card.querySelector(".barcode");
-  if (bar) bar.classList.toggle("barcode--ghost", !minted);
-  const qrTrig = card.querySelector(".cardqr-trig");
-  if (qrTrig) { qrTrig.classList.toggle("cardqr-trig--ghost", !minted); qrTrig.tabIndex = minted ? 0 : -1; }
+  if (bar) { bar.classList.toggle("barcode--ghost", !minted); bar.tabIndex = minted ? 0 : -1; }
 }
 
 function runDevelopChoreography() {

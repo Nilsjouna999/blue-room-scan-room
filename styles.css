@@ -680,15 +680,17 @@ body[data-devnav="1"] .toggle--treatment { display: inline-flex; }
 .verdict {
   margin-top: 9px;
   padding: 8px 14px 9px;
-  border: 1px solid var(--line-faint);
+  border: 1px solid var(--line);
   border-radius: 6px;
-  background: rgba(255, 255, 255, 0.015);
+  background: rgba(255, 255, 255, 0.022);
   font-family: var(--font-display);
   font-style: italic;
   font-weight: 500;
   font-size: 16.5px;
   line-height: 1.45;
-  color: var(--muted);
+  /* BR-S122: lifted muted → silver so the Signal Note carries presence in the middle
+     of the card and the read flows top→bottom instead of dipping into a dim valley. */
+  color: var(--silver);
 }
 .verdict__key {
   display: block;
@@ -698,7 +700,7 @@ body[data-devnav="1"] .toggle--treatment { display: inline-flex; }
   font-size: 7.5px;
   letter-spacing: 0.3em;
   text-transform: uppercase;
-  color: var(--faint);
+  color: var(--silver-dim);
 }
 
 /* Frame Reading — the developed mint ledger (BR-S119): each row is NAME · 5 diamond
@@ -752,18 +754,20 @@ body[data-devnav="1"] .toggle--treatment { display: inline-flex; }
   background: linear-gradient(135deg, color-mix(in srgb, #fbcb52 82%, #fff) 0%, #fbcb52 46%, color-mix(in srgb, #fbcb52 80%, #000) 100%);
   box-shadow: inset 1px 1px 1.2px rgba(255, 255, 255, 0.50), inset -1px -1px 1px rgba(0, 0, 0, 0.22), 0 0 7px rgba(243, 193, 72, 0.66);
 }
+/* BR-S122: IBM Plex Mono is only LOADED at 400/500 — 600/700 faux-bolded the word
+   (the "bulky/unsightly" CHARGED). Hold to real weights + tighter tracking + a hair
+   smaller; the tier WORD echoes the pip ramp (silver → brass → purple → gold) by
+   COLOUR, the peak crowned by its gold, not a synthetic bold. */
 .fr__tier {
-  font-family: var(--font-mono); font-size: 10px; font-weight: 600; letter-spacing: 0.2em; line-height: 1;
+  font-family: var(--font-mono); font-size: 9.5px; font-weight: 500; letter-spacing: 0.13em; line-height: 1;
   text-transform: uppercase; text-align: right; color: var(--fr-tier, var(--silver-dim));
   font-feature-settings: "tnum" 1; font-variant-ligatures: none;
 }
-/* tier WORD echoes the pip ramp (silver → brass → purple → gold) — weight carries the
-   climb so colour stays restrained; only Charged/Peak go saturated. */
-.fr__tier--muted { --fr-tier: #82807a; font-weight: 500; }
+.fr__tier--muted { --fr-tier: #82807a; font-weight: 400; }
 .fr__tier--clean { --fr-tier: var(--silver-dim); }
 .fr__tier--strong { --fr-tier: #c2a274; }
 .fr__tier--charged { --fr-tier: #b6a6e0; }
-.fr__tier--peak { --fr-tier: #ecc06f; font-weight: 700; }
+.fr__tier--peak { --fr-tier: #ecc06f; }
 /* Free Pull stays matte — flatten every lit pip to plain silver (no facet, no warm) and
    neutralise the tier ramp; the pip COUNT + the WORD still carry the tier on free. */
 .card[data-treatment="free"] .fr__pip.is-on {
@@ -812,11 +816,15 @@ body[data-devnav="1"] .toggle--treatment { display: inline-flex; }
   text-align: center;
 }
 .mintstrip__serial--ghost { color: var(--faint); }
+/* the barcode IS the scan-code trigger (BR-S122) — click it (bottom-right of the mint
+   strip) to pop the QR seat. A real <button>; minted-only, ghosted + inert on free. */
 .barcode {
   width: 50px;
   height: 13px;
   opacity: 0.55;
   flex: none;
+  border: 0; padding: 0; cursor: pointer;
+  transition: opacity 160ms ease;
   background: repeating-linear-gradient(
     90deg,
     var(--silver-dim) 0 1px, transparent 1px 3px,
@@ -824,17 +832,9 @@ body[data-devnav="1"] .toggle--treatment { display: inline-flex; }
     var(--silver-dim) 6px 7px, transparent 7px 10px
   );
 }
-.barcode--ghost { opacity: 0.22; }
-.mintstrip__codes { display: flex; align-items: center; gap: 9px; flex: none; }
-.cardqr-trig {
-  flex: none; width: 15px; height: 15px; padding: 0; margin: 0; line-height: 0;
-  background: none; border: 0; cursor: pointer; color: var(--silver-dim);
-  opacity: 0.72; transition: opacity 160ms ease, color 160ms ease;
-}
-.cardqr-trig:hover, .cardqr-trig:focus-visible { opacity: 1; color: var(--silver-bright); outline: none; }
-.cardqr-trig__svg { width: 100%; height: 100%; display: block; }
-.cardqr-trig__svg rect { fill: currentColor; }
-.cardqr-trig--ghost { opacity: 0.26; pointer-events: none; cursor: default; }
+.barcode:hover { opacity: 0.92; }
+.barcode:focus-visible { opacity: 0.92; outline: 1px solid var(--line-strong); outline-offset: 2px; }
+.barcode--ghost { opacity: 0.22; pointer-events: none; cursor: default; }
 
 /* sparkles + halo (dormant until shiny) */
 .card__sparkles { position: absolute; inset: 0; z-index: 3; pointer-events: none; opacity: 0; }
@@ -1201,7 +1201,6 @@ body[data-devnav="1"] .toggle--treatment { display: inline-flex; }
   text-transform: uppercase; color: var(--silver-dim);
 }
 /* the QR is the developed artifact's link → inert on the non-room reuses of the card */
-.msample__card .cardqr-trig, .proto__card .cardqr-trig { display: none; }
 @keyframes halo-breathe {
   0%, 100% { opacity: 0.78; transform: scale(1); }
   50% { opacity: 1; transform: scale(1.035); }
