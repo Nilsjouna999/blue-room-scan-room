@@ -606,9 +606,14 @@ function renderCard(src, treatment) {
             return ["presence", "signal", "visualImpact", "charge"].map((k) => {
               const band = tierBand(s[k]);
               const idx = LADDER.indexOf(band);
-              const pips = [0, 1, 2, 3, 4].map((p) =>
-                `<span class="fr__pip${p <= idx ? " is-on" : ""}${p === idx && idx === 4 ? " fr__pip--peak" : ""}${p === idx && idx === 3 ? " fr__pip--charged" : ""}"></span>`
-              ).join("");
+              /* BR-S120: pips coloured BY POSITION (the builder's mockup), not by tier —
+                 positions 1-3 = one warm base; the 4th pip is purple, the 5th gold, each
+                 with a glow, but ONLY when lit. A Peak row therefore shows both accents.
+                 Halo/minted only; the free gate keeps free matte. */
+              const pips = [0, 1, 2, 3, 4].map((p) => {
+                const on = p <= idx;
+                return `<span class="fr__pip${on ? " is-on" : ""}${on && p === 3 ? " fr__pip--p4" : ""}${on && p === 4 ? " fr__pip--p5" : ""}"></span>`;
+              }).join("");
               return `<div class="fr__row"><span class="fr__name">${esc(statLabel(k))}</span><span class="fr__pips">${pips}</span><span class="fr__tier${idx === 4 ? " fr__tier--peak" : idx === 3 ? " fr__tier--charged" : ""}">${esc(band)}</span></div>`;
             }).join("");
           })()}
@@ -619,7 +624,41 @@ function renderCard(src, treatment) {
         <div class="mintstrip">
           <span class="mintstrip__state ${minted ? "" : "mintstrip__state--free"}">${esc(t.stamp)}</span>
           <span class="mintstrip__serial ${minted ? "" : "mintstrip__serial--ghost"}">${esc(c.serial)} · ${esc(t.strip)}</span>
-          <span class="barcode ${minted ? "" : "barcode--ghost"}" aria-hidden="true"></span>
+          <span class="mintstrip__codes">
+            <span class="barcode ${minted ? "" : "barcode--ghost"}" aria-hidden="true"></span>
+            <button type="button" class="cardqr-trig ${minted ? "" : "cardqr-trig--ghost"}" data-card-qr aria-label="Show card scan code" tabindex="${minted ? "0" : "-1"}">
+              <svg class="cardqr-trig__svg" viewBox="0 0 24 24" aria-hidden="true">
+                <rect x="1" y="1" width="7" height="7" rx="1"></rect><rect x="3.2" y="3.2" width="2.6" height="2.6"></rect>
+                <rect x="16" y="1" width="7" height="7" rx="1"></rect><rect x="18.2" y="3.2" width="2.6" height="2.6"></rect>
+                <rect x="1" y="16" width="7" height="7" rx="1"></rect><rect x="3.2" y="18.2" width="2.6" height="2.6"></rect>
+                <rect x="11" y="2" width="2" height="2"></rect><rect x="11" y="6" width="2" height="2"></rect>
+                <rect x="11" y="11" width="2" height="2"></rect><rect x="15" y="11" width="2" height="2"></rect>
+                <rect x="19" y="11" width="2" height="2"></rect><rect x="11" y="15" width="2" height="2"></rect>
+                <rect x="15" y="15" width="2" height="2"></rect><rect x="19" y="19" width="2" height="2"></rect>
+                <rect x="15" y="19" width="2" height="2"></rect><rect x="19" y="15" width="2" height="2"></rect>
+              </svg>
+            </button>
+          </span>
+        </div>
+
+        <div class="cardqr" aria-hidden="true">
+          <div class="cardqr__seat">
+            <svg class="cardqr__code" viewBox="0 0 25 25" role="img" aria-label="Card scan code (placeholder)">
+              <rect class="cardqr__quiet" x="0" y="0" width="25" height="25"></rect>
+              <g class="cardqr__mods">
+                <rect x="2" y="2" width="6" height="6"></rect><rect class="cardqr__hole" x="3.3" y="3.3" width="3.4" height="3.4"></rect><rect x="4.3" y="4.3" width="1.4" height="1.4"></rect>
+                <rect x="17" y="2" width="6" height="6"></rect><rect class="cardqr__hole" x="18.3" y="3.3" width="3.4" height="3.4"></rect><rect x="19.3" y="4.3" width="1.4" height="1.4"></rect>
+                <rect x="2" y="17" width="6" height="6"></rect><rect class="cardqr__hole" x="3.3" y="18.3" width="3.4" height="3.4"></rect><rect x="4.3" y="19.3" width="1.4" height="1.4"></rect>
+                <rect x="10" y="2" width="1.5" height="1.5"></rect><rect x="13" y="3" width="1.5" height="1.5"></rect><rect x="10" y="5.5" width="1.5" height="1.5"></rect>
+                <rect x="2" y="10" width="1.5" height="1.5"></rect><rect x="4.5" y="11.5" width="1.5" height="1.5"></rect><rect x="6" y="13.5" width="1.5" height="1.5"></rect>
+                <rect x="10" y="10" width="1.5" height="1.5"></rect><rect x="12.5" y="11.5" width="1.5" height="1.5"></rect><rect x="15.5" y="10" width="1.5" height="1.5"></rect>
+                <rect x="18" y="12" width="1.5" height="1.5"></rect><rect x="20.5" y="13.5" width="1.5" height="1.5"></rect><rect x="11.5" y="14" width="1.5" height="1.5"></rect>
+                <rect x="14" y="16.5" width="1.5" height="1.5"></rect><rect x="16.5" y="18" width="1.5" height="1.5"></rect><rect x="19" y="16.5" width="1.5" height="1.5"></rect>
+                <rect x="21" y="20" width="1.5" height="1.5"></rect><rect x="13" y="20.5" width="1.5" height="1.5"></rect><rect x="10.5" y="18.5" width="1.5" height="1.5"></rect>
+              </g>
+            </svg>
+            <span class="cardqr__cap">Placeholder · scan link develops</span>
+          </div>
         </div>
       </div>
     </article>`;
@@ -2125,6 +2164,7 @@ function renderHaloGateMock() {
 /* ---------- render + wiring ---------- */
 
 function render() {
+  closeCardQR();                 // a rebuilt #stageZone drops any open QR; detach its listeners
   const src = SOURCES[state.source];
   document.body.dataset.treatment = state.treatment;
   applyView();
@@ -2186,6 +2226,8 @@ function patchCardFront(src, treatment) {
   if (serial) { serial.textContent = `${c.serial} · ${t.strip}`; serial.classList.toggle("mintstrip__serial--ghost", !minted); }
   const bar = card.querySelector(".barcode");
   if (bar) bar.classList.toggle("barcode--ghost", !minted);
+  const qrTrig = card.querySelector(".cardqr-trig");
+  if (qrTrig) { qrTrig.classList.toggle("cardqr-trig--ghost", !minted); qrTrig.tabIndex = minted ? 0 : -1; }
 }
 
 function runDevelopChoreography() {
@@ -2208,6 +2250,7 @@ function runDevelopChoreography() {
 
 /* In-place re-skin: flip the treatment without rebuilding the card node. */
 function applyTreatment(next) {
+  closeCardQR();                 // QR must not survive a treatment re-skin (the node persists)
   state.treatment = next;
   if (next !== "mint") state.labMaterial = null;
   const src = SOURCES[state.source];
@@ -2342,6 +2385,49 @@ document.addEventListener("keydown", (e) => {
   if (e.key !== "Escape") return;
   const lb = document.getElementById("lightbox");
   if (lb && lb.classList.contains("is-open")) { lb.classList.remove("is-open"); lb.setAttribute("aria-hidden", "true"); }
+});
+
+/* QR pop-out (BR-S120): the placeholder scan code seats to the card centre while the
+   card front blurs to its OWN base colour. Open is scoped to the LIVE room card
+   (#stageZone) so the menu / proto / dev reuses of renderCard stay inert. Outside-click,
+   Esc, or a second trigger tap close it; the document listeners attach only while open
+   and tear down on close, so nothing leaks between opens. render()/applyTreatment also
+   force-close (a rebuilt or re-skinned card must not keep a stale QR open). */
+function closeCardQR() {
+  const card = document.querySelector("#stageZone .card.is-qr-open");
+  if (card) {
+    card.classList.remove("is-qr-open");
+    const layer = card.querySelector(".cardqr");
+    if (layer) layer.setAttribute("aria-hidden", "true");
+  }
+  document.removeEventListener("pointerdown", onQROutside, true);
+  document.removeEventListener("keydown", onQREsc, true);
+}
+function onQROutside(e) {
+  /* the sharp QR seat keeps it open; the trigger toggles via its own handler;
+     anything else (the blurred surround, or elsewhere on the page) closes it. */
+  if (e.target.closest("#stageZone .card.is-qr-open .cardqr__seat")) return;
+  if (e.target.closest("[data-card-qr]")) return;
+  closeCardQR();
+}
+function onQREsc(e) { if (e.key === "Escape") { e.stopPropagation(); closeCardQR(); } }
+document.addEventListener("click", (e) => {
+  const trig = e.target.closest("[data-card-qr]");
+  if (!trig) return;
+  const card = trig.closest("#stageZone .card");
+  if (!card) return;                                     // menu / proto / dev reuses: inert
+  if (card.classList.contains("is-developing")) return;  // don't fight the develop ceremony
+  e.preventDefault(); e.stopPropagation();
+  const opening = !card.classList.contains("is-qr-open");
+  closeCardQR();                                         // idempotent reset
+  if (!opening) return;                                  // second tap = toggle closed
+  card.classList.add("is-qr-open");
+  const layer = card.querySelector(".cardqr");
+  if (layer) layer.setAttribute("aria-hidden", "false");
+  setTimeout(() => {                                     // defer so THIS click doesn't close it
+    document.addEventListener("pointerdown", onQROutside, true);
+    document.addEventListener("keydown", onQREsc, true);
+  }, 0);
 });
 
 document.getElementById("sourceToggle").addEventListener("click", (e) => {
