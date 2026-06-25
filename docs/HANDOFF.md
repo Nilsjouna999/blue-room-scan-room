@@ -2,8 +2,8 @@
 
 For a fresh Claude Code session to resume with zero context loss. **You are the BUILDER** (you hold the repo and
 make the changes). The user pastes specs/designs from a separate planning chat. Grounded in the repo — **re-grep
-line numbers, they drift** (this session shifted them a lot). Last written: **2026-06-23**, code at HEAD
-`55e42dc` (BR-S117), **pushed + live**.
+line numbers, they drift** (every session shifts them a lot). Last written: **2026-06-25**, code at HEAD
+`55e73cb` (BR-S123), **pushed + live**.
 
 ---
 
@@ -29,17 +29,26 @@ before contradicting) · `docs/TASK_QUEUE.md` (newest-first shipped log + Ready 
 ---
 
 ## 2 · Where the build is NOW
-**HEAD = origin/main = `55e42dc` (BR-S117) · pushed, in sync.** **LIVE** at
+**HEAD = origin/main = `55e73cb` (BR-S123) · pushed, in sync.** **LIVE** at
 **https://nilsjouna999.github.io/blue-room-scan-room/** (GitHub Pages, `main`/root — **push = deploy**, ~50–80s;
 the 5 photos are PUBLIC by owner consent — don't re-gitignore). Plain HTML/CSS/JS, no build, **node NOT installed**.
+**Deploy can HANG occasionally** (once stuck ~10min, no incident) — watch `gh run list`; the fix is an empty
+re-trigger commit (`git commit --allow-empty` + push), which supersedes the hung run.
 
-**Commit arc since the last handoff (oldest→newest):**
-- `cf43266` BR-S114 — Metrics 4-plate read + Diagram-notes design folded into the REAL tabs (from the user's two
-  "dc" mockup files); dossier restructure (Hidden Stat removed, Fit+Aura→Aura, Archetype stub).
-- `23ba04d` BR-S115 — Metrics "register reel" + **Source** tab + photo lightbox + ◆ BLUE ROOM→menu + Finish standalone.
-- `28b0267` BR-S116 — reel polish (breathing room + soft LED) + brand-hitbox fix + Finish-top reposition +
-  authored Metrics for the other 3 cards + safe cleanup (dead JS/CSS + junk temp files). *(15-agent workflow.)*
-- `55e42dc` BR-S117 — **fluid Surface Record** (2 forms to compare) + **combined "Surface"** module. *(4-agent panel.)*
+**Commit arc since the last handoff (oldest→newest) — this run was the CARD-FRONT overhaul + polish:**
+- `d7e3f6a` BR-S118 — Surface Record LOCKED to the horizontal **tray** form (every card; column retired) + Metrics
+  reel clipping fix (inherited `gap:16px` desynced the translate) + sleeker "Diagnostic Receipts" head + left type tune.
+- `72495f4` BR-S119 — **NEW CARD FRONT ported** from the builder's `ScanCardFront.jsx`: the **"Frame Reading"
+  pip-ledger** replaces the old stat bars + a sealed caramel finish; ORIGINAL halo kept; held to the existing
+  ~777px footprint (photo `--photo-ratio` 4/3.5→**4/3** to fit the taller ledger). *(3-lens read-only panel.)*
+- `7632296` BR-S120 — mockup pips (position-based: 4th purple / 5th gold + glow) + a clickable **QR pop-out seat**.
+- `71dd668` BR-S121 — Frame Reading AUDIT refine: 3-step brass value-ramp + **faceted-gem pips** + tier-word ramp +
+  re-CENTRED ledger (`116px 72px 1fr` in a `max-width:300px` band — killed the right-clustering). *(3-lens audit.)*
+- `db08313` BR-S122 — de-bulk tier words (**IBM Plex Mono only loads 400/500** — 600/700 were faux-bolded) +
+  barcode-IS-the-QR-trigger + brighter Signal Note (--muted→--silver).
+- `55e73cb` BR-S123 — **Mint Record showcase** from the card (link → real `.dplate--mint` fixed mid-screen over a
+  blurred page scrim; dismiss→top; minted-only; QR↔Mint exclusive) + QR dismiss exit anim + barcode hover glow +
+  Surface % → elegant Cormorant + Signal-Note box dropped + signature moved under the note. *(3-lens panel.)*
 
 **Left panel = THREE tabs now: Source · Diagram · Metrics** (data-tab; the tabbar pins, the body scrolls):
 - **Source** — the original photo, whole + clean (no overlays). Click → a centred **lightbox** (X / backdrop /
@@ -61,11 +70,27 @@ Field fused — the colour-field proportion bar is the hero, the material chip c
 on one foot line; free = bar + teaser, no material; paid = chip + bar + foot) · Scene Role · seam(Technical
 Receipts). `.module--surface` / `.surface__*`.
 
-**Dossier (card back, 5 plates) — `renderDossier`:** recordGate · **01 Surface Record** (BR-S117: the **fluid
-pigment vessel** — the palette as live pigment suspended in developer fluid; `renderSurfaceRecord` + canvas, run by
-`mountSurfaceRecords()`; **column** form on Driver/Shore/Tank, **tray** form on Ice Field/Run via `src.surfaceVariant`;
-paid only — free keeps the `.cfdeep` teaser) · **02 Archetype** (empty stub) · `THE RECORD` · **03 Aura** (empty
-stub) · **04 Mint Record** (struck `.dplate--mint`) · `THE ORACLE` · **05 Oracle Read**.
+**THE CARD FRONT (`renderCard`, the crown — fully rebuilt BR-S119–S123 from the builder's `ScanCardFront.jsx`):**
+head (◆ BLUE ROOM ARCHIVE / rarity) · `.photo` (4/3) · `.titleblock` (title · ◆-flanked archetype · **`.verdict`
+Signal Note** = the card's VOICE, bright-silver italic, NO box · **`.signature`** stacked directly under it — the
+two italic-serif lines are one stanza) · **`.framereading`** the developed mint LEDGER (`.fr__row` = NAME · 5
+rotate-45 diamond **pips** · tier WORD; centred `116px 72px 1fr` in a `max-width:300px` band; driven by the SAME
+`tierBand()` as Metrics — never 0-100). **Pips (shiny):** positions 1-3 climb a brass value-ramp `--fr-1/2/3`
+(`.fr__pip--p1/2/3`, off the material so teal can't dull it), 4th purple `.fr__pip--p4` + 5th gold `.fr__pip--p5`,
+all **faceted** (135° gradient) with a glow hierarchy; tier WORD echoes the ramp via `--fr-tier` (`.fr__tier--<band>`,
+all 5 emitted). **FREE flattens everything to matte silver** (the free gate). · `.mintstrip` (state · serial ·
+`.mintstrip__right` = **"Mint Record" link `.mintlink`** + **barcode `<button>`**). **Two card pop-outs**
+(mirrors the lightbox pattern; scoped to `#stageZone .card`; minted-only; mutually exclusive; force-closed in
+`render()`/`applyTreatment()`; reduced-motion-safe): (1) **QR seat `.cardqr`** — the barcode pops a placeholder
+QR centred, the card front blurs to its own base colour; `.is-qr-open`/`.is-qr-closing` (exit anim). (2) **Mint
+showcase** — the `.mintlink` lifts the REAL dossier `.dplate--mint` to `position:fixed` mid-screen over the
+body-level **`.mintscrim` (`#mintScrim`, backdrop blur)**; dismiss→smooth-scroll to top; `body.is-mint-showcase`.
+
+**Dossier (card back, 5 plates) — `renderDossier`:** recordGate · **01 Surface Record** (BR-S117, **LOCKED to the
+horizontal `tray` bath** BR-S118 — the palette as live pigment in developer fluid; `renderSurfaceRecord` + canvas,
+run by `mountSurfaceRecords()`; paid only — free keeps the `.cfdeep` teaser; per-swatch **% is now Cormorant 15px**)
+· **02 Archetype** (empty stub) · `THE RECORD` · **03 Aura** (empty stub) · **04 Mint Record** (`.dplate--mint` —
+also the target of the card's Mint showcase) · `THE ORACLE` · **05 Oracle Read**.
 
 **Brand:** only `◆ BLUE ROOM` (wrapped in `.brand__hit` with `data-view-to="menu"`) jumps to the menu — the zone
 sub-label is inert.
@@ -73,18 +98,16 @@ sub-label is inert.
 ---
 
 ## 3 · Open decisions / follow-ups (priority order)
-1. **Surface Record FORM — builder to pick: column vs tray.** Both are live (column on Driver/Shore/Tank, tray on
-   Ice Field/Run). Compare on the developed dossier; once chosen, set every card's `src.surfaceVariant` to the winner.
-2. **Aura plate (dossier 03) content** — currently an empty reserved stub. Design from `docs/BR-AURA-RESEARCH.md`
-   (research DONE). The right-panel "Surface" module now carries the material/finish; Aura is parked.
+1. **Card-front micro-options the builder flagged as easy one-liners (NOT done):** the QR pop-out + Mint showcase
+   are minted-only (ghosted on free — could enable on free); the shiny pip base carries a faint material breath
+   (could go flat brass). Optional Signal-Note copy nudge: the note's 1st sentence re-states the archetype's
+   subject; the 2nd clause is the real voice — a future copy pass could trim the literal opener (data.js note fields).
+2. **Aura plate (dossier 03) content** — empty reserved stub. Design from `docs/BR-AURA-RESEARCH.md` (research DONE).
 3. **Ice Field Metrics copy** (BR-S116, MY draft — "Plateau" signature etc.) — builder review vs their own words.
-   Driver/Shore/Run/Tank metrics: Driver from the user's mockup, the rest authored + opus-safety-passed.
-4. **"Surface" label on FREE** — the combined module reads "Surface" in both states now (was "Colour Field" on
-   free). Judge said one stable name is better; confirm or branch the moduleHead arg.
-5. **Dead-CSS sweep (conservative, deferred):** now-orphaned `.module--finish`/`.finish*`/`.module--cfield`/`.cfbar`
-   (container)/`.cfcaption` (BR-S117) + `.diamond`/`.dia-*`/`.impact*` (orphaned when statDiamond/mixRow were
-   removed BR-S116) + `.metriccap--foot` (pending a `docs/map/03_SURFACES.md` check). `.cfbar__seg` + `.cfdeep` are
-   STILL used — keep.
+4. **Dead-CSS sweep (a spawned-task CHIP exists for this):** confirmed-dead reading-panel orphans `.cfkey`/
+   `.cfcaption`/`.module--cfield`(+`.cfbar` container)/`.module--finish`+`.finish*`/`.dsource2*` — grep-confirmed,
+   the styles.css ~1426 comment flags them "follow-up sweep". KEEP `.cfbar__seg` (shared by `.surface__bar`),
+   `.cfdeep*`, `.surface__*`, `.metriccap`. (BR-S118 already removed `.met-foot`; BR-S119 removed `.ministat*`.)
 6. **Image optimization** — `source-02..05.jpg` are ~11 MB 4000px JPEGs shown ≤1472px; re-save ~2000px@90% on
    COPIES (irreversible lossy) with the originals safe in git. Flagged, not done — needs the builder's go.
 7. **Older standing threads:** readiness gate (feed strong+flat photos, confirm the stats grade both ways) → grade
@@ -128,6 +151,22 @@ sub-label is inert.
   stray `0` file got created + deleted this way.) Also `2>&1` on native exe wraps stderr as errors — don't.
 - **Canvas (`mountSurfaceRecords`)**: rAF per `[data-surface-canvas]`, swatches passed via `esc(JSON.stringify(...))`
   data-attr, re-mounted after each dossier render (rafs cancelled on re-mount), reduced-motion = one frame then stop.
+- **IBM Plex Mono only LOADS 400 + 500** (index.html) — `font-weight:600/700` on a mono span gets FAUX-BOLDED
+  (thick/ugly; this was the "bulky CHARGED"). Cormorant loads 500/600/700 ital. Use real loaded weights; carry
+  emphasis with colour/size, not an unloaded weight.
+- **The preview tab's animation TIMELINE pauses** (driven headless) — a CSS `@keyframes` reads `playState:"running"`
+  but `currentTime` stuck at 0 (frozen at the `from` frame). So an entrance keyframe that starts `opacity:0` leaves
+  the element INVISIBLE in that state. Fix pattern: **don't gate visibility on the entrance animation** — keep the
+  element opaque and animate SCALE only (the Mint showcase + a scrim fade do this). Real (visible) tabs run it fine;
+  the freeze is a test artifact, but the scale-only form is the robust ship. Verify open-states by a **temp
+  auto-open hook + headless capture** (`--virtual-time-budget` DOES advance animations), then REVERT the hook.
+- **Card pop-out pattern (QR seat + Mint showcase)** — both mirror the lightbox: a delegated `document` click on
+  `[data-*]` scoped to `#stageZone .card` (so menu/proto/dev reuses stay inert), outside-click + Esc close with
+  listeners attached on `setTimeout(0)` (so the opening click can't self-close) and torn down on close, force-closed
+  in `render()`/`applyTreatment()` (those rebuild #stageZone/#dossierMount). Keep them **mutually exclusive** (each
+  open closes the other). The Mint showcase lifts the REAL `.dplate--mint` via `position:fixed` (z 901) over a
+  body-level `.mintscrim` (z 900, `backdrop-filter:blur`) — NO clone. `position:fixed` centres in the visible
+  viewport (minus the page scrollbar, ~8px), so a tiny X offset is expected, not a bug.
 - **Preview server DROPS** between turns — just `preview_start "scanroom"` again. Bust cache:
   `await Promise.all(['app.js','styles.css','data.js','index.html'].map(f=>fetch(f,{cache:'reload'})))` THEN navigate.
 - **Commits:** Bash heredoc `git commit -F -` (PowerShell here-strings break on `->`/quotes). End with the
@@ -142,20 +181,26 @@ sub-label is inert.
 
 ## 6 · Key files
 - **`data.js`** — `SOURCES[0..4]` (ids: driver-salute · ice-auger · shore-catch · loose-run · tank-pick; each:
-  card{title,archetype,note,...} · markers · diagram · analysis · metrics.signalMix · **`frame`{signature,field,
-  event}** [BR-S116/117] · halo{material,a,b,c} · **`surfaceVariant`** "column"|"tray" [BR-S117] · aura · sceneRole
-  · dossier{...}) · `S107_SECTIONS` · `S108_EXTRAS` (`colourField` {label,hex,pct,proof} — the Surface palette) ·
-  `toScanResultV2`.
-- **`app.js`** (re-grep, lines drift): `renderLeftPanel` (Source/Diagram/Metrics switch) · `renderSourceTab` ·
-  `renderDiagramTab`+`diagSplit` · `renderMetricsTab`+`metPlate`/`metTier`/`metSmoothPath` · `mountMetricsReel`
-  (the reel controller) · `renderReadingPanel` (combined `surfacePlate`) · `renderSurfaceRecord`/`srMakeBlobs`/
-  `mountSurfaceRecords` (the fluid Surface Record) · `renderDossier` (5 plates) · `dplate` · event delegation +
-  `mountMetricsReel()`/`mountSurfaceRecords()` after each panel/dossier render.
-- **`index.html`** — topbar (`.brand__hit`→menu, source toggle, treatment toggle) · room (3 panels) · `#dossierMount`
-  · body-level `#lightbox`.
-- **`styles.css`** — `:root` warm-sand tokens · `.met-reel*`/`.met-plate*` (reel) · `.dnotes*` (diagram notes) ·
-  `.met-*` (metrics plates) · `.module--surface`/`.surface__*` (combined) · `.lightbox*` · `.srcphoto*` · `.dplate*`
-  /`.dfaplate`/`.dplate--mint` (dossier) · `.cfdeep`/`.cfbar__seg` (kept). The fluid Surface Record is INLINE-styled
-  (no classes — ported from the JSX).
+  card{title,archetype,note,signature,serial,stats,...} · markers · diagram · analysis · metrics.signalMix ·
+  **`frame`{signature,field,event}** [BR-S116/117] · halo{material,a,b,c} · aura · sceneRole · dossier{...})
+  *(`surfaceVariant` REMOVED BR-S118 — Surface Record is locked tray)* · `S107_SECTIONS` · `S108_EXTRAS`
+  (`colourField` {label,hex,pct,proof} — the Surface palette) · `toScanResultV2`. Public stats render as tier
+  WORDS only via `tierBand()` (`BAND_PCT`/`bandPct`/`miniStat` were removed BR-S119 — no 0-100 ever).
+- **`app.js`** (re-grep, lines drift): **`renderCard`** (the crown — head/photo/titleblock+verdict+signature/
+  `.framereading` pip-ledger/mintstrip + the `.cardqr` + Mint-link markup) · `patchCardFront` (in-place treatment
+  re-skin; syncs barcode + mintlink ghost) · `applyTreatment`/`render` (both force-close the pop-outs) ·
+  `closeCardQR`/`onQROutside`/`onQREsc` + the `[data-card-qr]` open handler · **`closeMintShowcase`/`onMintOutside`/
+  `onMintEsc` + the `[data-mint-showcase]` open handler** · `renderLeftPanel` (Source/Diagram/Metrics) ·
+  `renderMetricsTab`+`mountMetricsReel` (reel) · `renderReadingPanel` · `renderSurfaceRecord`/`srMakeBlobs`/
+  `mountSurfaceRecords` (fluid Surface Record, tray-only) · `renderDossier`/`dplate`.
+- **`index.html`** — topbar · room (3 panels) · `#dossierMount` · body-level **`#mintScrim`** (Mint showcase blur) ·
+  body-level `#lightbox`.
+- **`styles.css`** — `:root` warm-sand tokens · **`.framereading`/`.fr__row`/`.fr__pip`(`--p1..p5`)/`.fr__tier`
+  (`--<band>`)** (the pip-ledger) · **`.verdict`** (Signal Note, boxless) · `.signature` · **`.cardqr*`**
+  (`.is-qr-open`/`.is-qr-closing`) + **`.mintscrim`/`body.is-mint-showcase .dplate--mint`** (Mint showcase) ·
+  `.mintstrip__right`/`.mintlink`/`.barcode` (the two triggers) · `.met-reel*`/`.met-plate*` (reel) · `.dnotes*` ·
+  `.module--surface`/`.surface__*` · `.lightbox*` · `.dplate*`/`.dplate--mint` · `.cfdeep`/`.cfbar__seg` (kept).
+  The fluid Surface Record (`renderSurfaceRecord`) is INLINE-styled (ported from the JSX).
 - **Docs:** `TASK_QUEUE.md` (shipped log) · `DECISION_LOG.md` (ratifications) · `BR-AURA-RESEARCH.md` (aura ground)
-  · `FILE_MAP.md` (router). The user's source design for BR-S117 was `C:\Users\nilsj\Downloads\SurfaceRecord.jsx`.
+  · `FILE_MAP.md` (router). Builder source designs (React, pasted from the planning chat): the card front =
+  `C:\Users\nilsj\Downloads\ScanCardFront.jsx` (BR-S119); the Surface Record = `…\Downloads\SurfaceRecord.jsx` (BR-S117).
