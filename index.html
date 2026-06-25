@@ -62,6 +62,11 @@
 
   <section class="dossier" id="dossierMount"></section>
 
+  <!-- Mint Record showcase scrim (BR-S123) — body-level blur layer. The card's
+       "Mint Record" link adds body.is-mint-showcase: this scrim blurs the page and the
+       real .dplate--mint fixes to mid-screen above it; clicking the scrim dismisses. -->
+  <div class="mintscrim" id="mintScrim" data-mint-dismiss aria-hidden="true"></div>
+
   <!-- Source lightbox — body-level so it escapes panel overflow; opened from the
        Source tab photo, closed by the X / backdrop / Esc. Image src set on open. -->
   <div class="lightbox" id="lightbox" aria-hidden="true">

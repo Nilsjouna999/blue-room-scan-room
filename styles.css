@@ -678,18 +678,19 @@ body[data-devnav="1"] .toggle--treatment { display: inline-flex; }
   white-space: nowrap;
 }
 .verdict {
-  margin-top: 9px;
-  padding: 8px 14px 9px;
-  border: 1px solid var(--line);
-  border-radius: 6px;
-  background: rgba(255, 255, 255, 0.022);
+  margin-top: 10px;
+  padding: 2px 6px 0;
+  border: 0;
+  background: none;
   font-family: var(--font-display);
   font-style: italic;
   font-weight: 500;
   font-size: 16.5px;
   line-height: 1.45;
-  /* BR-S122: lifted muted → silver so the Signal Note carries presence in the middle
-     of the card and the read flows top→bottom instead of dipping into a dim valley. */
+  /* BR-S122/S123: the Signal Note is the card's VOICE — carried by bright silver italic
+     copy, NOT a container box. The box competed with the Frame Reading ledger for "the
+     important block"; dropping it (and stacking the signature under it) lets the note
+     read as the single voice, flowing top→bottom. */
   color: var(--silver);
 }
 .verdict__key {
@@ -776,9 +777,11 @@ body[data-devnav="1"] .toggle--treatment { display: inline-flex; }
 }
 .card[data-treatment="free"] .fr__tier { --fr-tier: var(--silver-dim); }
 
-/* signature line */
+/* signature line — BR-S123: moved DIRECTLY under the Signal Note (was below the ledger),
+   so the two italic-serif voice lines form one stanza: voice → signed voice. Kept dimmer
+   + smaller than the note so it reads as the quiet countersignature, not a second lead. */
 .signature {
-  margin-top: 8px;
+  margin-top: 6px;
   text-align: center;
   font-family: var(--font-display);
   font-style: italic;
@@ -824,7 +827,7 @@ body[data-devnav="1"] .toggle--treatment { display: inline-flex; }
   opacity: 0.55;
   flex: none;
   border: 0; padding: 0; cursor: pointer;
-  transition: opacity 160ms ease;
+  transition: opacity 160ms ease, filter 160ms ease;
   background: repeating-linear-gradient(
     90deg,
     var(--silver-dim) 0 1px, transparent 1px 3px,
@@ -832,9 +835,29 @@ body[data-devnav="1"] .toggle--treatment { display: inline-flex; }
     var(--silver-dim) 6px 7px, transparent 7px 10px
   );
 }
-.barcode:hover { opacity: 0.92; }
-.barcode:focus-visible { opacity: 0.92; outline: 1px solid var(--line-strong); outline-offset: 2px; }
+/* BR-S123: the barcode EMITS LIGHT on hover (a soft bloom off the silver bars, like the
+   old QR icon glowed) — drop-shadow blooms off the gradient where box-shadow cannot. */
+.barcode:hover, .barcode:focus-visible {
+  opacity: 1;
+  filter: drop-shadow(0 0 2px rgba(200, 196, 187, 0.6)) drop-shadow(0 0 6px rgba(148, 143, 135, 0.45));
+}
+.barcode:focus-visible { outline: 1px solid var(--line-strong); outline-offset: 2px; }
 .barcode--ghost { opacity: 0.22; pointer-events: none; cursor: default; }
+.barcode--ghost:hover, .barcode--ghost:focus-visible { filter: none; opacity: 0.22; }
+
+/* mint strip right cell (BR-S123): the "Mint Record" showcase link sits beside the
+   barcode so the strip stays a balanced 3-cell row (state | serial | right). */
+.mintstrip__right { display: inline-flex; align-items: center; gap: 11px; flex: none; }
+.mintlink {
+  flex: none; padding: 0; border: 0; background: none; cursor: pointer;
+  font-family: var(--font-mono); font-size: 8.5px; font-weight: 500; letter-spacing: 0.18em;
+  text-transform: uppercase; color: var(--silver-dim); white-space: nowrap;
+  transition: color 160ms ease, text-shadow 160ms ease;
+}
+.mintlink:hover, .mintlink:focus-visible {
+  color: var(--silver-bright); text-shadow: 0 0 7px rgba(233, 229, 220, 0.4); outline: none;
+}
+.mintlink--ghost { opacity: 0.22; pointer-events: none; cursor: default; }
 
 /* sparkles + halo (dormant until shiny) */
 .card__sparkles { position: absolute; inset: 0; z-index: 3; pointer-events: none; opacity: 0; }
@@ -1200,7 +1223,37 @@ body[data-devnav="1"] .toggle--treatment { display: inline-flex; }
   font-family: var(--font-mono); font-size: 8px; letter-spacing: 0.22em;
   text-transform: uppercase; color: var(--silver-dim);
 }
-/* the QR is the developed artifact's link → inert on the non-room reuses of the card */
+/* BR-S123: a precise, satisfying QR DISMISS — keep .cardqr mounted through a brief
+   reverse fade/scale (.is-qr-closing) instead of snapping straight to display:none. */
+.card.is-qr-closing .cardqr { display: flex; animation: cardqr-out 190ms ease-in both; }
+.card.is-qr-closing .cardqr__seat { animation: cardqr-seat-out 190ms cubic-bezier(0.4, 0, 0.7, 0.4) both; }
+@keyframes cardqr-out { to { opacity: 0; } }
+@keyframes cardqr-seat-out { to { transform: scale(0.965); opacity: 0; } }
+
+/* Mint Record showcase (BR-S123) — the card's "Mint Record" link lifts the REAL dossier
+   .dplate--mint to mid-screen over a page-wide blur scrim; dismiss un-blurs + scrolls top.
+   z 900/901 sits below the lightbox (1000). The plate (901) is above the scrim (900) so it
+   stays SHARP while the blurred page recedes behind it. */
+.mintscrim {
+  position: fixed; inset: 0; z-index: 900; opacity: 0; pointer-events: none;
+  background: rgba(6, 6, 8, 0.46);
+  -webkit-backdrop-filter: blur(7px) saturate(0.92); backdrop-filter: blur(7px) saturate(0.92);
+  transition: opacity 260ms cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+body.is-mint-showcase .mintscrim { opacity: 1; pointer-events: auto; }
+body.is-mint-showcase .dplate--mint {
+  position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  z-index: 901; width: min(560px, 92vw); max-height: 88vh; overflow-y: auto; margin: 0 !important;
+  opacity: 1; box-shadow: 0 40px 100px rgba(0, 0, 0, 0.7);
+  /* scale-only entrance (no opacity in the keyframe): the plate stays VISIBLE even if a
+     paused timeline freezes the animation at its first frame — the scrim fade carries the
+     "appear". translate(-50%,-50%) keeps it exactly centred through the pop. */
+  animation: mintshow-in 280ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+@keyframes mintshow-in {
+  from { transform: translate(-50%, -50%) scale(0.975); }
+  to { transform: translate(-50%, -50%) scale(1); }
+}
 @keyframes halo-breathe {
   0%, 100% { opacity: 0.78; transform: scale(1); }
   50% { opacity: 1; transform: scale(1.035); }
@@ -3369,6 +3422,8 @@ body[data-view="room"] .dev { display: none; }
 @media (prefers-reduced-motion: reduce) {
   .card, .fr__pip, .photo__shimmer, .card__sparkles, .card__halo { animation: none !important; }
   .cardqr, .cardqr__seat { animation: none !important; }
+  .mintscrim { transition: none !important; }
+  body.is-mint-showcase .dplate--mint { animation: none !important; }
   /* develop ceremony must not tween — snap the card + descendants to final skin */
   .card, .card * { transition: none !important; }
   .card.is-developing { animation: none !important; --dev: 1 !important; }

@@ -591,6 +591,7 @@ function renderCard(src, treatment) {
             <span class="archline__diamond">◆</span><span class="archline__rule"></span>
           </div>
           <p class="verdict"><span class="verdict__key">Signal Note</span>${esc(c.note)}</p>
+          <p class="signature">${esc(c.signature)}</p>
         </div>
 
         <div class="framereading">
@@ -621,12 +622,13 @@ function renderCard(src, treatment) {
           })()}
         </div>
 
-        <p class="signature">${esc(c.signature)}</p>
-
         <div class="mintstrip">
           <span class="mintstrip__state ${minted ? "" : "mintstrip__state--free"}">${esc(t.stamp)}</span>
           <span class="mintstrip__serial ${minted ? "" : "mintstrip__serial--ghost"}">${esc(c.serial)} · ${esc(t.strip)}</span>
-          <button type="button" class="barcode ${minted ? "" : "barcode--ghost"}" data-card-qr aria-label="Show card scan code" tabindex="${minted ? "0" : "-1"}"></button>
+          <span class="mintstrip__right">
+            <button type="button" class="mintlink ${minted ? "" : "mintlink--ghost"}" data-mint-showcase aria-label="Show the Mint Record" tabindex="${minted ? "0" : "-1"}">Mint Record</button>
+            <button type="button" class="barcode ${minted ? "" : "barcode--ghost"}" data-card-qr aria-label="Show card scan code" tabindex="${minted ? "0" : "-1"}"></button>
+          </span>
         </div>
 
         <div class="cardqr" aria-hidden="true">
@@ -891,7 +893,7 @@ function renderSurfaceRecord(src) {
         <span style="${bead(s.hex)}"></span>
         <span style="font-size:12.5px; letter-spacing:0.01em; color:var(--t-body);">${esc(s.label)}</span>
         <span style="flex:1; border-bottom:1px dotted rgba(233,229,220,0.17); transform:translateY(-2px); min-width:8px;"></span>
-        <span style="font-family:var(--font-mono); font-size:11px; color:var(--silver-bright); font-variant-numeric:tabular-nums;">${esc(s.pct)}</span>
+        <span style="font-family:var(--font-display); font-weight:500; font-size:15px; letter-spacing:0.02em; color:var(--silver-bright); font-feature-settings:'tnum' 1;">${esc(s.pct)}</span>
       </div>
       <p style="margin:4px 0 0 24px; font-family:var(--font-display); font-style:italic; font-size:12.5px; line-height:1.4; color:var(--t-meta); text-wrap:pretty;">${esc(s.proof)}</p>
     </div>`;
@@ -2153,6 +2155,7 @@ function renderHaloGateMock() {
 
 function render() {
   closeCardQR();                 // a rebuilt #stageZone drops any open QR; detach its listeners
+  closeMintShowcase(false);       // the dossier rebuilds below; drop any showcased plate (no scroll)
   const src = SOURCES[state.source];
   document.body.dataset.treatment = state.treatment;
   applyView();
@@ -2214,6 +2217,8 @@ function patchCardFront(src, treatment) {
   if (serial) { serial.textContent = `${c.serial} · ${t.strip}`; serial.classList.toggle("mintstrip__serial--ghost", !minted); }
   const bar = card.querySelector(".barcode");
   if (bar) { bar.classList.toggle("barcode--ghost", !minted); bar.tabIndex = minted ? 0 : -1; }
+  const mintlink = card.querySelector(".mintlink");
+  if (mintlink) { mintlink.classList.toggle("mintlink--ghost", !minted); mintlink.tabIndex = minted ? 0 : -1; }
 }
 
 function runDevelopChoreography() {
@@ -2237,6 +2242,7 @@ function runDevelopChoreography() {
 /* In-place re-skin: flip the treatment without rebuilding the card node. */
 function applyTreatment(next) {
   closeCardQR();                 // QR must not survive a treatment re-skin (the node persists)
+  closeMintShowcase(false);       // nor a showcased Mint plate (the dossier re-renders)
   state.treatment = next;
   if (next !== "mint") state.labMaterial = null;
   const src = SOURCES[state.source];
@@ -2380,14 +2386,19 @@ document.addEventListener("keydown", (e) => {
    and tear down on close, so nothing leaks between opens. render()/applyTreatment also
    force-close (a rebuilt or re-skinned card must not keep a stale QR open). */
 function closeCardQR() {
-  const card = document.querySelector("#stageZone .card.is-qr-open");
-  if (card) {
-    card.classList.remove("is-qr-open");
-    const layer = card.querySelector(".cardqr");
-    if (layer) layer.setAttribute("aria-hidden", "true");
-  }
   document.removeEventListener("pointerdown", onQROutside, true);
   document.removeEventListener("keydown", onQREsc, true);
+  const card = document.querySelector("#stageZone .card.is-qr-open");
+  if (!card) return;
+  card.classList.remove("is-qr-open");
+  const layer = card.querySelector(".cardqr");
+  if (layer) layer.setAttribute("aria-hidden", "true");
+  if (MOTION_OFF) return;                                // CSS snaps it off, no exit tween
+  /* BR-S123: a symmetric, precise exit — keep .cardqr mounted through a brief reverse
+     fade/scale (.is-qr-closing) so the dismiss is satisfying, not a sudden display:none. */
+  card.classList.add("is-qr-closing");
+  window.clearTimeout(closeCardQR._t);
+  closeCardQR._t = window.setTimeout(() => card.classList.remove("is-qr-closing"), 230);
 }
 function onQROutside(e) {
   /* the sharp QR seat keeps it open; the trigger toggles via its own handler;
@@ -2404,15 +2415,62 @@ document.addEventListener("click", (e) => {
   if (!card) return;                                     // menu / proto / dev reuses: inert
   if (card.classList.contains("is-developing")) return;  // don't fight the develop ceremony
   e.preventDefault(); e.stopPropagation();
+  closeMintShowcase(false);                              // QR + Mint showcase are exclusive
   const opening = !card.classList.contains("is-qr-open");
-  closeCardQR();                                         // idempotent reset
+  closeCardQR();                                         // idempotent reset (runs the exit if open)
   if (!opening) return;                                  // second tap = toggle closed
+  card.classList.remove("is-qr-closing");                // cancel any in-flight exit
+  window.clearTimeout(closeCardQR._t);
+  void card.offsetWidth;                                 // restart the enter cleanly
   card.classList.add("is-qr-open");
   const layer = card.querySelector(".cardqr");
   if (layer) layer.setAttribute("aria-hidden", "false");
   setTimeout(() => {                                     // defer so THIS click doesn't close it
     document.addEventListener("pointerdown", onQROutside, true);
     document.addEventListener("keydown", onQREsc, true);
+  }, 0);
+});
+
+/* Mint Record showcase (BR-S123): the card's "Mint Record" link lifts the REAL dossier
+   Mint Record plate (.dplate--mint) to mid-screen over a blurred page scrim; dismissing
+   (outside-click / Esc) un-blurs and smooth-scrolls back to the TOP of the page. Open is
+   scoped to the LIVE card (#stageZone) so ONLY the card triggers it — the real dossier
+   plate is never a trigger. render()/applyTreatment() force-close (the dossier rebuilds). */
+function closeMintShowcase(toTop) {
+  document.removeEventListener("pointerdown", onMintOutside, true);
+  document.removeEventListener("keydown", onMintEsc, true);
+  if (!document.body.classList.contains("is-mint-showcase")) return;
+  document.body.classList.remove("is-mint-showcase");
+  const scrim = document.getElementById("mintScrim");
+  if (scrim) scrim.setAttribute("aria-hidden", "true");
+  if (toTop) window.scrollTo({ top: 0, behavior: MOTION_OFF ? "auto" : "smooth" });
+}
+function onMintOutside(e) {
+  if (e.target.closest(".dplate--mint")) return;          // clicking the showcased plate keeps it
+  if (e.target.closest("[data-mint-showcase]")) return;   // the trigger toggles via its own handler
+  closeMintShowcase(true);
+}
+function onMintEsc(e) { if (e.key === "Escape") { e.stopPropagation(); closeMintShowcase(true); } }
+document.addEventListener("click", (e) => {
+  const trig = e.target.closest("[data-mint-showcase]");
+  if (!trig) return;
+  const card = trig.closest("#stageZone .card");
+  if (!card) return;                                      // only the LIVE card triggers; dossier plate inert
+  if (card.dataset.treatment === "free") return;          // minted-only: free has no real Mint Record
+  if (card.classList.contains("is-developing")) return;
+  e.preventDefault(); e.stopPropagation();
+  closeCardQR();                                          // mutually exclusive with the QR pop-out
+  const opening = !document.body.classList.contains("is-mint-showcase");
+  if (!opening) { closeMintShowcase(true); return; }      // second tap = dismiss to top
+  const plate = document.querySelector("#dossierMount .dplate--mint");
+  if (!plate) return;
+  plate.scrollTop = 0;
+  document.body.classList.add("is-mint-showcase");
+  const scrim = document.getElementById("mintScrim");
+  if (scrim) scrim.setAttribute("aria-hidden", "false");
+  setTimeout(() => {                                      // defer so THIS click doesn't close it
+    document.addEventListener("pointerdown", onMintOutside, true);
+    document.addEventListener("keydown", onMintEsc, true);
   }, 0);
 });
 
