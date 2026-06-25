@@ -1,0 +1,637 @@
+/* =====================================================================
+   BLUE ROOM — Staged Card Reveal (BR-S124)
+   Self-contained surface. Hosted on ?dev=staged-reveal. Everything is
+   scoped under .reveal-stage so it cannot leak into the live room/card.
+   TOKENS + MOTION are mapped onto the EXISTING design system (no fresh
+   palette) so the surface stays coherent with the rest of Blue Room.
+   Animate ONLY transform / opacity (+ box-shadow for the pulse). Never
+   width/height/top/left/margin — those reflow and stutter.
+   ===================================================================== */
+
+.reveal-stage {
+  /* --- colour: spec name -> existing system value --------------------- */
+  --rv-room:           var(--ink-950, #0a0b0d);          /* the paper */
+  --rv-room-2:         var(--ink-900, #100f0c);
+  --rv-ink:            var(--t-display, #e9e5dc);         /* warm off-white */
+  --rv-ink-2:          var(--t-primary, #d7d3ca);
+  --rv-ink-dim:        var(--t-meta, #948f87);            /* labels/captions */
+  --rv-ink-ghost:      var(--t-ghost, #6e6b63);
+  --rv-rule:           var(--line, rgba(233, 229, 220, 0.12));
+  --rv-rule-faint:     var(--line-faint, rgba(233, 229, 220, 0.07));
+  --rv-grey-arrow:     var(--t-meta, #948f87);
+  --rv-grey-arrow-hov: var(--t-primary, #d7d3ca);
+  --rv-halo:           var(--violet, #8b7bff);            /* the deeper purple */
+  --rv-halo-glow:      color-mix(in srgb, var(--violet, #8b7bff) 30%, transparent);
+
+  /* --- motion --------------------------------------------------------- */
+  --rv-ease:           cubic-bezier(0.2, 0.7, 0.2, 1);    /* the house easing */
+  --rv-dur-develop:    820ms;
+  --rv-dur-row:        70ms;                              /* per-row stagger */
+  --rv-dur-write:      1100ms;
+
+  position: relative;
+  min-height: 100vh;
+  overflow-x: clip;                       /* decorative halo bloom never makes a page scrollbar */
+  padding: clamp(28px, 5vh, 64px) clamp(16px, 4vw, 48px) 96px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background:
+    radial-gradient(120% 90% at 50% -10%, var(--rv-room-2) 0%, var(--rv-room) 62%);
+  color: var(--rv-ink-2);
+  font-family: var(--font-ui, "Inter", sans-serif);
+}
+
+/* ---- header ---------------------------------------------------------- */
+.reveal-stage__head {
+  text-align: center;
+  margin-bottom: clamp(20px, 4vh, 40px);
+}
+.reveal-stage__devtag {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.22em;
+  color: var(--rv-ink-ghost);
+  text-transform: uppercase;
+  margin-bottom: 14px;
+}
+.reveal-stage__brand {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(22px, 4vw, 30px);
+  letter-spacing: 0.08em;
+  color: var(--rv-ink);
+  margin: 0;
+}
+.reveal-stage__thesis {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: clamp(13px, 2.4vw, 15px);
+  color: var(--rv-ink-dim);
+  margin: 6px 0 0;
+}
+
+/* ---- the stage: card (+ arrow) on the left, reading on the right ------ */
+.reveal-stage__body {
+  display: flex;
+  gap: clamp(24px, 5vw, 64px);
+  align-items: flex-start;
+  justify-content: center;
+  width: 100%;
+  max-width: 1040px;
+}
+.reveal-stage__cardcol {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 22px;
+  flex: 0 0 auto;
+}
+
+/* =====================================================================
+   UNIT 1/4 — ArrowButton  (grey | purple variant)
+   props: variant, disabled · emits: onClick
+   Owns: bent-right shape, hover (darken + more present), purple pulse/glow
+   ===================================================================== */
+.rv-arrow {
+  --c: var(--rv-grey-arrow);
+  appearance: none;
+  border: 1px solid var(--rv-rule);
+  background: color-mix(in srgb, var(--rv-room-2) 70%, transparent);
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  color: var(--c);
+  transition:
+    transform 200ms var(--rv-ease),
+    border-color 200ms var(--rv-ease),
+    color 200ms var(--rv-ease),
+    box-shadow 200ms var(--rv-ease),
+    opacity 240ms var(--rv-ease);
+  will-change: transform;
+}
+.rv-arrow__svg {
+  width: 26px;
+  height: 26px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: transform 200ms var(--rv-ease);
+}
+.rv-arrow:hover:not([aria-disabled="true"]),
+.rv-arrow:focus-visible {
+  transform: scale(1.06);
+  color: var(--rv-grey-arrow-hov);
+  border-color: var(--rv-rule);
+  background: color-mix(in srgb, var(--rv-room-2) 92%, transparent);
+}
+.rv-arrow:hover:not([aria-disabled="true"]) .rv-arrow__svg { transform: translateX(2px); }
+.rv-arrow:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--rv-ink) 55%, transparent);
+  outline-offset: 3px;
+}
+.rv-arrow:active:not([aria-disabled="true"]) { transform: scale(0.97); }
+
+.rv-arrow[aria-disabled="true"] {
+  opacity: 0.32;
+  cursor: default;
+  pointer-events: none;
+}
+
+/* purple variant — the quiet offer (only after the free read settles) */
+.rv-arrow[data-variant="purple"] {
+  --c: var(--rv-halo);
+  border-color: color-mix(in srgb, var(--rv-halo) 55%, var(--rv-rule));
+  color: var(--rv-halo);
+  animation: rv-arrow-pulse 2.8s var(--rv-ease) infinite;
+}
+.rv-arrow[data-variant="purple"]:hover,
+.rv-arrow[data-variant="purple"]:focus-visible {
+  animation-play-state: paused;          /* pause the pulse on hover — no nag */
+  color: var(--rv-ink);
+  border-color: var(--rv-halo);
+  box-shadow: 0 0 0 1px var(--rv-halo-glow), 0 8px 30px var(--rv-halo-glow);
+}
+/* rare faint sparkle, low amplitude */
+.rv-arrow[data-variant="purple"]::after {
+  content: "";
+  position: absolute;
+  width: 4px; height: 4px;
+  border-radius: 50%;
+  background: var(--rv-halo);
+  top: 10px; right: 12px;
+  opacity: 0;
+  animation: rv-arrow-spark 4.4s ease-in-out infinite;
+}
+@keyframes rv-arrow-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--rv-halo) 0%, transparent); }
+  50%      { box-shadow: 0 0 0 5px color-mix(in srgb, var(--rv-halo) 12%, transparent), 0 6px 26px var(--rv-halo-glow); }
+}
+@keyframes rv-arrow-spark {
+  0%, 86%, 100% { opacity: 0; transform: scale(0.6); }
+  92%           { opacity: 0.85; transform: scale(1); }
+}
+.rv-arrow.is-gone {
+  opacity: 0;
+  transform: scale(0.9);
+  pointer-events: none;
+}
+.rv-arrow__cap {
+  display: block;
+  margin-top: 9px;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--rv-ink-ghost);
+  text-align: center;
+  transition: opacity 200ms var(--rv-ease);
+}
+
+/* =====================================================================
+   UNIT 2/6 — CardFrame  (photo | free | halo)
+   Fixed-aspect box. Layers stacked in ONE grid cell -> identical box in
+   every state; crossfade by opacity only (zero layout shift). Reuses the
+   real renderCard() for free + halo (the crown is the crown).
+   ===================================================================== */
+.rv-cardframe {
+  position: relative;
+  display: grid;
+  width: 360px;                           /* the designed display width; the card (min(--card-w,100%)) fills it */
+  isolation: isolate;
+}
+.rv-layer {
+  grid-area: 1 / 1;                       /* every layer fills the same cell */
+  min-width: 0;
+  opacity: 0;
+  transition: opacity var(--rv-dur-develop) var(--rv-ease),
+              transform var(--rv-dur-develop) var(--rv-ease);
+  transform: scale(0.992);
+  pointer-events: none;
+}
+.rv-layer > .card { width: 100%; animation: none; }   /* kill the card-in pop; we drive the crossfade */
+.rv-layer.is-shown {
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+}
+/* photo state: a full-card-sized raw plate that "develops" into the card */
+.rv-layer--photo { z-index: 1; }
+.rv-photoplate {
+  height: 100%;
+  border-radius: var(--card-radius, 12px);
+  overflow: hidden;
+  background: var(--ink-850, #11100d);
+  box-shadow: 0 44px 90px rgba(0, 0, 0, 0.62), 0 10px 28px rgba(0, 0, 0, 0.5);
+  position: relative;
+}
+.rv-photoplate img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  display: block;
+  filter: saturate(0.86) contrast(0.96) brightness(0.9);
+}
+.rv-photoplate::after {                   /* developer-fluid wash over the raw photo */
+  content: "";
+  position: absolute; inset: 0;
+  background: linear-gradient(180deg, rgba(10,11,13,0.28), rgba(10,11,13,0.5));
+  mix-blend-mode: multiply;
+}
+.rv-layer--free { z-index: 2; }
+.rv-layer--halo { z-index: 3; }
+
+/* the re-develop scan sweep (free -> halo) — pure transform, runs once */
+.rv-scanline {
+  position: absolute;
+  left: -2%; right: -2%;
+  top: 0;
+  height: 38%;
+  z-index: 6;
+  pointer-events: none;
+  opacity: 0;
+  background: linear-gradient(180deg,
+    transparent 0%,
+    color-mix(in srgb, var(--rv-halo) 22%, transparent) 50%,
+    transparent 100%);
+  mix-blend-mode: screen;
+}
+.rv-cardframe.is-scanning .rv-scanline {
+  animation: rv-scan var(--rv-dur-develop) var(--rv-ease) 1;
+}
+@keyframes rv-scan {
+  0%   { opacity: 0;   transform: translateY(-40%); }
+  18%  { opacity: 1; }
+  82%  { opacity: 1; }
+  100% { opacity: 0;   transform: translateY(280%); }
+}
+
+/* =====================================================================
+   UNIT 3/7 — ReadingPanel  (reserved | developed)
+   Renders straight on the room surface — NO card/border of its own.
+   The write-in ripples top->bottom; each row = a rule that draws (scaleX)
+   + text that fades up. Emits onWriteInComplete on the last row.
+   ===================================================================== */
+.rv-read {
+  flex: 1 1 340px;
+  min-width: 0;
+  max-width: 440px;
+  padding-top: 6px;
+}
+.rv-read__headline {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(24px, 4vw, 30px);
+  letter-spacing: 0.01em;
+  color: var(--rv-ink);
+  margin: 0 0 4px;
+  line-height: 1.05;
+}
+.rv-read__engine {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--rv-ink-ghost);
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 20px;
+}
+.rv-read__engine .rv-dot {
+  width: 5px; height: 5px; border-radius: 50%;
+  background: var(--rv-ink-dim);
+}
+.rv-read[data-engine="halo"] .rv-read__engine .rv-dot { background: var(--rv-halo); }
+
+/* a write-in row */
+.rv-row {
+  position: relative;
+  padding: 11px 0 12px;
+  opacity: 0;
+}
+.rv-row.is-writing {
+  animation: rv-row-text 420ms var(--rv-ease) forwards;
+  animation-delay: calc(var(--i, 0) * var(--rv-dur-row));
+}
+.rv-row__rule {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 1px;
+  background: var(--rv-rule);
+  transform: scaleX(0);
+  transform-origin: left center;
+}
+.rv-row.is-writing .rv-row__rule {
+  animation: rv-rule-draw 480ms var(--rv-ease) forwards;
+  animation-delay: calc(var(--i, 0) * var(--rv-dur-row));
+}
+.rv-row__label {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--rv-ink-dim);
+}
+.rv-row__val {
+  font-family: var(--font-display);
+  font-size: 16px;
+  color: var(--rv-ink-2);
+  margin-top: 3px;
+  line-height: 1.32;
+}
+.rv-row__val--note {
+  font-style: italic;
+  color: var(--rv-ink);
+}
+.rv-row__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+}
+
+/* the four ◆ core meters — persist across the swap, recolor grey->purple */
+.rv-meters { margin: 4px 0 2px; }
+.rv-meter {
+  display: grid;
+  grid-template-columns: 16px 1fr auto;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 0;
+  opacity: 0;
+}
+.rv-meter.is-writing {
+  animation: rv-row-text 420ms var(--rv-ease) forwards;
+  animation-delay: calc(var(--i, 0) * var(--rv-dur-row));
+}
+.rv-meter__glyph {
+  font-size: 11px;
+  color: var(--rv-ink-ghost);
+  transition: color 520ms var(--rv-ease), text-shadow 520ms var(--rv-ease);
+}
+.rv-meter__name {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--rv-ink-dim);
+}
+.rv-meter__right { display: inline-flex; align-items: center; gap: 9px; justify-self: end; }
+.rv-meter__pips { display: inline-flex; gap: 4px; }
+.rv-pip {
+  width: 7px; height: 7px;
+  transform: rotate(45deg);
+  border: 1px solid var(--rv-rule);
+  background: transparent;
+  transition: background 520ms var(--rv-ease), border-color 520ms var(--rv-ease), box-shadow 520ms var(--rv-ease);
+}
+.rv-pip.is-on { background: var(--rv-ink-dim); border-color: var(--rv-ink-dim); }
+.rv-meter__tag {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  color: var(--rv-ink-dim);
+  text-transform: uppercase;
+}
+/* developed (halo) recolor — the meters charge purple + gain the ◆ glow */
+.rv-read[data-engine="halo"] .rv-meter__glyph {
+  color: var(--rv-halo);
+  text-shadow: 0 0 8px var(--rv-halo-glow);
+}
+.rv-read[data-engine="halo"] .rv-pip.is-on {
+  background: var(--rv-halo);
+  border-color: var(--rv-halo);
+  box-shadow: 0 0 6px var(--rv-halo-glow);
+}
+.rv-read[data-engine="halo"] .rv-meter__tag { color: color-mix(in srgb, var(--rv-halo) 70%, var(--rv-ink)); }
+
+/* the below-card dossier — reserved (scribbled) vs developed (ink) */
+.rv-dossier { margin-top: 22px; }
+.rv-dossier__seam {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--rv-ink-ghost);
+  margin-bottom: 14px;
+  display: flex; align-items: center; gap: 10px;
+}
+.rv-dossier__seam::after {
+  content: ""; flex: 1; height: 1px; background: var(--rv-rule-faint);
+}
+.rv-slot { padding: 9px 0; opacity: 0; }
+.rv-slot.is-writing {
+  animation: rv-row-text 420ms var(--rv-ease) forwards;
+  animation-delay: calc(var(--i, 0) * var(--rv-dur-row));
+}
+.rv-slot__name {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--rv-ink-dim);
+}
+/* reserved: scribbled placeholder + a hand-drawn underline that draws on */
+.rv-slot--reserved .rv-slot__body {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 14px;
+  color: var(--rv-ink-ghost);
+  margin-top: 3px;
+}
+.rv-scribble {
+  display: block;
+  width: 100%;
+  height: 12px;
+  margin-top: 5px;
+  overflow: visible;
+}
+.rv-scribble path {
+  fill: none;
+  stroke: var(--rv-ink-ghost);
+  stroke-width: 1.4;
+  stroke-linecap: round;
+  stroke-dasharray: var(--len, 200);
+  stroke-dashoffset: var(--len, 200);
+}
+.rv-slot.is-writing .rv-scribble path {
+  animation: rv-ink-draw 620ms var(--rv-ease) forwards;
+  animation-delay: calc(var(--i, 0) * var(--rv-dur-row) + 120ms);
+}
+.rv-slot__tap {
+  display: inline-block;
+  margin-top: 6px;
+  font-family: var(--font-mono);
+  font-size: 8.5px;
+  letter-spacing: 0.22em;
+  color: var(--rv-halo);
+  text-transform: uppercase;
+  opacity: 0.78;
+}
+/* developed: written ink */
+.rv-slot--developed .rv-slot__body {
+  font-family: var(--font-display);
+  font-size: 15px;
+  color: var(--rv-ink-2);
+  margin-top: 3px;
+  line-height: 1.36;
+}
+.rv-slot--developed .rv-slot__body em {
+  font-style: italic;
+  color: var(--rv-ink);
+}
+.rv-slot__metric {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--rv-halo);
+  letter-spacing: 0.04em;
+}
+
+.rv-read__close {
+  margin-top: 22px;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 14px;
+  color: var(--rv-ink-dim);
+  opacity: 0;
+}
+.rv-read__close.is-writing {
+  animation: rv-row-text 520ms var(--rv-ease) forwards;
+  animation-delay: calc(var(--i, 0) * var(--rv-dur-row));
+}
+
+/* =====================================================================
+   UNIT 5 — WarningModal  (body-level, escapes overflow)
+   ===================================================================== */
+.rv-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 950;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 240ms var(--rv-ease, cubic-bezier(0.2, 0.7, 0.2, 1));
+}
+.rv-modal.is-open { opacity: 1; pointer-events: auto; }
+.rv-modal__backdrop {
+  position: absolute; inset: 0;
+  background: rgba(8, 9, 11, 0.55);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+.rv-modal__panel {
+  position: relative;
+  width: min(420px, 92vw);
+  background: linear-gradient(180deg, var(--ink-800, #151310), var(--ink-900, #100f0c));
+  border: 1px solid var(--line, rgba(233, 229, 220, 0.12));
+  border-radius: 14px;
+  padding: 30px 30px 24px;
+  box-shadow: 0 40px 90px rgba(0, 0, 0, 0.6);
+  transform: scale(0.96);
+  opacity: 0;
+  transition: transform 240ms var(--rv-ease, cubic-bezier(0.2, 0.7, 0.2, 1)),
+              opacity 240ms var(--rv-ease, cubic-bezier(0.2, 0.7, 0.2, 1));
+  color: var(--t-primary, #d7d3ca);
+}
+.rv-modal.is-open .rv-modal__panel { transform: scale(1); opacity: 1; }
+.rv-modal__kicker {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--violet, #8b7bff);
+  margin: 0 0 12px;
+}
+.rv-modal__body {
+  font-family: var(--font-display);
+  font-size: 17px;
+  line-height: 1.5;
+  color: var(--t-display, #e9e5dc);
+  margin: 0 0 24px;
+}
+.rv-modal__row { display: flex; gap: 12px; justify-content: flex-end; flex-wrap: wrap; }
+.rv-btn {
+  appearance: none;
+  font-family: var(--font-ui, "Inter", sans-serif);
+  font-size: 13px;
+  letter-spacing: 0.01em;
+  padding: 10px 20px;
+  border-radius: 9px;
+  cursor: pointer;
+  transition: transform 160ms var(--rv-ease, cubic-bezier(0.2,0.7,0.2,1)),
+              background 160ms ease, border-color 160ms ease, color 160ms ease;
+}
+.rv-btn:focus-visible { outline: 2px solid color-mix(in srgb, var(--t-display, #e9e5dc) 55%, transparent); outline-offset: 2px; }
+.rv-btn:active { transform: scale(0.98); }
+/* "Alright" — the easy, visually-default choice (stay; free is complete) */
+.rv-btn--default {
+  background: var(--t-display, #e9e5dc);
+  border: 1px solid var(--t-display, #e9e5dc);
+  color: var(--ink-950, #0a0b0d);
+  font-weight: 600;
+}
+.rv-btn--default:hover { background: #fff; }
+/* "No — let me see" — the quieter, deliberate choice (proceed to Halo) */
+.rv-btn--quiet {
+  background: transparent;
+  border: 1px solid var(--line-strong, rgba(233, 229, 220, 0.2));
+  color: var(--t-meta, #948f87);
+}
+.rv-btn--quiet:hover { color: var(--t-primary, #d7d3ca); border-color: var(--violet, #8b7bff); }
+
+/* =====================================================================
+   keyframes (shared)
+   ===================================================================== */
+@keyframes rv-row-text {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes rv-rule-draw {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+@keyframes rv-ink-draw {
+  to { stroke-dashoffset: 0; }
+}
+
+/* =====================================================================
+   responsive — below ~900px the reading reflows BELOW the card
+   ===================================================================== */
+@media (max-width: 900px) {
+  .reveal-stage__body { flex-direction: column; align-items: center; }
+  .rv-read { max-width: min(440px, 92vw); width: 100%; }
+}
+@media (max-width: 430px) {
+  /* shrink the crown card as one unit so its fixed internal layout never
+     squeezes or overflows on a phone (layout-aware zoom; the proto pattern) */
+  .reveal-stage__cardcol { zoom: 0.82; }
+}
+
+/* =====================================================================
+   reduced motion — instant crossfades, no stagger, no pulse, never hide
+   ===================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  .reveal-stage *,
+  .reveal-stage *::before,
+  .reveal-stage *::after {
+    animation-duration: 0.001ms !important;
+    animation-delay: 0ms !important;
+    transition-duration: 0.001ms !important;
+  }
+  .rv-layer { transition: none !important; transform: none !important; }
+  .rv-row, .rv-meter, .rv-slot, .rv-read__close { opacity: 1 !important; transform: none !important; }
+  .rv-row__rule { transform: scaleX(1) !important; }
+  .rv-scribble path { stroke-dashoffset: 0 !important; }
+  .rv-arrow[data-variant="purple"] { animation: none !important; }
+  .rv-arrow[data-variant="purple"]::after { display: none; }
+  .rv-scanline { display: none; }
+  .rv-modal, .rv-modal__panel { transition: none !important; }
+}

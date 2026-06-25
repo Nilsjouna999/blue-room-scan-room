@@ -11,6 +11,7 @@
     rel="stylesheet"
   />
   <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="reveal/reveal.css" />
 </head>
 <body data-treatment="free" data-view="menu">
   <!-- DEV NAV — dev-only state jumper. Hidden by default; revealed ONLY when the
@@ -84,6 +85,16 @@
        FUTURE uploaded-photo engine. Exposes window.BlueRoomScanContract.
        Loaded before app.js; not run against the local draft (no engine yet). -->
   <script src="scan-contract.js"></script>
+  <!-- Staged Card Reveal (BR-S124) — isolated dev surface on ?dev=staged-reveal.
+       Loaded BEFORE app.js so window.BRReveal exists when app boots and
+       mountDev() hands it the host. Units call the global renderCard (defined
+       by app.js, present by mount time). Self-contained — touches nothing live. -->
+  <script src="reveal/readings.data.js"></script>
+  <script src="reveal/arrow-button.js"></script>
+  <script src="reveal/card-frame.js"></script>
+  <script src="reveal/reading-panel.js"></script>
+  <script src="reveal/warning-modal.js"></script>
+  <script src="reveal/stage-controller.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

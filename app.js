@@ -91,7 +91,7 @@ const state ={ source: 0, treatment: "free", tab: "diagram", view: "menu", draft
      uploaded-blocked renders a validated DEV fixture, never a user scan.
      free-scan-sim = Free Pull mock · halo-gate = sealed card-back mock. */
   const dev = q.get("dev");
-  if (["uploaded-result", "uploaded-blocked", "free-scan-sim", "halo-gate", "before-after", "review-map", "proto-cards"].includes(dev)) { state.view = "dev"; state.dev = dev; }
+  if (["uploaded-result", "uploaded-blocked", "free-scan-sim", "halo-gate", "before-after", "review-map", "proto-cards", "staged-reveal"].includes(dev)) { state.view = "dev"; state.dev = dev; }
   else if (q.has("src") || q.has("t") || q.has("tab")) state.view = "room";
 }
 
@@ -1708,6 +1708,14 @@ function mountDev() {
   const F = (C && C.DEV_FIXTURES) || {};
   if (state.dev === "proto-cards") {
     document.getElementById("devView").innerHTML = renderProtoCards();
+    return;
+  }
+  if (state.dev === "staged-reveal") {
+    // BR-S124 — isolated staged-reveal surface. Self-contained units in
+    // /reveal (window.BRReveal); this branch only hands it the mount node.
+    const host = document.getElementById("devView");
+    if (window.BRReveal && typeof window.BRReveal.mount === "function") window.BRReveal.mount(host);
+    else host.innerHTML = '<p style="padding:48px;color:#948f87;text-align:center;font-family:sans-serif">Staged reveal failed to load (reveal/*.js).</p>';
     return;
   }
   if (state.dev === "review-map") {
