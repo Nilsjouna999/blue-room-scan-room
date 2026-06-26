@@ -697,17 +697,49 @@
 .reveal-stage--embedded .rv-read__headline { font-size: clamp(22px, 3vw, 28px); }
 .reveal-stage--embedded .rv-grid--halo { grid-template-columns: 1fr; max-width: 372px; }
 
-/* integrated-menu preview (?dev=menu-reveal): brand + doors as a LEFT chrome
-   layer that STEPS ASIDE on develop; the bare staged reveal slides full-width
-   (card glides left, read fills right). The live menu is untouched. */
-.menurev2 { position: relative; min-height: 100vh; padding: clamp(28px, 5vh, 56px) clamp(16px, 4vw, 48px) 80px; }
-.menurev2__chrome {
-  position: absolute; top: clamp(28px, 5vh, 56px); left: clamp(20px, 5vw, 64px); z-index: 6;
-  width: min(320px, 30vw); display: flex; flex-direction: column; gap: 16px; text-align: left;
-  transition: opacity 600ms var(--rv-ease), transform 720ms var(--rv-ease);
+/* ?dev=menu-reveal — the REAL menu grid hosts the staged reveal. .menurev
+   replicates the .menu container (the .menu class is display:none in dev view);
+   the sample-card slot becomes the menustage reveal. ONE base colour = the body's
+   gradient (the reveal paints NO background of its own). */
+.menurev { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 34px 24px; position: relative; }
+.menurev .menu__inner { width: min(1180px, 92vw); }      /* the sacred grid + the original width */
+.menu__stage--reveal { position: relative; }
+.menurev__mount { display: contents; }                   /* the reveal-stage IS the stage-cell content */
+
+/* menustage: the card lives in the menu's 1fr stage cell, sized + positioned
+   like the original sample card; the read reserves space on its right + slides in. */
+.reveal-stage--menustage {
+  --rv-read-w: clamp(280px, 30vw, 324px);
+  --rv-slide-gap: clamp(14px, 1.6vw, 24px);
+  min-height: 0; padding: 0; background: none; align-items: stretch; width: 100%;
 }
-.menurev2.is-developing .menurev2__chrome { opacity: 0; transform: translateX(-22px); pointer-events: none; }
-.menurev2__stage { position: relative; }
+.reveal-stage--menustage .reveal-stage__body { justify-content: center; gap: var(--rv-slide-gap); max-width: 100%; margin: 0; }
+.reveal-stage--menustage .rv-cardframe { width: 430px; zoom: 0.92; }   /* == .msample__card (the original sample) */
+.reveal-stage--menustage .rv-readslot { flex: 0 0 auto; width: var(--rv-read-w); min-width: 0; }
+.reveal-stage--menustage .rv-stagemain { position: relative; transition: transform 820ms var(--rv-ease); will-change: transform; }
+/* REST: card centred in the stage cell (matches the original); slides left when the read opens */
+.reveal-stage--menustage:not(.is-reading) .rv-stagemain { transform: translateX(calc((var(--rv-read-w) + var(--rv-slide-gap)) / 2)); }
+.reveal-stage--menustage.is-reading .rv-stagemain { transform: translateX(0); }
+.reveal-stage--menustage .rv-readslot { transition: opacity 820ms var(--rv-ease) 220ms, transform 820ms var(--rv-ease) 220ms; }
+.reveal-stage--menustage:not(.is-reading) .rv-readslot { opacity: 0; transform: translateX(22px); }
+.reveal-stage--menustage.is-reading .rv-readslot { opacity: 1; transform: translateX(0); }
+/* arrow sits below the card (absolute) so it never eats horizontal room from the read */
+.reveal-stage--menustage .rv-arrowslot { position: absolute; left: 50%; bottom: -56px; transform: translateX(-50%); }
+
+/* FULLVIEW takeover (see-deeper → halo): the stage cell promotes to a fixed
+   full-bleed layer; the menu chrome steps aside. */
+.menurev.is-fullview .menu__head,
+.menurev.is-fullview .menu__controls { opacity: 0; transform: translateX(-40px); pointer-events: none; transition: opacity 600ms var(--rv-ease), transform 720ms var(--rv-ease); }
+.menurev.is-fullview .menu__stage--reveal { position: fixed; inset: 0; z-index: 40; display: grid; place-items: center; padding: clamp(28px, 5vh, 64px); background: radial-gradient(120% 90% at 50% -10%, var(--rv-room-2) 0%, var(--rv-room) 62%); animation: rv-fullview-in 420ms var(--rv-ease) forwards; }
+@keyframes rv-fullview-in { from { opacity: 0; } to { opacity: 1; } }
+.menurev.is-fullview .reveal-stage--menustage { --rv-read-w: min(560px, 44vw); }
+.menurev.is-fullview .reveal-stage--menustage .rv-cardframe { zoom: 1; }
+.menurev.is-fullview .reveal-stage--menustage .reveal-stage__body { max-width: 1180px; }
+
+/* BACK affordance — fades in once the takeover settles */
+.menurev__back { position: fixed; top: clamp(20px, 4vh, 40px); left: clamp(20px, 4vw, 44px); z-index: 50; font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--t-meta); background: none; border: none; cursor: pointer; padding: 8px 4px; opacity: 0; pointer-events: none; transition: opacity 400ms var(--rv-ease) 360ms, color 160ms ease; }
+.menurev.is-fullview .menurev__back { opacity: 1; pointer-events: auto; }
+.menurev__back:hover { color: var(--t-display); }
 
 /* the arrow — bare hand-drawn glyph, no button chrome (your prototype) */
 .rv-arrow {

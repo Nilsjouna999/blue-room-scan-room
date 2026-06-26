@@ -1719,29 +1719,44 @@ function mountDev() {
     return;
   }
   if (state.dev === "menu-reveal") {
-    // PREVIEW: the menu's brand + doors as a LEFT chrome layer that steps aside on
-    // develop; the staged reveal (bare, full-width slide) is the stage — so the
-    // card glides left + the read fills the right. The live menu is UNTOUCHED.
+    // PREVIEW: the REAL menu grid (the sacred .menu__inner — byte-identical start frame),
+    // hosted on a non-view-gated .menurev wrapper (the .menu class is display:none in dev).
+    // The sample card slot hosts the staged reveal (menustage): card develops in place,
+    // the read slides in on the right, "see deeper" promotes to a fullview. Live menu UNTOUCHED.
     const host = document.getElementById("devView");
     host.innerHTML =
-      '<div class="menurev2">' +
-        '<div class="menurev2__chrome">' +
-          '<h1 class="menu__brand"><span class="menu__mark">◆</span> BLUE ROOM</h1>' +
-          '<p class="menu__thesis">Every photo is already a card. The room develops it.</p>' +
-          '<p class="menu__trust">Image-as-artifact scan — it reads frame, gesture and signal, never the person.</p>' +
-          '<div class="menu__doors">' +
-            '<button type="button" class="menu__door menu__door--add" data-draft-pick><span class="menu__door-kicker">Your Photo</span><span class="menu__door-name">Add your photo</span><span class="menu__door-desc">Stage your image as a local draft.</span></button>' +
-            '<button type="button" class="menu__door menu__door--sample" data-view-to="room"><span class="menu__door-kicker">Sample</span><span class="menu__door-name">View sample card</span><span class="menu__door-desc">A finished developed card — SRC-01.</span></button>' +
+      '<div class="menurev">' +
+        '<div class="menu__inner">' +
+          '<header class="menu__head">' +
+            '<h1 class="menu__brand"><span class="menu__mark">◆</span> BLUE ROOM</h1>' +
+            '<p class="menu__thesis">Every photo is already a card. The room develops it.</p>' +
+            '<p class="menu__trust">Image-as-artifact scan — it reads frame, gesture and signal, never the person.</p>' +
+          '</header>' +
+          '<section class="menu__stage menu__stage--reveal">' +
+            '<div class="msample__cap"><span class="msample__label">Sample Scan</span><span class="msample__type">SRC-01 · Archive</span></div>' +
+            '<div class="menurev__mount"></div>' +
+          '</section>' +
+          '<div class="menu__controls">' +
+            '<span class="menu__rule" aria-hidden="true"></span>' +
+            '<p class="msample__seal">The front is complete. The same card has a sealed back.</p>' +
+            '<div class="menu__doors">' +
+              '<button type="button" class="menu__door menu__door--add" data-draft-pick><span class="menu__door-kicker">Your Photo</span><span class="menu__door-name">Add your photo</span><span class="menu__door-desc">Stage your image as a local draft. The scan engine isn\'t connected yet — nothing reads it.</span></button>' +
+              '<button type="button" class="menu__door menu__door--sample" data-view-to="room"><span class="menu__door-kicker">Sample</span><span class="menu__door-name">View sample card</span><span class="menu__door-desc">See a finished developed card — SRC-01. A sample, not your photo.</span></button>' +
+            '</div>' +
+            '<p class="menu__foot">One sample · SRC-01 · Driver.</p>' +
           '</div>' +
         '</div>' +
-        '<div class="menurev2__stage"></div>' +
+        '<button type="button" class="menurev__back" aria-label="Return to the menu">← Back to the menu</button>' +
       '</div>';
-    const stage = host.querySelector(".menurev2__stage");
-    if (stage && window.BRReveal && typeof window.BRReveal.mount === "function") {
-      window.BRReveal.mount(stage, {
-        bare: true,
-        onReading: function () { const m = host.querySelector(".menurev2"); if (m) m.classList.add("is-developing"); },
+    const mountEl = host.querySelector(".menurev__mount");
+    if (mountEl && window.BRReveal && typeof window.BRReveal.mount === "function") {
+      const rev = window.BRReveal.mount(mountEl, {
+        menustage: true,
+        onFullview: function () { const m = host.querySelector(".menurev"); if (m) m.classList.add("is-fullview"); },
+        onBack: function () { const m = host.querySelector(".menurev"); if (m) m.classList.remove("is-fullview"); },
       });
+      const back = host.querySelector(".menurev__back");
+      if (back) back.addEventListener("click", function () { if (rev && rev.toFree) rev.toFree(); });
     }
     return;
   }

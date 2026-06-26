@@ -17,7 +17,8 @@
     if (!root) return;
     opts = opts || {};
     var embedded = !!opts.embedded;   // narrow slot — vertical stack, readings below
-    var bare = embedded || !!opts.bare; // skip the reveal's own header (a host menu provides the brand)
+    var menustage = !!opts.menustage; // hosted in the real menu grid's stage cell (card-right, slide-in read, one base)
+    var bare = embedded || menustage || !!opts.bare; // skip the reveal's own header (a host menu provides the brand)
 
     // idempotent: tear down any prior instance (body-level modal included)
     Array.prototype.slice.call(document.querySelectorAll(".rv-modal")).forEach(function (m) { m.remove(); });
@@ -33,7 +34,9 @@
     }
 
     var stage = document.createElement("div");
-    stage.className = "reveal-stage" + (embedded ? " reveal-stage--embedded" : "");
+    stage.className = "reveal-stage"
+      + (embedded ? " reveal-stage--embedded" : "")
+      + (menustage ? " reveal-stage--menustage" : "");
     stage.innerHTML =
       (bare ? "" :   // a host menu provides the brand/header
         '<div class="reveal-stage__head">' +
@@ -60,6 +63,7 @@
 
     var readslot = stage.querySelector(".rv-readslot");
     var panel = null;
+    var haloTimer = null;   // guards the develop beat across rapid taps
 
     var arrow = R.ArrowButton({ variant: "grey", label: "Develop the card", onClick: onArrow });
     var cap = document.createElement("span");
@@ -76,8 +80,17 @@
     });
 
     // ---- init --------------------------------------------------------
-    card.setMode("photo");
-    setArrow({ variant: "grey", disabled: false }, "Develop");
+    if (menustage) {
+      // the menu sample IS the developed free card (matches the original menu exactly);
+      // pressing reveals its reading, then "see deeper" mints + deepens in the fullview.
+      stageName = "FREE";
+      card.setMode("free");
+      setArrow({ variant: "grey", disabled: false }, "Read");
+    } else {
+      stageName = "PHOTO";
+      card.setMode("photo");
+      setArrow({ variant: "grey", disabled: false }, "Develop");
+    }
 
     // ---- helpers -----------------------------------------------------
     function setArrow(opts, caption) {
@@ -114,16 +127,21 @@
       });
     }
     function enterHalo() {
+      if (haloTimer) { clearTimeout(haloTimer); haloTimer = null; }
       stageName = "HALO";
-      if (panel) panel.clear();   // the free Stats & Readings fades to empty first
+      if (opts.onFullview) opts.onFullview();   // promote to the fullview: the menu chrome steps aside
+      stage.classList.remove("is-reading");      // card returns to centre for the develop
+      if (panel) panel.clear();                  // the free Stats & Readings fades to empty first
       setArrow({ variant: "grey", disabled: true }, "Developing…");
       // then, a beat later, the card itself develops (the wipe) — sequenced, not all at once
-      setTimeout(function () {
+      haloTimer = setTimeout(function () {
+        haloTimer = null;
         if (stageName === "HALO") card.setMode("halo"); // wipe-develop; onMorph('halo') re-enables
       }, 320);
     }
     function enterHaloReading() {
       stageName = "HALO_READING";
+      stage.classList.add("is-reading");         // slide left again for the halo read
       setArrow({ variant: "grey", disabled: true }, "Reading…");
       mountPanel(R.readings.haloReading, function () {
         // journey over — fade the arrow out
@@ -179,5 +197,20 @@
       }
       setTimeout(tick, 150);
     }
+
+    // ---- BACK from the fullview to the in-menu free read ----------------
+    function toFree() {
+      if (haloTimer) { clearTimeout(haloTimer); haloTimer = null; }
+      if (opts.onBack) opts.onBack();          // un-fullview: the menu chrome fades back in
+      stageName = "FREE_READING"; purpleReady = true;
+      if (panel) panel.clear();
+      card.setMode("free");                    // back to the matte free card
+      stage.classList.add("is-reading");       // the free read returns where they left it
+      mountPanel(R.readings.freeReading, function () {
+        setArrow({ variant: "purple", disabled: false, label: "See the deeper room" }, "See deeper");
+      });
+    }
+
+    return { el: stage, toFree: toFree };
   };
 })();
