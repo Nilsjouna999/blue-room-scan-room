@@ -215,7 +215,8 @@
 
       var fired = false;
       function fire() { if (fired) return; fired = true; if (fbTimer) { clearTimeout(fbTimer); fbTimer = null; } if (cb) cb(); }
-      fbTimer = setTimeout(fire, items.length * 320 + 2400);  // matches the slower, moodier pacing in CSS
+      var stagger = el.dataset.engine === "halo" ? 360 : 460;  // mirrors the --rv-stagger token (FREE 460 / HALO 360)
+      fbTimer = setTimeout(fire, items.length * stagger + 2400);  // fire after the last module settles
     }
 
     if (opts.reading) setReading(opts.reading);

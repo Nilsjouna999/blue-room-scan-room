@@ -3,9 +3,9 @@
 For a fresh Claude Code session to resume with zero context loss. **You are the BUILDER** (you hold the repo and
 make the changes). The user pastes specs/designs from a separate planning chat. Grounded in the repo — **re-grep
 line numbers, they drift** (every session shifts them a lot). Last written: **2026-06-26**, code at HEAD
-`BR-S132` (TIER 4 develop-craft + the arrow nit — **local, NOT pushed**); `e72aa24` (BR-S131 + this handoff) is
-the **pushed/live** tip. **The current work is the develop/reveal ADD-ON — see the ★ ACTIVE LANE section below
-FIRST.** (The §2 card-front detail underneath it is prior-run context, still accurate.)
+`BR-S133` (TIER 5 scribble polish — **local, NOT pushed**, atop BR-S132 develop-craft+arrow which is **pushed/live**).
+**The current work is the develop/reveal ADD-ON — see the ★ ACTIVE LANE section below FIRST.** (The §2 card-front
+detail underneath it is prior-run context, still accurate.)
 
 ---
 
@@ -67,14 +67,17 @@ card→halo tonal-rise + fix-bloom + wet-meniscus · `--rv-ease-soft` · robustn
 caption dropped** (the builder's pick; in a read-side lane so it never overlaps a module).
 
 **THE BUILD SPEC for the remaining work** (a 23-agent `menu-addon-polish-audit` Workflow result) is at the task output
-`…\tasks\wsc60yo20.output` — **read it first**. Tiers 1–4 DONE (S131 = 1–3, **S132 = TIER 4**); **Tiers 5–7 REMAIN:**
+`…\tasks\wsc60yo20.output` — **read it first**. Tiers 1–5 DONE (S131 = 1–3, S132 = TIER 4, **S133 = TIER 5**);
+**Tiers 6–7 REMAIN** — T6 robustness (thread `src` into the panel; kill SRC-01 hardcodes; comet polygon from
+`src.frame.signature.radii`) · T7 a11y + edge cases:
 - **TIER 4 — craft — ✅ DONE (BR-S132):** photo→free is now a 3-beat "Print Rising from the Bath" develop (clip
   bloom + exposure fix + sinking bath; standalone route only); card→halo got a tonal-rise filter + a halo-fix bloom
   (::after) + a wet-meniscus scanline (NOT a layer mask — the critic killed that: it froze blank + killed the glow
   clip). New `--rv-ease-soft` token. Robustness wipe-clip `→ inset(-60px -60px calc(100% + 60px) -60px)` applied.
-- **TIER 5 — scribble MINIMAL polish** (builder LIKES it — minimal only): draw easing → `cubic-bezier(.25,.46,.45,.94)`;
-  count-scaled stagger (460ms free / 360ms halo via a `--rv-stagger` token keyed off `.rv-read[data-engine="halo"]`);
-  a 3px `rv-settle` for pips/peak; let the flourish draw; `.rv-cap__em` 18→17px.
+- **TIER 5 — scribble MINIMAL polish — ✅ DONE (BR-S133):** `--rv-ease-draw` cubic-bezier(.25,.46,.45,.94) on the
+  sketch `.d`; count-scaled `--rv-stagger` (460ms free / 360ms halo via `.rv-read[data-engine="halo"]`) + the
+  reading-panel.js timeout mirrors it; a 3px `rv-settle` keyframe on pips/peak/photo; the flourish now DRAWS
+  in-sequence (freeze-safe 2-rule pattern, not stranded); `.rv-cap__em` 18→17px. Local, not pushed.
 - **TIER 6 — ROBUSTNESS (the image AND stats MAY CHANGE):** thread `src` into the panel —
   `panel = R.ReadingPanel({ reading, src })` (it currently never gets `src` → hardcoded to SRC-01). Replace every
   SRC-01 literal with `src.*`: photo `src.file`, pips `Math.round(src.card.stats[k]/20)`, serial `src.card.serial`,

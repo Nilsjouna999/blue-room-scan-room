@@ -25,10 +25,12 @@
 
   /* --- motion --------------------------------------------------------- */
   --rv-ease:           cubic-bezier(0.2, 0.7, 0.2, 1);    /* the house easing */
+  --rv-ease-draw:      cubic-bezier(0.25, 0.46, 0.45, 0.94); /* organic hand-drawn stroke draw-on */
   --rv-ease-soft:      cubic-bezier(0.4, 0, 0.2, 1);      /* the develop WIPE + wet-meniscus sweep ONLY */
   --rv-dur-develop:    820ms;
   --rv-dur-row:        70ms;                              /* per-row stagger */
   --rv-dur-write:      1100ms;
+  --rv-stagger:        460ms;                            /* FREE (<=4 modules) per-module write-in stagger */
 
   position: relative;
   min-height: 100vh;
@@ -907,6 +909,7 @@
 
 /* readings panel ---------------------------------------------------- */
 .rv-read { flex: 1 1 auto; max-width: 748px; width: 100%; margin: 0 auto; padding-top: 2px; text-align: left; }
+.rv-read[data-engine="halo"] { --rv-stagger: 360ms; }       /* HALO (8 modules) — tighter so the longer read doesn't drag */
 .rv-read__headline {
   font-family: var(--font-display); font-weight: 500; font-style: italic;
   font-size: clamp(26px, 4vw, 34px); letter-spacing: 0.01em;
@@ -914,7 +917,8 @@
 }
 .rv-read__flourish { display: flex; justify-content: center; margin: 2px 0 26px; }
 .rv-read__flourish .rv-sketch { width: 120px; height: 12px; color: var(--rv-ink-dim); }
-.rv-read__flourish .rv-sketch .d { stroke-dashoffset: 0; }  /* the headline flourish is static (never in a write-in group) */
+.rv-read__flourish .rv-sketch .d { stroke-dashoffset: 0; }  /* freeze-safe default: fully drawn if .is-writing never fires */
+.is-writing .rv-read__flourish .rv-sketch .d { stroke-dashoffset: 100; animation: rv-draw 0.85s var(--rv-ease-draw) forwards; animation-delay: calc(var(--i, 0) * var(--rv-stagger, 460ms) + 170ms + var(--di, 0) * 60ms); }  /* but DRAW in-sequence when the read writes in */
 
 .rv-subhead { grid-column: 1 / -1; display: flex; flex-direction: column; gap: 3px; margin-bottom: 4px; }
 .rv-subhead__t { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.24em; text-transform: uppercase; color: var(--rv-ink-dim); }
@@ -951,7 +955,7 @@
 .rv-cap__l { font-family: var(--font-display); font-style: italic; font-size: 15.5px; color: var(--rv-ink-2); line-height: 1.28; }
 .rv-cap__l--sub { font-size: 13.5px; color: var(--rv-ink-dim); }
 .rv-cap__l--gap { margin-top: 10px; }
-.rv-cap__em { font-style: italic; font-size: 18px; color: var(--rv-ink); }
+.rv-cap__em { font-style: italic; font-size: 17px; color: var(--rv-ink); }
 .rv-mod__cap--leaders { gap: 1px; }
 
 .rv-stats { display: flex; flex-direction: column; gap: 9px; }
@@ -971,16 +975,17 @@
 .rv-read__top, .rv-mod__hd, .rv-mod__cap, .rv-oracle, .rv-mintbox, .rv-peak, .rv-stat, .rv-subhead__t, .rv-photoframe img { opacity: 0; }
 .rv-read__top.is-writing,
 .rv-mod.is-writing .rv-mod__hd,
-.rv-subhead.is-writing .rv-subhead__t { animation: rv-fade 0.5s var(--rv-ease) forwards; animation-delay: calc(var(--i, 0) * 320ms); }
-.is-writing .rv-sketch .d { animation: rv-draw 0.85s var(--rv-ease) forwards; animation-delay: calc(var(--i, 0) * 320ms + 170ms + var(--di, 0) * 60ms); }
+.rv-subhead.is-writing .rv-subhead__t { animation: rv-fade 0.5s var(--rv-ease) forwards; animation-delay: calc(var(--i, 0) * var(--rv-stagger, 460ms)); }
+.is-writing .rv-sketch .d { animation: rv-draw 0.85s var(--rv-ease-draw) forwards; animation-delay: calc(var(--i, 0) * var(--rv-stagger, 460ms) + 170ms + var(--di, 0) * 60ms); }
 .rv-mod.is-writing .rv-mod__cap,
 .rv-mod.is-writing .rv-oracle,
-.rv-mod.is-writing .rv-mintbox,
+.rv-mod.is-writing .rv-mintbox { animation: rv-fade 0.6s var(--rv-ease) forwards; animation-delay: calc(var(--i, 0) * var(--rv-stagger, 460ms) + 1050ms); }
 .rv-mod.is-writing .rv-peak,
 .rv-mod.is-writing .rv-stat,
-.rv-mod.is-writing .rv-photoframe img { animation: rv-fade 0.6s var(--rv-ease) forwards; animation-delay: calc(var(--i, 0) * 320ms + 1050ms); }
+.rv-mod.is-writing .rv-photoframe img { animation: rv-settle 0.6s var(--rv-ease) forwards; animation-delay: calc(var(--i, 0) * var(--rv-stagger, 460ms) + 1050ms); }
 @keyframes rv-draw { to { stroke-dashoffset: 0; } }
 @keyframes rv-fade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+@keyframes rv-settle { from { opacity: 0; transform: translateY(3px); } to { opacity: 1; transform: none; } }  /* K3 — half the travel of rv-fade so pips/peak/photo don't jump */
 
 @media (max-width: 900px) {
   .reveal-stage__body { flex-direction: column; align-items: center; }
