@@ -1,14 +1,11 @@
 /* =====================================================================
-   BLUE ROOM — Staged Card Reveal · UNIT 3/7 ReadingPanel (BR-S125)
-   The hand-drawn "archive sketchbook" readings. ONE component, TWO
-   datasets: engine 'free' -> 4 modules, engine 'halo' -> 6 modules
-   (swap, not augment). Every sketch + label DRAWS ITSELF IN when the
-   arrow is pressed (stroke-dashoffset on the SVG marks + fade on labels),
-   sequenced module-by-module. Renders straight on the room surface.
-
-   props in : { reading, onWriteInComplete }
-   methods  : setReading(reading), play(cb)
-   Content is decorative SHOWCASE (per builder) — copy is placeholder.
+   BLUE ROOM — Staged Card Reveal · UNIT 3/7 ReadingPanel (BR-S126)
+   The hand-drawn "archive sketchbook" readings. engine 'free' -> 4
+   modules; engine 'halo' -> 8 modules (adds Frame Signature [the comet
+   metric] + the Source photo). Swap, not augment. Every sketch + label
+   DRAWS ITSELF IN when the arrow is pressed (stroke-dashoffset + fade),
+   sequenced module-by-module — slow + deliberate (it has a mood).
+   clear() empties the panel as the card morphs to halo.
    ===================================================================== */
 (function () {
   window.BRReveal = window.BRReveal || {};
@@ -21,8 +18,7 @@
     });
   }
 
-  /* ---- the 9 hand-drawn sketches (authored read-only; shared stroke
-     styling lives in CSS, so each mark is just geometry + the .d hook) -- */
+  /* ---- the hand-drawn sketches (shared stroke styling lives in CSS) ---- */
   var SKETCHES = {
     surface: { vb: "0 0 130 64", m:
       '<circle class="d" pathLength="100" cx="22" cy="22" r="11.2"/><circle class="d" pathLength="100" cx="65" cy="22" r="11.4"/><circle class="d" pathLength="100" cx="108" cy="22" r="11.1"/>' +
@@ -37,7 +33,7 @@
       '<line class="d" pathLength="100" x1="103" y1="20" x2="107" y2="33"/>' +
       '<path class="d" pathLength="100" d="M12 62 C24 59, 32 65, 46 61 C58 57, 68 64, 80 61 C90 59, 102 63, 114 61 C116 60, 118 62, 118 61"/>' },
     signalwave: { vb: "0 0 160 56", m:
-      '<polyline class="d" pathLength="100" points="10,30 18,28 24,32 30,29 36,31 42,28 48,32 54,29 58,31 62,28 66,32 68,26 70,8 72,30 76,33 80,29 86,32 92,28 98,32 104,29 110,31 116,28 120,31"/>' +
+      '<path class="d" pathLength="100" d="M10 30 L18 28 L24 32 L30 29 L36 31 L42 28 L48 32 L54 29 L58 31 L62 28 L66 32 L68 26 L70 8 L72 30 L76 33 L80 29 L86 32 L92 28 L98 32 L104 29 L110 31 L116 28 L120 31"/>' +
       '<path class="d a" pathLength="100" d="M138 16 C150 14, 158 20, 158 28 C158 36, 151 42, 139 43 C127 44, 119 38, 120 29 C121 20, 129 15, 137 16"/>' },
     archetype: { vb: "0 0 116 116", m:
       '<circle class="d" pathLength="100" cx="58" cy="58" r="4"/>' +
@@ -75,6 +71,12 @@
       '<path class="d a" pathLength="100" d="M92 13 C93 19 93 21 94 22 C93 23 93 25 92 31 C91 25 91 23 90 22 C91 21 91 19 92 13 Z"/><path class="d a" pathLength="100" d="M82 22 C88 23 90 23 92 24 C94 23 96 23 102 22 C96 21 94 21 92 20 C90 21 88 21 82 22 Z"/>' +
       '<path class="d" pathLength="100" d="M110 40 C110 44 111 45 111 46 C111 47 110 48 110 52 C109 48 109 47 109 46 C109 45 109 44 110 40 Z"/><path class="d" pathLength="100" d="M104 46 C108 46 109 46 110 47 C111 46 112 46 116 46 C112 45 111 45 110 45 C109 45 108 45 104 46 Z"/>' +
       '<path class="d" pathLength="100" d="M52 20 L55 17"/><path class="d" pathLength="100" d="M28 46 L25 49"/>' },
+    /* the "Comet — a single spike" Frame-Signature silhouette, drawn from
+       the real metric radii [0.90,0.52,0.41,0.45,0.60,0.97,0.70,0.49,0.66] */
+    comet: { vb: "0 0 116 116", m:
+      '<path class="d a" pathLength="100" d="M58 17 L73 40 L77 55 L76 68 L67 84 L43 100 L30 74 L36 54 L39 35 Z"/>' +
+      '<line class="d" pathLength="100" x1="58" y1="58" x2="48" y2="88"/>' +
+      '<circle class="d" pathLength="100" cx="58" cy="58" r="2.6"/>' },
   };
 
   function sketch(key) {
@@ -131,24 +133,32 @@
     var h = subhead("Halo Readings", true);
     h += '<div class="rv-grid rv-grid--halo">';
     h += mod("1", "SURFACE RECORD", artcap("surfacerec", cap(["Cu · Co · Am", "trace & balance map"])));
-    h += mod("2", "ARCHETYPE", artcap("archetype",
-      '<span class="rv-cap__l rv-cap__em">The Dispatcher</span><span class="rv-cap__l rv-cap__l--sub">threshold role</span><span class="rv-cap__l rv-cap__l--sub">controller · guide</span><span class="rv-cap__l rv-cap__l--sub">boundary · signal</span>'));
-    h += mod("3", "AURA", artcap("aura", cap(["warm glass copper", "held steady"])));
-    h += mod("4", "MINT RECORD",
+    h += mod("2", "FRAME SIGNATURE", artcap("comet",
+      '<span class="rv-cap__l rv-cap__em">Comet — a single spike</span><span class="rv-cap__l rv-cap__l--sub">signal-led · frame-light</span><span class="rv-cap__l rv-cap__l--sub">charged</span>'));
+    h += mod("3", "ARCHETYPE", artcap("archetype",
+      '<span class="rv-cap__l rv-cap__em">The Dispatcher</span><span class="rv-cap__l rv-cap__l--sub">threshold role</span><span class="rv-cap__l rv-cap__l--sub">controller · guide</span>'));
+    h += mod("4", "AURA", artcap("aura", cap(["warm glass copper", "held steady"])));
+    h += mod("5", "MINT RECORD",
       '<div class="rv-mod__art rv-mod__art--mint"><span class="rv-mintbox">BR-0001</span>' + sketch("mintseal") + "</div>" +
       '<div class="rv-mod__cap">' + cap(["Edition 1 of 1", "Filed, sealed, recorded"]) + "</div>");
-    h += mod("5", "ORACLE READ",
+    h += mod("6", "MAP / POSITION", artcap("mapquad", cap(["presence · charge", "impact · clarity"])));
+    h += mod("7", "ORACLE READ",
       '<div class="rv-mod__art rv-mod__art--oracle">' + sketch("oraclespark") + "</div>" +
       '<p class="rv-oracle">The salute is the whole message. Sent, received, and kept.</p>', "rv-mod--oracle");
-    h += mod("6", "MAP / POSITION", artcap("mapquad", cap(["presence · charge", "impact · clarity"])));
+    h += mod("8", "SOURCE",
+      '<div class="rv-mod__art rv-mod__art--photo"><span class="rv-photoframe"><img src="assets/source-01.jpg" alt="The original scanned frame" />' +
+      '<svg class="rv-sketch rv-photoframe__marks" viewBox="0 0 100 70" preserveAspectRatio="none" aria-hidden="true"><path class="d" pathLength="100" d="M5 20 L5 5 L20 5"/><path class="d" pathLength="100" d="M95 20 L95 5 L80 5"/><path class="d" pathLength="100" d="M5 50 L5 65 L20 65"/><path class="d" pathLength="100" d="M95 50 L95 65 L80 65"/></svg></span></div>' +
+      '<div class="rv-mod__cap">' + cap(["the original frame", "BR-SCN 01 · candid"]) + "</div>");
     h += "</div>";
     return h;
   }
 
   function html(r) {
     var halo = r.engine === "halo";
-    return '<h2 class="rv-read__headline">Stats &amp; Readings</h2>' +
+    return '<div class="rv-read__top" data-writein>' +
+      '<h2 class="rv-read__headline">Stats &amp; Readings</h2>' +
       '<div class="rv-read__flourish" aria-hidden="true"><svg class="rv-sketch" viewBox="0 0 120 12"><path class="d" pathLength="100" d="M8 6 C30 3 44 9 60 6 C76 3 90 9 112 6"/><circle class="d" pathLength="100" cx="60" cy="6" r="2.4"/></svg></div>' +
+      "</div>" +
       (halo ? buildHalo() : buildFree());
   }
 
@@ -157,15 +167,37 @@
     var el = document.createElement("div");
     el.className = "rv-read";
     var fbTimer = null;
+    var clearTimer = null;
 
     function setReading(r) {
       if (fbTimer) { clearTimeout(fbTimer); fbTimer = null; }
+      if (clearTimer) { clearTimeout(clearTimer); clearTimer = null; } // a pending wipe must never clobber a fresh read
+      el.style.opacity = ""; el.style.transition = "";
       el.dataset.engine = r.engine;
       el.innerHTML = html(r);
     }
 
+    // empty the panel (the free Stats & Readings clears as the card -> halo)
+    function clear() {
+      if (fbTimer) { clearTimeout(fbTimer); fbTimer = null; }
+      if (clearTimer) { clearTimeout(clearTimer); clearTimer = null; }
+      if (motionOff() || !el.innerHTML) {
+        el.innerHTML = ""; el.removeAttribute("data-engine");
+        el.style.opacity = ""; el.style.transition = "";
+        return;
+      }
+      el.style.transition = "opacity 280ms var(--rv-ease)";
+      el.style.opacity = "0";
+      clearTimer = setTimeout(function () {
+        clearTimer = null;
+        el.innerHTML = ""; el.removeAttribute("data-engine");
+        el.style.opacity = ""; el.style.transition = "";
+      }, 300);
+    }
+
     function play(cb) {
       if (fbTimer) { clearTimeout(fbTimer); fbTimer = null; }
+      if (clearTimer) { clearTimeout(clearTimer); clearTimer = null; }
       var items = Array.prototype.slice.call(el.querySelectorAll("[data-writein]"));
       items.forEach(function (n, i) {
         n.style.setProperty("--i", i);
@@ -183,10 +215,10 @@
 
       var fired = false;
       function fire() { if (fired) return; fired = true; if (fbTimer) { clearTimeout(fbTimer); fbTimer = null; } if (cb) cb(); }
-      fbTimer = setTimeout(fire, items.length * 150 + 1150);
+      fbTimer = setTimeout(fire, items.length * 320 + 2400);  // matches the slower, moodier pacing in CSS
     }
 
     if (opts.reading) setReading(opts.reading);
-    return { el: el, setReading: setReading, play: play, destroy: function () { el.remove(); } };
+    return { el: el, setReading: setReading, play: play, clear: clear, destroy: function () { el.remove(); } };
   };
 })();

@@ -33,7 +33,7 @@
       '<line class="rv-arrow__h" x1="80" y1="68" x2="91" y2="82"/>' +
       '<line class="rv-arrow__h" x1="66" y1="82" x2="75" y2="95"/>' +
       "</svg>";
-    if (opts.disabled) el.setAttribute("aria-disabled", "true");
+    if (opts.disabled) { el.setAttribute("aria-disabled", "true"); el.setAttribute("tabindex", "-1"); }
 
     el.addEventListener("click", function (e) {
       if (el.getAttribute("aria-disabled") === "true") {
@@ -47,9 +47,10 @@
       next = next || {};
       if (next.variant) el.dataset.variant = next.variant;
       if (typeof next.disabled === "boolean") {
-        if (next.disabled) el.setAttribute("aria-disabled", "true");
+        if (next.disabled) { el.setAttribute("aria-disabled", "true"); el.setAttribute("tabindex", "-1"); }
         else {
           el.removeAttribute("aria-disabled");
+          el.removeAttribute("tabindex");
           el.classList.remove("is-gone");
         }
       }

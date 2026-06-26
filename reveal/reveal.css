@@ -666,7 +666,7 @@
 .rv-arrow {
   background: none; border: none; border-radius: 0;
   width: auto; height: auto; padding: 10px;
-  color: var(--rv-ink-2);
+  color: var(--rv-ink-dim);                 /* dim at rest; brightens on hover */
   filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.55));
   transition: transform 200ms var(--rv-ease), color 200ms var(--rv-ease),
               filter 240ms var(--rv-ease), opacity 240ms var(--rv-ease);
@@ -675,7 +675,7 @@
 .rv-arrow__out { stroke-width: 2.1; stroke-linecap: round; stroke-linejoin: round; }
 .rv-arrow__h { stroke-width: 1.3; stroke-linecap: round; opacity: 0.5; }
 .rv-arrow:hover:not([aria-disabled="true"]), .rv-arrow:focus-visible { transform: scale(1.06); color: var(--rv-ink); }
-.rv-arrow:focus-visible { outline: 2px solid color-mix(in srgb, var(--rv-ink) 50%, transparent); outline-offset: 4px; }
+.rv-arrow:focus-visible { outline: 2px solid color-mix(in srgb, var(--rv-ink) 78%, transparent); outline-offset: 4px; }
 .rv-arrow:active:not([aria-disabled="true"]) { transform: scale(0.97); }
 .rv-arrow[aria-disabled="true"] { opacity: 0.3; pointer-events: none; }
 .rv-arrow.is-gone { opacity: 0; transform: scale(0.9); pointer-events: none; }
@@ -714,7 +714,7 @@
 .rv-grid { display: grid; gap: 32px 50px; }
 .rv-grid--free { grid-template-columns: 1fr; max-width: 372px; margin: 0 auto; }
 .rv-grid--halo { grid-template-columns: 1fr 1fr; max-width: 728px; margin: 0 auto; }
-.rv-mod--wide, .rv-mod--oracle { grid-column: 1 / -1; }
+.rv-mod--wide { grid-column: 1 / -1; }
 
 .rv-mod__hd { display: flex; align-items: baseline; gap: 8px; border-bottom: 1px solid var(--rv-rule-faint); padding-bottom: 6px; }
 .rv-mod__num { font-family: var(--font-mono); font-size: 10px; color: var(--rv-ink-ghost); }
@@ -728,6 +728,10 @@
 .rv-mod__art--mint { display: flex; align-items: center; gap: 12px; }
 .rv-mod__art--oracle { width: 100%; }
 .rv-mod__art--oracle .rv-sketch { height: 50px; }
+.rv-mod__art--photo { flex: 0 0 auto; }
+.rv-photoframe { position: relative; display: block; width: 124px; }
+.rv-photoframe img { width: 100%; display: block; aspect-ratio: 16 / 10; object-fit: cover; filter: saturate(0.92) contrast(0.97) brightness(0.96); border-radius: 1px; }
+.rv-photoframe__marks { position: absolute; inset: -5px; width: calc(100% + 10px); height: calc(100% + 10px); color: var(--rv-ink); pointer-events: none; }
 .rv-signal { position: relative; }
 .rv-signal .rv-sketch { height: 46px; }
 .rv-peak { position: absolute; right: 2px; top: 48%; transform: translateY(-50%); font-family: var(--font-mono); font-size: 8px; letter-spacing: 0.14em; color: var(--rv-halo); }
@@ -749,17 +753,21 @@
 .rv-mintbox { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em; color: var(--rv-ink-2); border: 1px solid var(--rv-rule); padding: 4px 9px; white-space: nowrap; }
 .rv-oracle { font-family: var(--font-display); font-style: italic; font-size: 16px; line-height: 1.45; color: var(--rv-ink); margin: 12px 0 0; max-width: 300px; }
 
-/* draw-on: sketch strokes draw, labels fade — sequenced per module */
+/* draw-on: sketch strokes draw, labels fade — sequenced per module.
+   Slow + deliberate: a moment per module (210ms), each sketch drawing its
+   strokes 54ms apart over 0.7s, the label settling after. It has a mood. */
 .rv-sketch .d { stroke-dasharray: 100; stroke-dashoffset: 100; }
-.rv-mod__hd, .rv-mod__cap, .rv-oracle, .rv-mintbox, .rv-peak, .rv-stat, .rv-subhead__t { opacity: 0; }
+.rv-read__top, .rv-mod__hd, .rv-mod__cap, .rv-oracle, .rv-mintbox, .rv-peak, .rv-stat, .rv-subhead__t, .rv-photoframe img { opacity: 0; }
+.rv-read__top.is-writing,
 .rv-mod.is-writing .rv-mod__hd,
-.rv-subhead.is-writing .rv-subhead__t { animation: rv-fade 0.42s var(--rv-ease) forwards; animation-delay: calc(var(--i, 0) * 150ms); }
-.is-writing .rv-sketch .d { animation: rv-draw 0.55s var(--rv-ease) forwards; animation-delay: calc(var(--i, 0) * 150ms + 130ms + var(--di, 0) * 42ms); }
+.rv-subhead.is-writing .rv-subhead__t { animation: rv-fade 0.5s var(--rv-ease) forwards; animation-delay: calc(var(--i, 0) * 320ms); }
+.is-writing .rv-sketch .d { animation: rv-draw 0.85s var(--rv-ease) forwards; animation-delay: calc(var(--i, 0) * 320ms + 170ms + var(--di, 0) * 60ms); }
 .rv-mod.is-writing .rv-mod__cap,
 .rv-mod.is-writing .rv-oracle,
 .rv-mod.is-writing .rv-mintbox,
 .rv-mod.is-writing .rv-peak,
-.rv-mod.is-writing .rv-stat { animation: rv-fade 0.45s var(--rv-ease) forwards; animation-delay: calc(var(--i, 0) * 150ms + 470ms); }
+.rv-mod.is-writing .rv-stat,
+.rv-mod.is-writing .rv-photoframe img { animation: rv-fade 0.6s var(--rv-ease) forwards; animation-delay: calc(var(--i, 0) * 320ms + 1050ms); }
 @keyframes rv-draw { to { stroke-dashoffset: 0; } }
 @keyframes rv-fade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 
@@ -775,6 +783,6 @@
 
 @media (prefers-reduced-motion: reduce) {
   .rv-sketch .d { stroke-dashoffset: 0 !important; }
-  .rv-mod__hd, .rv-mod__cap, .rv-oracle, .rv-mintbox, .rv-peak, .rv-stat, .rv-subhead__t { opacity: 1 !important; transform: none !important; }
+  .rv-read__top, .rv-mod__hd, .rv-mod__cap, .rv-oracle, .rv-mintbox, .rv-peak, .rv-stat, .rv-subhead__t, .rv-photoframe img { opacity: 1 !important; transform: none !important; }
   .rv-arrow[data-variant="purple"] { animation: none !important; }
 }

@@ -107,6 +107,7 @@
     }
     function enterHalo() {
       stageName = "HALO";
+      if (panel) panel.clear();   // the free Stats & Readings clears to empty as the card morphs to halo
       setArrow({ variant: "grey", disabled: true }, "Developing…");
       card.setMode("halo"); // re-develop sweep + meter recolor; onMorph('halo') re-enables
     }
