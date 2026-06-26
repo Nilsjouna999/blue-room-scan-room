@@ -45,11 +45,11 @@
         '<p class="reveal-stage__thesis">Every photo is already a card. Watch the room develop it.</p>' +
         "</div>") +
       '<div class="reveal-stage__body">' +
-      '<div class="rv-stagemain">' +   // card + arrow — slides LEFT when the read appears
+      '<div class="rv-stagemain" tabindex="-1">' +   // card + arrow — slides LEFT when the read appears
       '<div class="rv-cardslot"></div>' +
       '<div class="rv-arrowslot"></div>' +
       "</div>" +
-      '<div class="rv-readslot"></div>' +
+      '<div class="rv-readslot" aria-live="polite" aria-atomic="false"></div>' +
       "</div>";
     root.appendChild(stage);
 
@@ -62,12 +62,15 @@
     stage.querySelector(".rv-cardslot").appendChild(card.el);
 
     var readslot = stage.querySelector(".rv-readslot");
+    var stagemain = stage.querySelector(".rv-stagemain");   // M6: programmatic focus target during develop
     var panel = null;
     var haloTimer = null;   // guards the develop beat across rapid taps
 
     var arrow = R.ArrowButton({ variant: "grey", label: "Develop the card", onClick: onArrow });
     var cap = document.createElement("span");
     cap.className = "rv-arrow__cap";
+    cap.setAttribute("aria-live", "polite");   // M6: announce caption state (visible on standalone)
+    cap.setAttribute("aria-atomic", "true");
     cap.textContent = "Develop";
     var arrowSlot = stage.querySelector(".rv-arrowslot");
     arrowSlot.appendChild(arrow.el);
@@ -100,12 +103,18 @@
 
     function mountPanel(reading, onComplete) {
       if (!panel) {
-        panel = R.ReadingPanel({ reading: reading });
+        panel = R.ReadingPanel({ reading: reading, src: src });   // M5: thread src (kills SRC-01 hardcodes)
         readslot.appendChild(panel.el);
       } else {
         panel.setReading(reading);
       }
-      panel.play(onComplete);
+      panel.play(function () {
+        // M6: move focus to the read headline once the write-in settles so
+        // keyboard users are oriented (the headline carries tabindex=-1).
+        var hl = panel.el.querySelector(".rv-read__headline");
+        if (hl) hl.focus();
+        if (onComplete) onComplete();
+      });
     }
 
     // ---- stage entries ----------------------------------------------
@@ -113,6 +122,7 @@
       stageName = "FREE";
       setArrow({ variant: "grey", disabled: true }, "Developing…");
       card.setMode("free"); // onMorph('free') re-enables the arrow
+      if (stagemain && stage.contains(document.activeElement)) stagemain.focus();   // M6: only if the user is already in the reveal (never steal focus on page-load)
     }
     function enterFreeReading() {
       stageName = "FREE_READING";
@@ -133,6 +143,7 @@
       stage.classList.remove("is-reading");      // card returns to centre for the develop
       if (panel) panel.clear();                  // the free Stats & Readings fades to empty first
       setArrow({ variant: "grey", disabled: true }, "Developing…");
+      if (stagemain && stage.contains(document.activeElement)) stagemain.focus();   // M6: only if focus is already in the reveal
       // then, a beat later, the card itself develops (the wipe) — sequenced, not all at once
       haloTimer = setTimeout(function () {
         haloTimer = null;
@@ -153,8 +164,10 @@
     function onMorph(mode) {
       if (mode === "free" && stageName === "FREE") {
         setArrow({ variant: "grey", disabled: false, label: "Read the free card" }, "Read");
+        if (arrow && arrow.el && stage.contains(document.activeElement)) arrow.el.focus();   // M6: hand off — never steal focus on the menustage page-load morph
       } else if (mode === "halo" && stageName === "HALO") {
         setArrow({ variant: "grey", disabled: false, label: "Read the developed record" }, "Read");
+        if (arrow && arrow.el && stage.contains(document.activeElement)) arrow.el.focus();
       }
     }
 

@@ -604,7 +604,7 @@ function renderCard(src, treatment) {
                the card can't disagree with the reel. */
             const s = getScanResult(src)?.stats.freeVisible || c.stats;
             const LADDER = ["Muted", "Clean", "Strong", "Charged", "Peak"];
-            return ["presence", "signal", "visualImpact", "charge"].map((k) => {
+            return ["presence", "signal", "visualImpact", "charge"].map((k, rowIdx) => {
               const band = tierBand(s[k]);
               const idx = LADDER.indexOf(band);
               /* BR-S120/S121: pips coloured BY POSITION (the builder's mockup). Each lit
@@ -615,7 +615,7 @@ function renderCard(src, treatment) {
                  ramp (CSS); kept tier-driven (per row), independent of pip position. */
               const pips = [0, 1, 2, 3, 4].map((p) => {
                 const on = p <= idx;
-                return `<span class="fr__pip${on ? " is-on fr__pip--p" + (p + 1) : ""}"></span>`;
+                return `<span class="fr__pip${on ? " is-on fr__pip--p" + (p + 1) : ""}" style="--r:${rowIdx};--c:${p}"></span>`;
               }).join("");
               return `<div class="fr__row"><span class="fr__name">${esc(statLabel(k))}</span><span class="fr__pips">${pips}</span><span class="fr__tier fr__tier--${band.toLowerCase()}">${esc(band)}</span></div>`;
             }).join("");
@@ -1750,10 +1750,25 @@ function mountDev() {
       '</div>';
     const mountEl = host.querySelector(".menurev__mount");
     if (mountEl && window.BRReveal && typeof window.BRReveal.mount === "function") {
+      function _escBack(e) {   // BR-S134 M6: Esc returns from the fullview takeover
+        if (e.key === "Escape") {
+          e.preventDefault();
+          document.removeEventListener("keydown", _escBack, true);
+          if (rev && rev.toFree) rev.toFree();
+        }
+      }
       const rev = window.BRReveal.mount(mountEl, {
         menustage: true,
-        onFullview: function () { const m = host.querySelector(".menurev"); if (m) m.classList.add("is-fullview"); },
-        onBack: function () { const m = host.querySelector(".menurev"); if (m) m.classList.remove("is-fullview"); },
+        onFullview: function () {
+          const m = host.querySelector(".menurev");
+          if (m) m.classList.add("is-fullview");
+          document.addEventListener("keydown", _escBack, true);
+        },
+        onBack: function () {
+          const m = host.querySelector(".menurev");
+          if (m) m.classList.remove("is-fullview");
+          document.removeEventListener("keydown", _escBack, true);
+        },
       });
       const back = host.querySelector(".menurev__back");
       if (back) back.addEventListener("click", function () { if (rev && rev.toFree) rev.toFree(); });

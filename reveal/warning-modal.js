@@ -22,11 +22,11 @@
     el.setAttribute("role", "dialog");
     el.setAttribute("aria-modal", "true");
     el.setAttribute("aria-hidden", "true");
-    el.setAttribute("aria-labelledby", "rvModalBody");
+    el.setAttribute("aria-labelledby", "rvModalKicker rvModalBody");   // M6: label = kicker then body
     el.innerHTML =
       '<div class="rv-modal__backdrop" data-rv-dismiss></div>' +
       '<div class="rv-modal__panel" role="document">' +
-      '<p class="rv-modal__kicker">' + escAttr(copy.kicker) + "</p>" +
+      '<p class="rv-modal__kicker" id="rvModalKicker">' + escAttr(copy.kicker) + "</p>" +
       '<p class="rv-modal__body" id="rvModalBody">' + escAttr(copy.body) + "</p>" +
       '<div class="rv-modal__row">' +
       '<button type="button" class="rv-btn rv-btn--quiet" data-rv-confirm>' + escAttr(copy.confirm) + "</button>" +

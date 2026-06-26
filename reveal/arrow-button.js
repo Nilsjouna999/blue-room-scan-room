@@ -19,7 +19,7 @@
     el.dataset.variant = opts.variant || "grey";
     el.setAttribute("aria-label", opts.label || "Continue");
     el.innerHTML =
-      '<svg class="rv-arrow__svg" viewBox="0 0 120 120" aria-hidden="true">' +
+      '<svg class="rv-arrow__svg" viewBox="15 6 106 106" aria-hidden="true">' +
       '<path class="rv-arrow__out" d="M20 54 C24 28 54 14 82 26 C99 33 106 47 106 62 L120 54 L98 104 L60 80 L77 73 C76 58 66 47 51 45 C39 43 29 49 26 60 Z"/>' +
       '<line class="rv-arrow__h" x1="28" y1="54" x2="37" y2="66"/>' +
       '<line class="rv-arrow__h" x1="36" y1="42" x2="47" y2="56"/>' +

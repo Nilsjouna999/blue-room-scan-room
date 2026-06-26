@@ -3,7 +3,8 @@
 For a fresh Claude Code session to resume with zero context loss. **You are the BUILDER** (you hold the repo and
 make the changes). The user pastes specs/designs from a separate planning chat. Grounded in the repo — **re-grep
 line numbers, they drift** (every session shifts them a lot). Last written: **2026-06-26**, code at HEAD
-`BR-S133` (TIER 5 scribble polish — **local, NOT pushed**, atop BR-S132 develop-craft+arrow which is **pushed/live**).
+`BR-S134` (six missions: bolder halo develop · pip-fill · card-size parity · arrow hitbox · TIER 6 · TIER 7 —
+**local, NOT pushed**; BR-S133 and earlier are **pushed/live**). **The menu add-on audit Tiers 1–7 are ALL done.**
 **The current work is the develop/reveal ADD-ON — see the ★ ACTIVE LANE section below FIRST.** (The §2 card-front
 detail underneath it is prior-run context, still accurate.)
 
@@ -67,9 +68,13 @@ card→halo tonal-rise + fix-bloom + wet-meniscus · `--rv-ease-soft` · robustn
 caption dropped** (the builder's pick; in a read-side lane so it never overlaps a module).
 
 **THE BUILD SPEC for the remaining work** (a 23-agent `menu-addon-polish-audit` Workflow result) is at the task output
-`…\tasks\wsc60yo20.output` — **read it first**. Tiers 1–5 DONE (S131 = 1–3, S132 = TIER 4, **S133 = TIER 5**);
-**Tiers 6–7 REMAIN** — T6 robustness (thread `src` into the panel; kill SRC-01 hardcodes; comet polygon from
-`src.frame.signature.radii`) · T7 a11y + edge cases:
+`…\tasks\wsc60yo20.output`. **ALL Tiers DONE:** S131 = 1–3, S132 = TIER 4, S133 = TIER 5, **S134 = TIER 6 (robustness
+— `src` threaded into the panel; comet from `src.frame.signature.radii`; per-source proven on SRC-02) + TIER 7 (a11y:
+aria-live, guarded focus, Esc-from-fullview, modal label) + the builder's BR-S134 extras** (M1 bolder 3000ms latent-
+surfacing halo develop · M2 Frame-Reading pips fill row-by-row L→R · M3 card 396px in menu AND fullview, no grow on
+see-deeper · M4 arrow hitbox fixed — `.rv-stagemain` z-lifted above `.rv-readslot`; the read panel had been stacking
+over the arrow). **NEXT:** builder to judge the new develop FEEL + the pip-fill LIVE (headless can't show mid-develop).
+*(Historical tier spec, for reference:)*
 - **TIER 4 — craft — ✅ DONE (BR-S132):** photo→free is now a 3-beat "Print Rising from the Bath" develop (clip
   bloom + exposure fix + sinking bath; standalone route only); card→halo got a tonal-rise filter + a halo-fix bloom
   (::after) + a wet-meniscus scanline (NOT a layer mask — the critic killed that: it froze blank + killed the glow

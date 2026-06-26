@@ -99,6 +99,33 @@
       return '<div class="rv-stat"><span class="rv-stat__k">' + esc(r[0]) + '</span><span class="rv-stat__p">' + pips(r[1]) + "</span></div>";
     }).join("") + "</div>";
   }
+  // M5 (BR-S134) — Frame-Signature silhouette GENERATED from 9 radii (0..1 @ 40deg, north-up,
+  // clockwise). Verified: cx=cy=58, R=45.6 reproduces the live SRC-01 path (vertex 0 = 58,17) so
+  // SRC-01 is identical; SRC-02..05 get their own silhouette. Only the OUTER <path class="d a"> is
+  // generated; the inner spike line + centre dot stay STATIC (decorative-glyph law). Class "d a" +
+  // pathLength="100" preserved so rv-draw + the reduced-motion snap fire identically. radii guarded.
+  function cometSVG(radii) {
+    var R = (Array.isArray(radii) && radii.length === 9)
+      ? radii
+      : [0.90, 0.52, 0.41, 0.45, 0.60, 0.97, 0.70, 0.49, 0.66]; // SRC-01 fallback (freeze-safe)
+    var cx = 58, cy = 58, MAX = 45.6, pts = [];
+    for (var i = 0; i < 9; i++) {
+      var t = (-90 + i * 40) * Math.PI / 180;
+      var r = Math.max(0, Math.min(1, +R[i] || 0)) * MAX; // clamp 0..1 (guards >1 / NaN)
+      var x = Math.round((cx + r * Math.cos(t)) * 10) / 10;
+      var y = Math.round((cy + r * Math.sin(t)) * 10) / 10;
+      pts.push(x + " " + y);
+    }
+    var d = "M" + pts[0] + " L" + pts.slice(1).join(" L") + " Z";
+    return '<svg class="rv-sketch" viewBox="0 0 116 116" aria-hidden="true">' +
+      '<path class="d a" pathLength="100" d="' + d + '"/>' +
+      '<line class="d" pathLength="100" x1="58" y1="58" x2="48" y2="88"/>' +
+      '<circle class="d" pathLength="100" cx="58" cy="58" r="2.6"/>' +
+      '</svg>';
+  }
+  // 0..100 stat -> 0..5 pips, clamped. NEVER surface the raw integer (law: no public 0-100).
+  function statPip(v) { return Math.max(0, Math.min(5, Math.round((+v || 0) / 20))); }
+  function pad2(n) { n = String(n == null ? "" : n); return n.length < 2 ? "0" + n : n; }
   function mod(num, title, bodyHTML, cls) {
     return '<div class="rv-mod' + (cls ? " " + cls : "") + '" data-writein>' +
       '<div class="rv-mod__hd"><span class="rv-mod__num">' + num + "</span><span class=\"rv-mod__title\">" + title + "</span></div>" +
@@ -113,7 +140,9 @@
       '<svg class="rv-sketch rv-subline" viewBox="0 0 200 8" aria-hidden="true"><path class="d" pathLength="100" d="M2 5 C30 2 50 7 80 4 C110 1 140 7 170 4 C185 3 195 5 198 4"/></svg></div>';
   }
 
-  function buildFree() {
+  function buildFree(src) {
+    src = src || {};
+    var st = (src.card && src.card.stats) || {};
     var h = subhead("Free Readings", false);
     h += '<div class="rv-grid rv-grid--free">';
     h += mod("1", "SURFACE", artcap("surface", cap(["warm copper", "balanced"])));
@@ -121,7 +150,12 @@
       '<div class="rv-mod__art rv-mod__art--frame">' + sketch("diagram") + "</div>" +
       '<div class="rv-mod__cap rv-mod__cap--leaders"><span class="rv-cap__l">hand to lens</span><span class="rv-cap__l rv-cap__l--sub">dominant plane</span><span class="rv-cap__l rv-cap__l--gap">open side</span><span class="rv-cap__l rv-cap__l--sub">vector</span></div>',
       "rv-mod--wide");
-    h += mod("3", "STATS", stats([["presence", 4], ["clarity", 5], ["intention", 4], ["impact", 3]]), "rv-mod--stats");
+    h += mod("3", "STATS", stats([
+      ["presence", statPip(st.presence)],
+      ["frame",    statPip(st.frame)],
+      ["signal",   statPip(st.signal)],
+      ["impact",   statPip(st.visualImpact)]
+    ]), "rv-mod--stats");
     h += mod("4", "SIGNAL NOTE",
       '<div class="rv-mod__art"><div class="rv-signal">' + sketch("signalwave") + '<span class="rv-peak">PEAK</span></div></div>' +
       '<div class="rv-mod__cap">' + cap(["clear intent", "direct contact"]) + "</div>");
@@ -129,41 +163,60 @@
     return h;
   }
 
-  function buildHalo() {
+  function buildHalo(src) {
+    src = src || {};
+    var card = src.card || {};
+    var sig  = (src.frame && src.frame.signature) || {};
+    var oracle = ((src.dossier && src.dossier.oracle) || {}).short
+      || "The salute is the whole message. Sent, received, and kept.";
+    var file     = src.file || "assets/source-01.jpg";
+    var sigClass = sig.class || "Comet — a single spike";
+    var sigBand  = (sig.band || "Charged").toLowerCase();
+    var serial   = card.serial || "BR-0001";
+    var ratio    = src.orient === "portrait" ? "3 / 4" : "16 / 10";
+    var no       = src.no != null ? pad2(src.no) : "01";
+    var capWord  = (src.capture && src.capture.code)
+      ? src.capture.code.split(/[\s/]+/)[0].toLowerCase()
+      : "candid";
+
     var h = subhead("Halo Readings", true);
     h += '<div class="rv-grid rv-grid--halo">';
     h += mod("1", "SURFACE RECORD", artcap("surfacerec", cap(["Cu · Co · Am", "trace & balance map"])));
-    h += mod("2", "FRAME SIGNATURE", artcap("comet",
-      '<span class="rv-cap__l rv-cap__em">Comet — a single spike</span><span class="rv-cap__l rv-cap__l--sub">signal-led · frame-light</span><span class="rv-cap__l rv-cap__l--sub">charged</span>'));
+    h += mod("2", "FRAME SIGNATURE",
+      '<div class="rv-mod__art">' + cometSVG(sig.radii) + "</div>" +
+      '<div class="rv-mod__cap"><span class="rv-cap__l rv-cap__em">' + esc(sigClass) + '</span>' +
+      '<span class="rv-cap__l rv-cap__l--sub">signal-led · frame-light</span>' +
+      '<span class="rv-cap__l rv-cap__l--sub">' + esc(sigBand) + "</span></div>");
     h += mod("3", "ARCHETYPE", artcap("archetype",
       '<span class="rv-cap__l rv-cap__em">The Dispatcher</span><span class="rv-cap__l rv-cap__l--sub">threshold role</span><span class="rv-cap__l rv-cap__l--sub">controller · guide</span>'));
     h += mod("4", "AURA", artcap("aura", cap(["warm glass copper", "held steady"])));
     h += mod("5", "MINT RECORD",
-      '<div class="rv-mod__art rv-mod__art--mint"><span class="rv-mintbox">BR-0001</span>' + sketch("mintseal") + "</div>" +
+      '<div class="rv-mod__art rv-mod__art--mint"><span class="rv-mintbox">' + esc(serial) + '</span>' + sketch("mintseal") + "</div>" +
       '<div class="rv-mod__cap">' + cap(["Edition 1 of 1", "Filed, sealed, recorded"]) + "</div>");
     h += mod("6", "MAP / POSITION", artcap("mapquad", cap(["presence · charge", "impact · clarity"])));
     h += mod("7", "ORACLE READ",
       '<div class="rv-mod__art rv-mod__art--oracle">' + sketch("oraclespark") + "</div>" +
-      '<p class="rv-oracle">The salute is the whole message. Sent, received, and kept.</p>', "rv-mod--oracle");
+      '<p class="rv-oracle">' + esc(oracle) + "</p>", "rv-mod--oracle");
     h += mod("8", "SOURCE",
-      '<div class="rv-mod__art rv-mod__art--photo"><span class="rv-photoframe"><img src="assets/source-01.jpg" alt="The original scanned frame" />' +
+      '<div class="rv-mod__art rv-mod__art--photo"><span class="rv-photoframe" style="--photo-ratio:' + ratio + '"><img src="' + esc(file) + '" alt="The original scanned frame" />' +
       '<svg class="rv-sketch rv-photoframe__marks" viewBox="0 0 100 70" preserveAspectRatio="none" aria-hidden="true"><path class="d" pathLength="100" d="M5 20 L5 5 L20 5"/><path class="d" pathLength="100" d="M95 20 L95 5 L80 5"/><path class="d" pathLength="100" d="M5 50 L5 65 L20 65"/><path class="d" pathLength="100" d="M95 50 L95 65 L80 65"/></svg></span></div>' +
-      '<div class="rv-mod__cap">' + cap(["the original frame", "BR-SCN 01 · candid"]) + "</div>");
+      '<div class="rv-mod__cap">' + cap(["the original frame", "BR-SCN " + esc(no) + " · " + esc(capWord)]) + "</div>");
     h += "</div>";
     return h;
   }
 
-  function html(r) {
+  function html(r, src) {
     var halo = r.engine === "halo";
     return '<div class="rv-read__top" data-writein>' +
-      '<h2 class="rv-read__headline">Stats &amp; Readings</h2>' +
+      '<h2 class="rv-read__headline" tabindex="-1">Stats &amp; Readings</h2>' +
       '<div class="rv-read__flourish" aria-hidden="true"><svg class="rv-sketch" viewBox="0 0 120 12"><path class="d" pathLength="100" d="M8 6 C30 3 44 9 60 6 C76 3 90 9 112 6"/><circle class="d" pathLength="100" cx="60" cy="6" r="2.4"/></svg></div>' +
       "</div>" +
-      (halo ? buildHalo() : buildFree());
+      (halo ? buildHalo(src) : buildFree(src));
   }
 
   window.BRReveal.ReadingPanel = function (opts) {
     opts = opts || {};
+    var src = opts.src || null; // M5 (BR-S134) — one source per panel instance, reached via closure
     var el = document.createElement("div");
     el.className = "rv-read";
     var fbTimer = null;
@@ -174,7 +227,7 @@
       if (clearTimer) { clearTimeout(clearTimer); clearTimer = null; } // a pending wipe must never clobber a fresh read
       el.style.opacity = ""; el.style.transition = "";
       el.dataset.engine = r.engine;
-      el.innerHTML = html(r);
+      el.innerHTML = html(r, src);
     }
 
     // empty the panel (the free Stats & Readings clears as the card -> halo)

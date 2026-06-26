@@ -65,7 +65,7 @@
         el.classList.remove("is-developing");
         void el.offsetWidth;              // restart the wipe + the developer bar
         el.classList.add("is-developing");
-        var ddur = motionOff() ? 0 : 1850;
+        var ddur = motionOff() ? 0 : 3000;  // BR-S134 M1: savored develop (>= the 3000ms tonal/fix-bloom)
         timer = setTimeout(function () {
           el.classList.remove("is-developing");
           free.classList.remove("is-shown"); // free now fully covered — drop it

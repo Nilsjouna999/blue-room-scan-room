@@ -257,18 +257,20 @@
   opacity: 1;
   transition: none;
   animation:
-    rv-develop-wipe 1500ms var(--rv-ease-soft) forwards,   /* the clip seam — steady wet sweep */
-    rv-halo-tonal   1850ms var(--rv-ease)      forwards;   /* the SOLE filter writer on this layer */
+    rv-develop-wipe 2400ms var(--rv-ease-soft) forwards,   /* the wet seam — slow steady sweep (BR-S134 M1) */
+    rv-halo-tonal   3000ms var(--rv-ease)      forwards;   /* the SOLE filter writer on this layer */
   will-change: clip-path, filter;
 }
 /* TONAL RISE / FIXER — pale + flat in the developer, blooming to true colour as the
    fixer takes hold, a brief over-saturation swell at 84% before locking to 1/1/1.
    (one filter writer only — two filter animations on one element clobber). */
 @keyframes rv-halo-tonal {
-  0%   { filter: brightness(1.16) contrast(0.74) saturate(0.60); }  /* still in the developer */
-  62%  { filter: brightness(1.05) contrast(0.92) saturate(0.86); }
-  84%  { filter: brightness(1.10) contrast(1.02) saturate(1.06); }  /* the fix-swell — locking */
-  100% { filter: brightness(1)    contrast(1)    saturate(1); }     /* fixed / true */
+  0%   { filter: brightness(1.32) contrast(0.52) saturate(0.28); }  /* deep in the developer — ghost / latent */
+  22%  { filter: brightness(1.24) contrast(0.62) saturate(0.42); }  /* image just beginning to surface */
+  48%  { filter: brightness(1.13) contrast(0.82) saturate(0.70); }  /* milky mid-tones firming up */
+  72%  { filter: brightness(1.05) contrast(0.96) saturate(0.92); }  /* colour blooms toward true */
+  88%  { filter: brightness(1.08) contrast(1.04) saturate(1.08); }  /* the fix crest — locking, brief over-rich */
+  100% { filter: brightness(1)    contrast(1)    saturate(1); }     /* fixed / true — resting minted card */
 }
 /* HALO-FIX BLOOM — a brief violet glow swell at the last beat as the print "fixes",
    on a dedicated ::after so it never repaints the card interior or touches `filter`.
@@ -283,18 +285,41 @@
   border-radius: var(--card-radius, 12px);
   box-shadow:
     0 0 0 1px var(--rv-halo-glow),
-    0 0 34px 6px var(--rv-halo-glow);
+    0 0 44px 8px var(--rv-halo-glow);                      /* BR-S134 M1: 34px 6px -> 44px 8px */
   opacity: 0;
-  animation: rv-fix-bloom 1850ms var(--rv-ease) forwards;
+  animation: rv-fix-bloom 3000ms var(--rv-ease) forwards;
 }
 @keyframes rv-fix-bloom {
-  0%, 64% { opacity: 0;   transform: scale(0.992); }  /* dormant until the print nears fixed */
-  82%     { opacity: 0.9; transform: scale(1); }      /* the swell — the moment it locks */
-  100%    { opacity: 0;   transform: scale(1); }      /* fades — resting halo is the card's own */
+  0%, 64% { opacity: 0;    transform: scale(0.990); }  /* dormant — the image is still surfacing */
+  82%     { opacity: 0.55; transform: scale(0.997); }  /* glow begins to build as colour blooms */
+  90%     { opacity: 0.95; transform: scale(1.004); }  /* the swell — the moment the print LOCKS */
+  100%    { opacity: 0;    transform: scale(1); }      /* releases — resting halo is the card's own */
 }
 @keyframes rv-develop-wipe {
   from { clip-path: inset(-60px -60px calc(100% + 60px) -60px); }   /* clipped to the top — height-agnostic */
   to   { clip-path: inset(-60px); }                      /* fully developed, glow included */
+}
+
+/* ====================================================================
+   M2 (BR-S134) — FRAME-READING PIP FILL · row-by-row, left->right.
+   Lit pips on the HALO layer surface one row at a time (top first),
+   left->right within a row, as the card develops. Trigger is SCOPED to
+   .rv-cardframe.is-developing .rv-layer--halo so it NEVER fires on a plain
+   renderCard() re-render or the live-room .card.is-developing, and never
+   touches the free layer's already-visible pips. Stagger from inline --r
+   (row 0-3) + --c (col 0-4) baked in renderCard(). Worst case 3*150+4*55=
+   670ms start, completes 1030ms — inside the 3000ms develop, before the
+   ~2400ms seam. GPU-only (opacity+transform). Freeze-safe: the 100% frame
+   == the resting .fr__pip.is-on. rotate(45deg) RE-STATED every stop (the
+   pip rests at transform:rotate(45deg); animating scale alone would un-rotate). */
+@keyframes rv-pip-fill {
+  0%   { opacity: 0; transform: rotate(45deg) scale(0.58); }   /* latent — socket dark */
+  62%  { opacity: 1; transform: rotate(45deg) scale(1.06); }   /* wet bloom — seats with a hair of overshoot */
+  100% { opacity: 1; transform: rotate(45deg) scale(1);    }   /* fixed — == resting .fr__pip.is-on (freeze-safe) */
+}
+.rv-cardframe.is-developing .rv-layer--halo .fr__pip.is-on {
+  animation: rv-pip-fill 360ms var(--rv-ease, cubic-bezier(0.2, 0.7, 0.2, 1)) both;
+  animation-delay: calc(var(--r, 0) * 150ms + var(--c, 0) * 55ms);
 }
 
 /* ====================================================================
@@ -365,16 +390,16 @@
   pointer-events: none;
   opacity: 0;
   transform-origin: center top;
-  /* developer-fluid BODY: glow pooling just above the wet line, fading up */
+  /* developer-fluid BODY: richer pool above the wet line, fading up (BR-S134 M1) */
   background: linear-gradient(180deg,
     transparent 0%,
-    color-mix(in srgb, var(--rv-halo) 12%, transparent) 44%,
-    color-mix(in srgb, var(--rv-halo) 38%, transparent) 74%,
-    color-mix(in srgb, var(--rv-halo) 54%, transparent) 94%,
+    color-mix(in srgb, var(--rv-halo) 18%, transparent) 44%,
+    color-mix(in srgb, var(--rv-halo) 52%, transparent) 74%,
+    color-mix(in srgb, var(--rv-halo) 72%, transparent) 94%,
     transparent 100%);
   mix-blend-mode: screen;
 }
-/* CREST — the bright wet lip itself (surface tension), near-white core. STATIC. */
+/* CREST — the bright wet lip itself (surface tension), brighter near-white core. STATIC. */
 .rv-scanline::before {
   content: "";
   position: absolute;
@@ -384,16 +409,16 @@
   border-radius: 2px;
   background: linear-gradient(90deg,
     transparent 0%,
-    color-mix(in srgb, #fff 70%, var(--rv-halo)) 18%,
-    color-mix(in srgb, #fff 88%, var(--rv-halo)) 50%,
-    color-mix(in srgb, #fff 70%, var(--rv-halo)) 82%,
+    color-mix(in srgb, #fff 78%, var(--rv-halo)) 18%,
+    color-mix(in srgb, #fff 94%, var(--rv-halo)) 50%,
+    color-mix(in srgb, #fff 78%, var(--rv-halo)) 82%,
     transparent 100%);
   filter: blur(0.4px);
-  opacity: 0.92;
+  opacity: 0.96;
   mix-blend-mode: screen;
 }
 .rv-cardframe.is-developing .rv-scanline {
-  animation: rv-meniscus 1500ms var(--rv-ease-soft) 1;
+  animation: rv-meniscus 2400ms var(--rv-ease-soft) 1;         /* BR-S134 M1: rides the slower wipe (was 1500ms) */
 }
 @keyframes rv-meniscus {
   0%   { opacity: 0; transform: translateY(-40%) scaleY(0.86); }
@@ -867,12 +892,12 @@
 .menurev.is-fullview .menu__stage--reveal { position: fixed; inset: 0; z-index: 40; display: grid; place-items: center; padding: clamp(28px, 5vh, 64px); background: radial-gradient(120% 90% at 50% -10%, var(--rv-room-2) 0%, var(--rv-room) 62%); animation: rv-fullview-in 420ms var(--rv-ease) forwards; }
 @keyframes rv-fullview-in { from { opacity: 0; } to { opacity: 1; } }
 .menurev.is-fullview .reveal-stage--menustage { --rv-read-w: min(560px, 44vw); }
-.menurev.is-fullview .reveal-stage--menustage .rv-cardframe { zoom: 1; }
+.menurev.is-fullview .reveal-stage--menustage .rv-cardframe { width: 430px; zoom: 0.92; }   /* BR-S134 M3: same size as free/menu — the card never grows on see-deeper */
 .menurev.is-fullview .reveal-stage--menustage .reveal-stage__body { max-width: 1180px; }
 
 /* BACK affordance — fades in once the takeover settles */
-.menurev__back { position: fixed; top: clamp(20px, 4vh, 40px); left: clamp(20px, 4vw, 44px); z-index: 50; font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--t-meta); background: none; border: none; cursor: pointer; padding: 8px 4px; opacity: 0; pointer-events: none; transition: opacity 400ms var(--rv-ease) 360ms, color 160ms ease; }
-.menurev.is-fullview .menurev__back { opacity: 1; pointer-events: auto; }
+.menurev__back { position: fixed; top: clamp(20px, 4vh, 40px); left: clamp(20px, 4vw, 44px); z-index: 50; font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--t-meta); background: none; border: none; cursor: pointer; padding: 8px 4px; opacity: 0; pointer-events: none; visibility: hidden; transition: opacity 400ms var(--rv-ease) 360ms, color 160ms ease, visibility 0s linear 760ms; }
+.menurev.is-fullview .menurev__back { opacity: 1; pointer-events: auto; visibility: visible; transition: opacity 400ms var(--rv-ease) 360ms, color 160ms ease, visibility 0s linear 0s; }
 .menurev__back:hover { color: var(--t-display); }
 
 /* the arrow — bare hand-drawn glyph, no button chrome (your prototype) */
@@ -891,6 +916,7 @@
 .rv-arrow:focus-visible { outline: 2px solid color-mix(in srgb, var(--rv-ink) 78%, transparent); outline-offset: 4px; }
 .rv-arrow:active:not([aria-disabled="true"]) { transform: scale(0.97); }
 .rv-arrow[aria-disabled="true"] { opacity: 0.3; pointer-events: none; }
+.rv-arrow[aria-disabled="true"]:focus-visible { outline: none; }   /* BR-S134 M6: no ring on a truly-disabled arrow */
 .rv-arrow.is-gone { opacity: 0; transform: scale(0.9); pointer-events: none; }
 
 /* purple-neon variant — the first "see deeper" offer, before the modal */
@@ -945,7 +971,7 @@
 .rv-mod__art--oracle .rv-sketch { height: 50px; }
 .rv-mod__art--photo { flex: 0 0 auto; }
 .rv-photoframe { position: relative; display: block; width: 124px; }
-.rv-photoframe img { width: 100%; display: block; aspect-ratio: 16 / 10; object-fit: cover; filter: saturate(0.92) contrast(0.97) brightness(0.96); border-radius: 1px; }
+.rv-photoframe img { width: 100%; display: block; aspect-ratio: var(--photo-ratio, 16 / 10); object-fit: cover; filter: saturate(0.92) contrast(0.97) brightness(0.96); border-radius: 1px; }
 .rv-photoframe__marks { position: absolute; inset: -5px; width: calc(100% + 10px); height: calc(100% + 10px); color: var(--rv-ink); pointer-events: none; }
 .rv-signal { position: relative; }
 .rv-signal .rv-sketch { height: 46px; }
@@ -1007,7 +1033,31 @@
   }
   .rv-cardframe.is-developing .rv-layer--halo::after { animation: none !important; opacity: 0 !important; }
   .rv-cardframe.is-developing .rv-scanline { animation: none !important; }
+  .rv-cardframe.is-developing .rv-layer--halo .fr__pip.is-on {   /* BR-S134 M2: pips seated instantly */
+    animation: none !important;
+    animation-delay: 0ms !important;
+    opacity: 1 !important;
+    transform: rotate(45deg) !important;       /* preserve the seated-diamond rotation */
+  }
+  .reveal-stage--menustage .rv-arrow:hover:not([aria-disabled="true"]),
+  .reveal-stage--menustage .rv-arrow:focus-visible { transition: none !important; }   /* BR-S134 M4 */
   .rv-stagemain, .rv-readslot { transition: none !important; transform: none !important; }
   .rv-readslot { opacity: 1 !important; }
   .rv-arrow[data-variant="purple"] { animation: none !important; }
 }
+
+/* =====================================================================
+   M4 (BR-S134) — ARROW HITBOX == the visible glyph, in every state.
+   ROOT CAUSE (measured): after the slide the read panel z-stacked OVER the
+   arrow — the arrowslot's z-index:7 is trapped in .rv-stagemain's transform
+   stacking context, and .rv-readslot is a LATER flex sibling, so it painted
+   on top and ate clicks on the arrow's right half. Fix: lift stagemain above
+   the readslot. PLUS tighten the box so the breathe/hover peak can't overhang
+   (no drift: transform-origin pinned). BR-S132 placement is untouched. */
+.reveal-stage--menustage .rv-stagemain { z-index: 2; }   /* the arrow rides above the read seam */
+.reveal-stage--menustage .rv-readslot  { z-index: 1; }
+.rv-arrow { transform-origin: center; }
+.rv-arrow { padding: 4px; }                               /* standalone: encloses the 1.06 hover peak */
+.reveal-stage--menustage .rv-arrow { padding: 2px; }      /* menustage 56px glyph: tight box */
+.reveal-stage--menustage .rv-arrow:hover:not([aria-disabled="true"]),
+.reveal-stage--menustage .rv-arrow:focus-visible { transform: scale(1.035); }  /* peak stays inside the box */
