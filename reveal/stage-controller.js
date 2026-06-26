@@ -41,8 +41,10 @@
         '<p class="reveal-stage__thesis">Every photo is already a card. Watch the room develop it.</p>' +
         "</div>") +
       '<div class="reveal-stage__body">' +
+      '<div class="rv-stagemain">' +   // card + arrow — slides LEFT when the read appears
       '<div class="rv-cardslot"></div>' +
       '<div class="rv-arrowslot"></div>' +
+      "</div>" +
       '<div class="rv-readslot"></div>' +
       "</div>";
     root.appendChild(stage);
@@ -101,6 +103,8 @@
     function enterFreeReading() {
       stageName = "FREE_READING";
       purpleReady = false;
+      stage.classList.add("is-reading");   // the card glides LEFT; the read scribbles in on the right
+      if (opts.onReading) opts.onReading();
       setArrow({ variant: "grey", disabled: true }, "Reading…");
       mountPanel(R.readings.freeReading, function () {
         // grey -> purple ONLY now: the front is settled and complete

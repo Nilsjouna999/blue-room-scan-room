@@ -675,15 +675,24 @@
   transform: translateY(78px);            /* a touch below the card's centre */
   display: flex; flex-direction: column; align-items: center; gap: 8px;
 }
-.rv-readslot { flex: 1 1 auto; min-width: 0; }
+.rv-readslot { flex: 0 0 auto; width: min(560px, 44vw); min-width: 0; }
+
+/* BR-S129 — the cinematic develop: card + arrow glide LEFT and the read scribbles
+   in on the right. Reserved-width readslot, so the slide is pure transform (GPU). */
+.rv-stagemain { display: flex; flex-direction: row; align-items: flex-start; flex: 0 0 auto; transition: transform 820ms var(--rv-ease); will-change: transform; }
+.reveal-stage:not(.is-reading) .rv-stagemain { transform: translateX(min(290px, 21vw)); }  /* centred before the read */
+.reveal-stage.is-reading .rv-stagemain { transform: translateX(0); }                        /* slid to the left */
+.rv-readslot { transition: opacity 640ms var(--rv-ease) 220ms, transform 780ms var(--rv-ease) 220ms; }
+.reveal-stage:not(.is-reading) .rv-readslot { opacity: 0; transform: translateX(28px); }
+.reveal-stage.is-reading .rv-readslot { opacity: 1; transform: translateX(0); }
 
 /* embedded in the menu's sample-card slot — vertical stack, no own chrome,
    single-column readings (the "sample card develops in place" mode) */
 .reveal-stage--embedded { min-height: 0; padding: 0; background: none; overflow-x: visible; align-items: stretch; }
 .reveal-stage--embedded .reveal-stage__body { flex-direction: column; align-items: center; gap: 18px; max-width: 100%; }
-.reveal-stage--embedded .rv-cardslot { order: 1; }
-.reveal-stage--embedded .rv-arrowslot { order: 2; transform: none; align-self: center; }
-.reveal-stage--embedded .rv-readslot { order: 3; width: 100%; }
+.reveal-stage--embedded .rv-stagemain { flex-direction: column; align-items: center; transform: none !important; }
+.reveal-stage--embedded .rv-arrowslot { transform: none; align-self: center; }
+.reveal-stage--embedded .rv-readslot { width: 100%; opacity: 1 !important; transform: none !important; }
 .reveal-stage--embedded .rv-read { max-width: 100%; }
 .reveal-stage--embedded .rv-read__headline { font-size: clamp(22px, 3vw, 28px); }
 .reveal-stage--embedded .rv-grid--halo { grid-template-columns: 1fr; max-width: 372px; }
@@ -818,5 +827,7 @@
   .rv-sketch .d { stroke-dashoffset: 0 !important; }
   .rv-read__top, .rv-mod__hd, .rv-mod__cap, .rv-oracle, .rv-mintbox, .rv-peak, .rv-stat, .rv-subhead__t, .rv-photoframe img { opacity: 1 !important; transform: none !important; }
   .rv-cardframe.is-developing .rv-layer--halo { animation: none !important; clip-path: inset(-60px) !important; }
+  .rv-stagemain, .rv-readslot { transition: none !important; transform: none !important; }
+  .rv-readslot { opacity: 1 !important; }
   .rv-arrow[data-variant="purple"] { animation: none !important; }
 }
