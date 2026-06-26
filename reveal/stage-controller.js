@@ -16,7 +16,8 @@
   R.mount = function (root, opts) {
     if (!root) return;
     opts = opts || {};
-    var embedded = !!opts.embedded;   // hosted inside the menu's sample-card slot — no own header, readings stack below
+    var embedded = !!opts.embedded;   // narrow slot — vertical stack, readings below
+    var bare = embedded || !!opts.bare; // skip the reveal's own header (a host menu provides the brand)
 
     // idempotent: tear down any prior instance (body-level modal included)
     Array.prototype.slice.call(document.querySelectorAll(".rv-modal")).forEach(function (m) { m.remove(); });
@@ -34,7 +35,7 @@
     var stage = document.createElement("div");
     stage.className = "reveal-stage" + (embedded ? " reveal-stage--embedded" : "");
     stage.innerHTML =
-      (embedded ? "" :   // embedded in the menu -> the menu's brand is the header
+      (bare ? "" :   // a host menu provides the brand/header
         '<div class="reveal-stage__head">' +
         '<span class="reveal-stage__devtag">DEV · STAGED REVEAL — not a product surface yet</span>' +
         '<h1 class="reveal-stage__brand">◆ BLUE ROOM</h1>' +

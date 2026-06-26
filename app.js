@@ -1719,17 +1719,29 @@ function mountDev() {
     return;
   }
   if (state.dev === "menu-reveal") {
-    // PREVIEW of the integrated menu: the REAL menu markup, but the sample card
-    // slot hosts the staged reveal (embedded) so it "develops in place". The
-    // live menu is untouched — this is a separate route for the builder to judge.
+    // PREVIEW: the menu's brand + doors as a LEFT chrome layer that steps aside on
+    // develop; the staged reveal (bare, full-width slide) is the stage — so the
+    // card glides left + the read fills the right. The live menu is UNTOUCHED.
     const host = document.getElementById("devView");
-    // NOT the `.menu` class — it's view-gated (display:none unless view=menu).
-    // The menu LAYOUT lives on `.menu__inner`; wrap it in a neutral centerer.
-    host.innerHTML = '<div class="menurev-wrap">' + renderMenu() + "</div>";
-    const slot = host.querySelector(".msample__card");
-    if (slot && window.BRReveal && typeof window.BRReveal.mount === "function") {
-      slot.innerHTML = "";
-      window.BRReveal.mount(slot, { embedded: true });
+    host.innerHTML =
+      '<div class="menurev2">' +
+        '<div class="menurev2__chrome">' +
+          '<h1 class="menu__brand"><span class="menu__mark">◆</span> BLUE ROOM</h1>' +
+          '<p class="menu__thesis">Every photo is already a card. The room develops it.</p>' +
+          '<p class="menu__trust">Image-as-artifact scan — it reads frame, gesture and signal, never the person.</p>' +
+          '<div class="menu__doors">' +
+            '<button type="button" class="menu__door menu__door--add" data-draft-pick><span class="menu__door-kicker">Your Photo</span><span class="menu__door-name">Add your photo</span><span class="menu__door-desc">Stage your image as a local draft.</span></button>' +
+            '<button type="button" class="menu__door menu__door--sample" data-view-to="room"><span class="menu__door-kicker">Sample</span><span class="menu__door-name">View sample card</span><span class="menu__door-desc">A finished developed card — SRC-01.</span></button>' +
+          '</div>' +
+        '</div>' +
+        '<div class="menurev2__stage"></div>' +
+      '</div>';
+    const stage = host.querySelector(".menurev2__stage");
+    if (stage && window.BRReveal && typeof window.BRReveal.mount === "function") {
+      window.BRReveal.mount(stage, {
+        bare: true,
+        onReading: function () { const m = host.querySelector(".menurev2"); if (m) m.classList.add("is-developing"); },
+      });
     }
     return;
   }

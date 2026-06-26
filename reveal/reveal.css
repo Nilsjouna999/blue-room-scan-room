@@ -697,12 +697,17 @@
 .reveal-stage--embedded .rv-read__headline { font-size: clamp(22px, 3vw, 28px); }
 .reveal-stage--embedded .rv-grid--halo { grid-template-columns: 1fr; max-width: 372px; }
 
-/* preview wrapper for the integrated-menu route (?dev=menu-reveal) — the menu
-   layout lives on .menu__inner; this just centres it on the dev surface */
-.menurev-wrap { display: flex; justify-content: center; align-items: flex-start; padding: clamp(28px, 5vh, 60px) 20px; }
-/* keep the menu's left column pinned to the top as the develop read grows tall
-   (the live menu centres it with 1fr top+bottom spacer rows; drop the top one) */
-.menurev-wrap .menu__inner { grid-template-rows: 0 auto auto 1fr; }
+/* integrated-menu preview (?dev=menu-reveal): brand + doors as a LEFT chrome
+   layer that STEPS ASIDE on develop; the bare staged reveal slides full-width
+   (card glides left, read fills right). The live menu is untouched. */
+.menurev2 { position: relative; min-height: 100vh; padding: clamp(28px, 5vh, 56px) clamp(16px, 4vw, 48px) 80px; }
+.menurev2__chrome {
+  position: absolute; top: clamp(28px, 5vh, 56px); left: clamp(20px, 5vw, 64px); z-index: 6;
+  width: min(320px, 30vw); display: flex; flex-direction: column; gap: 16px; text-align: left;
+  transition: opacity 600ms var(--rv-ease), transform 720ms var(--rv-ease);
+}
+.menurev2.is-developing .menurev2__chrome { opacity: 0; transform: translateX(-22px); pointer-events: none; }
+.menurev2__stage { position: relative; }
 
 /* the arrow — bare hand-drawn glyph, no button chrome (your prototype) */
 .rv-arrow {
