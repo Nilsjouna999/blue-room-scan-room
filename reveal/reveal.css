@@ -25,6 +25,7 @@
 
   /* --- motion --------------------------------------------------------- */
   --rv-ease:           cubic-bezier(0.2, 0.7, 0.2, 1);    /* the house easing */
+  --rv-ease-soft:      cubic-bezier(0.4, 0, 0.2, 1);      /* the develop WIPE + wet-meniscus sweep ONLY */
   --rv-dur-develop:    820ms;
   --rv-dur-row:        70ms;                              /* per-row stagger */
   --rv-dur-write:      1100ms;
@@ -251,15 +252,108 @@
    (clip-path + transform + opacity only). */
 .rv-cardframe.is-developing .rv-layer--free { opacity: 1; transition: none; }
 .rv-cardframe.is-developing .rv-layer--halo {
-  opacity: 1; transition: none;
-  animation: rv-develop-wipe 1500ms var(--rv-ease) forwards;
+  opacity: 1;
+  transition: none;
+  animation:
+    rv-develop-wipe 1500ms var(--rv-ease-soft) forwards,   /* the clip seam — steady wet sweep */
+    rv-halo-tonal   1850ms var(--rv-ease)      forwards;   /* the SOLE filter writer on this layer */
+  will-change: clip-path, filter;
+}
+/* TONAL RISE / FIXER — pale + flat in the developer, blooming to true colour as the
+   fixer takes hold, a brief over-saturation swell at 84% before locking to 1/1/1.
+   (one filter writer only — two filter animations on one element clobber). */
+@keyframes rv-halo-tonal {
+  0%   { filter: brightness(1.16) contrast(0.74) saturate(0.60); }  /* still in the developer */
+  62%  { filter: brightness(1.05) contrast(0.92) saturate(0.86); }
+  84%  { filter: brightness(1.10) contrast(1.02) saturate(1.06); }  /* the fix-swell — locking */
+  100% { filter: brightness(1)    contrast(1)    saturate(1); }     /* fixed / true */
+}
+/* HALO-FIX BLOOM — a brief violet glow swell at the last beat as the print "fixes",
+   on a dedicated ::after so it never repaints the card interior or touches `filter`.
+   Inside the -60px glow clip; box-shadow STATIC, only opacity + transform animate.
+   Resting opacity 0 = the settled look is the card's own halo (freeze-safe). */
+.rv-cardframe.is-developing .rv-layer--halo::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  border-radius: var(--card-radius, 12px);
+  box-shadow:
+    0 0 0 1px var(--rv-halo-glow),
+    0 0 34px 6px var(--rv-halo-glow);
+  opacity: 0;
+  animation: rv-fix-bloom 1850ms var(--rv-ease) forwards;
+}
+@keyframes rv-fix-bloom {
+  0%, 64% { opacity: 0;   transform: scale(0.992); }  /* dormant until the print nears fixed */
+  82%     { opacity: 0.9; transform: scale(1); }      /* the swell — the moment it locks */
+  100%    { opacity: 0;   transform: scale(1); }      /* fades — resting halo is the card's own */
 }
 @keyframes rv-develop-wipe {
-  from { clip-path: inset(-60px -60px 900px -60px); }   /* clipped from the bottom — not yet developed */
+  from { clip-path: inset(-60px -60px calc(100% + 60px) -60px); }   /* clipped to the top — height-agnostic */
   to   { clip-path: inset(-60px); }                      /* fully developed, glow included */
 }
 
-/* the developer bar that rides the wipe edge */
+/* ====================================================================
+   PHOTO -> FREE  ·  "Print Rising from the Bath"  ·  standalone opening
+   only (?dev=staged-reveal); the menu starts already on FREE. 3 beats / 1180ms:
+     1) the print RISES — bottom-anchored clip bloom (lands ~62%, --rv-ease)
+     2) the print FIXES — exposure/contrast/saturate washed-out -> true
+        (back-loaded on --rv-ease-soft, settles last)
+     3) the BATH recedes — dims+desaturates+softens+sinks, fluid drains off
+   GPU-only: clip-path / filter / transform / opacity. Zero layout shift.
+   Resting `.rv-layer--free.is-shown` is the finished look, so a frozen
+   timeline ends correct (visibility never gated on the entrance animation). */
+.rv-cardframe.is-developing-photo .rv-layer--free {
+  opacity: 1;
+  transform: none;
+  transition: none;
+  transform-origin: 50% 100%;            /* lifted from the tray, bottom-anchored */
+  animation:
+    rv-print-rise 1180ms var(--rv-ease)      forwards,
+    rv-print-fix  1180ms var(--rv-ease-soft) forwards;
+}
+.rv-cardframe.is-developing-photo .rv-layer--photo {
+  opacity: 1;
+  transition: none;
+  animation: rv-bath-sink 1180ms var(--rv-ease-soft) forwards;
+}
+.rv-cardframe.is-developing-photo .rv-photoplate::after {
+  /* the existing developer-fluid wash literally DRAINS off (no new DOM) */
+  animation: rv-bath-drain 1180ms var(--rv-ease-soft) forwards;
+}
+/* the print climbs out of the bath — bottom-anchored clip bloom. End = inset(0). */
+@keyframes rv-print-rise {
+  from { clip-path: inset(0 0 100% 0); }   /* still submerged — nothing showing */
+  62%  { clip-path: inset(0 0 0 0); }      /* fully up by 62% — the rise LANDS */
+  to   { clip-path: inset(0 0 0 0); }      /* holds; resting look */
+}
+/* exposure/focus FIX — surfaces milky/overexposed, then locks to true tone.
+   NO blur on the hero. Back-loaded so the fix completes LAST. */
+@keyframes rv-print-fix {
+  0%   { filter: brightness(1.34) contrast(0.62) saturate(0.30); }  /* washed-out */
+  62%  { filter: brightness(1.12) contrast(0.90) saturate(0.82); }
+  to   { filter: brightness(1)    contrast(1)    saturate(1); }     /* fixed / true */
+}
+/* the bath sinks beneath the rising print: dims, desaturates, softens, recedes.
+   blur lives ONLY here (covered layer, dropped at end) — never on the hero. */
+@keyframes rv-bath-sink {
+  from { filter: saturate(0.86) contrast(0.96) brightness(0.90) blur(0px); transform: scale(1); }
+  to   { filter: saturate(0.30) contrast(0.92) brightness(0.60) blur(3px); transform: scale(0.988); }
+}
+/* developer fluid drains off the plate (the EXISTING ::after wash) */
+@keyframes rv-bath-drain {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+
+/* WET MENISCUS — the wipe's leading edge reads as a glossy wet develop seam: a
+   developer-fluid BODY (glow pooling above the wet line) + a bright near-white
+   CREST lip welded to its lower edge (surface tension). Rides the wipe with
+   translateY + a scaleY squash + opacity on --rv-ease-soft. This carries the
+   "feathered wet edge" read — the freeze+glow-safe alternative to a layer mask
+   (a border-box mask on the halo layer would kill the -60px glow + freeze blank). */
 .rv-scanline {
   position: absolute;
   left: -3%; right: -3%;
@@ -268,22 +362,42 @@
   z-index: 6;
   pointer-events: none;
   opacity: 0;
+  transform-origin: center top;
+  /* developer-fluid BODY: glow pooling just above the wet line, fading up */
   background: linear-gradient(180deg,
     transparent 0%,
-    color-mix(in srgb, var(--rv-halo) 16%, transparent) 38%,
-    color-mix(in srgb, var(--rv-halo) 42%, transparent) 50%,
-    color-mix(in srgb, var(--rv-halo) 16%, transparent) 62%,
+    color-mix(in srgb, var(--rv-halo) 12%, transparent) 44%,
+    color-mix(in srgb, var(--rv-halo) 38%, transparent) 74%,
+    color-mix(in srgb, var(--rv-halo) 54%, transparent) 94%,
     transparent 100%);
   mix-blend-mode: screen;
 }
-.rv-cardframe.is-developing .rv-scanline {
-  animation: rv-scan 1500ms var(--rv-ease) 1;
+/* CREST — the bright wet lip itself (surface tension), near-white core. STATIC. */
+.rv-scanline::before {
+  content: "";
+  position: absolute;
+  left: 0; right: 0;
+  bottom: 6%;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    color-mix(in srgb, #fff 70%, var(--rv-halo)) 18%,
+    color-mix(in srgb, #fff 88%, var(--rv-halo)) 50%,
+    color-mix(in srgb, #fff 70%, var(--rv-halo)) 82%,
+    transparent 100%);
+  filter: blur(0.4px);
+  opacity: 0.92;
+  mix-blend-mode: screen;
 }
-@keyframes rv-scan {
-  0%   { opacity: 0;   transform: translateY(-35%); }
-  14%  { opacity: 1; }
-  86%  { opacity: 1; }
-  100% { opacity: 0;   transform: translateY(320%); }
+.rv-cardframe.is-developing .rv-scanline {
+  animation: rv-meniscus 1500ms var(--rv-ease-soft) 1;
+}
+@keyframes rv-meniscus {
+  0%   { opacity: 0; transform: translateY(-40%) scaleY(0.86); }
+  12%  { opacity: 1; transform: translateY(-20%) scaleY(1); }     /* fluid gathers, lip swells in */
+  86%  { opacity: 1; transform: translateY(286%) scaleY(1); }
+  100% { opacity: 0; transform: translateY(320%) scaleY(1.12); }  /* trails + thins exiting the bottom */
 }
 
 /* =====================================================================
@@ -642,6 +756,16 @@
     transition-duration: 0.001ms !important;
   }
   .rv-layer { transition: none !important; transform: none !important; }
+  /* photo->free develop snaps to the finished free card; bath + drain neutralised */
+  .rv-cardframe.is-developing-photo .rv-layer--free {
+    animation: none !important;
+    clip-path: inset(0) !important;        /* fully risen — the resting free card */
+    filter: none !important;               /* true tone */
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  .rv-cardframe.is-developing-photo .rv-layer--photo { animation: none !important; filter: none !important; }
+  .rv-cardframe.is-developing-photo .rv-photoplate::after { animation: none !important; }
   .rv-row, .rv-meter, .rv-slot, .rv-read__close { opacity: 1 !important; transform: none !important; }
   .rv-row__rule { transform: scaleX(1) !important; }
   .rv-scribble path { stroke-dashoffset: 0 !important; }
@@ -723,8 +847,16 @@
 .reveal-stage--menustage .rv-readslot { transition: opacity 820ms var(--rv-ease) 220ms, transform 820ms var(--rv-ease) 220ms; }
 .reveal-stage--menustage:not(.is-reading) .rv-readslot { opacity: 0; transform: translateX(22px); }
 .reveal-stage--menustage.is-reading .rv-readslot { opacity: 1; transform: translateX(0); }
-/* arrow sits below the card (absolute) so it never eats horizontal room from the read */
-.reveal-stage--menustage .rv-arrowslot { position: absolute; left: 50%; bottom: -56px; transform: translateX(-50%); }
+/* BR-S132 — the arrow nestles at the card's RIGHT edge, vertically centred, pointing
+   into the read (was: stamped centred below the card with a caption underneath). It rides
+   .rv-stagemain (absolute within it), so it slides left with the card and lands in the
+   card->read seam. Caption dropped on the menu — the gesture carries the affordance. */
+.reveal-stage--menustage .rv-arrowslot { position: absolute; left: 100%; top: 50%; bottom: auto; transform: translateY(-50%); margin-left: 2px; z-index: 7; }
+.reveal-stage--menustage .rv-arrow__svg { width: 56px; height: 56px; }
+.reveal-stage--menustage .rv-arrow__cap { display: none; }
+/* the menu seam is only ~24px, so the read clears a left lane: the arrow nestles in it,
+   pointing INTO the read, instead of landing on top of the first module. */
+.reveal-stage--menustage.is-reading .rv-read { padding-left: 52px; }
 
 /* FULLVIEW takeover (see-deeper → halo): the stage cell promotes to a fixed
    full-bleed layer; the menu chrome steps aside. */
@@ -863,7 +995,13 @@
 @media (prefers-reduced-motion: reduce) {
   .rv-sketch .d { stroke-dashoffset: 0 !important; }
   .rv-read__top, .rv-mod__hd, .rv-mod__cap, .rv-oracle, .rv-mintbox, .rv-peak, .rv-stat, .rv-subhead__t, .rv-photoframe img { opacity: 1 !important; transform: none !important; }
-  .rv-cardframe.is-developing .rv-layer--halo { animation: none !important; clip-path: inset(-60px) !important; }
+  .rv-cardframe.is-developing .rv-layer--halo {
+    animation: none !important;
+    clip-path: inset(-60px) !important;                         /* PRESERVE the halo glow */
+    filter: brightness(1) contrast(1) saturate(1) !important;   /* fixed / true tone */
+  }
+  .rv-cardframe.is-developing .rv-layer--halo::after { animation: none !important; opacity: 0 !important; }
+  .rv-cardframe.is-developing .rv-scanline { animation: none !important; }
   .rv-stagemain, .rv-readslot { transition: none !important; transform: none !important; }
   .rv-readslot { opacity: 1 !important; }
   .rv-arrow[data-variant="purple"] { animation: none !important; }

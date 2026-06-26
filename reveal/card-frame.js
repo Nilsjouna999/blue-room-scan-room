@@ -74,6 +74,26 @@
         return;
       }
 
+      // PHOTO -> FREE is the standalone OPENING develop: the print rises out of the
+      // developer bath (bottom-anchored clip bloom) while the exposure/contrast fixes
+      // in, and the bath behind it dims/desaturates/softens/drains. Plays ONLY on
+      // ?dev=staged-reveal — the menu starts already on FREE, so it never fires there.
+      if (prev === "photo" && next === "free") {
+        free.classList.add("is-shown");      // the print — rises sharp, fixes in
+        halo.classList.remove("is-shown");
+        photo.classList.add("is-shown");     // the bath — stays beneath, then sinks
+        el.classList.remove("is-developing-photo");
+        void el.offsetWidth;                 // restart the develop
+        el.classList.add("is-developing-photo");
+        var pdur = motionOff() ? 0 : 1180;
+        timer = setTimeout(function () {     // reuses the module-scoped timer — no race
+          el.classList.remove("is-developing-photo");
+          photo.classList.remove("is-shown"); // print fully up — drop the bath
+          if (onMorphDone) onMorphDone(next);
+        }, pdur);
+        return;
+      }
+
       // default crossfade (photo <-> free, or a direct set)
       ["free", "halo", "photo"].forEach(function (n) {
         byName[n].classList.toggle("is-shown", n === next);

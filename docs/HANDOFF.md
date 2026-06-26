@@ -3,8 +3,9 @@
 For a fresh Claude Code session to resume with zero context loss. **You are the BUILDER** (you hold the repo and
 make the changes). The user pastes specs/designs from a separate planning chat. Grounded in the repo — **re-grep
 line numbers, they drift** (every session shifts them a lot). Last written: **2026-06-26**, code at HEAD
-`816973b` (BR-S131), **pushed + live**. **The current work is the develop/reveal ADD-ON — see the ★ ACTIVE LANE
-section below FIRST.** (The §2 card-front detail underneath it is prior-run context, still accurate.)
+`BR-S132` (TIER 4 develop-craft + the arrow nit — **local, NOT pushed**); `e72aa24` (BR-S131 + this handoff) is
+the **pushed/live** tip. **The current work is the develop/reveal ADD-ON — see the ★ ACTIVE LANE section below
+FIRST.** (The §2 card-front detail underneath it is prior-run context, still accurate.)
 
 ---
 
@@ -61,14 +62,16 @@ as a slow **develop WIPE** (matte→minted clip-path wipe + developer bar) · S1
 (superseded) · S129 the cinematic **card-slide-LEFT + read-scribbles-RIGHT** · **S131 the menu add-on REBUILT on the
 real menu grid** (Tiers 1–3 of the 23-agent audit plan): start frame == the original **by construction**, ONE base,
 doors structurally immovable; free read fits **RIGHT** (doors stay); "see deeper" → **fullview** takeover (chrome steps
-aside) + **← Back to the menu**.
+aside) + **← Back to the menu** · **S132 (LOCAL — NOT pushed) = TIER 4 develop-craft** (photo→free 3-beat develop ·
+card→halo tonal-rise + fix-bloom + wet-meniscus · `--rv-ease-soft` · robustness clip fix) **+ the arrow → right-of-card,
+caption dropped** (the builder's pick; in a read-side lane so it never overlaps a module).
 
 **THE BUILD SPEC for the remaining work** (a 23-agent `menu-addon-polish-audit` Workflow result) is at the task output
-`…\tasks\wsc60yo20.output` — **read it first**. Tiers 1–3 DONE; **Tiers 4–7 REMAIN:**
-- **TIER 4 — craft:** (a) smoother **image→card** (photo→free is a flat 820ms crossfade → make it a 3-beat develop;
-  spec `d:img2card`); (b) better **card→halo cinematic** (add a feathered wet-edge mask + tonal-rise filter + wet
-  meniscus + halo bloom to the existing clip wipe; spec `d:card2halo`). Also robustness: wipe `from` clip →
-  `inset(-60px -60px calc(100% + 60px) -60px)` (any card height).
+`…\tasks\wsc60yo20.output` — **read it first**. Tiers 1–4 DONE (S131 = 1–3, **S132 = TIER 4**); **Tiers 5–7 REMAIN:**
+- **TIER 4 — craft — ✅ DONE (BR-S132):** photo→free is now a 3-beat "Print Rising from the Bath" develop (clip
+  bloom + exposure fix + sinking bath; standalone route only); card→halo got a tonal-rise filter + a halo-fix bloom
+  (::after) + a wet-meniscus scanline (NOT a layer mask — the critic killed that: it froze blank + killed the glow
+  clip). New `--rv-ease-soft` token. Robustness wipe-clip `→ inset(-60px -60px calc(100% + 60px) -60px)` applied.
 - **TIER 5 — scribble MINIMAL polish** (builder LIKES it — minimal only): draw easing → `cubic-bezier(.25,.46,.45,.94)`;
   count-scaled stagger (460ms free / 360ms halo via a `--rv-stagger` token keyed off `.rv-read[data-engine="halo"]`);
   a 3px `rv-settle` for pips/peak; let the flourish draw; `.rv-cap__em` 18→17px.
@@ -82,10 +85,12 @@ aside) + **← Back to the menu**.
 - Apply the spec's **MOTION-LANGUAGE** table (two easings: `--rv-ease` + a NEW `--rv-ease-soft` for the wipe/scanline)
   + the **ROBUSTNESS rules** (every magic number → a function of content) consistently.
 
-**⚠ BUILDER NOTE (do early):** the read/develop **ARROW sits BELOW the card with a caption under it — the builder
-DISLIKES this** ("pains my soul"). On the menu, `.reveal-stage--menustage .rv-arrowslot` is `position:absolute;
-bottom:-56px` and the caption is `.rv-arrow__cap`. Reconsider it — likely **drop the caption** and/or move the arrow
-(beside the card? a subtler in-card / card-click affordance?). **Ask the builder for the placement they want.**
+**✅ ARROW NOTE — RESOLVED (BR-S132).** The builder chose **"right of the card, points into the read"** (caption
+dropped). On the menu the arrow now rides `.rv-stagemain` at `left:100%; top:50%` (card's right edge, vertically
+centred), `.rv-arrow__cap` is `display:none` in menustage, and `.reveal-stage--menustage.is-reading .rv-read` has
+`padding-left:52px` so the arrow nestles in a left lane instead of landing on a read module. *(Standalone
+`?dev=staged-reveal` keeps its base arrow placement — right of card, `translateY(78px)`, caption shown; left as-is
+since the pain point was the menu. Mirror it onto standalone if wanted — a one-liner.)*
 
 **HOW TO RUN THE REMAINING WORK (builder's explicit ask):** use a **~20-agent + 3-haiku** read-only audit/design
 **Workflow per tier** (the `menu-addon-polish-audit` pattern) throughout — agents AUDIT + author proposals, the
