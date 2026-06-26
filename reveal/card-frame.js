@@ -52,19 +52,34 @@
       if (next === mode) return;
       var prev = mode;
       mode = next;
+      if (timer) clearTimeout(timer);
+
+      // FREE -> HALO is the "develop": the minted card WIPES IN top->bottom over
+      // the free card beneath, a developer bar riding the reveal edge — like a
+      // print coming up in the tray. Same card geometry in both layers, so only
+      // the treatment (matte -> minted + glow) develops. Savor it (~1.5s + settle).
+      if (prev === "free" && next === "halo") {
+        free.classList.add("is-shown");   // free stays beneath during the wipe
+        halo.classList.add("is-shown");   // minted card on top, clip-revealed
+        photo.classList.remove("is-shown");
+        el.classList.remove("is-developing");
+        void el.offsetWidth;              // restart the wipe + the developer bar
+        el.classList.add("is-developing");
+        var ddur = motionOff() ? 0 : 1850;
+        timer = setTimeout(function () {
+          el.classList.remove("is-developing");
+          free.classList.remove("is-shown"); // free now fully covered — drop it
+          if (onMorphDone) onMorphDone(next);
+        }, ddur);
+        return;
+      }
+
+      // default crossfade (photo <-> free, or a direct set)
       ["free", "halo", "photo"].forEach(function (n) {
         byName[n].classList.toggle("is-shown", n === next);
       });
-      // the re-develop scan sweep runs only free -> halo
-      if (prev === "free" && next === "halo") {
-        el.classList.remove("is-scanning");
-        void el.offsetWidth; // force reflow so the sweep restarts
-        el.classList.add("is-scanning");
-      }
-      if (timer) clearTimeout(timer);
       var dur = motionOff() ? 0 : 820;
       timer = setTimeout(function () {
-        el.classList.remove("is-scanning");
         if (onMorphDone) onMorphDone(next);
       }, dur);
     }

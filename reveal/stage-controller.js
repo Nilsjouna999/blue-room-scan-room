@@ -107,9 +107,12 @@
     }
     function enterHalo() {
       stageName = "HALO";
-      if (panel) panel.clear();   // the free Stats & Readings clears to empty as the card morphs to halo
+      if (panel) panel.clear();   // the free Stats & Readings fades to empty first
       setArrow({ variant: "grey", disabled: true }, "Developing…");
-      card.setMode("halo"); // re-develop sweep + meter recolor; onMorph('halo') re-enables
+      // then, a beat later, the card itself develops (the wipe) — sequenced, not all at once
+      setTimeout(function () {
+        if (stageName === "HALO") card.setMode("halo"); // wipe-develop; onMorph('halo') re-enables
+      }, 320);
     }
     function enterHaloReading() {
       stageName = "HALO_READING";
