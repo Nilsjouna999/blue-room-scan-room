@@ -2,8 +2,9 @@
 
 For a fresh Claude Code session to resume with zero context loss. **You are the BUILDER** (you hold the repo and
 make the changes). The user pastes specs/designs from a separate planning chat. Grounded in the repo — **re-grep
-line numbers, they drift** (every session shifts them a lot). Last written: **2026-06-25**, code at HEAD
-`55e73cb` (BR-S123), **pushed + live**.
+line numbers, they drift** (every session shifts them a lot). Last written: **2026-06-26**, code at HEAD
+`816973b` (BR-S131), **pushed + live**. **The current work is the develop/reveal ADD-ON — see the ★ ACTIVE LANE
+section below FIRST.** (The §2 card-front detail underneath it is prior-run context, still accurate.)
 
 ---
 
@@ -29,13 +30,79 @@ before contradicting) · `docs/TASK_QUEUE.md` (newest-first shipped log + Ready 
 ---
 
 ## 2 · Where the build is NOW
-**HEAD = origin/main = `55e73cb` (BR-S123) · pushed, in sync.** **LIVE** at
-**https://nilsjouna999.github.io/blue-room-scan-room/** (GitHub Pages, `main`/root — **push = deploy**, ~50–80s;
+**HEAD = origin/main = `816973b` (BR-S131) · pushed, in sync.** **LIVE** at
+**https://nilsjouna999.github.io/blue-room-scan-room/** (GitHub Pages, `main`/root — **push = deploy**, ~30–80s;
 the 5 photos are PUBLIC by owner consent — don't re-gitignore). Plain HTML/CSS/JS, no build, **node NOT installed**.
 **Deploy can HANG occasionally** (once stuck ~10min, no incident) — watch `gh run list`; the fix is an empty
 re-trigger commit (`git commit --allow-empty` + push), which supersedes the hung run.
 
-**Commit arc since the last handoff (oldest→newest) — this run was the CARD-FRONT overhaul + polish:**
+---
+
+## ★ ACTIVE LANE — the develop/reveal ADD-ON (BR-S124 → BR-S131) — **RESUME HERE**
+
+A staged "develop" reveal was added to the project, built as isolated vanilla units in **`/reveal/`** (namespace
+`window.BRReveal`), hosted on **dev routes** — the **LIVE menu + room are UNTOUCHED**:
+- **`?dev=staged-reveal`** — the standalone full experience (photo→free→read→see-deeper→halo→read).
+- **`?dev=menu-reveal`** — the INTEGRATED menu: the **real `.menu__inner` grid** hosts the reveal in the sample-card slot.
+
+**UNITS (`reveal/*.js`, all on `window.BRReveal`):** `stage-controller.js` (the state machine + `mount(root, opts)`;
+opts: `embedded` [narrow vertical stack], `menustage` [hosted in the menu grid cell], `bare` [skip the reveal's own
+header], `onFullview`/`onBack` [the menu fullview promote/return], `onReading`; **returns `{el, toFree}`**) ·
+`card-frame.js` (card layers free/halo/photo + `setMode` + the develop **WIPE** = `.is-developing` clip-path inset
+top→bottom + `.rv-scanline` developer bar) · `reading-panel.js` (the scribble read — hand-drawn SVG **SKETCHES**,
+stroke-dashoffset draw-on; 4 free / 8 halo modules incl the **comet** [the Frame-Signature metric] + the **source
+photo**; `play()`/`clear()`) · `arrow-button.js` (the hand-drawn scribble arrow, silver→purple) · `warning-modal.js`
+(the "see deeper" consent gate) · `readings.data.js` (**PLACEHOLDER copy**). `reveal/reveal.css` = ALL reveal styling.
+The 6 reveal scripts load in index.html **BEFORE app.js** (so `window.BRReveal` exists at boot).
+
+**DONE (BR-S124 → S131, all pushed + live):** S124 staged reveal (7 units) · S125 hand-drawn "sketchbook" read · S126
+polish (arrow dim/hover, read clears on halo, slower pacing, +comet & source modules, bug/a11y fixes) · S127 free→paid
+as a slow **develop WIPE** (matte→minted clip-path wipe + developer bar) · S128/S130 menu integration v1/v2
+(superseded) · S129 the cinematic **card-slide-LEFT + read-scribbles-RIGHT** · **S131 the menu add-on REBUILT on the
+real menu grid** (Tiers 1–3 of the 23-agent audit plan): start frame == the original **by construction**, ONE base,
+doors structurally immovable; free read fits **RIGHT** (doors stay); "see deeper" → **fullview** takeover (chrome steps
+aside) + **← Back to the menu**.
+
+**THE BUILD SPEC for the remaining work** (a 23-agent `menu-addon-polish-audit` Workflow result) is at the task output
+`…\tasks\wsc60yo20.output` — **read it first**. Tiers 1–3 DONE; **Tiers 4–7 REMAIN:**
+- **TIER 4 — craft:** (a) smoother **image→card** (photo→free is a flat 820ms crossfade → make it a 3-beat develop;
+  spec `d:img2card`); (b) better **card→halo cinematic** (add a feathered wet-edge mask + tonal-rise filter + wet
+  meniscus + halo bloom to the existing clip wipe; spec `d:card2halo`). Also robustness: wipe `from` clip →
+  `inset(-60px -60px calc(100% + 60px) -60px)` (any card height).
+- **TIER 5 — scribble MINIMAL polish** (builder LIKES it — minimal only): draw easing → `cubic-bezier(.25,.46,.45,.94)`;
+  count-scaled stagger (460ms free / 360ms halo via a `--rv-stagger` token keyed off `.rv-read[data-engine="halo"]`);
+  a 3px `rv-settle` for pips/peak; let the flourish draw; `.rv-cap__em` 18→17px.
+- **TIER 6 — ROBUSTNESS (the image AND stats MAY CHANGE):** thread `src` into the panel —
+  `panel = R.ReadingPanel({ reading, src })` (it currently never gets `src` → hardcoded to SRC-01). Replace every
+  SRC-01 literal with `src.*`: photo `src.file`, pips `Math.round(src.card.stats[k]/20)`, serial `src.card.serial`,
+  oracle `src.dossier.oracle.short`, **comet polygon GENERATED from `src.frame.signature.radii`** (9 radii @ 40°),
+  thumbnail `aspect-ratio: var(--photo-ratio)`.
+- **TIER 7 — a11y + edge cases:** aria-live on `.rv-readslot`; focus through develop/fullview/back; **Esc** on the back
+  button; reduced-motion paths for the new steps; (`haloTimer` rapid-tap guard already done).
+- Apply the spec's **MOTION-LANGUAGE** table (two easings: `--rv-ease` + a NEW `--rv-ease-soft` for the wipe/scanline)
+  + the **ROBUSTNESS rules** (every magic number → a function of content) consistently.
+
+**⚠ BUILDER NOTE (do early):** the read/develop **ARROW sits BELOW the card with a caption under it — the builder
+DISLIKES this** ("pains my soul"). On the menu, `.reveal-stage--menustage .rv-arrowslot` is `position:absolute;
+bottom:-56px` and the caption is `.rv-arrow__cap`. Reconsider it — likely **drop the caption** and/or move the arrow
+(beside the card? a subtler in-card / card-click affordance?). **Ask the builder for the placement they want.**
+
+**HOW TO RUN THE REMAINING WORK (builder's explicit ask):** use a **~20-agent + 3-haiku** read-only audit/design
+**Workflow per tier** (the `menu-addon-polish-audit` pattern) throughout — agents AUDIT + author proposals, the
+orchestrator implements + verifies + commits in the **main loop** (the read-only-agent law; never let an agent commit).
+Verify each step by **headless Chrome → Read the PNG** @1600×900 (`preview_screenshot` is BROKEN). The `?rv=` deep-link
+auto-drives, but **menustage starts at FREE**, so `?rv=free` = the in-menu free read · `?rv=developed` = the fullview
+halo; use a **~13–26k `--virtual-time-budget`** (NOT huge — over-long budgets stall the auto-drive).
+
+**KEY GOTCHAS (menu host):** the `.menu` class is `display:none` in dev view (`styles.css:2737`) → the menu-reveal
+route hosts the real `.menu__inner` grid on a **NON-gated `.menurev` wrapper** (which replicates `.menu`). The reveal
+paints **NO background** in menustage (the body gradient is the ONE base — fixes the old 2-base-colour bug). The card
+is `430px × zoom 0.92` (== the original `.msample__card`). The slide distance is `translateX(calc((--rv-read-w +
+--rv-slide-gap)/2))` at rest → `0` on `.is-reading` (NOT a magic px). Two `.menu__head`/`.menu__doors` exist in the DOM
+(the hidden `#menuView` + the `.menurev` one) — scope DOM measurements to `.menurev`.
+
+**PRIOR-RUN commit arc (the CARD-FRONT overhaul + polish — context, NOT the active lane; the active lane is the
+reveal add-on above):**
 - `d7e3f6a` BR-S118 — Surface Record LOCKED to the horizontal **tray** form (every card; column retired) + Metrics
   reel clipping fix (inherited `gap:16px` desynced the translate) + sleeker "Diagnostic Receipts" head + left type tune.
 - `72495f4` BR-S119 — **NEW CARD FRONT ported** from the builder's `ScanCardFront.jsx`: the **"Frame Reading"
