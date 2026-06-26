@@ -91,7 +91,7 @@ const state ={ source: 0, treatment: "free", tab: "diagram", view: "menu", draft
      uploaded-blocked renders a validated DEV fixture, never a user scan.
      free-scan-sim = Free Pull mock · halo-gate = sealed card-back mock. */
   const dev = q.get("dev");
-  if (["uploaded-result", "uploaded-blocked", "free-scan-sim", "halo-gate", "before-after", "review-map", "proto-cards", "staged-reveal"].includes(dev)) { state.view = "dev"; state.dev = dev; }
+  if (["uploaded-result", "uploaded-blocked", "free-scan-sim", "halo-gate", "before-after", "review-map", "proto-cards", "staged-reveal", "menu-reveal"].includes(dev)) { state.view = "dev"; state.dev = dev; }
   else if (q.has("src") || q.has("t") || q.has("tab")) state.view = "room";
 }
 
@@ -1716,6 +1716,21 @@ function mountDev() {
     const host = document.getElementById("devView");
     if (window.BRReveal && typeof window.BRReveal.mount === "function") window.BRReveal.mount(host);
     else host.innerHTML = '<p style="padding:48px;color:#948f87;text-align:center;font-family:sans-serif">Staged reveal failed to load (reveal/*.js).</p>';
+    return;
+  }
+  if (state.dev === "menu-reveal") {
+    // PREVIEW of the integrated menu: the REAL menu markup, but the sample card
+    // slot hosts the staged reveal (embedded) so it "develops in place". The
+    // live menu is untouched — this is a separate route for the builder to judge.
+    const host = document.getElementById("devView");
+    // NOT the `.menu` class — it's view-gated (display:none unless view=menu).
+    // The menu LAYOUT lives on `.menu__inner`; wrap it in a neutral centerer.
+    host.innerHTML = '<div class="menurev-wrap">' + renderMenu() + "</div>";
+    const slot = host.querySelector(".msample__card");
+    if (slot && window.BRReveal && typeof window.BRReveal.mount === "function") {
+      slot.innerHTML = "";
+      window.BRReveal.mount(slot, { embedded: true });
+    }
     return;
   }
   if (state.dev === "review-map") {

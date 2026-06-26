@@ -13,8 +13,10 @@
   window.BRReveal = window.BRReveal || {};
   var R = window.BRReveal;
 
-  R.mount = function (root) {
+  R.mount = function (root, opts) {
     if (!root) return;
+    opts = opts || {};
+    var embedded = !!opts.embedded;   // hosted inside the menu's sample-card slot — no own header, readings stack below
 
     // idempotent: tear down any prior instance (body-level modal included)
     Array.prototype.slice.call(document.querySelectorAll(".rv-modal")).forEach(function (m) { m.remove(); });
@@ -30,13 +32,14 @@
     }
 
     var stage = document.createElement("div");
-    stage.className = "reveal-stage";
+    stage.className = "reveal-stage" + (embedded ? " reveal-stage--embedded" : "");
     stage.innerHTML =
-      '<div class="reveal-stage__head">' +
-      '<span class="reveal-stage__devtag">DEV · STAGED REVEAL — not a product surface yet</span>' +
-      '<h1 class="reveal-stage__brand">◆ BLUE ROOM</h1>' +
-      '<p class="reveal-stage__thesis">Every photo is already a card. Watch the room develop it.</p>' +
-      "</div>" +
+      (embedded ? "" :   // embedded in the menu -> the menu's brand is the header
+        '<div class="reveal-stage__head">' +
+        '<span class="reveal-stage__devtag">DEV · STAGED REVEAL — not a product surface yet</span>' +
+        '<h1 class="reveal-stage__brand">◆ BLUE ROOM</h1>' +
+        '<p class="reveal-stage__thesis">Every photo is already a card. Watch the room develop it.</p>' +
+        "</div>") +
       '<div class="reveal-stage__body">' +
       '<div class="rv-cardslot"></div>' +
       '<div class="rv-arrowslot"></div>' +

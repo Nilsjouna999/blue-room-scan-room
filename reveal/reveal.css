@@ -677,6 +677,24 @@
 }
 .rv-readslot { flex: 1 1 auto; min-width: 0; }
 
+/* embedded in the menu's sample-card slot — vertical stack, no own chrome,
+   single-column readings (the "sample card develops in place" mode) */
+.reveal-stage--embedded { min-height: 0; padding: 0; background: none; overflow-x: visible; align-items: stretch; }
+.reveal-stage--embedded .reveal-stage__body { flex-direction: column; align-items: center; gap: 18px; max-width: 100%; }
+.reveal-stage--embedded .rv-cardslot { order: 1; }
+.reveal-stage--embedded .rv-arrowslot { order: 2; transform: none; align-self: center; }
+.reveal-stage--embedded .rv-readslot { order: 3; width: 100%; }
+.reveal-stage--embedded .rv-read { max-width: 100%; }
+.reveal-stage--embedded .rv-read__headline { font-size: clamp(22px, 3vw, 28px); }
+.reveal-stage--embedded .rv-grid--halo { grid-template-columns: 1fr; max-width: 372px; }
+
+/* preview wrapper for the integrated-menu route (?dev=menu-reveal) — the menu
+   layout lives on .menu__inner; this just centres it on the dev surface */
+.menurev-wrap { display: flex; justify-content: center; align-items: flex-start; padding: clamp(28px, 5vh, 60px) 20px; }
+/* keep the menu's left column pinned to the top as the develop read grows tall
+   (the live menu centres it with 1fr top+bottom spacer rows; drop the top one) */
+.menurev-wrap .menu__inner { grid-template-rows: 0 auto auto 1fr; }
+
 /* the arrow — bare hand-drawn glyph, no button chrome (your prototype) */
 .rv-arrow {
   background: none; border: none; border-radius: 0;
