@@ -257,8 +257,8 @@
   opacity: 1;
   transition: none;
   animation:
-    rv-develop-wipe 2400ms var(--rv-ease-soft) forwards,   /* the wet seam — slow steady sweep (BR-S134 M1) */
-    rv-halo-tonal   3000ms var(--rv-ease)      forwards;   /* the SOLE filter writer on this layer */
+    rv-develop-wipe 2400ms var(--rv-ease-soft) forwards,   /* the wet seam — slow steady sweep; UNCHANGED (must finish before pips ignite) */
+    rv-halo-tonal   3550ms var(--rv-ease)      forwards;   /* BR-S135: 3000->3550ms; fix crest meets the ignition climax */
   will-change: clip-path, filter;
 }
 /* TONAL RISE / FIXER — pale + flat in the developer, blooming to true colour as the
@@ -287,7 +287,7 @@
     0 0 0 1px var(--rv-halo-glow),
     0 0 44px 8px var(--rv-halo-glow);                      /* BR-S134 M1: 34px 6px -> 44px 8px */
   opacity: 0;
-  animation: rv-fix-bloom 3000ms var(--rv-ease) forwards;
+  animation: rv-fix-bloom 3550ms var(--rv-ease) forwards;  /* BR-S135: 3000->3550ms; swell crest lands ~2911-3195ms, in step with final igniting columns */
 }
 @keyframes rv-fix-bloom {
   0%, 64% { opacity: 0;    transform: scale(0.990); }  /* dormant — the image is still surfacing */
@@ -312,14 +312,51 @@
    ~2400ms seam. GPU-only (opacity+transform). Freeze-safe: the 100% frame
    == the resting .fr__pip.is-on. rotate(45deg) RE-STATED every stop (the
    pip rests at transform:rotate(45deg); animating scale alone would un-rotate). */
-@keyframes rv-pip-fill {
-  0%   { opacity: 0; transform: rotate(45deg) scale(0.58); }   /* latent — socket dark */
-  62%  { opacity: 1; transform: rotate(45deg) scale(1.06); }   /* wet bloom — seats with a hair of overshoot */
-  100% { opacity: 1; transform: rotate(45deg) scale(1);    }   /* fixed — == resting .fr__pip.is-on (freeze-safe) */
+/* BR-S135: VERTICAL COLUMN-SCAN IGNITION — replaces BR-S134 row-major fade.
+   A scan passes LEFT->RIGHT through the 5 pip COLUMNS (--c 0-4). Within each
+   column the 4 stat rows ignite TOP->BOTTOM (--r 0-3) on a tight 42ms stagger;
+   a 99ms pause separates columns (col stride 225ms = 3×42ms row-span + 99ms gap).
+   Each lit pip is a COLD ARCHIVE DIAMOND (pale, desaturated, compressed at 0.92)
+   that FLASHES overbright ~1-2 frames (brightness 1.90, scale 1.18), BLOOMS a
+   small drop-shadow halo, then RETRACTS and RESOLVES into its own minted material
+   (brass ramp / violet / gold — set by .fr__pip--p1..p5 CSS, never hardcoded here).
+   Scale arc: 0.92 -> 1.18 -> 0.98 -> 1.04 -> 1.00 (brief exact sequence).
+   Base offset 2100ms: the wipe (2400ms, top->bottom) reveals the ledger ~1776-2160ms,
+   so cold diamonds are VISIBLE first, THEN the scan ignites.
+   Last pip (c4,r3): 2100 + 4×225 + 3×42 + 360 = 3486ms — under the 3550ms gate (no cut-off).
+   GPU-only: opacity + transform(rotate/scale) + filter(brightness/saturate/drop-shadow).
+   drop-shadow composites OVER the pip's own resting box-shadow (p4/p5 material glow
+   untouched); rv-halo-tonal writes filter on the ANCESTOR .rv-layer--halo (no clobber).
+   rotate(45deg) RE-STATED at every stop. 100% == resting .fr__pip.is-on (freeze-safe).
+   Scope: .rv-cardframe.is-developing .rv-layer--halo .fr__pip.is-on — NEVER the live
+   room .card, never a plain renderCard(), never the free layer, never empty pips. */
+@keyframes rv-pip-ignite {
+  /* COLD ARCHIVE DIAMOND — material present but pale, flat, low-energy, compressed */
+  0%   { opacity: 0.42; transform: rotate(45deg) scale(0.92);
+         filter: brightness(0.62) saturate(0.60) drop-shadow(0 0 0 transparent); }
+  /* IMPACT FLASH — 1-2 frame overbright peak + scale punch + halo at full bloom */
+  16%  { opacity: 1;    transform: rotate(45deg) scale(1.18);
+         filter: brightness(1.90) saturate(1.16)
+                 drop-shadow(0 0 4px rgba(243, 234, 214, 0.85)); }
+  /* COMPRESS-BACK through the brief's dip — glow already retracting */
+  30%  { opacity: 1;    transform: rotate(45deg) scale(0.98);
+         filter: brightness(1.42) saturate(1.08)
+                 drop-shadow(0 0 5px rgba(243, 234, 214, 0.50)); }
+  /* SETTLE micro-overshoot — halo nearly gone */
+  54%  { opacity: 1;    transform: rotate(45deg) scale(1.04);
+         filter: brightness(1.10) saturate(1.02)
+                 drop-shadow(0 0 2px rgba(243, 234, 214, 0.20)); }
+  /* RESOLVED / TRUE — == resting .fr__pip.is-on (true material, scale 1, glow gone) */
+  100% { opacity: 1;    transform: rotate(45deg) scale(1);
+         filter: brightness(1) saturate(1) drop-shadow(0 0 0 transparent); }
 }
 .rv-cardframe.is-developing .rv-layer--halo .fr__pip.is-on {
-  animation: rv-pip-fill 360ms var(--rv-ease, cubic-bezier(0.2, 0.7, 0.2, 1)) both;
-  animation-delay: calc(var(--r, 0) * 150ms + var(--c, 0) * 55ms);
+  animation: rv-pip-ignite 360ms var(--rv-ease, cubic-bezier(0.2, 0.7, 0.2, 1)) both;
+  /* COLUMN-dominant scan: --c (0-4) is the slow L->R axis (225ms stride =
+     126ms row-span + 99ms pause); --r (0-3) the tight top->bottom stagger (42ms).
+     Base 2100ms so the cold pips show first under the wipe. */
+  animation-delay: calc(2100ms + var(--c, 0) * 225ms + var(--r, 0) * 42ms);
+  will-change: transform, filter, opacity;
 }
 
 /* ====================================================================
@@ -1033,11 +1070,12 @@
   }
   .rv-cardframe.is-developing .rv-layer--halo::after { animation: none !important; opacity: 0 !important; }
   .rv-cardframe.is-developing .rv-scanline { animation: none !important; }
-  .rv-cardframe.is-developing .rv-layer--halo .fr__pip.is-on {   /* BR-S134 M2: pips seated instantly */
+  .rv-cardframe.is-developing .rv-layer--halo .fr__pip.is-on {   /* BR-S135: pips seated instantly */
     animation: none !important;
     animation-delay: 0ms !important;
     opacity: 1 !important;
     transform: rotate(45deg) !important;       /* preserve the seated-diamond rotation */
+    filter: none !important;                   /* BR-S135 NEW: kill ignition flash/bloom — true material at rest */
   }
   .reveal-stage--menustage .rv-arrow:hover:not([aria-disabled="true"]),
   .reveal-stage--menustage .rv-arrow:focus-visible { transition: none !important; }   /* BR-S134 M4 */

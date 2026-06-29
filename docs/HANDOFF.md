@@ -2,9 +2,11 @@
 
 For a fresh Claude Code session to resume with zero context loss. **You are the BUILDER** (you hold the repo and
 make the changes). The user pastes specs/designs from a separate planning chat. Grounded in the repo — **re-grep
-line numbers, they drift** (every session shifts them a lot). Last written: **2026-06-26**, code at HEAD
-`BR-S134` (six missions: bolder halo develop · pip-fill · card-size parity · arrow hitbox · TIER 6 · TIER 7 —
-**local, NOT pushed**; BR-S133 and earlier are **pushed/live**). **The menu add-on audit Tiers 1–7 are ALL done.**
+line numbers, they drift** (every session shifts them a lot). Last written: **2026-06-29**, code at HEAD
+`BR-S135` (pip COLUMN-SCAN IGNITION replacing the row-fade + first-read stat reorder — **local, NOT pushed**;
+BR-S134 and earlier are **pushed/live**). **The menu add-on audit Tiers 1–7 are ALL done** (S135 = a builder
+polish round on top: the develop's pip-grid now ignites L→R column-by-column, gate 3000→3550ms; the free read's
+STATS reversed to impact·signal·frame·presence). The pip-ignite FEEL is pending the builder's LIVE judgment.
 **The current work is the develop/reveal ADD-ON — see the ★ ACTIVE LANE section below FIRST.** (The §2 card-front
 detail underneath it is prior-run context, still accurate.)
 

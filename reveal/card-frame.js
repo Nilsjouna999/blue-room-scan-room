@@ -65,7 +65,7 @@
         el.classList.remove("is-developing");
         void el.offsetWidth;              // restart the wipe + the developer bar
         el.classList.add("is-developing");
-        var ddur = motionOff() ? 0 : 3000;  // BR-S134 M1: savored develop (>= the 3000ms tonal/fix-bloom)
+        var ddur = motionOff() ? 0 : 3550;  // BR-S135: gate >= ignition end (~3486ms); matched to tonal + fix-bloom (3550ms) so the print fixes WITH the last column
         timer = setTimeout(function () {
           el.classList.remove("is-developing");
           free.classList.remove("is-shown"); // free now fully covered — drop it
