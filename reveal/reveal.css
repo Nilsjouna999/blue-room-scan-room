@@ -709,16 +709,32 @@
   display: grid;
   place-items: center;
   padding: 24px;
-  opacity: 0;
+  /* BR-S136: the container no longer fades its OWN opacity — the backdrop + panel
+     animate themselves, so the backdrop-filter blur can RAMP cleanly (an opacity-
+     animating ancestor made backdrop-filter snap = the old "sharp/odd" feel). */
+  opacity: 1;
+  visibility: hidden;
   pointer-events: none;
-  transition: opacity 240ms var(--rv-ease, cubic-bezier(0.2, 0.7, 0.2, 1));
+  transition: visibility 0s linear 480ms;   /* stay visible through the fade-out, then hide */
 }
-.rv-modal.is-open { opacity: 1; pointer-events: auto; }
+.rv-modal.is-open { visibility: visible; pointer-events: auto; transition: visibility 0s; }
 .rv-modal__backdrop {
   position: absolute; inset: 0;
-  background: rgba(8, 9, 11, 0.55);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
+  /* rest: clear + unblurred; the defocus GROWS in (soft settle), not a hard slab */
+  background: rgba(8, 9, 11, 0);
+  backdrop-filter: blur(0px);
+  -webkit-backdrop-filter: blur(0px);
+  opacity: 0;
+  transition: background 480ms var(--rv-ease-soft, cubic-bezier(0.4, 0, 0.2, 1)),
+              opacity 480ms var(--rv-ease-soft, cubic-bezier(0.4, 0, 0.2, 1)),
+              backdrop-filter 480ms var(--rv-ease-soft, cubic-bezier(0.4, 0, 0.2, 1)),
+              -webkit-backdrop-filter 480ms var(--rv-ease-soft, cubic-bezier(0.4, 0, 0.2, 1));
+}
+.rv-modal.is-open .rv-modal__backdrop {
+  background: rgba(8, 9, 11, 0.5);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  opacity: 1;
 }
 .rv-modal__panel {
   position: relative;
@@ -728,10 +744,10 @@
   border-radius: 14px;
   padding: 30px 30px 24px;
   box-shadow: 0 40px 90px rgba(0, 0, 0, 0.6);
-  transform: scale(0.96);
+  transform: scale(0.965);
   opacity: 0;
-  transition: transform 240ms var(--rv-ease, cubic-bezier(0.2, 0.7, 0.2, 1)),
-              opacity 240ms var(--rv-ease, cubic-bezier(0.2, 0.7, 0.2, 1));
+  transition: transform 420ms var(--rv-ease-soft, cubic-bezier(0.4, 0, 0.2, 1)) 40ms,
+              opacity 360ms var(--rv-ease-soft, cubic-bezier(0.4, 0, 0.2, 1)) 40ms;
   color: var(--t-primary, #d7d3ca);
 }
 .rv-modal.is-open .rv-modal__panel { transform: scale(1); opacity: 1; }
@@ -836,7 +852,7 @@
   .rv-arrow[data-variant="purple"] { animation: none !important; }
   .rv-arrow[data-variant="purple"]::after { display: none; }
   .rv-scanline { display: none; }
-  .rv-modal, .rv-modal__panel { transition: none !important; }
+  .rv-modal, .rv-modal__panel, .rv-modal__backdrop { transition: none !important; }
 }
 
 /* =====================================================================
