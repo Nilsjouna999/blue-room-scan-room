@@ -604,7 +604,7 @@ function renderCard(src, treatment) {
                the card can't disagree with the reel. */
             const s = getScanResult(src)?.stats.freeVisible || c.stats;
             const LADDER = ["Muted", "Clean", "Strong", "Charged", "Peak"];
-            return ["charge", "visualImpact", "signal", "presence"].map((k, rowIdx) => {
+            return ["presence", "signal", "visualImpact", "charge"].map((k, rowIdx) => {
               const band = tierBand(s[k]);
               const idx = LADDER.indexOf(band);
               /* BR-S120/S121: pips coloured BY POSITION (the builder's mockup). Each lit
