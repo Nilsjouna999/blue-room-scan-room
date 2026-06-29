@@ -151,10 +151,10 @@
       '<div class="rv-mod__cap rv-mod__cap--leaders"><span class="rv-cap__l">hand to lens</span><span class="rv-cap__l rv-cap__l--sub">dominant plane</span><span class="rv-cap__l rv-cap__l--gap">open side</span><span class="rv-cap__l rv-cap__l--sub">vector</span></div>',
       "rv-mod--wide");
     h += mod("3", "STATS", stats([
-      ["impact",   statPip(st.visualImpact)],
-      ["signal",   statPip(st.signal)],
+      ["presence", statPip(st.presence)],
       ["frame",    statPip(st.frame)],
-      ["presence", statPip(st.presence)]
+      ["signal",   statPip(st.signal)],
+      ["impact",   statPip(st.visualImpact)]
     ]), "rv-mod--stats");
     h += mod("4", "SIGNAL NOTE",
       '<div class="rv-mod__art"><div class="rv-signal">' + sketch("signalwave") + '<span class="rv-peak">PEAK</span></div></div>' +
