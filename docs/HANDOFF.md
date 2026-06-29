@@ -3,10 +3,14 @@
 For a fresh Claude Code session to resume with zero context loss. **You are the BUILDER** (you hold the repo and
 make the changes). The user pastes specs/designs from a separate planning chat. Grounded in the repo — **re-grep
 line numbers, they drift** (every session shifts them a lot). Last written: **2026-06-29**, code at HEAD
-`BR-S135` (pip COLUMN-SCAN IGNITION replacing the row-fade + first-read stat reorder — **local, NOT pushed**;
-BR-S134 and earlier are **pushed/live**). **The menu add-on audit Tiers 1–7 are ALL done** (S135 = a builder
-polish round on top: the develop's pip-grid now ignites L→R column-by-column, gate 3000→3550ms; the free read's
-STATS reversed to impact·signal·frame·presence). The pip-ignite FEEL is pending the builder's LIVE judgment.
+`BR-S137` (the **Halo Finalization ritual** — final-pip impact → card lock → BLUE ROOM ARCHIVE blue stamp →
+released diagonal seal pass → per-material catches → settle — **local, NOT pushed**; BR-S135 and earlier
+**pushed/live**, BR-S136 local). **Menu add-on Tiers 1–7 + a builder polish arc on top (S135 pip column-ignite,
+S136 card-ledger reorder + modal-blur fix, S137 the seal-pass finalization).** The develop now ends with a
+premium authorize/coat/seal ritual (gate 3550ms unchanged; the ritual rides a separate `.is-finalizing` class at
+t≈3486ms, scoped to the reveal — live card byte-clean). The S135 pip-ignite + S137 ritual FEEL are pending the
+builder's LIVE judgment. **OPEN:** the right-panel STATS reorder (BR-S135) may want reverting (builder to decide);
+the seal nucleus anchor + specular warmth are verify-live-provisional.
 **The current work is the develop/reveal ADD-ON — see the ★ ACTIVE LANE section below FIRST.** (The §2 card-front
 detail underneath it is prior-run context, still accurate.)
 

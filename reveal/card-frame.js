@@ -47,30 +47,118 @@
     var byName = { free: free, halo: halo, photo: photo };
     var mode = null;
     var timer = null;
+    var finTimers = [];          // BR-S136 ritual setTimeout handles (cleared on interrupt)
+    var seenDevelop = false;     // BR-S136 repeat-variant flag (resets on new CardFrame instance)
+
+    function clearFinTimers() {
+      for (var i = 0; i < finTimers.length; i++) clearTimeout(finTimers[i]);
+      finTimers = [];
+    }
+    // BR-S136 — build the ONE moving overlay inside the HALO card's .card__plate,
+    // parked invisible. Injected => absent from a plain renderCard() => live room
+    // untouched. Returns the node.
+    function rvSealCreate() {
+      var plate = halo.querySelector(".card__plate");
+      if (!plate) return null;
+      var seal = plate.querySelector(":scope > .rv-seal");
+      if (!seal) {
+        seal = document.createElement("div");
+        seal.className = "rv-seal";
+        plate.appendChild(seal);
+      }
+      seal.style.willChange = "transform, opacity";   // promote ONLY during the ritual
+      return seal;
+    }
+    // BR-S136 — INTERRUPT / SKIP / END cleanup. Idempotent: cancels timers, removes
+    // the overlay + every ritual class + the final-pip tag, drops will-change, and
+    // always snaps to the settled minted card (never mid-sweep / half-glow).
+    function finalizeCleanup() {
+      clearFinTimers();
+      el.classList.remove("is-finalizing", "is-fin-repeat");
+      var fp = halo.querySelector(".fr__pip.is-final-pip");
+      if (fp) fp.classList.remove("is-final-pip");
+      var seal = halo.querySelector(".card__plate > .rv-seal");
+      if (seal) { seal.style.willChange = ""; seal.remove(); }
+      halo.classList.add("rv-halo-settled");   // settled tone persists (freeze-safe)
+    }
 
     function setMode(next) {
       if (next === mode) return;
       var prev = mode;
       mode = next;
       if (timer) clearTimeout(timer);
+      // BR-S136 — a mode change mid-ritual must snap to settled before the new mode
+      if (el.classList.contains("is-finalizing") || el.classList.contains("is-fin-repeat")) {
+        finalizeCleanup();
+      }
 
       // FREE -> HALO is the "develop": the minted card WIPES IN top->bottom over
       // the free card beneath, a developer bar riding the reveal edge — like a
       // print coming up in the tray. Same card geometry in both layers, so only
       // the treatment (matte -> minted + glow) develops. Savor it (~1.5s + settle).
       if (prev === "free" && next === "halo") {
+        finalizeCleanup();                 // clear any prior ritual before restarting
         free.classList.add("is-shown");   // free stays beneath during the wipe
         halo.classList.add("is-shown");   // minted card on top, clip-revealed
         photo.classList.remove("is-shown");
-        el.classList.remove("is-developing");
+        halo.classList.remove("rv-halo-settled");  // intentional: finalizeCleanup() above snaps settled; strip it to re-arm the ritual
+        el.classList.remove("is-developing", "is-finalizing", "is-fin-repeat");
         void el.offsetWidth;              // restart the wipe + the developer bar
         el.classList.add("is-developing");
-        var ddur = motionOff() ? 0 : 3550;  // BR-S135: gate >= ignition end (~3486ms); matched to tonal + fix-bloom (3550ms) so the print fixes WITH the last column
+        var off = motionOff();
+        var ddur  = off ? 0 : 3550;       // BR-S135 gate UNCHANGED — wipe/tonal/bloom/pip-ignite intact
+        var pipT0 = off ? 0 : 3486;       // final pip (c4,r3) lands == ritual t=0
+        var ritualDur = off ? 0 : (seenDevelop ? 360 : 900);
+
+        // gate-off at 3550 (drop the free layer) + onMorphDone — UNCHANGED schedule
         timer = setTimeout(function () {
           el.classList.remove("is-developing");
           free.classList.remove("is-shown"); // free now fully covered — drop it
           if (onMorphDone) onMorphDone(next);
         }, ddur);
+
+        if (off) {
+          // RM: no ritual travel; just settle (the CSS RM block does the visuals).
+          // both this and the gate timer (ddur=0) queue at t=0; this push is ordered
+          // after, so .is-developing removes first, then .is-finalizing adds.
+          finTimers.push(setTimeout(function () {
+            el.classList.add("is-finalizing");           // lets the RM label tint fire
+            halo.classList.add("rv-halo-settled");
+            finTimers.push(setTimeout(function () { el.classList.remove("is-finalizing"); }, 320));
+          }, 0));
+        } else {
+          // t=0 — tag the LAST lit pip (c4,r3 via CSS-var match; DOM-order last as
+          // fallback when c4,r3 is unlit), start the ritual, schedule the sub-beats.
+          finTimers.push(setTimeout(function () {
+            var last = halo.querySelector('.fr__pip.is-on[style*="--r:3"][style*="--c:4"]');
+            if (!last) {
+              var pips = halo.querySelectorAll(".fr__pip.is-on");
+              last = pips.length ? pips[pips.length - 1] : null;
+            }
+            if (last) last.classList.add("is-final-pip");
+            el.classList.add("is-finalizing");
+            if (seenDevelop) el.classList.add("is-fin-repeat");
+            seenDevelop = true;
+
+            var seal = rvSealCreate();
+            if (seal && !el.classList.contains("is-fin-repeat")) {
+              // full ritual: nucleus releases (300ms), seal sweep (340ms)
+              finTimers.push(setTimeout(function () { seal.classList.add("is-releasing"); }, 300));
+              finTimers.push(setTimeout(function () { seal.classList.add("is-sealing"); }, 340));
+            } else if (seal) {
+              // repeat: skip the nucleus, short micro-sheen only
+              finTimers.push(setTimeout(function () { seal.classList.add("is-sealing"); }, 120));
+            }
+            // settle + clean up the overlay at the end of the ritual window
+            finTimers.push(setTimeout(function () {
+              el.classList.remove("is-finalizing", "is-fin-repeat");
+              if (last) last.classList.remove("is-final-pip");
+              var s = halo.querySelector(".card__plate > .rv-seal");
+              if (s) { s.style.willChange = ""; s.remove(); }
+              halo.classList.add("rv-halo-settled");     // subtly-richer END
+            }, ritualDur));
+          }, pipT0));
+        }
         return;
       }
 
@@ -108,7 +196,8 @@
       el: el,
       setMode: setMode,
       getMode: function () { return mode; },
-      destroy: function () { if (timer) clearTimeout(timer); el.remove(); },
+      finalizeCleanup: finalizeCleanup,   // BR-S136 — let the HALO->HALO_READING arrow snap the ritual
+      destroy: function () { if (timer) clearTimeout(timer); finalizeCleanup(); el.remove(); },
     };
   };
 })();

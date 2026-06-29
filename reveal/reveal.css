@@ -359,6 +359,295 @@
   will-change: transform, filter, opacity;
 }
 
+/* =====================================================================
+   BR-S136 — HALO FINALIZATION MOTION v2  ·  authorize -> coat -> seal
+   Fires at t=0 == final pip land (~3486ms into the develop). A SEPARATE
+   class .rv-cardframe.is-finalizing drives it (added by the controller at
+   t=0, removed ~900ms later). .is-developing / ddur(3550ms) / tonal /
+   fix-bloom / pip-ignite are UNTOUCHED.
+   ALL selectors scoped to .rv-cardframe.is-finalizing .rv-layer--halo so
+   the LIVE ROOM card and a plain renderCard() are NEVER affected.
+   ONE moving overlay (.rv-seal, injected into .card__plate) + short pseudo
+   glints. Every 100% frame == the resting minted card (freeze-safe).
+   ===================================================================== */
+
+/* restrained phosphor/spectral blue tokens (NOT neon cyan) */
+.rv-cardframe.is-finalizing .rv-layer--halo {
+  --fin-core:  rgba(190, 220, 255, 0.70);
+  --fin-bloom: rgba(90, 145, 255, 0.32);
+  --fin-after: rgba(90, 145, 255, 0.08);
+}
+
+/* ---- 0-95ms · FINAL PIP IMPACT — ONLY the JS-tagged last pip (c4,r3) ----
+   Restrained: 1 -> 1.09 -> 0.985 -> 1.00, 1-2 frame overbright, tiny halo.
+   NOT a casino 1.16 pop; the 19 other pips are untouched. rotate(45deg)
+   re-stated every stop (the pip rests rotated). 100% == resting material. */
+@keyframes rv-final-pip {
+  0%   { transform: rotate(45deg) scale(1);     filter: brightness(1)    saturate(1)    drop-shadow(0 0 0 transparent); }
+  22%  { transform: rotate(45deg) scale(1.09);  filter: brightness(1.46) saturate(1.10) drop-shadow(0 0 4px rgba(220,232,255,0.62)); }
+  55%  { transform: rotate(45deg) scale(0.985); filter: brightness(1.12) saturate(1.03) drop-shadow(0 0 2px rgba(220,232,255,0.22)); }
+  100% { transform: rotate(45deg) scale(1);     filter: brightness(1)    saturate(1)    drop-shadow(0 0 0 transparent); }
+}
+.rv-cardframe.is-finalizing .rv-layer--halo .fr__pip.is-on.is-final-pip {
+  animation: rv-final-pip 95ms var(--rv-ease) both;
+  will-change: transform, filter;
+}
+
+/* ---- 60-125ms · MICRO CARD LOCK · tactile acknowledge, no white flash ----
+   On .card__plate (NOT .rv-layer--halo — its filter is owned by rv-halo-tonal). */
+@keyframes rv-final-lock {
+  0%   { transform: scale(1);     filter: brightness(1)     contrast(1); }
+  50%  { transform: scale(1.004); filter: brightness(1.035) contrast(1.025); }
+  100% { transform: scale(1);     filter: brightness(1)     contrast(1); }
+}
+.rv-cardframe.is-finalizing .rv-layer--halo .card__plate {
+  animation: rv-final-lock 65ms cubic-bezier(0.16, 1, 0.3, 1) 60ms both;
+  will-change: transform, filter;
+}
+
+/* ---- 125-360ms · BLUE ARCHIVE STAMP · localized to .card__house ONLY ----
+   DUPLICATE-LABEL ::after re-states the string; blue lives ONLY in text-shadow
+   + -webkit-text-stroke (lights the ◆ + letter EDGES) — never a rectangle.
+   position:relative scoped HERE only so the live header layout is untouched. */
+.rv-cardframe.is-finalizing .rv-layer--halo .card__house {
+  position: relative;
+  transform-origin: left center;
+  animation: rv-stamp-label 235ms cubic-bezier(0.16, 1, 0.3, 1) 125ms both;
+  will-change: transform, filter;
+}
+.rv-cardframe.is-finalizing .rv-layer--halo .card__house::after {
+  content: "◆ BLUE ROOM ARCHIVE";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  white-space: nowrap;
+  color: inherit;
+  -webkit-text-stroke: 0px var(--fin-core);
+  text-shadow: 0 0 0 var(--fin-bloom);
+  opacity: 0;
+  mix-blend-mode: screen;
+  animation: rv-stamp-charge 235ms cubic-bezier(0.16, 1, 0.3, 1) 125ms both;
+  will-change: opacity, text-shadow;
+}
+@keyframes rv-stamp-charge {
+  0%   { opacity: 0;    -webkit-text-stroke-width: 0px;
+         text-shadow: 0 0 0px var(--fin-bloom); }
+  22%  { opacity: 0.22; -webkit-text-stroke-width: 0.25px;
+         text-shadow: 0 0 1px var(--fin-core), 0 0 4px var(--fin-bloom); }
+  47%  { opacity: 1;    -webkit-text-stroke-width: 0.6px;
+         text-shadow:
+           0 0 1px var(--fin-core),
+           0 0 3px var(--fin-core),
+           0 0 9px var(--fin-bloom),
+           0 0 16px var(--fin-bloom); }
+  72%  { opacity: 0.4;  -webkit-text-stroke-width: 0.2px;
+         text-shadow: 0 0 2px var(--fin-after), 0 0 6px var(--fin-after); }
+  100% { opacity: 0;    -webkit-text-stroke-width: 0px;
+         text-shadow: 0 0 1px var(--fin-after); }
+}
+@keyframes rv-stamp-label {
+  0%   { filter: brightness(1);    transform: scale(1); }
+  22%  { filter: brightness(1.08); transform: scale(1.006); }
+  47%  { filter: brightness(1.22); transform: scale(1.012); }
+  100% { filter: brightness(1);    transform: scale(1.000); }
+}
+
+/* =====================================================================
+   THE SEAL OVERLAY (.rv-seal) — injected into .card__plate by the
+   controller at t=0; NOT in renderCard() output (live room byte-clean).
+   .card__plate overflow:hidden + 11px radius HARD-CLIPS it to the card
+   SURFACE (never the -60px halo bleed). pointer-events:none. Rests opacity:0.
+   z-index:7 sits above .cardfinish(5) + .cardqr(6) regardless of DOM order.
+   ===================================================================== */
+.rv-cardframe.is-finalizing .rv-layer--halo .card__plate > .rv-seal {
+  position: absolute;
+  top: -30%; left: -30%;
+  width: 160%; height: 160%;
+  z-index: 7;
+  pointer-events: none;
+  opacity: 0;
+  background: linear-gradient(115deg,
+    transparent 38%,
+    rgba(150,185,255,0.06) 43%,
+    rgba(230,240,255,0.26) 47%,
+    rgba(255,255,255,0.48) 50%,
+    rgba(180,210,255,0.18) 54%,
+    rgba(150,185,255,0.05) 58%,
+    transparent 63%);
+  mix-blend-mode: screen;
+  transform: translate3d(-46%, -46%, 0);
+}
+
+/* ---- 300-390ms · POINT -> LINE RELEASE (nucleus, ::before on .rv-seal) ----
+   Anchor top:23%/left:20% inside the 160% sheet maps to ~7% of plate height
+   (the .card__head strip where the ◆ archive mark sits) — VERIFY in headless
+   Chrome and nudge ±2% so the point ignites ON the mark. */
+.rv-cardframe.is-finalizing .rv-layer--halo .card__plate > .rv-seal::before {
+  content: "";
+  position: absolute;
+  top: 22%; left: 24%;   /* BR-S137: measured onto the archive mark (plate ~8%/5%) */
+  width: 14px; height: 14px;
+  margin: -7px 0 0 -7px;
+  border-radius: 50%;
+  background: radial-gradient(circle,
+    rgba(225,238,255,0.95) 0%,
+    var(--fin-core) 38%,
+    transparent 72%);
+  mix-blend-mode: screen;
+  opacity: 0;
+  transform: scale(0.2);
+  transform-origin: 50% 50%;
+}
+.rv-cardframe.is-finalizing .rv-layer--halo .card__plate > .rv-seal.is-releasing::before {
+  animation: rv-seal-nucleus 90ms cubic-bezier(0.22,0.61,0.36,1) forwards;
+}
+@keyframes rv-seal-nucleus {
+  0%   { opacity: 0;   transform: scale(0.18) scaleX(1); }
+  40%  { opacity: 1;   transform: scale(0.55) scaleX(1); }
+  100% { opacity: 0.4; transform: scale(0.7) scaleX(9) rotate(25deg); }
+}
+
+/* ---- 340-820ms · HALO SEAL PASS · the single moving overlay ---- */
+.rv-cardframe.is-finalizing .rv-layer--halo .card__plate > .rv-seal.is-sealing {
+  animation:
+    rv-seal-sweep 480ms cubic-bezier(0.22,0.61,0.36,1) forwards,
+    rv-seal-fade  480ms linear forwards;
+}
+@keyframes rv-seal-sweep {
+  0%   { transform: translate3d(-46%, -46%, 0); }
+  100% { transform: translate3d( 46%,  46%, 0); }
+}
+@keyframes rv-seal-fade {
+  0%   { opacity: 0; }
+  18%  { opacity: 1; }
+  70%  { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* =====================================================================
+   §2 MATERIAL HIERARCHY — short pseudo/filter glints fired as the band
+   reaches each zone (CSS animation-delays follow the sweep path:
+   border -> title -> photo -> pips -> [barcode MATTE] -> edition).
+   Each 100% == neutral (freeze-safe). The barcode stays MATTE.
+   ===================================================================== */
+
+/* 1 · CORNER TRIMS — sharp metallic glint (RESTRAINED +13% per spec, ~110ms) */
+@keyframes rv-catch-metal {
+  0%   { filter: brightness(1)    drop-shadow(0 0 0 transparent); }
+  40%  { filter: brightness(1.13) drop-shadow(0 0 1px rgba(225,235,255,0.40)); }
+  100% { filter: brightness(1)    drop-shadow(0 0 0 transparent); }
+}
+.rv-cardframe.is-finalizing .rv-layer--halo .corner {
+  animation: rv-catch-metal 110ms var(--rv-ease) both;
+  will-change: filter;
+}
+.rv-cardframe.is-finalizing .rv-layer--halo .corner--tl { animation-delay: 360ms; }
+.rv-cardframe.is-finalizing .rv-layer--halo .corner--tr { animation-delay: 430ms; }
+.rv-cardframe.is-finalizing .rv-layer--halo .corner--bl { animation-delay: 520ms; }
+.rv-cardframe.is-finalizing .rv-layer--halo .corner--br { animation-delay: 700ms; }
+
+/* 2 · TITLE FOIL — bright catch (+8-10%, ~120ms) */
+@keyframes rv-catch-foil {
+  0%   { filter: brightness(1)    drop-shadow(0 0 0 transparent); }
+  45%  { filter: brightness(1.10) drop-shadow(0 0 5px rgba(225,235,255,0.30)); }
+  100% { filter: brightness(1)    drop-shadow(0 0 0 transparent); }
+}
+.rv-cardframe.is-finalizing .rv-layer--halo .titleblock__title {
+  animation: rv-catch-foil 120ms var(--rv-ease) 430ms both;
+  will-change: filter;
+}
+.rv-cardframe.is-finalizing .rv-layer--halo .titleblock__archetype {
+  animation: rv-catch-foil 120ms var(--rv-ease) 470ms both;
+  will-change: filter;
+}
+
+/* 3 · PHOTO LAMINATE — broad soft gloss (+5% bright / +3% sat, ~180ms) */
+@keyframes rv-catch-laminate {
+  0%   { filter: brightness(1)    saturate(1); }
+  50%  { filter: brightness(1.05) saturate(1.03); }
+  100% { filter: brightness(1)    saturate(1); }
+}
+.rv-cardframe.is-finalizing .rv-layer--halo .photo {
+  animation: rv-catch-laminate 180ms var(--rv-ease-soft) 500ms both;
+  will-change: filter;
+}
+
+/* 4 · PIP GRID — tiny per-pip catch (+6%, ~80ms), staggered by column along the
+   sweep (reuses inline --c/--r). EXCLUDES the final pip (it had its own impact). */
+@keyframes rv-catch-pip {
+  0%   { filter: brightness(1); }
+  45%  { filter: brightness(1.06); }
+  100% { filter: brightness(1); }
+}
+.rv-cardframe.is-finalizing .rv-layer--halo .fr__pip.is-on:not(.is-final-pip) {
+  animation: rv-catch-pip 80ms var(--rv-ease) both;
+  animation-delay: calc(560ms + var(--c, 0) * 26ms + var(--r, 0) * 8ms);
+  will-change: filter;
+}
+
+/* 5 · BARCODE — MATTE. +2.5% brightness ONLY, linear, NO specular, NO drop-shadow.
+   Proof the materials differ. (No glint pseudo is added to it.) */
+@keyframes rv-catch-matte {
+  0%   { filter: brightness(1); }
+  50%  { filter: brightness(1.025); }
+  100% { filter: brightness(1); }
+}
+.rv-cardframe.is-finalizing .rv-layer--halo .barcode {
+  animation: rv-catch-matte 90ms linear 700ms both;
+}
+
+/* 6 · EDITION PLATE — final metallic close (+10%, tiny hold, ~200ms) — last note */
+@keyframes rv-catch-plate {
+  0%   { filter: brightness(1)    drop-shadow(0 0 0 transparent); }
+  40%  { filter: brightness(1.10) drop-shadow(0 0 4px rgba(225,235,255,0.34)); }
+  62%  { filter: brightness(1.08) drop-shadow(0 0 4px rgba(225,235,255,0.30)); }
+  100% { filter: brightness(1)    drop-shadow(0 0 0 transparent); }
+}
+.rv-cardframe.is-finalizing .rv-layer--halo .mintstrip__state {
+  animation: rv-catch-plate 200ms var(--rv-ease) 760ms both;
+  will-change: filter;
+}
+
+/* ---- FINAL SETTLED STATE (900ms+) — subtly richer, sealed, NOT neon ----
+   Applied by the controller (persists after .is-finalizing removes). Static
+   filter (not an animation) so a frozen end-state is correct. */
+.rv-cardframe .rv-layer--halo.rv-halo-settled .card__plate {
+  filter: contrast(1.02) saturate(1.01);
+}
+
+/* =====================================================================
+   REPEAT VARIANT — compressed ~360ms (restrained pip + blue stamp + short
+   micro-sheen + settle, NO long seal pass). Controller adds .is-fin-repeat
+   alongside .is-finalizing. Overrides the long timings.
+   ===================================================================== */
+.rv-cardframe.is-finalizing.is-fin-repeat .rv-layer--halo .card__house,
+.rv-cardframe.is-finalizing.is-fin-repeat .rv-layer--halo .card__house::after {
+  animation-duration: 160ms; animation-delay: 60ms;
+}
+.rv-cardframe.is-finalizing.is-fin-repeat .rv-layer--halo .card__plate > .rv-seal::before {
+  animation: none; opacity: 0;
+}
+.rv-cardframe.is-finalizing.is-fin-repeat .rv-layer--halo .card__plate > .rv-seal.is-sealing {
+  animation: rv-seal-sweep 200ms cubic-bezier(0.22,0.61,0.36,1) forwards,
+             rv-seal-fade  200ms linear forwards;
+}
+.rv-cardframe.is-finalizing.is-fin-repeat .rv-layer--halo .corner,
+.rv-cardframe.is-finalizing.is-fin-repeat .rv-layer--halo .titleblock__title,
+.rv-cardframe.is-finalizing.is-fin-repeat .rv-layer--halo .titleblock__archetype,
+.rv-cardframe.is-finalizing.is-fin-repeat .rv-layer--halo .photo,
+.rv-cardframe.is-finalizing.is-fin-repeat .rv-layer--halo .fr__pip.is-on:not(.is-final-pip),
+.rv-cardframe.is-finalizing.is-fin-repeat .rv-layer--halo .barcode,
+.rv-cardframe.is-finalizing.is-fin-repeat .rv-layer--halo .mintstrip__state {
+  animation: none !important;
+}
+
+/* RM tint keyframe (used by the prefers-reduced-motion block below) */
+@keyframes rv-stamp-charge-rm {
+  0%   { opacity: 0;    text-shadow: 0 0 0 var(--fin-bloom); }
+  50%  { opacity: 0.18; text-shadow: 0 0 6px var(--fin-bloom); }
+  100% { opacity: 0;    text-shadow: 0 0 0 var(--fin-after); }
+}
+
 /* ====================================================================
    PHOTO -> FREE  ·  "Print Rising from the Bath"  ·  standalone opening
    only (?dev=staged-reveal); the menu starts already on FREE. 3 beats / 1180ms:
@@ -1092,6 +1381,35 @@
     opacity: 1 !important;
     transform: rotate(45deg) !important;       /* preserve the seated-diamond rotation */
     filter: none !important;                   /* BR-S135 NEW: kill ignition flash/bloom — true material at rest */
+  }
+  /* BR-S136 — finalization RM fallback: 180-220ms, no travel, no overscale */
+  .rv-cardframe.is-finalizing .rv-layer--halo .card__plate,
+  .rv-cardframe.is-finalizing .rv-layer--halo .corner,
+  .rv-cardframe.is-finalizing .rv-layer--halo .titleblock__title,
+  .rv-cardframe.is-finalizing .rv-layer--halo .titleblock__archetype,
+  .rv-cardframe.is-finalizing .rv-layer--halo .photo,
+  .rv-cardframe.is-finalizing .rv-layer--halo .barcode,
+  .rv-cardframe.is-finalizing .rv-layer--halo .mintstrip__state {
+    animation: none !important; transform: none !important; filter: none !important;
+  }
+  .rv-cardframe.is-finalizing .rv-layer--halo .fr__pip.is-on,
+  .rv-cardframe.is-finalizing .rv-layer--halo .fr__pip.is-on.is-final-pip {
+    animation: none !important; opacity: 1 !important;
+    transform: rotate(45deg) !important; filter: none !important;
+  }
+  .rv-cardframe.is-finalizing .rv-layer--halo .card__plate > .rv-seal,
+  .rv-cardframe.is-finalizing .rv-layer--halo .card__plate > .rv-seal::before {
+    animation: none !important; opacity: 0 !important; transform: none !important;
+  }
+  .rv-cardframe.is-finalizing .rv-layer--halo .card__house {
+    animation: none !important; transform: none !important; filter: none !important;
+  }
+  .rv-cardframe.is-finalizing .rv-layer--halo .card__house::after {
+    -webkit-text-stroke-width: 0px !important;
+    animation: rv-stamp-charge-rm 200ms linear both !important;
+  }
+  .rv-cardframe .rv-layer--halo.rv-halo-settled .card__plate {
+    filter: contrast(1.02) saturate(1.01);
   }
   .reveal-stage--menustage .rv-arrow:hover:not([aria-disabled="true"]),
   .reveal-stage--menustage .rv-arrow:focus-visible { transition: none !important; }   /* BR-S134 M4 */

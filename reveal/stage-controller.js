@@ -151,6 +151,7 @@
       }, 320);
     }
     function enterHaloReading() {
+      if (card && card.finalizeCleanup) card.finalizeCleanup();   // BR-S136: snap any in-flight finalization ritual to settled before the slide
       stageName = "HALO_READING";
       stage.classList.add("is-reading");         // slide left again for the halo read
       setArrow({ variant: "grey", disabled: true }, "Reading…");
