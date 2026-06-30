@@ -263,6 +263,19 @@
 .rv-layer--free { z-index: 2; }
 .rv-layer--halo { z-index: 3; clip-path: inset(-60px); }  /* -60px keeps the halo glow visible; the develop wipe animates within this */
 
+/* BR-S143: kill the develop SEAM (free card taller than halo). In the narrow
+   reveal card (~396px) the mint-strip's serial is squeezed between the state
+   pill and the right cluster, and the FREE state pill ("FREE PULL EDITION") is
+   wider than HALO's ("HALO MINT") — so the free serial wrapped to ~5 lines vs
+   halo's ~2, making the free card ~36px TALLER. During the wipe that overhang
+   poked out below the developing halo. Fix: give the serial its OWN full-width
+   row (state + right stay on row one), so BOTH treatments render a single
+   serial line and the two layers are the SAME height — the wipe lands clean.
+   Reveal-scoped: the live 500px card is already equal-height (free==mint, the
+   serial fits in 2 lines for both) and is deliberately untouched. */
+.rv-cardframe .mintstrip { flex-wrap: wrap; row-gap: 6px; }
+.rv-cardframe .mintstrip__serial { order: 1; flex: 1 0 100%; text-align: center; }
+
 /* THE DEVELOP (free -> halo): the minted card wipes in top->bottom over the free
    card beneath; a developer bar rides the reveal edge. Compositor-cheap
    (clip-path + transform + opacity only). */
