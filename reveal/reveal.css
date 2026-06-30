@@ -34,6 +34,17 @@
   --rv-dur-write:      1100ms;
   --rv-stagger:        460ms;                            /* FREE (<=4 modules) per-module write-in stagger */
 
+  /* --- card size: ONE source for EVERY reveal/tutorial route (BR-S142) -----
+     standalone (?dev=staged-reveal) == in-menu (?dev=menu-reveal) == fullview,
+     so the tutorial card never changes size by route (was a hidden drift: a
+     hard 360px standalone vs 430+zoom in-menu). 430+zoom (not a flat 396px
+     width) mirrors .msample__card exactly — zoom scales the whole artifact so
+     the chrome proportions match (the zoom-not-width-squeeze law). This is the
+     "reveal tutorial" boat; the live ROOM crown (--card-w 500) is a SEPARATE,
+     intentionally larger boat and is untouched. */
+  --rv-card-w:         430px;
+  --rv-card-zoom:      0.92;
+
   position: relative;
   min-height: 100vh;
   overflow-x: clip;                       /* decorative halo bloom never makes a page scrollbar */
@@ -208,7 +219,8 @@
 .rv-cardframe {
   position: relative;
   display: grid;
-  width: 360px;                           /* the designed display width; the card (min(--card-w,100%)) fills it */
+  width: var(--rv-card-w);                /* BR-S142: ONE tutorial-card size for every reveal route (was a hard 360px standalone vs 430+zoom in-menu — a route-dependent drift). The inner card (min(--card-w,100%)) fills it. */
+  zoom: var(--rv-card-zoom);              /* scale the whole artifact (== .msample__card) so standalone matches the in-menu card pixel-for-pixel */
   isolation: isolate;
 }
 .rv-layer {
@@ -1224,7 +1236,9 @@
   min-height: 0; padding: 0; background: none; align-items: stretch; width: 100%;
 }
 .reveal-stage--menustage .reveal-stage__body { justify-content: center; gap: var(--rv-slide-gap); max-width: 100%; margin: 0; }
-.reveal-stage--menustage .rv-cardframe { width: 430px; zoom: 0.92; }   /* == .msample__card (the original sample) */
+/* BR-S142: the card width/zoom now come from --rv-card-w / --rv-card-zoom on
+   .reveal-stage (== .msample__card) — menustage, fullview and standalone are
+   ONE size from ONE source, so no per-route override is needed here. */
 .reveal-stage--menustage .rv-readslot { flex: 0 0 auto; width: var(--rv-read-w); min-width: 0; }
 .reveal-stage--menustage .rv-stagemain { position: relative; transition: transform 820ms var(--rv-ease); will-change: transform; }
 /* REST: card centred in the stage cell (matches the original); slides left when the read opens */
@@ -1251,7 +1265,8 @@
 .menurev.is-fullview .menu__stage--reveal { position: fixed; inset: 0; z-index: 40; display: grid; place-items: center; padding: clamp(28px, 5vh, 64px); background: radial-gradient(120% 90% at 50% -10%, var(--rv-room-2) 0%, var(--rv-room) 62%); animation: rv-fullview-in 420ms var(--rv-ease) forwards; }
 @keyframes rv-fullview-in { from { opacity: 0; } to { opacity: 1; } }
 .menurev.is-fullview .reveal-stage--menustage { --rv-read-w: min(560px, 44vw); }
-.menurev.is-fullview .reveal-stage--menustage .rv-cardframe { width: 430px; zoom: 0.92; }   /* BR-S134 M3: same size as free/menu — the card never grows on see-deeper */
+/* BR-S134 M3 / BR-S142: the card never grows on see-deeper — width/zoom come from
+   the single --rv-card-w / --rv-card-zoom token, so fullview == menu == standalone. */
 .menurev.is-fullview .reveal-stage--menustage .reveal-stage__body { max-width: 1180px; }
 
 /* BACK affordance — fades in once the takeover settles */
