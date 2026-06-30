@@ -91,7 +91,7 @@ const state ={ source: 0, treatment: "free", tab: "diagram", view: "menu", draft
      uploaded-blocked renders a validated DEV fixture, never a user scan.
      free-scan-sim = Free Pull mock · halo-gate = sealed card-back mock. */
   const dev = q.get("dev");
-  if (["uploaded-result", "uploaded-blocked", "free-scan-sim", "halo-gate", "before-after", "review-map", "proto-cards", "staged-reveal", "menu-reveal"].includes(dev)) { state.view = "dev"; state.dev = dev; }
+  if (["uploaded-result", "uploaded-blocked", "free-scan-sim", "halo-gate", "before-after", "review-map", "proto-cards", "staged-reveal", "menu-reveal", "vault"].includes(dev)) { state.view = "dev"; state.dev = dev; }
   else if (q.has("src") || q.has("t") || q.has("tab")) state.view = "room";
 }
 
@@ -1589,6 +1589,9 @@ function renderReviewMap() {
         card("share", "?dev=before-after", "?dev=before-after", "Before / After · Driver", "the photograph → the same frame, filed as a card"),
         card("share", "?dev=before-after&src=2", "?dev=before-after&src=2", "Before / After · Ice Field", "second source"),
       ])}
+      ${group("Archive surface", [
+        card("share", "?dev=vault", "?dev=vault", "The Vault", "saved minted cards · revisit moments · reopen readings · QR access"),
+      ])}
       ${group("Dev mock", [
         card("mock", "?dev=halo-gate", "?dev=halo-gate", "Halo Gate mock", "sealed card-back gate · not payment, not analysis"),
         card("mock", "?dev=free-scan-sim", "?dev=free-scan-sim", "Free scan sim", "Free Pull mock fixture"),
@@ -1703,11 +1706,261 @@ function renderProtoCards() {
     </div>`;
 }
 
+/* ============================================================
+   THE VAULT (?dev=vault) — BR-S144
+   A private archive of SAVED MINTED cards: revisit favorite image moments,
+   reopen a saved mint's Stats & Readings, and access each mint by QR code.
+   It is NOT a gallery / marketplace / leaderboard / profile / human archive —
+   it is a quiet RECORD SYSTEM. The selected mint reuses the master renderCard
+   (the crown is the crown), sized down so the page composition carries weight.
+   Local mock data (VAULT_MINTS) — trivially replaceable when a real save-store
+   ships. Copy is artifact-bound (frame / light / scene / signal), never the
+   person — per the locked product law. Scoped, additive: no existing route is
+   touched, the back button reuses the menu nav (data-view-to="menu").
+============================================================ */
+
+/* Signal Locked has no radio/system photo asset → a stylized SIGNAL placeholder
+   (a developed "carrier lock" tile). A data-URI SVG so renderCard's photo slot
+   and the rail thumb both render it cleanly (no broken-image state). */
+const VAULT_SIGNAL_IMG =
+  "data:image/svg+xml," + encodeURIComponent(
+    "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 300'>" +
+    "<rect width='400' height='300' fill='#0c0e13'/>" +
+    "<g stroke='#1a1f29' stroke-width='1'>" +
+      "<line x1='0' y1='75' x2='400' y2='75'/><line x1='0' y1='150' x2='400' y2='150'/><line x1='0' y1='225' x2='400' y2='225'/>" +
+      "<line x1='80' y1='0' x2='80' y2='300'/><line x1='160' y1='0' x2='160' y2='300'/><line x1='240' y1='0' x2='240' y2='300'/><line x1='320' y1='0' x2='320' y2='300'/>" +
+    "</g>" +
+    "<path d='M0 150 Q 20 108 40 150 T 80 150 Q 100 120 120 150 T 160 150 Q 178 150 196 130 Q 206 150 224 150 L 400 150' fill='none' stroke='#8b7bff' stroke-width='2.6' stroke-linecap='round'/>" +
+    "<circle cx='224' cy='150' r='3.4' fill='#8b7bff'/>" +
+    "<text x='20' y='38' fill='#5b6270' font-family='monospace' font-size='12' letter-spacing='3'>SIGNAL · LOCKED</text>" +
+    "<text x='298' y='284' fill='#3a4150' font-family='monospace' font-size='10' letter-spacing='2'>BR-SIG</text>" +
+    "</svg>"
+  );
+
+const VAULT_MINTS = [
+  { key: "drv", label: "Checkpoint Wave", id: "BR-001-DRV-0001", state: "HALO MINT · DEVELOPED",
+    filed: "APR 26, 2025 · 14:22", sealLine: "Sealed · Recorded",
+    src: SOURCES[0], thumb: SOURCES[0].file },
+  { key: "lnd", label: "Road Morning", id: "BR-001-LND-0022", state: "HALO MINT · DEVELOPED",
+    filed: "MAR 12, 2025 · 07:41", sealLine: "Sealed · Recorded",
+    src: { no: 22, file: "assets/source-02.jpg",
+      halo: { material: "Still-Water Pewter", a: "#6fb3e0", b: "#8b7bff", c: "#9fe0c8" },
+      photoTuning: { pos: "50% 44%", zoom: 1, scrim: 0.12, base: { bright: 1.0, contrast: 1.02, sat: 0.97 } },
+      capture: { code: "FIELD / LND", rec: "2025.03.12" },
+      card: { title: "Road Morning", archetype: "Open-Horizon Frame",
+        note: "Low mist holds the valley flat; the road's vanishing line draws the eye to one pale break in the ridge.",
+        signature: "Landscape document · first light", serial: "BR-001-LND-0022",
+        stats: { presence: 74, signal: 62, visualImpact: 80, charge: 70 } } },
+    thumb: "assets/source-02.jpg" },
+  { key: "sig", label: "Signal Locked", id: "BR-001-SIG-0044", state: "HALO MINT · DEVELOPED",
+    filed: "FEB 02, 2025 · 22:09", sealLine: "Sealed · Recorded",
+    src: { no: 44, file: VAULT_SIGNAL_IMG,
+      halo: { material: "Carrier Violet Glass", a: "#8b7bff", b: "#6fb3e0", c: "#9fe0c8" },
+      photoTuning: { pos: "50% 50%", zoom: 1, scrim: 0.05, base: { bright: 1.0, contrast: 1.0, sat: 1.0 } },
+      capture: { code: "SYS / SIG", rec: "2025.02.02" },
+      card: { title: "Signal Locked", archetype: "Held-Carrier Record",
+        note: "A clean carrier holds steady across the band; the lock reads as a flat, unbroken line with no drift at the edges.",
+        signature: "System record · carrier lock", serial: "BR-001-SIG-0044",
+        stats: { presence: 66, signal: 88, visualImpact: 60, charge: 74 } } },
+    thumb: VAULT_SIGNAL_IMG },
+];
+
+/* small hand-drawn marks reused across the Vault (scribble-archive language) */
+const VAULT_WAVE = '<svg viewBox="0 0 170 8" width="170" height="8" preserveAspectRatio="none" aria-hidden="true"><path d="M2 5 Q 12 1 22 5 T 42 5 T 62 5 T 82 5 T 102 5 T 122 5 T 142 5 T 168 5" fill="none" stroke="currentColor" stroke-width="1"/></svg>';
+const VAULT_WAVE_SM = '<svg viewBox="0 0 90 7" width="90" height="7" preserveAspectRatio="none" aria-hidden="true"><path d="M2 4 Q 9 1 16 4 T 30 4 T 44 4 T 58 4 T 72 4 T 88 4" fill="none" stroke="currentColor" stroke-width="1"/></svg>';
+const VAULT_ARROW = '<svg class="vanno__arr" viewBox="0 0 60 24" width="54" height="22" fill="none" aria-hidden="true"><path d="M2 8 C 22 4, 40 14, 53 17" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><path d="M46 12 L55 17 L45 20" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const VAULT_HEX = '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true"><path d="M12 2.5 L20 7 L20 17 L12 21.5 L4 17 L4 7 Z"/><circle cx="12" cy="11" r="2.1"/><path d="M12 13.1 L12 16.4"/></svg>';
+
+/* a deterministic, believable QR placeholder generated from the mint id (3 finder
+   patterns + timing rows + id-seeded data modules). Not a functional code — a
+   crisp, distinct-per-mint visual that reads instantly as "access by QR". */
+function vaultQR(seed) {
+  const N = 21;
+  const str = String(seed);
+  let base = 5381;
+  for (let i = 0; i < str.length; i++) base = ((base << 5) + base + str.charCodeAt(i)) >>> 0;
+  const bit = (x, y) => {
+    let h = (base ^ (x * 73856093) ^ (y * 19349663)) >>> 0;
+    h = (h ^ (h >>> 13)) >>> 0; h = (h * 1274126177) >>> 0;
+    return ((h >>> 17) & 1) === 1;
+  };
+  const inBox = (x, y, bx, by) => x >= bx && x < bx + 7 && y >= by && y < by + 7;
+  const finder = (x, y) => {
+    const f = (bx, by) => { const rx = x - bx, ry = y - by; return (rx === 0 || rx === 6 || ry === 0 || ry === 6) || (rx >= 2 && rx <= 4 && ry >= 2 && ry <= 4); };
+    if (inBox(x, y, 0, 0)) return f(0, 0);
+    if (inBox(x, y, N - 7, 0)) return f(N - 7, 0);
+    if (inBox(x, y, 0, N - 7)) return f(0, N - 7);
+    return null;
+  };
+  let cells = "";
+  for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) {
+    const fv = finder(x, y);
+    let on;
+    if (fv !== null) on = fv;
+    else if ((x < 8 && y < 8) || (x > N - 9 && y < 8) || (x < 8 && y > N - 9)) on = false; // finder separators
+    else if (x === 6 || y === 6) on = (x + y) % 2 === 0; // timing rows
+    else on = bit(x, y);
+    if (on) cells += `<rect x="${x}" y="${y}" width="1" height="1"/>`;
+  }
+  return `<svg class="vqr__svg" viewBox="-1 -1 ${N + 2} ${N + 2}" role="img" aria-label="Mint access code (placeholder)"><g fill="currentColor">${cells}</g></svg>`;
+}
+
+function renderVault() {
+  const m = VAULT_MINTS[0];
+  const crop = '<span class="vcrop vcrop--tl"></span><span class="vcrop vcrop--tr"></span><span class="vcrop vcrop--bl"></span><span class="vcrop vcrop--br"></span>';
+
+  const aboutRows = [
+    ["Your archive, secured", "Every mint you save is filed, sealed, and recorded."],
+    ["Reopen any reading", "Return to the full Stats &amp; Readings at any time."],
+    ["QR access", "Scan to verify, share, or open the mint anywhere."],
+    ["Favorite moments", "The images and instances that matter, always within reach."],
+  ].map(([t, c]) =>
+    `<div class="vrow"><span class="vrow__d" aria-hidden="true">◆</span><div class="vrow__txt"><span class="vrow__t">${t}</span><p class="vrow__c">${c}</p></div></div>`
+  ).join('<span class="vrow__div" aria-hidden="true"></span>');
+
+  const tiles = VAULT_MINTS.map((mt, i) =>
+    `<button type="button" class="vmtile${i === 0 ? " is-selected" : ""}" data-vault-select="${i}" aria-pressed="${i === 0 ? "true" : "false"}">
+       <span class="vmtile__thumb">${imgOrPlaceholder(mt.thumb, "vmtile__img")}</span>
+       <span class="vmtile__title">${esc(mt.label)}</span>
+       <span class="vmtile__id">${esc(mt.id)}</span>
+       <span class="vmtile__d" aria-hidden="true">◆</span>
+     </button>`
+  ).join("");
+
+  return `
+    <div class="vault" data-vault>
+      <header class="vault__top">
+        <button type="button" class="vault__back" data-view-to="menu">← Back to the menu</button>
+        <span class="vault__eyebrow">BLUE ROOM ARCHIVE&nbsp;&nbsp;·&nbsp;&nbsp;THE VAULT</span>
+        <h1 class="vault__title">The Vault</h1>
+        <span class="vault__wave" aria-hidden="true">${VAULT_WAVE}</span>
+        <p class="vault__intro">Saved minted cards are filed here.<br>Revisit favorite moments or images, reopen their readings, or access each mint by QR code.</p>
+      </header>
+
+      <div class="vault__main">
+        <div class="vault__left">
+          <div class="vanno-stack" aria-hidden="true">
+            <span class="vanno">saved${VAULT_ARROW}</span>
+            <span class="vanno">reading attached${VAULT_ARROW}</span>
+            <span class="vanno">filed / sealed / recorded${VAULT_ARROW}</span>
+          </div>
+          <div class="vmeta">
+            <div class="vmeta__row"><span class="vmeta__k">Current Mint</span><span class="vmeta__v" data-vault-metaid>${esc(m.id)}</span></div>
+            <span class="vmeta__hr" aria-hidden="true"></span>
+            <div class="vmeta__row"><span class="vmeta__k">Filed</span><span class="vmeta__v" data-vault-metafiled>${esc(m.filed)}</span></div>
+            <span class="vmeta__hr" aria-hidden="true"></span>
+            <span class="vmeta__seal" data-vault-metaseal>${esc(m.sealLine)}</span>
+          </div>
+          <span class="vfoot-stamp" aria-hidden="true">BR · Archive — Vol. 01</span>
+        </div>
+
+        <div class="vault__center">
+          <div class="vault__frame">
+            ${crop}
+            <span class="vguide vguide--l" aria-hidden="true"></span>
+            <span class="vguide vguide--r" aria-hidden="true"></span>
+            <div class="vault__cardwrap" data-vault-card>${renderCard(m.src, "shiny")}</div>
+          </div>
+          <span class="vault__cardcap" data-vault-cardcap>${esc(m.state)}</span>
+        </div>
+
+        <div class="vault__access">
+          <div class="vqr">
+            <span class="vqr__label">Access Mint</span>
+            <div class="vqr__frame">
+              ${crop}
+              <div class="vqr__code" data-vault-qr>${vaultQR(m.id)}</div>
+            </div>
+            <span class="vqr__id" data-vault-qrid>${esc(m.id)}</span>
+            <span class="vqr__cta">Scan to access</span>
+          </div>
+          <button type="button" class="vread" data-vault-openreading>
+            <span class="vread__mark" aria-hidden="true">${VAULT_HEX}</span>
+            <span class="vread__txt">
+              <span class="vread__t">Open Reading</span>
+              <span class="vread__d">Reopen this card’s Stats &amp; Readings</span>
+            </span>
+          </button>
+        </div>
+
+        <aside class="vault__about">
+          <span class="vabout__head">What is the Vault?</span>
+          <span class="vabout__wave" aria-hidden="true">${VAULT_WAVE_SM}</span>
+          <div class="vabout__rows">${aboutRows}</div>
+          <p class="vabout__note">Each mint is a record.<br>Each record is yours.<span class="vabout__seal" aria-hidden="true">◈</span></p>
+        </aside>
+      </div>
+
+      <div class="vault__moments">
+        <span class="vmoments__label">Favorite Moments</span>
+        <div class="vmoments__rail">
+          <button type="button" class="vmchev" data-vault-scroll="-1" aria-label="Scroll left">‹</button>
+          <div class="vmoments__track" data-vault-track>
+            ${tiles}
+            <div class="vmtile vmtile--empty" aria-hidden="true">
+              <span class="vmtile__plus">+</span>
+              <span class="vmtile__title">New mint</span>
+              <span class="vmtile__id">appears here</span>
+            </div>
+          </div>
+          <button type="button" class="vmchev" data-vault-scroll="1" aria-label="Scroll right">›</button>
+        </div>
+        <span class="vmoments__hint">scroll the vault</span>
+      </div>
+    </div>`;
+}
+
+function wireVault() {
+  const root = document.querySelector(".vault");
+  if (!root) return;
+  let sel = 0;
+  const $ = (s) => root.querySelector(s);
+  const cardSlot = $("[data-vault-card]"), metaId = $("[data-vault-metaid]"),
+    metaFiled = $("[data-vault-metafiled]"), metaSeal = $("[data-vault-metaseal]"),
+    qrSlot = $("[data-vault-qr]"), qrId = $("[data-vault-qrid]"), cardCap = $("[data-vault-cardcap]");
+
+  function selectMint(i) {
+    if (i < 0 || i >= VAULT_MINTS.length || i === sel) return;
+    sel = i;
+    const m = VAULT_MINTS[i];
+    if (cardSlot) cardSlot.innerHTML = renderCard(m.src, "shiny");
+    if (metaId) metaId.textContent = m.id;
+    if (metaFiled) metaFiled.textContent = m.filed;
+    if (metaSeal) metaSeal.textContent = m.sealLine;
+    if (qrSlot) qrSlot.innerHTML = vaultQR(m.id);
+    if (qrId) qrId.textContent = m.id;
+    if (cardCap) cardCap.textContent = m.state;
+    root.querySelectorAll("[data-vault-select]").forEach((b) => {
+      const on = Number(b.dataset.vaultSelect) === i;
+      b.classList.toggle("is-selected", on);
+      b.setAttribute("aria-pressed", on ? "true" : "false");
+    });
+  }
+
+  root.addEventListener("click", (e) => {
+    const tile = e.target.closest("[data-vault-select]");
+    if (tile) { selectMint(Number(tile.dataset.vaultSelect)); return; }
+    const scroll = e.target.closest("[data-vault-scroll]");
+    if (scroll) { const tr = $("[data-vault-track]"); if (tr) tr.scrollBy({ left: Number(scroll.dataset.vaultScroll) * 232, behavior: "smooth" }); return; }
+    if (e.target.closest("[data-vault-openreading]")) {
+      /* Reopen the selected mint's Stats & Readings. TODO: a per-mint reading
+         store. For now route to the canonical developed reading reveal (the real
+         Stats & Readings surface) — non-breaking, reuses an existing route. */
+      location.href = "?dev=staged-reveal&rv=developed";
+    }
+  });
+}
+
 function mountDev() {
   const C = window.BlueRoomScanContract;
   const F = (C && C.DEV_FIXTURES) || {};
   if (state.dev === "proto-cards") {
     document.getElementById("devView").innerHTML = renderProtoCards();
+    return;
+  }
+  if (state.dev === "vault") {
+    document.getElementById("devView").innerHTML = renderVault();
+    wireVault();
     return;
   }
   if (state.dev === "staged-reveal") {

@@ -3108,6 +3108,182 @@ body[data-view="room"] .dev { display: none; }
    Deliberately reads as a debug surface, not a product card: a
    labelled banner + footer, plain plates, no material/halo treatment.
 ============================================================= */
+/* ============================================================
+   THE VAULT (?dev=vault) — BR-S144
+   A refined archive composition with scribbled intelligence: dark Blue Room
+   mood, serif title, mono metadata, thin copper rules, violet accents, light
+   hand-drawn annotations. Premium UI + hand-annotated reading sheet — NOT a
+   physical collector case. Flat surfaces, restrained shadows. All scoped to
+   .vault so nothing leaks into the live room/card.
+============================================================ */
+.vault {
+  --v-copper: #b08a52;          /* thin copper/gold rule + label accent */
+  --v-copper-dim: #8a6f44;
+  --v-violet: var(--violet);
+  width: 100%;
+  max-width: 1480px;
+  margin: 0 auto;
+  font-family: var(--font-ui);
+  color: var(--t-body);
+}
+
+/* ---- top: back · eyebrow · serif title · wave · intro ---- */
+.vault__top { position: relative; text-align: center; padding: 2px 0 12px; }
+.vault__back {
+  position: absolute; left: 0; top: 4px;
+  font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--t-meta); background: none; border: none; cursor: pointer; padding: 6px 2px;
+  transition: color 160ms ease;
+}
+.vault__back:hover { color: var(--t-display); }
+.vault__eyebrow {
+  display: block; font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.34em;
+  text-transform: uppercase; color: var(--t-meta);
+}
+.vault__title {
+  font-family: var(--font-display); font-weight: 500; font-size: clamp(38px, 5vw, 54px);
+  letter-spacing: 0.01em; color: var(--t-display); line-height: 1.05; margin: 3px 0 0;
+}
+.vault__wave { display: inline-block; color: var(--v-copper-dim); margin: 7px 0 9px; }
+.vault__wave svg, .vabout__wave svg { display: block; }
+.vault__intro {
+  font-family: var(--font-display); font-size: clamp(13.5px, 1.5vw, 15.5px); line-height: 1.6;
+  color: var(--t-body); max-width: 540px; margin: 0 auto;
+}
+
+/* ---- main 4-column composition ---- */
+.vault__main {
+  display: grid;
+  grid-template-columns: minmax(168px, 220px) minmax(300px, 1fr) minmax(206px, 264px) minmax(238px, 312px);
+  gap: clamp(14px, 1.8vw, 38px);
+  align-items: start;
+  padding: 6px 0 0;
+}
+
+/* col 1 — annotations + metadata box */
+.vault__left { display: flex; flex-direction: column; gap: 24px; padding-top: 10px; }
+.vanno-stack { display: flex; flex-direction: column; gap: 20px; align-items: flex-end; text-align: right; }
+.vanno {
+  display: inline-flex; align-items: center; gap: 9px;
+  font-family: var(--font-display); font-style: italic; font-size: 14px; color: var(--t-meta);
+}
+.vanno__arr { color: var(--v-copper-dim); opacity: 0.75; flex: none; }
+.vmeta {
+  border: 1px solid var(--line); border-radius: var(--r-plate);
+  padding: 15px 16px 16px; display: flex; flex-direction: column; gap: 9px;
+  background: rgba(255, 255, 255, 0.012);
+}
+.vmeta__row { display: flex; flex-direction: column; gap: 3px; }
+.vmeta__k { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.24em; text-transform: uppercase; color: var(--t-meta); }
+.vmeta__v { font-family: var(--font-mono); font-size: 11.5px; letter-spacing: 0.07em; color: var(--t-primary); }
+.vmeta__hr { height: 1px; background: var(--line-faint); }
+.vmeta__seal { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.24em; text-transform: uppercase; color: var(--v-copper); margin-top: 2px; }
+/* quiet foot anchor — fills the lower-left void without a new box (hairline only) */
+.vfoot-stamp { margin-top: auto; padding-top: 12px; border-top: 1px solid var(--line-faint); font-family: var(--font-mono); font-size: 8.5px; letter-spacing: 0.24em; text-transform: uppercase; color: var(--t-ghost); }
+
+/* col 2 — the selected card in a tight sketch crop-frame that HUGS the artifact */
+.vault__center { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+.vault__frame { position: relative; padding: 12px 22px; }
+.vcrop { position: absolute; width: 13px; height: 13px; pointer-events: none; }
+.vcrop--tl { top: 4px; left: 6px; border-top: 1px solid var(--v-copper-dim); border-left: 1px solid var(--v-copper-dim); }
+.vcrop--tr { top: 4px; right: 6px; border-top: 1px solid var(--v-copper-dim); border-right: 1px solid var(--v-copper-dim); }
+.vcrop--bl { bottom: 4px; left: 6px; border-bottom: 1px solid var(--v-copper-dim); border-left: 1px solid var(--v-copper-dim); }
+.vcrop--br { bottom: 4px; right: 6px; border-bottom: 1px solid var(--v-copper-dim); border-right: 1px solid var(--v-copper-dim); }
+.vguide { position: absolute; top: 3px; bottom: 3px; width: 1px; background: repeating-linear-gradient(180deg, var(--line) 0 4px, transparent 4px 9px); pointer-events: none; }
+.vguide--l { left: 15px; } .vguide--r { right: 15px; }
+.vault__cardwrap { --card-w: 430px; width: 430px; zoom: 0.74; }
+/* flatten the trophy: kill the entrance pop + soften the heavy lift shadow so the
+   card reads as a filed record, not a floating physical object. */
+.vault__cardwrap .card { box-shadow: 0 16px 38px rgba(0, 0, 0, 0.42), 0 4px 12px rgba(0, 0, 0, 0.34); animation: none; }
+.vault__cardcap { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--t-body); }
+
+/* col 3 — QR access + open reading */
+.vault__access { display: flex; flex-direction: column; gap: 22px; padding-top: 12px; align-items: center; }
+.vqr { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.vqr__label { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.26em; text-transform: uppercase; color: var(--t-meta); }
+.vqr__frame { position: relative; padding: 15px; transition: filter 200ms ease; }
+.vqr__code { width: 124px; height: 124px; }
+.vqr__svg { width: 100%; height: 100%; color: var(--silver-dim); display: block; transition: color 200ms ease; }
+.vqr:hover .vqr__frame { filter: drop-shadow(0 0 5px rgba(139, 123, 255, 0.35)); }
+.vqr:hover .vqr__svg { color: var(--t-display); }
+.vqr__id { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.1em; color: var(--t-primary); }
+.vqr__cta { font-family: var(--font-mono); font-size: 8.5px; letter-spacing: 0.24em; text-transform: uppercase; color: var(--v-copper); }
+.vread {
+  display: flex; align-items: flex-start; gap: 12px; width: 100%; text-align: left; cursor: pointer;
+  border: 1px solid var(--line); border-radius: var(--r-plate); padding: 13px 15px;
+  background: rgba(255, 255, 255, 0.015);
+  transition: border-color 160ms ease, background 160ms ease, transform 160ms ease;
+}
+.vread:hover { border-color: color-mix(in srgb, var(--v-violet) 55%, var(--line)); background: rgba(139, 123, 255, 0.06); transform: translateY(-1px); }
+.vread:focus-visible { outline: 2px solid color-mix(in srgb, var(--v-violet) 60%, transparent); outline-offset: 2px; }
+.vread__mark { color: var(--v-violet); flex: none; margin-top: 1px; line-height: 0; }
+.vread__t { display: block; font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--t-display); }
+.vread__d { display: block; font-family: var(--font-display); font-style: italic; font-size: 13px; color: var(--t-body); margin-top: 4px; }
+
+/* col 4 — what is the vault */
+.vault__about { display: flex; flex-direction: column; gap: 12px; padding-top: 12px; }
+.vabout__head { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.28em; text-transform: uppercase; color: var(--t-meta); }
+.vabout__wave { color: var(--v-copper-dim); margin: -4px 0 4px; }
+.vabout__rows { display: flex; flex-direction: column; }
+.vrow { display: flex; gap: 11px; align-items: flex-start; padding: 13px 0; }
+.vrow__div { height: 1px; background: var(--line-faint); }
+.vrow__d { color: var(--v-violet); font-size: 9px; line-height: 1; margin-top: 4px; flex: none; }
+.vrow__t { display: block; font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--t-display); }
+.vrow__c { font-family: var(--font-display); font-size: 13.5px; line-height: 1.5; color: var(--t-body); margin-top: 4px; }
+.vabout__note {
+  position: relative; border: 1px solid var(--line); border-radius: var(--r-plate);
+  padding: 14px 16px; margin-top: 6px;
+  font-family: var(--font-display); font-style: italic; font-size: 13.5px; line-height: 1.6; color: var(--t-primary);
+}
+.vabout__seal { position: absolute; right: 13px; bottom: 11px; color: var(--v-copper-dim); font-style: normal; font-size: 12px; }
+
+/* ---- favorite moments rail ---- */
+.vault__moments {
+  margin-top: clamp(14px, 2vh, 26px); padding-top: 18px;
+  border-top: 1px solid var(--line-faint);
+  display: flex; flex-direction: column; align-items: center; gap: 14px;
+}
+.vmoments__label { align-self: flex-start; margin-left: clamp(8px, 6%, 96px); font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.28em; text-transform: uppercase; color: var(--t-meta); }
+.vmoments__rail { display: flex; align-items: center; gap: 14px; width: 100%; justify-content: center; }
+.vmoments__track {
+  display: flex; align-items: stretch; gap: 16px; overflow-x: auto; padding: 6px 2px 10px;
+  max-width: 1000px; scroll-snap-type: x proximity;
+  scrollbar-width: thin; scrollbar-color: var(--ink-700) transparent;
+}
+.vmchev { flex: none; font-size: 22px; line-height: 1; color: var(--t-ghost); background: none; border: none; cursor: pointer; padding: 8px 10px; transition: color 160ms ease; }
+.vmchev:hover { color: var(--t-primary); }
+.vmtile {
+  flex: 0 0 auto; width: 196px; display: flex; flex-direction: column; gap: 8px;
+  padding: 12px; cursor: pointer; text-align: center; scroll-snap-align: start;
+  border: 1px solid var(--line); border-radius: var(--r-plate); background: rgba(255, 255, 255, 0.012);
+  transition: border-color 160ms ease, background 160ms ease, transform 160ms ease, box-shadow 160ms ease;
+}
+.vmtile:hover { border-color: var(--line-strong); transform: translateY(-2px); }
+.vmtile.is-selected {
+  border-color: color-mix(in srgb, var(--v-violet) 70%, var(--line));
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--v-violet) 40%, transparent);
+  background: rgba(139, 123, 255, 0.05);
+}
+.vmtile__thumb { position: relative; width: 100%; aspect-ratio: 4 / 3; overflow: hidden; border-radius: 2px; background: var(--ink-850); }
+.vmtile__img { width: 100%; height: 100%; object-fit: cover; display: block; filter: saturate(0.94) contrast(0.98); }
+.vmtile__title { font-family: var(--font-display); font-size: 15px; color: var(--t-display); }
+.vmtile__id { font-family: var(--font-mono); font-size: 8.5px; letter-spacing: 0.1em; color: var(--t-meta); }
+.vmtile__d { color: var(--v-violet); font-size: 8px; line-height: 1; }
+.vmtile--empty { justify-content: center; align-items: center; gap: 5px; border-style: dashed; border-color: var(--line); cursor: default; color: var(--t-ghost); }
+.vmtile--empty:hover { transform: none; border-color: var(--line); }
+.vmtile__plus { font-size: 20px; color: var(--t-ghost); line-height: 1; }
+.vmtile--empty .vmtile__title { color: var(--t-meta); font-size: 13px; }
+.vmtile--empty .vmtile__id { text-transform: lowercase; }
+.vmoments__hint { font-family: var(--font-display); font-style: italic; font-size: 12.5px; color: var(--t-meta); }
+
+/* desktop-first safety: below the 4-col threshold, fold the about column under
+   the card and let the rail wrap — keeps the page usable, not a mobile redesign. */
+@media (max-width: 1180px) {
+  .vault__main { grid-template-columns: minmax(150px, 200px) minmax(280px, 1fr) minmax(200px, 260px); }
+  .vault__about { grid-column: 1 / -1; padding-top: 6px; border-top: 1px solid var(--line-faint); }
+  .vault__about .vabout__rows { display: grid; grid-template-columns: 1fr 1fr; gap: 0 26px; }
+}
+
 .dev { min-height: 100vh; display: flex; align-items: flex-start; justify-content: center; padding: 30px 22px 44px; }
 .uploadeddev { width: 100%; max-width: 620px; display: grid; gap: 14px; }
 .uploadeddev__tag {
