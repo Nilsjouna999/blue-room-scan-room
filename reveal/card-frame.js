@@ -69,6 +69,19 @@
       seal.style.willChange = "transform, opacity";   // promote ONLY during the ritual
       return seal;
     }
+    // BR-S141 — will-change lifecycle for the finalization catch set (replaces the 40+
+    // persistent CSS will-change hints removed in reveal.css). Promote at finalize-start,
+    // DROP at cleanup, so backing stores live only during the ~1.3s window. Mirrors the
+    // seal's add-then-clear discipline.
+    function rvCatchPromote(on) {
+      var sels = [".corner", ".titleblock__title", ".titleblock__archetype",
+                  ".photo", ".barcode", ".mintstrip__state",
+                  ".fr__pip.is-on", ".card__plate", ".card__house"];
+      for (var i = 0; i < sels.length; i++) {
+        var nodes = halo.querySelectorAll(sels[i]);
+        for (var j = 0; j < nodes.length; j++) nodes[j].style.willChange = on ? "filter, transform" : "";
+      }
+    }
     // BR-S136 — INTERRUPT / SKIP / END cleanup. Idempotent: cancels timers, removes
     // the overlay + every ritual class + the final-pip tag, drops will-change, and
     // always snaps to the settled minted card (never mid-sweep / half-glow).
@@ -79,6 +92,7 @@
       if (fp) fp.classList.remove("is-final-pip");
       var seal = halo.querySelector(".card__plate > .rv-seal");
       if (seal) { seal.style.willChange = ""; seal.remove(); }
+      rvCatchPromote(false);                    // BR-S141 — release the catch backing stores
       halo.classList.add("rv-halo-settled");   // settled tone persists (freeze-safe)
     }
 
@@ -108,7 +122,7 @@
         var off = motionOff();
         var ddur  = off ? 0 : 3550;       // BR-S135 gate UNCHANGED — wipe/tonal/bloom/pip-ignite intact
         var pipT0 = off ? 0 : 3486;       // final pip (c4,r3) lands == ritual t=0
-        var ritualDur = off ? 0 : (seenDevelop ? 360 : 900);
+        var ritualDur = off ? 0 : (seenDevelop ? 420 : 1360);   // BR-S141: 900 -> 1360 (cleanup fires ~160ms AFTER the edition catch at FIN+1200 = a real held settle, freeze-safe); repeat 360 -> 420
 
         // gate-off at 3550 (drop the free layer) + onMorphDone — UNCHANGED schedule
         timer = setTimeout(function () {
@@ -138,25 +152,25 @@
             if (last) last.classList.add("is-final-pip");
             el.classList.add("is-finalizing");
             if (seenDevelop) el.classList.add("is-fin-repeat");
+            if (!el.classList.contains("is-fin-repeat")) rvCatchPromote(true);   // BR-S141 — promote only when the catch cascade actually runs
             seenDevelop = true;
 
             var seal = rvSealCreate();
             if (seal && !el.classList.contains("is-fin-repeat")) {
-              // full ritual: nucleus releases (300ms), seal sweep (340ms)
-              finTimers.push(setTimeout(function () { seal.classList.add("is-releasing"); }, 300));
-              finTimers.push(setTimeout(function () { seal.classList.add("is-sealing"); }, 340));
+              // BR-S141: seal opens AFTER the stamp completes (stamp = FIN+210..445).
+              // nucleus releases (420ms), seal sweep (460ms) — was 300/340 (overlapped the stamp tail).
+              finTimers.push(setTimeout(function () { seal.classList.add("is-releasing"); }, 420));
+              finTimers.push(setTimeout(function () { seal.classList.add("is-sealing"); }, 460));
             } else if (seal) {
-              // repeat: skip the nucleus, short micro-sheen only
+              // repeat: skip the nucleus, short micro-sheen only (UNCHANGED)
               finTimers.push(setTimeout(function () { seal.classList.add("is-sealing"); }, 120));
             }
-            // settle + clean up the overlay at the end of the ritual window
-            finTimers.push(setTimeout(function () {
-              el.classList.remove("is-finalizing", "is-fin-repeat");
-              if (last) last.classList.remove("is-final-pip");
-              var s = halo.querySelector(".card__plate > .rv-seal");
-              if (s) { s.style.willChange = ""; s.remove(); }
-              halo.classList.add("rv-halo-settled");     // subtly-richer END
-            }, ritualDur));
+            // settle + clean up at the end of the ritual window. BR-S141: route through
+            // finalizeCleanup() (idempotent) so the catch will-change + seal are ALWAYS
+            // released on the happy path too — not just on interrupt. Fires at the longer
+            // ritualDur=1360 (~160ms after the edition catch at FIN+1200) = a rested,
+            // freeze-safe settle with no class-removal mid-animation.
+            finTimers.push(setTimeout(function () { finalizeCleanup(); }, ritualDur));
           }, pipT0));
         }
         return;

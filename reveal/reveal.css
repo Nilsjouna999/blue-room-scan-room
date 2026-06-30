@@ -24,9 +24,11 @@
   --rv-halo-glow:      color-mix(in srgb, var(--violet, #8b7bff) 30%, transparent);
 
   /* --- motion --------------------------------------------------------- */
-  --rv-ease:           cubic-bezier(0.2, 0.7, 0.2, 1);    /* the house easing */
+  --rv-ease:           cubic-bezier(0.2, 0.7, 0.2, 1);    /* the house easing — slow arcs, pip-ignite */
   --rv-ease-draw:      cubic-bezier(0.25, 0.46, 0.45, 0.94); /* organic hand-drawn stroke draw-on */
   --rv-ease-soft:      cubic-bezier(0.4, 0, 0.2, 1);      /* the develop WIPE + wet-meniscus sweep ONLY */
+  --rv-ease-snap:      cubic-bezier(0.16, 1, 0.3, 1);     /* BR-S141: authority snap — lock + stamp */
+  --rv-ease-seal:      cubic-bezier(0.22, 0.61, 0.36, 1); /* BR-S141: dry clear-coat seal — nucleus + sweep */
   --rv-dur-develop:    820ms;
   --rv-dur-row:        70ms;                              /* per-row stagger */
   --rv-dur-write:      1100ms;
@@ -331,24 +333,24 @@
    Scope: .rv-cardframe.is-developing .rv-layer--halo .fr__pip.is-on — NEVER the live
    room .card, never a plain renderCard(), never the free layer, never empty pips. */
 @keyframes rv-pip-ignite {
+  /* BR-S141 PERF: drop-shadow() stripped (per-frame alpha-blur on 16-20 concurrent
+     glints; a sub-px halo on a 14px diamond is invisible-grade). Brightness+scale
+     punch — the FELT part — kept verbatim. */
   /* COLD ARCHIVE DIAMOND — material present but pale, flat, low-energy, compressed */
   0%   { opacity: 0.42; transform: rotate(45deg) scale(0.92);
-         filter: brightness(0.62) saturate(0.60) drop-shadow(0 0 0 transparent); }
-  /* IMPACT FLASH — 1-2 frame overbright peak + scale punch + halo at full bloom */
+         filter: brightness(0.62) saturate(0.60); }
+  /* IMPACT FLASH — 1-2 frame overbright peak + scale punch */
   16%  { opacity: 1;    transform: rotate(45deg) scale(1.18);
-         filter: brightness(1.90) saturate(1.16)
-                 drop-shadow(0 0 4px rgba(243, 234, 214, 0.85)); }
-  /* COMPRESS-BACK through the brief's dip — glow already retracting */
+         filter: brightness(1.90) saturate(1.16); }
+  /* COMPRESS-BACK through the brief's dip */
   30%  { opacity: 1;    transform: rotate(45deg) scale(0.98);
-         filter: brightness(1.42) saturate(1.08)
-                 drop-shadow(0 0 5px rgba(243, 234, 214, 0.50)); }
-  /* SETTLE micro-overshoot — halo nearly gone */
+         filter: brightness(1.42) saturate(1.08); }
+  /* SETTLE micro-overshoot */
   54%  { opacity: 1;    transform: rotate(45deg) scale(1.04);
-         filter: brightness(1.10) saturate(1.02)
-                 drop-shadow(0 0 2px rgba(243, 234, 214, 0.20)); }
-  /* RESOLVED / TRUE — == resting .fr__pip.is-on (true material, scale 1, glow gone) */
+         filter: brightness(1.10) saturate(1.02); }
+  /* RESOLVED / TRUE — == resting .fr__pip.is-on (true material, scale 1) */
   100% { opacity: 1;    transform: rotate(45deg) scale(1);
-         filter: brightness(1) saturate(1) drop-shadow(0 0 0 transparent); }
+         filter: brightness(1) saturate(1); }
 }
 .rv-cardframe.is-developing .rv-layer--halo .fr__pip.is-on {
   animation: rv-pip-ignite 360ms var(--rv-ease, cubic-bezier(0.2, 0.7, 0.2, 1)) both;
@@ -356,7 +358,9 @@
      126ms row-span + 99ms pause); --r (0-3) the tight top->bottom stagger (42ms).
      Base 2100ms so the cold pips show first under the wipe. */
   animation-delay: calc(2100ms + var(--c, 0) * 225ms + var(--r, 0) * 42ms);
-  will-change: transform, filter, opacity;
+  /* BR-S141 PERF: will-change REMOVED — 16-20 persistent promotions hold backing
+     stores for the whole develop + defeat the hint. A 360ms filter anim does not
+     need it; the RM block (animation:none) already neutralises this rule. */
 }
 
 /* =====================================================================
@@ -382,15 +386,15 @@
    Restrained: 1 -> 1.09 -> 0.985 -> 1.00, 1-2 frame overbright, tiny halo.
    NOT a casino 1.16 pop; the 19 other pips are untouched. rotate(45deg)
    re-stated every stop (the pip rests rotated). 100% == resting material. */
-@keyframes rv-final-pip {
-  0%   { transform: rotate(45deg) scale(1);     filter: brightness(1)    saturate(1)    drop-shadow(0 0 0 transparent); }
-  22%  { transform: rotate(45deg) scale(1.09);  filter: brightness(1.46) saturate(1.10) drop-shadow(0 0 4px rgba(220,232,255,0.62)); }
-  55%  { transform: rotate(45deg) scale(0.985); filter: brightness(1.12) saturate(1.03) drop-shadow(0 0 2px rgba(220,232,255,0.22)); }
-  100% { transform: rotate(45deg) scale(1);     filter: brightness(1)    saturate(1)    drop-shadow(0 0 0 transparent); }
+@keyframes rv-final-pip {       /* BR-S141 PERF: drop-shadow stripped; scale+brightness impact kept */
+  0%   { transform: rotate(45deg) scale(1);     filter: brightness(1)    saturate(1); }
+  22%  { transform: rotate(45deg) scale(1.09);  filter: brightness(1.46) saturate(1.10); }
+  55%  { transform: rotate(45deg) scale(0.985); filter: brightness(1.12) saturate(1.03); }
+  100% { transform: rotate(45deg) scale(1);     filter: brightness(1)    saturate(1); }
 }
 .rv-cardframe.is-finalizing .rv-layer--halo .fr__pip.is-on.is-final-pip {
-  animation: rv-final-pip 95ms var(--rv-ease) both;
-  will-change: transform, filter;
+  animation: rv-final-pip 95ms var(--rv-ease-snap) both;
+  /* will-change is JS-managed (rvCatchPromote) only during the ritual window */
 }
 
 /* ---- 60-125ms · MICRO CARD LOCK · tactile acknowledge, no white flash ----
@@ -401,7 +405,10 @@
   100% { transform: scale(1);     filter: brightness(1)     contrast(1); }
 }
 .rv-cardframe.is-finalizing .rv-layer--halo .card__plate {
-  animation: rv-final-lock 65ms cubic-bezier(0.16, 1, 0.3, 1) 60ms both;
+  /* BR-S141 STRIKE: was 65ms@60ms (a 35ms twitch ON the impact). Now 75ms@150ms —
+     a ~55ms breath after the pip lands, so the card is felt to ACKNOWLEDGE the
+     impact, not flinch with it. Named snap easing. */
+  animation: rv-final-lock 75ms var(--rv-ease-snap) 150ms both;
   will-change: transform, filter;
 }
 
@@ -412,7 +419,9 @@
 .rv-cardframe.is-finalizing .rv-layer--halo .card__house {
   position: relative;
   transform-origin: left center;
-  animation: rv-stamp-label 235ms cubic-bezier(0.16, 1, 0.3, 1) 125ms both;
+  /* BR-S141 STRIKE: delay 125 -> 210 so authorize lands AFTER the lock acknowledge
+     (impact 0-95 -> breath -> lock 150-225 -> stamp 210-445) = three felt blows. */
+  animation: rv-stamp-label 235ms var(--rv-ease-snap) 210ms both;
   will-change: transform, filter;
 }
 .rv-cardframe.is-finalizing .rv-layer--halo .card__house::after {
@@ -426,7 +435,7 @@
   text-shadow: 0 0 0 var(--fin-bloom);
   opacity: 0;
   mix-blend-mode: screen;
-  animation: rv-stamp-charge 235ms cubic-bezier(0.16, 1, 0.3, 1) 125ms both;
+  animation: rv-stamp-charge 235ms var(--rv-ease-snap) 210ms both;  /* BR-S141: delay 125 -> 210 (matches the label) */
   will-change: opacity, text-shadow;
 }
 @keyframes rv-stamp-charge {
@@ -466,13 +475,16 @@
   z-index: 7;
   pointer-events: none;
   opacity: 0;
+  /* BR-S141 SCAN COHERENCE: violet-cored via color-mix(--rv-halo) so the seal reads
+     as the SAME halo light, hardened/specular — rhyming with the violet meniscus
+     (SCAN #1), not a foreign casino-blue. White-biased core keeps it a bright pass. */
   background: linear-gradient(115deg,
     transparent 38%,
-    rgba(150,185,255,0.06) 43%,
-    rgba(230,240,255,0.26) 47%,
-    rgba(255,255,255,0.48) 50%,
-    rgba(180,210,255,0.18) 54%,
-    rgba(150,185,255,0.05) 58%,
+    color-mix(in srgb, var(--rv-halo) 22%, transparent) 43%,
+    color-mix(in srgb, #fff 60%, var(--rv-halo)) 47%,
+    color-mix(in srgb, #fff 90%, var(--rv-halo)) 50%,
+    color-mix(in srgb, #fff 60%, var(--rv-halo)) 54%,
+    color-mix(in srgb, var(--rv-halo) 18%, transparent) 58%,
     transparent 63%);
   mix-blend-mode: screen;
   transform: translate3d(-46%, -46%, 0);
@@ -490,16 +502,16 @@
   margin: -7px 0 0 -7px;
   border-radius: 50%;
   background: radial-gradient(circle,
-    rgba(225,238,255,0.95) 0%,
-    var(--fin-core) 38%,
-    transparent 72%);
+    rgba(235,232,255,0.95) 0%,
+    color-mix(in srgb, #fff 55%, var(--rv-halo)) 40%,
+    transparent 72%);   /* BR-S141: rhymes with the violet-cored seal */
   mix-blend-mode: screen;
   opacity: 0;
   transform: scale(0.2);
   transform-origin: 50% 50%;
 }
 .rv-cardframe.is-finalizing .rv-layer--halo .card__plate > .rv-seal.is-releasing::before {
-  animation: rv-seal-nucleus 90ms cubic-bezier(0.22,0.61,0.36,1) forwards;
+  animation: rv-seal-nucleus 90ms var(--rv-ease-seal) forwards;
 }
 @keyframes rv-seal-nucleus {
   0%   { opacity: 0;   transform: scale(0.18) scaleX(1); }
@@ -509,9 +521,12 @@
 
 /* ---- 340-820ms · HALO SEAL PASS · the single moving overlay ---- */
 .rv-cardframe.is-finalizing .rv-layer--halo .card__plate > .rv-seal.is-sealing {
+  /* BR-S141: 480 -> 560ms and BOTH sweep + fade on --rv-ease-seal (was sweep=curve /
+     fade=linear, a physics mismatch). The band now DECELERATES into the card — a
+     deliberate seal landing, not a flick. */
   animation:
-    rv-seal-sweep 480ms cubic-bezier(0.22,0.61,0.36,1) forwards,
-    rv-seal-fade  480ms linear forwards;
+    rv-seal-sweep 560ms var(--rv-ease-seal) forwards,
+    rv-seal-fade  560ms var(--rv-ease-seal) forwards;
 }
 @keyframes rv-seal-sweep {
   0%   { transform: translate3d(-46%, -46%, 0); }
@@ -519,9 +534,9 @@
 }
 @keyframes rv-seal-fade {
   0%   { opacity: 0; }
-  18%  { opacity: 1; }
-  70%  { opacity: 1; }
-  100% { opacity: 0; }
+  20%  { opacity: 1; }   /* band fully laid down as it crosses */
+  76%  { opacity: 1; }   /* HELD through the deceleration — the deliberate coat */
+  100% { opacity: 0; }   /* thins only on the final settle */
 }
 
 /* =====================================================================
@@ -532,33 +547,34 @@
    ===================================================================== */
 
 /* 1 · CORNER TRIMS — sharp metallic glint (RESTRAINED +13% per spec, ~110ms) */
-@keyframes rv-catch-metal {
-  0%   { filter: brightness(1)    drop-shadow(0 0 0 transparent); }
-  40%  { filter: brightness(1.13) drop-shadow(0 0 1px rgba(225,235,255,0.40)); }
-  100% { filter: brightness(1)    drop-shadow(0 0 0 transparent); }
+@keyframes rv-catch-metal {       /* BR-S141: drop-shadow stripped, +1% to compensate */
+  0%   { filter: brightness(1); }
+  40%  { filter: brightness(1.14); }
+  100% { filter: brightness(1); }
 }
 .rv-cardframe.is-finalizing .rv-layer--halo .corner {
-  animation: rv-catch-metal 110ms var(--rv-ease) both;
-  will-change: filter;
+  animation: rv-catch-metal 110ms var(--rv-ease-snap) both;
+  /* will-change JS-managed (rvCatchPromote) only during the window */
 }
-.rv-cardframe.is-finalizing .rv-layer--halo .corner--tl { animation-delay: 360ms; }
-.rv-cardframe.is-finalizing .rv-layer--halo .corner--tr { animation-delay: 430ms; }
-.rv-cardframe.is-finalizing .rv-layer--halo .corner--bl { animation-delay: 520ms; }
-.rv-cardframe.is-finalizing .rv-layer--halo .corner--br { animation-delay: 700ms; }
+/* BR-S141 CASCADE: re-keyed to the seal band (opens FIN+460, spans ~FIN+460..1020),
+   so each zone glints as the band crosses it TL -> BR — a wipe-lit cascade, not the
+   old FIN+360-760 simultaneous swarm. */
+.rv-cardframe.is-finalizing .rv-layer--halo .corner--tl { animation-delay: 500ms; }
+.rv-cardframe.is-finalizing .rv-layer--halo .corner--tr { animation-delay: 620ms; }
+.rv-cardframe.is-finalizing .rv-layer--halo .corner--bl { animation-delay: 820ms; }
+.rv-cardframe.is-finalizing .rv-layer--halo .corner--br { animation-delay: 940ms; }
 
 /* 2 · TITLE FOIL — bright catch (+8-10%, ~120ms) */
-@keyframes rv-catch-foil {
-  0%   { filter: brightness(1)    drop-shadow(0 0 0 transparent); }
-  45%  { filter: brightness(1.10) drop-shadow(0 0 5px rgba(225,235,255,0.30)); }
-  100% { filter: brightness(1)    drop-shadow(0 0 0 transparent); }
+@keyframes rv-catch-foil {        /* BR-S141: drop-shadow stripped */
+  0%   { filter: brightness(1); }
+  45%  { filter: brightness(1.11); }
+  100% { filter: brightness(1); }
 }
 .rv-cardframe.is-finalizing .rv-layer--halo .titleblock__title {
-  animation: rv-catch-foil 120ms var(--rv-ease) 430ms both;
-  will-change: filter;
+  animation: rv-catch-foil 120ms var(--rv-ease-snap) 540ms both;
 }
 .rv-cardframe.is-finalizing .rv-layer--halo .titleblock__archetype {
-  animation: rv-catch-foil 120ms var(--rv-ease) 470ms both;
-  will-change: filter;
+  animation: rv-catch-foil 120ms var(--rv-ease-snap) 580ms both;
 }
 
 /* 3 · PHOTO LAMINATE — broad soft gloss (+5% bright / +3% sat, ~180ms) */
@@ -568,8 +584,8 @@
   100% { filter: brightness(1)    saturate(1); }
 }
 .rv-cardframe.is-finalizing .rv-layer--halo .photo {
-  animation: rv-catch-laminate 180ms var(--rv-ease-soft) 500ms both;
-  will-change: filter;
+  /* BR-S141: easing outlier --rv-ease-soft -> --rv-ease (the catch family); delay 500 -> 640 (cascade) */
+  animation: rv-catch-laminate 180ms var(--rv-ease) 640ms both;
 }
 
 /* 4 · PIP GRID — tiny per-pip catch (+6%, ~80ms), staggered by column along the
@@ -581,8 +597,10 @@
 }
 .rv-cardframe.is-finalizing .rv-layer--halo .fr__pip.is-on:not(.is-final-pip) {
   animation: rv-catch-pip 80ms var(--rv-ease) both;
-  animation-delay: calc(560ms + var(--c, 0) * 26ms + var(--r, 0) * 8ms);
-  will-change: filter;
+  /* BR-S141 PRIME LAG CUT: base 560->720, stride 26/8 -> 40/10. The 19 pips now span
+     ~720-990ms (~190ms) not ~128ms; at 80ms each, peak overlap caps at ~2-3 (was ~13).
+     will-change dropped (JS-managed). */
+  animation-delay: calc(720ms + var(--c, 0) * 40ms + var(--r, 0) * 10ms);
 }
 
 /* 5 · BARCODE — MATTE. +2.5% brightness ONLY, linear, NO specular, NO drop-shadow.
@@ -593,19 +611,18 @@
   100% { filter: brightness(1); }
 }
 .rv-cardframe.is-finalizing .rv-layer--halo .barcode {
-  animation: rv-catch-matte 90ms linear 700ms both;
+  animation: rv-catch-matte 90ms linear 880ms both;   /* BR-S141: cascade delay 700 -> 880 (matte, linear kept) */
 }
 
 /* 6 · EDITION PLATE — final metallic close (+10%, tiny hold, ~200ms) — last note */
-@keyframes rv-catch-plate {
-  0%   { filter: brightness(1)    drop-shadow(0 0 0 transparent); }
-  40%  { filter: brightness(1.10) drop-shadow(0 0 4px rgba(225,235,255,0.34)); }
-  62%  { filter: brightness(1.08) drop-shadow(0 0 4px rgba(225,235,255,0.30)); }
-  100% { filter: brightness(1)    drop-shadow(0 0 0 transparent); }
+@keyframes rv-catch-plate {       /* BR-S141: drop-shadow stripped */
+  0%   { filter: brightness(1); }
+  40%  { filter: brightness(1.11); }
+  62%  { filter: brightness(1.09); }
+  100% { filter: brightness(1); }
 }
 .rv-cardframe.is-finalizing .rv-layer--halo .mintstrip__state {
-  animation: rv-catch-plate 200ms var(--rv-ease) 760ms both;
-  will-change: filter;
+  animation: rv-catch-plate 200ms var(--rv-ease) 1000ms both;   /* BR-S141: cascade delay 760 -> 1000 (band exits BR; the final close note, ends FIN+1200) */
 }
 
 /* ---- FINAL SETTLED STATE (900ms+) — subtly richer, sealed, NOT neon ----
@@ -628,8 +645,8 @@
   animation: none; opacity: 0;
 }
 .rv-cardframe.is-finalizing.is-fin-repeat .rv-layer--halo .card__plate > .rv-seal.is-sealing {
-  animation: rv-seal-sweep 200ms cubic-bezier(0.22,0.61,0.36,1) forwards,
-             rv-seal-fade  200ms linear forwards;
+  animation: rv-seal-sweep 200ms var(--rv-ease-seal) forwards,
+             rv-seal-fade  200ms var(--rv-ease-seal) forwards;   /* BR-S141: named curve, unified (was curve/linear) */
 }
 .rv-cardframe.is-finalizing.is-fin-repeat .rv-layer--halo .corner,
 .rv-cardframe.is-finalizing.is-fin-repeat .rv-layer--halo .titleblock__title,
