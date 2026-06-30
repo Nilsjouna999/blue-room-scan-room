@@ -3161,6 +3161,7 @@ body[data-view="room"] .dev { display: none; }
   gap: clamp(16px, 2vw, 44px);
   align-items: start;
   padding: 6px 0 0;
+  position: relative;   /* anchors the bottom-right sealed-registry credit */
 }
 
 /* col 1 — the saved-mint COLLECTION: a quiet vertical list (example-light, no scroll) */
@@ -3203,7 +3204,8 @@ body[data-view="room"] .dev { display: none; }
 .vault__cardwrap .card { box-shadow: 0 14px 34px rgba(0, 0, 0, 0.4), 0 4px 12px rgba(0, 0, 0, 0.32); animation: none; }
 .vault__cardfoot { display: flex; flex-direction: column; align-items: center; gap: 3px; }
 .vault__cardcap { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--t-body); }
-.vault__cardprov { font-family: var(--font-mono); font-size: 8.5px; letter-spacing: 0.13em; text-transform: uppercase; color: var(--t-ghost); text-align: center; }
+.vault__cardprov { display: inline-flex; align-items: center; gap: 6px; font-family: var(--font-mono); font-size: 8.5px; letter-spacing: 0.13em; text-transform: uppercase; color: var(--t-meta); }
+.vault__cardprov .vlock { color: var(--v-copper); flex: none; }
 
 /* col 3 — QR access + open reading */
 .vault__access { display: flex; flex-direction: column; gap: 22px; padding-top: 12px; align-items: center; }
@@ -3245,12 +3247,23 @@ body[data-view="room"] .dev { display: none; }
 }
 .vabout__seal { position: absolute; right: 13px; bottom: 11px; color: var(--v-copper-dim); font-style: normal; font-size: 12px; }
 
+/* sealed-registry credit — wax seal + private-record line, pinned bottom-right in
+   the empty space below the About column → adds NO layout height (one-screen safe) */
+.vault__credit { position: absolute; right: 0; bottom: 2px; display: flex; align-items: flex-end; gap: 13px; opacity: 0.92; pointer-events: none; }
+.vcredit__txt { display: flex; flex-direction: column; gap: 2px; text-align: right; }
+.vcredit__l1 { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--t-meta); }
+.vcredit__l2 { font-family: var(--font-display); font-style: italic; font-size: 12px; color: var(--t-body); }
+.vcredit__l3 { font-family: var(--font-mono); font-size: 8px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--t-ghost); }
+.vcredit__seal { line-height: 0; }
+.vseal { display: block; }
+
 /* desktop-first safety: below the 4-col threshold, fold the About column to a full
    width row under the card; the collection stays a left vertical list. Not mobile. */
 @media (max-width: 1180px) {
   .vault__main { grid-template-columns: minmax(176px, 214px) minmax(280px, 1fr) minmax(196px, 256px); }
   .vault__about { grid-column: 1 / -1; padding-top: 6px; border-top: 1px solid var(--line-faint); }
   .vault__about .vabout__rows { display: grid; grid-template-columns: 1fr 1fr; gap: 0 26px; }
+  .vault__credit { display: none; }   /* avoid overlap when the grid reflows */
 }
 
 .dev { min-height: 100vh; display: flex; align-items: flex-start; justify-content: center; padding: 30px 22px 44px; }

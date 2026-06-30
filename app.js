@@ -1768,7 +1768,19 @@ const VAULT_MINTS = [
 /* small hand-drawn marks reused across the Vault (scribble-archive language) */
 const VAULT_WAVE = '<svg viewBox="0 0 170 8" width="170" height="8" preserveAspectRatio="none" aria-hidden="true"><path d="M2 5 Q 12 1 22 5 T 42 5 T 62 5 T 82 5 T 102 5 T 122 5 T 142 5 T 168 5" fill="none" stroke="currentColor" stroke-width="1"/></svg>';
 const VAULT_WAVE_SM = '<svg viewBox="0 0 90 7" width="90" height="7" preserveAspectRatio="none" aria-hidden="true"><path d="M2 4 Q 9 1 16 4 T 30 4 T 44 4 T 58 4 T 72 4 T 88 4" fill="none" stroke="currentColor" stroke-width="1"/></svg>';
-const VAULT_HEX ='<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true"><path d="M12 2.5 L20 7 L20 17 L12 21.5 L4 17 L4 7 Z"/><circle cx="12" cy="11" r="2.1"/><path d="M12 13.1 L12 16.4"/></svg>';
+const VAULT_HEX = '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true"><path d="M12 2.5 L20 7 L20 17 L12 21.5 L4 17 L4 7 Z"/><circle cx="12" cy="11" r="2.1"/><path d="M12 13.1 L12 16.4"/></svg>';
+/* the sealed-registry marks (BR-S146): a wax-seal authentication emblem + a small
+   lock glyph. Decorative — fixed Blue Room palette (var() doesn't resolve in SVG
+   presentation attributes; the lock uses currentColor so CSS can tint it). */
+const VAULT_SEAL = '<svg class="vseal" viewBox="0 0 120 120" width="74" height="74" aria-hidden="true">'
+  + '<circle cx="60" cy="60" r="55" fill="none" stroke="#8a6f44" stroke-width="5" stroke-dasharray="1.5 6.2" opacity="0.8"/>'
+  + '<circle cx="60" cy="60" r="45" fill="none" stroke="#b08a52" stroke-width="1"/>'
+  + '<circle cx="60" cy="60" r="37" fill="none" stroke="#8a6f44" stroke-width="0.9" opacity="0.7"/>'
+  + '<text x="60" y="43" text-anchor="middle" fill="#948f87" font-family="IBM Plex Mono, monospace" font-size="7" letter-spacing="2">ARCHIVE</text>'
+  + '<path d="M60 51 L70 61 L60 71 L50 61 Z" fill="none" stroke="#8b7bff" stroke-width="1.4"/>'
+  + '<text x="60" y="86" text-anchor="middle" fill="#b08a52" font-family="IBM Plex Mono, monospace" font-size="7" letter-spacing="2">SEALED</text>'
+  + '</svg>';
+const VAULT_LOCK = '<svg class="vlock" viewBox="0 0 14 14" width="9" height="11" fill="none" aria-hidden="true"><rect x="2" y="6" width="10" height="7" rx="1.3" stroke="currentColor" stroke-width="1.2"/><path d="M4 6 V4 a3 3 0 0 1 6 0 V6" stroke="currentColor" stroke-width="1.2"/></svg>';
 
 /* a deterministic, believable QR placeholder generated from the mint id (3 finder
    patterns + timing rows + id-seeded data modules). Not a functional code — a
@@ -1858,7 +1870,7 @@ function renderVault() {
           </div>
           <div class="vault__cardfoot">
             <span class="vault__cardcap" data-vault-cardcap>${esc(m.state)}</span>
-            <span class="vault__cardprov" data-vault-cardprov>Filed ${esc(m.filed)} · ${esc(m.sealLine)}</span>
+            <span class="vault__cardprov">${VAULT_LOCK}<span data-vault-provtext>Filed ${esc(m.filed.split(" · ")[0])} → Sealed → Recorded</span></span>
           </div>
         </div>
 
@@ -1887,6 +1899,15 @@ function renderVault() {
           <div class="vabout__rows">${aboutRows}</div>
           <p class="vabout__note">Each mint is a record.<br>Each record is yours.<span class="vabout__seal" aria-hidden="true">◈</span></p>
         </aside>
+
+        <div class="vault__credit" aria-hidden="true">
+          <div class="vcredit__txt">
+            <span class="vcredit__l1">Blue Room Archive</span>
+            <span class="vcredit__l2">A private record system</span>
+            <span class="vcredit__l3">Not for public release</span>
+          </div>
+          <span class="vcredit__seal">${VAULT_SEAL}</span>
+        </div>
       </div>
     </div>`;
 }
@@ -1897,7 +1918,7 @@ function wireVault() {
   let sel = 0;
   const $ = (s) => root.querySelector(s);
   const cardSlot = $("[data-vault-card]"), qrSlot = $("[data-vault-qr]"), qrId = $("[data-vault-qrid]"),
-    cardCap = $("[data-vault-cardcap]"), cardProv = $("[data-vault-cardprov]");
+    cardCap = $("[data-vault-cardcap]"), cardProv = $("[data-vault-provtext]");
 
   function selectMint(i) {
     if (i < 0 || i >= VAULT_MINTS.length || i === sel) return;
@@ -1905,7 +1926,7 @@ function wireVault() {
     const m = VAULT_MINTS[i];
     if (cardSlot) cardSlot.innerHTML = renderCard(m.src, "shiny");
     if (cardCap) cardCap.textContent = m.state;
-    if (cardProv) cardProv.textContent = `Filed ${m.filed} · ${m.sealLine}`;
+    if (cardProv) cardProv.textContent = `Filed ${m.filed.split(" · ")[0]} → Sealed → Recorded`;
     if (qrSlot) qrSlot.innerHTML = vaultQR(m.id);
     if (qrId) qrId.textContent = m.id;
     root.querySelectorAll("[data-vault-select]").forEach((b) => {
