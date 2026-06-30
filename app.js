@@ -1768,8 +1768,7 @@ const VAULT_MINTS = [
 /* small hand-drawn marks reused across the Vault (scribble-archive language) */
 const VAULT_WAVE = '<svg viewBox="0 0 170 8" width="170" height="8" preserveAspectRatio="none" aria-hidden="true"><path d="M2 5 Q 12 1 22 5 T 42 5 T 62 5 T 82 5 T 102 5 T 122 5 T 142 5 T 168 5" fill="none" stroke="currentColor" stroke-width="1"/></svg>';
 const VAULT_WAVE_SM = '<svg viewBox="0 0 90 7" width="90" height="7" preserveAspectRatio="none" aria-hidden="true"><path d="M2 4 Q 9 1 16 4 T 30 4 T 44 4 T 58 4 T 72 4 T 88 4" fill="none" stroke="currentColor" stroke-width="1"/></svg>';
-const VAULT_ARROW = '<svg class="vanno__arr" viewBox="0 0 60 24" width="54" height="22" fill="none" aria-hidden="true"><path d="M2 8 C 22 4, 40 14, 53 17" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><path d="M46 12 L55 17 L45 20" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-const VAULT_HEX = '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true"><path d="M12 2.5 L20 7 L20 17 L12 21.5 L4 17 L4 7 Z"/><circle cx="12" cy="11" r="2.1"/><path d="M12 13.1 L12 16.4"/></svg>';
+const VAULT_HEX ='<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true"><path d="M12 2.5 L20 7 L20 17 L12 21.5 L4 17 L4 7 Z"/><circle cx="12" cy="11" r="2.1"/><path d="M12 13.1 L12 16.4"/></svg>';
 
 /* a deterministic, believable QR placeholder generated from the mint id (3 finder
    patterns + timing rows + id-seeded data modules). Not a functional code — a
@@ -1818,14 +1817,19 @@ function renderVault() {
     `<div class="vrow"><span class="vrow__d" aria-hidden="true">◆</span><div class="vrow__txt"><span class="vrow__t">${t}</span><p class="vrow__c">${c}</p></div></div>`
   ).join('<span class="vrow__div" aria-hidden="true"></span>');
 
-  const tiles = VAULT_MINTS.map((mt, i) =>
-    `<button type="button" class="vmtile${i === 0 ? " is-selected" : ""}" data-vault-select="${i}" aria-pressed="${i === 0 ? "true" : "false"}">
-       <span class="vmtile__thumb">${imgOrPlaceholder(mt.thumb, "vmtile__img")}</span>
-       <span class="vmtile__title">${esc(mt.label)}</span>
-       <span class="vmtile__id">${esc(mt.id)}</span>
-       <span class="vmtile__d" aria-hidden="true">◆</span>
+  /* the saved-mint COLLECTION — a quiet vertical list on the left (3 saved + 1
+     placeholder). Example-light: a calm row each (thumb + title + id), not a
+     strong tile grid; the selected row carries a soft violet edge. */
+  const collection = VAULT_MINTS.map((mt, i) =>
+    `<button type="button" class="vcard${i === 0 ? " is-selected" : ""}" data-vault-select="${i}" aria-pressed="${i === 0 ? "true" : "false"}">
+       <span class="vcard__thumb">${imgOrPlaceholder(mt.thumb, "vcard__img")}</span>
+       <span class="vcard__meta"><span class="vcard__title">${esc(mt.label)}</span><span class="vcard__id">${esc(mt.id)}</span></span>
      </button>`
-  ).join("");
+  ).join("") +
+    `<div class="vcard vcard--empty" aria-hidden="true">
+       <span class="vcard__thumb vcard__thumb--empty">+</span>
+       <span class="vcard__meta"><span class="vcard__title">New mint</span><span class="vcard__id">appears here</span></span>
+     </div>`;
 
   return `
     <div class="vault" data-vault>
@@ -1835,24 +1839,15 @@ function renderVault() {
         <h1 class="vault__title">The Vault</h1>
         <span class="vault__wave" aria-hidden="true">${VAULT_WAVE}</span>
         <p class="vault__intro">Saved minted cards are filed here.<br>Revisit favorite moments or images, reopen their readings, or access each mint by QR code.</p>
+        <span class="vault__example" aria-hidden="true">an example preview — not the final Vault</span>
       </header>
 
       <div class="vault__main">
-        <div class="vault__left">
-          <div class="vanno-stack" aria-hidden="true">
-            <span class="vanno">saved${VAULT_ARROW}</span>
-            <span class="vanno">reading attached${VAULT_ARROW}</span>
-            <span class="vanno">filed / sealed / recorded${VAULT_ARROW}</span>
-          </div>
-          <div class="vmeta">
-            <div class="vmeta__row"><span class="vmeta__k">Current Mint</span><span class="vmeta__v" data-vault-metaid>${esc(m.id)}</span></div>
-            <span class="vmeta__hr" aria-hidden="true"></span>
-            <div class="vmeta__row"><span class="vmeta__k">Filed</span><span class="vmeta__v" data-vault-metafiled>${esc(m.filed)}</span></div>
-            <span class="vmeta__hr" aria-hidden="true"></span>
-            <span class="vmeta__seal" data-vault-metaseal>${esc(m.sealLine)}</span>
-          </div>
-          <span class="vfoot-stamp" aria-hidden="true">BR · Archive — Vol. 01</span>
-        </div>
+        <aside class="vault__collection">
+          <span class="vcoll__label">Favorite Moments</span>
+          <span class="vcoll__wave" aria-hidden="true">${VAULT_WAVE_SM}</span>
+          <div class="vcoll__list">${collection}</div>
+        </aside>
 
         <div class="vault__center">
           <div class="vault__frame">
@@ -1861,7 +1856,10 @@ function renderVault() {
             <span class="vguide vguide--r" aria-hidden="true"></span>
             <div class="vault__cardwrap" data-vault-card>${renderCard(m.src, "shiny")}</div>
           </div>
-          <span class="vault__cardcap" data-vault-cardcap>${esc(m.state)}</span>
+          <div class="vault__cardfoot">
+            <span class="vault__cardcap" data-vault-cardcap>${esc(m.state)}</span>
+            <span class="vault__cardprov" data-vault-cardprov>Filed ${esc(m.filed)} · ${esc(m.sealLine)}</span>
+          </div>
         </div>
 
         <div class="vault__access">
@@ -1890,23 +1888,6 @@ function renderVault() {
           <p class="vabout__note">Each mint is a record.<br>Each record is yours.<span class="vabout__seal" aria-hidden="true">◈</span></p>
         </aside>
       </div>
-
-      <div class="vault__moments">
-        <span class="vmoments__label">Favorite Moments</span>
-        <div class="vmoments__rail">
-          <button type="button" class="vmchev" data-vault-scroll="-1" aria-label="Scroll left">‹</button>
-          <div class="vmoments__track" data-vault-track>
-            ${tiles}
-            <div class="vmtile vmtile--empty" aria-hidden="true">
-              <span class="vmtile__plus">+</span>
-              <span class="vmtile__title">New mint</span>
-              <span class="vmtile__id">appears here</span>
-            </div>
-          </div>
-          <button type="button" class="vmchev" data-vault-scroll="1" aria-label="Scroll right">›</button>
-        </div>
-        <span class="vmoments__hint">scroll the vault</span>
-      </div>
     </div>`;
 }
 
@@ -1915,21 +1896,18 @@ function wireVault() {
   if (!root) return;
   let sel = 0;
   const $ = (s) => root.querySelector(s);
-  const cardSlot = $("[data-vault-card]"), metaId = $("[data-vault-metaid]"),
-    metaFiled = $("[data-vault-metafiled]"), metaSeal = $("[data-vault-metaseal]"),
-    qrSlot = $("[data-vault-qr]"), qrId = $("[data-vault-qrid]"), cardCap = $("[data-vault-cardcap]");
+  const cardSlot = $("[data-vault-card]"), qrSlot = $("[data-vault-qr]"), qrId = $("[data-vault-qrid]"),
+    cardCap = $("[data-vault-cardcap]"), cardProv = $("[data-vault-cardprov]");
 
   function selectMint(i) {
     if (i < 0 || i >= VAULT_MINTS.length || i === sel) return;
     sel = i;
     const m = VAULT_MINTS[i];
     if (cardSlot) cardSlot.innerHTML = renderCard(m.src, "shiny");
-    if (metaId) metaId.textContent = m.id;
-    if (metaFiled) metaFiled.textContent = m.filed;
-    if (metaSeal) metaSeal.textContent = m.sealLine;
+    if (cardCap) cardCap.textContent = m.state;
+    if (cardProv) cardProv.textContent = `Filed ${m.filed} · ${m.sealLine}`;
     if (qrSlot) qrSlot.innerHTML = vaultQR(m.id);
     if (qrId) qrId.textContent = m.id;
-    if (cardCap) cardCap.textContent = m.state;
     root.querySelectorAll("[data-vault-select]").forEach((b) => {
       const on = Number(b.dataset.vaultSelect) === i;
       b.classList.toggle("is-selected", on);
@@ -1940,8 +1918,6 @@ function wireVault() {
   root.addEventListener("click", (e) => {
     const tile = e.target.closest("[data-vault-select]");
     if (tile) { selectMint(Number(tile.dataset.vaultSelect)); return; }
-    const scroll = e.target.closest("[data-vault-scroll]");
-    if (scroll) { const tr = $("[data-vault-track]"); if (tr) tr.scrollBy({ left: Number(scroll.dataset.vaultScroll) * 232, behavior: "smooth" }); return; }
     if (e.target.closest("[data-vault-openreading]")) {
       /* Reopen the selected mint's Stats & Readings. TODO: a per-mint reading
          store. For now route to the canonical developed reading reveal (the real

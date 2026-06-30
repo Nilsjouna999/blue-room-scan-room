@@ -3137,52 +3137,58 @@ body[data-view="room"] .dev { display: none; }
 }
 .vault__back:hover { color: var(--t-display); }
 .vault__eyebrow {
-  display: block; font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.34em;
+  display: inline-flex; align-items: center; justify-content: center; gap: 13px;
+  font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.34em;
   text-transform: uppercase; color: var(--t-meta);
 }
+.vault__eyebrow::before, .vault__eyebrow::after { content: ""; width: 30px; height: 1px; background: var(--v-copper-dim); opacity: 0.6; }
 .vault__title {
-  font-family: var(--font-display); font-weight: 500; font-size: clamp(38px, 5vw, 54px);
-  letter-spacing: 0.01em; color: var(--t-display); line-height: 1.05; margin: 3px 0 0;
+  font-family: var(--font-display); font-weight: 500; font-size: clamp(38px, 5vw, 52px);
+  letter-spacing: 0.015em; color: var(--t-display); line-height: 1.04; margin: 5px 0 0;
 }
-.vault__wave { display: inline-block; color: var(--v-copper-dim); margin: 7px 0 9px; }
-.vault__wave svg, .vabout__wave svg { display: block; }
+.vault__wave { display: inline-block; color: var(--v-copper-dim); margin: 8px 0 11px; }
+.vault__wave svg, .vabout__wave svg, .vcoll__wave svg { display: block; }
 .vault__intro {
-  font-family: var(--font-display); font-size: clamp(13.5px, 1.5vw, 15.5px); line-height: 1.6;
-  color: var(--t-body); max-width: 540px; margin: 0 auto;
+  font-family: var(--font-display); font-size: clamp(13px, 1.4vw, 15px); line-height: 1.6;
+  color: var(--t-body); max-width: 520px; margin: 0 auto;
 }
+.vault__example { display: inline-block; margin-top: 9px; font-family: var(--font-display); font-style: italic; font-size: 11.5px; letter-spacing: 0.03em; color: var(--t-ghost); }
 
-/* ---- main 4-column composition ---- */
+/* ---- main composition: collection (left, vertical) · card · access · about ---- */
 .vault__main {
   display: grid;
-  grid-template-columns: minmax(168px, 220px) minmax(300px, 1fr) minmax(206px, 264px) minmax(238px, 312px);
-  gap: clamp(14px, 1.8vw, 38px);
+  grid-template-columns: minmax(184px, 234px) minmax(300px, 1fr) minmax(200px, 256px) minmax(236px, 300px);
+  gap: clamp(16px, 2vw, 44px);
   align-items: start;
   padding: 6px 0 0;
 }
 
-/* col 1 — annotations + metadata box */
-.vault__left { display: flex; flex-direction: column; gap: 24px; padding-top: 10px; }
-.vanno-stack { display: flex; flex-direction: column; gap: 20px; align-items: flex-end; text-align: right; }
-.vanno {
-  display: inline-flex; align-items: center; gap: 9px;
-  font-family: var(--font-display); font-style: italic; font-size: 14px; color: var(--t-meta);
+/* col 1 — the saved-mint COLLECTION: a quiet vertical list (example-light, no scroll) */
+.vault__collection { display: flex; flex-direction: column; gap: 9px; padding-top: 12px; }
+.vcoll__label { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.26em; text-transform: uppercase; color: var(--t-meta); }
+.vcoll__wave { color: var(--v-copper-dim); margin: -3px 0 3px; }
+.vcoll__list { display: flex; flex-direction: column; gap: 5px; }
+.vcard {
+  display: flex; align-items: center; gap: 11px; width: 100%; text-align: left; cursor: pointer;
+  background: none; border: 0; border-left: 2px solid transparent; border-radius: 5px;
+  padding: 7px 9px; transition: background 160ms ease, border-color 160ms ease;
 }
-.vanno__arr { color: var(--v-copper-dim); opacity: 0.75; flex: none; }
-.vmeta {
-  border: 1px solid var(--line); border-radius: var(--r-plate);
-  padding: 15px 16px 16px; display: flex; flex-direction: column; gap: 9px;
-  background: rgba(255, 255, 255, 0.012);
-}
-.vmeta__row { display: flex; flex-direction: column; gap: 3px; }
-.vmeta__k { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.24em; text-transform: uppercase; color: var(--t-meta); }
-.vmeta__v { font-family: var(--font-mono); font-size: 11.5px; letter-spacing: 0.07em; color: var(--t-primary); }
-.vmeta__hr { height: 1px; background: var(--line-faint); }
-.vmeta__seal { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.24em; text-transform: uppercase; color: var(--v-copper); margin-top: 2px; }
-/* quiet foot anchor — fills the lower-left void without a new box (hairline only) */
-.vfoot-stamp { margin-top: auto; padding-top: 12px; border-top: 1px solid var(--line-faint); font-family: var(--font-mono); font-size: 8.5px; letter-spacing: 0.24em; text-transform: uppercase; color: var(--t-ghost); }
+.vcard:hover { background: rgba(255, 255, 255, 0.03); }
+.vcard.is-selected { background: rgba(139, 123, 255, 0.07); border-left-color: var(--v-violet); }
+.vcard__thumb { flex: none; width: 56px; aspect-ratio: 4 / 3; overflow: hidden; border-radius: 2px; border: 1px solid var(--line); background: var(--ink-850); position: relative; }
+.vcard__img { width: 100%; height: 100%; object-fit: cover; display: block; filter: saturate(0.92) contrast(0.98); }
+.vcard__meta { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.vcard__title { font-family: var(--font-display); font-size: 14px; line-height: 1.15; color: var(--t-primary); }
+.vcard.is-selected .vcard__title { color: var(--t-display); }
+.vcard__id { font-family: var(--font-mono); font-size: 8.5px; letter-spacing: 0.08em; color: var(--t-meta); }
+.vcard--empty { cursor: default; border-left-color: transparent; }
+.vcard--empty:hover { background: none; }
+.vcard__thumb--empty { display: flex; align-items: center; justify-content: center; border-style: dashed; color: var(--t-ghost); font-size: 15px; }
+.vcard--empty .vcard__title { color: var(--t-meta); }
+.vcard--empty .vcard__id { text-transform: lowercase; }
 
 /* col 2 — the selected card in a tight sketch crop-frame that HUGS the artifact */
-.vault__center { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+.vault__center { display: flex; flex-direction: column; align-items: center; gap: 11px; padding-top: 2px; }
 .vault__frame { position: relative; padding: 12px 22px; }
 .vcrop { position: absolute; width: 13px; height: 13px; pointer-events: none; }
 .vcrop--tl { top: 4px; left: 6px; border-top: 1px solid var(--v-copper-dim); border-left: 1px solid var(--v-copper-dim); }
@@ -3191,11 +3197,13 @@ body[data-view="room"] .dev { display: none; }
 .vcrop--br { bottom: 4px; right: 6px; border-bottom: 1px solid var(--v-copper-dim); border-right: 1px solid var(--v-copper-dim); }
 .vguide { position: absolute; top: 3px; bottom: 3px; width: 1px; background: repeating-linear-gradient(180deg, var(--line) 0 4px, transparent 4px 9px); pointer-events: none; }
 .vguide--l { left: 15px; } .vguide--r { right: 15px; }
-.vault__cardwrap { --card-w: 430px; width: 430px; zoom: 0.74; }
+.vault__cardwrap { --card-w: 430px; width: 430px; zoom: 0.72; }
 /* flatten the trophy: kill the entrance pop + soften the heavy lift shadow so the
    card reads as a filed record, not a floating physical object. */
-.vault__cardwrap .card { box-shadow: 0 16px 38px rgba(0, 0, 0, 0.42), 0 4px 12px rgba(0, 0, 0, 0.34); animation: none; }
+.vault__cardwrap .card { box-shadow: 0 14px 34px rgba(0, 0, 0, 0.4), 0 4px 12px rgba(0, 0, 0, 0.32); animation: none; }
+.vault__cardfoot { display: flex; flex-direction: column; align-items: center; gap: 3px; }
 .vault__cardcap { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--t-body); }
+.vault__cardprov { font-family: var(--font-mono); font-size: 8.5px; letter-spacing: 0.13em; text-transform: uppercase; color: var(--t-ghost); text-align: center; }
 
 /* col 3 — QR access + open reading */
 .vault__access { display: flex; flex-direction: column; gap: 22px; padding-top: 12px; align-items: center; }
@@ -3237,49 +3245,10 @@ body[data-view="room"] .dev { display: none; }
 }
 .vabout__seal { position: absolute; right: 13px; bottom: 11px; color: var(--v-copper-dim); font-style: normal; font-size: 12px; }
 
-/* ---- favorite moments rail ---- */
-.vault__moments {
-  margin-top: clamp(14px, 2vh, 26px); padding-top: 18px;
-  border-top: 1px solid var(--line-faint);
-  display: flex; flex-direction: column; align-items: center; gap: 14px;
-}
-.vmoments__label { align-self: flex-start; margin-left: clamp(8px, 6%, 96px); font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.28em; text-transform: uppercase; color: var(--t-meta); }
-.vmoments__rail { display: flex; align-items: center; gap: 14px; width: 100%; justify-content: center; }
-.vmoments__track {
-  display: flex; align-items: stretch; gap: 16px; overflow-x: auto; padding: 6px 2px 10px;
-  max-width: 1000px; scroll-snap-type: x proximity;
-  scrollbar-width: thin; scrollbar-color: var(--ink-700) transparent;
-}
-.vmchev { flex: none; font-size: 22px; line-height: 1; color: var(--t-ghost); background: none; border: none; cursor: pointer; padding: 8px 10px; transition: color 160ms ease; }
-.vmchev:hover { color: var(--t-primary); }
-.vmtile {
-  flex: 0 0 auto; width: 196px; display: flex; flex-direction: column; gap: 8px;
-  padding: 12px; cursor: pointer; text-align: center; scroll-snap-align: start;
-  border: 1px solid var(--line); border-radius: var(--r-plate); background: rgba(255, 255, 255, 0.012);
-  transition: border-color 160ms ease, background 160ms ease, transform 160ms ease, box-shadow 160ms ease;
-}
-.vmtile:hover { border-color: var(--line-strong); transform: translateY(-2px); }
-.vmtile.is-selected {
-  border-color: color-mix(in srgb, var(--v-violet) 70%, var(--line));
-  box-shadow: 0 0 0 1px color-mix(in srgb, var(--v-violet) 40%, transparent);
-  background: rgba(139, 123, 255, 0.05);
-}
-.vmtile__thumb { position: relative; width: 100%; aspect-ratio: 4 / 3; overflow: hidden; border-radius: 2px; background: var(--ink-850); }
-.vmtile__img { width: 100%; height: 100%; object-fit: cover; display: block; filter: saturate(0.94) contrast(0.98); }
-.vmtile__title { font-family: var(--font-display); font-size: 15px; color: var(--t-display); }
-.vmtile__id { font-family: var(--font-mono); font-size: 8.5px; letter-spacing: 0.1em; color: var(--t-meta); }
-.vmtile__d { color: var(--v-violet); font-size: 8px; line-height: 1; }
-.vmtile--empty { justify-content: center; align-items: center; gap: 5px; border-style: dashed; border-color: var(--line); cursor: default; color: var(--t-ghost); }
-.vmtile--empty:hover { transform: none; border-color: var(--line); }
-.vmtile__plus { font-size: 20px; color: var(--t-ghost); line-height: 1; }
-.vmtile--empty .vmtile__title { color: var(--t-meta); font-size: 13px; }
-.vmtile--empty .vmtile__id { text-transform: lowercase; }
-.vmoments__hint { font-family: var(--font-display); font-style: italic; font-size: 12.5px; color: var(--t-meta); }
-
-/* desktop-first safety: below the 4-col threshold, fold the about column under
-   the card and let the rail wrap — keeps the page usable, not a mobile redesign. */
+/* desktop-first safety: below the 4-col threshold, fold the About column to a full
+   width row under the card; the collection stays a left vertical list. Not mobile. */
 @media (max-width: 1180px) {
-  .vault__main { grid-template-columns: minmax(150px, 200px) minmax(280px, 1fr) minmax(200px, 260px); }
+  .vault__main { grid-template-columns: minmax(176px, 214px) minmax(280px, 1fr) minmax(196px, 256px); }
   .vault__about { grid-column: 1 / -1; padding-top: 6px; border-top: 1px solid var(--line-faint); }
   .vault__about .vabout__rows { display: grid; grid-template-columns: 1fr 1fr; gap: 0 26px; }
 }
