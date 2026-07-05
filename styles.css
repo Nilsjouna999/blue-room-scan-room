@@ -2661,6 +2661,36 @@ body[data-treatment="shiny"] .dhidden__val { color: var(--halo-a, var(--t-displa
 .dmint__return-name { font-size: 12px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--silver-dim); }
 .dmint__return-desc { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.05em; color: var(--t-meta); line-height: 1.5; }
 
+/* =============================================================
+   03 — Aura plate (BR-S149): the thin relation capstone. A residue
+   MARK (tension/seam/smear on the near-black field) + the classLine
+   + ONE reused metTier band + the verdict line. NO map, NO 2nd band,
+   NO 0-100. Tint derives from the live --halo-a cascade. (docs/aura_info)
+============================================================= */
+.dplate--aura .daura {
+  --daura-tint: color-mix(in srgb, var(--halo-a) 55%, var(--silver));
+  --daura-tint-cold: color-mix(in srgb, var(--halo-b, var(--violet)) 40%, var(--silver-dim));
+  display: grid;
+  gap: 13px;
+}
+.daura__mark-wrap {
+  background: var(--ink-950);
+  border: 1px solid var(--line-faint);
+  border-radius: var(--r-plate);
+  padding: 14px 18px;
+}
+.daura__mark { display: block; width: 100%; height: auto; max-height: 104px; }
+.daura__anchor { fill: var(--line-strong); }
+.daura__filament, .daura__seam-line { stroke: var(--daura-tint); stroke-width: 2; fill: none; stroke-linecap: round; }
+.daura__rim { stroke: var(--daura-tint-cold); stroke-width: 1; fill: none; stroke-linecap: round; }
+.daura__bleed { fill: var(--daura-tint); opacity: 0.1; }
+.daura__read { display: grid; gap: 8px; }
+.daura__read .met-tier { margin: 1px 0; }
+.daura__class { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.24em; text-transform: uppercase; color: var(--t-meta); }
+.daura__line { font-family: var(--font-display); font-size: 15.5px; line-height: 1.5; color: var(--silver-bright); margin: 0; }
+.daura__free { font-family: var(--font-display); font-size: 14.5px; line-height: 1.5; color: var(--t-body); margin: 0 0 4px; }
+.daura--null .daura__line { color: var(--t-body); }
+
 /* 07 — oracle */
 .dplate--oracle { text-align: center; }
 .doracle {
@@ -3600,6 +3630,7 @@ body[data-view="room"] .dev { display: none; }
   body[data-treatment="shiny"] .panel--reading > .module { transition: none !important; }
   /* dossier shutter (Technique Pass #2) fully shown at rest — never hide content */
   .dossier__inner .dplate { animation: none !important; clip-path: none !important; opacity: 1 !important; }
+  .daura__mark, .daura__mark * { animation: none !important; transition: none !important; }
 }
 
 /* =============================================================

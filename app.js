@@ -967,6 +967,65 @@ function mountSurfaceRecords() {
   }
 }
 
+/* ---- 03 · AURA — the thin relation capstone (BR-S149, Session B) --------------
+   Ranks + names the RELATION the frame stages between its two co-present elements
+   (the one channel every single-element instrument misses; the ordinal for the
+   tension `stance` already narrates). Renders ONLY: one residue MARK + the authored
+   classLine (never the backstage KIND enum) + ONE metTier band (from auraField.tier,
+   hand-set, never code-derived) + one verdict line. Free = the two parts, unresolved.
+   Full spec: docs/aura_info/14_AURA_SPEC + 05_VISUAL_SYSTEM. */
+function auraMark(mode, node) {
+  const nx = (node && node.x) || 0, ny = (node && node.y) || 0;
+  const f = (n) => Math.round(n * 10) / 10;
+  if (mode === "seam") {
+    const sx = f(120 + nx * 82);
+    return `<g class="daura__g-seam" aria-hidden="true">`
+      + `<rect class="daura__bleed" x="${f(sx - 18)}" y="8" width="18" height="84"></rect>`
+      + `<line class="daura__seam-line" x1="${sx}" y1="8" x2="${sx}" y2="92"></line>`
+      + `<line class="daura__rim" x1="${f(sx + 3)}" y1="8" x2="${f(sx + 3)}" y2="92"></line></g>`;
+  }
+  if (mode === "smear") {
+    const rimX = f(150 + nx * 60), dy = f(ny * 20);
+    return `<g class="daura__g-smear" aria-hidden="true">`
+      + `<path class="daura__bleed" d="M22,${f(50 + dy)} C74,${f(34 + dy)} 150,${f(40 + dy)} 202,50 C150,${f(60 + dy)} 74,${f(66 + dy)} 22,${f(50 + dy)} Z"></path>`
+      + `<line class="daura__rim" x1="${rimX}" y1="18" x2="${rimX}" y2="82"></line></g>`;
+  }
+  // tension (default): two silent anchors + one biased filament (bias from field.node)
+  const cx = f(120 + nx * 70), cy = f(50 + ny * 82);
+  return `<g class="daura__g-tension" aria-hidden="true">`
+    + `<circle class="daura__anchor" cx="34" cy="50" r="2.4"></circle>`
+    + `<circle class="daura__anchor" cx="206" cy="50" r="2.4"></circle>`
+    + `<path class="daura__filament" d="M34,50 Q${cx},${cy} 206,50"></path></g>`;
+}
+
+function renderAuraBody(src, paid) {
+  const a = src.auraField;
+  if (!a) return `<p class="dstat__undeveloped">Aura read — reserved. Develops in a later pass.</p>`;
+  /* FREE: name the two co-present parts, resolve nothing — no mark, no band, no
+     classLine (the mark IS the reveal; free stays honestly whole, not a teased grade). */
+  if (!paid) {
+    return `<div class="daura daura--tease">`
+      + `<p class="daura__free">${esc(a.freeLine)}</p>`
+      + `<p class="dstat__undeveloped">The read between them develops with the mint.</p></div>`;
+  }
+  const mode = a.visual && a.visual.mode;
+  /* NULL relation (no second co-present term): no mark, Muted band, absence-shaped verdict. */
+  if (a.kind === null || !mode) {
+    return `<div class="daura daura--null">`
+      + metTier("Aura", a.tier || "Muted", src.halo.a)
+      + `<p class="daura__line">${esc(a.verdictLine)}</p></div>`;
+  }
+  const node = src.frame && src.frame.field && src.frame.field.node;
+  return `<div class="daura">`
+    + `<div class="daura__mark-wrap">`
+    + `<svg class="daura__mark daura__mark--${mode}" viewBox="0 0 240 100" role="img" aria-label="${esc(a.ariaSummary || a.verdictLine)}">`
+    + auraMark(mode, node) + `</svg></div>`
+    + `<div class="daura__read">`
+    + `<span class="daura__class">${esc(a.classLine)}</span>`
+    + metTier("Aura", a.tier, src.halo.a)
+    + `<p class="daura__line">${esc(a.verdictLine)}</p></div></div>`;
+}
+
 function renderDossier(src, treatment) {
   const paid = treatment !== "free";
   const d = src.dossier;
@@ -1014,11 +1073,10 @@ function renderDossier(src, treatment) {
   const archetype = dplate("02", "Archetype", paid, `
     <p class="dstat__undeveloped">Archetype read — reserved. Develops in a later pass.</p>`);
 
-  /* 03 — Aura (BR-S115: emptied to a reserved stub — the standalone right-panel
-     "Finish" module now carries the material/finish read; Aura is parked for a later
-     pass. Mirrors the Archetype stub.) */
-  const aura = dplate("03", "Aura", paid, `
-    <p class="dstat__undeveloped">Aura read — reserved. Develops in a later pass.</p>`);
+  /* 03 — Aura (BR-S149: built. The thin relation capstone — see renderAuraBody +
+     the auraField data. Free shows the two parts; develop names the relation
+     between them (a mode, not a grade). Finish still owns the material read.) */
+  const aura = dplate("03", "Aura", paid, renderAuraBody(src, paid), "dplate--aura");
 
   /* 06 — Mint Record */
   const mintBody = paid

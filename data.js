@@ -917,14 +917,19 @@ const SOURCES = [
       // Field's) or any material/palette read (Surface Record + Finish own that, BR-S115). Aura's lane here is the
       // illuminant-vs-surface CONJUNCTION only.
       kind: "Light-Fit",
-      classLine: "Borrowed Light",
+      classLine: "Applied Glare",
       tier: "Charged",
-      verdictLine: "Held face-out under the house tube, the shell wears a light it didn't bring.",   // CANDIDATE (replaces the VETOED "…never its own" — oracle pre-spend)
+      // CANDIDATE — SAFETY REWRITE (BR-S149 QA ws9a79a3y). The §8 candidate ("Borrowed Light" /
+      // "wears a light it didn't bring") rode the ORACLE's foreign-light payload ("lifted into
+      // light that was not designed for it") — a confirmed oracle-collision — and personified the
+      // shell (wears/didn't bring). Pivoted to the specular-OWNERSHIP facet (whose reflection this
+      // is) the oracle never touches; no personification. Human finalizes wording in Session C.
+      verdictLine: "Under the house tube, the specular catch is the tube's, not the shell's.",
       freeLine: "A held specimen and a hard house light, in one tank frame.",   // CANDIDATE
       visual: { mode: "seam", tint: "var(--halo-a)" },   // stressed frontier upper-left per the antennae (field.node ~{-0.08,0.14})
       safety: { imageActBasis: ["vertical cradle, specimen face-forward (performed presentation cue)", "fluorescent house-tube illuminant vs. shell surface"], noStableTraitClaim: true },
       provenance: { stanceRef: true, sourceRefs: ["stance", "aura[] Carapace/Fluorescent/Cyan-Tank (input ore)"] },
-      ariaSummary: "Aura reading: tier Charged, class Borrowed Light. The specimen is held face-out under a hard house tube, wearing a light its own surface never brought.",
+      ariaSummary: "Aura reading: tier Charged, class Applied Glare. Under the house tube the specular catch on the shell belongs to the tube, not to the shell's own surface.",
     },
     fit: "A live-tank seafood interior under fluorescent house light with a tropical mural surround — the container confirms the Encounter read.",
     impact: { value: 79, label: "Specular" },
