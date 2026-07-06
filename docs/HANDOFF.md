@@ -2,21 +2,19 @@
 
 For a fresh Claude Code session to resume with zero context loss. **You are the BUILDER** (you hold the repo and
 make the changes). The user pastes specs/designs from a separate planning chat. Grounded in the repo — **re-grep
-line numbers, they drift** (every session shifts them a lot). Last written: **2026-06-29**, code at HEAD
-`BR-S141` (the **Halo develop POLISH** — full 20-agent audit: de-lag/coordinate/de-clutter/pace the whole ritual;
-peak concurrent filters ~14→~3 — **local, NOT pushed until this turn's push**; BR-S140 and earlier pushed/live).
-**Menu add-on Tiers 1–7 + a builder polish arc (S135 pip column-ignite, S136 card-ledger reorder + modal-blur fix,
-S137 the seal-pass finalization, S138/S139 stat-order thrash, S140 stats settled, S141 the develop polish).** The
-full develop ritual = "five katana beats" (anticipation→forging→strike→seal→settle, ~4.8s): wipe+tonal+meniscus →
-pip column-ignite (drop-shadow stripped for perf) → final-pip impact → card lock → BLUE ROOM ARCHIVE blue stamp →
-violet-cored seal clear-coat → band-tracked material catches (will-change lifecycle-managed) → held settle. Gate
-3550ms unchanged; ritual on a separate `.is-finalizing` class, scoped to the reveal (live card byte-clean).
-**STATS SETTLED (S140):** the CARD's Frame Reading ledger = ORIGINAL (Frame Presence·Signal·Visual Impact·Scene
-Charge); the right-panel "Stats & Readings" free read STATS = SWITCHED (impact·signal·frame·presence). **The
-develop/ritual FEEL is pending the builder's LIVE judgment** (headless fast-forwards the ~4.8s). **OPEN/verify-
-live:** the seal nucleus anchor + the violet seal-recolor; whether the ~4.8s total + held settle feels right.
-**The current work is the develop/reveal ADD-ON — see the ★ ACTIVE LANE section below FIRST.** (The §2 card-front
-detail underneath it is prior-run context, still accurate.)
+line numbers, they drift** (every session shifts them a lot). Last written: **2026-07-06**, code at HEAD
+`BR-S149` (+ the empty deploy re-trigger `a9b0a72`). **HEAD = origin/main · push = deploy.**
+
+**This session shipped two arcs — read the ★ ACTIVE LANE below FIRST:**
+- **AURA (BR-S147→S149) — the current lane.** Dossier plate 03 (was an empty stub) now RENDERS a "thin relation
+  capstone": a residue mark + a class line + one `metTier` band + a verdict line. Built from a 25-agent synthesis of
+  the builder's GPT research + our own "Subtraction Gate" deep research, all captured in-repo at **`docs/aura_info/`**.
+  **Session C — a HUMAN authoring pass for the SRC-03/04/05 wording — is the remaining step.**
+- **THE VAULT (BR-S144→S146) + reveal fixes (BR-S142→S143).** A new dev-route page `?dev=vault` (saved-mint archive:
+  left-vertical collection · QR access · sealed-registry credit · one-screen), plus two reveal/tutorial fixes.
+
+**The develop/reveal ADD-ON (BR-S124→S141) is now SHIPPED — demoted to PRIOR LANE (reference) further below.** (The
+card-front + dossier detail in §2/PRIOR LANE is still accurate.)
 
 ---
 
@@ -42,15 +40,82 @@ before contradicting) · `docs/TASK_QUEUE.md` (newest-first shipped log + Ready 
 ---
 
 ## 2 · Where the build is NOW
-**HEAD = origin/main = `816973b` (BR-S131) · pushed, in sync.** **LIVE** at
-**https://nilsjouna999.github.io/blue-room-scan-room/** (GitHub Pages, `main`/root — **push = deploy**, ~30–80s;
-the 5 photos are PUBLIC by owner consent — don't re-gitignore). Plain HTML/CSS/JS, no build, **node NOT installed**.
-**Deploy can HANG occasionally** (once stuck ~10min, no incident) — watch `gh run list`; the fix is an empty
-re-trigger commit (`git commit --allow-empty` + push), which supersedes the hung run.
+**HEAD = origin/main = `a9b0a72` (BR-S149.1 — an empty deploy re-trigger; the real work is `2381473` BR-S149).**
+**LIVE** at **https://nilsjouna999.github.io/blue-room-scan-room/** (GitHub Pages, `main`/root — **push = deploy**,
+~30–80s; the 5 photos are PUBLIC by owner consent — don't re-gitignore). Plain HTML/CSS/JS, no build, **node NOT
+installed**. **Deploy can HANG *or FAIL* occasionally** (BR-S149's first run `28798228340` reported `conclusion:
+failure` — GitHub infra, not content) — watch `gh run list --json ...,conclusion`; the fix is an empty re-trigger
+commit (`git commit --allow-empty` + push), which supersedes the bad run. **After every push, VERIFY the code
+actually SERVES** (`curl` the live app.js/data.js for a fresh marker) — a green `git push` can sit behind a failed
+Pages deploy.
 
 ---
 
-## ★ ACTIVE LANE — the develop/reveal ADD-ON (BR-S124 → BR-S131) — **RESUME HERE**
+## ★ ACTIVE LANE — AURA (BR-S147→S149) + recent Vault/reveal — **RESUME HERE**
+
+### AURA — dossier plate 03, now LIVE (the current build)
+Aura reads the ONE thing no other instrument does: the **RELATION the frame stages between two co-present
+elements** (the tension / edge / mismatch / fit BETWEEN them). Every shipped instrument (Frame Reading pips ·
+Metrics Signature/Signal-Mix/Field/Event · Surface) reads a SINGLE element; `src.stance` already narrates the
+relation in prose, so Aura is the ONE **ordinal rank + kind-label** that turns that buried sentence into a scannable
+band. Proven by a 30-cell deletion matrix ("Subtraction Gate"), adversarially verified. It is a THIN capstone by
+mandate — one mark + one word + one band + one line; do NOT inflate it.
+
+**THE KNOWLEDGE BASE IS IN-REPO: `docs/aura_info/`** (15 core docs + appendix, from a 25-agent mission merging the
+builder's GPT research with the Subtraction Gate verdict). **A builder starts from `00_EXEC_BRIEF.md` + `14_AURA_SPEC.md`.**
+Verdict = GO. Person-safety stays **BR-S113 LOCKED** (doc 03's *relaxed* law was REJECTED; its mechanics survive);
+doc 04's "Field Map" is SUPERSEDED by residue visuals.
+
+**Shipped (BR-S148 data + BR-S149 render):**
+- `data.js` — an `auraField` per source: `{ kind` (BACKSTAGE enum Standoff/Edge/Figure-Ground/Light-Fit/Vector-into-Void/
+  null — **never rendered**) `· classLine` (the ONLY rendered title) `· tier` (Muted..Peak, **HAND-SET, never
+  computed**) `· verdictLine · freeLine · visual{mode:` tension/seam/smear/null `, tint} · safety · provenance{stanceRef}
+  · ariaSummary }`, plus a standalone `AURA_NULL_FIXTURE` (the falsifiability proof). **SRC-01/02 = FINAL + gate-passed;
+  SRC-03/04/05 = clear CANDIDATES** (human finalizes in Session C).
+- `app.js` — `renderAuraBody(src, paid)` + `auraMark(mode, node)` replace the stub via `dplate("03","Aura",paid,body,
+  "dplate--aura")`. Mark geometry derives from `src.frame.field.node` (never invented). Free = the two parts,
+  unresolved (no mark/band/class); develop = mark→classLine→`metTier` band→verdict; null = no mark, Muted band, absence verdict.
+- `styles.css` — `.daura__*` (residue SVG on `--ink-950`; tint `color-mix(--halo-a 55%, --silver)`; ONE reused
+  `metTier` band, **NOT** in `.met-bands`; no map/2nd-band/0-100) + a reduced-motion guard. Verified live @1600×900:
+  all 3 mark modes + free + null + all 5 tiers; console clean; Aura body shorter than Mint Record.
+
+**NEXT — Session C (HUMAN authoring):** finalize the SRC-03/04/05 verdict + class wording via `docs/aura_info/
+07_WRITERS_PLAYBOOK.md`; re-run `08_QA_CHECKLIST.md` per source; commit sign-offs to `docs/audits/`. **THE LIVE TRAP =
+ORACLE-COLLISION:** an aura line must NOT restate its source's `dossier.oracle`. SRC-05's own §8 "safe" candidate
+STILL collided (rode the oracle's foreign-light payload) — caught ONLY by the adversarial QA (`docs/audits/
+BR-S149_AURA_QA.md`) → rewritten to `Applied Glare` / "…the specular catch is the tube's, not the shell's." **Always
+read `dossier.oracle.full/.short` beside a drafted aura line.** There is **NO code backstop** for aura copy safety —
+the committed QA sheet is the enforcement record. **C-12 RATIFIED:** short cue-bound viewer-"you" clauses ("holds
+you at the glass") are LEGAL; `you are / your <trait>` stays dead; SRC-01 has a no-"you" fallback in its data.js comment.
+
+### THE VAULT — `?dev=vault` (BR-S144→S146, live)
+A DEV-ROUTE page (live room/menu untouched): a private archive of saved minted cards. `renderVault`/`wireVault`/
+`vaultQR` in app.js + scoped `.vault` CSS. Left = a vertical **Favorite Moments** collection (the real `renderCard`
+sized down); center = the selected mint in a crop-frame; right = **QR "Access Mint"** + **"What is the Vault?"**; a
+bottom-right wax-seal + "A private record system · not for public release" credit; fits ONE screen, no scroll. Local
+mock `VAULT_MINTS` (Checkpoint Wave = SOURCES[0]; Road Morning = source-02; Signal Locked = a stylized signal tile).
+**OPEN (spawned task):** only the ONE real example (Checkpoint Wave) should be clickable / carry a reading — Road
+Morning + Signal Locked become non-clickable VISUAL CUES. "Open Reading" currently routes to the developed reveal (TODO: per-mint).
+
+### Reveal/tutorial fixes (BR-S142→S143)
+- **S142** — the develop/tutorial card is now ONE size on every reveal route (via a `--rv-card-w` token; standalone
+  was 360px vs ~396 in-menu). Scoped to `/reveal`; the live room crown (500) + menu preview (~396) are a SEPARATE,
+  deliberate "boat" and were untouched (see the `blue-room-card-size-boats` memory).
+- **S143** — the develop SEAM fix: the free card rendered ~36px TALLER than the halo card (the mint-strip serial
+  wrapped more in the narrow reveal card), so the free card poked out below during the wipe. Serial → its own full-
+  width row; the two layers now match height.
+
+### OPEN THREADS (this session) — spawned-task chips exist for #2 and #3
+1. **Aura Session C** — human authoring of SRC-03/04/05 (above). The path is fully specced in `docs/aura_info/`.
+2. **Vault: only-the-real-example clickable** — non-interactive visual cues for Road Morning + Signal Locked.
+3. **Dossier `nth-of-type` rhythm bug** — the LOUD plate styling lands on Mint Record, not Oracle (`styles.css`
+   ~2355-2371, positional selectors from the old 7-plate stack). Migrate to semantic modifier classes. The Aura
+   build did NOT move plate positions, so this is a separate, pre-existing fix.
+4. Minor: dead `.dfitaura` CSS (BR-S109 killed form) · README/PROJECT_OS 7-plate drift · dev-reveal AURA placeholder reconcile.
+
+---
+
+## PRIOR LANE — the develop/reveal ADD-ON (BR-S124 → BR-S143, SHIPPED — reference)
 
 A staged "develop" reveal was added to the project, built as isolated vanilla units in **`/reveal/`** (namespace
 `window.BRReveal`), hosted on **dev routes** — the **LIVE menu + room are UNTOUCHED**:
