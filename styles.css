@@ -2673,13 +2673,18 @@ body[data-treatment="shiny"] .dhidden__val { color: var(--halo-a, var(--t-displa
   display: grid;
   gap: 13px;
 }
+/* BR-S152 — the mark is a compact relation glyph; cap the slide width so it reads as a framed
+   specimen mark (left-aligned to the read column) instead of a tiny sliver stranded in a
+   full-width void. The 240×100 viewBox now fills the slide edge-to-edge. */
 .daura__mark-wrap {
   background: var(--ink-950);
   border: 1px solid var(--line-faint);
   border-radius: var(--r-plate);
-  padding: 14px 18px;
+  padding: 16px 20px;
+  max-width: 380px;
+  justify-self: start;
 }
-.daura__mark { display: block; width: 100%; height: auto; max-height: 104px; }
+.daura__mark { display: block; width: 100%; height: auto; max-height: 150px; }
 .daura__anchor { fill: var(--line-strong); }
 .daura__filament, .daura__seam-line { stroke: var(--daura-tint); stroke-width: 2; fill: none; stroke-linecap: round; }
 .daura__rim { stroke: var(--daura-tint-cold); stroke-width: 1; fill: none; stroke-linecap: round; }
@@ -3182,7 +3187,9 @@ body[data-view="room"] .dev { display: none; }
   font-family: var(--font-display); font-size: clamp(13px, 1.4vw, 15px); line-height: 1.6;
   color: var(--t-body); max-width: 520px; margin: 0 auto;
 }
-.vault__example { display: inline-block; margin-top: 9px; font-family: var(--font-display); font-style: italic; font-size: 11.5px; letter-spacing: 0.03em; color: var(--t-ghost); }
+/* BR-S152 — a bold showcase banner (was a whisper italic line): a violet pill badge, matching
+   the reveal's ◆ Example · Showcase banner, so the Vault reads overtly as a showcase, not a page. */
+.vault__example { display: inline-block; margin-top: 13px; padding: 5px 17px 6px; font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.24em; text-transform: uppercase; color: var(--t-primary); background: color-mix(in srgb, var(--v-violet) 15%, transparent); border: 1px solid color-mix(in srgb, var(--v-violet) 38%, transparent); border-radius: 999px; }
 
 /* ---- main composition: collection (left, vertical) · card · access · about ---- */
 .vault__main {
