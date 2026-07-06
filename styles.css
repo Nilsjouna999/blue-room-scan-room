@@ -2684,11 +2684,33 @@ body[data-treatment="shiny"] .dhidden__val { color: var(--halo-a, var(--t-displa
   max-width: 380px;
   justify-self: start;
 }
-.daura__mark { display: block; width: 100%; height: auto; max-height: 150px; }
-.daura__anchor { fill: var(--line-strong); }
-.daura__filament, .daura__seam-line { stroke: var(--daura-tint); stroke-width: 2; fill: none; stroke-linecap: round; }
-.daura__rim { stroke: var(--daura-tint-cold); stroke-width: 1; fill: none; stroke-linecap: round; }
-.daura__bleed { fill: var(--daura-tint); opacity: 0.1; }
+/* BR-S153 · PHOSPHOR DECAY — overflow:visible so the offset echoes (up to ~13px past the spine
+   on the longest-throw source) render into the wrap padding instead of clipping at the viewBox. */
+.daura__mark { display: block; width: 100%; height: auto; max-height: 150px; overflow: visible; }
+/* silent poles upgraded from invisible to readable; heavy = resolved pole, light = yielding (<=3px). */
+.daura__anchor { fill: var(--daura-tint); }
+.daura__anchor--heavy { fill-opacity: 0.38; }
+.daura__anchor--light { fill-opacity: 0.26; }
+/* crisp CORE spine — load-bearing, full tint, thickened 2 -> 2.6px, >=3:1 on --ink-950. */
+.daura__filament, .daura__seam-line { stroke: var(--daura-tint); stroke-width: 2.6; fill: none; stroke-linecap: round; }
+/* crisp COLD rim — the dimmed per-source lean (raw halo.b like Ice's frost would outshine the core). */
+.daura__rim { stroke: var(--daura-tint-cold); stroke-width: 1.2; fill: none; stroke-linecap: round; }
+/* NOTE: .daura__bleed has NO stylesheet fill — each bleed is filled inline by url(#daura-glow-{id});
+   a CSS fill would override the gradient and paint a solid tint block. Opacity lives in the stops. */
+
+/* the reveal — one-shot, mark -> band -> line, ends <=600ms. Echoes are static baked filter output
+   (never re-rastered): only group opacity + the un-filtered --lit spine's dashoffset animate. */
+@keyframes daura-mark-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes daura-spine-draw { from { stroke-dashoffset: var(--daura-len, 260); } to { stroke-dashoffset: 0; } }
+.daura__g-tension, .daura__g-seam, .daura__g-smear { animation: daura-mark-in 240ms cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+.daura__filament--lit, .daura__seam-line--lit { stroke-dasharray: var(--daura-len, 260); animation: daura-spine-draw 300ms cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+.daura .met-tier { animation: met-fade 260ms cubic-bezier(0.2, 0.7, 0.2, 1) both; animation-delay: 300ms; }
+.daura .daura__line { animation: met-fade 240ms cubic-bezier(0.2, 0.7, 0.2, 1) both; animation-delay: 360ms; }
+@media (prefers-reduced-motion: reduce) {
+  .daura__g-tension, .daura__g-seam, .daura__g-smear, .daura__filament--lit, .daura__seam-line--lit,
+  .daura .met-tier, .daura .daura__line { animation: none; }
+  .daura__filament--lit, .daura__seam-line--lit { stroke-dasharray: none; }
+}
 .daura__read { display: grid; gap: 8px; }
 .daura__read .met-tier { margin: 1px 0; }
 .daura__class { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.24em; text-transform: uppercase; color: var(--t-meta); }
