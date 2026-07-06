@@ -1245,6 +1245,8 @@ function renderMenu(reveal) {
           <p class="pickmsg" role="status" aria-live="polite"></p>
         </div>
 
+        <a class="menu__codex" href="codex.html"><span class="menu__codex__mark" aria-hidden="true">◆</span> The Codex <span class="menu__codex__arr" aria-hidden="true">→</span></a>
+
         <p class="menu__foot">One sample · SRC-01 · Driver.</p>
       </div>
     </div>${reveal ? `
