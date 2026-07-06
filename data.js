@@ -268,25 +268,16 @@ const SOURCES = [
     sceneRole: "The pause the trip gets measured by.",
     stance:
       "One arm holding the wheel's territory, the other raised flat to the lens — half stop-sign, half salute. The two-arm split holds the frame in suspension: neither departing nor stationary.",
-    /* auraField (BR-S147 Session A · docs/aura_info/14_AURA_SPEC §8) — the thin synthesis-capstone:
-       aura ranks + names the RELATION the frame stages between its two co-present elements (the one
-       channel every single-element instrument misses; distills the sentence buried in `stance`).
-       `kind` is BACKSTAGE (schema-locked frame-geometry noun, never rendered); `classLine` is the ONE
-       rendered title; `tier` reuses the live Muted..Peak ladder (HAND-SET, never computed); `verdictLine`
-       is the one authored sentence; `freeLine` shows the two parts before develop. NOT a new relation-prose
-       field — provenance points at THIS source's own `stance`. The `aura[]` chip array above is INPUT ore
-       for the author, never re-rendered (the 3-chip tag-row is killed, BR-S109). Distinct key from `fitAura`. */
+    /* auraField (BR-S154 · NAMED AIR rebuild): see SRC-02 for the full schema comment. */
     auraField: {
-      kind: "Standoff",                                  // raised palm (address) vs wheel-hand (departure), engine off — two opposed holds
-      classLine: "Warm Refusal",
+      nameWords: ["Guarded", "Warmth"],
+      leadIn: "feels like",
+      readLine: "You are welcomed and stopped in the same second.",
+      // no-"you" fallback (if C-12 is ever reversed): "A welcome and a stop, in the same second."
       tier: "Charged",
-      verdictLine: "The palm holds you at the glass; the cabin keeps the warmth behind it.",
-      // no-"you" fallback (if C-12 is ever reversed): "The palm stops the lens; the cabin keeps its warmth behind it."
-      freeLine: "A raised palm and a fjord window, both in one cabin frame.",
-      visual: { mode: "tension", tint: "var(--halo-a)" },   // biased two-pole line, up-right toward the palm (field.node ~{0.42,-0.34})
-      safety: { imageActBasis: ["raised palm — performed gesture-intent (RULE 0's one allowance)", "window-band crop, right third"], noStableTraitClaim: true },
-      provenance: { stanceRef: true, sourceRefs: ["stance", "frame.event.label: Raised palm", "aura[] Idle-Engine/Open-Palm/Northbound (input ore, never rendered)"] },
-      ariaSummary: "Aura reading: tier Charged, class Warm Refusal. The raised palm holds the viewer at the glass while the cabin keeps its warmth behind it.",
+      freeLine: "Warm, and not entirely open.",
+      glowKey: "pool-low",                               // warm copper cabin light, pooled low in the frame
+      ariaSummary: "Aura: Guarded Warmth, Charged. You are welcomed and stopped in the same second.",
     },
     fit: "If the setting is formal, this card stays in the glovebox. On the road, it's the membership card.",
     impact: { value: 64, label: "Disarming" },
@@ -475,16 +466,20 @@ const SOURCES = [
     sceneRole: "Proof the lake was work, not wallpaper.",
     stance:
       "Crouched at full commitment, both gloves stacked on the brace, weight exactly where it should be. Nothing performed — the auger doesn't care, and the frame doesn't pretend otherwise.",
+    /* auraField (BR-S154 · NAMED AIR rebuild): the felt ENERGY of the image, words-led — a two-word
+       NAME of the feeling (nameWords, stacked adjective/noun), a second-person READ of the involuntary
+       reaction (readLine — must contain "you", never a photo object), and the hand-set tier worded into
+       an anchored REGISTER phrase ("Comes off the print · TIER"). No mark, no glyph, no field.node.
+       glowKey drives the whisper-light behind the name (see auraGlowStyle in app.js): press-top = light
+       arriving from directly overhead, thin and cold, echoing the low hard sun pressing onto the field. */
     auraField: {
-      kind: "Figure-Ground",                             // crouched body reads as function INSIDE a dominating white field
-      classLine: "Quiet Labour",
-      tier: "Clean",                                     // the relation is TOTAL but low-tension — quiet != weak (the every-outcome-wins proof of the ladder)
-      verdictLine: "The body bends into the task, not toward the lens; the ice keeps the rest.",
-      freeLine: "A crouched brace and a wide ice field, in one flat light.",
-      visual: { mode: "seam", tint: "var(--halo-a)" },   // seam OVERRIDE (a tension line reads false-null on centred balance); vertical, low-center
-      safety: { imageActBasis: ["crouched brace + gaze redirected to task (re-authorable posture/gaze cue)", "auger tool-axis"], noStableTraitClaim: true },
-      provenance: { stanceRef: true, sourceRefs: ["stance", "frame.event.label: Crouched brace", "aura[] Auger-Braced/Sun-Struck/Low-Horizon (input ore)"] },
-      ariaSummary: "Aura reading: tier Clean, class Quiet Labour. The crouched figure bends into its task rather than the lens, and the surrounding ice field keeps everything else.",
+      nameWords: ["Patient", "Cold"],
+      leadIn: "feels like",
+      readLine: "Nothing asks to be watched. You lower your voice anyway.",
+      tier: "Clean",                                     // hand-set; total commitment, low tension — quiet is not weak
+      freeLine: "Cold, and in no hurry.",
+      glowKey: "press-top",                              // hard low sun pressing straight down onto the white field
+      ariaSummary: "Aura: Patient Cold, Clean. Nothing in this frame asks to be watched, and you lower your voice anyway.",
     },
     fit: "Anywhere patience is currency, this card appreciates. In rooms that demand noise, it simply waits.",
     impact: { value: 58, label: "Grounding" },
@@ -618,18 +613,15 @@ const SOURCES = [
     aura: ["Lateral", "Dispatched", "Shore-Filed"],
     sceneRole: "Open shoreline dispatch — fjord and ridge as witness backdrop.",
     stance: "Transverse hold, catch presented perpendicular to the camera axis. The frame stays a field document — the shore does the staging, the catch states the terms.",
+    /* auraField (BR-S154 · NAMED AIR rebuild): see SRC-02 for the full schema comment. */
     auraField: {
-      // CANDIDATE — machine-proposed per spec §8; the FINAL verdictLine is HUMAN-authored in Session C
-      // (GO condition 5, authored-first). kind/tier/mode are F1-assigned; the wording is provisional.
-      kind: "Standoff",
-      classLine: "Plain Record",
+      nameWords: ["Flat", "Certainty"],
+      leadIn: "feels like",
+      readLine: "It doesn't ask you to believe it. It waits while you do.",
       tier: "Strong",
-      verdictLine: "The catch states the terms; the shore does the staging.",   // CANDIDATE (legal while `stance` is unrendered — it distills it; re-check if a Source tab ever renders stance)
-      freeLine: "A presented catch and an open shoreline, filed in one field frame.",   // CANDIDATE
-      visual: { mode: "tension", tint: "var(--halo-a)" },   // lateral anchors, subtle water-side bias (field.node ~{0.04,0.12}, "Centred")
-      safety: { imageActBasis: ["transverse hold — catch presented perpendicular to the camera axis", "shore-as-field-document framing"], noStableTraitClaim: true },
-      provenance: { stanceRef: true, sourceRefs: ["stance", "frame.event.label: Transverse hold filed", "aura[] Lateral/Dispatched/Shore-Filed (input ore)"] },
-      ariaSummary: "Aura reading: tier Strong, class Plain Record. The held catch states the terms of the frame while the open shore does the staging around it.",
+      freeLine: "Plain, and sure of itself.",
+      glowKey: "even",                                   // flat overcast — the quietest plate, deliberately near-absent
+      ariaSummary: "Aura: Flat Certainty, Strong. It doesn't ask you to believe it — it waits while you do.",
     },
     fit: "The held object's scale and orientation align exactly with the Dispatch archetype; the scene container confirms remote field provenance.",
     impact: { value: 83, label: "Bilateral" },
@@ -763,20 +755,15 @@ const SOURCES = [
     aura: ["Approach", "Channel", "Diffuse"],
     sceneRole: "Gravel-grass path exterior — a depth channel with a foreground action break.",
     stance: "Mid-stride foreground break, lens-direct approach, four limbs extended at peak. The path wedge and grass-bank enclosure hold the action in a corridor.",
+    /* auraField (BR-S154 · NAMED AIR rebuild): see SRC-02 for the full schema comment. */
     auraField: {
-      // CANDIDATE — human finalizes in Session C (GO condition 5).
-      // GUARDRAIL (O2 ruling b): frame.field.weight here ("foreground mass arriving into the lens") is OWNED by the
-      // Composition Field plate. verdictLine must read the CONJUNCTION (stride-vector vs. corridor), never re-narrate
-      // that single vector — if the line survives as a lone caption to "mass arriving into the lens", cut it.
-      kind: "Vector-into-Void",
-      classLine: "Lens-Direct Break",
+      nameWords: ["Sheer", "Arrival"],
+      leadIn: "feels like",
+      readLine: "You brace before you know why.",
       tier: "Peak",
-      verdictLine: "The run breaks toward the lens; the corridor never lets it spread.",   // CANDIDATE (replaces the VETOED "…a beat before contact" — oracle pre-spend)
-      freeLine: "A lens-direct stride and a path corridor, in one flat plate.",   // CANDIDATE
-      visual: { mode: "smear", tint: "var(--halo-a)" },   // forward drag, cool rim at the FRONT; a STATIC afterimage, never a live vector
-      safety: { imageActBasis: ["mid-stride foreground break, lens-direct approach (performed motion cue)", "path-wedge + grass-bank corridor"], noStableTraitClaim: true },
-      provenance: { stanceRef: true, sourceRefs: ["stance", "aura[] Approach/Channel/Diffuse (input ore)"] },
-      ariaSummary: "Aura reading: tier Peak, class Lens-Direct Break. The stride breaks forward toward the lens while the path corridor keeps it from spreading.",
+      freeLine: "Fast, and aimed at you.",
+      glowKey: "stream-in",                              // motion streaming toward the viewer, corridor-channeled
+      ariaSummary: "Aura: Sheer Arrival, Peak. You brace before you know why.",
     },
     fit: "The path wedge and bank enclosure contain the action within a structural corridor; the overcast plate holds light flat across the whole scene.",
     impact: { value: 88, label: "Kinetic" },
@@ -911,25 +898,15 @@ const SOURCES = [
     aura: ["Carapace", "Fluorescent", "Cyan-Tank"],
     sceneRole: "Held-specimen presentation over a live tank — interior showcase.",
     stance: "Vertical cradle, specimen face-forward, antennae extended upper-left. The frame organizes around the held armature, lifted into house light.",
+    /* auraField (BR-S154 · NAMED AIR rebuild): see SRC-02 for the full schema comment. */
     auraField: {
-      // CANDIDATE — human finalizes in Session C (GO condition 5).
-      // GUARDRAIL (O2 ruling b): do NOT restate frame.field.weight ("pulled down by the tank-blue band", Composition
-      // Field's) or any material/palette read (Surface Record + Finish own that, BR-S115). Aura's lane here is the
-      // illuminant-vs-surface CONJUNCTION only.
-      kind: "Light-Fit",
-      classLine: "Applied Glare",
+      nameWords: ["Uneasy", "Marvel"],
+      leadIn: "feels like",
+      readLine: "You want to look away, and you don't.",
       tier: "Charged",
-      // CANDIDATE — SAFETY REWRITE (BR-S149 QA ws9a79a3y). The §8 candidate ("Borrowed Light" /
-      // "wears a light it didn't bring") rode the ORACLE's foreign-light payload ("lifted into
-      // light that was not designed for it") — a confirmed oracle-collision — and personified the
-      // shell (wears/didn't bring). Pivoted to the specular-OWNERSHIP facet (whose reflection this
-      // is) the oracle never touches; no personification. Human finalizes wording in Session C.
-      verdictLine: "Under the house tube, the specular catch is the tube's, not the shell's.",
-      freeLine: "A held specimen and a hard house light, in one tank frame.",   // CANDIDATE
-      visual: { mode: "seam", tint: "var(--halo-a)" },   // stressed frontier upper-left per the antennae (field.node ~{-0.08,0.14})
-      safety: { imageActBasis: ["vertical cradle, specimen face-forward (performed presentation cue)", "fluorescent house-tube illuminant vs. shell surface"], noStableTraitClaim: true },
-      provenance: { stanceRef: true, sourceRefs: ["stance", "aura[] Carapace/Fluorescent/Cyan-Tank (input ore)"] },
-      ariaSummary: "Aura reading: tier Charged, class Applied Glare. Under the house tube the specular catch on the shell belongs to the tube, not to the shell's own surface.",
+      freeLine: "Bright, and slightly wrong.",
+      glowKey: "press-top",                              // hard fluorescent house tube, pressing straight down
+      ariaSummary: "Aura: Uneasy Marvel, Charged. You want to look away, and you don't.",
     },
     fit: "A live-tank seafood interior under fluorescent house light with a tropical mural surround — the container confirms the Encounter read.",
     impact: { value: 79, label: "Specular" },
@@ -947,22 +924,18 @@ const SOURCES = [
   },
 ];
 
-/* AURA null-relation fixture (BR-S147 Session A · docs/aura_info/14_AURA_SPEC §3) — the falsifiability
-   proof: a lone-element frame with NO second co-present term legitimately renders a NULL aura band
-   (no residue mark, Muted tier, absence-shaped verdict). Kept as a STANDALONE fixture, NOT a 6th room
-   source (none of SRC-01..05 is relation-free), so renderAuraBody() can be verified against the null
-   state before real sources wire in. Null HERE means there is no relation to name — distinct from the
-   SRC-03/04/05 CANDIDATE fields above (provisional wording, not absence). */
+/* AURA null fixture (BR-S154 · NAMED AIR rebuild) — the falsifiability proof: a frame with no legible
+   felt-energy reading legitimately renders the NULL band (no name, Muted register, an absence-shaped
+   read). Kept as a STANDALONE fixture, NOT a 6th room source, so renderAuraBody() can be verified
+   against the null state before real sources wire in. */
 const AURA_NULL_FIXTURE = {
-  kind: null,
-  classLine: null,
+  nameWords: null,
+  leadIn: "feels like",
+  readLine: "This frame keeps its temperature to itself.",
   tier: "Muted",
-  verdictLine: "Two elements, no edge between them; the frame files them side by side.",
-  freeLine: "A single subject and a plain backdrop, nothing staged between them.",
-  visual: { mode: null, tint: "var(--silver)" },   // mode null = NO residue mark drawn
-  safety: { imageActBasis: ["single-subject framing, no second co-present element"], noStableTraitClaim: true },
-  provenance: { stanceRef: true, sourceRefs: ["(hypothetical null-relation stance)"] },
-  ariaSummary: "Aura reading: no staged relation, tier Muted. The frame presents its elements side by side without naming a tension between them.",
+  freeLine: "Held, and not yet named.",
+  glowKey: null,   // null = no glow rendered
+  ariaSummary: "Aura: no name held, tier Muted. This frame keeps its temperature to itself.",
 };
 
 /* =============================================================

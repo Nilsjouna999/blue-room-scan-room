@@ -2662,61 +2662,158 @@ body[data-treatment="shiny"] .dhidden__val { color: var(--halo-a, var(--t-displa
 .dmint__return-desc { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.05em; color: var(--t-meta); line-height: 1.5; }
 
 /* =============================================================
-   03 — Aura plate (BR-S149): the thin relation capstone. A residue
-   MARK (tension/seam/smear on the near-black field) + the classLine
-   + ONE reused metTier band + the verdict line. NO map, NO 2nd band,
-   NO 0-100. Tint derives from the live --halo-a cascade. (docs/aura_info)
+   03 — Aura plate: NAMED AIR (BR-S154, replaces PHOSPHOR DECAY).
+   A fine-book chapter-title page, not a diagram. THE NAME (two
+   stacked serif words, hero scale) sits over a single tinted
+   hairline — the ONE and ONLY color in the panel, drawn straight
+   from --halo-a. Below it, one italic second-person READ, then one
+   small tracked REGISTER line. No SVG, no glyph, no meter: the
+   typography IS the visual. Nothing here can be misread as a
+   scribble because nothing here is drawn — it is set.
 ============================================================= */
 .dplate--aura .daura {
-  --daura-tint: color-mix(in srgb, var(--halo-a) 55%, var(--silver));
-  --daura-tint-cold: color-mix(in srgb, var(--halo-b, var(--violet)) 40%, var(--silver-dim));
+  position: relative;
   display: grid;
-  gap: 13px;
+  justify-items: start;
+  gap: 0;
+  padding: 4px 0 2px;
+  isolation: isolate;   /* keeps the glow pseudo-element from bleeding onto siblings */
 }
-/* BR-S152 — the mark is a compact relation glyph; cap the slide width so it reads as a framed
-   specimen mark (left-aligned to the read column) instead of a tiny sliver stranded in a
-   full-width void. The 240×100 viewBox now fills the slide edge-to-edge. */
-.daura__mark-wrap {
-  background: var(--ink-950);
-  border: 1px solid var(--line-faint);
-  border-radius: var(--r-plate);
-  padding: 16px 20px;
-  max-width: 380px;
-  justify-self: start;
+/* ATMOSPHERE — the graft from "THE AIR": a single soft whisper of the source's own
+   light, positioned by --daura-glow-pos (set inline per glowKey) and capped at
+   --daura-glow-peak (0.07 for Shore's deliberately-quiet "even" plate, 0.13 elsewhere).
+   This is NOT a color field and NOT a bordered window — it is an unbounded radial that
+   dies out well inside the plate, sitting entirely BEHIND the type (z-index -1) so it
+   can only ever reinforce the words, never compete with or substitute for them. It is
+   the one and only place in the panel color appears as a WASH rather than a line, and
+   it stays low enough that --t-display over it still clears AAA (verified per source
+   tint below). Reduced-motion: identical static frame, no keyframe required — the glow
+   was never animated by default (see the optional breathe, gated further down). */
+.daura::before {
+  content: "";
+  position: absolute;
+  inset: -8px -12px;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(
+    46% 60% at var(--daura-glow-pos, 50% 50%),
+    color-mix(in srgb, var(--daura-tint, var(--halo-a)) 100%, transparent) 0%,
+    transparent 72%
+  );
+  opacity: var(--daura-glow-peak, 0.1);
 }
-/* BR-S153 · PHOSPHOR DECAY — overflow:visible so the offset echoes (up to ~13px past the spine
-   on the longest-throw source) render into the wrap padding instead of clipping at the viewBox. */
-.daura__mark { display: block; width: 100%; height: auto; max-height: 150px; overflow: visible; }
-/* silent poles upgraded from invisible to readable; heavy = resolved pole, light = yielding (<=3px). */
-.daura__anchor { fill: var(--daura-tint); }
-.daura__anchor--heavy { fill-opacity: 0.38; }
-.daura__anchor--light { fill-opacity: 0.26; }
-/* crisp CORE spine — load-bearing, full tint, thickened 2 -> 2.6px, >=3:1 on --ink-950. */
-.daura__filament, .daura__seam-line { stroke: var(--daura-tint); stroke-width: 2.6; fill: none; stroke-linecap: round; }
-/* crisp COLD rim — the dimmed per-source lean (raw halo.b like Ice's frost would outshine the core). */
-.daura__rim { stroke: var(--daura-tint-cold); stroke-width: 1.2; fill: none; stroke-linecap: round; }
-/* NOTE: .daura__bleed has NO stylesheet fill — each bleed is filled inline by url(#daura-glow-{id});
-   a CSS fill would override the gradient and paint a solid tint block. Opacity lives in the stops. */
+.daura--tease::before { opacity: calc(var(--daura-glow-peak, 0.1) * 0.55); }
+.daura--null::before { display: none; }
+/* (A) THE LEAD — a whisper-quiet, lowercase self-printed instruction. Sits
+   directly above the NAME so the panel reads as one continuous sentence:
+   "feels like / Guarded / Warmth". Never competes with the hero. */
+.daura__lead {
+  margin: 0 0 2px;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 13px;
+  color: var(--t-ghost);
+}
+/* (B) THE NAME — the hero. Two words, stacked one per line, each its own block
+   so the line-break is a deliberate typographic beat, not a wrapped sentence. */
+.daura__name {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 36px;
+  line-height: 0.98;
+  letter-spacing: 0.002em;
+  color: var(--t-display);
+}
+.daura__name-l { display: block; }
+/* the second word lands — the panel's one dramatic beat. Pull it flush under
+   the first with a hair of extra weight-read via a slightly closer leading. */
+.daura__name-l + .daura__name-l { margin-top: 0.02em; }
 
-/* the reveal — one-shot, mark -> band -> line, ends <=600ms. Echoes are static baked filter output
-   (never re-rastered): only group opacity + the un-filtered --lit spine's dashoffset animate. */
-@keyframes daura-mark-in { from { opacity: 0; } to { opacity: 1; } }
-@keyframes daura-spine-draw { from { stroke-dashoffset: var(--daura-len, 260); } to { stroke-dashoffset: 0; } }
-.daura__g-tension, .daura__g-seam, .daura__g-smear { animation: daura-mark-in 240ms cubic-bezier(0.2, 0.7, 0.2, 1) both; }
-.daura__filament--lit, .daura__seam-line--lit { stroke-dasharray: var(--daura-len, 260); animation: daura-spine-draw 300ms cubic-bezier(0.2, 0.7, 0.2, 1) both; }
-.daura .met-tier { animation: met-fade 260ms cubic-bezier(0.2, 0.7, 0.2, 1) both; animation-delay: 300ms; }
-.daura .daura__line { animation: met-fade 240ms cubic-bezier(0.2, 0.7, 0.2, 1) both; animation-delay: 360ms; }
-@media (prefers-reduced-motion: reduce) {
-  .daura__g-tension, .daura__g-seam, .daura__g-smear, .daura__filament--lit, .daura__seam-line--lit,
-  .daura .met-tier, .daura .daura__line { animation: none; }
-  .daura__filament--lit, .daura__seam-line--lit { stroke-dasharray: none; }
+/* (C) THE HAIRLINE — the ONLY color in the panel. A crisp 24px x 1.5px rule in
+   the source's own --halo-a key: the plate's signature, not a decoration. */
+.daura__hairline {
+  display: block;
+  width: 24px;
+  height: 1.5px;
+  margin: 14px 0 16px;
+  background: var(--daura-tint, var(--halo-a));
+  border-radius: 1px;
 }
-.daura__read { display: grid; gap: 8px; }
-.daura__read .met-tier { margin: 1px 0; }
-.daura__class { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.24em; text-transform: uppercase; color: var(--t-meta); }
-.daura__line { font-family: var(--font-display); font-size: 15.5px; line-height: 1.5; color: var(--silver-bright); margin: 0; }
-.daura__free { font-family: var(--font-display); font-size: 14.5px; line-height: 1.5; color: var(--t-body); margin: 0 0 4px; }
-.daura--null .daura__line { color: var(--t-body); }
+.daura__hairline--free { background: color-mix(in srgb, var(--daura-tint, var(--halo-a)) 55%, var(--t-ghost)); }
+
+/* (D) THE READ — one authored second-person sentence: what the photo does to
+   YOU, not what is in it. Same authored-prose serif voice as the rest of the
+   dossier, italic to mark it as a felt reaction rather than a caption. */
+.daura__read {
+  margin: 0;
+  max-width: 34ch;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 15.5px;
+  line-height: 1.5;
+  color: var(--t-primary);
+}
+
+/* (E) THE REGISTER — the existing hand-set Muted..Peak ladder, worded into a
+   self-anchoring phrase. Small, quiet, tracked like the dossier's other mono
+   labels; the tier word alone carries the source's tint so it still reads as
+   "measured", the way the old stat bands did, without a pip row. */
+.daura__register {
+  margin: 18px 0 0;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: var(--track-caps);
+  text-transform: uppercase;
+  color: var(--t-meta);
+}
+.daura__tier { font-weight: 500; }
+
+/* FREE — the fragment stands alone, honest and whole, never a teased grade. */
+.daura--tease .daura__free {
+  margin: 0;
+  max-width: 34ch;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 14.5px;
+  line-height: 1.5;
+  color: var(--t-body);
+}
+.daura--tease .dstat__undeveloped { margin-top: 10px; }
+
+/* NULL — no color, no name; the absence is stated in the same three-part grammar. */
+.daura--null .daura__lead { color: var(--t-ghost); }
+.daura--null .daura__read { color: var(--t-body); font-style: italic; }
+.daura--null .daura__register { color: var(--t-ghost); }
+
+/* the reveal — one-shot, lead -> name -> hairline -> read -> register, quiet
+   stagger, ends well under 600ms. Purely opacity/transform; never re-rastered. */
+@keyframes daura-line-in { from { opacity: 0; transform: translateY(3px); } to { opacity: 1; transform: translateY(0); } }
+.daura__lead { animation: daura-line-in 220ms cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+.daura__name { animation: daura-line-in 260ms cubic-bezier(0.2, 0.7, 0.2, 1) both; animation-delay: 40ms; }
+.daura__hairline { animation: daura-line-in 220ms cubic-bezier(0.2, 0.7, 0.2, 1) both; animation-delay: 220ms; }
+.daura__read { animation: daura-line-in 240ms cubic-bezier(0.2, 0.7, 0.2, 1) both; animation-delay: 300ms; }
+.daura__register { animation: daura-line-in 220ms cubic-bezier(0.2, 0.7, 0.2, 1) both; animation-delay: 380ms; }
+/* the atmosphere fades in slightly BEHIND the reveal cascade so the mood lands a
+   half-beat before the word (per the locked design's "recognition, fired twice"),
+   then settles into one extremely slow breathe — a stage light, never a strobe.
+   ~7s cycle, opacity only, +-1.5 percentage points off the authored peak: tasteful
+   to the point of being nearly imperceptible on a still photo, never busy. */
+@keyframes daura-glow-in { from { opacity: 0; } to { opacity: var(--daura-glow-peak, 0.1); } }
+@keyframes daura-breathe {
+  0%, 100% { opacity: var(--daura-glow-peak, 0.1); }
+  50% { opacity: calc(var(--daura-glow-peak, 0.1) * 0.85); }
+}
+.daura::before {
+  animation: daura-glow-in 420ms ease-out both, daura-breathe 7s ease-in-out 420ms infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .daura__lead, .daura__name, .daura__hairline, .daura__read, .daura__register { animation: none; }
+  /* reduced motion: identical STATIC frame at the full authored peak — no fade-in, no breathe */
+  .daura::before { animation: none; opacity: var(--daura-glow-peak, 0.1); }
+}
 
 /* 07 — oracle */
 .dplate--oracle { text-align: center; }
@@ -3659,7 +3756,8 @@ body[data-view="room"] .dev { display: none; }
   body[data-treatment="shiny"] .panel--reading > .module { transition: none !important; }
   /* dossier shutter (Technique Pass #2) fully shown at rest — never hide content */
   .dossier__inner .dplate { animation: none !important; clip-path: none !important; opacity: 1 !important; }
-  .daura__mark, .daura__mark * { animation: none !important; transition: none !important; }
+  .daura__lead, .daura__name, .daura__hairline, .daura__read, .daura__register { animation: none !important; transition: none !important; }
+  .daura::before { animation: none !important; opacity: var(--daura-glow-peak, 0.1) !important; }
 }
 
 /* =============================================================

@@ -967,133 +967,83 @@ function mountSurfaceRecords() {
   }
 }
 
-/* ---- 03 · AURA — the thin relation capstone (BR-S149, Session B) --------------
-   Ranks + names the RELATION the frame stages between its two co-present elements
-   (the one channel every single-element instrument misses; the ordinal for the
-   tension `stance` already narrates). Renders ONLY: one residue MARK + the authored
-   classLine (never the backstage KIND enum) + ONE metTier band (from auraField.tier,
-   hand-set, never code-derived) + one verdict line. Free = the two parts, unresolved.
-   Full spec: docs/aura_info/14_AURA_SPEC + 05_VISUAL_SYSTEM. */
-/* PHOSPHOR DECAY residue mark (BR-S153) — the mark = one crisp load-bearing CORE spine (the pole
-   that resolved) + a short, alpha-clamped stack of blurred, offset copies of that same spine
-   decaying toward the pole that YIELDED (the afterimage of the two-pole relation) + a continuous
-   radial bleed-glow + (seam/smear) one soft cold exit rim. The 8-12% residue ceiling is COMPILED
-   into the decay filter (graded feFuncA slopes) so it cannot be breached; the crisp core + rim
-   carry 100% of the load-bearing contrast, so the mark is premium even though the residue is
-   always faint on black. Data-driven from src.frame.field.node — five non-interchangeable
-   silhouettes. Design: 28-agent workshop (PHOSPHOR DECAY + audit); docs/aura_info/05_VISUAL_SYSTEM. */
-const AURA_RIM_FILTER = `<filter id="daura-rim-soft" x="-20%" y="-20%" width="140%" height="140%" color-interpolation-filters="sRGB"><feGaussianBlur stdDeviation="0.35"/></filter>`;
+/* ---- 03 · AURA — NAMED AIR (BR-S154: full re-found, replaces PHOSPHOR DECAY) ----
+   Aura = the felt ENERGY/MOOD a photo radiates, read the instant you look — before
+   analysis. It is words-led, theory-free, and structurally cannot be misread as a
+   scribble because it renders NO abstract mark: three lines of plain English, in
+   strict size order, on a single whisper of the source's own light.
 
-/* echoes-only decay filter: graded per-tap alpha so overlapping taps composite <=12% (law compiled in). */
-function auraDecayFilter(id, dux, duy, throwPx, tapCount) {
-  const SD = [0.7, 1.5, 2.6], SLOPE = [0.10, 0.07, 0.05];
-  let taps = "", merge = "";
-  for (let k = 1; k <= tapCount; k++) {
-    const dx = (dux * throwPx * k).toFixed(2), dy = (duy * throwPx * k).toFixed(2);
-    taps += `<feGaussianBlur in="SourceGraphic" stdDeviation="${SD[k - 1]}" result="b${k}"/>`
-      + `<feOffset in="b${k}" dx="${dx}" dy="${dy}" result="o${k}"/>`
-      + `<feComponentTransfer in="o${k}" result="e${k}"><feFuncA type="linear" slope="${SLOPE[k - 1]}" intercept="0"/></feComponentTransfer>`;
-  }
-  for (let k = tapCount; k >= 1; k--) merge += `<feMergeNode in="e${k}"/>`;   // furthest echo first; NO SourceGraphic (echoes only — the crisp spine is an un-filtered sibling)
-  return `<filter id="daura-decay-${id}" x="-60%" y="-60%" width="220%" height="220%" color-interpolation-filters="sRGB">${taps}<feMerge>${merge}</feMerge></filter>`;
-}
+     (A) THE NAME     — the two-word feeling, stacked (adjective / noun), hero scale.
+     (B) THE HAIRLINE — a 24px tinted rule under the name: the one, only, and entire
+                        piece of color in the panel (the source's --halo-a key).
+     (C) THE READ     — one second-person sentence: what the photo does to YOU.
+     (D) THE REGISTER — "COMES OFF THE PRINT · <TIER>", the existing hand-set
+                        Muted..Peak ladder worded into a self-anchoring phrase.
 
-/* bbox-unit radial glow: alpha reaches 0 at every bleed-shape edge (no hard box). var() must live
-   in style= — it does not resolve inside a bare SVG presentation attribute. */
-function auraGlow(id, nx, ny) {
-  const cl = (v) => (0.5 + Math.max(-0.35, Math.min(0.35, v * 0.7))).toFixed(3);
-  return `<radialGradient id="daura-glow-${id}" cx="0.5" cy="0.5" r="0.5" fx="${cl(nx)}" fy="${cl(ny)}">`
-    + `<stop offset="0%" style="stop-color:var(--daura-tint)" stop-opacity="0.12"/>`
-    + `<stop offset="55%" style="stop-color:var(--daura-tint)" stop-opacity="0.07"/>`
-    + `<stop offset="100%" style="stop-color:var(--daura-tint)" stop-opacity="0"/></radialGradient>`;
-}
+   Backstage: auraField.nameWords holds the two-word NAME as an array (already
+   stacked, no split-on-space guessing), auraField.readLine holds the second-person
+   READ, auraField.leadIn the lowercase "feels like" lead, auraField.freeLine the
+   pre-mint fragment, auraField.tier the hand-set Muted..Peak word, auraField.glowKey
+   the light-behavior enum consumed by auraGlowStyle(). src.halo.a is the only color
+   read. NO field.node, NO mode, NO mark geometry — none of it is consulted. */
 
-/* One aura mark renders per document at a time, so the shared #daura-rim-soft id (emitted once in
-   renderAuraBody) and the per-source #daura-decay/#daura-glow ids resolve unambiguously. Revisit
-   the id scheme if aura marks ever co-render on one surface. */
-function auraMark(mode, node, id) {
-  const f = (n) => Math.round(n * 10) / 10;
-  const nx = (node && node.x) || 0, ny = (node && node.y) || 0;
-  const mag = Math.hypot(nx, ny) || 1e-4;
-  const throwPx = 3 + Math.min(mag, 0.55) * 18;
-  const tapCount = mag < 0.20 ? 2 : 3;                    // low-mag sources: fewer taps -> reads as residue, never a motion vector
-  const focusX = f(120 + nx * 70), focusY = f(50 + ny * 82);
-  const seamSign = (mode === "seam") ? 1 : -1;            // seam bleeds toward the field (+node); tension/smear drag toward the yielding pole (-node)
-  const dux = (seamSign * nx) / mag, duy = (seamSign * ny) / mag;
-  const gid = `url(#daura-glow-${id})`;
-  const glow = auraGlow(id, nx, ny);
-
-  if (mode === "seam") {
-    const sx = f(120 + nx * 82);
-    const tilt = f(Math.max(-18, Math.min(18, nx * 85)));  // node-driven: Ice ~+3.4 (a cut), Tank ~-6.8 (the mirror)
-    const seamThrow = Math.min(throwPx, 7);                 // cap the downward spill inside the wrap padding
-    const panelSide = (id === "ice-auger") ? 1 : -1;       // Ice panel right / Tank panel left — the mirrored swap-test proof
-    const px = f(sx + panelSide * 7), rimx = f(sx - panelSide * 3);
-    const defs = `<defs>${auraDecayFilter(id, dux, duy, seamThrow, tapCount)}${glow}</defs>`;
-    return `<g class="daura__g-seam" aria-hidden="true">${defs}<g transform="rotate(${tilt} ${sx} 50)">`
-      + `<ellipse class="daura__bleed" cx="${px}" cy="50" rx="9" ry="36" style="fill:${gid}"></ellipse>`
-      + `<g filter="url(#daura-decay-${id})"><line class="daura__seam-line" x1="${sx}" y1="16" x2="${sx}" y2="84"></line></g>`
-      + `<line class="daura__seam-line daura__seam-line--lit" x1="${sx}" y1="16" x2="${sx}" y2="84"></line>`
-      + `<line class="daura__rim" x1="${rimx}" y1="16" x2="${rimx}" y2="84" filter="url(#daura-rim-soft)"></line>`
-      + `</g></g>`;
-  }
-  if (mode === "smear") {
-    const fxv = -dux, fyv = -duy;                          // forward axis (into the corridor); echoes trail behind
-    const reach = Math.min(40, fyv ? Math.abs(34 / fyv) : 40);
-    const tipX = f(120 + fxv * reach), tipY = f(50 + fyv * reach);
-    const backX = f(120 - fxv * 24), backY = f(50 - fyv * 24);
-    const mx = f((tipX + backX) / 2), my = f((tipY + backY) / 2);
-    const ang = f(Math.atan2(fyv, fxv) * 180 / Math.PI);
-    const nX = -fyv, nY = fxv, cX = f(tipX + fxv * 3), cY = f(tipY + fyv * 3);
-    const defs = `<defs>${auraDecayFilter(id, dux, duy, throwPx, tapCount)}${glow}</defs>`;
-    return `<g class="daura__g-smear" aria-hidden="true">${defs}`
-      + `<ellipse class="daura__bleed" cx="${mx}" cy="${my}" rx="${f((reach + 24) / 2 + 6)}" ry="13" transform="rotate(${ang} ${mx} ${my})" style="fill:${gid}"></ellipse>`
-      + `<g filter="url(#daura-decay-${id})"><line class="daura__seam-line" x1="${backX}" y1="${backY}" x2="${tipX}" y2="${tipY}"></line></g>`
-      + `<line class="daura__seam-line daura__seam-line--lit" x1="${backX}" y1="${backY}" x2="${tipX}" y2="${tipY}"></line>`
-      + `<line class="daura__rim" x1="${f(cX + nX * 10)}" y1="${f(cY + nY * 10)}" x2="${f(cX - nX * 10)}" y2="${f(cY - nY * 10)}" filter="url(#daura-rim-soft)"></line>`
-      + `</g>`;
-  }
-  // tension (default): two silent anchors (heavy = resolved +node pole, light = yielding) + one biased filament; echoes drag toward -node
-  const heavyRight = nx >= 0;
-  const hx = heavyRight ? 206 : 34, lx = heavyRight ? 34 : 206;
-  const defs = `<defs>${auraDecayFilter(id, dux, duy, throwPx, tapCount)}${glow}</defs>`;
-  return `<g class="daura__g-tension" aria-hidden="true">${defs}`
-    + `<ellipse class="daura__bleed" cx="${focusX}" cy="${focusY}" rx="34" ry="22" style="fill:${gid}"></ellipse>`
-    + `<circle class="daura__anchor daura__anchor--heavy" cx="${hx}" cy="50" r="3"></circle>`
-    + `<circle class="daura__anchor daura__anchor--light" cx="${lx}" cy="50" r="2.2"></circle>`
-    + `<g filter="url(#daura-decay-${id})"><path class="daura__filament" d="M34,50 Q${focusX},${focusY} 206,50"></path></g>`
-    + `<path class="daura__filament daura__filament--lit" d="M34,50 Q${focusX},${focusY} 206,50"></path>`
-    + `</g>`;
+/* Glow-position enum -> a CSS custom property the stylesheet turns into a single soft
+   radial whisper behind THE NAME. Four behaviors, each an honest echo of the source's
+   own light (never a new invented visual language): pool-low = warm light pooled low
+   in frame (Driver's cabin), press-top = a hard light pressing straight down (Ice's
+   low sun, Tank's fluorescent tube), even = flat/near-absent (Shore's overcast — the
+   deliberately quietest plate), stream-in = light/motion arriving toward the viewer
+   (Run). Unknown/missing key degrades to "even" (the safest, quietest default). */
+const AURA_GLOW_POS = {
+  "pool-low": "50% 82%",
+  "press-top": "50% 6%",
+  "even": "50% 50%",
+  "stream-in": "50% 62%",
+};
+function auraGlowStyle(glowKey, tint) {
+  const pos = AURA_GLOW_POS[glowKey] || AURA_GLOW_POS.even;
+  const peak = glowKey === "even" ? 0.07 : 0.13;   // Shore's "even" plate stays the quietest on purpose
+  return `--daura-tint:${esc(tint)};--daura-glow-pos:${pos};--daura-glow-peak:${peak};`;
 }
 
 function renderAuraBody(src, paid) {
   const a = src.auraField;
+  const tint = (src.halo && src.halo.a) || "var(--violet)";
   if (!a) return `<p class="dstat__undeveloped">Aura read — reserved. Develops in a later pass.</p>`;
-  /* FREE: name the two co-present parts, resolve nothing — no mark, no band, no
-     classLine (the mark IS the reveal; free stays honestly whole, not a teased grade). */
+
+  /* FREE (pre-mint): the name is held back — only the honest felt-fragment is shown,
+     whole and unteased, plus a dim hairline that hints the mint will carry color.
+     No masked hero, no partial grade: what's shown is complete, just smaller than
+     the developed read. */
   if (!paid) {
-    return `<div class="daura daura--tease">`
+    return `<div class="daura daura--tease" style="${auraGlowStyle(a.glowKey, tint)}">`
+      + `<span class="daura__hairline daura__hairline--free" aria-hidden="true"></span>`
       + `<p class="daura__free">${esc(a.freeLine)}</p>`
-      + `<p class="dstat__undeveloped">The read between them develops with the mint.</p></div>`;
+      + `<p class="dstat__undeveloped">The read develops with the mint.</p></div>`;
   }
-  const mode = a.visual && a.visual.mode;
-  const node = src.frame && src.frame.field && src.frame.field.node;
-  /* NULL relation (or no node/mode): no mark, Muted band, absence-shaped verdict. A missing node
-     must land here — a centered filament is a false-equilibrium FAILURE, never a render. */
-  if (a.kind === null || !mode || !node) {
+
+  /* NULL (auraField present but incomplete — no name/read authored yet, or a future
+     source ships before its Aura pass): no name, no glow, no color — the panel states
+     its own absence inside the SAME three-line grammar, so silence still reads as a
+     designed choice rather than a bug. Structural check (nameWords + readLine), not
+     a stale backstage `kind` flag. */
+  if (!Array.isArray(a.nameWords) || !a.nameWords.length || !a.readLine) {
+    const tier = (a.tier || "Muted").toUpperCase();
     return `<div class="daura daura--null">`
-      + metTier("Aura", a.tier || "Muted", src.halo.a)
-      + `<p class="daura__line">${esc(a.verdictLine)}</p></div>`;
+      + `<p class="daura__lead" aria-hidden="true">feels like</p>`
+      + `<p class="daura__read">This frame keeps its temperature to itself.</p>`
+      + `<p class="daura__register">COMES OFF THE PRINT &middot; <span class="daura__tier">${esc(tier)}</span></p></div>`;
   }
-  return `<div class="daura">`
-    + `<div class="daura__mark-wrap">`
-    + `<svg class="daura__mark daura__mark--${mode}" viewBox="0 0 240 100" role="img" aria-label="${esc(a.ariaSummary || a.verdictLine)}">`
-    + `<defs>${AURA_RIM_FILTER}</defs>`
-    + auraMark(mode, node, src.id) + `</svg></div>`
-    + `<div class="daura__read">`
-    + `<span class="daura__class">${esc(a.classLine)}</span>`
-    + metTier("Aura", a.tier, src.halo.a)
-    + `<p class="daura__line">${esc(a.verdictLine)}</p></div></div>`;
+
+  const [nameTop, nameBottom] = a.nameWords;
+  const tier = (a.tier || "").toUpperCase();
+  return `<div class="daura" style="${auraGlowStyle(a.glowKey, tint)}" role="group" aria-label="${esc(a.ariaSummary || `${a.nameWords.join(" ")}. ${a.readLine}`)}">`
+    + `<p class="daura__lead" aria-hidden="true">${esc(a.leadIn || "feels like")}</p>`
+    + `<p class="daura__name"><span class="daura__name-l">${esc(nameTop)}</span>${nameBottom ? `<span class="daura__name-l">${esc(nameBottom)}</span>` : ""}</p>`
+    + `<span class="daura__hairline" aria-hidden="true"></span>`
+    + `<p class="daura__read">${esc(a.readLine)}</p>`
+    + `<p class="daura__register">COMES OFF THE PRINT &middot; <span class="daura__tier" style="color:${metMatText(tint)};">${esc(tier)}</span></p>`
+    + `</div>`;
 }
 
 function renderDossier(src, treatment) {
@@ -1143,9 +1093,9 @@ function renderDossier(src, treatment) {
   const archetype = dplate("02", "Archetype", paid, `
     <p class="dstat__undeveloped">Archetype read — reserved. Develops in a later pass.</p>`);
 
-  /* 03 — Aura (BR-S149: built. The thin relation capstone — see renderAuraBody +
-     the auraField data. Free shows the two parts; develop names the relation
-     between them (a mode, not a grade). Finish still owns the material read.) */
+  /* 03 — Aura, NAMED AIR (BR-S154): the felt energy/mood a photo radiates, read
+     instantly — see renderAuraBody. Free shows the honest fragment; develop names
+     the feeling, proves it against the viewer, and records its intensity. */
   const aura = dplate("03", "Aura", paid, renderAuraBody(src, paid), "dplate--aura");
 
   /* 06 — Mint Record */
