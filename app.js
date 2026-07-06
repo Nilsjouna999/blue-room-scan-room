@@ -1175,6 +1175,11 @@ function renderMenu(reveal) {
           <span class="msample__label">Sample Scan</span>
           <span class="msample__type">SRC-01 · Archive</span>
         </div>
+        ${reveal ? `<p class="menurev__note">Example preview — not a filed record</p>
+        <span class="menurev__crop menurev__crop--tl" aria-hidden="true"></span>
+        <span class="menurev__crop menurev__crop--tr" aria-hidden="true"></span>
+        <span class="menurev__crop menurev__crop--bl" aria-hidden="true"></span>
+        <span class="menurev__crop menurev__crop--br" aria-hidden="true"></span>` : ""}
         ${reveal ? '<div class="menurev__mount"></div>' : `<div class="msample__card">${renderCard(s, "free")}</div>`}
       </section>
 
@@ -1208,7 +1213,8 @@ function renderMenu(reveal) {
         <p class="menu__foot">One sample · SRC-01 · Driver.</p>
       </div>
     </div>${reveal ? `
-    <button type="button" class="menurev__back" aria-label="Return to the menu">← Back to the menu</button>` : ""}`;
+    <button type="button" class="menurev__back" aria-label="Return to the menu">← Back to the menu</button>
+    <button type="button" class="menurev__fwd" aria-label="Open the example Vault">To the Vault →</button>` : ""}`;
 }
 
 /* BR-S150: the LIVE entrance IS the develop reveal (promoted from ?dev=menu-reveal — this
@@ -1239,6 +1245,10 @@ function wireMenuReveal(host) {
   });
   const back = host.querySelector(".menurev__back");
   if (back) back.addEventListener("click", function () { if (rev && rev.toFree) rev.toFree(); });
+  /* BR-S151: the right-edge mirror of Back — hands off to the example Vault (its only route,
+     a full reload; the vault's own back returns to a clean menu). */
+  const fwd = host.querySelector(".menurev__fwd");
+  if (fwd) fwd.addEventListener("click", function () { location.href = "?dev=vault"; });
 }
 
 /* DEV NAV rail markup (dev-only; mounted only when DEVNAV). State navigation
@@ -2069,6 +2079,11 @@ function mountDev() {
           '</header>' +
           '<section class="menu__stage menu__stage--reveal">' +
             '<div class="msample__cap"><span class="msample__label">Sample Scan</span><span class="msample__type">SRC-01 · Archive</span></div>' +
+            '<p class="menurev__note">Example preview — not a filed record</p>' +
+            '<span class="menurev__crop menurev__crop--tl" aria-hidden="true"></span>' +
+            '<span class="menurev__crop menurev__crop--tr" aria-hidden="true"></span>' +
+            '<span class="menurev__crop menurev__crop--bl" aria-hidden="true"></span>' +
+            '<span class="menurev__crop menurev__crop--br" aria-hidden="true"></span>' +
             '<div class="menurev__mount"></div>' +
           '</section>' +
           '<div class="menu__controls">' +
@@ -2082,6 +2097,7 @@ function mountDev() {
           '</div>' +
         '</div>' +
         '<button type="button" class="menurev__back" aria-label="Return to the menu">← Back to the menu</button>' +
+        '<button type="button" class="menurev__fwd" aria-label="Open the example Vault">To the Vault →</button>' +
       '</div>';
     const mountEl = host.querySelector(".menurev__mount");
     if (mountEl && window.BRReveal && typeof window.BRReveal.mount === "function") {
@@ -2107,6 +2123,8 @@ function mountDev() {
       });
       const back = host.querySelector(".menurev__back");
       if (back) back.addEventListener("click", function () { if (rev && rev.toFree) rev.toFree(); });
+      const fwd = host.querySelector(".menurev__fwd");
+      if (fwd) fwd.addEventListener("click", function () { location.href = "?dev=vault"; });
     }
     return;
   }

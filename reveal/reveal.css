@@ -1287,6 +1287,36 @@
 .menurev.is-fullview .menurev__back { opacity: 1; pointer-events: auto; visibility: visible; transition: opacity 400ms var(--rv-ease) 360ms, color 160ms ease, visibility 0s linear 0s; }
 .menurev__back:hover { color: var(--t-display); }
 
+/* BR-S151 — FORWARD affordance: the right-edge mirror of .menurev__back (same whisper chrome),
+   hands off to the example Vault. Only appears in the fullview takeover. */
+.menurev__fwd { position: fixed; top: clamp(20px, 4vh, 40px); right: clamp(20px, 4vw, 44px); left: auto; z-index: 50; font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--t-meta); background: none; border: none; cursor: pointer; padding: 8px 4px; opacity: 0; pointer-events: none; visibility: hidden; transition: opacity 400ms var(--rv-ease) 360ms, color 160ms ease, visibility 0s linear 760ms; }
+.menurev.is-fullview .menurev__fwd { opacity: 1; pointer-events: auto; visibility: visible; transition: opacity 400ms var(--rv-ease) 360ms, color 160ms ease, visibility 0s linear 0s; }
+.menurev__fwd:hover { color: var(--t-display); }
+.menurev__fwd:focus-visible { outline: 1px solid color-mix(in srgb, var(--t-display) 60%, transparent); outline-offset: 4px; }
+
+/* BR-S151 — EXAMPLE signal (text): a product-voiced sibling of the suppressed .reveal-stage__devtag.
+   Quiet mono eyebrow, centered under the Sample-Scan cap; only in the fullview takeover. */
+.menurev__note { display: none; }
+/* flows as a grid row directly under .msample__cap (the fullview stage is display:grid;
+   place-items:center) so it stays glued to the cap at every viewport height — never
+   overlaps the Stats & Readings panel below. */
+.menurev.is-fullview .menurev__note { display: block; margin: 7px 0 0; font-family: var(--font-mono); font-size: 9.5px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--t-ghost); text-align: center; white-space: nowrap; pointer-events: none; opacity: 0; animation: rv-fullview-in 400ms var(--rv-ease) 420ms forwards; }
+
+/* BR-S151 — EXAMPLE signal (visual): four hairline crop-mark ticks in the fixed stage gutter —
+   the archive/registry "proof frame" motif (self-minted; NOT the vault's .vcrop). Touch nothing. */
+.menurev__crop { display: none; }
+.menurev.is-fullview .menurev__crop { display: block; position: fixed; width: 18px; height: 18px; z-index: 44; pointer-events: none; opacity: 0; animation: rv-fullview-in 500ms var(--rv-ease) 480ms forwards; }
+.menurev.is-fullview .menurev__crop--tl { top: clamp(14px, 2.6vh, 26px); left: clamp(14px, 2.6vw, 30px); border-top: 1px solid var(--rv-ink-ghost); border-left: 1px solid var(--rv-ink-ghost); }
+.menurev.is-fullview .menurev__crop--tr { top: clamp(14px, 2.6vh, 26px); right: clamp(14px, 2.6vw, 30px); border-top: 1px solid var(--rv-ink-ghost); border-right: 1px solid var(--rv-ink-ghost); }
+.menurev.is-fullview .menurev__crop--bl { bottom: clamp(14px, 2.6vh, 26px); left: clamp(14px, 2.6vw, 30px); border-bottom: 1px solid var(--rv-ink-ghost); border-left: 1px solid var(--rv-ink-ghost); }
+.menurev.is-fullview .menurev__crop--br { bottom: clamp(14px, 2.6vh, 26px); right: clamp(14px, 2.6vw, 30px); border-bottom: 1px solid var(--rv-ink-ghost); border-right: 1px solid var(--rv-ink-ghost); }
+
+/* reduced-motion: land the example marks + arrow visible, no staged fade */
+@media (prefers-reduced-motion: reduce) {
+  .menurev.is-fullview .menurev__note, .menurev.is-fullview .menurev__crop { animation: none; opacity: 1; }
+  .menurev__fwd { transition: color 160ms ease; }
+}
+
 /* the arrow — bare hand-drawn glyph, no button chrome (your prototype) */
 .rv-arrow {
   background: none; border: none; border-radius: 0;
