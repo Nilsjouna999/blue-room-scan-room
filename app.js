@@ -1160,7 +1160,7 @@ function applyView() {
   }
 }
 
-function renderMenu() {
+function renderMenu(reveal) {
   const s = SOURCES[0];
   return `
     <div class="menu__inner">
@@ -1170,12 +1170,12 @@ function renderMenu() {
         <p class="menu__trust">Image-as-artifact scan — it reads frame, gesture and signal, never the person.</p>
       </header>
 
-      <section class="menu__stage">
+      <section class="menu__stage${reveal ? " menu__stage--reveal" : ""}">
         <div class="msample__cap">
           <span class="msample__label">Sample Scan</span>
           <span class="msample__type">SRC-01 · Archive</span>
         </div>
-        <div class="msample__card">${renderCard(s, "free")}</div>
+        ${reveal ? '<div class="menurev__mount"></div>' : `<div class="msample__card">${renderCard(s, "free")}</div>`}
       </section>
 
       <div class="menu__controls">
@@ -1207,11 +1207,38 @@ function renderMenu() {
 
         <p class="menu__foot">One sample · SRC-01 · Driver.</p>
       </div>
-    </div>`;
+    </div>${reveal ? `
+    <button type="button" class="menurev__back" aria-label="Return to the menu">← Back to the menu</button>` : ""}`;
 }
 
+/* BR-S150: the LIVE entrance IS the develop reveal (promoted from ?dev=menu-reveal — this
+   reverses the earlier "live menu untouched" stance, by builder direction). The sample card
+   develops IN PLACE: arrow → scribble reading → "see deeper" → fullview takeover. #menuView
+   itself carries the `menurev` class so the reveal's menustage + fullview CSS applies.
+   ROBUST FALLBACK: if the reveal units (window.BRReveal / reveal/*.js) failed to load, render
+   the plain static Archive Desk — the front door must never break. */
 function mountMenu() {
-  document.getElementById("menuView").innerHTML = renderMenu();
+  const host = document.getElementById("menuView");
+  const canReveal = !!(window.BRReveal && typeof window.BRReveal.mount === "function");
+  host.classList.toggle("menurev", canReveal);
+  host.classList.remove("is-fullview");   // clean state on (re)mount
+  host.innerHTML = renderMenu(canReveal);
+  if (canReveal) wireMenuReveal(host);
+}
+
+function wireMenuReveal(host) {
+  const mountEl = host.querySelector(".menurev__mount");
+  if (!mountEl) return;
+  function _escBack(e) {
+    if (e.key === "Escape") { e.preventDefault(); document.removeEventListener("keydown", _escBack, true); if (rev && rev.toFree) rev.toFree(); }
+  }
+  const rev = window.BRReveal.mount(mountEl, {
+    menustage: true,
+    onFullview: function () { host.classList.add("is-fullview"); document.addEventListener("keydown", _escBack, true); },
+    onBack: function () { host.classList.remove("is-fullview"); document.removeEventListener("keydown", _escBack, true); },
+  });
+  const back = host.querySelector(".menurev__back");
+  if (back) back.addEventListener("click", function () { if (rev && rev.toFree) rev.toFree(); });
 }
 
 /* DEV NAV rail markup (dev-only; mounted only when DEVNAV). State navigation
