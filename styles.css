@@ -777,6 +777,24 @@ body[data-devnav="1"] .toggle--treatment { display: inline-flex; }
 }
 .card[data-treatment="free"] .fr__tier { --fr-tier: var(--silver-dim); }
 
+/* BR-S156 — the ledger reads "bugged" + oversized ONLY in the small BOATS, which scale the
+   whole card with `zoom` (reveal 0.92 / fullview 0.82, Vault 0.72). Under zoom a 1px
+   .fr__row border-bottom collapses to a sub-pixel line that the browser rounds
+   inconsistently row-to-row (some visible, some gone) = the flicker; and the 8.5px pips
+   read a hair large next to the 9px labels. Fix scoped to the zoomed boats ONLY — the
+   unzoomed 500px crown keeps its crisp 1px hairline + 8.5px pip (regression scout's law).
+   Root cause, not the global size: swap the fractional border for a zoom-robust gradient
+   hairline (a background fill anti-aliases uniformly and never rounds to 0), trim the pips,
+   and open the name→pip lane so the diamonds never kiss the text. */
+.reveal-stage .fr__pip, .msample__card .fr__pip, .vault .fr__pip { width: 7.5px; height: 7.5px; }
+.reveal-stage .fr__pips, .msample__card .fr__pips, .vault .fr__pips { gap: 6px; }
+.reveal-stage .fr__row, .msample__card .fr__row, .vault .fr__row {
+  column-gap: 16px; border-bottom: 0;
+  background-image: linear-gradient(var(--line-faint), var(--line-faint));
+  background-size: 100% 1px; background-position: left bottom; background-repeat: no-repeat;
+}
+.reveal-stage .fr__row:last-child, .msample__card .fr__row:last-child, .vault .fr__row:last-child { background-image: none; }
+
 /* signature line — BR-S123: moved DIRECTLY under the Signal Note (was below the ledger),
    so the two italic-serif voice lines form one stanza: voice → signed voice. Kept dimmer
    + smaller than the note so it reads as the quiet countersignature, not a second lead. */
@@ -3345,6 +3363,11 @@ body[data-view="room"] .dev { display: none; }
 .vcard__title { font-family: var(--font-display); font-size: 14px; line-height: 1.15; color: var(--t-primary); }
 .vcard.is-selected .vcard__title { color: var(--t-display); }
 .vcard__id { font-family: var(--font-mono); font-size: 8.5px; letter-spacing: 0.08em; color: var(--t-meta); }
+/* BR-S156 — a saved moment shown as a static VISUAL CUE, not a control: only the one real
+   example (Checkpoint Wave) is selectable; the rest read as filed images, present but inert. */
+.vcard--cue { cursor: default; }
+.vcard--cue:hover { background: none; }
+.vcard--cue .vcard__img { filter: saturate(0.86) contrast(0.97) brightness(0.94); }
 .vcard--empty { cursor: default; border-left-color: transparent; }
 .vcard--empty:hover { background: none; }
 .vcard__thumb--empty { display: flex; align-items: center; justify-content: center; border-style: dashed; color: var(--t-ghost); font-size: 15px; }

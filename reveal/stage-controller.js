@@ -159,6 +159,9 @@
         // journey over — fade the arrow out
         arrow.el.classList.add("is-gone");
         cap.style.opacity = "0";
+        // BR-S156: the read is fully drawn — NOW release the to-the-Vault hand-off
+        // (the menu host gates its arrow on this; guarded so routes without opts don't throw).
+        if (opts.onReadSettled) opts.onReadSettled();
       });
     }
 

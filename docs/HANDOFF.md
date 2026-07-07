@@ -3,9 +3,36 @@
 For a fresh Claude Code session to resume with zero context loss. **You are the BUILDER** (you hold the repo and
 make the changes). The user pastes specs/designs from a separate planning chat. Grounded in the repo — **re-grep
 line numbers, they drift** (every session shifts them a lot). Last written: **2026-07-07**, code at HEAD
-`BR-S155` (`26ed7d0`). **HEAD = origin/main · push = deploy · all live.**
+`BR-S156` (**LOCAL — committed to main, NOT pushed**; prior pushed HEAD `26ed7d0` BR-S155). **push = deploy · live.**
 
-**★ LATEST SESSION (2026-07-07) — read this first:**
+**★ LATEST SESSION (2026-07-07) — BR-S156 — read this first:**
+- **VAULT/SHOWCASE POLISH + THE BLUE ROOM LEXICON (BR-S156, LOCAL — on main, not pushed).** Four fixes, all
+  additive/scoped; pre-edit critique = a 7-agent read-only workflow (2 critics GO_WITH_CHANGES · 3 lexicon authors ·
+  opus synth · adversarial person-read verify = **GO**).
+  - **Frame Reading ledger de-bugged — ZOOMED boats only.** The per-row divider was a 1px border collapsing to a
+    sub-pixel line under `zoom` (Vault 0.72 / reveal 0.82–0.92) and rounding inconsistently row-to-row = the flicker;
+    swapped for a zoom-robust **gradient hairline** (`background-image` fill, anti-aliases uniformly, never rounds to 0),
+    pips trimmed 8.5→7.5px, name→pip lane opened to 16px. **Scoped to `.reveal-stage / .msample__card / .vault` — the
+    unzoomed 500px CROWN is UNTOUCHED** (the regression scout's law: the globals are shared; the crown is already crisp).
+  - **To-the-Vault showcase arrow now WAITS for the reading.** It was fading in ~520ms into the fullview takeover while
+    the Stats & Readings panel was still blank. Gated on a new **`is-vaultready`** class set from the halo read's
+    completion (`onReadSettled` fired in `stage-controller.js enterHaloReading()` → wired in BOTH mounts: `wireMenuReveal`
+    + the `?dev=menu-reveal` branch; removed at fullview-entry and on back). `reveal.css` requires
+    `.menurev.is-fullview.is-vaultready .menurev__fwd`; delay trimmed (the gate is the wait now).
+  - **Vault Favorite Moments** — resolves OPEN-thread #2: only **Checkpoint Wave** (the one real example) stays a live
+    control; **Road Morning** is now a static `.vcard--cue` div (no `data-vault-select`); **Signal Locked removed** +
+    the dead `VAULT_SIGNAL_IMG` const.
+  - **THE CODEX gains an 8th system — "The Blue Room Lexicon"** (`codex-data.json` + a `build_codex.py disp()` branch →
+    regenerated `codex.html`): 7 entries for the archive's OWN instruments/records — **Metrics · Diagram · Source ·
+    Surface · The Developed Back · Surface Record · Mint Record** — plain-canonical voice, artifact-bound (safety-passed:
+    never the person, no 0-100, no unlock/paywall). Count now **166 entries · 8 systems**. Regenerate: edit
+    `codex-data.json` → `python build_codex.py`.
+  - **NEXT (builder's queued next two, in order):** (1) set up the **arcane reading** basic info — the photo-less
+    esoteric "records office" reading (birth date/name/hour/place → Codex systems → one synthesised verdict); (2)
+    **click-to-expand full-page lore** for BOTH the Codex + the reading room (basic answer shown → click a box → it
+    expands to a near-full-page in-depth panel; gather + fill the deep content afterwards).
+
+**★ PRIOR SESSION (2026-07-07) — BR-S153→S155:**
 - **AURA REBUILT → NAMED AIR (BR-S153→S154, LIVE).** The old "thin relation capstone / residue mark" (BR-S147→149,
   `docs/aura_info`, and the PHOSPHOR DECAY afterimage mark) was **SCRAPPED by the builder as incomprehensible** ("a
   scribble a toddler could make; makes zero sense"). Dossier plate 03 is now **pure typography, no glyph**: `feels like`
@@ -115,8 +142,8 @@ A DEV-ROUTE page (live room/menu untouched): a private archive of saved minted c
 sized down); center = the selected mint in a crop-frame; right = **QR "Access Mint"** + **"What is the Vault?"**; a
 bottom-right wax-seal + "A private record system · not for public release" credit; fits ONE screen, no scroll. Local
 mock `VAULT_MINTS` (Checkpoint Wave = SOURCES[0]; Road Morning = source-02; Signal Locked = a stylized signal tile).
-**OPEN (spawned task):** only the ONE real example (Checkpoint Wave) should be clickable / carry a reading — Road
-Morning + Signal Locked become non-clickable VISUAL CUES. "Open Reading" currently routes to the developed reveal (TODO: per-mint).
+**DONE (BR-S156):** only Checkpoint Wave (the one real example) is a live control; Road Morning is a static
+`.vcard--cue` and Signal Locked was removed. ("Open Reading" still routes to the developed reveal — TODO: per-mint.)
 
 ### Reveal/tutorial fixes (BR-S142→S143)
 - **S142** — the develop/tutorial card is now ONE size on every reveal route (via a `--rv-card-w` token; standalone
@@ -128,7 +155,7 @@ Morning + Signal Locked become non-clickable VISUAL CUES. "Open Reading" current
 
 ### OPEN THREADS (this session) — spawned-task chips exist for #2 and #3
 1. **Aura Session C** — human authoring of SRC-03/04/05 (above). The path is fully specced in `docs/aura_info/`.
-2. **Vault: only-the-real-example clickable** — non-interactive visual cues for Road Morning + Signal Locked.
+2. ~~**Vault: only-the-real-example clickable**~~ — DONE (BR-S156): Road Morning is a static cue; Signal Locked removed.
 3. **Dossier `nth-of-type` rhythm bug** — the LOUD plate styling lands on Mint Record, not Oracle (`styles.css`
    ~2355-2371, positional selectors from the old 7-plate stack). Migrate to semantic modifier classes. The Aura
    build did NOT move plate positions, so this is a separate, pre-existing fix.

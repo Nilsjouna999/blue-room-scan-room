@@ -12,6 +12,7 @@ def disp(sysname):
     if 'rune' in s or 'futhark' in s: return ('runes', 'The Elder Futhark', 'the twenty-four runes')
     if 'trigram' in s: return ('trigrams', 'The Eight Trigrams', 'the building blocks')
     if 'ching' in s or 'hexagram' in s: return ('iching', 'The I Ching', 'the sixty-four hexagrams')
+    if 'lexicon' in s: return ('lexicon', 'The Blue Room Lexicon', 'the instruments & records')
     return (s.replace(' ', '-'), sysname, '')
 
 def esc(x): return html.escape(str(x if x is not None else ''))

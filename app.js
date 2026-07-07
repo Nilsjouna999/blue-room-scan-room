@@ -1277,8 +1277,11 @@ function wireMenuReveal(host) {
   }
   const rev = window.BRReveal.mount(mountEl, {
     menustage: true,
-    onFullview: function () { host.classList.add("is-fullview"); document.addEventListener("keydown", _escBack, true); },
-    onBack: function () { host.classList.remove("is-fullview"); document.removeEventListener("keydown", _escBack, true); },
+    // BR-S156: enter fullview with the vault hand-off CLOSED; release it only once the
+    // developed reading has fully drawn (onReadSettled), so the arrow never precedes the read.
+    onFullview: function () { host.classList.add("is-fullview"); host.classList.remove("is-vaultready"); document.addEventListener("keydown", _escBack, true); },
+    onReadSettled: function () { host.classList.add("is-vaultready"); },
+    onBack: function () { host.classList.remove("is-fullview"); host.classList.remove("is-vaultready"); document.removeEventListener("keydown", _escBack, true); },
   });
   const back = host.querySelector(".menurev__back");
   if (back) back.addEventListener("click", function () { if (rev && rev.toFree) rev.toFree(); });
@@ -1851,24 +1854,6 @@ function renderProtoCards() {
    touched, the back button reuses the menu nav (data-view-to="menu").
 ============================================================ */
 
-/* Signal Locked has no radio/system photo asset → a stylized SIGNAL placeholder
-   (a developed "carrier lock" tile). A data-URI SVG so renderCard's photo slot
-   and the rail thumb both render it cleanly (no broken-image state). */
-const VAULT_SIGNAL_IMG =
-  "data:image/svg+xml," + encodeURIComponent(
-    "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 300'>" +
-    "<rect width='400' height='300' fill='#0c0e13'/>" +
-    "<g stroke='#1a1f29' stroke-width='1'>" +
-      "<line x1='0' y1='75' x2='400' y2='75'/><line x1='0' y1='150' x2='400' y2='150'/><line x1='0' y1='225' x2='400' y2='225'/>" +
-      "<line x1='80' y1='0' x2='80' y2='300'/><line x1='160' y1='0' x2='160' y2='300'/><line x1='240' y1='0' x2='240' y2='300'/><line x1='320' y1='0' x2='320' y2='300'/>" +
-    "</g>" +
-    "<path d='M0 150 Q 20 108 40 150 T 80 150 Q 100 120 120 150 T 160 150 Q 178 150 196 130 Q 206 150 224 150 L 400 150' fill='none' stroke='#8b7bff' stroke-width='2.6' stroke-linecap='round'/>" +
-    "<circle cx='224' cy='150' r='3.4' fill='#8b7bff'/>" +
-    "<text x='20' y='38' fill='#5b6270' font-family='monospace' font-size='12' letter-spacing='3'>SIGNAL · LOCKED</text>" +
-    "<text x='298' y='284' fill='#3a4150' font-family='monospace' font-size='10' letter-spacing='2'>BR-SIG</text>" +
-    "</svg>"
-  );
-
 const VAULT_MINTS = [
   { key: "drv", label: "Checkpoint Wave", id: "BR-001-DRV-0001", state: "HALO MINT · DEVELOPED",
     filed: "APR 26, 2025 · 14:22", sealLine: "Sealed · Recorded",
@@ -1884,17 +1869,6 @@ const VAULT_MINTS = [
         signature: "Landscape document · first light", serial: "BR-001-LND-0022",
         stats: { presence: 74, signal: 62, visualImpact: 80, charge: 70 } } },
     thumb: "assets/source-02.jpg" },
-  { key: "sig", label: "Signal Locked", id: "BR-001-SIG-0044", state: "HALO MINT · DEVELOPED",
-    filed: "FEB 02, 2025 · 22:09", sealLine: "Sealed · Recorded",
-    src: { no: 44, file: VAULT_SIGNAL_IMG,
-      halo: { material: "Carrier Violet Glass", a: "#8b7bff", b: "#6fb3e0", c: "#9fe0c8" },
-      photoTuning: { pos: "50% 50%", zoom: 1, scrim: 0.05, base: { bright: 1.0, contrast: 1.0, sat: 1.0 } },
-      capture: { code: "SYS / SIG", rec: "2025.02.02" },
-      card: { title: "Signal Locked", archetype: "Held-Carrier Record",
-        note: "A clean carrier holds steady across the band; the lock reads as a flat, unbroken line with no drift at the edges.",
-        signature: "System record · carrier lock", serial: "BR-001-SIG-0044",
-        stats: { presence: 66, signal: 88, visualImpact: 60, charge: 74 } } },
-    thumb: VAULT_SIGNAL_IMG },
 ];
 
 /* small hand-drawn marks reused across the Vault (scribble-archive language) */
@@ -1964,12 +1938,16 @@ function renderVault() {
   /* the saved-mint COLLECTION — a quiet vertical list on the left (3 saved + 1
      placeholder). Example-light: a calm row each (thumb + title + id), not a
      strong tile grid; the selected row carries a soft violet edge. */
-  const collection = VAULT_MINTS.map((mt, i) =>
-    `<button type="button" class="vcard${i === 0 ? " is-selected" : ""}" data-vault-select="${i}" aria-pressed="${i === 0 ? "true" : "false"}">
-       <span class="vcard__thumb">${imgOrPlaceholder(mt.thumb, "vcard__img")}</span>
-       <span class="vcard__meta"><span class="vcard__title">${esc(mt.label)}</span><span class="vcard__id">${esc(mt.id)}</span></span>
-     </button>`
-  ).join("") +
+  const collection = VAULT_MINTS.map((mt, i) => {
+    const inner =
+      `<span class="vcard__thumb">${imgOrPlaceholder(mt.thumb, "vcard__img")}</span>` +
+      `<span class="vcard__meta"><span class="vcard__title">${esc(mt.label)}</span><span class="vcard__id">${esc(mt.id)}</span></span>`;
+    /* BR-S156: only the ONE real example (Checkpoint Wave) is a live control; the other saved
+       moments are static filed-image CUES — present, but not selectable (no data-vault-select). */
+    return i === 0
+      ? `<button type="button" class="vcard is-selected" data-vault-select="0" aria-pressed="true">${inner}</button>`
+      : `<div class="vcard vcard--cue">${inner}</div>`;
+  }).join("") +
     `<div class="vcard vcard--empty" aria-hidden="true">
        <span class="vcard__thumb vcard__thumb--empty">+</span>
        <span class="vcard__meta"><span class="vcard__title">New mint</span><span class="vcard__id">appears here</span></span>
@@ -2145,12 +2123,16 @@ function mountDev() {
         menustage: true,
         onFullview: function () {
           const m = host.querySelector(".menurev");
-          if (m) m.classList.add("is-fullview");
+          if (m) { m.classList.add("is-fullview"); m.classList.remove("is-vaultready"); }   // BR-S156: vault hand-off closed until the read settles
           document.addEventListener("keydown", _escBack, true);
+        },
+        onReadSettled: function () {
+          const m = host.querySelector(".menurev");
+          if (m) m.classList.add("is-vaultready");   // BR-S156: reading fully drawn → release the arrow
         },
         onBack: function () {
           const m = host.querySelector(".menurev");
-          if (m) m.classList.remove("is-fullview");
+          if (m) { m.classList.remove("is-fullview"); m.classList.remove("is-vaultready"); }
           document.removeEventListener("keydown", _escBack, true);
         },
       });

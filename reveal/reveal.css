@@ -1293,8 +1293,11 @@
    (same glyph + neon as the "see deeper" arrows), fixed at the right edge and vertically
    centred. The wrapper owns the fixed position so the inner .rv-arrow keeps its own
    scale/breathe transforms. Only appears in the fullview takeover. */
-.menurev__fwd { position: fixed; top: 50%; right: clamp(12px, 2.6vw, 40px); transform: translateY(-50%); z-index: 50; display: flex; flex-direction: column; align-items: center; gap: 2px; opacity: 0; pointer-events: none; visibility: hidden; transition: opacity 480ms var(--rv-ease) 520ms, visibility 0s linear 1000ms; }
-.menurev.is-fullview .menurev__fwd { opacity: 1; pointer-events: auto; visibility: visible; transition: opacity 480ms var(--rv-ease) 520ms, visibility 0s linear 0s; }
+/* BR-S156 — the vault hand-off waits for the READING: it appears only once the Stats &
+   Readings have fully scribbled in (`is-vaultready`, set from the read's completion), not
+   while the panel is still blank. Delay trimmed — the gate itself is the wait now. */
+.menurev__fwd { position: fixed; top: 50%; right: clamp(12px, 2.6vw, 40px); transform: translateY(-50%); z-index: 50; display: flex; flex-direction: column; align-items: center; gap: 2px; opacity: 0; pointer-events: none; visibility: hidden; transition: opacity 300ms var(--rv-ease), visibility 0s linear 320ms; }
+.menurev.is-fullview.is-vaultready .menurev__fwd { opacity: 1; pointer-events: auto; visibility: visible; transition: opacity 460ms var(--rv-ease) 80ms, visibility 0s linear 0s; }
 .menurev__fwd .rv-arrow { padding: 6px; }
 .menurev__fwd .rv-arrow__svg { width: 62px; height: 62px; }
 .menurev__fwd-cap { font-family: var(--font-mono); font-size: 8.5px; letter-spacing: 0.2em; text-transform: uppercase; color: color-mix(in srgb, var(--rv-halo) 80%, var(--rv-ink)); pointer-events: none; }
