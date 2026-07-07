@@ -1,0 +1,97 @@
+/* =============================================================
+   THE ARCANA INTAKE — "The Setting of Marks" (BR-S159)
+   Ported from the builder's high-fidelity blueprint
+   (design_handoff_arcana_intake). Isolated dev route (?dev=arcane);
+   all styling scoped under .arcane. Two signature behaviours live in
+   arcane.js: the CROWN BLUEPRINT (inks in as marks are typed) and the
+   FORGING CEREMONY (a stepped paper-cutout animation on "Draw the
+   reading"). The arcane reading carries NO photo-read safety walls.
+   Uses the global Sand/line/font tokens; adds only a scoped room bg.
+============================================================= */
+.arcane {
+  --ac-bg-room: radial-gradient(110% 80% at 50% -10%, #161411 0%, var(--ink-900) 55%, var(--ink-950) 100%);
+  position: fixed; inset: 0; z-index: 30; overflow-y: auto; overflow-x: hidden;
+  background: var(--ac-bg-room);
+  font-family: var(--font-ui);
+  display: flex; flex-direction: column; align-items: center;
+  padding: 52px 24px 96px; box-sizing: border-box;
+}
+
+.ac-back {
+  position: fixed; top: 40px; left: 48px; z-index: 4;
+  font-family: var(--font-ui); font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase;
+  color: var(--t-meta); background: none; border: 0; cursor: pointer; padding: 6px 2px;
+  text-decoration: none; transition: color 0.2s ease;
+}
+.ac-back:hover { color: var(--t-display); }
+
+/* the crown blueprint slot (338×422) — glow layer + the inked SVG */
+.ac-crown { position: relative; width: 338px; height: 422px; margin-bottom: 2px; display: flex; align-items: center; justify-content: center; }
+.ac-crown-glow { position: absolute; inset: -8%; opacity: 0; transition: opacity 1s cubic-bezier(.2,.7,.2,1); pointer-events: none; filter: blur(36px); }
+.ac-crown-svg { width: 100%; height: 100%; overflow: visible; position: relative; }
+
+/* the form column */
+.ac-form { width: 100%; max-width: 456px; }
+.ac-head { text-align: center; margin-bottom: 46px; }
+.ac-title { font-family: var(--font-display); font-weight: 600; font-size: 42px; letter-spacing: 0.005em; color: var(--t-display); margin: 0 0 14px; line-height: 1.02; }
+.ac-sub { font-family: var(--font-display); font-style: italic; font-size: 17px; color: var(--t-meta); margin: 0; line-height: 1.4; }
+
+/* the marks — bare inscribed lines, not a form */
+.ac-mark { display: block; margin-bottom: 24px; }
+.ac-mark__label { display: block; font-family: var(--font-ui); font-size: 10px; font-weight: 500; letter-spacing: 0.22em; text-transform: uppercase; color: var(--t-ghost); margin-bottom: 9px; }
+.ac-mark__field {
+  width: 100%; box-sizing: border-box; background: transparent; border: none; border-bottom: 1px solid var(--line);
+  padding: 7px 2px; color: var(--t-primary); font-family: var(--font-display); font-size: 19px; outline: none;
+  transition: border-color 0.25s ease, color 0.25s ease;
+}
+.ac-mark__field::placeholder { color: var(--t-ghost); font-style: italic; opacity: 0.72; }
+.ac-mark__field:focus { border-color: var(--line-strong); color: var(--t-display); }
+
+.ac-rule { height: 1px; background: var(--line); margin: 16px 0 28px; }
+
+/* the closing flourish */
+.ac-cta { text-align: center; }
+.ac-draw {
+  font-family: var(--font-ui); font-size: 11px; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--t-meta); background: transparent; border: none; border-radius: 999px; padding: 9px 16px; cursor: pointer;
+  transition: color 0.16s ease;
+}
+.ac-draw:hover { color: var(--silver); }
+.ac-hope { font-family: var(--font-display); font-style: italic; font-size: 13.5px; color: var(--t-ghost); margin: 18px 0 0; }
+.ac-notice { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.18em; color: var(--t-ghost); margin: 14px 0 0; min-height: 14px; }
+
+/* ---- THE FORGING CEREMONY (overlay) ---- */
+.ac-ceremony { position: fixed; inset: 0; z-index: 60; }
+.ac-ceremony[hidden] { display: none; }
+.ac-forge {
+  position: relative; width: 100%; height: 100%; min-height: 560px; background: var(--ac-bg-room);
+  overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding-bottom: 110px; box-sizing: border-box; font-family: var(--font-ui);
+}
+.ac-forge__svg { width: min(1150px, 96vw); max-height: 78vh; }
+
+.ac-forge__caps { position: absolute; left: 0; right: 0; bottom: 28px; display: flex; flex-direction: column; align-items: center; gap: 9px; pointer-events: none; }
+.ac-forge__cap { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.26em; color: var(--t-body); }
+.ac-forge__sub { font-family: var(--font-display); font-style: italic; font-size: 15px; color: var(--t-ghost); text-align: center; white-space: nowrap; }
+.ac-forge__count { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.2em; color: var(--t-ghost); min-height: 14px; }
+
+.ac-forge__end { display: flex; flex-direction: column; align-items: center; gap: 10px; pointer-events: auto; margin-top: 4px; }
+.ac-forge__end[hidden] { display: none; }
+.ac-forge__endbtns { display: flex; gap: 14px; align-items: center; }
+.ac-forge__endnote { font-family: var(--font-display); font-style: italic; font-size: 13px; color: var(--t-ghost); text-align: center; white-space: nowrap; }
+
+.ac-btn { font-family: var(--font-ui); font-size: 11px; font-weight: 500; letter-spacing: 0.16em; text-transform: uppercase; padding: 9px 18px; border-radius: 999px; cursor: pointer; transition: color 0.16s ease, border-color 0.16s ease; }
+.ac-btn--secondary { color: var(--t-body); background: transparent; border: 1px solid var(--line-strong); }
+.ac-btn--secondary:hover { color: var(--t-display); border-color: var(--t-meta); }
+.ac-btn--ghost { color: var(--t-meta); background: transparent; border: none; }
+.ac-btn--ghost:hover { color: var(--silver); }
+
+.ac-forge__skip { position: absolute; right: 36px; bottom: 32px; background: transparent; border: none; cursor: pointer; font-family: var(--font-ui); font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--t-ghost); padding: 8px; transition: color 0.16s ease; }
+.ac-forge__skip:hover { color: var(--t-body); }
+.ac-forge__skip[hidden] { display: none; }
+
+/* reduced motion — the crown inks instantly; the ceremony jumps to its sealed end (arcane.js) */
+@media (prefers-reduced-motion: reduce) {
+  .ac-crown-svg [data-ink] { transition: none !important; }
+  .ac-crown-glow { transition: none !important; }
+}

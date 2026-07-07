@@ -3,23 +3,27 @@
 For a fresh Claude Code session to resume with zero context loss. **You are the BUILDER** (you hold the repo and
 make the changes). The user pastes specs/designs from a separate planning chat. Grounded in the repo — **re-grep
 line numbers, they drift** (every session shifts them a lot). Last written: **2026-07-07**, code at HEAD
-`BR-S158` (**pushed = LIVE** — the arcane intake is now linked from the live menu; BR-S156/S157 rode along in the same push). **push = deploy · live.**
+`BR-S159` (**pushed = LIVE** — the arcane intake was REBUILT to the builder's high-fidelity blueprint; BR-S156/S157/S158 all live). **push = deploy · live.**
 
-**★ LATEST SESSION (2026-07-07) — BR-S157/S158 — read this first:**
-- **THE ARCANE READING'S INTAKE SCREEN — "The Antechamber of Marks" (BR-S157, LOCAL, `?dev=arcane`).** The FIRST screen
-  of the photo-less "arcane" reading: the seeker SETS THEIR MARKS before the reading is drawn. Built front-end-first from
-  a 7-agent code-blind design workshop (5 concept lanes → opus synth → voice/law critic; verdict GO). **What it is:** a
-  thin central column of inscribed marks (given name · day of birth · hour · ground/place · optional "what is brought"),
-  open dark to either side; as each mark is set, ONE primitive RED-OCHRE cave daub answers it out in the margin (five
-  distinct hand-rough gestures — smear / finger-strokes / dot-cluster / thumb-stamp / tally); a fine GOLD CROWN overhead
-  wakes band-by-band (ghost→gold, one segment per core mark) and holds a faint glow once all four are laid — its solid
-  weight DELIBERATELY WITHHELD for the result screen it will preside over. "Draw the reading" opens once the name + day
-  are set (flexible gate — the hour/ground/matter may be left dark). Copy is archive-dry + fully in-world (NO backend/
-  mechanism words — new standing rule [[no-backend-jargon-in-copy]]); only the in-world mark names render (plain labels
-  live in aria-label). Scoped to `.antechamber`; palette additions (`--mark-ochre #9d3b28`, `--crown-gold #c69b63`, …)
-  are LOCAL — the global ramp is untouched. `renderArcane`/`wireArcane` + a `mountDev` branch in app.js; `.antechamber`
-  CSS at the END of styles.css. Reduced-motion = static state flips. Verified (headless empty + filled @1600×900 + DOM
-  drive): crown wakes 1000→1111, daubs answer each mark, clearing a mark relocks the gate + unlights its band, console clean.
+**★ LATEST SESSION (2026-07-07) — BR-S157→S159 — read this first:**
+- **THE ARCANA INTAKE — REBUILT to the builder's blueprint (BR-S159, LIVE, `?dev=arcane`, `arcane.js` + `arcane.css`).**
+  The builder handed a high-fidelity design bundle (`Arcana Intake Crown Blueprint.zip` → `design_handoff_arcana_intake/`)
+  and said "apply pixel-perfect + push". It SUPERSEDES the BR-S157 antechamber (red-ochre daubs + band crown — that code
+  is REMOVED: the old `renderArcane`/`wireArcane`/`ANTE_*` in app.js + the `.antechamber` block in styles.css are gone).
+  **What it is now:** (1) **CROWN BLUEPRINT** — a large draftsman + heraldic crown of **78 strokes** hovering above the
+  form; every character typed anywhere inks more of it (progress = `chars / 64`), deleting un-inks; at the budget it
+  "finishes" — jewels fill `#7e937f` (moss) + a soft halo blooms (the crown IS the progress indicator, no text). (2) The
+  five marks (name · day · hour · ground · matter) as bare hairline inputs; Cormorant 600 title "The Setting of Marks".
+  (3) **FORGING CEREMONY** — "Draw the reading" plays a stepped (~125ms tick, ~20s) paper-cutout scene: a shaman consults
+  a crown constellation + a mug, forwards a name-slip to a smith, who strikes the record into being over 8 strikes (schedule
+  strike×3 · inspect · strike×3 · blow · strike · BIG), then it rises + the seal fills + a copper halo. Skippable (jumps to
+  end), ESC, reduced-motion → end; end controls "Return to the marks" (state intact) + "Strike it again". Empty-form → the
+  guard "NO MARKS ARE SET. THE FORGE HAS NOTHING TO STRIKE." **Port:** self-contained `window.BRArcane` (like the reveal
+  units); loaded before app.js; `mountDev` delegates to it. Uses the global Sand/line/font tokens; accent `#7e937f`, forge
+  material `#c98a5e`, spark `#e8b27d`. Verified (headless empty/inked/mid-forge/end @1600×900 + DOM drive): 78 strokes ink
+  0→39→78, finish fills jewels + glow; ceremony full cast, slip carries the name, skip→sealed record + halo 0.16, return
+  restores the intake with marks intact; console clean. **FLAG (builder's copy, verbatim per pixel-perfect):** the under-CTA
+  line reads "Each mark, once set, is **hope**." (S157 had "is kept") — kept as given; confirm if it was meant as "kept".
 - **★ SAFETY RULING (builder, 2026-07-07) — the arcane reading carries NO photo-read safety walls.** There is no photo;
   the reading uses divination systems that already existed (astrology / numerology / tarot / runes / trigrams / I Ching)
   which the seeker CHOOSES to consult, and Blue Room only adds a few addons that take all those readings and synthesise
