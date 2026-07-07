@@ -3,9 +3,29 @@
 For a fresh Claude Code session to resume with zero context loss. **You are the BUILDER** (you hold the repo and
 make the changes). The user pastes specs/designs from a separate planning chat. Grounded in the repo — **re-grep
 line numbers, they drift** (every session shifts them a lot). Last written: **2026-07-07**, code at HEAD
-`BR-S159` (**pushed = LIVE** — the arcane intake was REBUILT to the builder's high-fidelity blueprint; BR-S156/S157/S158 all live). **push = deploy · live.**
+`BR-S161` (**pushed = LIVE** — the arcana reading now has a RESULT room "The Armor Received"; BR-S156→S161 all live). **push = deploy · live.**
 
-**★ LATEST SESSION (2026-07-07) — BR-S157→S159 — read this first:**
+**★ LATEST SESSION (2026-07-07) — BR-S160/S161 — read this first:**
+- **THE ARMOR RECEIVED — arcana reading RESULT room (BR-S161, LIVE, `?dev=arcana-result`, `arcana-result.js` + `.css`).**
+  The builder pasted a mockup ("The Armor Received") and said "pixel perfect as our reading" — the omen verdict shown as
+  a suit of ARMOUR, each reading in its place. Recreated faithfully. **Approach:** the armour FIGURE is the builder's
+  EXACT art embedded as the hero (`assets/arcana/armor-figure.png` — cropped from the mockup, bg crushed to pure black +
+  the baked-in belt card painted out, then `mix-blend-mode:screen` so only the gold linework + chest glow float onto the
+  page); the header, faint ring, TWELVE reading cards (Crown · R/L Shoulder · Breastplate · Gauntlets · Belt Seal ·
+  Greaves · Boots + four corner blessings: Rune / Archive Lexicon / Trigram Ward / Tarot Counsel), gold/copper medallion
+  icons, dotted connectors, corner compass roses, the "View full verdict" button + footer are rebuilt crisply in HTML/CSS.
+  Self-contained `window.BRArcanaResult`; `mountDev` delegates. **SHOWCASE data** (matches the mockup) — must be COMPUTED
+  from the intake marks later; the per-reading verdict pages + full verdict are NOT built (inert links). No photo-read
+  walls. **NOTES for refinement:** card positions are eyeballed-close (tweak `CARDS[].cx/cy` in arcana-result.js); the
+  figure is a raster embed (can be redrawn as vector for crispness); the figure ≈ mockup but not byte-identical.
+- **CODEX section images (BR-S160, LIVE).** `build_codex.py` now renders an optional `systemImage` banner under a system
+  header; the Chinese Zodiac points at `assets/codex/chinese-zodiac.png` (the builder's zodiac-wheel art, "ROSTER" title
+  cropped off — swap the file to replace). Regenerate as usual: edit `codex-data.json` → `python build_codex.py`.
+- **★ NICE CEREMONY VARIANT (noted, not built):** the builder's Downloads also holds a higher-fidelity gold-line forge
+  ceremony frame ("THE COMMISSION IS ACCEPTED" — a gold hummingbird carrying the slip). A candidate upgrade for the
+  BR-S159 forge ceremony's aesthetic if wanted.
+
+**★ PRIOR SESSION (2026-07-07) — BR-S157→S159:**
 - **THE ARCANA INTAKE — REBUILT to the builder's blueprint (BR-S159, LIVE, `?dev=arcane`, `arcane.js` + `arcane.css`).**
   The builder handed a high-fidelity design bundle (`Arcana Intake Crown Blueprint.zip` → `design_handoff_arcana_intake/`)
   and said "apply pixel-perfect + push". It SUPERSEDES the BR-S157 antechamber (red-ochre daubs + band crown — that code
