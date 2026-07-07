@@ -3,7 +3,7 @@
 For a fresh Claude Code session to resume with zero context loss. **You are the BUILDER** (you hold the repo and
 make the changes). The user pastes specs/designs from a separate planning chat. Grounded in the repo — **re-grep
 line numbers, they drift** (every session shifts them a lot). Last written: **2026-07-07**, code at HEAD
-`BR-S163` (**pushed = LIVE** — Kingdom Threshold on the result page + the pixel-perfect living CEREMONY; BR-S156→S163 all live). **push = deploy · live.**
+`BR-S164` (**pushed = LIVE** — the FULL forge-sequence ceremony is now the intake's ceremony; BR-S156→S164 all live). **push = deploy · live.**
 
 **★ LATEST SESSION (2026-07-07) — BR-S162/S163 — read this first:**
 - **THE CEREMONY — builder's exact art, pixel-perfect + alive (BR-S163, LIVE, `?dev=ceremony`, `ceremony.js`+`.css`).**
@@ -13,11 +13,15 @@ line numbers, they drift** (every session shifts them a lot). Last written: **20
   card glow, drifting embers, star twinkle. Baked caption/labels stay pixel-perfect; invisible corner buttons keep
   Back/Skip live (Skip → the result room). Self-contained `window.BRCeremony`; `mountDev` on `?dev=ceremony`. **Isolated —
   the live intake's own ForgeCeremony (arcane.js) is UNTOUCHED, not yet swapped.**
-  - **★ THE OPEN FORK:** the reference is a SINGLE frame, so it can't be pixel-perfect AND show the full 5-hit forge
-    SEQUENCE (the smith mid-swing, a crown forming on the anvil — poses the frame lacks). BR-S163 shipped the pixel-perfect
-    LIVING version. The full sequence is a matching-gold-line layer ON TOP of this exact scene — its complete plan (20-agent
-    workshop: render-from-frame controller, refined 6-stage crown SVG, grid-locked beats, element map, audit fixes) is saved
-    at **`docs/ARCANA_CEREMONY_PLAN.md`**. Builder to choose: keep the living version, or add the forge beats.
+  - **FORK RESOLVED → BR-S164 built the FULL SEQUENCE + swapped it into the intake.** The reference is a single frame, so:
+    the exact scene stays pixel-perfect (`ceremony-scene-base.png`, crow+trail+baked-caption painted off + screen-blended);
+    the CROW is its own layer (`crow.png`, flies in + perches); the forge beats the frame lacks (crown forming over 5 hits,
+    hammer, sparks, quench, halo) are matching gold-line SVG overlays on the anvil, driven by the workshop's render-from-frame
+    controller (`deriveState` sole clock, freeze-safe; 160 ticks @ 125ms). Live per-beat captions; reduced-motion → finished
+    crown; end = Strike-it-again / Enter-the-reading. `window.BRCeremony`; the intake's "Draw the reading" now opens it (Back →
+    marks, Enter → result room). Plan preserved at **`docs/ARCANA_CEREMONY_PLAN.md`**. **The old inline `ForgeCeremony` in
+    arcane.js is now the DEAD fallback** (kept only if ceremony.js fails to load) — a later sweep can remove it. The motion
+    FEEL is the builder's LIVE call (headless can't show real-time; forced-frame captures verified each beat).
   - **NOTE:** the reference art keeps the horn-hat + an envelope (not the clean hat / crown-card from the earlier redesign
     brief) — pixel-perfect wins over those redesign notes by the builder's explicit call.
 - **KINGDOM THRESHOLD (BR-S162, LIVE)** on the Armor Received page: a subtle ivory/gold horizon (not a divider) between the
