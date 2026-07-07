@@ -2,19 +2,40 @@
 
 For a fresh Claude Code session to resume with zero context loss. **You are the BUILDER** (you hold the repo and
 make the changes). The user pastes specs/designs from a separate planning chat. Grounded in the repo — **re-grep
-line numbers, they drift** (every session shifts them a lot). Last written: **2026-07-06**, code at HEAD
-`BR-S149` (+ the empty deploy re-trigger `a9b0a72`). **HEAD = origin/main · push = deploy.**
+line numbers, they drift** (every session shifts them a lot). Last written: **2026-07-07**, code at HEAD
+`BR-S155` (`26ed7d0`). **HEAD = origin/main · push = deploy · all live.**
 
-**This session shipped two arcs — read the ★ ACTIVE LANE below FIRST:**
-- **AURA (BR-S147→S149) — the current lane.** Dossier plate 03 (was an empty stub) now RENDERS a "thin relation
-  capstone": a residue mark + a class line + one `metTier` band + a verdict line. Built from a 25-agent synthesis of
-  the builder's GPT research + our own "Subtraction Gate" deep research, all captured in-repo at **`docs/aura_info/`**.
-  **Session C — a HUMAN authoring pass for the SRC-03/04/05 wording — is the remaining step.**
-- **THE VAULT (BR-S144→S146) + reveal fixes (BR-S142→S143).** A new dev-route page `?dev=vault` (saved-mint archive:
-  left-vertical collection · QR access · sealed-registry credit · one-screen), plus two reveal/tutorial fixes.
+**★ LATEST SESSION (2026-07-07) — read this first:**
+- **AURA REBUILT → NAMED AIR (BR-S153→S154, LIVE).** The old "thin relation capstone / residue mark" (BR-S147→149,
+  `docs/aura_info`, and the PHOSPHOR DECAY afterimage mark) was **SCRAPPED by the builder as incomprehensible** ("a
+  scribble a toddler could make; makes zero sense"). Dossier plate 03 is now **pure typography, no glyph**: `feels like`
+  → the two-word NAME of the feeling (stacked serif hero) → a hairline in `halo.a` → a second-person READ ("You brace
+  before you know why.") → `COMES OFF THE PRINT · <TIER>`, on one faint glow of the photo's light. See
+  [[blue-room-aura-agenda]]; **do NOT revive the residue-mark theory** — `docs/aura_info` is dead reference only.
+- **SHOWCASE + REVEAL FULLVIEW (BR-S151→S152, LIVE).** The develop-reveal fullview ("Stats & Readings") got a purple
+  hand-drawn **to-the-Vault arrow** (right-edge, vertically centred) + a `◆ EXAMPLE · SHOWCASE` banner + a vignette
+  scrim so it reads as a showcase, not a real page; the Vault's example marker was upgraded to match.
+- **THE CODEX (BR-S155, LIVE).** New standalone reference page **`codex.html`** (built from **`codex-data.json`** via
+  **`build_codex.py`**): 159 canonical meanings across 7 systems (Western zodiac ·12, Chinese zodiac+five elements ·17,
+  numerology ·12, tarot Major Arcana ·22 w/ reversed, Elder Futhark runes ·24, the eight trigrams ·8, all 64 I Ching
+  hexagrams). Browsable + searchable, Blue Room look, `← Blue Room` back-link. Reached from the menu via a quiet
+  `.menu__codex` pill ("◆ The Codex →"). NOT wired into the app router — a real page the menu links out to. This is the
+  **"first bank"** (plain canonical meanings, not the archive voice); a later multi-source research sweep is meant to
+  deepen/verify each entry. Regenerate: edit `codex-data.json` → `python build_codex.py` → it rewrites `codex.html`.
 
-**The develop/reveal ADD-ON (BR-S124→S141) is now SHIPPED — demoted to PRIOR LANE (reference) further below.** (The
-card-front + dossier detail in §2/PRIOR LANE is still accurate.)
+**PLANNED / PAUSED (design only, NOTHING built into the app):**
+- **ARCHETYPE (plate 02, still the reserved stub)** — designed as "The Determination / So Filed": a tarot-style
+  CLASSIFICATION (the archive rules the photo is 1 of ~12 KINDS — The Encounter/Dispatch/Arrival…), Arcana-Plate look
+  + engraved-seal crests. **PAUSED, mockups only.** See [[blue-room-archetype-paused]].
+- **THE SEPARATE READING** — planned: a photo-less "records office" reading a PERSON from birth date/name/hour/place
+  through the Codex systems, synthesised into one tarot/omen verdict; archive-dry tone; conditional sections that
+  appear as their input is filed. **Plan only, nothing built.**
+
+**PROCESS LAW LEARNED (see [[front-end-first-not-theory]]):** design the FRONT-END (what the viewer sees/reads/FEELS)
+FIRST and code-blind; never let a backend theory drive a visual; an abstract mark that needs a theory to read is a
+failure even if elegant. This is why Aura was rebuilt words-led — comprehension is the bar, not elegance.
+
+**Prior lanes — The Vault (BR-S144→146), the develop/reveal ADD-ON (BR-S124→141) — are SHIPPED; detail further below.**
 
 ---
 
