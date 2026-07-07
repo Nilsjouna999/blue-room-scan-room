@@ -3,9 +3,28 @@
 For a fresh Claude Code session to resume with zero context loss. **You are the BUILDER** (you hold the repo and
 make the changes). The user pastes specs/designs from a separate planning chat. Grounded in the repo — **re-grep
 line numbers, they drift** (every session shifts them a lot). Last written: **2026-07-07**, code at HEAD
-`BR-S161` (**pushed = LIVE** — the arcana reading now has a RESULT room "The Armor Received"; BR-S156→S161 all live). **push = deploy · live.**
+`BR-S163` (**pushed = LIVE** — Kingdom Threshold on the result page + the pixel-perfect living CEREMONY; BR-S156→S163 all live). **push = deploy · live.**
 
-**★ LATEST SESSION (2026-07-07) — BR-S160/S161 — read this first:**
+**★ LATEST SESSION (2026-07-07) — BR-S162/S163 — read this first:**
+- **THE CEREMONY — builder's exact art, pixel-perfect + alive (BR-S163, LIVE, `?dev=ceremony`, `ceremony.js`+`.css`).**
+  The builder wanted their reference frame ("THE COMMISSION IS ACCEPTED") kept PIXEL-PERFECT, not redrawn. So the art is
+  the exact image (`assets/arcana/ceremony/ceremony-scene.png` = the reference crushed to gold-on-black + `mix-blend-mode:
+  screen`), with ambient life layered over it that never touches a line: forge-mouth breath, chimney smoke, sky-omen +
+  card glow, drifting embers, star twinkle. Baked caption/labels stay pixel-perfect; invisible corner buttons keep
+  Back/Skip live (Skip → the result room). Self-contained `window.BRCeremony`; `mountDev` on `?dev=ceremony`. **Isolated —
+  the live intake's own ForgeCeremony (arcane.js) is UNTOUCHED, not yet swapped.**
+  - **★ THE OPEN FORK:** the reference is a SINGLE frame, so it can't be pixel-perfect AND show the full 5-hit forge
+    SEQUENCE (the smith mid-swing, a crown forming on the anvil — poses the frame lacks). BR-S163 shipped the pixel-perfect
+    LIVING version. The full sequence is a matching-gold-line layer ON TOP of this exact scene — its complete plan (20-agent
+    workshop: render-from-frame controller, refined 6-stage crown SVG, grid-locked beats, element map, audit fixes) is saved
+    at **`docs/ARCANA_CEREMONY_PLAN.md`**. Builder to choose: keep the living version, or add the forge beats.
+  - **NOTE:** the reference art keeps the horn-hat + an envelope (not the clean hat / crown-card from the earlier redesign
+    brief) — pixel-perfect wins over those redesign notes by the builder's explicit call.
+- **KINGDOM THRESHOLD (BR-S162, LIVE)** on the Armor Received page: a subtle ivory/gold horizon (not a divider) between the
+  title and the armour — fades at the ends, breaks at a centre crown-gate sigil (hover → soft glow + hidden "VIEW KINGDOM"),
+  reserved as a future profile/kingdom gateway. `.ar-threshold` in arcana-result.js/css.
+
+**★ PRIOR SESSION (2026-07-07) — BR-S160/S161:**
 - **THE ARMOR RECEIVED — arcana reading RESULT room (BR-S161, LIVE, `?dev=arcana-result`, `arcana-result.js` + `.css`).**
   The builder pasted a mockup ("The Armor Received") and said "pixel perfect as our reading" — the omen verdict shown as
   a suit of ARMOUR, each reading in its place. Recreated faithfully. **Approach:** the armour FIGURE is the builder's
