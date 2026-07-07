@@ -772,7 +772,15 @@
       inputs.forEach(function (i) { if (i.dataset.mark === "name") nameVal = i.value; });
       if (ceremony && ceremony.destroy) ceremony.destroy();
       ceremonyHost.hidden = false;
-      ceremony = ForgeCeremony(ceremonyHost, nameVal, MATERIAL, exitCeremony);
+      // BR-S164: "Draw the reading" now opens the redesigned ceremony (ceremony.js,
+      // window.BRCeremony) — the builder's pixel-perfect forge scene, alive, with the
+      // crown forged over 5 hits. Back → the marks; "Enter the reading" → the result.
+      // Falls back to the original inline ForgeCeremony if ceremony.js didn't load.
+      if (window.BRCeremony && typeof window.BRCeremony.mount === "function") {
+        ceremony = window.BRCeremony.mount(ceremonyHost, { onExit: exitCeremony, onDone: function () { location.href = "?dev=arcana-result"; } });
+      } else {
+        ceremony = ForgeCeremony(ceremonyHost, nameVal, MATERIAL, exitCeremony);
+      }
     }
 
     inputs.forEach(function (i) { i.addEventListener("input", refresh); });
