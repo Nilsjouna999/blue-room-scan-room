@@ -91,7 +91,7 @@ const state ={ source: 0, treatment: "free", tab: "diagram", view: "menu", draft
      uploaded-blocked renders a validated DEV fixture, never a user scan.
      free-scan-sim = Free Pull mock · halo-gate = sealed card-back mock. */
   const dev = q.get("dev");
-  if (["uploaded-result", "uploaded-blocked", "free-scan-sim", "halo-gate", "before-after", "review-map", "proto-cards", "staged-reveal", "menu-reveal", "vault"].includes(dev)) { state.view = "dev"; state.dev = dev; }
+  if (["uploaded-result", "uploaded-blocked", "free-scan-sim", "halo-gate", "before-after", "review-map", "proto-cards", "staged-reveal", "menu-reveal", "vault", "arcane"].includes(dev)) { state.view = "dev"; state.dev = dev; }
   else if (q.has("src") || q.has("t") || q.has("tab")) state.view = "room";
 }
 
@@ -2058,6 +2058,137 @@ function wireVault() {
   });
 }
 
+/* ============================================================
+   THE ANTECHAMBER OF MARKS (?dev=arcane) — BR-S157
+   The intake screen of the ARCANE (photo-less) reading: the seeker
+   SETS THEIR MARKS before the reading is drawn. A thin central
+   column of inscribed lines, open dark to either side; as each mark
+   is set, one primitive red-ochre cave daub answers it in the
+   margin, and a fine gold crown overhead wakes band-by-band. The
+   reading RESULT is a LATER screen — the crown's solid weight is
+   deliberately withheld here. Copy is archive-dry + in-world (no
+   mechanism words). Scoped to .antechamber; isolated dev route.
+   NOTE: the person-safety WALL for the omen verdict about a real
+   named person is a prerequisite of the RESULT page, not this intake.
+============================================================ */
+
+/* five primitive red-ochre gestures — hand-rough, never geometric-clean;
+   one daubs up in the margin as its mark is set (fill/stroke = currentColor). */
+const ANTE_DAUBS = {
+  1: '<svg viewBox="0 0 44 26" aria-hidden="true"><path d="M4 15 Q11 7 19 11 Q28 15 39 8 Q35 12 34 15 Q30 20 21 18 Q12 17 7 18 Q4 18 4 15 Z"/><path d="M14 19 Q22 22 31 19 Q24 24 16 22 Z"/></svg>',
+  2: '<svg viewBox="0 0 26 36" aria-hidden="true"><path d="M8 3 Q5 17 9 33" fill="none" stroke="currentColor" stroke-width="3.6" stroke-linecap="round"/><path d="M17 5 Q20 18 15 31" fill="none" stroke="currentColor" stroke-width="3.1" stroke-linecap="round"/></svg>',
+  3: '<svg viewBox="0 0 32 30" aria-hidden="true"><path d="M7 8 Q11 6 11 10 Q10 13 7 12 Q5 10 7 8Z"/><path d="M18 5 Q21 4 21 7 Q20 9 18 8 Q16 6 18 5Z"/><path d="M23 17 Q27 16 26 20 Q23 23 20 21 Q19 18 23 17Z"/><path d="M11 20 Q14 19 14 22 Q12 24 10 22 Q9 20 11 20Z"/></svg>',
+  4: '<svg viewBox="0 0 30 36" aria-hidden="true"><path d="M15 3 Q27 5 25 18 Q24 31 13 30 Q4 28 5 16 Q6 5 15 3 Z"/></svg>',
+  5: '<svg viewBox="0 0 36 28" aria-hidden="true"><path d="M6 4 L8 23" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"/><path d="M13 3 L14 23" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"/><path d="M20 4 L21 22" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"/><path d="M3 12 Q17 7 31 14" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg>',
+};
+
+/* a fine banded circlet, thin line only — four segments (one per core mark),
+   each waking ghost→gold as its mark is set. Never fully resolves here. */
+const ANTE_CROWN =
+  '<svg class="ante__crown" viewBox="0 0 72 46" data-lit="0" aria-hidden="true">'
+  + '<g class="ante__cseg" data-seg="1"><path d="M10 40 Q36 43 62 40 L60 31 Q36 34 12 31 Z"/></g>'
+  + '<g class="ante__cseg" data-seg="2"><path d="M13 31 L21 13 L29 31"/><circle cx="21" cy="11" r="1.7"/></g>'
+  + '<g class="ante__cseg" data-seg="3"><path d="M28 31 L36 6 L44 31"/><circle cx="36" cy="4" r="1.9"/></g>'
+  + '<g class="ante__cseg" data-seg="4"><path d="M43 31 L51 13 L59 31"/><circle cx="51" cy="11" r="1.7"/></g>'
+  + '</svg>';
+
+/* the marks the reading is drawn from — only the in-world NAME renders; the
+   plain descriptor lives in aria-label only, and optionality is spoken in the
+   microcopy ("may be left dark"), never a rendered "(optional)". */
+const ANTE_MARKS = [
+  { i: 1, core: true,  name: "The Name Borne",           aria: "Given name",           ph: "the name you answer to" },
+  { i: 2, core: true,  name: "The Day First Counted",    aria: "Date of birth",        ph: "the day, the month, the year" },
+  { i: 3, core: true,  name: "The Hour First Struck",    aria: "Hour of birth",        ph: "the hour, if it is known" },
+  { i: 4, core: true,  name: "The Ground First Stood On", aria: "Place of birth",      ph: "the town, and the land" },
+  { i: 5, core: false, name: "What Is Brought",          aria: "The matter you bring", ph: "the matter you carry, in a line — or leave it unspoken" },
+];
+
+function renderArcane() {
+  const daubs = [1, 2, 3, 4, 5].map((n) =>
+    `<span class="ante__daub ante__daub--${n}${n === 5 ? " ante__daub--warm" : ""}" data-daub="${n}">${ANTE_DAUBS[n]}</span>`
+  ).join("");
+  const marks = ANTE_MARKS.map((m) =>
+    `<label class="ante__mark" data-mark="${m.i}" data-core="${m.core ? 1 : 0}" data-set="0">
+       <span class="ante__mark-name">${esc(m.name)}</span>
+       <input class="ante__mark-in" type="text" autocomplete="off" spellcheck="false" aria-label="${esc(m.aria)}" placeholder="${esc(m.ph)}">
+     </label>`
+  ).join("");
+  return `
+    <div class="antechamber" data-antechamber>
+      <button type="button" class="ante__back" data-view-to="menu">← Back to the menu</button>
+      <div class="ante__margins" aria-hidden="true">${daubs}</div>
+      <div class="ante__column">
+        <div class="ante__crownwrap" aria-hidden="true">${ANTE_CROWN}</div>
+        <h1 class="ante__title">The Setting of Marks</h1>
+        <p class="ante__sub">Before the reading is drawn, lay down what it is drawn from.</p>
+        <p class="ante__sub2">The crown overhead is not yet whole.</p>
+        <div class="ante__marks">${marks}</div>
+        <div class="ante__begin-wrap">
+          <button type="button" class="ante__begin" data-begin disabled>draw the reading</button>
+          <p class="ante__micro">Each mark, once set, is kept.</p>
+        </div>
+      </div>
+      <div class="ante__drawn" data-ante-drawn><p>The marks are laid.<br>The reading waits beyond.</p></div>
+    </div>`;
+}
+
+function wireArcane() {
+  const root = document.querySelector(".antechamber");
+  if (!root) return;
+  const marks = [...root.querySelectorAll(".ante__mark")];
+  const crown = root.querySelector(".ante__crown");
+  const segs = [...root.querySelectorAll(".ante__cseg")];
+  const begin = root.querySelector("[data-begin]");
+  const drawn = root.querySelector("[data-ante-drawn]");
+  const daubs = {};
+  root.querySelectorAll("[data-daub]").forEach((d) => { daubs[d.dataset.daub] = d; });
+  const flashTimers = {};
+
+  function refresh() {
+    let coreSet = 0, nameSet = false, daySet = false, matterSet = false;
+    marks.forEach((m) => {
+      const inp = m.querySelector(".ante__mark-in");
+      const set = inp.value.trim() !== "";
+      const idx = m.dataset.mark;
+      m.dataset.set = set ? "1" : "0";
+      if (daubs[idx]) daubs[idx].classList.toggle("is-shown", set);   // the cave answers in the margin
+      if (m.dataset.core === "1") {
+        if (set) coreSet++;
+        if (idx === "1") nameSet = set;
+        if (idx === "2") daySet = set;
+        const seg = segs[Number(idx) - 1];                            // this mark wakes its own crown band
+        if (seg) {
+          const wasLit = seg.classList.contains("is-lit");
+          seg.classList.toggle("is-lit", set);
+          if (set && !wasLit) {                                       // a brief brighten that settles
+            seg.classList.add("just-lit");
+            clearTimeout(flashTimers[idx]);
+            flashTimers[idx] = setTimeout(() => seg.classList.remove("just-lit"), 760);
+          }
+          if (!set) seg.classList.remove("just-lit");
+        }
+      } else if (set) {
+        matterSet = true;                                            // the optional matter deepens the glow, lights no band
+      }
+    });
+    crown.dataset.lit = String(coreSet);
+    crown.classList.toggle("is-woken", coreSet >= 4);
+    crown.classList.toggle("is-enriched", matterSet);
+    const ready = nameSet && daySet;                                 // the name and the day suffice
+    begin.classList.toggle("is-ready", ready);
+    begin.disabled = !ready;
+  }
+
+  marks.forEach((m) => {
+    const inp = m.querySelector(".ante__mark-in");
+    inp.addEventListener("input", refresh);
+    inp.addEventListener("blur", refresh);
+  });
+  begin.addEventListener("click", () => { if (!begin.disabled) root.classList.add("is-drawing"); });
+  if (drawn) drawn.addEventListener("click", () => root.classList.remove("is-drawing"));   // the door lets you step back
+  refresh();
+}
+
 function mountDev() {
   const C = window.BlueRoomScanContract;
   const F = (C && C.DEV_FIXTURES) || {};
@@ -2068,6 +2199,11 @@ function mountDev() {
   if (state.dev === "vault") {
     document.getElementById("devView").innerHTML = renderVault();
     wireVault();
+    return;
+  }
+  if (state.dev === "arcane") {
+    document.getElementById("devView").innerHTML = renderArcane();
+    wireArcane();
     return;
   }
   if (state.dev === "staged-reveal") {

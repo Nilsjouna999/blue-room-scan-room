@@ -3,9 +3,32 @@
 For a fresh Claude Code session to resume with zero context loss. **You are the BUILDER** (you hold the repo and
 make the changes). The user pastes specs/designs from a separate planning chat. Grounded in the repo — **re-grep
 line numbers, they drift** (every session shifts them a lot). Last written: **2026-07-07**, code at HEAD
-`BR-S156` (**LOCAL — committed to main, NOT pushed**; prior pushed HEAD `26ed7d0` BR-S155). **push = deploy · live.**
+`BR-S157` (**LOCAL — committed to main, NOT pushed**; last pushed/live HEAD is still `26ed7d0` BR-S155). **push = deploy · live.**
 
-**★ LATEST SESSION (2026-07-07) — BR-S156 — read this first:**
+**★ LATEST SESSION (2026-07-07) — BR-S157 — read this first:**
+- **THE ARCANE READING'S INTAKE SCREEN — "The Antechamber of Marks" (BR-S157, LOCAL, `?dev=arcane`).** The FIRST screen
+  of the photo-less "arcane" reading: the seeker SETS THEIR MARKS before the reading is drawn. Built front-end-first from
+  a 7-agent code-blind design workshop (5 concept lanes → opus synth → voice/law critic; verdict GO). **What it is:** a
+  thin central column of inscribed marks (given name · day of birth · hour · ground/place · optional "what is brought"),
+  open dark to either side; as each mark is set, ONE primitive RED-OCHRE cave daub answers it out in the margin (five
+  distinct hand-rough gestures — smear / finger-strokes / dot-cluster / thumb-stamp / tally); a fine GOLD CROWN overhead
+  wakes band-by-band (ghost→gold, one segment per core mark) and holds a faint glow once all four are laid — its solid
+  weight DELIBERATELY WITHHELD for the result screen it will preside over. "Draw the reading" opens once the name + day
+  are set (flexible gate — the hour/ground/matter may be left dark). Copy is archive-dry + fully in-world (NO backend/
+  mechanism words — new standing rule [[no-backend-jargon-in-copy]]); only the in-world mark names render (plain labels
+  live in aria-label). Scoped to `.antechamber`; palette additions (`--mark-ochre #9d3b28`, `--crown-gold #c69b63`, …)
+  are LOCAL — the global ramp is untouched. `renderArcane`/`wireArcane` + a `mountDev` branch in app.js; `.antechamber`
+  CSS at the END of styles.css. Reduced-motion = static state flips. Verified (headless empty + filled @1600×900 + DOM
+  drive): crown wakes 1000→1111, daubs answer each mark, clearing a mark relocks the gate + unlights its band, console clean.
+- **★ HARD PREREQUISITE for the RESULT page (the omen verdict) — do NOT build it until this wall is specified:** the
+  arcane reading READS A PERSON from their birth marks; the photo-read person-safety walls (BR-S113 / READING_DOCTRINE)
+  govern a PHOTOGRAPHED OBJECT, not a pronouncement on a living named seeker. Before building the result page, define what
+  an omen verdict about a real person may / may not assert (no fate / health / death / character-worth pronouncements) and
+  whether the photo guardrails transfer or a separate wall is needed. (voice/law critic, medium.)
+- **NEXT after that:** click-to-expand full-page lore for BOTH the Codex + the reading room (basic answer → click → a
+  near-full-page in-depth panel; gather + fill the deep content afterwards).
+
+**★ PRIOR SESSION (2026-07-07) — BR-S156:**
 - **VAULT/SHOWCASE POLISH + THE BLUE ROOM LEXICON (BR-S156, LOCAL — on main, not pushed).** Four fixes, all
   additive/scoped; pre-edit critique = a 7-agent read-only workflow (2 critics GO_WITH_CHANGES · 3 lexicon authors ·
   opus synth · adversarial person-read verify = **GO**).
@@ -54,9 +77,10 @@ line numbers, they drift** (every session shifts them a lot). Last written: **20
 - **ARCHETYPE (plate 02, still the reserved stub)** — designed as "The Determination / So Filed": a tarot-style
   CLASSIFICATION (the archive rules the photo is 1 of ~12 KINDS — The Encounter/Dispatch/Arrival…), Arcana-Plate look
   + engraved-seal crests. **PAUSED, mockups only.** See [[blue-room-archetype-paused]].
-- **THE SEPARATE READING** — planned: a photo-less "records office" reading a PERSON from birth date/name/hour/place
+- **THE SEPARATE / ARCANE READING** — a photo-less "records office" reading a PERSON from birth date/name/hour/place
   through the Codex systems, synthesised into one tarot/omen verdict; archive-dry tone; conditional sections that
-  appear as their input is filed. **Plan only, nothing built.**
+  appear as their input is filed. **INTAKE SCREEN BUILT** (BR-S157, `?dev=arcane` — "The Antechamber of Marks", above);
+  the omen-verdict RESULT page is NOT built and is gated on its person-safety wall (see the BR-S157 prerequisite above).
 
 **PROCESS LAW LEARNED (see [[front-end-first-not-theory]]):** design the FRONT-END (what the viewer sees/reads/FEELS)
 FIRST and code-blind; never let a backend theory drive a visual; an abstract mark that needs a theory to read is a

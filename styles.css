@@ -3831,3 +3831,104 @@ body[data-devnav="1"] .devnav {
 }
 .devnav__btn:hover { color: var(--t-display); border-color: var(--line-strong); }
 .devnav__sep { color: var(--t-ghost); font-size: 9px; padding: 0 1px; }
+
+/* =============================================================
+   THE ANTECHAMBER OF MARKS (?dev=arcane) — BR-S157
+   Intake screen of the arcane (photo-less) reading. Thin central
+   column of inscribed marks · open dark sides where red-ochre cave
+   daubs answer each set mark · a fine gold crown overhead that wakes
+   band-by-band. Palette additions are LOCAL to .antechamber; the
+   global warm-sand ramp is untouched. Isolated dev route.
+============================================================= */
+.antechamber {
+  --mark-ochre: #9d3b28;
+  --mark-ochre-warm: #b5583c;
+  --crown-ghost: #5d5a52;
+  --crown-gold: #c69b63;
+  --crown-gold-edge: #d9b678;
+  --crown-glow: rgba(198, 155, 99, 0.16);
+  position: fixed; inset: 0; z-index: 40; overflow: hidden;
+  display: grid; place-items: center;
+  background: radial-gradient(120% 92% at 50% 38%, var(--ink-900) 0%, var(--ink-950) 60%, #060708 100%);
+  font-family: var(--font-ui); color: var(--t-body);
+}
+.ante__back {
+  position: fixed; top: clamp(20px, 4vh, 40px); left: clamp(20px, 4vw, 44px); z-index: 6;
+  font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--t-meta); background: none; border: 0; cursor: pointer; padding: 8px 4px; transition: color 160ms ease;
+}
+.ante__back:hover { color: var(--t-display); }
+
+/* the open margins — where the cave answers each mark */
+.ante__margins { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
+.ante__daub { position: absolute; width: 32px; height: 30px; color: var(--mark-ochre); opacity: 0; transition: opacity 600ms ease; }
+.ante__daub svg { width: 100%; height: 100%; display: block; fill: currentColor; }
+.ante__daub.is-shown { opacity: 0.5; }
+.ante__daub--warm { color: var(--mark-ochre-warm); }
+.ante__daub--1 { left: 13%;  top: 69%; transform: rotate(-4deg); }
+.ante__daub--2 { right: 14%; top: 26%; transform: rotate(6deg); }
+.ante__daub--3 { left: 9%;   top: 46%; transform: rotate(3deg); }
+.ante__daub--4 { left: 17%;  top: 20%; transform: rotate(-7deg); }
+.ante__daub--5 { right: 10%; top: 57%; transform: rotate(4deg); }
+
+/* the thin central column — inscribed lines, not a form */
+.ante__column { position: relative; z-index: 2; width: min(400px, 86vw); display: flex; flex-direction: column; align-items: center; text-align: center; }
+
+/* the crown, waking overhead — thin line only, four segments */
+.ante__crownwrap { margin-bottom: 24px; line-height: 0; }
+.ante__crown { width: 76px; height: auto; overflow: visible; transition: filter 700ms ease; }
+.ante__crown .ante__cseg path { fill: none; }
+.ante__crown .ante__cseg path, .ante__crown .ante__cseg circle {
+  stroke: var(--crown-ghost); stroke-width: 1.3; stroke-linejoin: round; stroke-linecap: round;
+  opacity: 0.5; transition: stroke 650ms ease, opacity 650ms ease, fill 650ms ease;
+}
+.ante__crown .ante__cseg circle { fill: none; }
+.ante__cseg.is-lit path, .ante__cseg.is-lit circle { stroke: var(--crown-gold); opacity: 1; }
+.ante__cseg.is-lit circle { fill: var(--crown-gold); }
+.ante__crown.is-woken { filter: drop-shadow(0 0 8px var(--crown-glow)); }
+.ante__crown.is-woken.is-enriched { filter: drop-shadow(0 0 12px var(--crown-glow)); }
+
+/* title · sub · a quiet world-state line (states world, does not narrate the UI) */
+.ante__title { font-family: var(--font-display); font-size: 34px; font-weight: 500; letter-spacing: 0.01em; line-height: 1.08; color: var(--t-display); }
+.ante__sub { margin-top: 13px; font-family: var(--font-display); font-style: italic; font-size: 15.5px; line-height: 1.5; color: var(--t-body); max-width: 330px; }
+.ante__sub2 { margin-top: 9px; font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--t-ghost); }
+
+/* the marks */
+.ante__marks { margin-top: 42px; width: 100%; display: flex; flex-direction: column; gap: 28px; }
+.ante__mark { display: flex; flex-direction: column; align-items: stretch; gap: 7px; text-align: left; cursor: text; }
+.ante__mark-name { font-family: var(--font-mono); font-size: 9.5px; font-weight: 400; letter-spacing: 0.22em; text-transform: uppercase; color: var(--t-ghost); transition: color 500ms ease; }
+.ante__mark[data-set="1"] .ante__mark-name { color: var(--t-primary); }
+.ante__mark-in {
+  width: 100%; background: none; border: 0; border-bottom: 1px solid var(--line);
+  padding: 3px 0 8px; font-family: var(--font-display); font-size: 20px; color: var(--t-display);
+  outline: none; transition: border-color 400ms ease;
+}
+.ante__mark-in::placeholder { color: var(--t-ghost); font-style: italic; font-size: 15px; opacity: 0.85; }
+.ante__mark-in:focus { border-bottom-color: var(--crown-gold); }
+.ante__mark[data-set="1"] .ante__mark-in { border-bottom-color: var(--line-strong); }
+
+/* the closing flourish — draw the reading (opens once the name and day are set) */
+.ante__begin-wrap { margin-top: 46px; width: 100%; padding-top: 26px; border-top: 1px solid var(--line-faint); display: flex; flex-direction: column; align-items: center; gap: 11px; }
+.ante__begin {
+  font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.3em; text-transform: uppercase;
+  color: var(--crown-ghost); background: none; border: 0; cursor: default; padding: 6px 4px; transition: color 500ms ease;
+}
+.ante__begin.is-ready { color: var(--crown-gold); cursor: pointer; }
+.ante__begin.is-ready:hover { color: var(--crown-gold-edge); }
+.ante__micro { font-family: var(--font-display); font-style: italic; font-size: 12.5px; color: var(--t-ghost); }
+
+/* the doorway — a held foreshadow (the reading result is a later screen) */
+.ante__drawn { position: fixed; inset: 0; z-index: 8; display: none; place-items: center; text-align: center; cursor: pointer; background: radial-gradient(58% 50% at 50% 45%, rgba(6, 7, 8, 0.5), rgba(6, 7, 8, 0.92)); }
+.ante__drawn p { font-family: var(--font-display); font-style: italic; font-size: 23px; line-height: 1.5; color: var(--crown-gold); }
+.antechamber.is-drawing .ante__column { opacity: 0.1; transition: opacity 700ms ease; pointer-events: none; }
+.antechamber.is-drawing .ante__drawn { display: grid; }
+
+/* freshly-lit band — a brief brighten that settles (motion only) */
+@media (prefers-reduced-motion: no-preference) {
+  .ante__cseg.just-lit path, .ante__cseg.just-lit circle { animation: ante-band-light 760ms ease; }
+}
+@keyframes ante-band-light { 0%, 45% { stroke: var(--crown-gold-edge); } 100% { stroke: var(--crown-gold); } }
+@media (prefers-reduced-motion: reduce) {
+  .ante__daub, .ante__crown, .ante__crown .ante__cseg path, .ante__crown .ante__cseg circle,
+  .ante__mark-name, .ante__mark-in, .ante__begin, .antechamber.is-drawing .ante__column { transition: none !important; }
+}
