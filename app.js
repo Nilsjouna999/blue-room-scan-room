@@ -1245,7 +1245,10 @@ function renderMenu(reveal) {
           <p class="pickmsg" role="status" aria-live="polite"></p>
         </div>
 
-        <a class="menu__codex" href="codex.html"><span class="menu__codex__mark" aria-hidden="true">◆</span> The Codex <span class="menu__codex__arr" aria-hidden="true">→</span></a>
+        <div class="menu__portals">
+          <a class="menu__codex" href="codex.html"><span class="menu__codex__mark" aria-hidden="true">◆</span> The Codex <span class="menu__codex__arr" aria-hidden="true">→</span></a>
+          <a class="menu__codex" href="?dev=arcane"><span class="menu__codex__mark" aria-hidden="true">◆</span> The Arcane Reading <span class="menu__codex__arr" aria-hidden="true">→</span></a>
+        </div>
 
         <p class="menu__foot">One sample · SRC-01 · Driver.</p>
       </div>

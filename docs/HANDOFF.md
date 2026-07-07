@@ -3,9 +3,9 @@
 For a fresh Claude Code session to resume with zero context loss. **You are the BUILDER** (you hold the repo and
 make the changes). The user pastes specs/designs from a separate planning chat. Grounded in the repo — **re-grep
 line numbers, they drift** (every session shifts them a lot). Last written: **2026-07-07**, code at HEAD
-`BR-S157` (**LOCAL — committed to main, NOT pushed**; last pushed/live HEAD is still `26ed7d0` BR-S155). **push = deploy · live.**
+`BR-S158` (**pushed = LIVE** — the arcane intake is now linked from the live menu; BR-S156/S157 rode along in the same push). **push = deploy · live.**
 
-**★ LATEST SESSION (2026-07-07) — BR-S157 — read this first:**
+**★ LATEST SESSION (2026-07-07) — BR-S157/S158 — read this first:**
 - **THE ARCANE READING'S INTAKE SCREEN — "The Antechamber of Marks" (BR-S157, LOCAL, `?dev=arcane`).** The FIRST screen
   of the photo-less "arcane" reading: the seeker SETS THEIR MARKS before the reading is drawn. Built front-end-first from
   a 7-agent code-blind design workshop (5 concept lanes → opus synth → voice/law critic; verdict GO). **What it is:** a
@@ -20,13 +20,18 @@ line numbers, they drift** (every session shifts them a lot). Last written: **20
   are LOCAL — the global ramp is untouched. `renderArcane`/`wireArcane` + a `mountDev` branch in app.js; `.antechamber`
   CSS at the END of styles.css. Reduced-motion = static state flips. Verified (headless empty + filled @1600×900 + DOM
   drive): crown wakes 1000→1111, daubs answer each mark, clearing a mark relocks the gate + unlights its band, console clean.
-- **★ HARD PREREQUISITE for the RESULT page (the omen verdict) — do NOT build it until this wall is specified:** the
-  arcane reading READS A PERSON from their birth marks; the photo-read person-safety walls (BR-S113 / READING_DOCTRINE)
-  govern a PHOTOGRAPHED OBJECT, not a pronouncement on a living named seeker. Before building the result page, define what
-  an omen verdict about a real person may / may not assert (no fate / health / death / character-worth pronouncements) and
-  whether the photo guardrails transfer or a separate wall is needed. (voice/law critic, medium.)
-- **NEXT after that:** click-to-expand full-page lore for BOTH the Codex + the reading room (basic answer → click → a
-  near-full-page in-depth panel; gather + fill the deep content afterwards).
+- **★ SAFETY RULING (builder, 2026-07-07) — the arcane reading carries NO photo-read safety walls.** There is no photo;
+  the reading uses divination systems that already existed (astrology / numerology / tarot / runes / trigrams / I Ching)
+  which the seeker CHOOSES to consult, and Blue Room only adds a few addons that take all those readings and synthesise
+  ONE Blue Room reading. So the BR-S113 / READING_DOCTRINE person-safety walls (which govern reading a PHOTOGRAPHED person)
+  do NOT apply here — the RESULT page is **not gated on them**; write the verdict in the traditional-divination register
+  (character / fortune / omen statements are the genre). Keep only ordinary responsible voice (no literal medical / death
+  claims) — voice, not a wall. Photo-read walls stay LOCKED for the PHOTO read. (See the `arcane-reading-no-photo-safety` memory.)
+- **ADDED TO THE LIVE MENU (BR-S158):** a quiet `.menu__codex` pill "◆ The Arcane Reading →" (beside "◆ The Codex →")
+  links the live menu to `?dev=arcane`. So the intake is reachable from the front door.
+- **NEXT:** build the arcane RESULT page (the omen verdict — the solid gold crown arrives, readings arranged around it;
+  no safety wall). THEN the click-to-expand full-page lore for BOTH the Codex + the reading room (basic answer → click →
+  a near-full-page in-depth panel; gather + fill the deep content afterwards).
 
 **★ PRIOR SESSION (2026-07-07) — BR-S156:**
 - **VAULT/SHOWCASE POLISH + THE BLUE ROOM LEXICON (BR-S156, LOCAL — on main, not pushed).** Four fixes, all

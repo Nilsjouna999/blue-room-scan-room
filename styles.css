@@ -3018,6 +3018,9 @@ body[data-view="room"] .dev { display: none; }
 .menu__codex__mark { color: var(--violet); }
 .menu__codex__arr { color: var(--t-ghost); transition: color 160ms ease, transform 160ms ease; }
 .menu__codex:hover .menu__codex__arr { color: var(--t-meta); transform: translateX(2px); }
+/* BR-S158 — two quiet portals (The Codex · The Arcane Reading) sit as a row under the doors */
+.menu__portals { display: flex; gap: 10px; flex-wrap: wrap; align-self: start; margin-top: 4px; }
+.menu__portals .menu__codex { margin-top: 0; align-self: auto; }
 
 /* Archive Desk narrow fallback (BR-S083): below the desk threshold, restore the
    centered single-column stack (brand → card → controls), card back to zoom 0.7.
@@ -3036,6 +3039,7 @@ body[data-view="room"] .dev { display: none; }
   .menu__controls { align-items: center; }
   .menu__actions { justify-items: center; }
   .menu__codex { align-self: center; }
+  .menu__portals { align-self: center; justify-content: center; }
   .menu__foot { margin-top: 0; }
   .msample__card { zoom: 0.7; }
 }
