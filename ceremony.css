@@ -1,0 +1,52 @@
+/* =============================================================
+   THE CEREMONY — the arcana forge ceremony (BR-S163)
+   The builder's EXACT reference art kept pixel-perfect
+   (assets/arcana/ceremony/ceremony-scene.png — crushed to gold-on-black +
+   mix-blend-mode:screen so the black drops out and the linework floats), and
+   brought to LIFE with ambient animation that never alters one line of the art:
+   the forge breathes, smoke curls from the chimney, the sky omen shimmers,
+   embers drift, stars twinkle. Isolated dev route (?dev=ceremony); scoped .ceremony.
+   NOTE: the reference is a single frame; the full 5-hit forge SEQUENCE (the smith
+   mid-swing, a crown forming on the anvil) is a later matching-line-art layer.
+============================================================= */
+.ceremony {
+  --cer-amber: #e8a24d;
+  position: fixed; inset: 0; z-index: 30; overflow: hidden;
+  background: radial-gradient(120% 100% at 50% 44%, #100d09 0%, #080706 60%, #040302 100%);
+  display: grid; place-items: center; font-family: var(--font-ui);
+}
+/* the stage matches the art's aspect so % overlays land on the right elements */
+.cer-stage { position: relative; width: min(100vw, 133vh); aspect-ratio: 1448 / 1086; }
+.cer-scene { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; mix-blend-mode: screen; pointer-events: none; }
+
+.cer-fx { position: absolute; pointer-events: none; }
+/* forge mouth breathing + sky omen + the crow's sealed card — soft additive glows */
+.cer-forgeglow { left: 79.5%; top: 61%; width: 11%; height: 13%; border-radius: 50%; background: radial-gradient(circle, rgba(232,162,77,0.5) 0%, rgba(232,162,77,0) 66%); mix-blend-mode: screen; animation: cer-breathe 4.6s ease-in-out infinite; }
+.cer-omenglow { left: 45.5%; top: 15%; width: 9%; height: 12%; border-radius: 50%; background: radial-gradient(circle, rgba(201,163,92,0.24) 0%, rgba(201,163,92,0) 70%); mix-blend-mode: screen; animation: cer-breathe 6.2s ease-in-out infinite 1s; }
+.cer-cardglow { left: 54%; top: 49.5%; width: 5.5%; height: 6.5%; border-radius: 50%; background: radial-gradient(circle, rgba(232,162,77,0.32) 0%, rgba(232,162,77,0) 70%); mix-blend-mode: screen; animation: cer-breathe 3.6s ease-in-out infinite 0.5s; }
+@keyframes cer-breathe { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
+
+/* smoke curls rising from the chimney (two, staggered) */
+.cer-smoke { left: 82.5%; top: 38%; width: 3.4%; height: 13%; }
+.cer-smoke svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; opacity: 0; animation: cer-smoke 6.5s ease-out infinite; }
+.cer-smoke svg:nth-child(2) { animation-delay: 3s; }
+.cer-smoke path { fill: none; stroke: rgba(178,168,150,0.55); stroke-width: 1.3; stroke-linecap: round; }
+@keyframes cer-smoke { 0% { opacity: 0; transform: translateY(8px) scaleY(0.6); } 22% { opacity: 0.55; } 70% { opacity: 0.35; } 100% { opacity: 0; transform: translateY(-26px) scaleY(1.2); } }
+
+/* embers drifting up from the forge base */
+.cer-embers span { position: absolute; width: 2px; height: 2px; border-radius: 50%; background: var(--cer-amber); opacity: 0; animation: cer-ember 3.4s ease-out infinite; }
+@keyframes cer-ember { 0% { opacity: 0; transform: translate(0, 5px); } 22% { opacity: 0.9; } 100% { opacity: 0; transform: translate(var(--ex, 4px), -34px); } }
+
+/* faint star twinkle */
+.cer-stars span { position: absolute; width: 2px; height: 2px; border-radius: 50%; background: #d7d3ca; animation: cer-twinkle 4.2s ease-in-out infinite; }
+@keyframes cer-twinkle { 0%, 100% { opacity: 0.15; } 50% { opacity: 0.7; } }
+
+/* the reference bakes its own caption + corner labels into the art; live
+   controls sit invisibly over the corner text so they stay pixel-perfect. */
+.cer-btn { position: absolute; top: 3.2%; height: 4.2%; background: none; border: 0; cursor: pointer; color: transparent; }
+.cer-btn--back { left: 2%; width: 15%; }
+.cer-btn--skip { right: 2%; width: 15%; }
+
+@media (prefers-reduced-motion: reduce) {
+  .cer-forgeglow, .cer-omenglow, .cer-cardglow, .cer-smoke svg, .cer-embers span, .cer-stars span { animation: none !important; opacity: 0.55; }
+}
