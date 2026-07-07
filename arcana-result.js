@@ -97,6 +97,17 @@
         '<h1 class="ar-title">The Armor Received</h1>' +
         '<p class="ar-sub">Each reading has taken its place.<br>The record is now worn.</p>' +
       "</div>" +
+      // The Kingdom Threshold — a quiet mystical horizon between the world/kingdom
+      // above and the equipped armour-record below. Reserved as a future gateway
+      // to the seeker's kingdom/profile (the centre gate can become clickable).
+      '<div class="ar-threshold">' +
+        '<span class="ar-threshold__line ar-threshold__line--l"></span>' +
+        '<button type="button" class="ar-threshold__gate" data-ar-kingdom aria-label="View kingdom">' +
+          '<svg class="ar-threshold__sigil" viewBox="0 0 30 16" aria-hidden="true"><path d="M8 8 L8 4.6 L11 6.3 L15 3 L19 6.3 L22 4.6 L22 8" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linejoin="round"/><path d="M4 11.6 Q15 8.8 26 11.6" fill="none" stroke="currentColor" stroke-width="1"/></svg>' +
+          '<span class="ar-threshold__label">View kingdom</span>' +
+        "</button>" +
+        '<span class="ar-threshold__line ar-threshold__line--r"></span>' +
+      "</div>" +
       '<div class="ar-canvas">' +
         '<svg class="ar-ring" viewBox="0 0 1000 616" preserveAspectRatio="none" aria-hidden="true">' +
           '<ellipse cx="500" cy="320" rx="410" ry="270"/>' +
