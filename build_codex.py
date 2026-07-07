@@ -36,9 +36,12 @@ for w in data:
             + rev_html
             + '</article>')
     note = esc(w.get('systemNote', ''))
+    img = esc(w.get('systemImage', ''))
+    img_html = (f'<figure class="sys-img"><img src="{img}" alt="{esc(title)}" loading="lazy"></figure>' if img else '')
     secs.append(
         f'<section class="sys" id="{sid}">'
         + f'<div class="sys-head"><h2 class="sys-title">{esc(title)}</h2><span class="sys-sub">{esc(sub)}</span></div>'
+        + img_html
         + (f'<p class="sys-note">{note}</p>' if note else '')
         + f'<div class="grid">{"".join(cards)}</div>'
         + '</section>')
@@ -67,6 +70,8 @@ main{padding:20px 0 90px}
 .sys-title{font-size:27px;font-weight:600;margin:0;color:var(--ink)}
 .sys-sub{font-family:"SFMono-Regular",ui-monospace,Consolas,monospace;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold-dim)}
 .sys-note{font-style:italic;font-size:13.5px;color:var(--dim);max-width:760px;margin:14px 0 24px;line-height:1.6}
+.sys-img{margin:20px 0 6px;max-width:460px}
+.sys-img img{width:100%;height:auto;display:block;border:1px solid var(--hair);border-radius:10px}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
 .card{background:linear-gradient(180deg,rgba(255,255,255,.014),rgba(0,0,0,.14)),var(--card);border:1px solid var(--hair);border-radius:9px;padding:17px 19px}
 .c-name{font-size:20px;font-weight:600;margin:0 0 5px;color:var(--ink)}
