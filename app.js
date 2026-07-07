@@ -91,7 +91,7 @@ const state ={ source: 0, treatment: "free", tab: "diagram", view: "menu", draft
      uploaded-blocked renders a validated DEV fixture, never a user scan.
      free-scan-sim = Free Pull mock · halo-gate = sealed card-back mock. */
   const dev = q.get("dev");
-  if (["uploaded-result", "uploaded-blocked", "free-scan-sim", "halo-gate", "before-after", "review-map", "proto-cards", "staged-reveal", "menu-reveal", "vault", "arcane"].includes(dev)) { state.view = "dev"; state.dev = dev; }
+  if (["uploaded-result", "uploaded-blocked", "free-scan-sim", "halo-gate", "before-after", "review-map", "proto-cards", "staged-reveal", "menu-reveal", "vault", "arcane", "arcana-result"].includes(dev)) { state.view = "dev"; state.dev = dev; }
   else if (q.has("src") || q.has("t") || q.has("tab")) state.view = "room";
 }
 
@@ -2079,6 +2079,14 @@ function mountDev() {
     const host = document.getElementById("devView");
     if (window.BRArcane && typeof window.BRArcane.mount === "function") window.BRArcane.mount(host);
     else host.innerHTML = '<p style="padding:48px;color:#948f87;text-align:center;font-family:sans-serif">The arcane reading failed to load (arcane.js).</p>';
+    return;
+  }
+  if (state.dev === "arcana-result") {
+    // BR-S160 — "The Armor Received", the arcana reading result room. In
+    // arcana-result.js (window.BRArcanaResult); this branch hands it the node.
+    const host = document.getElementById("devView");
+    if (window.BRArcanaResult && typeof window.BRArcanaResult.mount === "function") window.BRArcanaResult.mount(host);
+    else host.innerHTML = '<p style="padding:48px;color:#948f87;text-align:center;font-family:sans-serif">The result room failed to load (arcana-result.js).</p>';
     return;
   }
   if (state.dev === "staged-reveal") {
