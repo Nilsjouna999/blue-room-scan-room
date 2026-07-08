@@ -1,64 +1,109 @@
 /* =============================================================
-   THE CEREMONY — arcana forge ceremony (BR-S163 → S164 full sequence)
-   The builder's EXACT reference scene stays pixel-perfect (base crushed to
-   gold-on-black + mix-blend-mode:screen). The crow is its own screen-blended
-   layer so it can fly in; the forge sequence (crown forming on the anvil, sparks,
-   quench) is a matching gold-line SVG overlay. Ambient (forge breath, smoke,
-   embers, stars) never touches the art. Scoped .ceremony; route ?dev=ceremony.
+   THE CEREMONY — the arcana forge ceremony (BR-S165 sprite-rig rebuild)
+   The finished build: real SEPARATED art layers, not a single flat frame.
+   The smith's OWN arm+hammer (rightarm.png, cut from the source art) actually
+   SWINGS and strikes the anvil — no procedural floating hammer. Sky-read →
+   cup-read → the crow carries the sealed commission → the smith accepts and
+   strikes the crown over 5 marks → quench → the reading is drawn. All motion is
+   time-driven from ceremony.js render(t); no CSS keyframes. Every rule is scoped
+   under .ceremony (this sheet is linked globally). route ?dev=ceremony; also
+   hosted by the arcane intake. window.BRCeremony.
 ============================================================= */
 .ceremony {
-  --cer-amber: #e8a24d; --cer-cream: #ece7dc;
+  --ivory: rgba(236, 224, 198, 0.92);
+  --gold: rgba(218, 158, 75, 0.95);
   position: fixed; inset: 0; z-index: 30; overflow: hidden;
-  background: radial-gradient(120% 100% at 50% 44%, #100d09 0%, #080706 60%, #040302 100%);
-  display: grid; place-items: center; font-family: var(--font-ui);
+  display: grid; place-items: center;
+  background: radial-gradient(circle at 50% 48%, rgba(28, 26, 22, 0.55), #070808 68%), #0b0b0c;
+  color: var(--ivory);
+  font-family: Georgia, "Times New Roman", serif;
 }
-.cer-stage { position: relative; width: min(100vw, 133vh); aspect-ratio: 1448 / 1086; }
-.cer-scene { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; mix-blend-mode: screen; pointer-events: none; }
 
-/* the crow — its own layer, positioned at its origin in the frame, flown by JS */
-.cer-crow { position: absolute; left: 42.27%; top: 39.41%; width: 19.34%; height: auto; mix-blend-mode: screen; pointer-events: none; transform-origin: 50% 50%; transition: transform 110ms ease-out, opacity 200ms ease; }
+/* the 1448×1086 stage — fit()-scaled from centre by ceremony.js */
+.ceremony .cer-stage { width: 1448px; height: 1086px; position: relative; overflow: hidden; transform-origin: center center; background: #0f0f10; isolation: isolate; }
+.ceremony .vignette { position: absolute; inset: 0; z-index: 33; pointer-events: none; background: radial-gradient(circle at 50% 53%, transparent 38%, rgba(0, 0, 0, 0.30) 74%, rgba(0, 0, 0, 0.6) 100%); }
+.ceremony .layer { position: absolute; display: block; will-change: transform, opacity, filter; transform-origin: center center; }
 
-/* the forge-sequence overlay (crown / hammer / sparks / quench) — gold line on transparent */
-.cer-overlay { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; mix-blend-mode: screen; overflow: visible; }
-.cer-overlay [data-part="crown"] { transition: transform 200ms ease; }
-.cer-overlay [data-part="crownglow"], .cer-overlay [data-part="crownhalo"] { transition: opacity 320ms ease; }
-.cer-overlay [data-part="crow"], .cer-overlay [data-part="hammer"] { transition: transform 90ms linear, opacity 160ms ease; }
-.cer-overlay [data-part="flash"], .cer-overlay [data-part="sparks"], .cer-overlay [data-part="quench"] { transition: opacity 90ms ease; }
+/* separated art layers, seated at their source-frame coordinates */
+.ceremony #bg { left: 0; top: 0; width: 1448px; height: 1086px; z-index: 0; opacity: 1; }
+.ceremony #skyBloom { position: absolute; left: 560px; top: 60px; width: 340px; height: 360px; z-index: 3; opacity: 0; pointer-events: none;
+  background: radial-gradient(circle at 50% 48%, rgba(226, 170, 92, 0.30), rgba(226, 170, 92, 0.06) 45%, transparent 68%); }
+.ceremony #sigil { left: 540px; top: 70px; width: 315px; height: 320px; z-index: 5; filter: drop-shadow(0 0 7px rgba(225, 154, 69, 0.16)); }
+.ceremony #sigilCrown { position: absolute; left: 676px; top: 204px; width: 84px; height: 66px; z-index: 6; opacity: 0; filter: drop-shadow(0 0 6px rgba(255, 181, 90, 0.5)); }
+.ceremony #gazeBeam { position: absolute; left: 283px; top: 250px; width: 440px; height: 345px; z-index: 7; opacity: 0; pointer-events: none; }
+.ceremony #gazeBeam svg { width: 100%; height: 100%; overflow: visible; }
+.ceremony #gazeBeam line { stroke: rgba(228, 182, 110, 0.6); stroke-width: 1.5; stroke-dasharray: 2 10; stroke-linecap: round; filter: drop-shadow(0 0 4px rgba(228, 182, 110, 0.45)); }
+.ceremony #trail { left: 155px; top: 490px; width: 485px; height: 180px; z-index: 8; opacity: 0; filter: drop-shadow(0 0 6px rgba(220, 158, 75, 0.20)); }
+.ceremony #shaman { left: 165px; top: 445px; width: 225px; height: 360px; z-index: 12; transform-origin: 50% 96%; }
+.ceremony #ground { left: 28px; top: 770px; width: 1390px; height: 38px; z-index: 6; }
+.ceremony #forge { left: 1110px; top: 455px; width: 315px; height: 355px; z-index: 10; }
+.ceremony #forgeGlow { left: 1190px; top: 575px; width: 168px; height: 205px; z-index: 11; mix-blend-mode: screen; }
+.ceremony #flame { left: 1215px; top: 648px; width: 120px; height: 114px; z-index: 12; transform-origin: 50% 100%; mix-blend-mode: screen; }
+.ceremony #bucket { left: 785px; top: 655px; width: 100px; height: 150px; z-index: 12; transform-origin: 54px 146px; }
+.ceremony #stump { left: 947px; top: 636px; width: 109px; height: 160px; z-index: 12; }
+.ceremony #anvil { left: 917px; top: 574px; width: 149px; height: 99px; z-index: 13; transform-origin: 50% 100%; }
+.ceremony #smith { left: 945px; top: 455px; width: 243px; height: 355px; z-index: 14; transform-origin: 50% 98%; }
+.ceremony #rightArm { position: absolute; left: 1076px; top: 610px; width: 110px; height: 210px; z-index: 16; transform-origin: 18px 28px; filter: drop-shadow(0 0 3px rgba(228, 180, 110, 0.22)); }
+.ceremony #envelopeDrop { left: 761px; top: 475px; width: 110px; height: 88px; z-index: 19; opacity: 0; transform-origin: 50% 50%; filter: drop-shadow(0 0 8px rgba(255, 181, 90, 0.22)); }
+.ceremony #crowCombined { left: 560px; top: 395px; width: 310px; height: 210px; z-index: 18; filter: drop-shadow(0 0 5px rgba(214, 165, 86, 0.12)); opacity: 0; }
+.ceremony #crow { left: 555px; top: 392px; width: 230px; height: 211px; z-index: 18; filter: drop-shadow(0 0 5px rgba(214, 165, 86, 0.12)); opacity: 0; }
 
-/* ---- ambient (CSS loops; never re-poses the art) ---- */
-.cer-fx { position: absolute; pointer-events: none; }
-.cer-forgeglow { left: 79.5%; top: 61%; width: 11%; height: 13%; border-radius: 50%; background: radial-gradient(circle, rgba(232,162,77,0.5) 0%, rgba(232,162,77,0) 66%); mix-blend-mode: screen; animation: cer-breathe 4.6s ease-in-out infinite; }
-.cer-omenglow { left: 45.5%; top: 15%; width: 9%; height: 12%; border-radius: 50%; background: radial-gradient(circle, rgba(201,163,92,0.24) 0%, rgba(201,163,92,0) 70%); mix-blend-mode: screen; animation: cer-breathe 6.2s ease-in-out infinite 1s; }
-@keyframes cer-breathe { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
-.cer-smoke { left: 82.5%; top: 38%; width: 3.4%; height: 13%; }
-.cer-smoke svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; opacity: 0; animation: cer-smoke 6.5s ease-out infinite; }
-.cer-smoke svg:nth-child(2) { animation-delay: 3s; }
-.cer-smoke path { fill: none; stroke: rgba(178,168,150,0.55); stroke-width: 1.3; stroke-linecap: round; }
-@keyframes cer-smoke { 0% { opacity: 0; transform: translateY(8px) scaleY(0.6); } 22% { opacity: 0.55; } 70% { opacity: 0.35; } 100% { opacity: 0; transform: translateY(-26px) scaleY(1.2); } }
-.cer-embers span { position: absolute; width: 2px; height: 2px; border-radius: 50%; background: var(--cer-amber); opacity: 0; animation: cer-ember 3.4s ease-out infinite; }
-@keyframes cer-ember { 0% { opacity: 0; transform: translate(0, 5px); } 22% { opacity: 0.9; } 100% { opacity: 0; transform: translate(var(--ex, 4px), -34px); } }
-.cer-stars span { position: absolute; width: 2px; height: 2px; border-radius: 50%; background: #d7d3ca; animation: cer-twinkle 4.2s ease-in-out infinite; }
-@keyframes cer-twinkle { 0%, 100% { opacity: 0.15; } 50% { opacity: 0.7; } }
+/* omen cup — held in front of the reader, tilted to read the grounds */
+.ceremony .cup { position: absolute; left: 283px; top: 584px; width: 86px; height: 80px; z-index: 13; opacity: 0; will-change: transform, opacity; transform-origin: 44px 60px; filter: drop-shadow(0 0 5px rgba(222, 167, 80, 0.10)); }
+.ceremony .cup svg { width: 100%; height: 100%; overflow: visible; }
+.ceremony .cup path, .ceremony .cup ellipse, .ceremony .cup line { fill: none; stroke: rgba(236, 224, 198, 0.9); stroke-width: 2.1; stroke-linecap: round; stroke-linejoin: round; }
+.ceremony .cup .steam { stroke: rgba(218, 158, 75, 0.55); stroke-width: 1.3; opacity: 0; }
+.ceremony .cup .omen { fill: rgba(255, 186, 96, 0.9); stroke: none; opacity: 0; filter: drop-shadow(0 0 5px rgba(255, 160, 60, 0.7)); }
+.ceremony .skyStar { position: absolute; width: 4px; height: 4px; border-radius: 50%; background: rgba(255, 206, 120, 0.95); box-shadow: 0 0 7px rgba(255, 180, 90, 0.8); z-index: 5; opacity: 0; }
 
-/* ---- live caption (the reference's baked caption is painted off the base) ---- */
-.cer-caption { position: absolute; left: 0; right: 0; bottom: 7%; display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center; pointer-events: none; opacity: 0.9; transition: opacity 0.4s ease; }
-.cer-caption.is-bright { opacity: 1; }
-.cer-cap { font-family: var(--font-mono); font-size: 13px; letter-spacing: 0.32em; text-transform: uppercase; color: var(--cer-cream); }
-.cer-sub { font-family: var(--font-display); font-style: italic; font-size: 15px; color: var(--t-meta); }
-.cer-count { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.24em; color: var(--t-ghost); min-height: 13px; }
-.cer-end[hidden] { display: none; }
-.cer-end { pointer-events: auto; margin-top: 6px; }
-.cer-endbtns { display: flex; gap: 16px; }
-.cer-ebtn { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--t-meta); background: none; border: 1px solid var(--line); border-radius: 999px; padding: 9px 18px; cursor: pointer; transition: color 0.16s ease, border-color 0.16s ease; }
-.cer-ebtn:hover { color: var(--cer-cream); border-color: var(--t-meta); }
-.cer-ebtn--go { color: var(--cer-amber); border-color: rgba(232,162,77,0.4); }
-.cer-ebtn--go:hover { color: #f2c88a; border-color: var(--cer-amber); }
+/* seal token — the commission distilled to its wax seal */
+.ceremony .sealTok { position: absolute; left: 951px; top: 632px; width: 34px; height: 34px; z-index: 19; opacity: 0; will-change: transform, opacity; transform-origin: 50% 82%; }
+.ceremony .sealTok svg { width: 100%; height: 100%; overflow: visible; }
+.ceremony .sealTok circle, .ceremony .sealTok path { fill: none; stroke: rgba(255, 181, 90, 0.95); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.ceremony .sealTok .fillw { fill: rgba(255, 170, 74, 0.14); stroke: none; }
 
-.cer-btn { position: absolute; top: 3.2%; height: 4.2%; background: none; border: 0; cursor: pointer; color: transparent; }
-.cer-btn--back { left: 2%; width: 15%; }
-.cer-btn--skip { right: 2%; width: 15%; }
+/* crown halo behind the forged crown */
+.ceremony #crownHalo { position: absolute; left: 838px; top: 512px; width: 260px; height: 240px; z-index: 18; opacity: 0; pointer-events: none;
+  background: radial-gradient(circle at 50% 55%, rgba(255, 175, 80, 0.34), rgba(255, 150, 60, 0.07) 46%, transparent 70%); }
 
-@media (prefers-reduced-motion: reduce) {
-  .cer-crow, .cer-overlay *, .cer-forgeglow, .cer-omenglow, .cer-smoke svg, .cer-embers span, .cer-stars span { animation: none !important; transition: none !important; }
-  .cer-forgeglow, .cer-omenglow { opacity: 0.55; }
-}
+.ceremony .crownForge { position: absolute; left: 898px; top: 588px; width: 140px; height: 85px; z-index: 20; opacity: 0; filter: drop-shadow(0 0 8px rgba(228, 142, 45, 0.25)); will-change: transform, opacity; transform-origin: 50% 84%; }
+.ceremony .crownForge svg { width: 100%; height: 100%; overflow: visible; }
+.ceremony .crownForge path, .ceremony .crownForge line, .ceremony .crownForge circle { fill: none; stroke: var(--gold); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.ceremony .crownForge .hot { stroke: rgba(255, 181, 82, 0.96); filter: drop-shadow(0 0 7px rgba(255, 142, 35, 0.4)); }
+.ceremony .crownForge .crownStage { opacity: 0; }
+.ceremony .crownForge .seal { fill: rgba(255, 190, 96, 0.92); stroke: rgba(255, 150, 60, 0.95); stroke-width: 1.3; filter: drop-shadow(0 0 5px rgba(255, 150, 50, 0.75)); }
+
+.ceremony .impactFlash { position: absolute; left: 942px; top: 642px; width: 46px; height: 22px; border-radius: 50%; background: radial-gradient(circle, rgba(255, 208, 120, 0.8), rgba(230, 121, 34, 0.28) 46%, transparent 72%); z-index: 21; opacity: 0; transform: scale(0.35); filter: blur(0.5px); }
+.ceremony .spark { position: absolute; width: 3px; height: 3px; border-radius: 50%; background: rgba(255, 190, 96, 0.95); box-shadow: 0 0 8px rgba(255, 145, 52, 0.7); z-index: 24; opacity: 0; will-change: transform, opacity; }
+.ceremony .steam { position: absolute; width: 18px; height: 18px; border: 1px solid rgba(235, 223, 198, 0.24); border-radius: 50%; z-index: 26; opacity: 0; filter: blur(0.35px); will-change: transform, opacity; }
+.ceremony .waterPour { position: absolute; left: 858px; top: 592px; width: 150px; height: 120px; z-index: 19; opacity: 0; will-change: opacity; }
+.ceremony .pipeSmoke { position: absolute; width: 18px; height: 18px; border: 1px solid rgba(236, 224, 198, 0.18); border-radius: 50%; z-index: 27; opacity: 0; filter: blur(0.35px); will-change: transform, opacity; pointer-events: none; }
+.ceremony .waterPour svg { width: 100%; height: 100%; overflow: visible; }
+.ceremony .waterPour .stream { fill: none; stroke: rgba(206, 214, 208, 0.7); stroke-width: 2.4; stroke-linecap: round; filter: drop-shadow(0 0 5px rgba(206, 214, 208, 0.22)); }
+.ceremony .waterPour .drop { fill: rgba(210, 218, 212, 0.78); }
+
+/* ---- live caption (the reference's baked caption is off the base art) ---- */
+.ceremony .caption { position: absolute; left: 0; right: 0; bottom: 112px; text-align: center; z-index: 35; pointer-events: none; color: rgba(236, 224, 198, 0.96); }
+.ceremony .caption .title { font-size: 20px; letter-spacing: 0.43em; font-weight: 600; text-transform: uppercase; text-shadow: 0 0 9px rgba(236, 224, 198, 0.08); }
+.ceremony .caption .sub { margin-top: 15px; font-size: 14px; font-style: italic; letter-spacing: 0.02em; color: rgba(236, 224, 198, 0.58); }
+.ceremony .orn { position: absolute; left: 50%; bottom: 138px; width: 470px; height: 1px; transform: translateX(-50%); z-index: 34; background: linear-gradient(90deg, transparent, rgba(218, 158, 75, 0.45) 12%, transparent 29%, transparent 71%, rgba(218, 158, 75, 0.45) 88%, transparent); opacity: 0.7; }
+.ceremony .orn::before, .ceremony .orn::after { content: "\2726"; position: absolute; top: -10px; color: rgba(218, 158, 75, 0.7); font-size: 13px; text-shadow: 0 0 6px rgba(218, 158, 75, 0.25); }
+.ceremony .orn::before { left: 118px; }
+.ceremony .orn::after { right: 118px; }
+.ceremony .bottomRule { position: absolute; left: 50%; bottom: 76px; width: 420px; height: 1px; background: linear-gradient(90deg, transparent, rgba(218, 158, 75, 0.37), transparent 45%, transparent 55%, rgba(218, 158, 75, 0.37), transparent); transform: translateX(-50%); z-index: 34; opacity: 0.65; }
+.ceremony .bottomRule::after { content: "\2727"; position: absolute; left: 50%; top: -12px; transform: translateX(-50%); font-size: 22px; color: rgba(218, 158, 75, 0.75); }
+
+/* ---- the end panel: revealed when the ceremony reaches its final frame ---- */
+.ceremony .cer-end[hidden] { display: none; }
+.ceremony .cer-end { pointer-events: auto; margin-top: 18px; display: flex; justify-content: center; }
+.ceremony .cer-endbtns { display: flex; gap: 16px; }
+.ceremony .cer-ebtn { font: 700 10px/1.1 system-ui, sans-serif; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(236, 224, 198, 0.64); background: rgba(0, 0, 0, 0.18); border: 1px solid rgba(218, 158, 75, 0.22); border-radius: 999px; padding: 10px 18px; cursor: pointer; transition: color 0.16s ease, border-color 0.16s ease; }
+.ceremony .cer-ebtn:hover { color: rgba(236, 224, 198, 0.92); border-color: rgba(218, 158, 75, 0.5); }
+.ceremony .cer-ebtn--go { color: rgba(232, 178, 96, 0.95); border-color: rgba(232, 162, 77, 0.4); }
+.ceremony .cer-ebtn--go:hover { color: #f2c88a; border-color: rgba(232, 162, 77, 0.95); }
+
+/* ---- nav (real buttons; the labels are the hit area) ---- */
+.ceremony .cer-nav { position: absolute; top: 52px; font: 700 10px/1.2 system-ui, sans-serif; letter-spacing: 0.34em; color: rgba(224, 170, 88, 0.68); z-index: 40; text-transform: uppercase; background: none; border: 0; cursor: pointer; padding: 6px 4px; transition: color 0.16s ease; }
+.ceremony .cer-nav:hover { color: rgba(240, 200, 130, 0.95); }
+.ceremony .cer-nav--back { left: 40px; }
+.ceremony .cer-nav--skip { right: 40px; }
