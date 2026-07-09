@@ -1,21 +1,22 @@
 /* =============================================================
-   THE CEREMONY — the arcana forge ceremony (BR-S165 sprite-rig rebuild)
-   Replaces the flat single-frame + procedural-hammer build with the finished
-   SEPARATED-LAYER build: the smith's OWN arm+hammer (rightarm.png, cut from the
-   source art) actually swings and strikes the anvil. Sky-read → cup-read → the
-   crow carries the sealed commission → the smith accepts and strikes the crown
-   over 5 marks → quench → the reading is drawn. Time-driven: one render(t) off a
-   single clock, DURATION 20.8s; freeze-safe (jumpToEnd = render(DURATION)).
-   The finished build's engine is grafted into the ceremony's mount CONTRACT:
-   window.BRCeremony.mount(host, opts) -> { destroy }.
-     opts.onExit — Back to readings (the intake returns to the marks)
-     opts.onDone — Enter the reading (-> the result room)
+   THE CEREMONY — the arcana forge ceremony (BR-S166 "living ritual plate")
+   Direction change: the approved art is a STILL illustration; forcing full-body
+   character animation out of it read as a paper-cutout / puppet. So the plate now
+   just WAKES UP. The crow is the ONE traveling element; everything else moves
+   little but glows, reveals, pulses, and jolts. The smith is STATIC at the approved
+   pose (un-split 07_smith.png) — the forge is sold by impact light, not by limbs.
+   The five strikes are TIERED: three quiet taps that build the crown, and two
+   decisive marks (STRIKE #3, SEAL #5) that carry the full impact stack.
+   Time-driven: one render(t) off a single clock, DURATION 12–14s; freeze-safe
+   (jumpToEnd = render(DURATION)). Grafted into the mount CONTRACT:
+     window.BRCeremony.mount(host, opts) -> { destroy, seek }
+     opts.onExit — Back to readings   |   opts.onDone — Enter the reading
    Router (?dev=ceremony) calls mount(host) with NO opts; the intake supplies both.
 ============================================================= */
 (function () {
   "use strict";
   var A = "assets/arcana/ceremony/";
-  var DURATION = 20.8;
+  var DURATION = 14.0;
 
   function sceneHTML() {
     return "" +
@@ -39,8 +40,7 @@
         '<img id="bucket" class="layer" src="' + A + '05_bucket.png" alt="" />' +
         '<img id="stump" class="layer" src="' + A + '06b_stump_only.png" alt="" />' +
         '<img id="anvil" class="layer" src="' + A + '06a_anvil_only.png" alt="" />' +
-        '<img id="smith" class="layer" src="' + A + '07_smith_norightarm.png" alt="" />' +
-        '<img id="rightArm" class="layer" src="' + A + 'rightarm.png" alt="" />' +
+        '<img id="smith" class="layer" src="' + A + '07_smith.png" alt="" />' +
 
         '<img id="shaman" class="layer" src="' + A + '02_shaman.png" alt="" />' +
         '<div class="cup" id="cup" aria-hidden="true">' +
@@ -80,10 +80,6 @@
         '<img id="envelopeDrop" class="layer" src="' + A + '04b_envelope_only.png" alt="" />' +
 
         '<div class="impactFlash" id="impactFlash"></div>' +
-        '<div class="waterPour" id="waterPour" aria-hidden="true"><svg viewBox="0 0 150 120">' +
-          '<path class="stream" d="M22 60 C48 40, 84 44, 110 62"/>' +
-          '<circle class="drop" cx="107" cy="68" r="2.3"/><circle class="drop" cx="114" cy="76" r="1.7"/><circle class="drop" cx="101" cy="77" r="2"/>' +
-        '</svg></div>' +
         '<div id="sparkHost"></div><div id="steamHost"></div><div id="smokeHost"></div>' +
 
         '<div class="vignette"></div>' +
@@ -112,25 +108,24 @@
     var els = {
       sigil: $("sigil"), sigilCrown: $("sigilCrown"), skyBloom: $("skyBloom"), gazeBeam: $("gazeBeam"),
       shaman: $("shaman"), cup: $("cup"), trail: $("trail"), crow: $("crow"), crowC: $("crowCombined"),
-      seal: $("sealTok"), smith: $("smith"), anvil: $("anvil"), bucket: $("bucket"), forge: $("forge"),
+      seal: $("sealTok"), smith: $("smith"), anvil: $("anvil"), forge: $("forge"),
       forgeGlow: $("forgeGlow"), flame: $("flame"), halo: $("crownHalo"), crown: $("crownForge"),
-      rightArm: $("rightArm"), envelope: $("envelopeDrop"), flash: $("impactFlash"), water: $("waterPour"),
+      envelope: $("envelopeDrop"), flash: $("impactFlash"),
       capTitle: $("capTitle"), capSub: $("capSub")
     };
 
-    // ---- timeline ----
+    // ---- timeline (12–14s "living ritual plate") ----
     var T = {
-      skyA: 0.3, skyB: 3.6,                     // read the sky
-      cupIn: 3.7, cupRead: 4.9, cupOut: 7.1,    // read the cup
-      omenEnd: 7.5,
-      crowStart: 7.7, crowHover: 10.7, release: 11.0, crowExit: 12.0,
-      nod1: 12.3, nod2: 12.75, acceptEnd: 13.35,
-      hammerIn: 12.9,
-      quench: 17.9, coolEnd: 19.35,
-      lift: 19.45
+      skyA: 0.2, skyB: 1.8,                          // 1. the sky is read (sigil wakes, stars ignite)
+      cupIn: 2.0, cupRead: 3.0, cupHold: 3.4, cupOut: 3.5, omenEnd: 4.0,  // 2. the cup is read (rise, held omen, lower)
+      crowStart: 3.7, crowHover: 5.8, release: 5.9, crowExit: 6.4,        // 3. the commission is carried (the one traveler)
+      landSeal: 6.15, nod1: 6.45, nod2: 6.8, acceptEnd: 7.0,              // 4. accepted — seal rests + double-glows
+      quench: 11.0, coolEnd: 12.4, lift: 12.5                             // 6/7. cooled, then drawn
     };
-    var hits = [13.35, 14.35, 15.28, 16.12, 16.90];   // steady -> accelerating
+    var hits = [7.4, 8.1, 8.9, 9.9, 10.6];             // 5. struck: tap, tap, STRIKE(#3), pause, tap, SEAL(#5)
+    var isAccent = function (k) { return k === 2 || k === 4; };  // the two decisive marks
     var ANVIL_FACE = { x: 968, y: 655 };
+    var firstHit = hits[0];
 
     // ---- helpers ----
     var clamp = function (v, a, b) { a = (a === undefined ? 0 : a); b = (b === undefined ? 1 : b); return Math.max(a, Math.min(b, v)); };
@@ -146,16 +141,16 @@
     var caption = function (title, sub) { if (els.capTitle.textContent !== title) els.capTitle.textContent = title; if (els.capSub.textContent !== sub) els.capSub.textContent = sub; };
     var jolt = function (t, c, d) { return (t >= c && t < c + d) ? (1 - (t - c) / d) : 0; };
 
-    // ---- sky stars ----
+    // ---- sky stars (ignite one-by-one INSIDE the 1.6s sky beat) ----
     var skyStars = [], starPos = [[610, 150], [790, 150], [600, 300], [800, 300], [697, 110]];
-    var sh = $("skyStars");
+    var sh = $("skyStars"), i;
     starPos.forEach(function (p) { var d = document.createElement("div"); d.className = "skyStar"; d.style.left = p[0] + "px"; d.style.top = p[1] + "px"; sh.appendChild(d); skyStars.push(d); });
 
-    // ---- particles ----
-    var sparkHost = $("sparkHost"), sparks = [], i;
-    for (i = 0; i < 14; i++) {
+    // ---- particles: thinner sparks (ritual embers, not an arcade fountain) ----
+    var sparkHost = $("sparkHost"), sparks = [];
+    for (i = 0; i < 8; i++) {
       var sEl = document.createElement("div"); sEl.className = "spark"; sparkHost.appendChild(sEl);
-      sparks.push({ el: sEl, ang: (-158 + (i / 13) * 116 + (i % 3) * 3) * Math.PI / 180, dist: 22 + ((i * 37) % 60), delay: ((i * 11) % 8) / 100 - 0.025, life: 0.40 + ((i * 7) % 26) / 100, size: 1.8 + ((i * 11) % 24) / 10 });
+      sparks.push({ el: sEl, ang: (-150 + (i / 7) * 120 + (i % 3) * 4) * Math.PI / 180, dist: 16 + ((i * 29) % 32), delay: ((i * 11) % 7) / 100, life: 0.34 + ((i * 7) % 18) / 100, size: 1.5 + ((i * 11) % 14) / 10 });
     }
     var steamHost = $("steamHost"), steam = [];
     for (i = 0; i < 11; i++) {
@@ -168,17 +163,19 @@
       pipeSmoke.push({ el: pEl, off: i * 0.12, drift: ((i % 2) ? 1 : -1) * (8 + (i * 7) % 20), lift: 30 + (i * 13) % 42, scale: 0.5 + (i % 4) * 0.22 });
     }
 
+    // sparks fly ONLY on the two accented marks (#3 STRIKE, #5 SEAL)
     function updateSparks(t) {
       var idx = 0; hits.forEach(function (h, k) { if (Math.abs(t - h) < Math.abs(t - hits[idx])) idx = k; });
-      var c = hits[idx], local = t - c, strong = (idx === 2 || idx === 4);
+      if (!isAccent(idx)) { sparks.forEach(function (s) { s.el.style.opacity = 0; }); return; }
+      var c = hits[idx], local = t - c, big = (idx === 4);
       sparks.forEach(function (s) {
         var tt = (local - s.delay) / s.life;
         if (tt < 0 || tt > 1) { s.el.style.opacity = 0; return; }
-        var e = out(tt), g = 46 * tt * tt;
-        var x = ANVIL_FACE.x + Math.cos(s.ang) * s.dist * e * (strong ? 1.15 : 0.85);
-        var y = ANVIL_FACE.y + Math.sin(s.ang) * s.dist * e * (strong ? 1.15 : 0.85) + g;
+        var e = out(tt), g = 40 * tt * tt;
+        var x = ANVIL_FACE.x + Math.cos(s.ang) * s.dist * e * (big ? 1.1 : 0.9);
+        var y = ANVIL_FACE.y + Math.sin(s.ang) * s.dist * e * (big ? 1.1 : 0.9) + g;
         s.el.style.left = x + "px"; s.el.style.top = y + "px"; s.el.style.width = s.el.style.height = s.size + "px";
-        s.el.style.opacity = String((1 - tt) * (strong ? 0.95 : 0.7)); s.el.style.transform = "scale(" + (1 + tt * 0.6) + ")";
+        s.el.style.opacity = String((1 - tt) * (big ? 0.6 : 0.5)); s.el.style.transform = "scale(" + (1 + tt * 0.5) + ")";
       });
     }
     function updateSteam(t) {
@@ -195,7 +192,7 @@
       });
     }
     function updatePipeSmoke(t) {
-      var bursts = [2.25, 10.25, 18.85];
+      var bursts = [1.8, 8.6, 12.6];           // slow ambient drift on quiet beats, all inside 0–14s
       pipeSmoke.forEach(function (s) {
         var best = -99; bursts.forEach(function (b) { var local = t - b - s.off; if (local >= 0 && local < 1.8) best = local; });
         if (best < 0) { s.el.style.opacity = 0; return; }
@@ -203,74 +200,82 @@
         s.el.style.left = (1260 + s.drift * e) + "px";
         s.el.style.top = (492 - s.lift * e) + "px";
         s.el.style.transform = "scale(" + (s.scale + e * 1.25) + ")";
-        s.el.style.opacity = String(0.26 * (1 - e));
+        s.el.style.opacity = String(0.24 * (1 - e));
       });
     }
     function updateCrown(stageNum, hotPulse, coolT) {
       els.crown.querySelectorAll(".crownStage").forEach(function (g) { g.style.opacity = Number(g.dataset.stage) === stageNum ? 1 : 0; });
-      var glow = (1 - coolT) * (0.10 + hotPulse * 0.5) + coolT * 0.08;
+      var glow = (1 - coolT) * (0.10 + hotPulse * 0.5) + coolT * 0.06;
       els.crown.style.filter = "drop-shadow(0 0 " + (8 + hotPulse * 12) + "px rgba(255,151,47," + glow + "))";
     }
 
     function render(rawT) {
       var t = Math.min(rawT, DURATION);
       // per-frame ephemerals off
-      setO(els.trail, 0); setO(els.flash, 0); setO(els.water, 0); setO(els.envelope, 0);
+      setO(els.flash, 0); setO(els.envelope, 0);
       els.cup.querySelectorAll(".steam").forEach(function (p) { p.style.opacity = 0; });
       els.cup.querySelector(".omen").style.opacity = 0;
 
-      // ===== FORGE fire: living flame + glow, one warm hero =====
+      // ===== the five marks, TIERED — compute once, drives smith + forge + flash + crown =====
+      var smithDip = 0, anvilDip = 0, tapImpact = 0, accentImpact = 0, forgePulse = 0;
+      hits.forEach(function (h, k) {
+        var j = jolt(t, h, 0.16), near = nearPulse(t, h, 0.12), acc = isAccent(k);
+        smithDip += j * (acc ? 2.4 : 1.4);
+        anvilDip += j * (acc ? 2.2 : 1.3);
+        tapImpact = Math.max(tapImpact, near);
+        if (acc) { accentImpact = Math.max(accentImpact, near); forgePulse = Math.max(forgePulse, nearPulse(t, h, 0.16)); }
+      });
+
+      // ===== FORGE fire: living flame + glow; pulses only on the two accented marks =====
       var flick = 1 + 0.035 * Math.sin(t * 11.3) + 0.02 * Math.sin(t * 7.1 + 1.7) + 0.012 * Math.sin(t * 17.7);
-      var strikeFlare = 0; hits.forEach(function (h) { strikeFlare = Math.max(strikeFlare, nearPulse(t, h, 0.16)); });
       var quenchDim = 1 - 0.35 * ease(beat(t, T.quench, T.quench + 0.8)) * (1 - ease(beat(t, T.lift, T.lift + 0.8)));
-      els.flame.style.transform = "translate3d(0,0,0) scaleY(" + (flick + strikeFlare * 0.06) + ") scaleX(" + (1 - (flick - 1) * 0.6) + ")";
+      els.flame.style.transform = "translate3d(0,0,0) scaleY(" + (flick + forgePulse * 0.06) + ") scaleX(" + (1 - (flick - 1) * 0.6) + ")";
       els.flame.style.opacity = String((0.86 + 0.08 * Math.sin(t * 0.7)) * quenchDim);
-      els.forgeGlow.style.opacity = String((0.5 + 0.12 * Math.sin(t * 0.9) + strikeFlare * 0.25) * quenchDim);
-      els.forge.style.filter = "drop-shadow(0 0 " + (9 + Math.sin(t * 4) * 2 + strikeFlare * 10) + "px rgba(220,130,42," + ((0.13 + strikeFlare * 0.22) * quenchDim) + "))";
+      els.forgeGlow.style.opacity = String((0.5 + 0.12 * Math.sin(t * 0.9) + forgePulse * 0.25) * quenchDim);
+      els.forge.style.filter = "drop-shadow(0 0 " + (9 + Math.sin(t * 4) * 2 + forgePulse * 10) + "px rgba(220,130,42," + ((0.13 + forgePulse * 0.22) * quenchDim) + "))";
       updatePipeSmoke(t);
 
-      // ===== OMEN part 1 — READ THE SKY =====
+      // ===== 1. THE SKY IS READ — sigil wakes/draws in, stars ignite, gaze up =====
       var skyRead = ease(beat(t, T.skyA, T.skyB));
       var sigBrite = lerp(0.28, 0.96, skyRead);
-      var forgeFocus = ease(beat(t, T.hammerIn - 0.3, T.hammerIn + 1.0));
+      var forgeFocus = ease(beat(t, T.acceptEnd - 0.5, T.acceptEnd + 0.6));   // sky sigil recedes as the forge takes over
       var sigilCoolIn = ease(beat(t, T.quench + 0.4, T.lift + 0.6));
       els.sigil.style.opacity = String(sigBrite * (1 - 0.62 * forgeFocus));
-      els.sigil.style.transform = "translate3d(0," + (Math.sin(t * 1.05) * 1.2) + "px,0)";
+      els.sigil.style.transform = "translate3d(0," + (Math.sin(t * 1.05) * 1.2) + "px,0) scale(" + lerp(0.965, 1, skyRead) + ")";  // gentle draw-in
       els.skyBloom.style.opacity = String((0.2 + 0.8 * skyRead) * (1 - ease(beat(t, T.cupRead, T.omenEnd))) * (1 - 0.7 * forgeFocus));
-      skyStars.forEach(function (d, k) { var a = beat(t, T.skyA + 0.3 + k * 0.42, T.skyA + 0.9 + k * 0.42); var fade = 1 - ease(beat(t, T.cupRead, T.omenEnd));
+      // stars ignite one-by-one, all lit inside the sky beat, then fade as the cup takes over
+      skyStars.forEach(function (d, k) { var a = beat(t, T.skyA + 0.15 + k * 0.22, T.skyA + 0.6 + k * 0.22); var fade = 1 - ease(beat(t, T.cupRead, T.omenEnd));
         d.style.opacity = String(ease(a) * fade * (0.7 + 0.3 * Math.sin(t * 4 + k))); });
-      var gaze = ease(beat(t, T.skyA + 0.5, T.skyA + 1.7)) * (1 - ease(beat(t, T.cupIn - 0.2, T.cupIn + 0.4)));
-      els.gazeBeam.style.opacity = String(gaze * 0.6);
-      els.sigilCrown.style.opacity = String(clamp((sigBrite * (1 - 0.62 * forgeFocus)) * 0.95 + sigilCoolIn * 0.28));
+      var gaze = ease(beat(t, T.skyA + 0.5, T.skyA + 1.4)) * (1 - ease(beat(t, T.cupIn - 0.2, T.cupIn + 0.3)));
+      els.gazeBeam.style.opacity = String(gaze * 0.55);
+      els.sigilCrown.style.opacity = String(clamp((sigBrite * (1 - 0.62 * forgeFocus)) * 0.95 + sigilCoolIn * 0.32));
 
-      // shaman: look UP for the sky, DOWN into the cup
-      var lookUp = ease(beat(t, T.skyA, T.skyB - 0.4)) * (1 - ease(beat(t, T.cupIn - 0.2, T.cupIn + 0.5)));
+      // ===== SHAMAN — near-still; micro-tilts capped, forge-watch is GLOW not tilt =====
+      var lookUp = ease(beat(t, T.skyA, T.skyB - 0.3)) * (1 - ease(beat(t, T.cupIn - 0.2, T.cupIn + 0.4)));
       var lookDown = ease(beat(t, T.cupIn, T.cupRead)) * (1 - ease(beat(t, T.cupOut, T.omenEnd)));
-      var shRot = lerp(0, -6.0, lookUp) + lerp(0, 2.4, lookDown);
-      var strikeReact = 0; hits.forEach(function (h) { strikeReact = Math.max(strikeReact, nearPulse(t, h, 0.18)); });
-      var watchForge = ease(beat(t, T.acceptEnd, T.acceptEnd + 0.8)) * (1 - ease(beat(t, T.lift + 0.6, T.lift + 1.4)));
-      shRot += watchForge * 2.4;
+      var shRot = lerp(0, -2.0, lookUp) + lerp(0, 1.5, lookDown);        // capped micro-lean; NO forge-watch rotation
       setT(els.shaman, Math.sin(t * 1.8) * 0.3, 0, shRot, 1);
       var skyGlow = lookUp * (1 - ease(beat(t, T.cupIn - 0.1, T.cupRead)));
-      els.shaman.style.filter = "drop-shadow(0 0 " + (4 + strikeReact * 6 * watchForge + skyGlow * 9) + "px rgba(230,182,104," + (0.05 + strikeReact * 0.14 * watchForge + skyGlow * 0.20) + "))";
+      var watchGlow = ease(beat(t, T.acceptEnd, T.acceptEnd + 0.8)) * (1 - ease(beat(t, T.lift + 0.4, T.lift + 1.2)));
+      els.shaman.style.filter = "drop-shadow(0 0 " + (4 + accentImpact * 6 * watchGlow + skyGlow * 9) + "px rgba(230,182,104," + (0.05 + accentImpact * 0.14 * watchGlow + skyGlow * 0.20) + "))";
 
-      // cup: rises in front, tilts to read, omen glint, then lowers
+      // ===== 2. THE CUP IS READ — small lift, held omen ripple, then lower (glow-led) =====
       var cupUp = ease(beat(t, T.cupIn, T.cupRead));
       var cupGone = ease(beat(t, T.cupOut, T.omenEnd));
       var cupOp = cupUp * (1 - cupGone);
       setO(els.cup, cupOp);
-      var cupTilt = lerp(6, -14, cupUp);
-      setT(els.cup, lerp(-4, 4, cupUp), lerp(30, 4, cupUp), cupTilt, lerp(0.9, 1.05, cupUp));
+      setT(els.cup, lerp(-2, 2, cupUp), lerp(14, 4, cupUp), lerp(4, -6, cupUp), lerp(0.94, 1.03, cupUp));  // ~10px lift, small tip
       if (cupOp > 0.2) {
+        var omenGlow = ease(beat(t, T.cupRead, T.cupHold)) * (1 - cupGone);   // blooms 3.0→3.4, HELD to 3.5, then lowers
         els.cup.querySelectorAll(".steam").forEach(function (p, k) { p.style.opacity = String((0.2 + 0.16 * Math.sin(t * 5 + k)) * cupUp * (1 - cupGone)); });
-        els.cup.querySelector(".omen").style.opacity = String(ease(beat(t, T.cupRead, T.cupRead + 0.8)) * (1 - cupGone) * (0.7 + 0.3 * Math.sin(t * 3)));
+        els.cup.querySelector(".omen").style.opacity = String(omenGlow * (0.75 + 0.25 * Math.sin(t * 3)));
       }
 
-      // ===== CARRIED — crow enters from the LEFT EDGE, delivers over the anvil =====
+      // ===== 3. THE COMMISSION IS CARRIED — the crow (the one traveling element) =====
       var cIn = softOut(beat(t, T.crowStart, T.crowHover));
       var flyX = lerp(-640, 0, cIn);
       var flyY = lerp(-108, 0, ease(beat(cIn, 0.42, 1.0)));
-      var bob = 4 * Math.sin(t * 6.2) * (1 - cIn) * (t < T.release ? 1 : 0.3);
+      var bob = 5 * Math.sin(t * 7.0) * (1 - cIn) * (t < T.release ? 1 : 0.3);   // a touch more wingbeat at the faster pace
       var pitchDesc = lerp(0, 5, ease(beat(t, T.crowHover - 0.5, T.release)));
       var ex = ease(beat(t, T.release, T.crowExit));
       var cx = flyX + lerp(0, 210, ex);
@@ -284,99 +289,63 @@
       setT(els.crow, cx, cy, cr, cs);
       setO(els.trail, ease(beat(t, T.crowStart + 0.6, T.crowStart + 1.4)) * (1 - ease(beat(t, T.crowHover - 0.4, T.release))) * 0.85);
 
-      // dropped commission: real envelope art first, then distilled into the seal token
-      var firstHit = hits[0];
-      var envHome = { x: 761 + 55, y: 475 + 44 };
-      var envRest = { x: ANVIL_FACE.x, y: 640 };
-      if (t >= T.release && t < firstHit - 0.08) {
-        var ea = beat(t, T.release, T.release + 1.08);
-        var ee = out(ea);
-        var evx = lerp(envHome.x, envRest.x, ee) - envHome.x;
-        var evy = lerp(envHome.y, envRest.y, inQuad(ea)) + Math.sin(Math.PI * ea) * -18 - envHome.y;
-        setO(els.envelope, ease(beat(t, T.release, T.release + 0.10)) * (1 - ease(beat(t, firstHit - 0.28, firstHit - 0.08))));
-        setT(els.envelope, evx, evy, lerp(0, -10, ee), lerp(1, 0.62, ee));
+      // ===== 4. THE COMMISSION IS ACCEPTED — envelope distills, seal GLOWS IN on the anvil (no slide) =====
+      // envelope: a short vertical drop by the crow, then it distills (fades + shrinks) into the seal
+      if (t >= T.release && t < T.release + 0.55) {
+        var ea = beat(t, T.release, T.release + 0.5);
+        setO(els.envelope, ease(beat(t, T.release, T.release + 0.12)) * (1 - ease(beat(t, T.release + 0.3, T.release + 0.5))));
+        setT(els.envelope, 0, lerp(0, 26, out(ea)), lerp(0, -6, ea), lerp(1, 0.7, ea));
       }
-
-      // ===== SEAL — released at the beak, falls to the anvil, rests, struck =====
-      var beakX = ANVIL_FACE.x, beakY = 640;
-      var sOp = 0, sx = 0, sy = 0, sScaleY = 1, sGlow = 0;
-      var restCx = ANVIL_FACE.x, restCy = 642;
-      var homeCx = 951 + 17, homeCy = 632 + 17;
-      if (t >= T.release && t < T.nod1) {
-        var sa = beat(t, T.release + 0.85, T.release + 1.25);
-        sOp = ease(beat(t, T.release + 0.82, T.release + 0.98));
-        var fx = lerp(beakX, restCx, out(sa));
-        var fy = lerp(beakY, restCy, inQuad(sa)) + (sa > 0.9 ? -Math.sin((sa - 0.9) / 0.1 * Math.PI) * 6 : 0);
-        sx = fx - homeCx; sy = fy - homeCy;
-        sScaleY = sa > 0.9 ? lerp(1, 0.9, Math.sin((sa - 0.9) / 0.1 * Math.PI)) : 1;
-        sGlow = 0.2;
-      } else if (t >= T.nod1 && t < firstHit) {
-        sOp = 1; sx = restCx - homeCx; sy = restCy - homeCy;
-        sGlow = 0.2 + 0.32 * (nearPulse(t, T.nod1, 0.3) + nearPulse(t, T.nod2, 0.28));
+      // seal: materializes at rest ON the anvil (element centre already = 968,649), double-glows on the nods, consumed at hit1
+      var sOp = 0, sGlow = 0, sScaleY = 1, sPop = 1;
+      if (t >= T.release + 0.2 && t < firstHit) {
+        sOp = ease(beat(t, T.release + 0.2, T.release + 0.5));
+        sPop = 1 + 0.12 * (1 - ease(beat(t, T.release + 0.2, T.release + 0.55)));    // small materialize pop
+        sGlow = 0.25 + 0.42 * (nearPulse(t, T.nod1, 0.25) + nearPulse(t, T.nod2, 0.22));  // "reads it twice"
       } else if (t >= firstHit && t < firstHit + 0.16) {
         var cf = beat(t, firstHit, firstHit + 0.14);
-        sOp = 1 - cf; sx = restCx - homeCx; sy = restCy - homeCy; sScaleY = lerp(1, 0.14, cf); sGlow = 1;
+        sOp = 1 - cf; sScaleY = lerp(1, 0.14, cf); sGlow = 1;
       }
       if (sOp > 0) {
         setO(els.seal, sOp);
-        els.seal.style.transform = "translate3d(" + sx + "px," + sy + "px,0) scaleY(" + sScaleY + ")";
-        els.seal.style.filter = "drop-shadow(0 0 " + (5 + sGlow * 16) + "px rgba(255,172,74," + (0.25 + sGlow * 0.6) + "))";
+        els.seal.style.transform = "translate3d(0,0,0) scale(" + sPop + ") scaleY(" + sScaleY + ")";
+        els.seal.style.filter = "drop-shadow(0 0 " + (6 + sGlow * 16) + "px rgba(255,172,74," + (0.3 + sGlow * 0.6) + "))";
       } else setO(els.seal, 0);
 
-      // ===== SMITH jolt on contact; anvil squashes =====
-      var smithDip = 0, anvilDip = 0, impact = 0;
-      hits.forEach(function (h) { var j = jolt(t, h, 0.16); impact = Math.max(impact, nearPulse(t, h, 0.12)); smithDip += j * 2.0; anvilDip += j * 2.0; });
-      var nod = nearPulse(t, T.nod1, 0.3) * 1.2 + nearPulse(t, T.nod2, 0.28) * 1.0;
-      setT(els.smith, 0, smithDip, nod * 1.2 + watchForge * 0.6, 1);
-      setT(els.anvil, 0, anvilDip, 0, anvilDip > 0 ? 0.985 : 1);
+      // ===== SMITH — STATIC pose; only a small vertical jolt on marks + a 1.5px bow on the accept-nods =====
+      var nodDip = nearPulse(t, T.nod1, 0.22) * 1.5 + nearPulse(t, T.nod2, 0.20) * 1.3;
+      setT(els.smith, 0, smithDip + nodDip, 0, 1);          // NO rotation — the plate stays locked
+      setT(els.anvil, 0, anvilDip, 0, anvilDip > 0 ? 0.99 : 1);
 
-      // ===== SMITH RIGHT ARM (real source art, arm+hammer) — raises and strikes =====
-      var A_READY = 78, A_WIND = 98, A_CONTACT = 67;    // positive = swing the mallet LEFT onto the anvil
-      var armAngle = 0;                                  // 0 = hanging at the side (matches the source)
-      var raise = ease(beat(t, T.hammerIn, T.hammerIn + 0.45)) * (1 - ease(beat(t, hits[4] + 0.35, hits[4] + 0.85)));
-      if (raise > 0.005) {
-        var a = A_READY;
-        var nearest = hits[0]; hits.forEach(function (h) { if (Math.abs(t - h) < Math.abs(t - nearest)) nearest = h; });
-        var local = t - nearest;
-        if (local < -0.28) a = A_READY;
-        else if (local < -0.05) a = lerp(A_WIND, A_READY, 1 - out(beat(t, nearest - 0.28, nearest - 0.05)));
-        else if (local < 0.0) a = lerp(A_WIND, A_CONTACT, inQuad(beat(t, nearest - 0.05, nearest)));
-        else if (local < 0.2) { var r = beat(t, nearest, nearest + 0.2); a = A_CONTACT + (A_READY - A_CONTACT) * r - Math.sin(r * Math.PI) * 8 * (1 - r); }
-        else a = A_READY;
-        armAngle = a * raise;
-      }
-      els.rightArm.style.transform = "rotate(" + armAngle + "deg)";
-      setO(els.flash, impact * 0.85);
-      els.flash.style.transform = "scale(" + (0.4 + impact * 1.8) + ")";
+      // ===== 5. impact flash — soft & only on the accented marks =====
+      setO(els.flash, accentImpact * 0.8);
+      els.flash.style.transform = "scale(" + (0.4 + accentImpact * 1.7) + ")";
       updateSparks(t);
 
-      // ===== CROWN — one increment per mark, halo, grows & rises on DRAWN =====
+      // ===== CROWN — one readable stage per mark; settles & the HALO carries the ascent =====
       var stageNum = -1; hits.forEach(function (h, k) { if (t >= h) stageNum = k; });
       var cool = ease(beat(t, T.quench, T.coolEnd));
       if (stageNum >= 0) {
-        var crownLift = ease(beat(t, T.lift, DURATION - 0.4));
-        els.crown.style.opacity = String(lerp(1, 0.94, cool));
-        var grow = 1 + crownLift * 0.5;
-        setT(els.crown, -crownLift * 54, -crownLift * 90, 0, lerp(1, 0.97, cool) * grow);
-        updateCrown(stageNum, impact + (t > hits[0] && t < hits[4] + 0.4 ? 0.3 : 0), cool);
-        var haloOn = ease(beat(t, hits[1], hits[4])) * (1 - 0.3 * cool) + crownLift * 0.6;
+        var crownLift = ease(beat(t, T.lift, DURATION - 0.3));
+        els.crown.style.opacity = String(lerp(1, 0.95, cool));
+        var grow = 1 + crownLift * 0.2;                                // forms UP from its seat (pivot 50% 84%)
+        setT(els.crown, 0, -crownLift * 20, 0, lerp(1, 0.98, cool) * grow);   // a settle, not a launch
+        updateCrown(stageNum, tapImpact * 0.4 + accentImpact * 0.6, cool);
+        var haloOn = ease(beat(t, hits[1], hits[4])) * (1 - 0.3 * cool) + crownLift * 0.7;
         els.halo.style.opacity = String(clamp(haloOn * 0.9));
-        els.halo.style.transform = "translate3d(" + (-crownLift * 54) + "px," + (-crownLift * 90) + "px,0) scale(" + lerp(1, 1.7, crownLift) + ")";
+        els.halo.style.transform = "translate3d(0," + (-crownLift * 20 - crownLift * 14) + "px,0) scale(" + lerp(1, 1.32, crownLift) + ")";  // light rises freely
       } else { els.crown.style.opacity = "0"; els.halo.style.opacity = "0"; }
 
-      // ===== COOLED — quench poured from the bucket =====
-      setT(els.bucket, 0, 0, 0, 1);
-      var qq = ease(beat(t, T.quench + 0.1, T.quench + 0.5)) * (1 - ease(beat(t, T.quench + 1.0, T.quench + 1.5)));
-      setO(els.water, qq * 0.9); els.water.style.transform = "translateY(" + ((1 - qq) * 4) + "px)";
+      // ===== 6. THE METAL IS COOLED — glow cools + steam + forge dim (no literal water pour) =====
       updateSteam(t);
 
-      // ===== captions (synced to actions) =====
+      // ===== captions (synced to the beats) =====
       if (t < T.cupIn) caption("THE SKY IS READ", "the reader questions the heavens.");
       else if (t < T.omenEnd) caption("THE CUP IS READ", "then the grounds give their answer.");
       else if (t < T.crowExit - 0.4) caption("THE COMMISSION IS CARRIED", "by crow, sealed and witnessed.");
       else if (t < firstHit) caption("THE COMMISSION IS ACCEPTED", "the smith reads it twice. it is a crown.");
       else if (t < T.quench) caption("THE CROWN IS STRUCK", "five marks, one shape.");
-      else if (t < T.lift) caption("THE METAL IS COOLED", "water makes the answer hold.");
+      else if (t < T.lift) caption("THE METAL IS COOLED", "the answer settles into pale gold.");
       else caption("THE READING IS DRAWN", "filed, sealed, and cooling.");
     }
 
@@ -425,7 +394,9 @@
         if (raf) { cancelAnimationFrame(raf); raf = null; }
         window.removeEventListener("resize", fit);
         window.removeEventListener("keydown", onKey);
-      }
+      },
+      // QA scrubbing only (router/intake ignore it): cancel the loop, paint one frame.
+      seek: function (tt) { if (destroyed) return; if (raf) { cancelAnimationFrame(raf); raf = null; } render(Math.max(0, Math.min(tt, DURATION))); }
     };
   }
 
