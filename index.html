@@ -14,6 +14,8 @@
   <link rel="stylesheet" href="reveal/reveal.css" />
   <link rel="stylesheet" href="arcane.css" />
   <link rel="stylesheet" href="arcana-result.css" />
+  <link rel="stylesheet" href="arcana-reading.css" />
+  <link rel="stylesheet" href="arcana-profile.css" />
   <link rel="stylesheet" href="ceremony.css" />
 </head>
 <body data-treatment="free" data-view="menu">
@@ -105,6 +107,14 @@
   <!-- The Armor Received (BR-S160) — arcana reading RESULT room on
        ?dev=arcana-result; exposes window.BRArcanaResult, mounted by mountDev(). -->
   <script src="arcana-result.js"></script>
+  <!-- The Arcana Reading — the illuminated dossier, crowned by a reliquary
+       (?dev=arcana-reading). Replaces "The Armor Received". The name engine
+       must load FIRST: the reading asks it for the crown's name + derivation. -->
+  <script src="arcana-name-engine.js"></script>
+  <script src="arcana-reading.js"></script>
+  <!-- The Profile / Hub (?dev=profile) — the seeker's home: crown, vault, people,
+       doors out. Static design surface, mocked commerce. window.BRArcanaProfile. -->
+  <script src="arcana-profile.js"></script>
   <!-- The Ceremony (BR-S163) — the forge ceremony on ?dev=ceremony; the builder's
        exact art kept pixel-perfect + brought to life. window.BRCeremony. -->
   <script src="ceremony.js"></script>

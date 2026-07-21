@@ -1,0 +1,262 @@
+/* =============================================================
+   THE PROFILE / HUB (?dev=profile)
+
+   Two zones on a near-black archive ground:
+   ABOVE GROUND — a self-contained "surface world": a borderless warm ground-panel
+     rising out of the floor, sealed at its base by a gold Kingdom-Threshold horizon.
+   UNDERGROUND — content sections as open L-bracket ledger panels (spine + gold
+     top-rule + folder-tab heading), clearly contained, flat, nothing lifted.
+
+   Colour law: gold (value + all wayfinding) over warm-grey text and ivory/near-black
+   surfaces. NO pure white. Violet reserved for commerce — absent here by design
+   (commerce lives in the Arcana Room); tokens kept defined. The ONE exception is the
+   red/purple liquid-flame HALO — a cosmetic avatar-frame flair, deliberately off-law.
+   [OPEN DECISION 4] violet hex remains the brief's suggested value.
+============================================================= */
+
+.pf {
+  --pf-gold: #c9a35c;
+  --pf-gold-lit: #e2c489;
+  --pf-cream: #e9e5dc;
+  --pf-cream-display: #dcd6c9;
+  --pf-crown: #e0dacd;
+  --pf-room: #0a0b0d;
+  --pf-tab-bg: #0c0d11;                       /* folder-tab chip — one hair above the floor */
+  --pf-line: rgba(201, 163, 92, 0.13);
+  --pf-line-soft: rgba(201, 163, 92, 0.07);
+  --pf-line-cut: rgba(201, 163, 92, 0.22);    /* section spine + top-rule start */
+  --pf-body: #b1ada4;
+  --pf-meta: #9c9790;
+  --pf-ghost: #96918a;
+  --pf-violet: #8a6fb0;                        /* commerce register — defined, unused here */
+  --pf-violet-lit: #a487c8;
+  --pf-violet-line: rgba(138, 111, 176, 0.4);
+  --pf-serif: "Cormorant Garamond", "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+  --pf-mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+  --pf-ui: system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  position: fixed; inset: 0; z-index: 30;
+  overflow-y: auto; overflow-x: hidden;
+  background: radial-gradient(120% 66% at 50% 0%, #15110b 0%, #0a0b0d 56%, #070607 100%);
+  color: var(--pf-body); font-family: var(--pf-ui); -webkit-font-smoothing: antialiased;
+}
+.pf *, .pf *::before, .pf *::after { box-sizing: border-box; }
+.pf :focus-visible { outline: 2px solid var(--pf-gold-lit); outline-offset: 3px; }
+.pf-defs { position: absolute; }
+
+/* ---------- masthead — room doors (above the surface box) ---------- */
+.pf-top {
+  position: sticky; top: 0; z-index: 14;
+  display: flex; align-items: center; justify-content: space-between; gap: 18px; flex-wrap: wrap;
+  padding: 17px clamp(16px, 4vw, 46px) 13px;
+  background: linear-gradient(to bottom, rgba(10,11,13,.98), rgba(10,11,13,.55) 72%, rgba(10,11,13,0));
+  backdrop-filter: blur(2px);
+}
+.pf-wordmark { display: inline-flex; align-items: baseline; gap: 9px; text-decoration: none; font-family: var(--pf-serif); font-weight: 600; font-size: 20px; letter-spacing: .015em; color: var(--pf-cream-display); transition: color .18s; }
+.pf-wordmark__mark { color: var(--pf-gold); font-size: 12px; transform: translateY(-1px); }
+.pf-wordmark:hover, .pf-wordmark:focus-visible { color: var(--pf-crown); outline: none; }
+.pf-doors { display: flex; align-items: center; }
+/* each door reads as a framed doorway that lights on approach (top lintel + bottom sill) */
+.pf-door {
+  position: relative; background: none; border: 0; cursor: pointer; text-decoration: none;
+  padding: 6px clamp(12px, 1.7vw, 18px);
+  font-family: var(--pf-mono); font-size: 9.5px; font-weight: 500; letter-spacing: .2em; text-transform: uppercase;
+  color: var(--pf-meta); transition: color .18s;
+}
+.pf-door + .pf-door { border-left: 1px solid var(--pf-line-soft); }
+.pf-door::before, .pf-door::after { content: ""; position: absolute; left: 8px; right: 8px; height: 1px; background: var(--pf-gold); transform: scaleX(0); transform-origin: center; transition: transform .22s ease; }
+.pf-door::before { top: 2px; background: var(--pf-line-soft); }
+.pf-door::after { bottom: 0; }
+.pf-door:hover, .pf-door:focus-visible { color: var(--pf-gold-lit); outline: none; }
+.pf-door:hover::before, .pf-door:hover::after, .pf-door:focus-visible::before, .pf-door:focus-visible::after { transform: scaleX(1); }
+
+/* ---------- shell ---------- */
+.pf-wrap { width: min(760px, 92vw); margin: 0 auto; padding: clamp(14px, 3vh, 30px) 0 16vh; }
+
+/* ---------- ABOVE GROUND — the surface-world box ---------- */
+.pf-surface {
+  position: relative; isolation: isolate; text-align: center;
+  margin: clamp(10px, 2.5vh, 22px) auto 0;
+  padding: clamp(20px, 4vh, 38px) clamp(16px, 4vw, 32px) 0;
+  background: linear-gradient(180deg, rgba(233,229,220,.022) 0%, rgba(233,229,220,.007) 70%, transparent 100%);
+}
+.pf-crown-slot { position: relative; display: grid; place-items: center; min-height: 150px; margin: 0 auto 6px; }
+.pf-crown-slot::after { content: ""; position: absolute; left: 50%; bottom: 2px; transform: translateX(-50%); width: 58%; height: 24px; background: radial-gradient(ellipse at center, rgba(201,163,92,.13), transparent 70%); filter: blur(2px); pointer-events: none; z-index: -1; }
+.pf-crown-svg { width: clamp(150px, 30vw, 210px); height: auto; color: var(--pf-gold); filter: drop-shadow(0 10px 26px rgba(201,163,92,.20)) drop-shadow(0 0 12px rgba(201,163,92,.24)); }
+.pf-crown-name { font-family: var(--pf-serif); font-weight: 600; font-size: clamp(20px, 2.6vw, 27px); line-height: 1.15; letter-spacing: .01em; color: var(--pf-cream-display); margin: 8px 0 0; text-wrap: balance; }
+.pf-crown-empty { width: clamp(150px, 30vw, 200px); aspect-ratio: 1 / .62; display: grid; place-items: center; border: 1px dashed var(--pf-line); border-radius: 4px; color: var(--pf-ghost); font-family: var(--pf-mono); font-size: 9px; letter-spacing: .2em; text-transform: uppercase; text-align: center; line-height: 1.9; padding: 12px; }
+.pf-provbar { display: inline-flex; gap: 6px; margin: 14px 0 0; }
+.pf-provbar i { width: 7px; height: 7px; border-radius: 50%; background: var(--pf-gold); box-shadow: 0 0 6px rgba(201,163,92,.4); }
+.pf-prov { font-family: var(--pf-serif); font-style: italic; font-size: 15px; color: var(--pf-meta); margin: 12px auto 0; max-width: 42ch; line-height: 1.5; }
+.pf-eyebrow { font-family: var(--pf-mono); font-size: 9px; font-weight: 500; letter-spacing: .3em; text-transform: uppercase; color: var(--pf-ghost); margin: 18px 0 0; }
+
+/* identity — a boxed red/purple flame FRAME whose line burns + pulsates like liquid nitrogen,
+   flowing around the border (cosmetic avatar-frame flair, off the content law by design) */
+@property --pf-angle { syntax: "<angle>"; initial-value: 0deg; inherits: false; }
+.pf-identity {
+  position: relative; isolation: isolate; display: inline-flex; align-items: center; gap: 16px;
+  margin: 18px auto 0; padding: 17px 30px; border-radius: 14px;
+  /* a lit NICHE recessed into the surface: name rests in a soft pool of dark that feathers to nothing */
+  background: radial-gradient(135% 155% at 50% 42%, rgba(5,4,7,.74) 0%, rgba(9,8,11,.38) 52%, rgba(10,11,13,0) 100%);
+  /* AO recess (inset dark) + a warm lit top-rim + an always-on ambient bloom that spills onto the surface (two radii) */
+  box-shadow:
+    inset 0 1px 14px rgba(0,0,0,.55),
+    inset 0 1px 0 rgba(255,150,180,.10),
+    0 0 12px rgba(168,42,112,.22),
+    0 0 34px rgba(123,47,247,.15);
+}
+.pf-halo { position: absolute; inset: -1px; border-radius: 15px; z-index: -1; pointer-events: none; }
+/* the burning line — dim violet base (a quiet line at rest) + a hot arc that flows around it, masked to the
+   border. Temperature-bridged (orange->red->magenta->violet) and screen-blended so it reads as emitted light. */
+.pf-halo::before {
+  content: ""; position: absolute; inset: 0; border-radius: inherit; padding: 1.5px;
+  background: conic-gradient(from var(--pf-angle),
+    rgba(108,60,150,.28) 0deg, rgba(108,60,150,.28) 190deg,
+    #ff7a3d 220deg, #ff3b47 236deg, #e01e5a 252deg, #b5179e 270deg, #7b2ff7 292deg, #6a4bd0 306deg,
+    rgba(108,60,150,.28) 322deg, rgba(108,60,150,.28) 360deg);
+  filter: url(#pfLiquid) blur(1.4px);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor; mask-composite: exclude;
+  mix-blend-mode: screen;
+  animation: pf-flow 6s linear infinite;
+}
+/* wide soft environmental spill — the hot arc's light bleeding out, additive, dissolving into the room */
+.pf-halo::after {
+  content: ""; position: absolute; inset: -14px; border-radius: 28px;
+  background: conic-gradient(from var(--pf-angle),
+    transparent 0deg, transparent 206deg, #ff5e3a 240deg, #e01e5a 258deg, #b5179e 274deg, #7b2ff7 298deg, transparent 340deg, transparent 360deg);
+  filter: url(#pfLiquid) blur(26px) saturate(1.1);
+  opacity: .4; mix-blend-mode: screen;
+  animation: pf-flow 6s linear infinite, pf-breathe 3.4s ease-in-out infinite;
+}
+@keyframes pf-flow { to { --pf-angle: 360deg; } }
+@keyframes pf-breathe { 0%, 100% { opacity: .22; } 50% { opacity: .52; } }
+.pf-avatar { width: 46px; height: 46px; border-radius: 50%; border: 1px solid var(--pf-line); display: grid; place-items: center; font-family: var(--pf-serif); font-weight: 600; font-size: 22px; color: var(--pf-gold); flex: none; background: rgba(201,163,92,.06); }
+.pf-identity__txt { display: flex; flex-direction: column; text-align: left; }
+.pf-cname { font-family: var(--pf-serif); font-weight: 600; font-size: clamp(26px, 3.4vw, 36px); line-height: 1.1; letter-spacing: .012em; color: var(--pf-crown); margin: 0; text-wrap: balance; }
+.pf-handle { font-family: var(--pf-mono); font-size: 11px; letter-spacing: .14em; color: var(--pf-meta); margin: 4px 0 0; }
+
+/* the horizon — a gold Kingdom-Threshold line sealing the base of the surface box */
+.pf-horizon { position: relative; display: flex; align-items: center; justify-content: center; gap: 16px; width: 100%; margin: clamp(16px, 3.5vh, 28px) auto 0; padding-bottom: clamp(12px, 2.5vh, 22px); }
+.pf-horizon::before { content: ""; position: absolute; left: 12%; right: 12%; top: 50%; height: 16px; transform: translateY(-50%); background: radial-gradient(60% 100% at 50% 50%, rgba(233,229,220,.08), transparent 72%); pointer-events: none; }
+.pf-horizon__line { position: relative; flex: 1; height: 1px; }
+.pf-horizon__line--l { background: linear-gradient(to right, transparent 0%, rgba(233,229,220,.03) 14%, rgba(201,163,92,.5) 100%); }
+.pf-horizon__line--r { background: linear-gradient(to left, transparent 0%, rgba(233,229,220,.03) 14%, rgba(201,163,92,.5) 100%); }
+.pf-horizon__line--l::before, .pf-horizon__line--r::after { content: ""; position: absolute; top: -2px; width: 1px; height: 5px; background: rgba(201,163,92,.14); }
+.pf-horizon__line--l::before { left: 0; }
+.pf-horizon__line--r::after { right: 0; }
+.pf-horizon__gate { display: grid; place-items: center; color: var(--pf-gold); }
+.pf-horizon__gate svg { width: 30px; height: 16px; opacity: .5; transition: opacity .3s, filter .3s; }
+.pf-surface:hover .pf-horizon__gate svg { opacity: .85; filter: drop-shadow(0 0 6px rgba(201,163,92,.4)); }
+
+/* ---------- the reading portal (first thing underground) ---------- */
+.pf-portal { display: flex; flex-direction: column; align-items: center; gap: 10px; margin: clamp(12px, 3vh, 26px) 0 0; }
+.pf-portal .pf-doorbar { width: min(540px, 100%); }
+
+/* ---------- shared in-body door bar — every door speaks one language ---------- */
+.pf-doorbar {
+  display: flex; align-items: center; gap: 16px; width: 100%; text-decoration: none; text-align: left; cursor: pointer;
+  border: 1px solid var(--pf-line); border-radius: 6px; padding: 16px 20px;
+  background: linear-gradient(180deg, rgba(233,229,220,.014), transparent 60%);
+  transition: border-color .18s, background .18s;
+}
+.pf-doorbar:hover, .pf-doorbar:focus-visible { border-color: var(--pf-gold); background: rgba(201,163,92,.05); outline: none; }
+.pf-doorbar--referral { margin-top: clamp(32px, 5.5vh, 52px); }
+.pf-doorbar__seal { width: 34px; height: 34px; color: var(--pf-gold); flex: none; }
+.pf-doorbar__txt { flex: 1; }
+.pf-doorbar__t { font-family: var(--pf-serif); font-weight: 600; font-size: 21px; color: var(--pf-cream-display); line-height: 1.1; display: block; }
+.pf-doorbar__s { font-family: var(--pf-mono); font-size: 9.5px; letter-spacing: .06em; color: var(--pf-meta); margin-top: 5px; display: block; }
+.pf-doorbar__arr { margin-left: auto; color: var(--pf-gold); font-size: 18px; transition: transform .18s; }
+.pf-doorbar:hover .pf-doorbar__arr, .pf-doorbar:focus-visible .pf-doorbar__arr { transform: translateX(3px); }
+
+/* open-this-reading (free, gold) + redraw (a quiet gold door, price lives in the Arcana Room) */
+.pf-openreading { background: none; border: 0; cursor: pointer; padding: 6px 2px; text-decoration: none; font-family: var(--pf-mono); font-size: 10px; font-weight: 500; letter-spacing: .16em; text-transform: uppercase; color: var(--pf-gold); border-bottom: 1px solid var(--pf-line); transition: color .18s, border-color .18s; }
+.pf-openreading:hover, .pf-openreading:focus-visible { color: var(--pf-gold-lit); border-color: var(--pf-gold); outline: none; }
+.pf-openreading--sm { font-size: 9px; letter-spacing: .12em; }
+.pf-redraw { background: none; border: 0; cursor: pointer; padding: 6px 2px; text-decoration: none; font-family: var(--pf-mono); font-size: 10px; font-weight: 500; letter-spacing: .16em; text-transform: uppercase; color: var(--pf-meta); border-bottom: 1px solid var(--pf-line-soft); transition: color .18s, border-color .18s; }
+.pf-redraw:hover, .pf-redraw:focus-visible { color: var(--pf-gold-lit); border-color: var(--pf-line); outline: none; }
+.pf-redraw--sm { font-size: 9px; letter-spacing: .12em; }
+
+/* ---------- UNDERGROUND — sections as open L-bracket ledger panels ---------- */
+.pf-sec {
+  position: relative; margin: clamp(32px, 5.5vh, 52px) 0 0; padding: 30px 0 24px 22px;
+  border-left: 1px solid var(--pf-line-cut);
+  background: linear-gradient(to right, rgba(233,229,220,.020) 0%, rgba(233,229,220,.007) 30%, transparent 62%);
+}
+.pf-sec::before { content: ""; position: absolute; left: -1px; top: 0; width: min(58%, 340px); height: 1px; background: linear-gradient(to right, var(--pf-gold) 0%, var(--pf-line) 42%, transparent 100%); }
+.pf-sec::after { content: ""; position: absolute; left: -1px; bottom: 0; width: 38px; height: 1px; background: linear-gradient(to right, rgba(201,163,92,.5), transparent); }
+/* folder-tab heading — an opaque chip straddling the elbow, knocking a clean gap in the top-rule */
+.pf-sec__h { position: absolute; top: 0; left: 14px; transform: translateY(-50%); z-index: 1; display: inline-flex; align-items: center; gap: 10px; margin: 0; padding: 3px 12px; background: var(--pf-tab-bg); border: 1px solid var(--pf-line); border-radius: 4px; font-family: var(--pf-mono); font-size: 9.5px; font-weight: 500; letter-spacing: .22em; text-transform: uppercase; color: var(--pf-gold); }
+.pf-sec__note { font-family: var(--pf-mono); font-size: 8.5px; letter-spacing: .16em; text-transform: uppercase; color: var(--pf-ghost); }
+.pf-lede { font-family: var(--pf-serif); font-size: 16px; line-height: 1.6; color: var(--pf-body); max-width: 60ch; margin: 2px 0 20px; }
+
+/* Rings — mini-crowns (§3.4) */
+.pf-family { display: flex; flex-wrap: wrap; gap: 14px; }
+.pf-mini { flex: 0 0 auto; width: 144px; border: 1px solid var(--pf-line-soft); border-radius: 4px; padding: 16px 12px 14px; text-align: center; background: rgba(233,229,220,.018); }
+.pf-mini svg { width: 66px; height: auto; color: var(--pf-gold); opacity: .92; }
+.pf-mini__rel { font-family: var(--pf-mono); font-size: 10px; letter-spacing: .16em; text-transform: uppercase; color: var(--pf-gold); margin: 10px 0 0; }
+.pf-mini__label { font-family: var(--pf-serif); font-size: 16px; color: var(--pf-cream); margin: 5px 0 0; line-height: 1.25; }
+.pf-mini__n { font-family: var(--pf-mono); font-size: 10px; letter-spacing: .08em; color: var(--pf-meta); margin: 6px 0 0; }
+.pf-mini__acts { display: flex; flex-direction: column; align-items: center; gap: 6px; margin: 12px 0 0; }
+.pf-mini--add { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; color: var(--pf-ghost); cursor: pointer; border-style: dashed; background: none; }
+.pf-mini--add:hover, .pf-mini--add:focus-visible { color: var(--pf-gold-lit); border-color: var(--pf-gold); outline: none; }
+.pf-mini__plus { font-size: 20px; line-height: 1; color: var(--pf-gold); }
+.pf-mini--add .pf-mini__label { color: inherit; }
+.pf-mini--add .pf-mini__n { color: var(--pf-ghost); }
+
+/* the vault */
+.pf-vault { display: grid; grid-template-columns: 1fr; gap: 16px; }
+.pf-cards { display: flex; gap: 12px; overflow-x: auto; padding: 2px 2px 8px; }
+.pf-card { flex: 0 0 auto; width: 116px; height: 160px; border: 1px solid var(--pf-line); border-radius: 6px; padding: 12px 10px; display: flex; flex-direction: column; justify-content: space-between; align-items: stretch; text-align: left; cursor: pointer; background: linear-gradient(160deg, rgba(201,163,92,.05), rgba(10,11,13,0)); transition: border-color .18s, background .18s, transform .06s; }
+.pf-card:hover, .pf-card:focus-visible { border-color: var(--pf-gold); background: linear-gradient(160deg, rgba(201,163,92,.12), rgba(10,11,13,0)); outline: none; }
+.pf-card:active { transform: translateY(1px); }
+.pf-card__k { font-family: var(--pf-mono); font-size: 9.5px; letter-spacing: .16em; text-transform: uppercase; color: var(--pf-ghost); }
+.pf-card__n { font-family: var(--pf-serif); font-size: 17px; color: var(--pf-cream); line-height: 1.15; }
+.pf-card__seal { align-self: flex-end; width: 22px; height: 22px; color: var(--pf-gold); opacity: .85; }
+
+/* showcase + privacy (expandable/closable per item) */
+.pf-show { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; }
+.pf-showitem { border: 1px solid var(--pf-line-soft); border-radius: 5px; padding: 16px; background: rgba(233,229,220,.018); }
+.pf-showitem__top { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+.pf-showitem__kind { font-family: var(--pf-mono); font-size: 8.5px; letter-spacing: .2em; text-transform: uppercase; color: var(--pf-gold); }
+.pf-showitem__t { font-family: var(--pf-serif); font-size: 19px; color: var(--pf-cream); margin: 8px 0 0; line-height: 1.2; }
+.pf-showitem__d { font-family: var(--pf-serif); font-size: 14px; font-style: italic; color: var(--pf-meta); margin: 6px 0 0; line-height: 1.5; }
+.pf-vis { position: relative; margin: 16px 0 0; }
+.pf-vis__toggle { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; background: none; border: 1px solid var(--pf-line); border-radius: 999px; padding: 7px 13px; font-family: var(--pf-mono); font-size: 9px; letter-spacing: .1em; text-transform: uppercase; color: var(--pf-meta); transition: border-color .18s, color .18s; }
+.pf-vis__toggle:hover, .pf-vis__toggle:focus-visible { border-color: var(--pf-gold); color: var(--pf-gold-lit); outline: none; }
+.pf-vis__toggle b { color: var(--pf-cream); font-weight: 500; }
+.pf-vis__eye { color: var(--pf-gold); font-size: 8px; }
+.pf-vis__caret { font-size: 8px; transition: transform .2s; }
+.pf-vis__toggle[aria-expanded="true"] .pf-vis__caret { transform: rotate(180deg); }
+.pf-vis__menu { position: absolute; left: 0; top: calc(100% + 6px); z-index: 5; min-width: 170px; display: flex; flex-direction: column; padding: 5px; background: #131117; border: 1px solid var(--pf-line); border-radius: 6px; box-shadow: 0 12px 30px rgba(0,0,0,.5); }
+.pf-vis__menu[hidden] { display: none; }
+.pf-vis__menu button { display: flex; align-items: center; justify-content: space-between; gap: 12px; cursor: pointer; text-align: left; background: none; border: 0; border-radius: 4px; padding: 9px 12px; font-family: var(--pf-mono); font-size: 9.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--pf-meta); transition: background .15s, color .15s; }
+.pf-vis__menu button:hover, .pf-vis__menu button:focus-visible { background: rgba(201,163,92,.08); color: var(--pf-gold-lit); outline: none; }
+.pf-vis__menu button[aria-selected="true"] { color: var(--pf-gold); }
+.pf-vis__tick { color: var(--pf-gold); }
+.pf-showhint { font-family: var(--pf-mono); font-size: 10.5px; letter-spacing: .03em; color: var(--pf-meta); margin: 14px 0 0; line-height: 1.7; }
+
+/* friends */
+.pf-friends { display: flex; flex-direction: column; }
+.pf-friend { display: flex; align-items: center; gap: 14px; padding: 13px 0; border-bottom: 1px solid var(--pf-line-soft); text-decoration: none; color: inherit; }
+.pf-friend:last-of-type { border-bottom: 0; }
+.pf-friend__av { width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--pf-line); display: grid; place-items: center; font-family: var(--pf-serif); font-size: 16px; color: var(--pf-gold); flex: none; }
+.pf-friend__n { font-family: var(--pf-serif); font-size: 18px; color: var(--pf-cream); flex: 1; }
+.pf-friend__crown { font-family: var(--pf-mono); font-size: 9px; letter-spacing: .12em; text-transform: uppercase; color: var(--pf-meta); }
+.pf-friend__vis { font-family: var(--pf-mono); font-size: 10px; letter-spacing: .08em; text-transform: uppercase; color: var(--pf-meta); }
+.pf-addfriend { margin: 16px 0 0; background: none; border: 1px solid var(--pf-line); border-radius: 3px; padding: 9px 16px; cursor: pointer; font-family: var(--pf-mono); font-size: 9.5px; letter-spacing: .16em; text-transform: uppercase; color: var(--pf-meta); transition: border-color .18s, color .18s; }
+.pf-addfriend:hover, .pf-addfriend:focus-visible { border-color: var(--pf-gold); color: var(--pf-gold-lit); outline: none; }
+
+/* footer — bedrock */
+.pf-foot { margin: clamp(44px, 8vh, 72px) 0 0; padding-top: 24px; border-top: 1px solid var(--pf-line-soft); font-family: var(--pf-mono); font-size: 9px; letter-spacing: .1em; color: var(--pf-ghost); line-height: 1.9; text-align: center; }
+
+@media (max-width: 620px) {
+  .pf-top { gap: 10px 14px; }
+  .pf-mini { width: calc(50% - 7px); }
+  .pf-show { grid-template-columns: 1fr; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pf * { transition: none !important; }
+  .pf-halo, .pf-halo::before, .pf-halo::after { animation: none !important; }
+}
