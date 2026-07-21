@@ -1,0 +1,218 @@
+### AUDITED UNITS: 19  |  CRITICS: 2
+
+### FINAL VERDICT TALLY
+  ACCURATE      : 49
+  UNDERSTATED   : 1
+  OVERSTATED    : 11
+  FALSE         : 4
+  UNVERIFIABLE  : 8
+
+
+============ FALSE (delivery claim contradicted) ============
+
+[seal]
+  CLAIM: In V3.1 the drawn gold oval outline around this inset has been removed (no drawn oval should be visible).
+  NOTE : Confirmed via 3x crop: f220 shows a thin, hard-edged, flat copper ELLIPSE floating over the lower-left wax/compass base, absent in f216 (pops in mid-scene over the hero object). It is not a specular highlight - it does not follow the wax-ridge 3D contour. Nuance: the large FRAMING oval around the whole inset does look removed (border is now rectangular torn-parchment); the violator is a different smaller stray oval. Either way the stated criterion 'no drawn oval visible' fails. Not an over-reach; P1 flicker on the focal object is fair.
+
+[hammer_strikes]
+  CLAIM: The object being struck ALREADY looks like the finished crown (no raw-to-forged transformation).
+  NOTE : Confirmed - not an over-reach. Zoom of the f398 impact shows the hammer face meeting a blown-out white/gold flare with NO discernible crown-shaped workpiece; raised-frame f380 shows only a small indistinct dark workpiece under a tongs/gauntleted hand. The one crown-shaped object is a separate fully-formed glowing crown (spikes + jeweled band + central star gem) sitting as a PROP on the right-side table, entirely off the anvil, in every frame. So the claim's literal stated visual (the struck object looks like the crown) is factually wrong -> FALSE. Nuance: the claim's broader conclusion ('no raw-to-forged transformation reads') is directionally valid, but via a different mechanism, which the refuter correctly relocates to missed_problem 2.
+
+[steam]
+  CLAIM: There is NO visible quench, so the steam has no physical source and reads as magic (acceptable only because divination was established).
+  NOTE : Confirmed. A quench IS visible: the bottom-right corner shows a round wood-banded bucket filled with dark reflective liquid, a rod/tool resting in it, on a stone base beside the flat working anvil with the lit fireplace behind — a textbook smith's quench. Separately, the left workbench cup emits a clear, literal steam plume. The premise 'no visible quench / steam has no physical source' is directly contradicted. The frame in fact supplies MORE mundane physical justification (forge + quench + fire + steaming cup) than the doc's 'sourceless magic' framing wants. FALSE is correct; no over-reach.
+
+[SECTION_asset_requests]
+  CLAIM: The 10-item list is COMPLETE (no needed asset missing).
+  NOTE : Confirmed incomplete. At minimum the duplicate right-table crown cull (two crowns present in the f560/f615 reveal) and the crown's cross-room transport (forge anvil at right in f340/f449 -> central steps in f560, no carry shot) are real needed fixes absent from the list. Consecration agent/effect, a hero reveal insert, and crow legibility are additional gaps.
+
+
+============ OVERSTATED (delivery too generous / worse than stated) ============
+
+[establishment]
+  CLAIM: A dark chamber gradually becomes readable and works as atmospheric establishment.
+  NOTE : Confirmed independently. f000 is frame 0 and its entire right ~60% is already fully legible (zodiac wheel, star field, arched fireplace with live fire, anvil/altar with star-map top, candles, green cauldron, crowned banner, firelit crown). f040 adds only a warm lower-left bloom; readability of the set does not increase. So the 'works as atmospheric establishment' half is accurate but the 'gradually becomes readable' half is not evidenced in the sampled range — the chamber starts readable, there is no from-black reveal. Refuter is well-calibrated, not over-reaching; severity is correctly cosmetic (none).
+
+[writing]
+  CLAIM: 3) The actual written instruction is unreadable, so the crown commission stays implied.
+  NOTE : Both halves confirmed. (a) Illegible = TRUE: crop_writing shows only scattered marks plus an ink streak on the lit page, no readable text. (b) 'Stays implied' = contradicted: the crown commission is loudly telegraphed on-screen — a heraldic crown on the top-right banner (crop_banner), a physical finished crown on the far-right table (crop_table), plus a black anvil and a lit forge (crop_anvil_forge). The commission is SHOWN, not merely implied. OVERSTATED (not FALSE) is the correct calibration because the illegibility premise genuinely holds. Refuter is right.
+
+[forger_inspect]
+  CLAIM: 1) The forger is already inspecting a crown on/near the anvil, understandable as a cut from delivery to work.
+  NOTE : Agree with OVERSTATED. Frame confirms the true core (forger at his workstation with a crown on the anvil), but the claim overstates coherence: (a) the hammer is unmistakably raised/poised over the crown -- a striking/forging pose, not 'inspecting'; and (b) 'understandable as a cut from delivery to work' is unsupported, since no letter/delivery beat appears (see claim 2). One correction to the refuter's own evidence: the anvil under the crown is a FULL-SIZED working anvil, not a 'small side-anvil at the right edge' -- that descriptor is a minor over-reach. It is peripheral (right third) but not small. The substance of the refuter's point (crown is on the working anvil while the central ceremonial anvil is empty) still stands.
+
+[hammer_strikes]
+  CLAIM: Five hammer strikes alternate raised / contact / inspection artwork and read clearly as forging.
+  NOTE : Confirmed. The 'reads clearly as forging' half is accurate - every frame is unambiguous blacksmithing (bearded smith, emblem-faced hammer, anvil, arched forge fire, sparks). But the three-way 'raised/contact/inspection' alternation is not delivered: only TWO pose artworks exist (raised = f380/f510; contact = f398/f449/f489/f525), no inspection pose in any sample, and each pose is a reused still. 'Alternate' is itself generous since sampling is contact-dominant (3 consecutive contact frames 398/449/489). OVERSTATED is the correct call - not fully FALSE because the forging-legibility half holds.
+
+[completed_forge]
+  CLAIM: The forger pauses over the completed crown; reads as completion.
+  NOTE : Confirmed via crop of the forger (~x1350,y500). He holds the star-marked hammer raised high above/behind his head, arm fully extended, fierce downward glare — a clear mid-strike/active-forging stance, not a pause; this reads as 'still forging.' However the crown itself is fully formed and glowing inside a lit consecration circle, so the 'completion' half IS supported by the finished crown. Because one half holds (completion) and one half is contradicted (pauses), OVERSTATED is the correct calibration — not FALSE. Refuter's split-half reasoning is accurate. Agree.
+
+[steam]
+  CLAIM: Steam gathers around the centered crown and fits the ritual atmosphere.
+  NOTE : Confirmed in bright_f615.png. The crown sits on the lower dais step in clear, brightly-lit air; the visible steam wisps and the bright vertical glow-column concentrate at/above the central black anvil behind and above the crown, not around the crown itself. The 'fits ritual atmosphere' half is accurate (steam + candlelight + zodiac star read as mystical), but 'gathers around the centered crown' mislocates the steam. OVERSTATED (not FALSE) is well-calibrated: there is general central haze and the atmosphere claim holds, but the steam-to-crown relationship is exaggerated. No over-reach by the refuter.
+
+[SECTION_P0_duplicate_crown]
+  CLAIM: The problem is 'story-breaking / premise logically false' (P0 severity).
+  NOTE : Agree the P0 'logically false premise / story-breaking' label overshoots. The duplicate is genuine but small and peripheral (far lower-right), and the f730 reveal lands on a DISTINCT, larger, more ornate gothic crown on the central pedestal, so the climax still reads with a unique hero object. P1 is defensible; I lean P1-P2. Also worth flagging a mild over-reach risk the refuter did not raise: in a crown-forging workshop a finished crown as inventory/set-dressing is a plausible non-error reading, which further argues against any P0/P1 severity.
+
+[SECTION_correct_or_fitting_list]
+  CLAIM: 2) The selected crow is black, carries the sealed letter as one combined asset, travels stable left-to-right, and is not swapped mid-flight.
+  NOTE : Agree. Black crow: yes. But in f282 the envelope's lower edge sits exactly on the central anvil top, so it reads as much as 'letter resting on altar, crow arriving behind' as 'carried as one asset.' Stability/no-swap is unverifiable from a single in-flight frame (f282). The seal-glyph change between f244 and f282 (see missed problems) further undercuts 'one combined asset carried and delivered.' Doc's clean-correct listing is too generous; not FALSE though.
+
+[SECTION_correct_or_fitting_list]
+  CLAIM: 3) The sealing stamp sits on wax and the envelope is visibly closed (reads as completed seal).
+  NOTE : Agree. Zoom confirms the compass-rose stamp is still IN CONTACT with a spread red wax blob on an open, cord-tied parchment sheet - sealing in progress, not a lifted/completed seal, and nothing in f216 is a 'closed envelope.' A closed sealed envelope only appears later (f244 cream, f282 white). 'Envelope visibly closed / completed seal' overstates f216.
+
+[SECTION_asset_requests]
+  CLAIM: No item in the list is redundant or over-scoped.
+  NOTE : Confirmed overstated. No item is strictly redundant, but Item 7 (full-frame quench artwork) is over-scoped for a non-essential beat and Item 10 (new pedestal) may duplicate the existing central altar; allocation is forge-heavy (items 3-7) while the more-broken crow gets one item and consecration none.
+
+[SECTION_verdict_chain_readability]
+  CLAIM: Overall — the broad chain communicates 'without specialist explanation'
+  NOTE : I reach the same verdict but correct the reasoning. Refuter's pillar (a), link-4 has-vs-makes, is weak (link 4 reads fine as forging). The claim is still overstated for stronger reasons the refuter under-weighted: (1) the JUDGMENT/'verdict' semantics are not legible — the opening reads as tarot DIVINATION, not a verdict being rendered, and the output is a decorative crown with no judgment signifier, so reading this specifically as a 'verdict chain' needs context; and (2) the letter->commission joint (f282 crow with letter cuts straight to f340 smith already forging) is conveyed only by juxtaposition, an unshown ellipsis. A general viewer gets A coherent story (reading -> sealed letter -> crow delivery -> crown forged -> crown blessed) but not precisely THE intended verdict chain without explanation.
+
+
+============ UNDERSTATED (delivery too harsh) ============
+
+[centered_reveal]
+  CLAIM: 3) It may feel only loosely supported by the central staging (no visible pedestal/contact).
+  NOTE : Agree the doc is too harsh. In the tight crop the crown's base band rests directly on a stone dais tier/step with clear contact -- it reads grounded, not floating -- so the doc's 'no visible contact' is inaccurate. The 'no visible pedestal' half is fair (it sits on a plain step, not a dedicated stand), but the crown does not read as 'loosely supported.' The reveal is better-grounded than the claim admits.
+
+
+============ VERIFIER OVERTURNED REFUTER ============
+
+[cup] refuter=OVERSTATED -> final=ACCURATE
+  CLAIM: It can look pasted into the chamber rather than filmed as a real close-up.
+  NOTE : OVER-REACH by the refuter. The doc's hedged 'can look pasted' is a fair, calibrated observation: the panel genuinely reads as a composited overlay (hard torn-parchment border, own soft-focus candle background, cup grossly out of scale). So the observation is accurate, not overstated. Two problems with the refuter's OVERSTATED label: (1) it contradicts its own evidence, which argues the tell is MORE pronounced than stated (that direction is UNDERSTATED, not OVERSTATED); (2) the panel is clearly a DELIBERATE parchment 'vision-window' motif with decorative gold edging, so a well-hedged 'can look pasted' is exactly the right register. The doc claim stands as ACCURATE.
+
+[centered_reveal] refuter=OVERSTATED -> final=ACCURATE
+  CLAIM: 1) A hard cut presents the forged crown centered in the chamber, clearer than the previous blurry quench and floating travel (those are GONE).
+  NOTE : The refuter OVER-REACHED. Its OVERSTATED downgrade rests on a rival crown it described as 'a second, larger, brighter golden crown' creating hero ambiguity. Measured at true (same-native-scale) comparison, that right-table crown is SMALLER than the centered crown (gold-mass ~4415 vs ~8804 px; bright>200 ~1150 vs ~3025) and is silver/pewter-toned with only a gold gem glow, NOT larger/brighter/golden. So there is no real ambiguity about which is the forged hero crown -- the centered golden crown clearly dominates the magic-circle dais. The verifiable in-frame substance ('presents the forged crown centered ... as a glowing focal point') is ACCURATE. The comparative clauses ('hard cut', 'clearer than the blurry quench and floating travel', 'those are GONE') are genuinely UNVERIFIABLE from these two in-scene frames -- on that narrow point the refuter is right. Net: not overstated; I disagree with the downgrade.
+
+[halo] refuter=OVERSTATED -> final=ACCURATE
+  CLAIM: The approved halo motif appears above the crown and reads cleanly as consecration/completion.
+  NOTE : Over-reach. In both f730 and f760 the motif is unmistakable: a bright starburst with a discrete horizontal perspective-ellipse halo ring, joined by a vertical light-beam down to the hero crown on its stepped dais. The halo ring is the brightest, boldest element up-center and is rendered as a tilted 3D ellipse, visually distinct from the flat concentric zodiac/astrolabe circles it sits inside, so it does NOT read as just another wheel ring. The consecration axis (crown -> beam -> star/halo) is one of the clearest reads in the frame, so 'reads cleanly' is defensible. Critically, the refuter's justification is backwards: at the real ~2.9x-darker grade, darkening pushes the dim flat wheel rings toward black while the bright halo/star/beam persist, INCREASING separation, not causing them to 'compete.' The busyness caveat has minor merit but does not warrant a downgrade; the P2/none impact is immaterial either way.
+
+[SECTION_verdict_chain_readability] refuter=OVERSTATED -> final=ACCURATE
+  CLAIM: Link 4 — forger MAKES the crown is legible
+  NOTE : Refuter over-reached. Close crops show the anvil crown in f340 is GLOWING HOT (worked metal) under a raised hammer, and f449 is a clear downstroke with a spark-burst — hot-workpiece + raised/striking hammer + flying sparks + forge fire is textbook 'forging/making' iconography. Tellingly, a separate COOL/finished crown sits on the side table, distinguishing a display piece from the hot piece being worked. The finished crown-SHAPE (vs raw ingot) leaves only minor has-vs-makes softness (P3), not P1. 'Forger makes the crown' reads.
+
+
+============ CONFIRMED MISSED PROBLEMS ============
+
+[establishment] Dead left ~40% of frame: near-black empty space in both frames — only a faint patterned rug, a dim red glow, and a few candle points are discernible even at 2.9x brightening; in the true mean-luma-30 grade this half reads near-pure black, producing strong compositional imbalance with all content crammed right-of-center. Confirmed as a real observation. Mitigation noted and visible: a warm orange bloom grows lower-left in f040, consistent with the void being reserved negative space for a character/light entrance rather than pure waste — so P2 with caveat is the correct weighting, not higher.
+
+[witch_appears] Refuter's claim-2 gaze evidence is factually wrong: it asserts pupils are centered / directed forward at the camera, but at 8x zoom both irises are clearly shifted toward the viewer's right and slightly downward (an off-axis glance toward the table/spread area), not a straight-to-camera gaze. This does not overturn the verdict but is a real error in the audit's stated evidence.
+
+[cup] CONFIRMED (with calibration): Dark speck/artifact in the steam — a distinct brown speck floats near center-top of the vapor plume and reads as a stray artifact; this is real and a legitimate small defect. HOWEVER the refuter's 'blown-out, near-clipping white, flat white blob' framing is OVERSTATED: at high magnification the plume retains clear internal wisps, curls and translucency (blurred candles show through) and is warm gold-white, not clipped white. Also, this is a ~2.9x-brightened audit frame — in the intended very-dark grade the plume would be far dimmer, cutting against the 'blown-out' severity rather than supporting it. Net: confirm the artifact and the eye-pull; downgrade the blow-out characterization.
+
+[cup] CONFIRMED: Premature crown exposure during the divination scene. Both crowns are present and clearly visible — the gold crown emblem on the heraldic banner (upper-right) AND, more prominently, a fully-rendered 3D jeweled crown prop on the wooden shelf right of the fireplace with a glowing central gem. The table crown is the stronger instance the refuter under-weighted. Factual presence is confirmed; the 'dilutes the later reveal' concern is a reasonable but subjective narrative-pacing judgment (depends on the forge->reveal->consecration structure, which a single frame cannot fully verify). Valid P2 flag worth raising.
+
+[tarot] CONFIRMED (crown pre-shown): lower-right pedestal holds a finished, lit crown, and the upper-right hanging banner bears a crown emblem, both fully visible during the tarot beat. The single wide frame shows reader's table, central altar/font, forge fire, anvil, quench bucket and crown simultaneously, so the climactic crown payoff is visually pre-shown and beats are not spatially isolated. Caveat: 'seemingly locked establishing shot' across the whole scene is itself a temporal claim unverifiable from one still — but the crown's presence during the tarot beat is confirmed.
+
+[tarot] CONFIRMED (generic Φ cards): the three upright cards on the reader's table are identical Φ-glyph placeholders rather than distinct tarot iconography. This undercuts the 'arcana reader' believability and compounds the legibility problem in claim 3.
+
+[seal] CONFIRM P2 tonal/exposure mismatch: the inset is high-key with near-white parchment and shallow-DOF background blur, set against a dark sharp room, so it reads as a brighter pasted-in panel rather than an integrated view. Verified in both frames (partly exaggerated by the ~2.9x brightening, but the DOF+high-key vs sharp-dark-room inconsistency is genuine).
+
+[seal] CONFIRM (minor) P2/P3 legibility risk: the die face is unambiguously a cardinal-star compass rose, which can read as a navigational compass lying on the letter; the red wax context still keeps the seal beat mostly clear, so this is a soft/stylistic concern rather than a hard defect.
+
+[seal] ADDITIONAL missed problem (not in refuter list): the sealing action is physically implausible - the die leans on top of the wax at an angle while the crimson puddle already shows fully-formed concentric ripples, so no actual emboss/contact is depicted. This undercuts the 'sealing' realism and compounds the finished-tableau problem (~P2).
+
+[crow_handoff] CONFIRMED (P2): The crow's body/tail merges almost completely with the dark forge-side and table on the right; only the edge-lit raised wing and rim-lit head/beak carry the silhouette. Verified in crop_crow — the mass below the wing-fan is near-black with no internal detail, so on a true dark grade a viewer could momentarily read it as shadow before the wing registers. Real legibility softening of a beat the doc calls one of its clearest.
+
+[crow_handoff] CONFIRMED (P2, arguably P3): The witch's hand is open with fingers spread and a clear gap to the envelope's left edge — it is NOT gripping the letter (verified in crop_hand). The sealed message reads as floating/telekinetically offered rather than physically handed, weakening the literal 'entrusts/hands over' staging. Note: given the witch is a magic-user, a levitated offer may be intentional/on-theme, which is why this is a soft softener, not a break.
+
+[crow_flight] P2 (oversized / billboarded envelope) - CONFIRMED. In f282 and f306 the envelope stays flat and front-facing to camera (seal fully legible in both), never angled or foreshortened with the flight, reading like a decal pinned to the beak rather than a gripped letter. It is roughly the size of the crow's body core (smaller than the full wingspan, so 'nearly as large as the crow's body' is fair for the core). ADDITIONAL facet the refuter missed: the envelope is markedly larger when carried (f282/f306) than when it rests on the left table in f258 - a scale pop-up on pickup that compounds the oversize read.
+
+[crow_flight] P1 (no on-screen delivery / reception) - CORE FACT CONFIRMED. The letter's delivery/handoff/reception is never shown: crow and envelope are present at f306 and simply absent at f322, so the causal payoff occurs off-screen within this scene. The absence is genuine and consistent with Claim 4. (Its stronger framing is separately rejected below, and the absence itself may be intentional per the doc.)
+
+[forger_inspect] MP1 (forging-logic contradiction) CONFIRMED: hammer is verifiably raised mid-strike over a crown that is already complete and glowing. Hammering a finished crown is physically/narratively incoherent and blurs whether he is making, finishing, or inspecting it -- and the scene is literally named 'forger_inspect' yet depicts a forging strike, a direct name/content mismatch. Real problem. Severity is closer to P2 than P1 (the gist 'smith working a crown' still reads), but the contradiction is genuine.
+
+[forger_inspect] MP3 (crown multiplicity) CONFIRMED: independently verified three crown instances -- the crown on the work-anvil, a second finished crown on the far-right table, and a crown emblem on the upper-right wall banner. For a beat meant to uniquely reveal/consecrate 'the crown', the duplicated finished crowns do undercut singular identity. P2 is fair.
+
+[forger_inspect] MP2 (empty hero-anvil) CONFIRMED as a real compositional observation but with severity OVERSTATED: the large, centered, symmetric, lit anvil on the concentric-circle dais with a radiant star behind it is indeed the single strongest focal magnet and is empty, while the story action sits off-center right. However, calling the beat 'under-staged' at P1 over-reaches -- the glowing crown plus the bright forge fire form a strong competing warm focal cluster that does hold the eye, and an empty central ceremonial dais is plausibly intentional (reserved for a later consecration beat). Treat as ~P3 directorial note, not a P1 defect.
+
+[hammer_strikes] CONFIRMED (refuter missed_problem 1): The RAISED pose is also a single reused still, not just the contact pose. My pixel diff of f380 vs f510 = mean 1.97/255, max 36 - even more identical than the contact quartet. The entire hammer_strikes scene is therefore just two frozen artworks (one raised, one contact) cycling with only spark/flame flicker; the 'one reused pose' repetition covers the whole scene, not just contact. Severity P1 is appropriate.
+
+[hammer_strikes] CONFIRMED (refuter missed_problem 2): No raw-to-forged transformation reads. The anvil workpiece is never legible - blown out by the white impact flare in every contact frame and only a tiny indistinct lump in the raised frames - while a fully finished, glowing crown already sits as a prop on the right-side table throughout the forging (verified in the prop crop). The audience sees a completed crown resting beside an unreadable lump being hammered, so the intended 'the forger makes THIS crown' beat does not land. Valid storytelling defect, P1.
+
+[completed_forge] Heraldic crown emblem on the upper-right wall banner (~x1730,y180): CONFIRMED. A gold stylized crown device sits among star/asterisk motifs on the right wall panel, distinct from the two physical crowns. It is a third crown motif clustered on the right side of frame and does compound the uniqueness dilution flagged in claim 2, drawing the eye rightward away from the crown being consecrated. It is a decorative/heraldic symbol rather than a competing physical artifact, so the impact is lighter than the shelf crown — P2 severity is fair, arguably even slightly generous, but the observation is factually valid.
+
+[centered_reveal] MP2 CONFIRMED (static-hold): f560 and f590 (~1.25s apart) are near-identical -- I independently measured max pixel diff 22/255 and only ~392 px changed above threshold, scattered at candle/fireplace flicker points. No camera push-in, no reframing, and no bloom/light change on the hero crown. For a 'reveal and consecration' climax the beat gets no emphasis move or isolation. (Caveat: the sub-clause 'identical to earlier establishing shots' is a cross-scene comparison I cannot verify without prior frames, but the in-scene inertness is solid.) Severity P2 is fair.
+
+[centered_reveal] MP3 CONFIRMED (hero crown subordinate in composition): the golden crown sits low on the dais directly below the large dark central anvil, which is bigger and looms over it; it is not scaled up, raised, or isolated for the climactic beat and occupies only a modest fraction of the wide frame. Directionally correct, though 'small and dwarfed' is slightly strong -- the crown is still the brightest, largest gold focal mass in the frame. Severity P2 is fair.
+
+[centered_reveal] ADDITIONAL problem both auditors under-weighted: the reveal is a busy full-wide with multiple bright competing focal elements -- most notably the large glowing star/zodiac mandala on the back wall (among the brightest objects in frame), plus the lit fireplace, many candles, and glowing dais glyphs. This dilutes the hero crown's focal hierarchy more than the small side crown does, and reinforces the 'no isolation' criticism (P2).
+
+[steam] CONFIRMED: The crown-consecration beat is weakened because steam never touches or veils the crown. The crown sits fully exposed and separately lit on the front dais step while the steam/glow concentrates up at the anvil, so a viewer is unlikely to associate the steam with the crown. Frame-grounded and valid, though it is largely a consequence of Claim 1's finding rather than a wholly independent defect.
+
+[steam] CONFIRMED: The frame contains multiple competing steam/smoke sources plus explicit forge context — a steaming cup (left workbench), smoke wisps mid-left, a second flat-topped working anvil (right), a water/quench bucket (bottom-right), and a lit fireplace (far right). These split focus from the central 'magical' steam and supply mundane explanations, undercutting the doc's sourceless-magic framing. All elements verified in the crops. Overlaps with Claim 2's evidence but adds the legitimate composition/focus-splitting point.
+
+[halo] Third crown image confirmed: a heraldic crown emblem is inscribed on the upper-right wall banner in BOTH f730 and f760 (verified via crop). Combined with the center hero crown and the bottom-right shelf crown, that is three crown images sharing the frame, so exclusivity is undercut on two fronts, not one. Factually correct as stated. Impact is minor/cosmetic: the banner emblem is small, dim, peripheral wall heraldry, arguably intentional set dressing for a royal/consecration chamber, and the hero crown remains the unmistakable focus (far larger, centered, elevated, beam-lit).
+
+[SECTION_P0_duplicate_crown] CONFIRMED -- Self-illumination: the shelf duplicate has a bright glowing starburst core in every plate (f040/f216/f400/f540/f700 and all bright plates), making it one of the brightest objects in the lower-right. It is NOT concealed by the dark grade and reads as a lit crown even in the pre-forge beats, removing the 'too dark to notice' mitigation. Valid P2.
+
+[SECTION_P0_duplicate_crown] CONFIRMED (with caveat) -- Make->reveal design mismatch: the crown FORGED on the smith's anvil at f340/f540 is a simple ~5-spike crown (near-identical to the shelf prop), whereas the crown CONSECRATED on the central pedestal at f730 is a taller, more ornate gothic-arched crown of clearly different silhouette. As shot the made object and revealed object do not visually match. Lower confidence than #1: a legitimate in-world reading exists (magical consecration/transfiguration of the same crown), which the refuter itself notes. Valid P2.
+
+[SECTION_correct_or_fitting_list] CONFIRMED - Seal-glyph inconsistency across the message's life. Zoomed crops confirm three genuinely distinct glyphs: f216 stamp face = 8-point compass-rose/star in a ticked circle; f244 sealed envelope = red radiating sunburst/asterisk; f282 carried envelope = red concentric-circle bullseye/target with a small central spiral. Same 'sealed message' shows three different seals, undercutting the carried-and-delivered continuity that claims 2 and 3 rely on. Real P2 continuity nit.
+
+[SECTION_correct_or_fitting_list] CONFIRMED (factual, low severity) - Crown-location shift. The crown is forged and floor-haloed on the small RIGHT-side anvil in f540, but the consecrated reveal in f730 shows it on the CENTRAL pedestal, while a second crown remains on the right shelf. The location change of the hero prop between the forging and consecration beats is real. Caveat: this is plausibly intended staging (forge at the forge, reveal at the altar), and with ~190 unsampled frames between f540 and f730 an on-screen move cannot be ruled out, so the refuter's 'without an on-screen move' portion is unverifiable from the sampled frames. Confirm the observation; treat severity as mild.
+
+[SECTION_asset_requests] Duplicate/pre-existing crown continuity: a fully-formed glowing crown sits on the bottom-right table in EVERY frame (verified f080 and f560 crops are near-identical), so the f560/f615 reveal shows two crowns and it is unclear which is the forged one; the list never flags culling this duplicate from hero frames.
+
+[SECTION_asset_requests] Consecration beat has no agent or effect: f560/f615 show only the crown resting on the steps with faint smoke - no witch/forger present and no ritual light from the central star reaching the crown; no list item covers a consecration performance or effect.
+
+[SECTION_asset_requests] Crown teleports across the room: forging occurs at the RIGHT foreground anvil (f340/f449) but the finished crown appears on the CENTRAL dais steps (f560) with no shot of it being carried or moved; Item 6 covers tongs handling at the anvil but not the cross-room traversal or who delivers it.
+
+[SECTION_asset_requests] Crow legibility: in f244 the crow reads as an indistinct dark mass and the letter handoff barely registers; the delivery does not clearly parse. (Nuance: the crow already carries some star-backlit rim-light, so 'needs rim-light to be visible at all' slightly overstates the remedy, but the underlying legibility/staging problem is real.)
+
+[SECTION_asset_requests] No hero insert for the final reveal: f560/f615 are wide shots where the revealed crown is small, low on the steps, and competes with the bright central star and the duplicate right-table crown; there is no push-in or close insert to sell the reveal.
+
+[SECTION_verdict_chain_readability] Verdict semantics are not legible (refuter did not flag this). Nothing in the chain conveys 'judgment/verdict/decree' — the opening beat reads as tarot DIVINATION (reinforced by the DIVINATION/TAROT/NUMEROLOGY labels in f080) and the payload is an ornamental crown with no signifier of a sentence or ruling. So reading the sequence as the intended 'verdict chain' (per the section name) requires specialist/contextual explanation, independent of the causal-glue issue the refuter raised.
+
+[SECTION_verdict_chain_readability] A finished, static crown sits on the far-right side table from f080 onward — i.e. before any forging occurs — and a crown banner hangs on the wall throughout. This ambient pre-existing-crown presence mildly dilutes the 'the smith CREATES the crown' read and competes with the freshly-forged crown for 'this is THE crown' identity. Minor (P3) but genuine, and unmentioned by the refuter.
+
+
+============ CRITIC FINDINGS ============
+
+== LENS: Continuity & physical-logic: asset identity, object-state, screen-direction across the film  (7 findings) ==
+
+  [P1] in_audit=False: ASSET-IDENTITY BREAK on the hero object: the crown enshrined on the sacred central pedestal is a DIFFERENT crown than the one the forger forged. The forged crown (f340, f540) and the shelf crown are a short, CLOSED royal band-crown with ~7 small triangular points and red diamond jewels. The crown that appears on the central dais (f560, f615, f660, f730, f760) is a TALL, OPEN, gothic crown with large fleur-de-lis spires and a central tall spire — a completely different silhouette and style. The object the whole ceremony pays off on is not the object that was made.
+     EVIDENCE: Zoomed compare: forger's crown on anvil f340/f540 = rounded closed crown, many small points, red jewels; central-dais crown f660/f730 = tall open 5-spire gothic crown. Different mesh/silhouette. Shelf duplicate crown also matches the rounded royal type, not the dais type.
+     frames: ['f340', 'f540', 'f560', 'f660', 'f730', 'f760']
+
+  [P2] in_audit=False: SCREEN-DIRECTION reversal of the crow. In the reception medium shot (f244) the crow is on the RIGHT with its beak/head pointing LEFT toward the witch (correct delivery orientation, witch is screen-left). In the following wide shot (f282) the crow is over the central anvil facing RIGHT — beak pointing away from the witch. The crow flips 180 degrees of facing between adjacent story beats, breaking the line of action for the hand-off.
+     EVIDENCE: f244 zoom: crow head/beak oriented left toward witch's reaching hand. f282 zoom: crow body/beak oriented screen-right, away from witch. Recipient (witch) is stationary on the left in both.
+     frames: ['f244', 'f282']
+
+  [P2] in_audit=False: WAX-SEAL EMBLEM inconsistency on the letter. The signet stamp pressing the wax (f216 close-up) imprints an 8-point COMPASS-ROSE / star. But the sealed envelope shows different emblems: f244 shows a radiating red SUNBURST/spider seal, and f282 shows a red concentric-ring TARGET/bullseye seal. Three different seal designs for what reads as one letter, and none matches the compass-rose signet that supposedly stamped it.
+     EVIDENCE: f216 zoom: signet face = compass rose. f244 zoom: envelope seal = red radiating sunburst. f282 zoom: envelope seal = red concentric target with center glyph. Signet motif does not match either sealed-envelope motif.
+     frames: ['f216', 'f244', 'f282']
+
+  [P2] in_audit=False: OBJECT-STATE contradiction in the forge: the forging progression is non-monotonic. f340 shows a fully finished gold crown already sitting on the anvil, f449 shows NO crown at all — the hammer strikes a bare/raw glowing billet with a heavy spark burst — and f540 shows the finished crown back on the anvil again. The completed crown disappears back into raw material and then re-completes. This is more than the audit's 'starts on a finished crown' / 'repetitive forge': the finished object literally reverts to nothing and returns.
+     EVIDENCE: f340 anvil zoom: complete jeweled crown. f449 anvil zoom: no crown, bare anvil, large sparks from raw metal. f540: complete crown present again.
+     frames: ['f340', 'f449', 'f540']
+
+  [P2] in_audit=False: Forger CHARACTER + workstation vanish with no exit, and the crown relocates without a carry/placement shot. In f540 the forger is mid-swing at his forge anvil (right) with the crown on it; in the very next sampled wide (f560) the forger is entirely gone and a crown has appeared at the BASE of the central dais steps (far from the forge anvil on the right). The crown then jumps again from the step base (f560-f660) to the TOP of the central pedestal (f730-f760). Character disappearance plus two unmotivated crown teleports.
+     EVIDENCE: f540: forger present, crown on right forge anvil. f560/f615/f660: forger absent, crown at foot of central dais. f730/f760: crown now elevated on top of central pedestal under the star-beam. No intermediate carrying/placing frames.
+     frames: ['f540', 'f560', 'f660', 'f730', 'f760']
+
+  [P2] in_audit=False: HAMMER asset inconsistency. The forger's hammerhead changes design between shots: relatively plain in f340, embossed with compass-wheel + star glyphs on its faces in f449, and in f540 the top face carries garbled/illegible lettering (nonsense characters) alongside a star. The tool's engraving is not a stable asset.
+     EVIDENCE: f340 hammer: plain faces. f449 hammer zoom: compass-wheel and star embossed on faces. f540 hammer zoom: top face shows garbled text glyphs ('6C9'-like) plus star; face motifs differ from f449.
+     frames: ['f340', 'f449', 'f540']
+
+  [P2] in_audit=False: Physical-logic: the delivered letter is unsupported. In f282 the envelope stands upright, floating in front of the crow's chest above the anvil — it is not gripped in the crow's beak nor held in its talons, and it is not resting flat on the anvil. The letter hovers with no means of support.
+     EVIDENCE: f282 crow zoom: envelope is vertical and detached, in front of the bird's breast; talons are not on it and beak is not holding it.
+     frames: ['f282']
+
+== LENS: honesty-policy-compliance (strict visible-source rule): only crop/alpha-mask/resize/stepped-placement/hold/editorial-cut/brightness-grade permitted; NO procedural visible layers, NO drawn line/glow/portal/halo/light-shaft, NO paint-over/inpainting/crackle/smear.  (2 findings) ==
+
+  [P0] in_audit=False: A synthetic drawn glow/portal layer is composited over the hero (crown) shot: a clean geometric elliptical ring (a Saturn-style halo/portal ring rendered in perspective) encircles the sky-star, and a bright vertical light-shaft/beam descends from the star down toward the centered crown. Neither is source art — both sit ON TOP of the background compass-rose/astrological art (the underlying symbols read straight through the ring and beam), the ring is a uniform-stroke perfect ellipse that ignores the underlying geometry, and both are ABSENT in f560/f590 (where the crown is already present) then appear in f730/f760, i.e. they are animated in as an additive layer. This is precisely the prohibited 'drawn line/glow/portal' and 'procedural visible layer.' A brightness grade cannot synthesize a new geometric ellipse or a connecting light-shaft that were not in the plate.
+     EVIDENCE: f730 and f760 show a bright horizontal elliptical ring around the star plus a vertical light-beam to the crown; zoom crop crops/f760_ring.png shows the ring as a clean perspective ellipse with background compass symbols visible through it and the beam as a discrete additive shaft. Absent in f560/f590 (crown present, no ring/beam), confirming it is a layer added over time rather than static source content.
+     frames: ['bright_f730.png', 'bright_f760.png', 'bright_f560.png', 'bright_f590.png']
+
+  [P1] in_audit=False: A drawn glow ring is composited over the wax seal at the base of the compass medallion. A thin, geometrically-perfect tan/gold ellipse floats semi-transparently in front of the dark wax, not conforming to the wax's contours or lighting. It is ABSENT in the adjacent frame f216 and PRESENT in f220, i.e. it is animated in as a synthetic drawn line/glow layer — a violation of 'NO drawn line/glow' and 'NO procedural visible layers.'
+     EVIDENCE: Side-by-side seal crops: crops/bright_f216_seal.png has no ellipse over the wax; crops/bright_f220_seal.png shows a clean thin elliptical ring overlaid on the wax pool at the medallion base, geometry inconsistent with the underlying wax swirl.
+     frames: ['bright_f220.png', 'bright_f216.png']

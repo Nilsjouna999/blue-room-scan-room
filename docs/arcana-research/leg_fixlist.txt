@@ -1,0 +1,172 @@
+I have full confirmation of both the live measured page (`_artifact-preview.html`, unprefixed classes — matches the brief's measured values) and its sibling `arcana-reading.css` (`.arc-*` classes). Here is the synthesis.
+
+---
+
+# BLUE ROOM ARCANA — MASTER FIX LIST (before → after)
+
+**Scope note for the builder.** Two files carry this UI. The brief's *measured* values live in `C:\Users\nilsj\OneDrive\Documents\blue-room-scan-room\_artifact-preview.html` (inline `<style>`, unprefixed classes: `.crown h1`, `.read`, `.aff__open`, `.acc h1`…). Its sibling `C:\Users\nilsj\OneDrive\Documents\blue-room-scan-room\arcana-reading.css` holds the same reading page with `.arc-*` classes and near-identical values. **Apply every reading-page fix to BOTH** (each line below gives the `_artifact-preview.html` selector first, then the `arcana-reading.css` twin in parentheses). The detail/accession page exists only in `_artifact-preview.html`.
+
+**One disagreement resolved up front:** the audits split on crown weight (some said 400, some said 600). Adopt the Type-System redesign's ruling — the real fix is *embedding* the weight, not synthesizing it. Crown hero gets a **real embedded SemiBold 600**; everything else Cormorant gets **real Medium 500**. Never let the browser synthesize a Cormorant weight (the codebase already learned this on Plex Mono at BR-S122). Weight 400 does not kill the shimmer; a real 600 cut does.
+
+---
+
+## GROUP 1 — CROWN TITLE + FONT EMBED (do this first; it is ~50% of the win)
+
+**1.1 — Self-host the fonts (root cause; nothing else in Group 1 works without it).**
+The page currently only *names* Cormorant in a stack, so most viewers get Georgia and the whole audit is moot.
+- REMOVE the runtime Google link at `arcana-reading-sheet.html:7` (`<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=IBM+Plex+Mono:wght@400;500…">`).
+- Generate + self-host **5 subsetted woff2** (Latin + Latin-Extended only): `CormorantGaramond-Medium` (500), `CormorantGaramond-MediumItalic` (500), `CormorantGaramond-SemiBold` (600, crown only), `IBMPlexMono-Regular` (400), `IBMPlexMono-Medium` (500). **Drop Cormorant 300 entirely** (unused, most shimmer-prone).
+- `@font-face`: `font-display: optional` on the two crown files (SemiBold + Medium-Italic, above-the-fold, zero-reflow), `swap` on the other three (masked by the scroll-in animation).
+- Add `<link rel="preload" as="font" type="font/woff2" crossorigin>` for **SemiBold only**.
+- Verify the licensed source actually ships a static SemiBold 600 before embedding. Until the woff2 exist, the page silently falls back to Georgia — this build step is the gate for the entire type plan.
+
+**1.2 — Crown title.** `.crown h1` (`_artifact-preview.html:38`) and its twin `.arc-name` (`arcana-reading.css:52`):
+- `font-weight: 500 → 600` (real SemiBold — the single highest-leverage anti-shimmer change)
+- `font-size: clamp(31px,5.2vw,50px) → clamp(32px,4.4vw,44px)` (trade a little ceiling size for the weight gain)
+- `line-height: 1.06 → 1.16` (more leading per glyph even in a smaller box)
+- `letter-spacing: normal → 0.012em` (breaks stroke-adjacency shimmer; not enough to read as a tracked label)
+- `color: #ece7dc` **unchanged** — the crown is canon's one sanctioned depth peak; do not dim it
+- ADD `text-shadow: 0 1px 2px rgba(4,3,2,.55)` (pure room-black, zero color content — depth via shadow, not brightness; does not touch the gold rule)
+- Do the same weight/leading logic on the detail hero `.acc h1` (`:77`): `font-weight 500→600`, `line-height 1.04→1.10`.
+
+---
+
+## GROUP 2 — OPEN-RECORD AFFORDANCE (the "wack and bad" fix)
+
+The root cause is `writing-mode:vertical-rl; transform:rotate(180deg)` — text set upside-down-and-backwards, sized to fit a 56px rail rather than to be read. **Delete the rail, move the control into the reading flow, and set the text horizontally.** (This dovetails with Group 4, which removes the rail's grid column.)
+
+**2.1 — Kill the vertical orientation.** `.aff__open` (`_artifact-preview.html:60`):
+- REMOVE `writing-mode:vertical-rl;` and `transform:rotate(180deg);` entirely.
+- New rule: `display:inline-flex; align-items:center; gap:8px; padding:8px 14px; border:1px solid var(--edge) /*rgba(201,163,92,.13)*/; border-radius:3px; writing-mode:horizontal-tb; transform:none;`
+- Text: `font-size 9px → 9.5px; font-weight 500; letter-spacing .2em → .14em; text-transform:uppercase;` copy stays literal **"OPEN RECORD"** (deadpan-archival voice), keep the `→` arrow glyph.
+- Color: **rest** `color:var(--gold) #c9a35c` (reclaims gold-as-currency for the one primary action; clears the 4.0:1 AA failure of the old ghost grey). **Hover/focus** `border-color + color → var(--gold-lit) #e2c489`.
+- `:focus-visible` → `outline:2px solid var(--gold-lit); outline-offset:3px; border-radius:4px` (keyboard affordance; reuses gold-as-focus).
+- Optional arrow nudge on hover `translateX(2px)` — if used, gate under `@media (prefers-reduced-motion: no-preference)`.
+
+**2.2 — Reversed dot moves to where it means something.** Currently a floating rail element (`.revdot`, `:63`). Delete it as a standalone; render the 6px ember dot **inline inside `.rev b`, immediately before the word "Reversed"** (6px right-margin, `aria-hidden`). Its job is to flag the reversed block — colocate it with that block, not the button.
+
+**2.3 — Placement stays per-draw.** The horizontal button sits in normal flow as the **last child of the draw**, after `.rev` (or after `.body` when there's no reversed block): `.aff{position:static; display:flex; align-items:center; gap:10px; margin:22px 0 0}`. Do **not** consolidate into one page-level link — that breaks scan-and-open.
+
+---
+
+## GROUP 3 — BRIGHTNESS / CONTRAST RETUNE (token-level; fixes two AA failures)
+
+Split the overloaded roles into a disciplined 8-token ramp. Two current values **fail WCAG AA for text** and must move: ghost `#7d7970` (4.0:1) and text-on-ember `#b25f39` (3.4:1).
+
+| Token | Old → New | Contrast | Applies to |
+|---|---|---|---|
+| `--cream` | `#ece7dc` unchanged | ~13:1 | **prose only now** (`.body`, detail `.prose`, `.two li`, running-prose) |
+| `--cream-display` | **NEW `#dcd6c9`** | ~11:1 | every Cormorant use **≥26px**: `.crown h1`, `.read h2`/`.arc-read__name`, `.acc h1`, hero name. Strips near-white glare off large hairline strokes without going grey. Hard rule: never <26px |
+| `--t-ghost` | `#7d7970 → #96918a` | 4.0 → ~5.6:1 | ghost **text** (OPEN-RECORD rest label if you keep grey anywhere, disclaimer, Contested italic). Cap at 11px / single-line |
+| `--t-meta` | `#948f87 → #9c9790` | 5.4 → ~5.8:1 | `.slot` secondary, `.keys`, `.tag`, emblem glyphs — clears the small-mono comfort floor |
+| `--t-body` | `#b1ada4` unchanged | 8:1 | body-grey anchor — do not touch |
+| `--gold` | `#c9a35c` unchanged | 6.5:1 | crown, slot labels, section accent, hairlines, OPEN-RECORD, focus. Never used for prose |
+| `--gold-lit` | `#e2c489` unchanged | — | hover/active **only**, never a resting state |
+| `--ember-mark` | `#b25f39` unchanged | 3.4:1 | **decoration only**: `.rev` border, the dot, clash chords/nodes. Never carries a sentence |
+| `--ember-text` | **NEW `#d1794f`** (`#d9704a` in the wheel) | ~5.0:1 | any **readable** ember copy: the word "Reversed", clash legend labels. Never on a border/dot/line |
+
+Verify final ratios in a live checker (relative-luminance math drifts ±0.3:1 with anti-aliasing). The cream split needs a markup pass to reclassify every ≥26px Cormorant instance to `--cream-display` — miss one and you get a glare spot.
+
+---
+
+## GROUP 4 — READING-PAGE LAYOUT (kill the rail; fixed-grid rhythm)
+
+**4.1 — Delete the 56px sticky rail + two-column grid** (this is what forced the button to be vertical/tiny/grey in the first place).
+- `.read` (`:45`) / `.arc-read` (`arcana-reading.css:68`): `display:grid; grid-template-columns:1fr auto; column-gap:26px → display:block`.
+- DELETE `.aff{grid-column:2;grid-row:1/span 99;position:sticky;top:74px…}` (`:59`) — replaced by the inline flex row from fix 2.3.
+- DELETE the `@media (max-width:820px)` overrides for `.aff`/`.aff__open` (`:149–151`); **keep** the `.two{grid-template-columns:1fr}` line (`:152`) — that belongs to the detail page.
+- Net: `grid-template-columns` leaves the reading page entirely; ~10 lines of hack debt gone.
+
+**4.2 — Replace vh/vw clamp rhythm with a fixed 4px-grid ladder** (fixes the "40px-mobile vs 84px-desktop" tempo swing and the ~173px desktop seal void). Inside `.read`, desktop values:
+- slot→name `margin-top: 8px`
+- name→tag `12px`
+- tag→keys `16px`
+- keys→body `20px`
+- body→body (multi-para) `13px → 16px` (the least-defensible gap — why long reads felt run-on)
+- body→rev `16px → 20px`
+- rev→aff `22–24px` (largest internal gap = "this reading is over")
+
+**4.3 — Block + section margins → fixed two-breakpoint px** (desktop ≥821 / mobile ≤600):
+- `.read` / `.arc-read` padding: `clamp(28px,5vh,50px) 0 → 40px 0` desktop, `28px 0` mobile
+- `.chap` / `.arc-chapter` margin-top: `clamp(44px,9vh,80px) → 64px` desktop, `44px` mobile
+- `.chap` **margin-bottom: `2px → 18px`** — the chapter label currently collides into the first mono slot label (both uppercase-tracked); give the eye a beat
+- `.crown` / `.arc-crown-head` padding: `64px 0 44px` desktop / `40px 0 32px` mobile, horizontal `20px flat → clamp(20px,4vw,32px)` (stops the pinch; keeps the asymmetric top>bottom entrance)
+- `.seal` / `.arc-seal` margin-top: `clamp(50px,10vh,110px) → 72px` desktop, `48px` mobile
+
+**4.4 — Reorder the draw body: keywords before the data line.** In the JS template (`_artifact-preview.html` ~`:300`), current order is name → `.tag` (dry reference data) → `.keys` (evocative). **Swap to name → `.keys` → `.tag` → `.body`** so the emotional entry-ramp comes first and the metadata sits directly above the prose it annotates. Pure string reorder; verify the concatenation still closes all tags.
+
+---
+
+## GROUP 5 — DETAIL / ACCESSION PAGE LAYOUT (three tiers, no new gold on headers)
+
+Turn the flat stack of 8+ identical gold `.sec__h` headers into **THRESHOLD → FEATURED → FOOTNOTE**, using type + one left-border + hairline rhythm. Gold stays reserved for crown/slot/ring/focus — do **not** spend it on section headers.
+
+**5.1 — THRESHOLD tier.** Pull the accession block out of the header grid:
+- `.acc__mark` (`:80`): keep 9px→**11px** mono, `color: var(--gold)inline → --t-body #b1ada4` (it is a record-ID stamp, not "section #0"), `letter-spacing .22em → .14em`, uppercase, `margin:18px 0 6px`. Also drop the inline `style="color:var(--gold)"` on the crown name inside it (`:318`) — keep that as body-grey too, or the gold leaks.
+- `.acc__frag` (`:81`): keep Cormorant italic but `font-size 19px → 15px` (19px italic Cormorant on dark is a shimmer hotspot), `color #ece7dc`, keep the 2px gold left-border as the "this is the proof" tick.
+- Seal the tier with one full-width hairline `1px solid rgba(201,163,92,.12); margin:28px 0 0`.
+
+**5.2 — FEATURED headers** (The Reading, At-a-glance, Strengths & Shadow, What It Turns On, In Love, Compatibility). `.sec__h` for these:
+- `font-size 9px → 10.5px`, `letter-spacing .28em → .20em` (kills fragmentation), `color: gold → #c7c2b8` warm-silver (new token; ~9:1; verify it doesn't become a 4th undocumented grey in `docs/DESIGN_TOKENS.md`)
+- ADD `border-left:2px solid rgba(201,163,92,.30); padding-left:10px; margin-top:32px`
+- hairline under: `1px solid rgba(201,163,92,.09)`
+
+**5.3 — FOOTNOTE headers** (Origin, Attributions, Correspondences, Deeper Hooks, Contested):
+- `font-size 9px` (keep), `letter-spacing .28em → .22em`, `color: gold → #7d7970 ghost`, **no left border**, `margin-top:20px` (12px tighter than Featured = visual recession), hairline `rgba(201,163,92,.06)`.
+
+**5.4 — One unlabeled zone-break** between Compatibility and Origin: `1px solid var(--edge) rgba(201,163,92,.13); margin:44px 0 24px`. No new sigil (that would rival the crown's depth exclusivity).
+
+**5.5 — Regroup the closing beat.** Current order (`~:320–357`) sandwiches prev/next nav between `agency` and `disclaimer`, splitting one thought. Reorder to **lin → adj (prev/next) → agency → disc → close** so navigation happens once and the two framing statements land together.
+
+**5.6 — Supporting detail-page type:**
+- `.two li` (`:105`) strengths/shadow: `line-height 1.5 → 1.6`
+- `.glance dd` data values: give them presence — `12px mono cream #ece7dc` so the core payload outweighs the footnote lists
+- `.disclaimer` (`:145`): `font-size 9px → keep 8.5–10px` but confirm `line-height ≥1.7` and move color to the lifted `--t-ghost #96918a` (the one place tight fine-print could fail regardless of contrast)
+- `.agency` (`:138`) italic: fine where it is once reordered; `color --t-meta`.
+
+---
+
+## GROUP 6 — EVERYTHING ELSE
+
+**6.1 — Body prose (second-highest-leverage after the crown; read far longer than any title).** `.body` (`:55`, `1.74`) / `.arc-read__body` (`arcana-reading.css:92`, `1.72`) and unify the scattered detail-page prose (`.prose` 16.5, `.two li` 15.5, `.glance dd` 17, `.source__note` 14.5):
+- `font-weight: → 500` (real Medium)
+- `font-size: 17.5/16.5/15/17px scatter → 18px flat` for all long-form reading copy
+- `line-height: 1.72–1.74 → 1.78`
+- `letter-spacing: → 0.006em` (imperceptible per glyph, measurable stroke-crowding relief per paragraph)
+- `max-width: 62ch` — extend to the detail prose blocks that lack it
+- Re-check total page height against Group 4 margins (the taller paragraph box changes vertical rhythm).
+
+**6.2 — Reversed block** stays the one intentionally-quieter serif. `.rev` (`:57`): `font-size 15.5px → 16px`, `line-height 1.65 → 1.70`, keep `font-weight 400`, keep ember border. `.rev b` label → `--ember-text #d1794f` (readable) not `--ember-mark`.
+
+**6.3 — Label tier — unify the mono uppercase micro-labels** (currently 9–9.5px, tracking `.22–.28em` drift). One spec for `.slot`/`.arc-read__slot`, `.chap`/`.arc-chapter__head`, `.sec__h` (footnote), kickers: **10px, weight 500 (never 600/700), letter-spacing 0.22em flat**. This alone lifts every fragmenting 9px label off the floor.
+
+**6.4 — Data/meta tier:** `.tag`/`.arc-read__tag`, `.acc__mark`, disclaimers → **11px, weight 400, letter-spacing 0.06em, line-height ≥1.6** (data reads calmer than labels).
+
+**6.5 — Keywords `.keys` / `.arc-read__keys`** (`:87`): keep the Inter family, but align to the label logic — `11px, weight 500, letter-spacing .17em → .16em`, color to lifted `--t-meta #9c9790`.
+
+**6.6 — Emblem marks (Cormorant Roman numerals + I Ching subs).** Tarot marks: `.emblem{font-weight:600}` (normalizes the 1:3 single-vs-multi-char weight ratio; `I` vs `XVII`). Hexagram subs `.emblem sub` (`:32`): `font-size .32em → .40em` (7px→~9px, currently invisible), `vertical-align .2em → .35em`. Recede the line-grid with `color: rgba(148,143,135,.85)` on hex glyphs only. Zodiac/runes/trigrams need no change.
+
+**6.7 — Compatibility wheel** (`_artifact-preview.html`, CSS `~:118`, JS `wheel()` `~:254`):
+- **BUG (JS ~:266):** `wheel(ZOD,ZGL,i,c.kindred.concat([c.mirror]),[c.mirror])` puts the mirror sign in **both** the gold and ember arrays → a double-stroke and a node color that silently resolves to ember. Fix to `var w=wheel(ZOD,ZGL,i,c.kindred,[c.mirror]);` (gold = kindred only) so drawing matches the 4-row legend. Verify no other `wheel()` caller relies on a node being gold+ember at once.
+- **BUG (baseline):** replace the hardcoded `(p[1]+5)` y-offset with `p[1]` + `dominant-baseline="central"` on the `<text>`.
+- Canvas `230×230 → 272×272`; `cx/cy 115 → 136`; `R 88 → 104`; `.wheel` CSS `width/height 230px → 272px` (buys ~54px node spacing).
+- Glyph `font-size 15 → 17`, add `font-weight="500"` + `letter-spacing=".015em"` (same anti-shimmer as the rest).
+- Node fills: neutral/ghost `#7d7970 → #9c968c` (4.0→5.6:1); ember `#b25f39 → #d9704a` (3.4→4.9:1, still ember-family). Current-node circle `r 12 → 15`, add `stroke=#e2c489 stroke-width=1` lit rim.
+- ADD a base dial ring as first SVG element: `<circle cx=136 cy=136 r=104 fill=none stroke="rgba(201,163,92,.13)" stroke-width=1/>` (reads as an instrument, reuses `--edge`).
+- Chords: gold kindred `stroke-width 1→1.25, opacity .5→.68`; ember clash `stroke-width 1→1.25, dasharray "2 3"→"1.5 3.5", opacity .6→.72`.
+- **CSS BUG (legend ~:125):** ensure `.legend .k{color:var(--gold)}` and `.legend .m{color:var(--ember-text)}` are separate, properly-terminated rules. Point the wheel + legend ember at a single `--ember-legible:#d9704a` token (scoped to the wheel — do not let it leak into the reversed-block ember).
+- Legend label `font-size 8.5px → 9.5px`.
+- Responsive: `@media (max-width:560px){.compat{flex-direction:column;align-items:flex-start;gap:20px}.wheel{width:min(240px,78vw);height:min(240px,78vw)}}` (SVG viewBox scales the rest for free).
+
+**6.8 — Strengths/Shadow mobile** (optional): `@media (max-width:599px){.two{gap:14px 24px}.two li{font-size:14.5px;line-height:1.45}}`.
+
+---
+
+### Priority order for the builder
+1. **Group 1** (font embed + crown 600) — without the embed everything else renders in Georgia; the crown is the #1 client complaint.
+2. **Group 4.1 + Group 2** (kill the rail, then the horizontal button) — the rail is the single structural cause of the "wack" button; they must land together.
+3. **Group 6.1** (body prose to 18/500/1.78) — most-read text on the page.
+4. **Group 3** (token retune) — fixes two AA failures; touch-once, benefits everywhere.
+5. **Groups 4.2–4.4, 5, 6.2–6.8** — rhythm, detail-page tiers, and the wheel bug/contrast cleanup.
+
+**Canon preserved throughout:** gold only on crown + slot labels + focus + the OPEN-RECORD action; ember only on the reversed read/dot/clash (with `--ember-text` reserved for legible ember copy, `--ember-mark` for decoration); no pure white (`--cream-display #dcd6c9` is the display ceiling, `--cream #ece7dc` the prose ceiling); the crown remains the one object with sanctioned depth (shadow, not brightness).

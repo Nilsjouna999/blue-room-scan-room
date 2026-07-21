@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>BLUE ROOM · live watch</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg:#0a0a0c; --panel:#111114; --panel2:#0e0e11; --line:#23232a; --line2:#2c2c35;
+      --txt:#cfcabf; --dim:#7a7a86; --hi:#e9e5dc; --on:#2a2a33; --onbd:#6a6a7a; --acc:#6fe;
+    }
+    * { box-sizing: border-box; margin: 0; }
+    html, body { height: 100%; background: var(--bg); color: var(--txt);
+                 font: 12px/1.4 "IBM Plex Mono", ui-monospace, monospace; }
+    body { display: flex; flex-direction: column; }
+
+    /* top status strip */
+    .top { display:flex; align-items:center; gap:9px; padding:7px 11px;
+           border-bottom:1px solid var(--line); background:var(--panel); }
+    #dot { width:8px; height:8px; border-radius:50%; background:#3a9466; flex:none; transition:background .15s, box-shadow .15s; }
+    #dot.pulse { background:var(--acc); box-shadow:0 0 9px var(--acc); }
+    .brand { color:var(--hi); letter-spacing:.15em; text-transform:uppercase; font-size:11px; font-weight:600; }
+    .sp { flex:1; }
+    #status { color:var(--dim); font-size:10.5px; }
+    #status.changed { color:#8eecc4; }
+    .ibtn { color:var(--dim); background:none; border:1px solid var(--line2); border-radius:4px;
+            padding:3px 9px; cursor:pointer; font:inherit; font-size:10.5px; }
+    .ibtn:hover { color:#fff; border-color:var(--onbd); }
+
+    /* control panel (collapsible) */
+    .panel { padding:9px 11px; border-bottom:1px solid var(--line); background:var(--panel2); display:grid; gap:7px; }
+    .panel.collapsed { display:none; }
+    .row { display:flex; align-items:center; gap:9px; }
+    .row > .lab { width:74px; flex:none; color:var(--dim); text-transform:uppercase;
+                  letter-spacing:.1em; font-size:9.5px; text-align:right; }
+    .chips { display:flex; gap:4px; flex-wrap:wrap; }
+    .chip { font:inherit; font-size:11px; color:var(--txt); background:#1a1a20;
+            border:1px solid var(--line2); border-radius:4px; padding:3px 10px; cursor:pointer; transition:.1s; }
+    .chip:hover { border-color:#4a4a57; color:#fff; }
+    .chip.on { background:var(--on); border-color:var(--onbd); color:#fff; }
+    .row.muted { opacity:.35; pointer-events:none; }
+
+    /* url bar */
+    .urlbar { display:flex; align-items:center; gap:9px; padding:5px 11px;
+              border-bottom:1px solid var(--line); background:var(--panel); }
+    .urlbar .lab { color:var(--dim); text-transform:uppercase; letter-spacing:.1em; font-size:9.5px; flex:none; }
+    #url { color:var(--dim); font-size:10.5px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; flex:1; }
+
+    iframe { flex:1; width:100%; border:0; background:#000; }
+  </style>
+</head>
+<body>
+  <div class="top">
+    <span id="dot"></span>
+    <span class="brand">Blue Room · live</span>
+    <span class="sp"></span>
+    <span id="status">watching…</span>
+    <button class="ibtn" id="toggle">Hide ▲</button>
+  </div>
+
+  <div class="panel" id="panel"></div>
+
+  <div class="urlbar">
+    <span class="lab">URL</span>
+    <span id="url"></span>
+    <button class="ibtn" id="copy">Copy</button>
+    <button class="ibtn" id="open">Open ↗</button>
+  </div>
+
+  <iframe id="view"></iframe>
+
+  <script>
+    /* BLUE ROOM dev-live watch — local tooling (untracked).
+       Edit the config blocks below to add states; the UI builds itself. */
+
+    const WATCH = ["styles.css", "app.js", "data.js", "index.html"];
+    const POLL_MS = 1200;
+
+    /* ---- control config (extend here) ----
+       Fixed rows are data-driven; "Finish" is CONTEXTUAL on treatment so the
+       Free / Lab finish sets never overlap (the old confusion). */
+    const ROW_SRC = { key:"src", label:"Source",    opts:[["SRC 1","1"],["SRC 2","2"]] };
+    const ROW_T   = { key:"t",   label:"Treatment", opts:[["Free","free"],["Halo","shiny"],["Lab","mint"]] };
+    const ROW_TAB = { key:"tab", label:"Tab",       opts:[["Source","source"],["Diagram","diagram"],["Metrics","metrics"]] };
+    const FINISHES = {
+      free:  [["—",""]],   /* Letterpress locked as the Free default (BR-S060); no per-finish toggle */
+      mint:  [["—",""],["Cold Foil","cold-foil"],["Black Star","black-star"],["Night Gloss","night-gloss"]],
+      shiny: [["—",""]],
+    };
+
+    const state = { src:"1", t:"free", tab:"diagram", finish:"" };
+
+    const view = document.getElementById("view");
+    const statusEl = document.getElementById("status");
+    const dot = document.getElementById("dot");
+    const panel = document.getElementById("panel");
+    const urlEl = document.getElementById("url");
+    let stamps = {};
+
+    function buildURL(bust) {
+      let q = `?src=${state.src}&t=${state.t}&tab=${state.tab}`;
+      if (state.finish) {
+        if (state.t === "free") q += `&free=${state.finish}&devnav=1`;   /* DEVNAV-gated */
+        else if (state.t === "mint") q += `&lab=${state.finish}`;
+      }
+      return `/${q}` + (bust ? `&_=${bust}` : "");
+    }
+
+    function render() {
+      panel.innerHTML = "";
+      const finishOpts = FINISHES[state.t] || [["—",""]];
+      const rows = [
+        ROW_SRC, ROW_T,
+        { key:"finish", label:"Finish", opts:finishOpts, muted: finishOpts.length <= 1 },
+        ROW_TAB,
+      ];
+      for (const r of rows) {
+        const row = document.createElement("div");
+        row.className = "row" + (r.muted ? " muted" : "");
+        const lab = document.createElement("span"); lab.className = "lab"; lab.textContent = r.label;
+        const chips = document.createElement("div"); chips.className = "chips";
+        for (const [label, val] of r.opts) {
+          const b = document.createElement("button");
+          b.className = "chip" + (state[r.key] === val ? " on" : "");
+          b.textContent = label;
+          b.onclick = () => {
+            state[r.key] = val;
+            if (r.key === "t") state.finish = "";   /* finish resets with treatment */
+            render(); reload("manual");
+          };
+          chips.appendChild(b);
+        }
+        row.appendChild(lab); row.appendChild(chips); panel.appendChild(row);
+      }
+      urlEl.textContent = buildURL();
+    }
+
+    async function reload(reason) {
+      const bust = Date.now();
+      /* Bulletproof freshness: bypass + UPDATE the HTTP cache for the watched files
+         BEFORE the iframe loads, so CSS/JS edits always show (fixes "can't see the change").
+         cache:"reload" fetches from network and rewrites the cache entry. */
+      try { await Promise.all(WATCH.map(f => fetch("/" + f, { cache: "reload" }))); } catch (e) {}
+      view.src = buildURL(bust);
+      statusEl.textContent = `${reason} · ${new Date().toLocaleTimeString()}`;
+      statusEl.className = reason === "file change" ? "changed" : "";
+      dot.classList.add("pulse"); setTimeout(() => dot.classList.remove("pulse"), 400);
+    }
+
+    document.getElementById("toggle").onclick = (e) => {
+      const hidden = panel.classList.toggle("collapsed");
+      e.target.textContent = hidden ? "Show ▼" : "Hide ▲";
+    };
+    document.getElementById("copy").onclick = () => {
+      try { navigator.clipboard.writeText(location.origin + buildURL()); statusEl.textContent = "URL copied"; } catch (e) {}
+    };
+    document.getElementById("open").onclick = () => window.open(buildURL(Date.now()), "_blank");
+
+    async function poll() {
+      let changed = false;
+      for (const f of WATCH) {
+        try {
+          const r = await fetch(`/${f}?_=${Date.now()}`, { method:"HEAD", cache:"no-store" });
+          const tag = r.headers.get("Last-Modified") || r.headers.get("ETag") || "";
+          if (stamps[f] !== undefined && stamps[f] !== tag) changed = true;
+          stamps[f] = tag;
+        } catch (e) { /* server momentarily busy */ }
+      }
+      if (changed) reload("file change");
+    }
+
+    render();
+    reload("init");
+    setInterval(poll, POLL_MS);
+  </script>
+</body>
+</html>

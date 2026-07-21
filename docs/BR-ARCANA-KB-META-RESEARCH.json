@@ -1,0 +1,225 @@
+[
+ {
+  "system": "PROVENANCE LANDSCAPE: Seven Divination/Esoteric Systems — Distinguishing ancient attestation from 19th-20th century occult revival from modern invention",
+  "notes": "KEY PATTERNS ACROSS ALL SEVEN SYSTEMS: (1) TAROT and NUMEROLOGY are the only pure modern inventions (15th century gaming + 19th-century occultism, respectively). (2) RUNES and I CHING are ancient WITH significant medieval-to-modern reframing (von List, Wilhelm-Jung). (3) ZODIAC SYSTEMS (Western sun signs, Chinese animals) are ancient BUT personality associations are modern invention/marketing. (4) The Golden Dawn (1888+) is the pivotal institution that synthesized Kabbalah, astrology, tarot, and runes into a unified occult system—most 19th-20th century correspondences originate there. (5) REPEATING FALSE CLAIMS ONLINE: sun sign determines personality alone (false—need full chart); tarot is ancient (false—Renaissance); Egyptian tarot origins (false—Court de Gébelin's lie); numerology Life Path is ancient (false—19th century); mercury retrograde causes tech failures (false—no mechanism); zodiac predicts fate/compatibility (no scientific basis); runes are pure mystical symbols (false—they're letters). (6) CONTESTED FACTS: Wilhelm-Baynes I Ching accuracy (later sinology scholarship questions it); medieval rune meanings vs. original meanings (uncertain—reconstructed, not directly attested); Nazi rune use (appropriation/distortion of history, not preservation of authentic tradition).",
+  "entries": [
+   {
+    "name": "Western Sun Signs (Tropical Zodiac Astrology)",
+    "origin": "Ptolemy's Tetrabiblos (150 CE) formalized 12-sign tropical zodiac starting at vernal equinox; evolved from Babylonian-Greek-Egyptian Hellenistic fusion (post-Alexander conquest 332 BCE). Classical astrology focused on Ascendant (rising sign), NOT sun sign.",
+    "deeper_hooks": [
+     "Ptolemy's Tetrabiblos is the primary source text; it describes 'natural characters' of signs as 'handed down by tradition' but does NOT present sun sign as primary personality determinant",
+     "Classical astrology's horoscopic point (Ascendant) was primary; sun sign was secondary factor",
+     "Tropical zodiac uses vernal equinox, not actual constellations—this distinction matters for understanding precession debates"
+    ],
+    "attributions": [
+     "Ancient: Ptolemy (~150 CE) codified system; Hellenistic traditions (post-332 BCE); Babylonian origins",
+     "19th-20th century revival: Alan Leo (1890s) popularized sun-sign-as-personality; R.H. Naylor created first newspaper horoscope (1930); widespread sun-sign columns by 1937",
+     "Modern invention: sun-sign-alone-determines-personality narrative; specific personality archetype associations (Aries as bold, Pisces as dreamy, etc.)"
+    ],
+    "contested": [
+     "Precession argument: critics claim zodiac 'changed' (false for Western tropical astrology, which stays fixed to vernal equinox; true for sidereal systems)",
+     "Mercury retrograde effects: optical illusion with no physical mechanism (48 million miles away, negligible gravity/magnetism); no validated correlation with technology failures or human events",
+     "Sun sign personality determination: no scientific basis in studies of 100,000+ people; full natal chart needed (moon, ascendant, planets, houses), not sun sign alone",
+     "Fate/compatibility prediction: no scientific validation; Barnum effect explains perceived accuracy"
+    ],
+    "correspondences": [
+     "Tropical zodiac = seasonal markers, not constellations (Ptolemy's innovation)",
+     "12 signs × 30° = 360° circle (not direct to constellation boundaries)",
+     "Vernal equinox = 0° Aries (fixed point, moves relative to stars due to precession)"
+    ],
+    "symbolism": "Sun sign astrology: modern reduction of classical astrology; conflates Ptolemy's formalized system with 20th-century newspaper invention; modern personality columns are 20th-century content marketing, not inherited tradition"
+   },
+   {
+    "name": "Chinese Zodiac Animals (12-Year Cycle)",
+    "origin": "12-animal system documented from Qin Dynasty (221-207 BCE) onward; clearly established by Han Dynasty (206 BCE-220 CE). Archaeological evidence from pre-Qin bamboo texts. Associated with 12 Earthly Branches in divination/calendrical systems. Possibly inspired by Jupiter's 12-year orbital cycle.",
+    "deeper_hooks": [
+     "Shuowen Jiezi (Han-era dictionary) contains early descriptions; Book of Rites, Records of the Grand Historian reference zodiac in rituals",
+     "System predates famous origin legend (Great Race) by 1000+ years",
+     "Integrated into broader Chinese cosmological thinking, not isolated personality system"
+    ],
+    "attributions": [
+     "Ancient: attested from Qin/Han dynasties; integrated into Earthly Branches system used for calendrics and divination for 2000+ years",
+     "19th-20th century: personality associations with animals formalized and popularized in modern era",
+     "Modern invention: personality type readings; romantic compatibility predictions; fortune-telling applications"
+    ],
+    "contested": [
+     "Great Race legend (Jade Emperor held race to order animals): Tang Dynasty (618-907 CE) folk narrative, NOT historical source; arrived 1000 years after zodiac system itself",
+     "Personality correlation: no scientific basis in meta-analysis of 40+ controlled studies; astrologers no better than chance at predicting personality",
+     "Birth year determines personality: Barnum effect (vague positive descriptions seem accurate); priming effects influence self-perception, not actual personality change",
+     "Birth year determines fate/compatibility: no validated predictive power"
+    ],
+    "correspondences": [
+     "12 animals ↔ 12 Earthly Branches (core system)",
+     "12-year cycle ↔ Jupiter's orbital period (astronomical basis hypothesis)",
+     "Paired with yin-yang, Five Elements (wood, fire, earth, metal, water) in classical framework"
+    ],
+    "symbolism": "The Great Race legend is beloved folk narrative but NOT the origin; it's a later mythological justification (Tang Dynasty) for an earlier system. Modern personality readings are cultural framework, not predictive science."
+   },
+   {
+    "name": "Numerology Life Path Numbers",
+    "origin": "Pythagorean philosophy (570-495 BCE) viewed numbers as cosmic building blocks; Jewish gematria assigned values to Hebrew letters for textual study; Kabbalistic Tree of Life uses 10 numbered sephiroth. BUT modern 'Life Path Numbers' are NOT ancient—they are L. Dow Balliett's late-19th-century invention.",
+    "deeper_hooks": [
+     "Pythagorean philosophy underpins number philosophy, not calculation systems",
+     "Gematria is letter-to-number mapping for textual exegesis (Torah, mystical texts), NOT personality numerology",
+     "Kabbalistic sephiroth (10) are emanations/divine attributes, not personality archetypes",
+     "Term 'numerology' coined 1907 (likely Julian Strode) to give ancient practice scientific-sounding name"
+    ],
+    "attributions": [
+     "Ancient: Pythagorean philosophy; Jewish gematria tradition; Kabbalistic cosmology",
+     "19th-20th century: L. Dow Balliett (late 1800s) combined Pythagorean theory with New Thought, created Life Path/Expression/Destiny number system; Juno Jordan (mid-20th) developed Pinnacle, Challenge, Cycle structures",
+     "Modern invention: specific digit-reduction calculation methods; master numbers (11, 22, 33) system; personality type readings linked to Life Path numbers"
+    ],
+    "contested": [
+     "Life Path numbers as ancient Pythagorean practice: FALSE—L. Dow Balliett's 19th-century invention",
+     "Numerology based on ancient gematria: PARTIAL LIE—gematria is textual interpretation tool, not personality calculation",
+     "Numbers have inherent vibrations affecting personality: no physical basis; confirmation bias and Barnum effect explain perceived accuracy",
+     "Life Path predicts destiny or character: no scientific validation; common false claim online"
+    ],
+    "correspondences": [
+     "Pythagorean: numbers as cosmic principles (not personality types)",
+     "Kabbalistic: sephiroth as divine emanations, not personality paths",
+     "Modern: Life Path 1-9 plus Master Numbers 11, 22, 33 (constructed system, not attested elsewhere)"
+    ],
+    "symbolism": "Modern numerology is 19th-century invention marketed as ancient wisdom. Balliett synthesized Pythagoras + New Thought spirituality to create new system. No lineage to ancient numerology traditions, despite naming borrowing."
+   },
+   {
+    "name": "Tarot Major Arcana (22 Trump Cards)",
+    "origin": "NOT ANCIENT. First appeared in northern Italy early 15th century (c. 1430s-1440s) as playing cards (carte da trionfi/'triumph cards'). Likely commissioned by Filippo Maria Visconti, Duke of Milan. Used for trick-taking card game tarocchi, NOT divination. Visconti-Sforza decks (mid-1400s) are oldest surviving. Imagery draws from Renaissance visual culture: Christian virtue allegories, classical mythology, courtly hierarchy, memento mori.",
+    "deeper_hooks": [
+     "Tarot is a gaming innovation, not an ancient divinary tool—conflating the two is foundational error",
+     "Divination use began 18th century (Antoine Court de Gébelin 1781, Etteilla 1783)—300+ years after tarot invention",
+     "Court de Gébelin's false Egyptian origin claim (1781) became 'received wisdom' despite zero historical evidence",
+     "Waite-Smith deck (1909) is modern design encoding Golden Dawn correspondences, NOT preservation of ancient tarot"
+    ],
+    "attributions": [
+     "Ancient: NONE—tarot is Renaissance Italian, 15th century onward",
+     "18th century: Antoine Court de Gébelin (1781) first assigned occult meaning (falsely claiming Egyptian origin); Etteilla/Jean-Baptiste Alliette (1783) published first divination technique",
+     "19th-20th century: Eliphas Lévi (1850s-60s) developed mystical correspondences; Hermetic Order of Golden Dawn (1888+) synthesized Kabbalah-astrology-tarot; A.E. Waite + Pamela Colman Smith (1909) created Rider-Waite-Smith with full scene illustrations",
+     "Modern invention: psychological readings; spiritual self-help applications; Jungian interpretation; most card meanings post-1880s"
+    ],
+    "contested": [
+     "Tarot is ancient: FALSE—Renaissance, 15th century",
+     "Tarot was used for divination in the Renaissance: FALSE—divination use began 18th century",
+     "Tarot has Egyptian origins: FALSE—Court de Gébelin's unfounded claim, still repeated online as fact",
+     "Waite preserved ancient tarot tradition: FALSE—Waite created innovations (reordered cards, full Minor Arcana illustrations) to fit Golden Dawn astrology system",
+     "All tarot meanings derive from ancient tradition: FALSE—most derive from 19th-20th century occult revival (Lévi, Golden Dawn, Waite)",
+     "The 22 Major Arcana have fixed meanings: MISLEADING—multiple competing traditions (French vs. English, Waite vs. Crowley vs. Thoth, etc.)"
+    ],
+    "correspondences": [
+     "Waite's innovations: Strength/Justice reordered to match Golden Dawn astrology (Strength=Leo, Justice=Libra)",
+     "22 Major Arcana ↔ 22 Hebrew letters (added post-facto by Court de Gébelin, not original structure)",
+     "78 cards = 22 trumps + 1 Fool + 56 Minor (4 suits × 14 cards)",
+     "Golden Dawn: each card encoded with Kabbalistic, astrological, alchemical correspondences (19th-century creation)"
+    ],
+    "symbolism": "Tarot is quintessential example of modern occult invention disguised as ancient tradition. Renaissance gaming cards become 18th-century divination tool become 19th-century magical system. Each layer of meaning is added, not recovered."
+   },
+   {
+    "name": "Elder Futhark Runes (24 Letters)",
+    "origin": "Elder Futhark alphabet used in Germanic/Scandinavian regions, likely 2nd-8th century CE. Primary textual sources: Old English Rune Poem (10th-century manuscript, possibly drawing on 7th-century material); Old Icelandic and Norwegian Rune Poems (15th century, older oral tradition); Poetic Edda Hávamál (Odin's Rune Song, stanzas 139-146); Prose Edda (compiled c. 1220 by Snorri Sturluson).",
+    "deeper_hooks": [
+     "Rune meanings are reconstructed from medieval sources (rune poems, Eddas, sagas), NOT directly from Elder Futhark period itself",
+     "None of the written rune sources date to Elder Futhark period—they are post-dating by 500+ years, preserving oral tradition",
+     "Guido von List (19th century) read 'secret meaning' into runes outside historical context, inventing Armanen system",
+     "Nazi appropriation (1930s+) was deliberate misrepresentation of medieval scholarship for racial ideology"
+    ],
+    "attributions": [
+     "Ancient: Elder Futhark alphabet attested 2nd-8th century CE in inscriptions; meanings reconstructed from medieval rune poems and Eddas",
+     "19th-20th century: Guido von List created Armanen runes with modernist 'secret meanings'; Stephen Flowers documented 5 historical revival periods (Renaissance to late 20th century)",
+     "Nazi appropriation (1930s-1940s): Othala and Tiwaz runes weaponized; Nazi rewrote history claiming futhark was origin of all runic systems (FALSE—has Mediterranean origins)",
+     "Modern invention: divination systems (rune casting); new age spiritual meanings; personality/psychology applications"
+    ],
+    "contested": [
+     "Runes are mystical symbols with fixed meanings: PARTIALLY FALSE—they are letters with historically reconstructed meaning based on medieval sources, not universal spiritual symbols",
+     "Runes have occult power: 19th-century revival invention (von List, Golden Dawn), not historical attestation",
+     "Nazi use preserved authentic Germanic rune tradition: FALSE—Nazi interpretation was a distortion that ignored medieval scholarship and Rune-poem meanings",
+     "Othala and Tiwaz are purely hate symbols: MISLEADING—both have legitimate non-extremist usage in Norse paganism; context determines meaning (important: anti-racism scholarship emphasizes this)",
+     "Medieval rune meanings = original meanings: UNCERTAIN—rune poems preserve tradition but are removed from Elder Futhark period by 500+ years; reconstruction is scholarly inference, not direct evidence"
+    ],
+    "correspondences": [
+     "Elder Futhark: 24 letters, organized into three aettirs (groups of 8)",
+     "Rune poems: parallel tradition in Old English, Icelandic, Norwegian versions with some variation in meanings",
+     "Medieval context: runes appear in Eddas, sagas, and magical texts as symbols of power and knowledge"
+    ],
+    "symbolism": "Runes are letters weaponized by Nazis, reclaimed by modern heathenry, and romanticized by new age spirituality. Medieval scholarship (rune poems, Eddas) is only textual bridge to Elder Futhark period—actual meanings are reconstructed, not directly attested. Separating historical from Nazi-corrupted from modern-invented interpretations is essential."
+   },
+   {
+    "name": "I Ching Trigrams (8 Core Trigrams)",
+    "origin": "I Ching (Book of Changes) is 3,000-year-old Chinese text from Western Zhou period (1000-750 BCE) onward. Originally divination manual; transformed into philosophical/cosmological text during Warring States period (500-200 BCE). 8 trigrams are fundamental building blocks; stacked to form 64 hexagrams. Ten Wings (philosophical commentaries) added during early imperial period. Included in Chinese Five Classics (2nd century BCE onward). Philosophical core: reality is constantly changing; no static state.",
+    "deeper_hooks": [
+     "I Ching serves dual function: divination tool AND philosophical/cosmological framework—not purely predictive",
+     "Wilhelm-Baynes translation (1950) reframed text through Western psychological lens (Jung's synchronicity, introspection) rather than as cosmological/ritual system",
+     "Trigrams pair to form hexagrams; represent archetypal life situations, not fixed outcomes",
+     "Wilhelm's use of weather/seasonal metaphors emphasized in Western version; original text is more abstract/cosmological"
+    ],
+    "attributions": [
+     "Ancient: original divination manual, Western Zhou (1000-750 BCE); philosophical texts added Warring States onward; cosmological integration by early imperial period",
+     "19th-20th century: Richard Wilhelm German translation (early 20th century); Cary F. Baynes English translation (1950); Carl Jung wrote foreword emphasizing synchronicity and psychological introspection",
+     "Modern invention: psychology/self-help applications; personal introspection readings; Wilhelm's metaphorical emphasis (weather, seasons, agriculture)"
+    ],
+    "contested": [
+     "I Ching predicts the future with certainty: FALSE—philosophical tool for understanding change, not fortune-telling device",
+     "Wilhelm's translation is historically accurate: QUESTIONABLE—it reframes through Western psychology; later sinology scholarship shows interpretive choices influenced by Jung's theories",
+     "I Ching is primarily a divination tool for fate prediction: PARTIAL—originally yes, but philosophical core is about understanding constant change and complementary forces",
+     "All meanings in I Ching are literal: FALSE—meanings are metaphorical/archetypal reflections of life situations, not prescriptive",
+     "Wilhelm-Baynes is the 'definitive' translation: CONTESTED—modern sinology scholarship questions Wilhelm's interpretive choices; later translations (e.g., Edward Shaughnessy, Richard Rutt) offer alternative readings"
+    ],
+    "correspondences": [
+     "8 trigrams ↔ yin/yang lines (unbroken/broken)",
+     "Trigram pairs ↔ 64 hexagrams (8 × 8 matrix)",
+     "Yin-yang cosmology ↔ complementary opposites, constant movement",
+     "Five Elements (wood, fire, earth, metal, water) ↔ trigram correspondences in classical interpretation"
+    ],
+    "symbolism": "I Ching is ancient philosophical text reframed by modern Western psychology as personal introspection tool. Wilhelm-Jung collaboration shifted focus from original cosmological/divination function to Jungian self-discovery. Modern readings are psychologically recontextualized ancient wisdom, not preserved tradition."
+   },
+   {
+    "name": "I Ching Hexagrams (64 Hexagrams)",
+    "origin": "64 hexagrams are core of I Ching text (3,000-year-old, Western Zhou period 1000-750 BCE onward). Each hexagram is 6-line figure (stacked trigrams) representing archetypal situation or state in universe. Divination method: casting yarrow stalks or coins yields hexagram reflecting seeker's present situation. Philosophical function: illuminate circumstances through symbolic/metaphorical reflection of change. Used in China for centuries as both divination and philosophical study.",
+    "deeper_hooks": [
+     "Hexagrams are not predictive of future—they reflect/illuminate present situation",
+     "Each hexagram has multiple interpretations depending on changing lines (dynamic aspect of reading)",
+     "Wilhelm-Baynes reframing (same as trigrams): added psychological/introspective layer not present in original cosmological framework",
+     "Meanings are contextual and dependent on questioner's situation, not fixed universal meanings"
+    ],
+    "attributions": [
+     "Ancient: 64 hexagrams part of original 3,000-year-old I Ching text; used as divination and philosophical study for 2000+ years",
+     "19th-20th century: Wilhelm/Baynes/Jung Western reframing (identical to trigram issue); added psychological interpretation layer",
+     "Modern invention: fate prediction readings; personal development applications; tarot-like personality readings (not original function)"
+    ],
+    "contested": [
+     "I Ching predicts future: FALSE—hexagrams reflect present situation and illuminate current circumstances",
+     "Hexagrams have one fixed meaning: FALSE—meanings are contextual; changing lines add nuance and shift interpretation",
+     "Wilhelm translation is definitive: CONTESTED—later sinology scholarship critiques Wilhelm's interpretive choices and Jung's influence on framing",
+     "I Ching is primarily about divination for fate: PARTIAL—originally divination tool, but philosophical core is about understanding constant change and being in harmony with it, not passive prediction"
+    ],
+    "correspondences": [
+     "64 hexagrams = 8 trigrams stacked (8 × 8 matrix)",
+     "Hexagram structure: upper trigram = external circumstances, lower trigram = internal/personal aspect (interpretive framework)",
+     "Changing lines (yaos) = dynamic aspect, shift meaning contextually",
+     "Classical commentary tradition: Ten Wings plus centuries of scholarly commentary add interpretive layers"
+    ],
+    "symbolism": "Like trigrams, hexagrams are ancient philosophical tool reframed as personal introspection device by Wilhelm-Jung collaboration. Original function: cosmological divination reflecting harmony with change. Modern function: self-help psychological reading. The 'archetypes' Jungian psychology emphasizes are Western psychological framework overlaid on original cosmological language."
+   }
+  ],
+  "sources": [
+   "https://sacred-texts.com/astro/ptb/index.htm (Ptolemy's Tetrabiblos primary source)",
+   "https://www.britannica.com/topic/Chinese-zodiac",
+   "https://en.wikipedia.org/wiki/Rider%E2%80%93Waite_Tarot",
+   "https://www.sciencenordic.com/denmark-forskerzonen-history/how-the-nazis-abused-the-history-of-runes/1459227",
+   "https://en.wikipedia.org/wiki/I_Ching",
+   "https://en.wikipedia.org/wiki/Visconti-Sforza_Tarot",
+   "https://www.history.com/articles/chinese-zodiac-signs-animals-history",
+   "https://kerykeion.net/content/learn-tarots/history/origins-of-tarot",
+   "https://mysticryst.com/blogs/the-mystic-journal/numerology-history-pythagoras-modern-systems",
+   "https://en.wikipedia.org/wiki/Hermetic_Order_of_the_Golden_Dawn",
+   "https://onlinelibrary.wiley.com/doi/10.1111/1468-5922.12958 (I Ching and Jungian psychology)",
+   "https://www.ancient-origins.net/news-history-archaeology/nazi-norse-runes-0010845",
+   "https://www.nationalgeographic.com/history/article/history-of-horoscopes",
+   "https://www.themorgan.org/collection/tarot-cards (Visconti-Sforza tarot museum collection)",
+   "https://www.metmuseum.org/perspectives/tarot-2 (Metropolitan Museum tarot history)",
+   "https://zodiacauthority.com/zodiac-history-and-origins",
+   "https://en.wikipedia.org/wiki/Sun_sign_astrology",
+   "https://medium.com/@mmfbznn/the-science-behind-the-chinese-zodiac-0fdfc753551f",
+   "https://www.chani.com/blogs/the-history-of-the-zodiac"
+  ]
+ }
+]

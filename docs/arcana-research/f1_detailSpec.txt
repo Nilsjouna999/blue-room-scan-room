@@ -1,0 +1,195 @@
+Ground truth verified against the live files. One master-plan assumption is wrong and I've corrected it below. Here is the definitive spec.
+
+---
+
+# BLUE ROOM ARCANA — THE DETAIL PAGE (ENTRY) SPEC v1
+
+The dedicated page for one drawn result: a full page about *Aries*, or *The Tower*, or *Hexagram 16*. One template renders all **154** results (12 sun + 12 year-animal + 12 life-path + 22 tarot + 24 rune + 8 trigram + 64 hexagram). It is a record you consult, not a loop you re-enter.
+
+## 0. Ground truth (verified against the files — two corrections to the master plan)
+
+- **`reversed` is TAROT-ONLY, not "broad."** The master plan cited "166 occurrences." That count is the empty `"reversed": ""` keys. Actual non-empty: **22/22 tarot majors, 0 in every other system.** So the reversed block renders in practice only on the 22 tarot pages. Keep the render *conditional on non-empty* (never assume tarot by name), but do not design the layout around it appearing elsewhere.
+- **`tag` is heterogeneous and sometimes near-empty.** Verified samples: sun `♈ · Mar 21–Apr 19 · Fire · Cardinal · Mars`; chinese `2020, 2008, … · Fixed element: Water`; **numerology `core number` (that's the whole tag)**; tarot `0 · Major Arcana`; rune `F · cattle / wealth`; trigram `The Creative · yang · the father · attribute: strong`; hexagram `Heaven over Heaven`. The template renders `tag` verbatim as the metadata line — but because numerology's tag is bare, the **dek line and keywords carry the identifying weight on life-path pages.** Do not synthesize a richer tag; render what's there.
+- `systemNote` exists exactly **8 times** (one per system object, index-0 concern), currently surfaced nowhere. Free content for section 7.
+- Chinese ships 17 entries (12 animals + 5 element entries); `indexCodex()` already splits animals into `by.chinese`. Detail pages resolve only the **12 animals** — the 5 elements are not drawable results and get no page.
+- The Blue Room Lexicon (7 entries) is internal instrument copy, **not** one of the 7 routed systems. No detail pages.
+- No `slug` or `mark` field exists in the data. Both are **computed at render** — no schema change for v1.
+
+## 1. URL contract (single source of truth — shared with the reading page)
+
+```
+index.html?dev=arcana-entry&system=<key>&slug=<slug>&from=<seed>[&role=counsel]
+```
+
+- `system` ∈ the 7 `indexCodex()` keys: `sun · chinese · lifePath · tarotMajor · rune · trigram · hexagram`. No new enum.
+- `slug` = `slugify(entry.name)` (§2). Computed identically when the reading page **builds** the link and when the entry page **resolves** it — so they can never drift, and no slug is stored.
+- `from` = the reading seed. **Optional.** Present → the return strip and close echo the crown name and link back to the exact reading. Absent (direct/shared/bookmarked link) → fall back to a generic "Browse the codex," never a broken back-link.
+- `role=counsel` only disambiguates *which of the two tarot draws* the reader came from (draw vs counsel card share `tarotMajor`). It affects the **return context only** — the page content for the card is identical either way.
+- Mounted through the existing `?dev=` switch in `app.js` (whitelist + one `mountDev()` branch), the same 3-line pattern `arcana-reading` uses. No router, no build step, no per-entry HTML file.
+
+## 2. The slug function (define once; both pages import it)
+
+Put it in the shared `arcana-system-map.js` so `arcana-reading.js` and `entry.js` call the same function.
+
+```
+slugify(name):
+  1. Unicode-normalize NFKD and strip combining marks   // Qián → Qian  ← REQUIRED
+  2. lowercase
+  3. strip a single leading "the "
+  4. replace every run of non-[a-z0-9] with "-"
+  5. trim leading/trailing "-"
+```
+
+**The diacritic fold in step 1 is load-bearing and is the one place a naive slugify breaks.** Verified against real names:
+
+| System | Example name | slug |
+|---|---|---|
+| sun | `Aries` | `aries` |
+| tarot | `The Tower` | `tower` |
+| tarot | `Wheel of Fortune` | `wheel-of-fortune` |
+| rune | `Fehu` | `fehu` |
+| lifePath | `1` | `1` |
+| trigram | `☰ Qián · Heaven` | `qian-heaven` (glyph dropped, `á`→`a`) |
+| hexagram | `1 · The Creative (Qián)` | `1-the-creative-qian` |
+
+Resolution on the entry page: `indexCodex(codex)[system]`, then find the entry whose `slugify(name) === slug`. No match → §7 not-found state.
+
+## 3. Page shell & mount
+
+- No new `.html` file. Renders into the same host `app.js` gives the other `?dev=` views. Reuses `arcana-reading.css` tokens (the `.arc` custom-property block) plus a new `entry.css` scoped under `.arc-entry`. New JS: `entry.js` (`window.BRArcanaEntry.mount`), loaded after `arcana-name-engine.js` and `arcana-system-map.js`.
+- `entry.js` fetches `codex-data.json` once (browser HTTP cache covers repeats — same as the reading page), runs `indexCodex`, resolves the entry, renders the canonical order below into one column.
+- **Opens directly into the record.** No hero splash, no full-bleed art, no reveal ceremony gating the content. The deadpan-archive voice means the page behaves like a museum object label, not a landing page.
+- **Motion:** the whole content block arrives with the *same single gesture* the reading uses — opacity fade + 12–16px drift, 450ms, once, honoring `prefers-reduced-motion`. Do not invent a detail-page-specific animation. One motion vocabulary across both pages is the deliverable.
+
+## 4. Section-by-section anatomy (canonical order, top to bottom)
+
+Measure for all prose: **62ch**, matching `.arc-read__body`. Type roles unchanged: Cormorant Garamond (display + prose), Inter (UI chrome), IBM Plex Mono (meta/data).
+
+**1 — RETURN STRIP** *(always present; sticky, 44px, mono, matches masthead weight)*
+- With `from`: `← <Crown Name>` (e.g. `← The Ember-Banked Founder`) — proves this is *their* reading. The crown name is re-derived from `from` via `assemble()`, not stored.
+- Without `from`: `← Browse the codex`.
+- A real `<a href>` to `?dev=arcana-reading&seed=<from>` (or the codex, on fallback). Escape key also triggers it. No floating button, no modal. This is the only persistent "how did I get here."
+
+**2 — IDENTITY HEADER** *(always present)*
+- Left: the **identity mark** in a fixed 240px slot (§6), gold (`--ar-gold`) — this is the "consecrated" context, mark permanently gold, vs. the reading page's ghost-at-rest "sealed" context.
+- Gold mono **slot label** at full opacity above the name, pairing slot + system proper noun: `SUN SIGN · CONSTELLATION`. The system proper noun comes from the shared map: Constellation / Year Animal / Life Path / Major Arcana / Elder Futhark / Trigram / I Ching.
+- Large serif **name** (`entry.name`) — the object of attention. Uncontrolled length; wraps.
+- Mono **metadata line** = `entry.tag`, verbatim, untruncated (unlike mobile reading, which may clip). On numerology this is just `core number` — accepted; the dek and keywords do the work.
+
+**3 — KEYWORDS** *(always present)*
+- Same spaced small-caps treatment as the reading, **one size step larger** (this is the primary view, not a fragment). Rendered as a real `<ul>` (a11y), styled to look like the reading's dotted rule. 5–8 items, 1–2 words each — straight from `entry.keywords`.
+
+**4 — DEK LINE** *(always present; zero new authoring)*
+- The **first sentence of `entry.meaning`**, pulled programmatically (split on `.\s`), set slightly larger and lighter than body — the scan-first summary. No hand-authored copy, no voice-drift risk. Budget: naturally ≤ ~160 chars given the source data.
+
+**5 — FULL MEANING** *(always present)*
+- The complete `entry.meaning`, identical text to the reading page, at the 62ch serif measure, broken into paragraphs by the existing `paras()` logic (~260 chars/para). **Never truncated here** — this is where the meaning lives at full length. Source length 320–540 chars.
+
+**6 — REVERSED / SHADOW READ** *(conditional: render only if `entry.reversed` is non-empty)*
+- In practice: the 22 tarot pages only. Full-width block, ember left-border (`--ar-ember`) — ember's one reserved role, no background tint. Weighted **equal** to section 5's type size here (on the reading page it's subordinate; on the detail page the reader came to study it, so it's co-equal). Mono `REVERSED` label in ember, then `entry.reversed` verbatim (150–450 chars).
+- If empty: render nothing. **No "no reversed meaning" placeholder** — silence is the empty state.
+
+**7 — ON THIS SYSTEM** *(always present; surfaces existing data)*
+- Quiet bordered box, Inter/mono register (not serif prose), placed after the reversed block so it frames without stalling. Content = the system object's `systemNote` (the 8 that already exist), 1–3 sentences. Authored **once per system, reused across all its entries** — not per-entry. Explains the *tradition*, not the entry ("what a sun sign is for" vs. "what a rune is for"). Budget 150–400 chars (data already fits).
+
+**8 — ADJACENT IN THE SEQUENCE** *(always present; zero new data)*
+- Prev / Next within the same system's existing array order: `Pisces ← Aries → Taurus`; tarot by numeral; runes by Futhark row; hexagrams 1→64; trigrams by array; life-path 1→9→masters. Derived purely from array position at load — no correspondence data needed. Two mono citation links `← <Name>` / `<Name> →`, each a real `<a href>` carrying the same `system` + fresh `slug` + the current `from`. Wrap at the ends (first ↔ last) or omit the missing side — decide once; recommend **wrap** so the sequence reads as a closed ring.
+
+**9 — RELATED: "ALSO DRAWN IN THIS READING"** *(present only when `from` resolves; zero new data)*
+- Re-derive the reader's 8-draw set from `from` (same `draw(by, seed)` call the reading uses), list the *other* draws as mono citation links to their own entry pages. Genuinely useful, not filler; costs nothing. Omit the whole section when `from` is absent or the reading can't be rebuilt — **no "no related entries" placeholder.**
+- This is the v1 stub. `entry.js`'s renderer must **prefer `entry.correspondence` when that Phase-5 field lands** and fall back to this stub otherwise — so the richer capped correspondence map (§ master-plan Phase 5) drops in with no code change. Each future correspondence link carries a truth-label (`correspondence` / `structural` / `numerical reduction` / `resonance`).
+
+**10 — PROVENANCE STAMP** *(always present; closing authority signal)*
+- Museum-style mono footer, not a CTA: system proper noun · ordinal within system · codex id. Format: `FILED UNDER MAJOR ARCANA · ENTRY XVI OF XXII · CODEX·TAROT·016`. Ordinal and total derive from array position + length at load — no stored id. Hexagram ordinals are already in the name (`16 · …`); use array index everywhere for consistency so all 154 compute the same way.
+
+**11 — CLOSE** *(always present; deliberately narrow)*
+- Two links only: `← <Crown Name>` (or `← Browse the codex` fallback) **and** `Browse the <System>` (a lateral link listing that system's other entries — a future system-index view; for v1 it may point at the reading page's system or be omitted until that index exists, but the slot is specified here).
+- **No draw-again, no share, no save, no rate.** Absolute-finality canon: the only motion is *back to the reading* or *sideways within the record*.
+
+### Section presence matrix
+
+| # | Section | Presence |
+|---|---|---|
+| 1 | Return strip | Always (text varies on `from`) |
+| 2 | Identity header | Always |
+| 3 | Keywords | Always |
+| 4 | Dek line | Always (derived) |
+| 5 | Full meaning | Always |
+| 6 | Reversed | Only if `entry.reversed` non-empty → tarot only |
+| 7 | On this system | Always (`systemNote`) |
+| 8 | Adjacent | Always |
+| 9 | Also in this reading | Only if `from` resolves |
+| 10 | Provenance | Always |
+| 11 | Close | Always |
+
+## 5. System-specific variation (a tarot card vs. a rune vs. a hexagram)
+
+**Variation is confined to exactly three things.** Everything else — order, spacing, type, motion — is byte-identical across all 154 so the archive reads as one system.
+
+1. **The metadata line (§4.2)** = `entry.tag` verbatim. This is where a card, a rune, and a hexagram naturally differ (numeral vs. rune-letter/gloss vs. trigram-composition). No per-system code branch — just render the field.
+2. **The system emblem in the mark (§6)** — the traditional glyph swaps per system (see table below).
+3. **The `systemNote` (§7)** — one paragraph per system.
+4. **Reversed (§6/§4.6)** — appears only where the field is non-empty (tarot). This is data-driven, not a name check.
+
+| System (`key`) | Slot label · Proper noun | Emblem (traditional glyph) | Reversed? | slug source note |
+|---|---|---|---|---|
+| `sun` | SUN SIGN · Constellation | ♈–♓ zodiac sign | no | plain name |
+| `chinese` | YEAR ANIMAL · Year Animal | 鼠牛虎… animal kanji | no | plain name |
+| `lifePath` | LIFE PATH · Life Path | reduced numeral 1–9, 11/22/33 | no | slug **is the digit** |
+| `tarotMajor` | THE DRAW / COUNSEL CARD · Major Arcana | roman numeral 0–XXI | **yes** | strip leading "the" |
+| `rune` | RUNE · Elder Futhark | Elder Futhark glyph ᚠᚢᚦ… | no | plain name |
+| `trigram` | TRIGRAM · Trigram | ☰–☷ trigram | no | **strip glyph + fold á** |
+| `hexagram` | HEXAGRAM · I Ching | 6-bar line-stack, ordinal 1–64 | no | leading ordinal keeps slugs unique |
+
+Note the two tarot slot labels: a page reached via the draw shows `THE DRAW`, via the counsel card shows `COUNSEL CARD` (driven by `role`), while name/meaning/reversed are identical — the same card in two seats.
+
+## 6. Identity mark placement
+
+- **240px fixed slot**, top-left of the Identity Header (§4.2), gold. Same procedural **Sealed Mark** as the reading page's 44px rail mark — system emblem (top register, the traditional glyph from the table above) fused with a deterministic 3×3 name-seeded cipher (bottom register) — rendered from `arcana-marks.js` (`markFor(systemKey, name)`), `currentColor`, no art dependency.
+- The slot is **fixed-size and reserved** so the eventual GPT-authored bespoke SVG (one brief → 154 outputs) drops in with zero layout retrofit. Art is out of scope; this team authors the brief, not the SVG.
+- **No ember reversed-dot on the detail mark.** The 6px ember corner-dot is a reading-page scanning aid; here the reversed *block* itself carries that role at full size. Ember stays single-role.
+
+## 7. Navigation in and out
+
+- **In:** the reading page's right-side `EXPLORE <NAME> →` marginal link (real `<a href>`, built from the shared map + `slugify`). Middle-click / new-tab / keyboard all work because it's a true anchor, never a JS-only handler.
+- **Out — back to reading:** the return strip (§4.1) `<a href>` always resolves from `from`, so a shared/bookmarked URL with no history still works. If `document.referrer` matches origin, intercept and `history.back()` to preserve native scroll; else fall through to the href.
+- **Scroll restore:** on leaving the reading, it writes `scrollY` to `sessionStorage['br-scroll-'+seed]`; on return, `requestAnimationFrame(() => scrollTo(0, saved))` once, then clear. Works identically for the return link and the browser Back button (both cold-load `mount()`).
+- **Not-found state** (stale/malformed `system` or `slug`): in-voice, never a raw 404 — `This entry is not on file.` plus the return/browse link. Same for a `from` that no longer resolves: drop section 9, fall the return strip back to `← Browse the codex`.
+- **No-JS:** `<noscript>` — `This record requires JavaScript to assemble.`
+
+## 8. Responsive behaviour
+
+The reading page ships essentially zero media queries; the detail page is built **mobile-first from day one** so it does not inherit that debt.
+
+- **≥900px:** Identity Header is two columns — 240px mark left, name/slot/tag stacked right. Prose holds the 62ch measure centered in the column. Adjacent (§8) sits as a two-item row.
+- **<900px:** single column. Mark shrinks to ~120px and centers above the slot label + name. Prose measure collapses to viewport width (min 16px gutters). Adjacent prev/next stack. Return strip stays sticky at 44px.
+- **<600px:** mark ~88px; tighten header vertical padding so the name is above the fold; keywords wrap freely.
+- Mark uses `max-width:100%` inside its slot at every breakpoint so the eventual SVG scales without overflow. Body never scrolls horizontally.
+
+## 9. Canon & token compliance (must hold on every one of the 154 pages)
+
+- **Gold** (`--ar-gold`/`--ar-gold-bright`) spent only on: the 240px mark, the slot label, and citation-link focus/hover. Nothing else.
+- **Ember** (`--ar-ember`) only on: the reversed block border + its mono label. Nowhere else on this page.
+- Text ceiling **cream** (`--ar-cream`); no pure white; no 7-system color coding.
+- Voice: third person, never "you"/"your reading"; no exclamation, no hedging in meaning/reversed; every count pulled live (provenance ordinal/total from array, never hardcoded). Litmus: "could this be a museum-object label?"
+- Ethics: reads the artifact and the draw, never rates/diagnoses the person; anti-paywall (nothing on the reading page is removed or gated to drive here — the detail page is *optional further reading*); no outcome prediction; no share/save/rate/loop.
+- Every navigational control is a real `<a href>`, never a dead `<button>`.
+
+## 10. Build dependencies & order
+
+1. `arcana-system-map.js` — the one canonical table (7 keys → codex system regex → proper-noun label → mono chip) + shared `slugify`. **Everything below is a pure function of this.**
+2. `arcana-marks.js` / `arcana-marks.css` — the mark generator (44px reading / 240px detail call sites).
+3. `entry.js` + `entry.css`, mounted via `?dev=arcana-entry` (3-line `app.js` diff mirroring `arcana-reading`). Renders §4 order against the *current* `codex-data.json` with the §9 related-items stub — this alone delivers client asks #1 (dedicated page) and #3 (mark) end to end.
+4. Reading-page wiring (separate task): `EXPLORE →` link + inline mark + seed/scroll `sessionStorage` — client ask #2.
+5. (Phase 5, later) additive `correspondence` field → §9 renderer already prefers it. No code change.
+
+## 11. Definition of done
+
+- All 154 slugs resolve by `system+slug`; direct/shared/bookmarked URLs are reload-safe; back restores scroll via `from`.
+- Canonical §4 order renders, including the surfaced `systemNote`, the derived dek, adjacent-in-sequence, and the provenance stamp.
+- Reversed appears **only** where `entry.reversed` is non-empty (tarot), never as a placeholder elsewhere.
+- Nothing hand-authored per entry; the only per-system authoring is the 8 `systemNote`s (already in data) and the 7 proper-noun labels.
+- In-voice not-found; mark at 240px gold in a fixed slot ready for the GPT SVG swap.
+- Canon held (gold/ember reservation, no white, no share/save/rate, third-person deadpan); every link a real `<a href>`; shared `arcana-system-map.js` is the sole routing/slug source so the reading and detail pages can never drift.
+
+**Key files:** `C:\Users\nilsj\OneDrive\Documents\blue-room-scan-room\arcana-reading.js` (link-source + `draw()`/`readHTML()` to edit), `arcana-reading.css` (token block to reuse), `arcana-name-engine.js` (`indexCodex` at line 260, the 7-key map to mirror), `codex-data.json` (content; 8 `systemNote`s, tarot-only `reversed`), `index.html` (script/link load order at lines 13–17, 112–117), `app.js` (`?dev=` whitelist + `mountDev()` branch to extend).

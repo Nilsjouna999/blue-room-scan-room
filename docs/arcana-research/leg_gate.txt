@@ -1,0 +1,86 @@
+Both load-bearing code claims verified against the live file: the wheel double-array bug is real (`_artifact-preview.html:266`, mirror index sits in both the gold and ember arrays), and `.acc__frag` is already 19px italic cream with a gold left-border (line 81) — so any audit claiming it is "unstyled" is wrong; the only real change there is the shimmer size-drop. Here is the adversarial pass.
+
+---
+
+# ADVERSARIAL AUDIT OF THE FIX LIST — corrected final calls
+
+The list is ~80% sound. Its structural moves (kill the rail, embed the fonts, fix the wheel bug, three-tier the detail page) are correct and I'm not relitigating them. But it commits **four canon breaks, two direct self-contradictions, and one strategic miss on the client's actual complaint** — and its single most-visible new component is generic. Disputed points below, most-severe first.
+
+## 1. It defends the crown's brightness against the one complaint the client actually filed. (STRATEGIC MISS)
+
+The client said the crown "needs to be easier for the eyes." The list's answer: embed a real 600, add a drop shadow, and **explicitly refuse to dim it** ("color #ece7dc unchanged — the crown is canon's one sanctioned peak; do not dim it"). That is canon-purity overriding the paying brief. For a thin high-contrast serif at 44-50px on #0a0b0d, the most reliable "easier on the eyes" lever is *lowering luminance contrast*, not adding stroke weight. The list already invented the right token (`--cream-display #dcd6c9`) and then **withholds it from the exact element that prompted it.**
+
+Worse, this is a flat self-contradiction: **Group 1.2 keeps the crown at `#ece7dc`; Group 3's token table routes `.crown h1` to `--cream-display #dcd6c9`.** Both can't ship.
+
+**Corrected call:** dim the crown. Crown title → `#e0dacd` (one hair brighter than the draw names so a micro-hierarchy survives), draw names/hero `.read h2`/`.acc h1` → `--cream-display #dcd6c9`. The crown stays the peak via **size + centered isolation + the gold crown MARK above it** — brightness does not have to be the peak signal, and here it is the thing straining the eye. This directly answers complaint (a); the weight bump alone does not.
+
+## 2. Kill the crown text-shadow. (CANON BREAK + self-defeating)
+
+`text-shadow: 0 1px 2px rgba(4,3,2,.55)` on the title is wrong twice over. First, canon depth belongs to the crown *object* (the gold glyph), not a generic CSS drop-shadow on letterforms — a soft black shadow on text reads as web-chrome/letterpress, not a reverent archive. Second, it is **self-defeating**: you embed a real 600 and add tracking to *sharpen* the hairlines, then a 2px blur *smears* those same hairlines on near-black, reintroducing the halo you're fighting. Depth via shadow "zero color content" is a rationalization — it still muddies strokes.
+
+**Corrected call:** delete the text-shadow entirely. The crown's depth is the gold mark + isolation. Grounding against the black comes from the (now-dimmed) cream-display luminance and the real weight, not a blur.
+
+## 3. OPEN RECORD at rest = gold spends the currency eight times per page. (CANON BREAK)
+
+This is the sharpest break. Canon (which the list itself restates) is **gold ONLY on crown + slot labels + focus.** The list then quietly adds "the OPEN-RECORD action" to the gold allowlist and sets the **resting** state to `--gold`. That link repeats once per draw — so gold-at-rest fires **~8×** down a reverent page on a secondary utility affordance. "Reclaims gold-as-currency for the one primary action" is backwards: OPEN RECORD is not primary, and currency you spend eight times isn't currency.
+
+Note the list overrode its own Affordance-Redesign subsystem here — that subsystem correctly kept **rest = ghost, gold on hover/focus only.** The master list picked the wrong resolution.
+
+**Corrected call:** rest state = **`--t-body #b1ada4` (8:1, clears AA)** text + a hairline `--edge` border; the border *shape* carries the affordance (non-color cue), not the color. **Gold-lit only on hover/focus** — that is the sanctioned "focus" slot, fully canon. This fixes the 4.0:1 ghost failure without spending gold at all.
+
+## 4. The horizontal button is a Bootstrap pill — it makes a reverent archive look like an app. (REVERENCE / GENERIC)
+
+`display:inline-flex; padding:8px 14px; border:1px solid; border-radius:3px` + a hover `translateX(2px)` arrow, repeated 8×, is the single most generic component in the list — a "Read more" button farm. The brief's north star is "a reverent archive at night, NOT an app," and eight rounded, animated CTA chips is precisely app-chrome.
+
+**Corrected call:** demote from button to **ruled typographic link**. Mono `OPEN RECORD →`, 9.5px, tracked, sitting above/against a hairline `--edge` rule at the foot of the draw — no rounded box, no fill, no padding-pill. Border-radius and background wash have no place in this system. **Drop the arrow-nudge motion** (point 6 below). A deadpan archive doesn't wink.
+
+## 5. The "no synthetic Cormorant weight" rule is broken by the list's own emblem fix. (SELF-CONTRADICTION on its #1 principle)
+
+The entire type plan's central lesson (invoking BR-S122) is **never let the browser synthesize a Cormorant weight — embed real cuts.** The plan then embeds exactly **one** 600 file, scoped "crown-only." But **Group 6.6 sets `.emblem{font-weight:600}`** on the Cormorant roman-numeral emblems. Those emblems now either (a) synthesize 600 — the exact forbidden act — or (b) the 600 file is not "crown-only" after all.
+
+**Corrected call:** pick one and state it. Either emblems stay at the embedded **500** (and get their single-vs-multi-char weight normalized another way, e.g. leave them 500 and accept the ratio, or nudge size not weight), or the SemiBold file is explicitly declared **"crown + emblems,"** not "crown-only," and preload accounts for it. As written the list violates the principle it leads with.
+
+## 6. Cut the hover arrow-nudge motion. (REVERENCE)
+
+Billed as "the one permitted motion in the whole system." On a page whose thesis is stillness, animating an arrow ×8 — even gated behind `prefers-reduced-motion` — is app affordance leaking in. The gold-lit color shift on hover/focus is already sufficient "it's alive" signal.
+
+**Corrected call:** remove `translateX`. Color/border change on hover only.
+
+## 7. Grey proliferation — the palette is now 5 greys, and the detail-page tiers mint an unneeded 6th. (OVER-CORRECTION)
+
+Group 5 introduces `--warm-silver #c7c2b8` for Featured section headers, on top of `--cream`, `--cream-display`, lifted `--t-meta #9c9790`, lifted `--t-ghost #96918a`. That's five-to-six near-identical warm greys, and the token audit *itself* flags the risk. Hierarchy on the detail page should come from **size + tracking + the left-border**, which the tier system already provides — it does not need a new hue.
+
+**Corrected call:** kill `#c7c2b8`. Featured headers = existing `--t-body #b1ada4`; Footnote headers = `--t-meta`/`--t-ghost`. Differentiate the three tiers by size, letter-spacing, and the 2px gold-tint left-border on Featured only. No new grey.
+
+## 8. Internal AA inconsistencies the list contradicts itself on. (CORRECTNESS)
+
+- **Group 3** mandates ghost *text* must leave `#7d7970` (4.0:1) for `#96918a`. But **Group 5.3** styles Footnote headers at 9px `#7d7970` and **Group 5.6** sets the disclaimer to `#7d7970` **at 65% opacity** — which drops it well below 4.0:1. Both violate Group 3's own rule.
+  **Corrected call:** Footnote headers and disclaimer use the lifted `#96918a`; never stack opacity on top of a grey to signal "quiet" — reduce size/tracking instead. Opacity-on-grey is the one move guaranteed to fail the contrast pass the list is trying to win.
+
+- **Multi-paragraph body gap conflicts:** Group 4.2 says body→body `16px`; the type subsystem / Group 6.1 says `13→20px`. Pick 16. With the new 1.78 leading (~32px), a 20px inter-paragraph gap ≈ the leading, so paragraphs float apart and the "one continuous read" intent breaks. **16px wins.**
+
+## 9. Over-selling weight 600 as "the single highest-leverage anti-shimmer change." (FRAMING)
+
+The genuine root cause is that the page currently renders in **Georgia** (font only named, never embedded) — the embed is ~90% of the win, as the list elsewhere admits. Cormorant SemiBold still has high stroke contrast; its hairlines are still hairlines, so 500→600 helps modestly but does not "kill" shimmer. The real anti-shimmer trio is **embed + cream-display (lower luminance) + modest ceiling (44px not 50px)**, with weight as a supporting move. This matters because the list **gates the entire plan on a static 600 cut that may not exist in the licensed source** (its own risk note). Don't stake the build on the least-certain, least-leveraged lever.
+
+**Corrected call:** embed is priority 1 and stands alone. Crown → 600 *if* the licensed static cut is confirmed; if not, ship crown at embedded 500 + cream-display + 44px and you still get most of the comfort. Don't let a missing 600 file block the embed.
+
+## 10. `font-display: optional` on the crown is the wrong bet for the most important, most-complained-about element. (RISK)
+
+`optional` means: if the font isn't cached within ~100ms, the browser shows **Georgia Bold for the entire session** — on the single element the client called out, while everything else around it is Cormorant. That's a jarring mismatch precisely where it's least acceptable.
+
+**Corrected call:** crown uses **`swap`** (with the preload already specified) — real Cormorant wins first paint in the common case and is *guaranteed* to swap in eventually. A one-frame reflow on the crown is a better failure mode than a permanent Georgia crown.
+
+---
+
+## KEEP AS-IS (survived the attack)
+- Kill the 56px rail + two-column grid; single-column draws. Correct — the rail existed only to host vertical text.
+- Reversed dot moves inline before "Reversed." Correct — colocate the flag with what it flags.
+- Reorder name → keys → tag → body. Correct, low-risk.
+- Wheel bug fix (gold array = `c.kindred` only), `dominant-baseline:central` over the `+5` hack, 230→272 canvas, base dial ring reusing `--edge`. **Most defensible group in the list — verified real.** One caveat: the wheel's `--ember-legible #d9704a` is a *second* ember hex alongside the reversed-block `#b25f39`; keep it strictly scoped to the wheel as the list says, or "ember means one thing" quietly erodes.
+- Three-tier detail page (threshold/featured/footnote) via type + border + rhythm, no gold on the 8 headers. Correct — just don't mint the new grey (point 7).
+- Body prose → 18px / 500 / 1.78 / 62ch. Accept, with one caution: 500 (heavier) *and* 1.78 (looser) *and* +tracking all at once risks a loose feel; if it reads airy in preview, pull leading to 1.72 before touching size.
+- `.acc__frag` 19→15px for italic shimmer. Fine — but note it is already fully styled (verified line 81), so this is a shimmer trim, not the "unstyled element" some audits claimed.
+
+## One-line synthesis
+The list's structural surgery is right; its **color discipline drifts app-ward** exactly where canon is tightest — it dims everything *except* the crown the client complained about, and spends gold on a button eight times while claiming to protect gold-as-currency. Fix those two inversions (dim the crown, de-gold the resting link) and drop the pill/shadow/motion generics, and it lands.

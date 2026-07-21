@@ -1,0 +1,85 @@
+Verified against the live files. The plan's factual spine has several breaks, and its centerpiece (the identity system) has a masterpiece-disqualifying flaw plus a provably false guarantee. Findings below, each with the fix.
+
+---
+
+# ADVERSARIAL AUDIT — where this plan does not reach masterpiece
+
+## A. Load-bearing "verified ground truth" that is actually wrong
+
+**1. The `reversed` claim is inverted — the single worst error in the plan.**
+Plan: *"reversed is populated broadly (166 occurrences), not tarot-only… detail pages must render it conditionally."* Ground truth: `reversed` is populated for **exactly the 22 Tarot majors and nothing else**. Zodiac, chinese, numerology, runes, trigrams, hexagrams, lexicon — **all empty** (`reversed: ""`). The "166 occurrences" is the **total entry count** (12+17+12+22+24+8+64+7 = 166) — the author grepped the *key*, counted every empty string, and reported it as populated. The one sub-audit that got this right (Text Architecture: *"tarot majors carry it; other systems correctly render nothing"*) directly contradicts the synthesis, and the synthesis lost.
+Consequence: the "ember reversed-dot appears when reversed non-empty" affordance fires on **2 of 8 draws only** — fine as behavior, but every design rationale built on "all 7 systems carry a shadow read" is false, and any reviewer who checks will distrust the rest of the "verified" list.
+Fix: state it correctly — reversed is a Tarot-only field; the ember dot and the detail reversed block are Tarot-only by data, not by template accident. Do not promise a shadow read the corpus doesn't have.
+
+**2. The entry count is 166, not 154 — and the plan never reconciles the extra 12.**
+Actual data: chinese block ships **17** entries (12 animals **+ 5 Wu Xing elements**: Wood/Fire/Earth/Metal/Water), and there is an **8th block, "The Blue Room Lexicon" (7 entries: Metrics, Diagram, Source, Surface, …)** — internal/ceremony vocabulary, not a divination system. The plan asserts "all 154 slugs resolve" and "systemNote exists 8 times (one per system) — free content" without noticing that one of those 8 systemNotes belongs to the Lexicon and 5 chinese "results" are elements.
+Consequence: any engine that iterates `indexCodex()` output to build marks / detail routes / a "browse the system" list will surface **12 phantom results** (5 elements + 7 lexicon) as if they were draws. The mark generator's `chinese → single kanji` rule breaks outright on "Wood/Fire/Earth/Metal/Water."
+Fix: the shared contract must **whitelist the 7 drawable systems explicitly** and reuse the existing split — `indexCodex()` already separates `by.chineseElements` and maps the Lexicon to slot `"lexicon"`. The detail/mark/route layer must consume `by.chinese` (12 animals) and hard-exclude `chineseElements` and `lexicon`. The plan's URL contract says *"system ∈ the 7 indexCodex() keys"* — **`indexCodex()` emits 9 keys** (adds `lexicon` and `chineseElements`). That sentence is the routing bug it warns against, written into the contract.
+
+**3. The "three Twelve sites" are not three live sites.**
+Only `arcana-reading.js:97` renders on the actual page. `index.html` loads *only* `arcana-name-engine.js` + `arcana-reading.js`. The other two "sites" (`arcana-reading-compose.js:72`, `:140`) are referenced **solely by `arcana-reading-sheet.html`, a dev word-dump harness** — dead relative to the reading page. `arcana-reading.js:4` is a code comment.
+Consequence: Phase 0's "fix Twelve in all three sites" spends effort on a harness and a comment; more importantly, "verified against the live files" demonstrably wasn't — the plan didn't check what `index.html` includes.
+Fix: fix the one live site (`:97` → `draws.length`). Decide whether `compose.js`/`copy.js` are being retired; if kept, they're a *separate* surface, not part of this page.
+
+## B. The identity system — two failures, one of them disqualifying
+
+**4. "Guarantees zero collisions" is mathematically false.**
+The Entry Cipher is a 3×3 grid = **9 bits = 512 patterns**, seeded by a hash of the name. Expected collisions across 166 entries ≈ n²/2m ≈ 27. **Even scoped per-system**, the 64 hexagrams in a 512-space expect ~4 collisions. The plan states "zero collisions, zero subjective decisions… never repeats by construction" **twice**. It provably repeats.
+Fix: if a cipher is kept at all, it needs ≥16 bits (4×4) to make collisions improbable, or it must drop the uniqueness guarantee. But see #5 — the better move is to delete it.
+
+**5. The Entry Cipher is generic procedural noise wearing a museum label — the biggest masterpiece risk in the plan.**
+A SHA-seeded 3×3 dot matrix is a GitHub-identicon / Jdenticon pattern. It **carries no meaning, cannot be recognized, and communicates "randomly generated"** — the precise opposite of the canon voice ("the mythic treated as filed record," the museum-object-label litmus). Aries and The Tower would each get a meaningless speckle. A real archive does not hash-brand its holdings. This is the generic/gamey failure mode the brief warned against, sitting at the exact spot the client cared most about ("logos or photos or *something* — an identity mark per result").
+It also breaks its own coherence: the interim mark uses **djb2** (Build sub-audit) while the GPT hand-off spec uses **first-9-bits-of-SHA-1** — different algorithms produce different patterns, so the "drops in with no retrofit" swap would **visibly change every mark's identity**.
+Fix — the single highest-leverage cut in the whole plan: **kill the entry cipher; ship the authentic System Emblem alone, at hero scale.** Every system already owns a real, historically-loaded, recognizable mark: zodiac glyphs ♈–♓, tarot numeral+name, Elder Futhark runes (which *are* glyphs), the hexagram's own 6-line figure (already a unique 6-bit visual — no hash needed), the trigram's 3-line figure, the animal's kanji, the life-path numeral. These are on-canon ("the real traditional glyph, not an invented one"), need no collision math, and mean something. The cipher adds only noise and three bugs.
+
+**6. "Ships as code day one, zero art dependency, regeneratable from the name alone" — half-true.**
+The **cipher** half is name-derivable; the **emblem** half is not. The data stores `name: "The Fool"` and `name: "Fehu"` — no roman numeral, no rune glyph. Deriving the emblem needs authored lookup tables for **tarot (22 numerals), runes (24 glyphs), year-animals (12 kanji)**, and life-path is the numeral itself. Zodiac is extractable from `tag` (`♈ · …`), trigram/hexagram glyphs/numbers live in the `name` string. So ~58 glyph mappings must be hand-authored — real work the plan bills as "procedural, zero dependency."
+Fix: honestly scope the emblem lookup as a small authored table (it's the *good* kind of authoring — canonical glyphs, not opinions), and note zodiac/trigram/hexagram are parseable while tarot/rune/animal need the table.
+
+## C. Canon breaches the plan commits while claiming to hold canon
+
+**7. A 240px permanently-gold hero mark on 154 detail pages debases the crown.**
+Canon: *"gold #c9a35c–#e2c489 is CURRENCY, spent only on the crown and slot labels… the crown [is] the only element with object-depth."* The plan specs the detail-page mark as **"240px gold permanently"** and then lists in Definition of Done: *"gold spent only on crown / slot labels / mark-focus."* A 240px always-gold glyph is **none of those three** — it's a decorative gold hero on every one of 154 pages. Minting gold heroes at that scale is exactly "gold as decoration," and it flattens the crown's reserved object-status. This is the plan contradicting its own canon ledger in the same document.
+Fix: the detail hero renders in **archive grey (display/primary), not gold**; gold stays a focus/hover accent and the crown's reserved currency. If the detail page needs a "consecrated" beat, earn it with scale and the slot-label gold, not a gold glyph.
+
+**8. "Draw N of 8" fights the seal's own language.**
+The masthead currently says "8 readings"; the plan wants live "Draw N of 8." But the whole artifact is **one reading**, the seal says **"the marks are set,"** the crown says systems are **"consulted."** Readings / draws / marks / systems are used interchangeably. A live counter foregrounds an app-progress framing against a one-shot-ritual voice.
+Fix: pick one noun (the seal's "marks" is the strongest, most on-voice). If a count is shown, it counts *marks*, and it should not animate like a software progress meter.
+
+## D. Contract / routing cracks
+
+**9. `role=counsel` disambiguates nothing.**
+The detail page is per-**entry**, not per-draw-slot. If The Draw and the Counsel Card both land on The Tower, both links point at the same card's page — which is correct. `&role=counsel` changes no lookup and renders no different page. It's a parameter that does nothing, added to "solve" a non-problem.
+Fix: drop `role`. If counsel context ever matters, it belongs in the "Also drawn in this reading" strip (derived from `from=seed`), not in the entry URL.
+
+**10. slugify() was speced against the easy 15% of the corpus.**
+The worked examples are all clean Latin ("The Tower"→"tower"). But **~60% of entries are CJK/diacritic/numeric**: trigrams `"☰ Qián · Heaven"`, hexagrams `"23 · Splitting Apart (Bō)"`, elements `"Wood"`, numerology `"1"…"33"`. `slugify = [a-z0-9] only` turns "Qián" into `qi-n`, produces bare-number slugs like `11`, and yields unshareable URLs like `1-the-creative-qi-n` — undermining the "clean shareable URL" masterpiece claim for most of the corpus.
+Fix: decide the slug policy for the hard cases *before* Phase 1 (transliterate diacritics á→a; for hexagram/trigram use the ordinal — `hexagram/23`, `trigram/qian`; namespace numerology so `lifePath/11` isn't a naked `11`). Slugs must round-trip for **all** systems, tested against the real names, not the three examples.
+
+**11. The sub-audits disagree on the URL, and the synthesis inherited the disagreement.**
+Three schemes appear across the sub-audits: `detail.html?system=&entry=&from=`, `?dev=arcana-entry&system=&slug=&seed=`, `entry.html?system=&slug=&from=`. Param names conflict (`entry` vs `slug`, `from` vs `seed`) and filenames conflict (`detail.html` / `entry.html` / `index.html?dev=`). The master plan picks one but the drift it warns about is already latent in its inputs.
+Fix: freeze the exact string once, in `arcana-system-map.js`, and grep the sub-audit language out of the build so no one wires an older variant.
+
+## E. Scope and premise
+
+**12. Phase 5 (the knowledge bank) invents authority the corpus doesn't hold.**
+The correspondence maps (Zodiac↔Tarot Golden Dawn, Rune→Tarot "resonance," etc.) are a whole data-model + ~220 links + 24 hand-authored editorial pairings, layered onto a client who said "pretty good starter" and asked for **three concrete things**. The Rune→Tarot "resonance" is explicitly *this team's opinion* — the one place the deadpan archive starts asserting cross-tradition claims that aren't documented. Even truth-labeled, it's editorial voice in a museum that has so far only *filed* things.
+Fix: defer Phase 5 entirely until 1–4 ship and the client asks. The "Also drawn in this reading" stub (zero new data, genuinely relevant) already satisfies "related items." Don't build a correspondence engine on spec.
+
+**13. The "restore THEIR reading" ceremony is built on a fixture.**
+`pick()` is commented *"for fixtures/harness only, never for a real reading,"* and the page hardcodes `seed=br-01`. There is **no intake→reading pipeline** yet — the reading is a deterministic demo. Building `from=seed` back-links, sessionStorage scroll-restore, and "← The Ember-Banked Founder" personalization atop a fixture is machinery for a personalization that doesn't exist.
+Fix: fine to make the plumbing seed-aware, but don't gold-plate the "their reading" emotional arc (breadcrumb echoing the crown name, scroll ceremony) until a real seed is generated per user. Right now every visitor is br-01.
+
+## F. Smaller but real
+
+- **14. a11y math.** Plan lifts `--t-ghost` to "~4.1:1" and calls a11y cleared. **4.1:1 is below WCAG AA (4.5:1)** for normal text. If ghost carries any body-sized text it still fails. Fix: target 4.5:1 for text, or restrict ghost to large/decorative use and say so.
+- **15. `esc(e)` on the Error** (`arcana-reading.js:152`) — confirmed real, renders `[object Error]` / leaks the message. Fix is correct as stated (static in-voice line + `console.error`). One of the few "verified" items that actually verified.
+- **16. `paras()` uses a lookbehind regex** (`/(?<=\.)\s+/`, line 31) — fine in modern browsers, but it's the kind of thing the `<noscript>`/old-browser fallback story should acknowledge, since the plan adds `<noscript>` for the no-JS case but not a degraded-JS case.
+
+---
+
+## The two things that actually stop masterpiece
+1. **The Entry Cipher.** It's generic, it's provably collision-prone, its interim and final algorithms don't match, and it reads as "computer-generated" in an artifact whose entire thesis is "hand-filed record." Cut it. Ship the authentic emblem — the hexagram's six lines, the rune's own shape — at hero scale, in archive grey. That one cut removes findings #4, #5, #6, and half of #7.
+2. **The gold hero + the inverted-data credibility hit.** A permanently-gold 240px mark on 154 pages spends the one currency the whole system reserves for the crown; and the "verified ground truth" list contains an inverted reversed-field claim, a wrong entry count, and a wrong live-site count — three checkable errors that mean Phase 0 and Phase 1 must be re-grounded against the files before anyone builds on them.
+
+Everything else in the plan (marginal `EXPLORE →` real-`<a href>`, one shared system-map, query-param single-template detail page, no build step, the Phase-0 truth/a11y fixes) is sound and worth building — after the ground truth is re-verified and the identity system is reduced to the emblem.

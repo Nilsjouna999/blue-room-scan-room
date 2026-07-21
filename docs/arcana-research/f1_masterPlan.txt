@@ -1,0 +1,63 @@
+I have verified the load-bearing claims against the actual code. Here is the master plan.
+
+---
+
+# BLUE ROOM ARCANA — MASTER PLAN TO MASTERPIECE
+
+Synthesis of the 10 sub-systems into one build. Decisive throughout. Ground-truth verified against the live files in `C:\Users\nilsj\OneDrive\Documents\blue-room-scan-room\`.
+
+## Verified ground truth (drives the plan)
+- **The reading draws 8, but three places say "Twelve."** `arcana-reading.js:97` crown subhead, `arcana-reading-compose.js:72` and `:140` seal all hardcode "twelve systems." The draw array (`arcana-reading.js:49-56`) has exactly 8 slots. The masthead count (`arcana-reading.js:91`) is *already* dynamic (`draws.length`). This is a live voice-breaking lie on every reading. **Confirmed bug.**
+- **Error state renders `[object Error]`.** `arcana-reading.js:152` does `esc(e)` on a raw Error object in the `.catch`. **Confirmed bug.**
+- **`systemNote` exists 8 times** (one per system) in `codex-data.json` — currently surfaced nowhere. Free content for detail pages.
+- **No `slug` and no `mark` field exist** in the data. Both must be *computed at render*, not stored — no schema change needed for v1.
+- **`reversed` is populated broadly (166 occurrences), not tarot-only.** Detail pages must render it conditionally per-entry (check non-empty), not assume tarot.
+- **One `@media` query in `arcana-reading.css`** — the page has essentially zero responsive layer.
+- **Mount pattern is settled:** `app.js:94` whitelists `?dev=` views; `mountDev()` at `:2064` branches per view (`arcana-reading` at `:2092`). New pages bolt on here with a 3-line diff — no router, no build step.
+
+## The three governing decisions
+
+**1. INDEX vs DETAIL SPLIT — the reading page is never abridged.**
+The reading page keeps every draw's full meaning + reversed + keywords + tag inline, exactly as now. No teaser, no expand/collapse, no gating — that reads as a paywall and breaks canon. The detail page adds *only what doesn't fit a single-sitting 8-draw read*: the `systemNote`, a dek line (first sentence of `meaning`, derived), adjacent-in-sequence, correspondences, a provenance stamp, and the mark at hero size. Nothing on the reading page today is ever removed or hidden behind an interaction. (Locks sub-systems 1, 2, 6.)
+
+**2. THE RIGHT-SIDE ELEMENT — marginal deep-link + inline mark, NOT a rail (resolved conflict).**
+Sub-systems 1 and 5 spec an 88–110px sticky 2-column grid rail; sub-systems 7 and 10 reject it as a second visual system forced into a single-column ~60ch reading. **Lead call: ship the marginal pattern, defer the rail.** Each draw gets (a) a right-aligned mono `EXPLORE <NAME> →` link outside the prose measure (a real `<a href>`, reflowing inline below the meaning under 900px), and (b) a small identity mark beside the slot label, with a 6px ember dot at its corner when `reversed` is non-empty. This answers the client's #2 and #3 today, reuses existing IBM Plex Mono / ghost-grey tokens (zero new visual language), carries zero layout risk, and is fully reversible. The fixed-width sticky rail is **out of scope for v1** — revisit only if a dedicated measure/layout pass proves the reading can spare the width.
+
+**3. THE IDENTITY SYSTEM — "Sealed Marks," procedural now, GPT-art-swappable later.**
+Every one of the 154 results gets a two-register mark: a **system emblem** (top — the real traditional glyph: zodiac ♈–♓, tarot numerals 0–XXI, Elder Futhark runes, trigrams ☰–☷, hexagram number 1–64, year-animal kanji, life-path numeral) fused with an **entry cipher** (bottom — a deterministic 3×3 dot matrix hashed from the entry name). Ships as code day one (`arcana-marks.js`, `currentColor`, ghost at rest → gold on focus), zero art dependency, zero collisions, regeneratable from the name. The mark lives in a **fixed-size slot** so the eventual GPT-authored bespoke SVG (system token + name-seeded cipher, one brief → 154 outputs) drops in with no layout retrofit. (Locks sub-systems 3, 5, 10.)
+
+**Locked URL contract (one source of truth, or links die):** reuse the existing mount switch —
+`index.html?dev=arcana-entry&system=<key>&slug=<slug>&from=<seed>`
+where `system` ∈ the 7 `indexCodex()` keys (`sun, chinese, lifePath, tarotMajor, rune, trigram, hexagram`), `slug = slugify(name)`, `from` = seed (optional; its absence just omits the back-to-reading link), and the two tarot draws disambiguate with `&role=counsel`. The reading page *constructs* this and the detail page *parses* it — both import the same map and the same `slugify()`.
+
+## Phased roadmap (hard gates — each must be true before the next)
+
+**Phase 0 — Correctness & canon truth.** No new features; makes the page stop lying and pass baseline a11y. Fix the "Twelve" count in all three sites to read `draws.length` (subhead + both seal strings). Fix the `[object Error]` catch to a static in-voice line + `console.error`. Promote `.arc-chapter__head` div → semantic `<h2>`. Add `:focus-visible` outlines, `role="progressbar"`/`aria-valuenow` on the scroll bar, real `<ul>` for keywords, a `<noscript>` fallback, and lift `--t-ghost` off #6e6b63 to a ~4.1:1 tone. *Gate: the page tells the truth about itself and clears basic a11y.* No dependencies — ship immediately.
+
+**Phase 1 — The shared contract.** Build `arcana-system-map.js` (`window.BRArcanaSystems`): the single canonical table mapping each of the 7 routing keys → codex system string → display label ("Constellation," "Elder Futhark," …) → mono chip → the one shared `slugify()`. Loaded before both `arcana-reading.js` and `entry.js`. *Gate: reading page and detail engine resolve system+slug from the exact same file — routing can never drift.* **Everything below depends on this.**
+
+**Phase 2 — Identity marks (client #3).** `arcana-marks.js` (`markFor(systemKey, name) → {glyph, dots[9]}`) + `arcana-marks.css` (one block, two call sites: 44px reading, 240px detail hero). *Depends on Phase 1. Gate: all 154 results render a deterministic, non-colliding mark from code, fixed-size slot reserved for the GPT SVG.*
+
+**Phase 3 — Right-side affordance (client #2).** Edit `arcana-reading.js` `readHTML()`: append the marginal `EXPLORE →` `<a href>` (Phase-1 contract) + inline mark + ember reversed-dot; capture `scrollY` to `sessionStorage` keyed by seed on out-navigation. Add the page's **first real breakpoint** (margin link ≥900px, reflow inline <900px). *Depends on Phase 1 + 2. Gate: every draw has a live keyboard/middle-click/new-tab-safe deep link and a visual mark; the inline reading loses nothing.* Optional low-risk polish foldable here: masthead `I · II · III` chapter-jump anchors and a live "Draw N of 8" swap — both nice, neither blocking.
+
+**Phase 4 — Detail page (client #1).** `entry.html` shell + `entry.js` engine + `entry.css`, mounted via `?dev=arcana-entry`. One template resolves all 154 by system+slug and renders the canonical order: return strip (`← <Crown Name>`, fallback `← Browse the codex`) → identity header (240px gold mark + gold slot label + serif name + tag) → keywords → **dek line** (derived first sentence) → full meaning → reversed (conditional on non-empty) → **`systemNote` block** (surface the 8 that already exist) → adjacent-in-sequence (prev/next from the system's array order, zero new data) → related "Also drawn in this reading" stub (re-derived from `from=seed`, zero new data) → provenance stamp → close (Back + Browse system). Page-turn veil (200ms) + `requestAnimationFrame` scroll restore. In-voice not-found state for stale URLs. *Depends on Phase 1–3. Gate: all 154 slugs resolve; direct/shared URLs are reload-safe; back restores scroll; `systemNote` is visible; nothing hand-authored per entry.*
+
+**Phase 5 — Knowledge bank (additive, content-gated).** Extend `codex-data.json` additively with a `correspondence` object per entry using the capped 6-link map (sub-system 9): ship the formula-derivable links first (Zodiac↔Tarot bidirectional, Trigram→Hexagram tree, Life-Path→Tarot, Year-Animal→Element badge — ~34 entries, zero editorial judgment), each carrying a truth-label ("correspondence"/"structural"/"numerical reduction"). `entry.js` prefers `entry.correspondence`, falls back to the Phase-4 stub, so data lands with no code change. *Depends on Phase 4. Gate: every link is truth-labeled; the cap prevents any infinite cross-system rabbit-hole.* The **Rune→Tarot resonance table (24 hand-picked pairs, labeled "resonance," not "correspondence")** is the *only* genuine authoring in the whole plan — schedule it as its own small copy task, not a blocker.
+
+## Explicitly out of scope
+- **Background art and crown-mark art** — placeholders; GPT owns; this team authors briefs only.
+- **The 154 bespoke Sealed-Mark SVGs** — GPT executes our brief (96px emblem lookup + the 154-row 9-bit cipher table, computed by us and handed over as literal data, not left to the artist + 3 worked example SVGs). The Phase-2 procedural marks are the interim; the fixed slot accepts the SVGs with no retrofit.
+- **The full 200px sticky rail** — deferred; marginal link + inline mark is the shipped answer.
+- **The ~220 correspondence rationale strings** — ship links label-only first.
+- **Promoting off `?dev=` to real `.html` routes** — decide when `arcana-reading` itself graduates, not before.
+- **Rejected outright, do not silently reconsider:** teaser/expand-collapse disclosure, per-system 7-color coding (violates the gold-is-currency / ember-has-one-role canon), sidebar TOC / scroll-spy app-nav, reversed-as-toggle-card, share/save/rate/gallery/"My Readings," floating back button, keyword-fuzzy cross-links.
+
+## Definition of done
+- **Reading page:** full unabridged inline reading intact; every draw carries an inline mark + a live `EXPLORE →` real-`<a href>` deep link; crown subhead and seal read the true live count; chapter heads are `<h2>`; first real breakpoint present; a11y (focus-visible, progressbar ARIA, ≥4.1:1 ghost, keyword `<ul>`, `<noscript>`); motion is 450ms / 0.25-threshold on the three-gesture vocabulary (fade / 8–16px drift / static crown glow) with reduced-motion honored.
+- **Detail page:** one template resolves all 154 by system+slug; canonical sections including surfaced `systemNote`, derived dek, adjacent-in-sequence, provenance; reload/share-safe; in-voice not-found; back-to-reading restores scroll via `from=seed`; mark hero at 240px gold.
+- **Identity:** 154 deterministic non-colliding marks from code today; fixed slot ready for the GPT SVG swap with no layout change; Sealed Marks brief authored and handed off.
+- **Contract integrity:** `arcana-system-map.js` is the sole routing/slug/label source; reading and detail pages never drift; every deep link is a real `<a href>`.
+- **Canon held:** gold spent only on crown / slot labels / mark-focus; ember only on the reversed block + its one indicator dot; no pure white; no new color system; anti-paywall (nothing gated); no rating, diagnosis, or outcome prediction; no share/save/loop.
+- **Knowledge bank (when Phase 5 lands):** the capped 6-link map with truth-labels; no cross-system branching beyond it.
+
+**Single highest-leverage move:** build `arcana-system-map.js` (Phase 1) first. Once that one table is right, the detail template, the mark generator, and every deep link become pure functions of data already in `codex-data.json` — the entire feature set (dedicated pages + right-side affordance + 154 identity marks) ships with **no new JSON field, no build step, and a ~3-line `app.js` diff**, and the Phase-0 truth fixes ride along in files already open.

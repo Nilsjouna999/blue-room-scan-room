@@ -1,0 +1,314 @@
+[
+  {
+    "name": "Fehu",
+    "tag": "F · cattle / wealth",
+    "keywords": [
+      "wealth",
+      "abundance",
+      "earned reward",
+      "new energy",
+      "material security"
+    ],
+    "meaning": "Fehu represents cattle, the ancient Germanic measure of movable wealth, and signals material gain, prosperity, and resources gained through effort. It marks a time of abundance, success, or the arrival of new energy and opportunity. Because wealth in herds must be tended and can be lost, Fehu also carries a reminder that gains must be maintained and used wisely rather than hoarded.",
+    "reversed": ""
+  },
+  {
+    "name": "Uruz",
+    "tag": "U · aurochs / wild ox",
+    "keywords": [
+      "strength",
+      "vitality",
+      "raw power",
+      "endurance",
+      "untamed will"
+    ],
+    "meaning": "Uruz is named for the aurochs, a powerful and now-extinct wild ox, and represents raw physical strength, vitality, and untamed will. It speaks to endurance, good health, and the courage to face challenges head-on. The rune signals a surge of primal energy and the toughening that comes through testing and hardship.",
+    "reversed": ""
+  },
+  {
+    "name": "Thurisaz",
+    "tag": "TH · giant / thorn",
+    "keywords": [
+      "conflict",
+      "danger",
+      "reactive force",
+      "protection",
+      "catalyst"
+    ],
+    "meaning": "Thurisaz means thorn or giant, referencing the jötnar, and carries a charge of danger, conflict, and disruptive force. It can indicate a defensive or reactive power, such as a thorn that wounds or a barrier that protects, and often points to a difficult confrontation or a jolt that breaks a stagnant situation. The rune warns of impulsive or destructive energy that must be handled with caution.",
+    "reversed": ""
+  },
+  {
+    "name": "Ansuz",
+    "tag": "A · a god (Odin) / divine breath",
+    "keywords": [
+      "communication",
+      "wisdom",
+      "inspiration",
+      "divine message",
+      "speech"
+    ],
+    "meaning": "Ansuz is associated with Odin and the breath or voice of the divine, representing communication, wisdom, and inspired speech. It signals messages, insight, or guidance received from a wise source, and favors learning, teaching, and persuasive or truthful communication. The rune points to the power of words and the arrival of clarifying knowledge.",
+    "reversed": ""
+  },
+  {
+    "name": "Raidho",
+    "tag": "R · riding / wagon",
+    "keywords": [
+      "journey",
+      "movement",
+      "travel",
+      "life path",
+      "right action"
+    ],
+    "meaning": "Raidho means riding or the wheeled wagon, and represents travel, journeys, and forward movement in life. It can indicate a literal trip or a more figurative progression along one's path, with emphasis on rightful order, timing, and the rhythm of a well-directed course. The rune counsels steady, correct action to reach one's destination.",
+    "reversed": ""
+  },
+  {
+    "name": "Kenaz",
+    "tag": "K · torch / beacon",
+    "keywords": [
+      "illumination",
+      "knowledge",
+      "creativity",
+      "revealing",
+      "controlled fire"
+    ],
+    "meaning": "Kenaz means torch or fire used as a tool, symbolizing controlled illumination, knowledge, and creative skill. It signals insight, learning, and the light that reveals what was hidden, as well as inspiration applied to craft or art. The rune reflects transformation through the guided use of fire, skill, and inner vision rather than destructive flame.",
+    "reversed": ""
+  },
+  {
+    "name": "Gebo",
+    "tag": "G · gift / exchange",
+    "keywords": [
+      "gift",
+      "generosity",
+      "partnership",
+      "reciprocity",
+      "balance"
+    ],
+    "meaning": "Gebo means gift, representing generosity, exchange, and the balanced reciprocity between giver and receiver. It signals partnerships, contracts, and relationships built on fair give-and-take, including gifts of love, hospitality, or sacrifice. The rune is shaped as a symmetrical X and is traditionally treated as non-reversible, carrying no inverted meaning.",
+    "reversed": ""
+  },
+  {
+    "name": "Wunjo",
+    "tag": "W/V · joy",
+    "keywords": [
+      "joy",
+      "harmony",
+      "fellowship",
+      "fulfillment",
+      "happiness"
+    ],
+    "meaning": "Wunjo means joy and represents harmony, contentment, and the pleasure of shared fellowship. It signals a period of happiness, success, and smooth cooperation with others, often after hardship has passed. The rune reflects emotional well-being and the comfort of belonging to a community or kinship group.",
+    "reversed": ""
+  },
+  {
+    "name": "Hagalaz",
+    "tag": "H · hail",
+    "keywords": [
+      "disruption",
+      "natural force",
+      "sudden change",
+      "testing",
+      "uncontrolled event"
+    ],
+    "meaning": "Hagalaz means hail, the destructive ice that falls from the sky and then melts away, symbolizing sudden disruption and uncontrollable natural force. It represents crisis, hardship, or upheaval that is beyond one's control but ultimately temporary and often clears the way for renewal. The rune is treated as non-reversible, since hail's disruptive nature is constant regardless of orientation.",
+    "reversed": ""
+  },
+  {
+    "name": "Nauthiz",
+    "tag": "N · need / necessity",
+    "keywords": [
+      "need",
+      "constraint",
+      "hardship",
+      "resilience",
+      "necessity"
+    ],
+    "meaning": "Nauthiz means need and represents constraint, hardship, and the friction of necessity. It signals resistance, delay, or want, but also the resilience and resourcefulness that emerge from being tested by difficult circumstance. The rune counsels patience and self-reliance in the face of restriction.",
+    "reversed": ""
+  },
+  {
+    "name": "Isa",
+    "tag": "I · ice",
+    "keywords": [
+      "stillness",
+      "stagnation",
+      "pause",
+      "clarity",
+      "frozen state"
+    ],
+    "meaning": "Isa means ice, symbolizing stillness, stasis, and a freeze on activity or progress. It signals a period where action is blocked or must be suspended, calling for patience, caution, and clear-headed waiting rather than forcing movement. As a single unbroken vertical stroke, Isa is treated as non-reversible.",
+    "reversed": ""
+  },
+  {
+    "name": "Jera",
+    "tag": "J/Y · year / harvest",
+    "keywords": [
+      "harvest",
+      "cycle",
+      "reward",
+      "fruition",
+      "natural timing"
+    ],
+    "meaning": "Jera means year or harvest, representing the natural cycle of sowing and reaping and the reward that comes from sustained effort. It signals fruition, positive change, and the fair completion of a cycle in its proper season. The rune reflects the working of natural law and is treated as non-reversible due to its symmetrical form.",
+    "reversed": ""
+  },
+  {
+    "name": "Eihwaz",
+    "tag": "EI · yew tree",
+    "keywords": [
+      "endurance",
+      "death and rebirth",
+      "defense",
+      "stability",
+      "transformation"
+    ],
+    "meaning": "Eihwaz is linked to the yew tree, a long-lived and poisonous tree associated with both death and endurance, and represents resilience, protection, and steady transformation. It signals a dependable foundation, defense against hardship, and the capacity to endure through change or ending. The rune reflects the link between mortality and continuity, marking transitions that strengthen rather than destroy.",
+    "reversed": ""
+  },
+  {
+    "name": "Perthro",
+    "tag": "P · dice-cup / lot-container",
+    "keywords": [
+      "fate",
+      "mystery",
+      "chance",
+      "hidden things",
+      "divination"
+    ],
+    "meaning": "Perthro's exact meaning is debated but is traditionally linked to a dice-cup or container used for casting lots, representing chance, fate, and hidden or unknown outcomes. It signals mysteries, secrets, and matters governed by luck or destiny rather than direct control. The rune is associated with divination itself and with the revealing of what is presently concealed.",
+    "reversed": ""
+  },
+  {
+    "name": "Algiz",
+    "tag": "Z · elk / protection",
+    "keywords": [
+      "protection",
+      "defense",
+      "higher connection",
+      "vigilance",
+      "shielding"
+    ],
+    "meaning": "Algiz, shaped like an outstretched hand or elk's antlers, represents protection, defense, and a shielding or warding force. It signals guardianship, vigilance against danger, and connection to higher or spiritual guidance that watches over the individual. The rune counsels alertness and invokes safety in times of vulnerability.",
+    "reversed": ""
+  },
+  {
+    "name": "Sowilo",
+    "tag": "S · sun",
+    "keywords": [
+      "success",
+      "vitality",
+      "guidance",
+      "wholeness",
+      "victory"
+    ],
+    "meaning": "Sowilo means sun and represents success, vitality, and life-giving energy. It signals victory, good health, and clear guidance, much as the sun lights the way and sustains life. The rune reflects wholeness, achievement, and positive momentum reaching its goal.",
+    "reversed": ""
+  },
+  {
+    "name": "Tiwaz",
+    "tag": "T · the god Tyr / sky-god",
+    "keywords": [
+      "justice",
+      "honor",
+      "sacrifice",
+      "leadership",
+      "victory through discipline"
+    ],
+    "meaning": "Tiwaz is named for Tyr, the god of law and justice who sacrificed his hand to bind the wolf Fenrir, and represents honor, justice, and disciplined self-sacrifice. It signals fair victory earned through duty, courage, and adherence to principle rather than force alone. The rune favors leadership, right conduct, and standing firm for what is just.",
+    "reversed": ""
+  },
+  {
+    "name": "Berkano",
+    "tag": "B · birch",
+    "keywords": [
+      "growth",
+      "fertility",
+      "new beginnings",
+      "nurturing",
+      "renewal"
+    ],
+    "meaning": "Berkano is named for the birch tree, one of the first to grow leaves in spring, and represents fertility, growth, and new beginnings. It signals nurturing energy, family matters, birth, and the careful tending needed for something new to flourish. The rune reflects the feminine, protective, and regenerative forces of nature.",
+    "reversed": ""
+  },
+  {
+    "name": "Ehwaz",
+    "tag": "E · horse",
+    "keywords": [
+      "partnership",
+      "progress",
+      "trust",
+      "teamwork",
+      "steady movement"
+    ],
+    "meaning": "Ehwaz means horse, symbolizing the close working partnership between horse and rider and, by extension, trust, teamwork, and cooperative progress. It signals beneficial movement forward, loyal relationships, and steady advancement made possible through mutual reliance. The rune favors harmony between partners working toward a shared goal.",
+    "reversed": ""
+  },
+  {
+    "name": "Mannaz",
+    "tag": "M · man / humankind",
+    "keywords": [
+      "self",
+      "humanity",
+      "social order",
+      "identity",
+      "cooperation"
+    ],
+    "meaning": "Mannaz means man or humankind, representing the self in relation to others and the shared nature of human society. It signals self-awareness, intelligence, and the social bonds, structures, and cooperation that support communal life. The rune reflects one's place within the human order and the balance between individual identity and collective belonging.",
+    "reversed": ""
+  },
+  {
+    "name": "Laguz",
+    "tag": "L · water / lake",
+    "keywords": [
+      "intuition",
+      "emotion",
+      "the unconscious",
+      "flow",
+      "psychic sense"
+    ],
+    "meaning": "Laguz means water or lake, representing intuition, emotion, and the fluid, unconscious currents of life. It signals psychic sensitivity, imagination, and the need to flow with circumstances rather than resist them. The rune reflects the deep, sometimes hidden emotional undercurrents that guide instinct and inner life.",
+    "reversed": ""
+  },
+  {
+    "name": "Ingwaz",
+    "tag": "NG · the god Ing (Freyr)",
+    "keywords": [
+      "fertility",
+      "gestation",
+      "potential",
+      "completion",
+      "internal growth"
+    ],
+    "meaning": "Ingwaz is named for Ing, an early form of the god Freyr associated with fertility and peace, and represents gestation, stored potential, and internal growth building toward release. It signals a phase of quiet preparation or incubation before a goal reaches completion and manifests outwardly. The rune's symmetrical diamond form is treated as non-reversible.",
+    "reversed": ""
+  },
+  {
+    "name": "Dagaz",
+    "tag": "D · day / dawn",
+    "keywords": [
+      "breakthrough",
+      "awakening",
+      "transformation",
+      "clarity",
+      "new dawn"
+    ],
+    "meaning": "Dagaz means day, representing the breakthrough of dawn light and a decisive, positive transformation. It signals awakening, clarity, and a turning point where a new and better phase begins, often bringing sudden and welcome change. The rune's symmetrical form is treated as non-reversible, reflecting its unambiguous, wholly positive charge.",
+    "reversed": ""
+  },
+  {
+    "name": "Othala",
+    "tag": "O · ancestral property / homeland",
+    "keywords": [
+      "heritage",
+      "home",
+      "tradition",
+      "inheritance",
+      "belonging"
+    ],
+    "meaning": "Othala means ancestral property or homeland, representing inherited wealth, family legacy, and one's roots or homeland. It signals the values, traditions, and belongings passed down through generations, along with a sense of stable belonging and identity tied to home and kin. The rune favors matters of inheritance, land, and the enduring foundation provided by one's heritage.",
+    "reversed": ""
+  }
+]

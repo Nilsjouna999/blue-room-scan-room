@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Arcana Reading — composed readings</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  :root { --gold:#c9a35c; --ember:#b25f39; --cream:#ece7dc; --meta:#948f87; --ghost:#6e6b63; --line:#232320; }
+  body { background:#0a0b0d; color:#d7d3ca; font-family:"Cormorant Garamond",Georgia,serif;
+         margin:0; padding:44px clamp(16px,5vw,64px) 120px; }
+  h1 { font-weight:400; font-size:26px; color:var(--cream); margin:0 0 6px; }
+  .sub { font-family:"IBM Plex Mono",monospace; font-size:10.5px; letter-spacing:.2em;
+         text-transform:uppercase; color:var(--ghost); margin:0 0 40px; }
+  .reading { max-width:660px; margin:0 auto 96px; }
+  .draw { font-family:"IBM Plex Mono",monospace; font-size:10px; letter-spacing:.18em;
+          text-transform:uppercase; color:var(--ghost); border-bottom:1px solid var(--line);
+          padding-bottom:10px; margin-bottom:30px; }
+  .row { padding:13px 0 14px; border-bottom:1px solid var(--line); }
+  .lbl { font-family:"IBM Plex Mono",monospace; font-size:9px; letter-spacing:.22em;
+         text-transform:uppercase; color:var(--ghost); }
+  .val { font-size:19px; color:var(--cream); margin:3px 0 5px; }
+  .line { font-size:16.5px; line-height:1.62; color:#b1ada4; }
+  .res { margin:34px 0 0; }
+  .res .line { padding:9px 0; border-left:2px solid var(--line); padding-left:15px; margin-bottom:9px; }
+  .res .HOLD { border-left-color:var(--ember); }
+  .res .CONFIRM { border-left-color:rgba(201,163,92,.45); }
+  .v { font-family:"IBM Plex Mono",monospace; font-size:8.5px; letter-spacing:.2em; color:var(--ghost); }
+  .crown { margin:44px 0 0; padding:26px 0 0; border-top:1px solid var(--line); }
+  .name { font-size:37px; color:var(--gold); line-height:1.1; }
+  .deriv { font-size:16px; line-height:1.6; color:#b1ada4; margin-top:14px; }
+  .seal { font-family:"IBM Plex Mono",monospace; font-size:10px; letter-spacing:.18em;
+          color:var(--ghost); margin-top:30px; }
+  .warn { color:var(--ember); font-family:"IBM Plex Mono",monospace; font-size:12px; }
+</style>
+</head>
+<body>
+<h1>Arcana Reading — composed readings</h1>
+<p class="sub">the words only · no room, no motion · judge the writing</p>
+<div id="out"><p class="warn">loading…</p></div>
+
+<script src="arcana-name-engine.js"></script>
+<script src="arcana-reading-copy.js"></script>
+<script src="arcana-reading-compose.js"></script>
+<script>
+(function () {
+  /* distinct salts — sequential seeds hashed into overlapping picks, which
+     made every sample draw look like the same reading */
+  var SEEDS = ["alder", "bramble", "cinder", "dovetail", "ember-glass"];
+  function esc(s){ return String(s==null?"":s).replace(/[&<>]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;"}[c];}); }
+
+  fetch("codex-data.json").then(function(r){return r.json();}).then(function(codex){
+    var by = window.BRArcanaName.indexCodex(codex);
+    var P = window.BRArcanaName.pick;
+    var html = SEEDS.map(function (seed) {
+      var r = {
+        sun: P(by.sun, seed+"-sun"), chinese: P(by.chinese, seed+"-chi"),
+        lifePath: P(by.lifePath, seed+"-lp"), tarotMajor: P(by.tarotMajor, seed+"-tm"),
+        tarotCounsel: P(by.tarotMajor, seed+"-tc"), rune: P(by.rune, seed+"-rn"),
+        trigram: P(by.trigram, seed+"-tg")
+      };
+      var a = window.BRArcanaName.assemble(r);
+      var c = window.BRArcanaCompose.compose(r, a);
+      var draw = [r.sun.name, r.chinese.name, "LP "+r.lifePath.name, r.tarotMajor.name,
+                  r.tarotCounsel.name, r.rune.name, r.trigram.name].join(" · ");
+      return '<div class="reading">' +
+        '<div class="draw">' + esc(seed) + ' &nbsp;—&nbsp; ' + esc(draw) + '</div>' +
+        c.rows.map(function(row){
+          return '<div class="row"><div class="lbl">'+esc(row.label)+'</div>' +
+                 '<div class="val">'+esc(row.value)+'</div>' +
+                 '<div class="line">'+esc(row.line)+'</div></div>';
+        }).join("") +
+        '<div class="res">' + c.resonance.map(function(x){
+          return '<div class="line '+esc(x.verdict)+'"><span class="v">'+esc(x.verdict)+'</span><br>'+esc(x.line)+'</div>';
+        }).join("") + '</div>' +
+        '<div class="crown"><div class="lbl">The Name Borne</div>' +
+          '<div class="name">'+esc(a.name)+'</div>' +
+          '<div class="deriv">'+esc(c.derivation)+'</div></div>' +
+        '<div class="seal">'+esc(c.seal)+'</div>' +
+      '</div>';
+    }).join("");
+    document.getElementById("out").innerHTML = html;
+  }).catch(function(e){ document.getElementById("out").innerHTML = '<p class="warn">'+e+'</p>'; });
+})();
+</script>
+</body>
+</html>

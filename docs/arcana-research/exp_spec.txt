@@ -1,0 +1,134 @@
+Confirmed both flagged data dependencies. The Chinese fixed element lives inside each entry's `tag` string (e.g. `"...· Fixed element: Water"`) — parseable, so the Wu Xing diagram has its data. Per-entry codex fields are exactly `{name, tag, keywords, meaning, reversed}`; all new interpretive material joins from the KB bank by `(system, name)`. Canon hexes in DESIGN_TOKENS.md match the JSON. Here is the synthesized build spec.
+
+---
+
+# BLUE ROOM — ARCANA RECORD PAGE, UNIFIED BUILD SPEC v1
+
+The one lead decision that reconciles the three sub-systems: **there is exactly one non-gold, non-ember accent surface on the page, and it lands on the What-it-turns-on line.** That single move satisfies both the colour sub-system ("one tint, one surface, one instance, never text") and the section sub-system ("give What-it-turns-on the page's one sanctioned accent"). They are not two accent lanes — they are the same surface. Everything below holds to that.
+
+---
+
+## 1. FINAL ORDERED SECTION LIST (meaning-first, history-last)
+
+Order is fixed for all systems; identity-only sections are cleanly **omitted** (not stubbed) for symbolic systems. `codex` = `codex-data.json` entry; `KB` = arcana knowledge-bank entry (BR-ARCANA-KB-SCHEMA.md).
+
+**TIER 1 — MEANING** (always open)
+
+| # | Section | Source field(s) | Systems |
+|---|---------|-----------------|---------|
+| 1 | **Masthead** — name, glyph, kicker; factbar row; keyword chips; `meaning` demoted to a collapsed "standing gloss" toggle | `codex.name`, `codex.tag` → factbar, `codex.keywords` → chips, `KB.glyph`, `KB.factbar[]`, `codex.meaning` → standing-gloss toggle | all 7 |
+| 2 | **Soul-Signature Bloom** (SVG crest, replaces a portrait) | derived: first 9 bits of `SHA-1(codex.name, UTF-8)`, row-major | all 7 |
+| 3 | **GPT Hero image** (one raster, the only sanctioned raster zone) | external asset keyed `(system, name)`; brief in §3 | all 7 |
+| 4 | **Essence** (cold-open, 2–4 sentences) | `KB.sections.cold_open` | all 7 |
+| 5 | **Gifts** (archetype properties, prose paragraph — never a checklist) | `codex.keywords` + affirmative clauses of `codex.meaning`, voiced flat; enriched by `KB.sections.symbolism` | all 7 |
+| 6 | **Hardships** (same voice, paired immediately under Gifts) | shadow clause of `codex.meaning` + `codex.reversed` | all 7 |
+| 7 | **What-it-turns-on** (one pull-quoted mechanism line — **the page's one accent surface**) | `KB.hooks[0]` (the primary swap-tested claim) | all 7 |
+
+**TIER 1 STRUCTURAL DIAGRAM** (system-native, sits directly after What-it-turns-on — this is the "why," so it is meaning, not decoration)
+
+| # | Section | Source field(s) | Systems |
+|---|---------|-----------------|---------|
+| 8a | **Elemental Cycle** (Wu Xing ring + ke-star) | fixed element parsed from `codex.tag` (`Fixed element: X`) | chinese_zodiac only |
+| 8b | **Decan Strip** (3 Chaldean decans) | `KB.ext_sun.decan_rulers[3]` | western_sun_signs only |
+| — | (symbolic + numerology systems: no mid-page structural diagram; the Bloom is their crest) | — | — |
+
+**TIER 2 — RELATIONSHIPS** (identity systems only; whole tier omitted for symbolic)
+
+| # | Section | Source field(s) | Systems |
+|---|---------|-----------------|---------|
+| 9 | **Friendships** (platonic register) | `KB.crosslinks[]` filtered `relation`≈social + new bank copy | identity only |
+| 10 | **In-love** (romantic register) | `KB.crosslinks[]` + new bank copy | identity only |
+| 11 | **Compatibility** (paired-archetype, framed "reads well against," never scored) + existing **Compatibility wheel** graph | `KB.crosslinks[]`, existing compatibility graph data | identity only |
+
+**TIER 3 — DEPTH** (heading + first line visible, one-tap expand)
+
+| # | Section | Source field(s) | Systems |
+|---|---------|-----------------|---------|
+| 12 | **Correspondences** (tier-chipped grid, every cell attestation-stamped) | `KB.correspondences[]` (each carries own `tier`) | all 7 |
+| 13 | **Deeper-hooks** (the anti-template unique-fact block; keep separate render target) | `KB.hooks[]` (all except the one promoted to §7) | all 7 |
+
+**TIER 3 MECHANISM DIAGRAM** (provenance-flavoured, so it sits late, right before history)
+
+| # | Section | Source field(s) | Systems |
+|---|---------|-----------------|---------|
+| 14 | **Numerology Reduction Geometry** (stepped digit-sum descent; fork/notch at 11/22/33) | derived reduction path + `KB.ext_numerology.master_number` | numerology only |
+
+**TIER 4 — HISTORY** (collapsed by default, payload-labeled, true end of page)
+
+| # | Section | Source field(s) | Systems |
+|---|---------|-----------------|---------|
+| 15 | **Variations** (named textual/cultural divergences — open on a concrete fact) | `KB.ext.naming_history` / `regional_variants` / `rune_poems` / `thoth_variant` | all 7 |
+| 16 | **Origin** (dated provenance ledger — absorbs old "Attributions" via per-layer tier stamps) | `KB.provenance.one_line` + `KB.provenance.layers[]` | all 7 |
+| 17 | **Contested** (dated dispute, no verdict; absent block is itself information) | `KB.contested[]` | all 7 |
+| 18 | **Sources** footer (true terminus, no summary after) | `KB.sources[]` | all 7 |
+
+**Killed as standalone sections** (per section sub-system, do not re-add): "The-reading (codex)" → masthead standing-gloss toggle; "At-a-glance" → masthead factbar component; "Attributions" → folded into Origin's per-layer tier stamps + Sources footer.
+
+**Content boundary rule** (prevents Variations/Origin duplication): Variations = *named* textual/cultural divergences; Origin = *dated* chronological ledger. Never restate `codex.meaning` in body copy — it appears once, in the masthead toggle.
+
+---
+
+## 2. COLOUR SYSTEM — exact element→hex map, one surface, one rule
+
+**THE ONE RULE:** One element-tint, one surface, one instance per page, **never on text**. The single tinted surface is a **2px left hairline rule (with an optional 4px dot terminal) on the What-it-turns-on block (§7)** — and nowhere else. It marks *where* the tradition's material sits, never *how good* the result is: no grade, no rank, no legend/key that teaches a colour-code. Gold stays currency (crown + slot labels + focus only); Ember keeps its one role (reversed-read + clash marks); the element-tint is a quiet third register, only ever one at a time.
+
+**Base + canon (locked, DESIGN_TOKENS.md):**
+- Ground `#0a0b0d` (`--ink-950`) · Text ramp `#e9e5dc / #d7d3ca / #b1ada4 / #948f87 / #6e6b63`
+- Gold `#c9a35c` base, `#e2c489` bright · Ember `#b25f39` (reversed/clash only, never in a diagram file)
+
+**Element→hex map** (all at or below gold's ~57% lightness, below ember's saturation):
+
+| Element | Hex | Applies to |
+|---|---|---|
+| Fire (Western + Chinese, shared) | `#9c5a34` | Aries/Leo/Sagittarius; Snake, Horse |
+| Earth (Western) | `#6f6a42` | Taurus/Virgo/Capricorn |
+| Air (Western) | `#6d8791` | Gemini/Libra/Aquarius |
+| Water (Western) | `#3e5f73` | Cancer/Scorpio/Pisces |
+| Wood (Chinese) | `#4c6f52` | Tiger, Rabbit |
+| Earth (Chinese) | `#7a6234` | Ox, Dragon, Goat, Dog |
+| Metal (Chinese) | `#7f8790` | Monkey, Rooster |
+| Water (Chinese) | `#33495a` | Rat, Pig |
+
+**Fallback:** systems the tradition assigns **no** classical element — **numerology** and **runes** — get **no tint**; their What-it-turns-on line takes a **gold** hairline (`#c9a35c`) instead, since gold is already sanctioned for focus. **Tarot** uses its Golden-Dawn element (`KB.ext_tarot.golden_dawn.element` → Western Fire/Earth/Air/Water hex, attributed as revival). **Trigrams / hexagrams** use `KB.ext.*.five_element` → the Chinese five-hex map. Result: the tint appears only where an element is genuinely attested; honesty preserved.
+
+**Hover micro-tint:** the one interactive tinted instance (the What-it-turns-on hairline, or a compatibility chip in Tier 2) may lift **+6–8% lightness on the same hue** on hover, reverting fully on blur. No new hue, never on prose or resting surfaces.
+
+**Forbidden:** tint on body/prose, on Gifts/Hardships copy, on the card's own material (gold/copper/frost), on buttons/CTAs, on titles, on more than one surface, or two elements visible together.
+
+---
+
+## 3. VISUAL / GRAPH ADDITIONS — placement + GPT brief
+
+All inline SVG on `#0a0b0d`, `currentColor`-driven, 2px stroke / 8px clear margin to rhyme with the 154 sealed marks. **Gold only on the one highlighted/terminal node; ember never in any diagram file.** Placements above; drawing specs:
+
+1. **Soul-Signature Bloom** (§2, under title — highest leverage, all 7 systems, zero new data). viewBox ~200×200, center ghost-grey disc, 9 spokes at 40°, terminal filled disc (bit=1) / open ring (bit=0) in the mark's row-major order. Gold permitted here because the *page container* supplies colour (`currentColor`) — it must be page-tinted, not a baked coloured file (or it violates §4 of the marks brief).
+2. **GPT Hero** (§3) — one raster per result, the only raster zone.
+3. **Elemental Cycle** (§8a, chinese) — viewBox ~200×200, 5 nodes at 72°, generative outer arcs (warm-grey, gold only on the two arcs touching the entry's fixed-element node), ke-cycle inner pentagon in thin dashed warm-grey. Caption: "The tradition places the [Animal] under [Element], which feeds [X] and is checked by [Y]."
+4. **Decan Strip** (§8b, western) — horizontal strip viewBox ~300×60, 3 equal 10° segments split by 1px hairlines, each holding its Chaldean ruling-planet glyph in ghost-grey; gold only on frame/segment labels. All three shown neutral (app knows Sun sign only) — no scoring, no bars.
+5. **Numerology Reduction Geometry** (§14) — vertical stepped descent, ~24px circles at 96px scale, single hairline connector, gold on the terminal circle only; explicit fork/notch at 11/22/33.
+6. **Compatibility wheel** (§11) — existing graph, unchanged.
+
+**GPT hero art-brief template** (one paragraph, fill brackets per entry):
+
+> Render a single symbolic motif for **[ENTRY NAME]**, the **[SYSTEM]** archetype — not a portrait, not a scene, not a mascot, and no human figure anywhere in frame: a real object or natural form the tradition itself associates with **[ENTRY]**, photographed as if it were a recovered museum specimen at night. Ground: near-black fading to warm archive grey (#0a0b0d to #b1ada4, no pure black or white). One low raking light source; camera-real texture — grain, wear, imperfection — never flat vector, never cartoon, never glowing or mythic. No gold and no bright colour baked into the image (gold is spent by the page chrome around it, never inside the art); no text, no border, no vignette, no lens flare. Subject fills ~55–65% of frame, centered or slightly off-center, mood reverent-clinical like an object under glass — never heroic, cute, or triumphant. *Example fills:* Aries → a cracked ram's horn on a velvet specimen block; the Snake → a single shed snakeskin coiled on cold stone.
+
+**Budget flag (open, not a design call):** 154 unique heroes vs. 7 generic per-system heroes. If unfunded, fall back to 7 (one look per system) — do not mix raster and vector inconsistently. Use prototype-then-batch: draw one, lock the look, batch by system.
+
+---
+
+## 4. IDENTITY vs SYMBOLIC APPLICABILITY
+
+**Identity systems** — `western_sun_signs`, `chinese_zodiac`, `numerology` — render the **full page** including Tier 2 (Friendships / In-love / Compatibility + wheel).
+
+**Symbolic systems** — `tarot_major`, `runes_elder_futhark`, `trigrams`, `hexagrams` — render everything **except Tier 2**, which is a clean per-system skip (zero width, no "N/A" stub — an empty Compatibility accordion on The Tower reads as a bug).
+
+**Per-system visual eligibility:** Bloom + Hero + all narrative tiers = all 7. Elemental Cycle = chinese only. Decan Strip = western only. Reduction Geometry = numerology only. Element-tint surface = western/chinese (native), tarot (Golden-Dawn, attributed), trigram/hexagram (five_element); numerology + runes fall back to gold.
+
+---
+
+## Two flags for implementation
+
+1. **Tier 2 content gap:** the KB schema has no dedicated Friendships/In-love copy fields — it carries `crosslinks[]` (typed edges) only. Those three sections need either a new bank field or generation from crosslinks; do not ship them off `codex.meaning`. Flagged as a content-bank task, not a layout blocker.
+2. **Bloom colour discipline:** the Bloom is the one place gold is allowed on a mark-derived graphic, but only via page-supplied `currentColor` (marks-brief §4). If built as a separate baked coloured SVG it fails review.
+
+Canon docs verified: `DESIGN_TOKENS.md` (hex + "accent is currency" lock), `BR-ARCANA-KB-SCHEMA.md` (source fields, `(system,name)` join, sections skeleton), `codex-data.json` (per-entry fields + Chinese element in `tag`).

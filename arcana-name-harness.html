@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Arcana Name Engine — harness</title>
+<style>
+  body { background:#0a0b0d; color:#d7d3ca; font-family:"IBM Plex Mono",Consolas,monospace; font-size:12px; padding:24px; }
+  h1 { font-family:"Cormorant Garamond",serif; color:#e9e5dc; font-weight:400; font-size:22px; margin:0 0 4px; }
+  .sum { color:#948f87; margin:0 0 18px; line-height:1.7; }
+  .sum b { color:#e2c489; }
+  table { border-collapse:collapse; width:100%; }
+  th,td { text-align:left; padding:6px 10px; border-bottom:1px solid #232320; vertical-align:top; }
+  th { color:#6e6b63; text-transform:uppercase; letter-spacing:.16em; font-size:9px; }
+  .name { color:#e2c489; font-family:"Cormorant Garamond",serif; font-size:17px; }
+  .in { color:#6e6b63; font-size:10px; }
+  .CONFIRM { color:#8fb08a; } .HOLD { color:#b25f39; } .QUIET { color:#6e6b63; }
+  .dupe { color:#b25f39; font-weight:700; }
+</style>
+</head>
+<body>
+<h1>Arcana Name Engine — output sweep</h1>
+<p class="sum" id="sum">loading codex…</p>
+<table><thead><tr>
+  <th>#</th><th>name</th><th>inputs</th><th>resonance</th><th>tension</th><th>lexicon</th>
+</tr></thead><tbody id="rows"></tbody></table>
+
+<script src="arcana-name-engine.js"></script>
+<script>
+(function () {
+  var N = 60; // sweep size
+  fetch("codex-data.json").then(function (r) { return r.json(); }).then(function (codex) {
+    var by = window.BRArcanaName.indexCodex(codex);
+    var missing = ["sun","chinese","lifePath","tarotMajor","rune","trigram"].filter(function(k){ return !by[k] || !by[k].length; });
+    if (missing.length) { document.getElementById("sum").textContent = "MISSING SYSTEMS: " + missing.join(", "); return; }
+
+    var out = [], names = {}, verdicts = { CONFIRM:0, HOLD:0, QUIET:0 }, tense = 0;
+    for (var i = 0; i < N; i++) {
+      var seed = "sweep-" + i;
+      var r = {
+        /* strides chosen coprime to each list length so every sweep walks the
+           WHOLE system, not a short sub-cycle (an 11-stride over 22 majors
+           only ever surfaces 2 cards) */
+        sun:        by.sun[i % by.sun.length],
+        chinese:    by.chinese[(i * 5 + 3) % by.chinese.length],
+        lifePath:   by.lifePath[(i * 7 + 1) % by.lifePath.length],
+        tarotMajor: by.tarotMajor[(i * 9 + 2) % by.tarotMajor.length],
+        rune:       by.rune[(i * 11 + 5) % by.rune.length],
+        trigram:    by.trigram[(i * 3 + 1) % by.trigram.length]
+      };
+      var a;
+      try { a = window.BRArcanaName.assemble(r); }
+      catch (e) { out.push({ err: String(e), i: i }); continue; }
+      names[a.name] = (names[a.name] || 0) + 1;
+      a.resonance.forEach(function (x) { verdicts[x.verdict]++; });
+      if (a.tension.present) tense++;
+      out.push({ i: i, r: r, a: a });
+    }
+
+    var uniq = Object.keys(names).length;
+    var dupes = Object.keys(names).filter(function (k) { return names[k] > 1; });
+    document.getElementById("sum").innerHTML =
+      "swept <b>" + N + "</b> reading-sets · unique names <b>" + uniq + "</b> (" + Math.round(uniq/N*100) + "%) · " +
+      "repeated names <b>" + dupes.length + "</b> · " +
+      "resonance CONFIRM <b>" + verdicts.CONFIRM + "</b> / HOLD <b>" + verdicts.HOLD + "</b> / QUIET <b>" + verdicts.QUIET + "</b> · " +
+      "sets with a genuine tension beat <b>" + tense + "</b> (" + Math.round(tense/N*100) + "%)" +
+      (dupes.length ? "<br>repeats: " + dupes.slice(0,8).join(" · ") : "");
+
+    var tb = document.getElementById("rows");
+    tb.innerHTML = out.map(function (o) {
+      if (o.err) return "<tr><td>" + o.i + "</td><td colspan='5' class='HOLD'>" + o.err + "</td></tr>";
+      var a = o.a, r = o.r;
+      var res = a.resonance.map(function (x) {
+        return "<span class='" + x.verdict + "'>" + x.verdict + "</span> <span class='in'>" + x.note + "</span>";
+      }).join("<br>");
+      var ins = [r.sun.name, r.chinese.name, "LP " + r.lifePath.name, r.tarotMajor.name, r.rune.name, r.trigram.name].join(" · ");
+      return "<tr><td>" + o.i + "</td>" +
+        "<td><span class='name " + (names[a.name] > 1 ? "dupe" : "") + "'>" + a.name + "</span>" +
+          "<div class='in'>" + a.subtitle + "</div></td>" +
+        "<td class='in'>" + ins + "</td>" +
+        "<td>" + res + "</td>" +
+        "<td class='in'>" + (a.tension.present ? "<span class='HOLD'>YES</span> " + a.tension.line : "—") + "</td>" +
+        "<td class='in'>" + a.lexicon + "</td></tr>";
+    }).join("");
+  }).catch(function (e) { document.getElementById("sum").textContent = "load error: " + e; });
+})();
+</script>
+</body>
+</html>
