@@ -340,8 +340,9 @@
       '<div class="acc__close"><a href="#/">← '+(filed?"Back to the reading":"The reading")+'</a></div></section>';
   }
 
-  // router
-  var curSeed="birth~Antton Aikio~2001~4~9",n=0;
+  // router — the reading comes from ?seed= (the intake builds "birth~name~y~m~d");
+  // with no seed it opens the reference reading (Antton Aikio, 9 April 2001).
+  var curSeed=(function(){try{return new URLSearchParams(location.search).get("seed")||""}catch(e){return ""}})()||"birth~Antton Aikio~2001~4~9",n=0;
   function route(){
     var h=location.hash.replace(/^#/,""),m=h.match(/^\/e\/([^\/]+)\/([^\/]+)(?:\/([^\/]+))?$/),app=document.getElementById("app");
     if(m){app.innerHTML=renderEntry(m[1],decodeURIComponent(m[2]),m[3]?decodeURIComponent(m[3]):null);document.getElementById("bar").style.width="0";window.scrollTo(0,0);return}

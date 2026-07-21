@@ -176,6 +176,27 @@
   /* ---------------------------------------------------------------
      THE INTAKE — "The Setting of Marks"
   --------------------------------------------------------------- */
+
+  /* Parse the free-text "day" mark (birth date) → {y,m,d}. The prompt order is
+     day-month-year, so ambiguous numeric dates read as D M Y. ISO (YYYY-MM-DD)
+     and month names are handled. Returns null if a full date can't be read —
+     the reading then degrades to a name-seeded draw rather than defaulting. */
+  function parseBirth(txt) {
+    txt = String(txt || "").trim();
+    if (!txt) return null;
+    var MO = { jan:1, feb:2, mar:3, apr:4, may:5, jun:6, jul:7, aug:8, sep:9, oct:10, nov:11, dec:12 };
+    function ok(y, m, d) { return (y && m >= 1 && m <= 12 && d >= 1 && d <= 31) ? { y: y, m: m, d: d } : null; }
+    var iso = txt.match(/\b(1[89]\d\d|20\d\d)[-\/.](\d{1,2})[-\/.](\d{1,2})\b/);
+    if (iso) return ok(+iso[1], +iso[2], +iso[3]);
+    var year = null, ym = txt.match(/\b(1[89]\d\d|20\d\d)\b/); if (ym) year = +ym[1];
+    var month = null, mm = txt.toLowerCase().match(/(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)/); if (mm) month = MO[mm[1]];
+    var nums = (txt.match(/\d+/g) || []).map(Number).filter(function (n) { return n !== year; });
+    var day = null;
+    if (month) day = nums.filter(function (n) { return n >= 1 && n <= 31; })[0] || null;
+    else if (nums.length >= 2) { day = nums[0]; month = nums[1]; }   // day-month order
+    return ok(year, month, day);
+  }
+
   var DEFS = [
     { key: "name",   label: "The name borne",            ph: "the name you answer to" },
     { key: "day",    label: "The day first counted",     ph: "the day, the month, the year" },
@@ -826,8 +847,18 @@
         return;
       }
       notice.textContent = "";
-      var nameVal = "";
-      inputs.forEach(function (i) { if (i.dataset.mark === "name") nameVal = i.value; });
+      var nameVal = "", dayVal = "";
+      inputs.forEach(function (i) {
+        if (i.dataset.mark === "name") nameVal = i.value;
+        if (i.dataset.mark === "day") dayVal = i.value;
+      });
+      // Build the reading's seed FROM THE MARKS: a real birth date derives the
+      // reading (sun sign / year animal / life path); otherwise a name-seeded draw
+      // so a reading still lands. The reading (arcana-reading.js) reads ?seed=.
+      var nm = (nameVal || "Seeker").replace(/~/g, " ").trim() || "Seeker";
+      var b = parseBirth(dayVal);
+      var seed = b ? ("birth~" + nm + "~" + b.y + "~" + b.m + "~" + b.d) : ("draw~" + nm + "~" + totalChars());
+      var enterReading = function () { location.href = "?dev=arcana-reading&seed=" + encodeURIComponent(seed); };
       if (ceremony && ceremony.destroy) ceremony.destroy();
       ceremonyHost.hidden = false;
       // BR-S164: "Draw the reading" now opens the redesigned ceremony (ceremony.js,
@@ -835,7 +866,7 @@
       // crown forged over 5 hits. Back → the marks; "Enter the reading" → the result.
       // Falls back to the original inline ForgeCeremony if ceremony.js didn't load.
       if (window.BRCeremony && typeof window.BRCeremony.mount === "function") {
-        ceremony = window.BRCeremony.mount(ceremonyHost, { onExit: exitCeremony, onDone: function () { location.href = "?dev=arcana-reading"; } });
+        ceremony = window.BRCeremony.mount(ceremonyHost, { onExit: exitCeremony, onDone: enterReading });
       } else {
         ceremony = ForgeCeremony(ceremonyHost, nameVal, MATERIAL, exitCeremony);
       }

@@ -2083,9 +2083,9 @@ function mountDev() {
     return;
   }
   if (state.dev === "arcana-reading") {
-    // The Arcana Reading — the illuminated dossier, crowned by a reliquary.
-    // In arcana-reading.js (window.BRArcanaReading) + arcana-name-engine.js;
-    // this branch hands it the node. ?seed= redraws the fixture reading set.
+    // The Arcana Reading — the full reading + per-draw record pages. Self-contained
+    // in arcana-reading.js (window.BRArcanaReading); this branch hands it the node.
+    // ?seed=birth~name~y~m~d builds the reading; no seed = the reference reading.
     const host = document.getElementById("devView");
     if (window.BRArcanaReading && typeof window.BRArcanaReading.mount === "function") window.BRArcanaReading.mount(host);
     else host.innerHTML = '<p style="padding:48px;color:#948f87;text-align:center;font-family:sans-serif">The reading failed to load (arcana-reading.js).</p>';
