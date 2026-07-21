@@ -835,7 +835,7 @@
       // crown forged over 5 hits. Back → the marks; "Enter the reading" → the result.
       // Falls back to the original inline ForgeCeremony if ceremony.js didn't load.
       if (window.BRCeremony && typeof window.BRCeremony.mount === "function") {
-        ceremony = window.BRCeremony.mount(ceremonyHost, { onExit: exitCeremony, onDone: function () { location.href = "?dev=arcana-result"; } });
+        ceremony = window.BRCeremony.mount(ceremonyHost, { onExit: exitCeremony, onDone: function () { location.href = "?dev=arcana-reading"; } });
       } else {
         ceremony = ForgeCeremony(ceremonyHost, nameVal, MATERIAL, exitCeremony);
       }

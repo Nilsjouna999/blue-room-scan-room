@@ -202,7 +202,7 @@
     function start() { stop(); setDone(false); var f = 0; renderFrame(0); iv = setInterval(function () { f++; renderFrame(f); if (f >= TOTAL) { stop(); setDone(true); } }, TICK_MS); }
     function jumpToEnd() { stop(); renderFrame(TOTAL); setDone(true); }
     function onKey(e) { if (e.key === "Escape") { done ? proceed() : jumpToEnd(); } }
-    function proceed() { if (opts.onDone) opts.onDone(); else location.href = "?dev=arcana-result"; }
+    function proceed() { if (opts.onDone) opts.onDone(); else location.href = "?dev=arcana-reading"; }
 
     if (skipEl) skipEl.addEventListener("click", jumpToEnd);
     var againEl = q("[data-cer-again]"), goEl = q("[data-cer-go]"), backEl = q(".cer-btn--back");
