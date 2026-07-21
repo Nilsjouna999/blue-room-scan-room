@@ -91,7 +91,7 @@ const state ={ source: 0, treatment: "free", tab: "diagram", view: "menu", draft
      uploaded-blocked renders a validated DEV fixture, never a user scan.
      free-scan-sim = Free Pull mock · halo-gate = sealed card-back mock. */
   const dev = q.get("dev");
-  if (["uploaded-result", "uploaded-blocked", "free-scan-sim", "halo-gate", "before-after", "review-map", "proto-cards", "staged-reveal", "menu-reveal", "vault", "arcane", "arcana-result", "ceremony"].includes(dev)) { state.view = "dev"; state.dev = dev; }
+  if (["uploaded-result", "uploaded-blocked", "free-scan-sim", "halo-gate", "before-after", "review-map", "proto-cards", "staged-reveal", "menu-reveal", "vault", "arcane", "arcana-result", "arcana-reading", "profile", "ceremony"].includes(dev)) { state.view = "dev"; state.dev = dev; }
   else if (q.has("src") || q.has("t") || q.has("tab")) state.view = "room";
 }
 
@@ -2087,6 +2087,24 @@ function mountDev() {
     const host = document.getElementById("devView");
     if (window.BRArcanaResult && typeof window.BRArcanaResult.mount === "function") window.BRArcanaResult.mount(host);
     else host.innerHTML = '<p style="padding:48px;color:#948f87;text-align:center;font-family:sans-serif">The result room failed to load (arcana-result.js).</p>';
+    return;
+  }
+  if (state.dev === "arcana-reading") {
+    // The Arcana Reading — the illuminated dossier, crowned by a reliquary.
+    // In arcana-reading.js (window.BRArcanaReading) + arcana-name-engine.js;
+    // this branch hands it the node. ?seed= redraws the fixture reading set.
+    const host = document.getElementById("devView");
+    if (window.BRArcanaReading && typeof window.BRArcanaReading.mount === "function") window.BRArcanaReading.mount(host);
+    else host.innerHTML = '<p style="padding:48px;color:#948f87;text-align:center;font-family:sans-serif">The reading failed to load (arcana-reading.js).</p>';
+    return;
+  }
+  if (state.dev === "profile") {
+    // The Profile / Hub — the seeker's home: crown, vault, people, doors out.
+    // In arcana-profile.js (window.BRArcanaProfile); this branch hands it the node.
+    // Static design surface — mock data, mocked commerce (no backend/payment).
+    const host = document.getElementById("devView");
+    if (window.BRArcanaProfile && typeof window.BRArcanaProfile.mount === "function") window.BRArcanaProfile.mount(host);
+    else host.innerHTML = '<p style="padding:48px;color:#948f87;text-align:center;font-family:sans-serif">The profile failed to load (arcana-profile.js).</p>';
     return;
   }
   if (state.dev === "ceremony") {

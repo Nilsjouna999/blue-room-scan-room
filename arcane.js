@@ -184,6 +184,30 @@
     { key: "matter", label: "What is brought",           ph: "the matter you carry, in a line — or leave it unspoken" },
   ];
 
+  // WHO the reading is drawn for (mock — self + family/friend crowns + someone new).
+  // The profile hands us ?for=…&subject=… to pre-select; the choice is captured
+  // for the draw so the crown lands on the right head.
+  var WHOFOR = [
+    { id: "self",    label: "Myself",      kind: "self" },
+    { id: "mother",  label: "Mother",      kind: "crown",  crown: "The Deep-Rooted Keeper" },
+    { id: "brother", label: "Brother",     kind: "crown",  crown: "The Quick-Kindled Scout" },
+    { id: "ingrid",  label: "Ingrid",      kind: "friend", crown: "The Deep-Tided Weaver" },
+    { id: "new",     label: "Someone new", kind: "new" },
+  ];
+  function forwhomHTML() {
+    var chips = WHOFOR.map(function (w, i) {
+      return '<button type="button" class="ac-forwhom__chip' + (w.kind === "new" ? " ac-forwhom__chip--new" : "") + '"' +
+        ' role="radio" aria-checked="' + (i === 0 ? "true" : "false") + '" data-forwhom="' + w.id + '">' +
+        '<span class="ac-forwhom__who">' + esc(w.label) + "</span>" +
+        (w.crown ? '<span class="ac-forwhom__crown">' + esc(w.crown) + "</span>" : "") +
+        "</button>";
+    }).join("");
+    return '<div class="ac-forwhom" data-ac-forwhom>' +
+      '<span class="ac-forwhom__label">For whom is this drawn?</span>' +
+      '<div class="ac-forwhom__opts" role="radiogroup" aria-label="For whom is this drawn?">' + chips + "</div>" +
+      "</div>";
+  }
+
   function intakeHTML() {
     var fields = DEFS.map(function (d) {
       return '<label class="ac-mark">' +
@@ -200,10 +224,14 @@
             '<h1 class="ac-title">The Setting of Marks</h1>' +
             '<p class="ac-sub">Before the reading is drawn, lay down what it is drawn from.</p>' +
           "</div>" +
+          forwhomHTML() +
+          '<div class="ac-redraw-banner" data-ac-redraw hidden></div>' +
           '<div class="ac-marks">' + fields + "</div>" +
           '<div class="ac-rule"></div>' +
           '<div class="ac-cta">' +
-            '<button type="button" class="ac-draw" data-ac-draw>Draw the reading</button>' +
+            '<button type="button" class="ac-draw" data-ac-draw>' +
+              '<span data-ac-draw-label>Draw the reading</span> <span class="ac-draw__price">$4.99</span>' +
+            "</button>" +
             '<p class="ac-hope">Each mark, once set, is hope.</p>' +
             '<p class="ac-notice" data-ac-notice></p>' +
           "</div>" +
@@ -749,6 +777,36 @@
     var drawBtn = root.querySelector("[data-ac-draw]");
     var ceremonyHost = root.querySelector("[data-ac-ceremony]");
     var noticeT = null, ceremony = null;
+
+    // ---- who is it for? (§ from the profile hand-off) ----
+    var params = {};
+    try { new URLSearchParams(location.search).forEach(function (v, k) { params[k] = v; }); } catch (e) {}
+    var chips = slice(root.querySelectorAll("[data-forwhom]"));
+    var forWhom = "self";
+    function setForWhom(id) {
+      forWhom = id;
+      chips.forEach(function (c) { c.setAttribute("aria-checked", String(c.getAttribute("data-forwhom") === id)); });
+    }
+    chips.forEach(function (c) { c.addEventListener("click", function () { setForWhom(c.getAttribute("data-forwhom")); }); });
+    // pre-select from the profile's redirect (?for=self|other&subject=…)
+    var wantId = "self";
+    if (params["for"] === "other") {
+      var subj = String(params.subject || "").toLowerCase();
+      var match = WHOFOR.filter(function (w) { return w.id === subj || String(w.label).toLowerCase() === subj; })[0];
+      wantId = match ? match.id : "new";
+    }
+    setForWhom(wantId);
+    // redraw context — the original crown is RIPPED when this is drawn
+    var redrawBanner = root.querySelector("[data-ac-redraw]");
+    var drawLabel = root.querySelector("[data-ac-draw-label]");
+    if (params.redraw === "1" || params.intent === "redraw") {
+      var w = WHOFOR.filter(function (x) { return x.id === wantId; })[0];
+      var subjName = (w && w.crown) ? w.crown : (wantId === "self" ? "your crown" : "this crown");
+      redrawBanner.hidden = false;
+      redrawBanner.innerHTML = '<span class="ac-redraw-banner__mark" aria-hidden="true">&#10022;</span> Enriching ' +
+        esc(subjName) + " — a new reading is drawn and its rubies are added to the crown. The original is kept, never lost.";
+      if (drawLabel) drawLabel.textContent = "Draw the richer reading";
+    }
 
     function totalChars() { var c = 0; inputs.forEach(function (i) { c += (i.value || "").length; }); return c; }
     function progress() { return Math.min(1, totalChars() / Math.max(8, COMPLETION_CHARS)); }

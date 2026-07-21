@@ -1,0 +1,111 @@
+/* =============================================================
+   THE ARCANA READING — the page the seeker actually reads.
+
+   Each of the twelve draws is revealed with its real codex entry:
+   the name, its metadata line, its keywords, and its meaning. The
+   content is the reading; the design's whole job is to make a long
+   read feel unhurried, ordered, and worth finishing.
+
+   Room / Plate / Artifact canon: the page is the dark Room, each
+   reading is a flat Plate, and the crown is the one Artifact.
+   Gold is currency — the crown and the active reading only.
+============================================================= */
+
+.arc {
+  --ar-gold: #c9a35c;
+  --ar-gold-bright: #e2c489;
+  --ar-ember: #b25f39;
+  --ar-cream: #ece7dc;
+  --ar-room: #0a0b0d;
+  --ar-line: rgba(201, 163, 92, 0.14);
+  --ar-line-soft: rgba(201, 163, 92, 0.07);
+
+  position: fixed; inset: 0; z-index: 30;
+  overflow-y: auto; overflow-x: hidden;
+  background:
+    radial-gradient(120% 70% at 50% 0%, #14110c 0%, #0a0b0d 55%, #070607 100%);
+  color: var(--t-body, #b1ada4);
+  font-family: var(--font-ui, Inter, sans-serif);
+  scroll-behavior: smooth;
+}
+
+/* ---------- masthead ---------- */
+.arc-top {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 18px clamp(18px, 4vw, 46px);
+  font-family: var(--font-mono, monospace); font-size: 9.5px;
+  letter-spacing: 0.22em; text-transform: uppercase; color: var(--t-ghost, #6e6b63);
+  position: sticky; top: 0; z-index: 12;
+  background: linear-gradient(to bottom, rgba(10,11,13,.96), rgba(10,11,13,0));
+}
+.arc-top button { background: none; border: 0; cursor: pointer; color: inherit; font: inherit; letter-spacing: inherit; }
+.arc-top button:hover { color: var(--ar-cream); }
+.arc-progress { flex: 1; height: 1px; margin: 0 22px; background: var(--ar-line-soft); position: relative; }
+.arc-progress i { position: absolute; inset: 0 auto 0 0; width: 0%; background: var(--ar-gold); transition: width .25s linear; }
+
+/* ---------- the crown, at the head of the record ---------- */
+.arc-crown-head { text-align: center; padding: clamp(30px, 7vh, 74px) 20px clamp(26px, 5vh, 52px); }
+.arc-crown-head svg { width: 62px; height: auto; color: var(--ar-gold); display: block; margin: 0 auto 18px;
+  filter: drop-shadow(0 8px 22px rgba(201,163,92,.20)) drop-shadow(0 0 10px rgba(201,163,92,.24)); }
+.arc-kicker { font-family: var(--font-mono, monospace); font-size: 9px; letter-spacing: 0.28em;
+  text-transform: uppercase; color: var(--t-ghost, #6e6b63); }
+.arc-name { font-family: var(--font-display, serif); font-weight: 500;
+  font-size: clamp(30px, 4.6vw, 46px); line-height: 1.08; color: var(--ar-cream); margin: 9px 0 0; }
+.arc-sub { font-family: var(--font-display, serif); font-style: italic; font-size: 15px;
+  color: var(--t-meta, #948f87); margin: 12px 0 0; }
+
+/* ---------- chapters ---------- */
+.arc-col { width: min(700px, 90vw); margin: 0 auto; padding-bottom: 22vh; }
+.arc-chapter { margin: clamp(40px, 8vh, 84px) 0 0; }
+.arc-chapter__head {
+  display: flex; align-items: center; gap: 14px;
+  font-family: var(--font-mono, monospace); font-size: 9px; letter-spacing: 0.26em;
+  text-transform: uppercase; color: var(--t-ghost, #6e6b63); margin-bottom: 6px;
+}
+.arc-chapter__head::after { content: ""; flex: 1; height: 1px; background: var(--ar-line-soft); }
+
+/* ---------- one reading ---------- */
+.arc-read {
+  padding: clamp(26px, 4.5vh, 46px) 0;
+  border-bottom: 1px solid var(--ar-line-soft);
+  opacity: 0; transform: translateY(14px);
+  transition: opacity .7s cubic-bezier(.22,1,.36,1), transform .7s cubic-bezier(.22,1,.36,1);
+}
+.arc-read.is-in { opacity: 1; transform: none; }
+.arc-read:last-child { border-bottom: 0; }
+
+.arc-read__slot { font-family: var(--font-mono, monospace); font-size: 9px; letter-spacing: 0.26em;
+  text-transform: uppercase; color: var(--ar-gold); opacity: .75; }
+.arc-read__name { font-family: var(--font-display, serif); font-weight: 500;
+  font-size: clamp(27px, 3.4vw, 37px); line-height: 1.12; color: var(--ar-cream); margin: 7px 0 0; }
+
+/* the codex metadata line — dates, element, modality, ruler */
+.arc-read__tag { font-family: var(--font-mono, monospace); font-size: 10.5px; letter-spacing: .1em;
+  color: var(--t-meta, #948f87); margin: 11px 0 0; line-height: 1.6; }
+
+/* keywords as a quiet rule of small caps, not chips */
+.arc-read__keys { margin: 15px 0 0; font-family: var(--font-ui, sans-serif); font-size: 11px;
+  letter-spacing: .17em; text-transform: uppercase; color: var(--t-meta, #948f87); line-height: 1.9; }
+.arc-read__keys span { color: var(--t-ghost, #6e6b63); margin: 0 7px; }
+
+/* THE READ — the actual thing the seeker is here for. Generous measure. */
+.arc-read__body { font-family: var(--font-display, serif); font-size: 17.5px; line-height: 1.72;
+  color: var(--ar-cream); margin: 18px 0 0; max-width: 62ch; }
+.arc-read__body + .arc-read__body { margin-top: 13px; }
+
+/* the reversed / shadow read, when the entry carries one */
+.arc-read__rev { margin: 16px 0 0; padding-left: 15px; border-left: 2px solid var(--ar-ember);
+  font-family: var(--font-display, serif); font-size: 15.5px; line-height: 1.62;
+  color: var(--t-body, #b1ada4); max-width: 62ch; }
+.arc-read__rev b { display: block; font-family: var(--font-mono, monospace); font-weight: 400;
+  font-size: 8.5px; letter-spacing: .24em; text-transform: uppercase; color: var(--ar-ember); margin-bottom: 6px; }
+
+/* ---------- the close ---------- */
+.arc-seal { text-align: center; margin: clamp(50px, 10vh, 110px) 0 0;
+  font-family: var(--font-mono, monospace); font-size: 9.5px; letter-spacing: .26em;
+  text-transform: uppercase; color: var(--t-ghost, #6e6b63); line-height: 2.2; }
+
+@media (prefers-reduced-motion: reduce) {
+  .arc { scroll-behavior: auto; }
+  .arc-read { opacity: 1; transform: none; transition: none; }
+}
