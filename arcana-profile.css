@@ -88,16 +88,12 @@
 .pf-id__handle { font-family: var(--pf-mono); font-size: 11px; letter-spacing: .14em; color: var(--pf-meta); margin-top: 4px; }
 .pf-id__born { color: var(--pf-ghost); letter-spacing: .1em; }
 
-/* the Crown — placeholder art wrapped as the reading button; centred monument, the most negative space */
-.pf-crownwrap { display: flex; flex-direction: column; align-items: center; text-align: center; margin: clamp(22px, 4.5vh, 44px) auto clamp(8px, 2vh, 16px); }
+/* the Crown — placeholder art wrapped as the reading button; sits above the Rings (no name headline) */
+.pf-crownblock { display: flex; flex-direction: column; align-items: center; text-align: center; margin: clamp(18px, 3.5vh, 34px) auto clamp(4px, 1vh, 10px); }
 .pf-crownbtn { display: flex; flex-direction: column; align-items: center; gap: 8px; background: none; border: 1px solid transparent; border-radius: 12px; padding: 10px 20px; cursor: pointer; transition: border-color .18s, background .18s; }
 .pf-crownbtn:hover, .pf-crownbtn:focus-visible { border-color: var(--pf-line); background: rgba(162,134,74,.035); outline: none; }
-.pf-crown-svg { width: clamp(178px, 32vw, 250px); height: auto; filter: drop-shadow(0 14px 18px rgba(0,0,0,.5)) drop-shadow(0 5px 16px rgba(162,134,74,.14)) drop-shadow(0 0 12px rgba(162,134,74,.10)); }
-.pf-crownbtn:hover .pf-crown-svg { filter: drop-shadow(0 14px 18px rgba(0,0,0,.5)) drop-shadow(0 5px 18px rgba(162,134,74,.2)) drop-shadow(0 0 14px rgba(162,134,74,.16)); }
-.pf-crown-name { font-family: var(--pf-serif); font-weight: 600; font-size: clamp(30px, 4.4vw, 50px); line-height: 1.08; letter-spacing: .008em; color: var(--pf-cream-display); text-wrap: balance; max-width: 15ch; }
-/* the one living element — warm letters with black nitrogen currents whipping inside */
-.pf-nitro { filter: url(#pfNitro); color: var(--pf-crown); }
-@media (prefers-reduced-motion: reduce) { .pf-nitro { filter: none; } }
+.pf-crown-svg { width: clamp(148px, 26vw, 208px); height: auto; filter: drop-shadow(0 12px 16px rgba(0,0,0,.5)) drop-shadow(0 5px 14px rgba(162,134,74,.13)) drop-shadow(0 0 12px rgba(162,134,74,.09)); }
+.pf-crownbtn:hover .pf-crown-svg { filter: drop-shadow(0 12px 16px rgba(0,0,0,.5)) drop-shadow(0 5px 16px rgba(162,134,74,.2)) drop-shadow(0 0 14px rgba(162,134,74,.15)); }
 .pf-crown-empty { width: clamp(160px, 30vw, 210px); aspect-ratio: 1 / .62; display: grid; place-items: center; border: 1px dashed var(--pf-violet-line); border-radius: 4px; color: var(--pf-violet-lit); font-family: var(--pf-mono); font-size: 9px; letter-spacing: .2em; text-transform: uppercase; text-align: center; line-height: 1.9; padding: 12px; }
 /* the reading's spine under the name — the three named draws, in gold */
 .pf-spine { font-family: var(--pf-mono); font-size: 10px; letter-spacing: .2em; text-transform: uppercase; color: var(--pf-gold); opacity: .9; margin: 13px 0 0; }
@@ -117,23 +113,6 @@ a.pf-redraw.pf-paid:hover, a.pf-redraw.pf-paid:focus-visible { color: #bda6e4; b
 .pf-mini--add.pf-paid { color: var(--pf-violet-lit); border-color: var(--pf-violet-line); }
 .pf-mini--add.pf-paid:hover, .pf-mini--add.pf-paid:focus-visible { border-color: var(--pf-violet); color: #bda6e4; }
 .pf-mini--add.pf-paid .pf-mini__plus, .pf-mini--add.pf-paid .pf-mini__n { color: var(--pf-violet-lit); }
-
-/* the horizon — a gold Kingdom-Threshold line sealing the base of the surface box */
-.pf-horizon { position: relative; display: flex; align-items: center; justify-content: center; gap: 16px; width: 100%; margin: clamp(16px, 3.5vh, 28px) auto 0; padding-bottom: clamp(12px, 2.5vh, 22px); }
-.pf-horizon::before { content: ""; position: absolute; left: 12%; right: 12%; top: 50%; height: 16px; transform: translateY(-50%); background: radial-gradient(60% 100% at 50% 50%, rgba(233,229,220,.08), transparent 72%); pointer-events: none; }
-.pf-horizon__line { position: relative; flex: 1; height: 1px; }
-.pf-horizon__line--l { background: linear-gradient(to right, transparent 0%, rgba(233,229,220,.03) 14%, rgba(201,163,92,.5) 100%); }
-.pf-horizon__line--r { background: linear-gradient(to left, transparent 0%, rgba(233,229,220,.03) 14%, rgba(201,163,92,.5) 100%); }
-.pf-horizon__line--l::before, .pf-horizon__line--r::after { content: ""; position: absolute; top: -2px; width: 1px; height: 5px; background: rgba(201,163,92,.14); }
-.pf-horizon__line--l::before { left: 0; }
-.pf-horizon__line--r::after { right: 0; }
-.pf-horizon__gate { display: grid; place-items: center; color: var(--pf-gold); }
-.pf-horizon__gate svg { width: 30px; height: 16px; opacity: .5; transition: opacity .3s, filter .3s; }
-.pf-surface:hover .pf-horizon__gate svg { opacity: .85; filter: drop-shadow(0 0 6px rgba(201,163,92,.4)); }
-
-/* ---------- the reading portal (first thing underground) ---------- */
-.pf-portal { display: flex; flex-direction: column; align-items: center; gap: 10px; margin: clamp(12px, 3vh, 26px) 0 0; }
-.pf-portal .pf-doorbar { width: min(540px, 100%); }
 
 /* ---------- shared in-body door bar — every door speaks one language ---------- */
 .pf-doorbar {
@@ -175,19 +154,15 @@ a.pf-redraw.pf-paid:hover, a.pf-redraw.pf-paid:focus-visible { color: #bda6e4; b
 /* Rings — mini-crowns (§3.4) */
 .pf-family { display: flex; flex-wrap: wrap; gap: 14px; }
 .pf-mini { flex: 0 0 auto; width: 144px; border: 1px solid var(--pf-line-soft); border-radius: 4px; padding: 16px 12px 14px; text-align: center; background: rgba(233,229,220,.018); }
-.pf-mini svg { width: 66px; height: auto; color: var(--pf-gold); opacity: .92; }
-.pf-mini__rel { font-family: var(--pf-mono); font-size: 10px; letter-spacing: .16em; text-transform: uppercase; color: var(--pf-gold); margin: 10px 0 0; }
 .pf-mini__label { font-family: var(--pf-serif); font-size: 16px; color: var(--pf-cream); margin: 5px 0 0; line-height: 1.25; }
 .pf-mini__n { font-family: var(--pf-mono); font-size: 10px; letter-spacing: .08em; color: var(--pf-meta); margin: 6px 0 0; }
-.pf-mini__acts { display: flex; flex-direction: column; align-items: center; gap: 6px; margin: 12px 0 0; }
-.pf-mini--add { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; color: var(--pf-ghost); cursor: pointer; border-style: dashed; background: none; }
+.pf-mini--add { min-height: 128px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; color: var(--pf-ghost); cursor: pointer; border-style: dashed; background: none; }
 .pf-mini--add:hover, .pf-mini--add:focus-visible { color: var(--pf-gold-lit); border-color: var(--pf-gold); outline: none; }
 .pf-mini__plus { font-size: 20px; line-height: 1; color: var(--pf-gold); }
 .pf-mini--add .pf-mini__label { color: inherit; }
 .pf-mini--add .pf-mini__n { color: var(--pf-ghost); }
 
 /* "Read for someone" → the family-tree relation picker (paid, violet) */
-.pf-mini__ring { opacity: .95; }
 .pf-mini--add-wrap { position: relative; width: 144px; flex: 0 0 auto; display: flex; }
 .pf-mini--add-wrap .pf-mini--add { width: 100%; }
 .pf-relmenu { position: absolute; left: 0; top: calc(100% + 8px); z-index: 20; width: 264px; padding: 13px; background: #131117; border: 1px solid var(--pf-violet-line); border-radius: 8px; box-shadow: 0 16px 40px rgba(0,0,0,.55); }
@@ -210,28 +185,36 @@ a.pf-redraw.pf-paid:hover, a.pf-redraw.pf-paid:focus-visible { color: #bda6e4; b
 .pf-card__cap { padding: 9px 11px 11px; }
 .pf-card__k { display: block; font-family: var(--pf-mono); font-size: 8px; letter-spacing: .18em; text-transform: uppercase; color: var(--pf-ghost); }
 .pf-card__n { display: block; font-family: var(--pf-serif); font-size: 15px; color: var(--pf-cream); line-height: 1.15; margin-top: 3px; }
+/* empty minted-card slot — the Vault isn't open yet */
+.pf-card--empty { background: none; border: 1px dashed var(--pf-line-soft); cursor: default; align-items: center; justify-content: center; }
+.pf-card--empty:hover { border-color: var(--pf-line-soft); box-shadow: none; }
+.pf-card__slot { font-family: var(--pf-mono); font-size: 8px; letter-spacing: .22em; text-transform: uppercase; color: var(--pf-ghost); opacity: .7; }
 
-/* showcase + privacy (expandable/closable per item) */
-.pf-show { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; }
-.pf-showitem { border: 1px solid var(--pf-line-soft); border-radius: 5px; padding: 16px; background: rgba(233,229,220,.018); }
-.pf-showitem__top { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
-.pf-showitem__kind { font-family: var(--pf-mono); font-size: 8.5px; letter-spacing: .2em; text-transform: uppercase; color: var(--pf-gold); }
-.pf-showitem__t { font-family: var(--pf-serif); font-size: 19px; color: var(--pf-cream); margin: 8px 0 0; line-height: 1.2; }
-.pf-showitem__d { font-family: var(--pf-serif); font-size: 14px; font-style: italic; color: var(--pf-meta); margin: 6px 0 0; line-height: 1.5; }
-.pf-vis { position: relative; margin: 16px 0 0; }
-.pf-vis__toggle { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; background: none; border: 1px solid var(--pf-line); border-radius: 999px; padding: 7px 13px; font-family: var(--pf-mono); font-size: 9px; letter-spacing: .1em; text-transform: uppercase; color: var(--pf-meta); transition: border-color .18s, color .18s; }
-.pf-vis__toggle:hover, .pf-vis__toggle:focus-visible { border-color: var(--pf-gold); color: var(--pf-gold-lit); outline: none; }
-.pf-vis__toggle b { color: var(--pf-cream); font-weight: 500; }
-.pf-vis__eye { color: var(--pf-gold); font-size: 8px; }
-.pf-vis__caret { font-size: 8px; transition: transform .2s; }
-.pf-vis__toggle[aria-expanded="true"] .pf-vis__caret { transform: rotate(180deg); }
-.pf-vis__menu { position: absolute; left: 0; top: calc(100% + 6px); z-index: 5; min-width: 170px; display: flex; flex-direction: column; padding: 5px; background: #131117; border: 1px solid var(--pf-line); border-radius: 6px; box-shadow: 0 12px 30px rgba(0,0,0,.5); }
-.pf-vis__menu[hidden] { display: none; }
-.pf-vis__menu button { display: flex; align-items: center; justify-content: space-between; gap: 12px; cursor: pointer; text-align: left; background: none; border: 0; border-radius: 4px; padding: 9px 12px; font-family: var(--pf-mono); font-size: 9.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--pf-meta); transition: background .15s, color .15s; }
-.pf-vis__menu button:hover, .pf-vis__menu button:focus-visible { background: rgba(201,163,92,.08); color: var(--pf-gold-lit); outline: none; }
-.pf-vis__menu button[aria-selected="true"] { color: var(--pf-gold); }
-.pf-vis__tick { color: var(--pf-gold); }
-.pf-showhint { font-family: var(--pf-mono); font-size: 10.5px; letter-spacing: .03em; color: var(--pf-meta); margin: 14px 0 0; line-height: 1.7; }
+/* showcase — choosable slots: feature a reading result or a minted card */
+.pf-show { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px; }
+.pf-slotwrap { position: relative; }
+.pf-slot { width: 100%; min-height: 120px; display: flex; flex-direction: column; cursor: pointer; border-radius: 6px; padding: 16px 14px; transition: border-color .18s, background .18s, color .18s; }
+.pf-slot--empty { align-items: center; justify-content: center; gap: 7px; text-align: center; border: 1px dashed var(--pf-line); background: rgba(233,229,220,.012); color: var(--pf-ghost); }
+.pf-slot--empty:hover, .pf-slot--empty:focus-visible { border-color: var(--pf-gold); color: var(--pf-gold-lit); outline: none; }
+.pf-slot__plus { font-size: 22px; line-height: 1; color: var(--pf-gold); }
+.pf-slot__hint { font-family: var(--pf-mono); font-size: 9px; letter-spacing: .12em; text-transform: uppercase; line-height: 1.7; }
+.pf-slot--filled { border: 1px solid var(--pf-line); background: rgba(233,229,220,.02); }
+.pf-slot--filled:hover, .pf-slot--filled:focus-visible { border-color: var(--pf-gold); outline: none; }
+.pf-slot__kind { font-family: var(--pf-mono); font-size: 8px; letter-spacing: .2em; text-transform: uppercase; color: var(--pf-gold); }
+.pf-slot__t { font-family: var(--pf-serif); font-size: 19px; color: var(--pf-cream); line-height: 1.15; margin-top: 4px; text-align: left; }
+.pf-slot__change { font-family: var(--pf-mono); font-size: 8.5px; letter-spacing: .12em; text-transform: uppercase; color: var(--pf-meta); margin-top: auto; padding-top: 12px; }
+
+/* the pick menu — choose a reading result or a minted card */
+.pf-pickmenu { position: absolute; left: 0; right: 0; top: calc(100% + 8px); z-index: 20; padding: 13px; background: #131117; border: 1px solid var(--pf-line); border-radius: 8px; box-shadow: 0 16px 40px rgba(0,0,0,.55); }
+.pf-pickmenu[hidden] { display: none; }
+.pf-pickmenu__h { font-family: var(--pf-mono); font-size: 9px; letter-spacing: .16em; text-transform: uppercase; color: var(--pf-meta); margin: 0 0 9px; }
+.pf-pickmenu__grid + .pf-pickmenu__h { margin-top: 14px; }
+.pf-pickmenu__grid { display: flex; flex-direction: column; gap: 5px; }
+.pf-pickopt { display: flex; align-items: baseline; gap: 10px; text-align: left; background: none; border: 1px solid var(--pf-line-soft); border-radius: 5px; padding: 8px 11px; cursor: pointer; transition: border-color .15s, background .15s; }
+.pf-pickopt:hover, .pf-pickopt:focus-visible { border-color: var(--pf-gold); background: rgba(201,163,92,.06); outline: none; }
+.pf-pickopt__k { font-family: var(--pf-mono); font-size: 8px; letter-spacing: .14em; text-transform: uppercase; color: var(--pf-gold); flex: none; min-width: 64px; }
+.pf-pickopt__n { font-family: var(--pf-serif); font-size: 15px; color: var(--pf-cream); }
+.pf-pickempty { font-family: var(--pf-mono); font-size: 9px; letter-spacing: .04em; color: var(--pf-ghost); margin: 0; line-height: 1.6; }
 
 /* friends */
 .pf-friends { display: flex; flex-direction: column; }
@@ -254,5 +237,4 @@ a.pf-redraw.pf-paid:hover, a.pf-redraw.pf-paid:focus-visible { color: #bda6e4; b
 }
 @media (prefers-reduced-motion: reduce) {
   .pf * { transition: none !important; }
-  .pf-nitro { filter: none !important; }
 }
