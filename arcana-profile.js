@@ -117,6 +117,22 @@
       '<stop offset="0" stop-color="#dcc38b"/><stop offset=".45" stop-color="#ab8646"/><stop offset="1" stop-color="#563914"/></radialGradient>' +
     '</svg>';
 
+  /* the identity name's treatment — WHITE letters with a black "oil / ink" edge that
+     ripples and bounces ever so slightly around the glyphs. Animated turbulence displaces
+     the RIM only (dilated-alpha minus alpha), so the letters themselves stay crisp/readable. */
+  var OIL_DEFS = '<svg class="pf-defs" width="0" height="0" aria-hidden="true" focusable="false"><defs>' +
+    '<filter id="pfOil" x="-16%" y="-45%" width="132%" height="190%" color-interpolation-filters="sRGB">' +
+      '<feTurbulence type="fractalNoise" baseFrequency="0.015 0.021" numOctaves="2" seed="8" result="noise">' +
+        '<animate attributeName="baseFrequency" dur="7s" values="0.015 0.021;0.023 0.014;0.015 0.021" repeatCount="indefinite" calcMode="spline" keySplines="0.45 0 0.55 1;0.45 0 0.55 1"/>' +
+      '</feTurbulence>' +
+      '<feMorphology in="SourceAlpha" operator="dilate" radius="1.5" result="fat"/>' +
+      '<feComposite in="fat" in2="SourceAlpha" operator="out" result="rim"/>' +
+      '<feDisplacementMap in="rim" in2="noise" scale="4.5" xChannelSelector="R" yChannelSelector="G" result="rimMoved"/>' +
+      '<feFlood flood-color="#050507" result="ink"/>' +
+      '<feComposite in="ink" in2="rimMoved" operator="in" result="oilEdge"/>' +
+      '<feMerge><feMergeNode in="oilEdge"/><feMergeNode in="SourceGraphic"/></feMerge>' +
+    '</filter></defs></svg>';
+
   /* ---------- masthead (§3.1) — room doors, above the surface box ---------- */
   function headerHTML() {
     var doors = [["arcane", "The Arcana Room"], ["codex", "The Codex"]];
@@ -263,7 +279,7 @@
   }
 
   function render() {
-    return '<div class="pf">' + CROWN_DEFS +
+    return '<div class="pf">' + CROWN_DEFS + OIL_DEFS +
       headerHTML() +
       '<div class="pf-wrap">' +
         surfaceHTML() +

@@ -205,27 +205,43 @@
     { key: "matter", label: "What is brought",           ph: "the matter you carry, in a line — or leave it unspoken" },
   ];
 
-  // WHO the reading is drawn for (mock — self + family/friend crowns + someone new).
-  // The profile hands us ?for=…&subject=… to pre-select; the choice is captured
-  // for the draw so the crown lands on the right head.
+  // WHO the reading is drawn for. The FIRST reading on an account is for yourself;
+  // Family and Friend unlock once a reading has been completed (or when arriving from
+  // the profile's "read for someone"). Family opens a family-member picker.
   var WHOFOR = [
-    { id: "self",    label: "Myself",      kind: "self" },
-    { id: "mother",  label: "Mother",      kind: "crown",  crown: "The Deep-Rooted Keeper" },
-    { id: "brother", label: "Brother",     kind: "crown",  crown: "The Quick-Kindled Scout" },
-    { id: "ingrid",  label: "Ingrid",      kind: "friend", crown: "The Deep-Tided Weaver" },
-    { id: "new",     label: "Someone new", kind: "new" },
+    { id: "self",   label: "Myself",   gated: false },
+    { id: "family", label: "Family",   gated: true, pick: true },
+    { id: "friend", label: "A friend", gated: true },
   ];
+  var FAMILY_MEMBERS = ["Mother", "Father", "Sister", "Brother", "Grandmother", "Grandfather", "Aunt", "Uncle", "Cousin", "Partner", "Child"];
+  function acctUnlocked() {
+    var byRead = false; try { byRead = localStorage.getItem("br_has_reading") === "1"; } catch (e) {}
+    var p = null; try { p = new URLSearchParams(location.search); } catch (e) {}
+    var byProfile = p && (p.get("for") === "other" || !!p.get("subject"));
+    return byRead || byProfile;
+  }
   function forwhomHTML() {
+    var unlocked = acctUnlocked();
     var chips = WHOFOR.map(function (w, i) {
-      return '<button type="button" class="ac-forwhom__chip' + (w.kind === "new" ? " ac-forwhom__chip--new" : "") + '"' +
-        ' role="radio" aria-checked="' + (i === 0 ? "true" : "false") + '" data-forwhom="' + w.id + '">' +
-        '<span class="ac-forwhom__who">' + esc(w.label) + "</span>" +
-        (w.crown ? '<span class="ac-forwhom__crown">' + esc(w.crown) + "</span>" : "") +
-        "</button>";
+      var locked = w.gated && !unlocked;
+      var extra = locked
+        ? '<span class="ac-forwhom__lock" aria-hidden="true">&#128274; after your first reading</span>'
+        : (w.pick ? '<span class="ac-forwhom__crown">choose who &rsaquo;</span>' : "");
+      return '<button type="button" class="ac-forwhom__chip' + (locked ? " is-locked" : "") + (w.pick ? " ac-forwhom__chip--fam" : "") + '"' +
+        ' role="radio" aria-checked="' + (i === 0 ? "true" : "false") + '"' + (locked ? ' aria-disabled="true"' : "") +
+        ' data-forwhom="' + w.id + '"' + (w.pick && !locked ? ' data-fampick aria-haspopup="menu" aria-expanded="false"' : "") + ">" +
+        '<span class="ac-forwhom__who">' + esc(w.label) + "</span>" + extra + "</button>";
     }).join("");
+    var famMenu = unlocked
+      ? '<div class="ac-fammenu" role="menu" aria-label="Which family member?" hidden>' +
+          FAMILY_MEMBERS.map(function (r) { return '<button type="button" class="ac-famopt" role="menuitem" data-fam-choice="' + esc(r) + '">' + esc(r) + "</button>"; }).join("") +
+        "</div>"
+      : "";
     return '<div class="ac-forwhom" data-ac-forwhom>' +
       '<span class="ac-forwhom__label">For whom is this drawn?</span>' +
       '<div class="ac-forwhom__opts" role="radiogroup" aria-label="For whom is this drawn?">' + chips + "</div>" +
+      (unlocked ? "" : '<p class="ac-forwhom__note">Your first reading is for yourself. Family and friends unlock once you have completed a reading.</p>') +
+      famMenu +
       "</div>";
   }
 
@@ -803,18 +819,35 @@
     var params = {};
     try { new URLSearchParams(location.search).forEach(function (v, k) { params[k] = v; }); } catch (e) {}
     var chips = slice(root.querySelectorAll("[data-forwhom]"));
-    var forWhom = "self";
+    var famMenu = root.querySelector(".ac-fammenu");
+    var forWhom = "self", famSubject = "";
+    function flashNotice(t) { notice.textContent = t; clearTimeout(noticeT); noticeT = setTimeout(function () { notice.textContent = ""; }, 3400); }
+    function closeFam() { if (famMenu) famMenu.hidden = true; var f = root.querySelector("[data-fampick]"); if (f) f.setAttribute("aria-expanded", "false"); }
+    function labelFamily(member) { var who = root.querySelector('[data-forwhom="family"] .ac-forwhom__who'); if (who) who.textContent = member ? "Family · " + member : "Family"; }
     function setForWhom(id) {
       forWhom = id;
       chips.forEach(function (c) { c.setAttribute("aria-checked", String(c.getAttribute("data-forwhom") === id)); });
     }
-    chips.forEach(function (c) { c.addEventListener("click", function () { setForWhom(c.getAttribute("data-forwhom")); }); });
-    // pre-select from the profile's redirect (?for=self|other&subject=…)
+    chips.forEach(function (c) {
+      c.addEventListener("click", function () {
+        if (c.classList.contains("is-locked")) { flashNotice("THIS UNLOCKS AFTER YOUR FIRST READING — THE FIRST IS FOR YOURSELF."); return; }
+        setForWhom(c.getAttribute("data-forwhom"));
+        if (c.hasAttribute("data-fampick") && famMenu) {
+          var willOpen = famMenu.hidden; famMenu.hidden = !willOpen; c.setAttribute("aria-expanded", String(willOpen));
+        } else closeFam();
+      });
+    });
+    if (famMenu) slice(famMenu.querySelectorAll("[data-fam-choice]")).forEach(function (b) {
+      b.addEventListener("click", function () {
+        famSubject = b.getAttribute("data-fam-choice");
+        setForWhom("family"); labelFamily(famSubject); closeFam();
+      });
+    });
+    // pre-select from the profile's "read for someone" (?for=other&subject=…) → Family + member
     var wantId = "self";
     if (params["for"] === "other") {
-      var subj = String(params.subject || "").toLowerCase();
-      var match = WHOFOR.filter(function (w) { return w.id === subj || String(w.label).toLowerCase() === subj; })[0];
-      wantId = match ? match.id : "new";
+      wantId = "family";
+      if (params.subject) { famSubject = params.subject.charAt(0).toUpperCase() + params.subject.slice(1); labelFamily(famSubject); }
     }
     setForWhom(wantId);
     // redraw context — the original crown is RIPPED when this is drawn
@@ -858,7 +891,10 @@
       var nm = (nameVal || "Seeker").replace(/~/g, " ").trim() || "Seeker";
       var b = parseBirth(dayVal);
       var seed = b ? ("birth~" + nm + "~" + b.y + "~" + b.m + "~" + b.d) : ("draw~" + nm + "~" + totalChars());
-      var enterReading = function () { location.href = "?dev=arcana-reading&seed=" + encodeURIComponent(seed); };
+      var enterReading = function () {
+        try { localStorage.setItem("br_has_reading", "1"); } catch (e) {}   // unlocks Family/Friend next time
+        location.href = "?dev=arcana-reading&seed=" + encodeURIComponent(seed);
+      };
       if (ceremony && ceremony.destroy) ceremony.destroy();
       ceremonyHost.hidden = false;
       // BR-S164: "Draw the reading" now opens the redesigned ceremony (ceremony.js,

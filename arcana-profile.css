@@ -84,7 +84,9 @@
 .pf-id { display: flex; align-items: center; gap: 14px; padding-left: 23px; }
 .pf-id__av { width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--pf-line); display: grid; place-items: center; font-family: var(--pf-serif); font-weight: 600; font-size: 21px; color: var(--pf-gold); flex: none; background: rgba(162,134,74,.06); }
 .pf-id__txt { display: flex; flex-direction: column; }
-.pf-id__name { font-family: var(--pf-serif); font-weight: 600; font-size: clamp(24px, 3vw, 32px); line-height: 1.05; letter-spacing: .012em; color: var(--pf-cream-display); }
+/* the identity name — white, with a black oil/ink edge rippling around the letters */
+.pf-id__name { font-family: var(--pf-serif); font-weight: 600; font-size: clamp(26px, 3.4vw, 38px); line-height: 1.05; letter-spacing: .012em; color: #f4f3ef; filter: url(#pfOil); }
+@media (prefers-reduced-motion: reduce) { .pf-id__name { filter: none; } }
 .pf-id__handle { font-family: var(--pf-mono); font-size: 11px; letter-spacing: .14em; color: var(--pf-meta); margin-top: 4px; }
 .pf-id__born { color: var(--pf-ghost); letter-spacing: .1em; }
 
