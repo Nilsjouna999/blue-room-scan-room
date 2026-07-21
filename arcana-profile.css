@@ -15,8 +15,8 @@
 ============================================================= */
 
 .pf {
-  --pf-gold: #c9a35c;
-  --pf-gold-lit: #e2c489;
+  --pf-gold: #a2864a;          /* muted antique gold — dimmed from #c9a35c (too bright) */
+  --pf-gold-lit: #c0a05d;
   --pf-cream: #e9e5dc;
   --pf-cream-display: #dcd6c9;
   --pf-crown: #e0dacd;
@@ -75,67 +75,45 @@
 
 /* ---------- ABOVE GROUND — the surface-world box ---------- */
 .pf-surface {
-  position: relative; isolation: isolate; text-align: center;
+  position: relative; isolation: isolate; text-align: left;
   margin: clamp(10px, 2.5vh, 22px) auto 0;
-  padding: clamp(20px, 4vh, 38px) clamp(16px, 4vw, 32px) 0;
-  background: linear-gradient(180deg, rgba(233,229,220,.022) 0%, rgba(233,229,220,.007) 70%, transparent 100%);
+  padding: clamp(16px, 3vh, 28px) 0 0;
 }
-.pf-crown-slot { position: relative; display: grid; place-items: center; min-height: 150px; margin: 0 auto 6px; }
-.pf-crown-slot::after { content: ""; position: absolute; left: 50%; bottom: 2px; transform: translateX(-50%); width: 58%; height: 24px; background: radial-gradient(ellipse at center, rgba(201,163,92,.13), transparent 70%); filter: blur(2px); pointer-events: none; z-index: -1; }
-.pf-crown-svg { width: clamp(150px, 30vw, 210px); height: auto; color: var(--pf-gold); filter: drop-shadow(0 10px 26px rgba(201,163,92,.20)) drop-shadow(0 0 12px rgba(201,163,92,.24)); }
-.pf-crown-name { font-family: var(--pf-serif); font-weight: 600; font-size: clamp(20px, 2.6vw, 27px); line-height: 1.15; letter-spacing: .01em; color: var(--pf-cream-display); margin: 8px 0 0; text-wrap: balance; }
-.pf-crown-empty { width: clamp(150px, 30vw, 200px); aspect-ratio: 1 / .62; display: grid; place-items: center; border: 1px dashed var(--pf-line); border-radius: 4px; color: var(--pf-ghost); font-family: var(--pf-mono); font-size: 9px; letter-spacing: .2em; text-transform: uppercase; text-align: center; line-height: 1.9; padding: 12px; }
-.pf-provbar { display: inline-flex; gap: 6px; margin: 14px 0 0; }
-.pf-provbar i { width: 7px; height: 7px; border-radius: 50%; background: var(--pf-gold); box-shadow: 0 0 6px rgba(201,163,92,.4); }
-.pf-prov { font-family: var(--pf-serif); font-style: italic; font-size: 15px; color: var(--pf-meta); margin: 12px auto 0; max-width: 42ch; line-height: 1.5; }
-.pf-eyebrow { font-family: var(--pf-mono); font-size: 9px; font-weight: 500; letter-spacing: .3em; text-transform: uppercase; color: var(--pf-ghost); margin: 18px 0 0; }
 
-/* identity — a boxed red/purple flame FRAME whose line burns + pulsates like liquid nitrogen,
-   flowing around the border (cosmetic avatar-frame flair, off the content law by design) */
-@property --pf-angle { syntax: "<angle>"; initial-value: 0deg; inherits: false; }
-.pf-identity {
-  position: relative; isolation: isolate; display: inline-flex; align-items: center; gap: 16px;
-  margin: 18px auto 0; padding: 17px 30px; border-radius: 14px;
-  /* a lit NICHE recessed into the surface: name rests in a soft pool of dark that feathers to nothing */
-  background: radial-gradient(135% 155% at 50% 42%, rgba(5,4,7,.74) 0%, rgba(9,8,11,.38) 52%, rgba(10,11,13,0) 100%);
-  /* AO recess (inset dark) + a warm lit top-rim + an always-on ambient bloom that spills onto the surface (two radii) */
-  box-shadow:
-    inset 0 1px 14px rgba(0,0,0,.55),
-    inset 0 1px 0 rgba(255,150,180,.10),
-    0 0 12px rgba(168,42,112,.22),
-    0 0 34px rgba(123,47,247,.15);
-}
-.pf-halo { position: absolute; inset: -1px; border-radius: 15px; z-index: -1; pointer-events: none; }
-/* the burning line — dim violet base (a quiet line at rest) + a hot arc that flows around it, masked to the
-   border. Temperature-bridged (orange->red->magenta->violet) and screen-blended so it reads as emitted light. */
-.pf-halo::before {
-  content: ""; position: absolute; inset: 0; border-radius: inherit; padding: 1.5px;
-  background: conic-gradient(from var(--pf-angle),
-    rgba(108,60,150,.28) 0deg, rgba(108,60,150,.28) 190deg,
-    #ff7a3d 220deg, #ff3b47 236deg, #e01e5a 252deg, #b5179e 270deg, #7b2ff7 292deg, #6a4bd0 306deg,
-    rgba(108,60,150,.28) 322deg, rgba(108,60,150,.28) 360deg);
-  filter: url(#pfLiquid) blur(1.4px);
-  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor; mask-composite: exclude;
-  mix-blend-mode: screen;
-  animation: pf-flow 6s linear infinite;
-}
-/* wide soft environmental spill — the hot arc's light bleeding out, additive, dissolving into the room */
-.pf-halo::after {
-  content: ""; position: absolute; inset: -14px; border-radius: 28px;
-  background: conic-gradient(from var(--pf-angle),
-    transparent 0deg, transparent 206deg, #ff5e3a 240deg, #e01e5a 258deg, #b5179e 274deg, #7b2ff7 298deg, transparent 340deg, transparent 360deg);
-  filter: url(#pfLiquid) blur(26px) saturate(1.1);
-  opacity: .4; mix-blend-mode: screen;
-  animation: pf-flow 6s linear infinite, pf-breathe 3.4s ease-in-out infinite;
-}
-@keyframes pf-flow { to { --pf-angle: 360deg; } }
-@keyframes pf-breathe { 0%, 100% { opacity: .22; } 50% { opacity: .52; } }
-.pf-avatar { width: 46px; height: 46px; border-radius: 50%; border: 1px solid var(--pf-line); display: grid; place-items: center; font-family: var(--pf-serif); font-weight: 600; font-size: 22px; color: var(--pf-gold); flex: none; background: rgba(201,163,92,.06); }
-.pf-identity__txt { display: flex; flex-direction: column; text-align: left; }
-.pf-cname { font-family: var(--pf-serif); font-weight: 600; font-size: clamp(26px, 3.4vw, 36px); line-height: 1.1; letter-spacing: .012em; color: var(--pf-crown); margin: 0; text-wrap: balance; }
-.pf-handle { font-family: var(--pf-mono); font-size: 11px; letter-spacing: .14em; color: var(--pf-meta); margin: 4px 0 0; }
+/* identity — a quiet LEFT header, name starting at the section column edge */
+.pf-id { display: flex; align-items: center; gap: 14px; padding-left: 23px; }
+.pf-id__av { width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--pf-line); display: grid; place-items: center; font-family: var(--pf-serif); font-weight: 600; font-size: 21px; color: var(--pf-gold); flex: none; background: rgba(162,134,74,.06); }
+.pf-id__txt { display: flex; flex-direction: column; }
+.pf-id__name { font-family: var(--pf-serif); font-weight: 600; font-size: clamp(24px, 3vw, 32px); line-height: 1.05; letter-spacing: .012em; color: var(--pf-cream-display); }
+.pf-id__handle { font-family: var(--pf-mono); font-size: 11px; letter-spacing: .14em; color: var(--pf-meta); margin-top: 4px; }
+
+/* the Crown — placeholder art wrapped as the reading button; centred monument, the most negative space */
+.pf-crownwrap { display: flex; flex-direction: column; align-items: center; text-align: center; margin: clamp(22px, 4.5vh, 44px) auto clamp(8px, 2vh, 16px); }
+.pf-crownbtn { display: flex; flex-direction: column; align-items: center; gap: 8px; background: none; border: 1px solid transparent; border-radius: 12px; padding: 10px 20px; cursor: pointer; transition: border-color .18s, background .18s; }
+.pf-crownbtn:hover, .pf-crownbtn:focus-visible { border-color: var(--pf-line); background: rgba(162,134,74,.035); outline: none; }
+.pf-crown-svg { width: clamp(178px, 32vw, 250px); height: auto; filter: drop-shadow(0 14px 18px rgba(0,0,0,.5)) drop-shadow(0 5px 16px rgba(162,134,74,.14)) drop-shadow(0 0 12px rgba(162,134,74,.10)); }
+.pf-crownbtn:hover .pf-crown-svg { filter: drop-shadow(0 14px 18px rgba(0,0,0,.5)) drop-shadow(0 5px 18px rgba(162,134,74,.2)) drop-shadow(0 0 14px rgba(162,134,74,.16)); }
+.pf-crown-name { font-family: var(--pf-serif); font-weight: 600; font-size: clamp(30px, 4.4vw, 50px); line-height: 1.08; letter-spacing: .008em; color: var(--pf-cream-display); text-wrap: balance; max-width: 15ch; }
+/* the one living element — warm letters with black nitrogen currents whipping inside */
+.pf-nitro { filter: url(#pfNitro); color: var(--pf-crown); }
+@media (prefers-reduced-motion: reduce) { .pf-nitro { filter: none; } }
+.pf-crown-empty { width: clamp(160px, 30vw, 210px); aspect-ratio: 1 / .62; display: grid; place-items: center; border: 1px dashed var(--pf-violet-line); border-radius: 4px; color: var(--pf-violet-lit); font-family: var(--pf-mono); font-size: 9px; letter-spacing: .2em; text-transform: uppercase; text-align: center; line-height: 1.9; padding: 12px; }
+.pf-prov { font-family: var(--pf-serif); font-style: italic; font-size: 14.5px; color: var(--pf-meta); margin: 8px auto 0; max-width: 42ch; line-height: 1.5; }
+
+/* crown actions — Open this reading (free, gold) + Redraw (paid, violet), kept tight under the crown */
+.pf-crownacts { display: flex; flex-direction: column; align-items: center; gap: 11px; margin: 13px 0 0; }
+.pf-openreading--lg { padding: 10px 22px; font-size: 10.5px; letter-spacing: .18em; border: 1px solid var(--pf-line-cut); border-radius: 999px; }
+.pf-openreading--lg:hover, .pf-openreading--lg:focus-visible { border-color: var(--pf-gold); }
+
+/* PAID register — violet, the one commerce colour; every control that leads to paid content */
+a.pf-redraw.pf-paid { color: var(--pf-violet-lit); border-bottom-color: var(--pf-violet-line); }
+a.pf-redraw.pf-paid:hover, a.pf-redraw.pf-paid:focus-visible { color: #bda6e4; border-bottom-color: var(--pf-violet); }
+.pf-openreading.pf-paid { color: var(--pf-violet-lit); border-color: var(--pf-violet-line); }
+.pf-openreading.pf-paid:hover, .pf-openreading.pf-paid:focus-visible { border-color: var(--pf-violet); color: #bda6e4; }
+.pf-crownbtn--empty:hover, .pf-crownbtn--empty:focus-visible { border-color: transparent; background: rgba(138,111,176,.06); }
+.pf-mini--add.pf-paid { color: var(--pf-violet-lit); border-color: var(--pf-violet-line); }
+.pf-mini--add.pf-paid:hover, .pf-mini--add.pf-paid:focus-visible { border-color: var(--pf-violet); color: #bda6e4; }
+.pf-mini--add.pf-paid .pf-mini__plus, .pf-mini--add.pf-paid .pf-mini__n { color: var(--pf-violet-lit); }
 
 /* the horizon — a gold Kingdom-Threshold line sealing the base of the surface box */
 .pf-horizon { position: relative; display: flex; align-items: center; justify-content: center; gap: 16px; width: 100%; margin: clamp(16px, 3.5vh, 28px) auto 0; padding-bottom: clamp(12px, 2.5vh, 22px); }
@@ -205,15 +183,30 @@
 .pf-mini--add .pf-mini__label { color: inherit; }
 .pf-mini--add .pf-mini__n { color: var(--pf-ghost); }
 
+/* "Read for someone" → the family-tree relation picker (paid, violet) */
+.pf-mini__ring { opacity: .95; }
+.pf-mini--add-wrap { position: relative; width: 144px; flex: 0 0 auto; display: flex; }
+.pf-mini--add-wrap .pf-mini--add { width: 100%; }
+.pf-relmenu { position: absolute; left: 0; top: calc(100% + 8px); z-index: 20; width: 264px; padding: 13px; background: #131117; border: 1px solid var(--pf-violet-line); border-radius: 8px; box-shadow: 0 16px 40px rgba(0,0,0,.55); }
+.pf-relmenu[hidden] { display: none; }
+.pf-relmenu__h { font-family: var(--pf-mono); font-size: 9px; letter-spacing: .16em; text-transform: uppercase; color: var(--pf-meta); margin: 0 0 11px; }
+.pf-relmenu__grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.pf-relopt { text-align: left; background: none; border: 1px solid var(--pf-line); border-radius: 5px; padding: 9px 12px; cursor: pointer; font-family: var(--pf-serif); font-size: 15px; color: var(--pf-cream); transition: border-color .15s, background .15s, color .15s; }
+.pf-relopt:hover, .pf-relopt:focus-visible { border-color: var(--pf-violet); color: var(--pf-violet-lit); background: rgba(138,111,176,.08); outline: none; }
+
 /* the vault */
 .pf-vault { display: grid; grid-template-columns: 1fr; gap: 16px; }
-.pf-cards { display: flex; gap: 12px; overflow-x: auto; padding: 2px 2px 8px; }
-.pf-card { flex: 0 0 auto; width: 116px; height: 160px; border: 1px solid var(--pf-line); border-radius: 6px; padding: 12px 10px; display: flex; flex-direction: column; justify-content: space-between; align-items: stretch; text-align: left; cursor: pointer; background: linear-gradient(160deg, rgba(201,163,92,.05), rgba(10,11,13,0)); transition: border-color .18s, background .18s, transform .06s; }
-.pf-card:hover, .pf-card:focus-visible { border-color: var(--pf-gold); background: linear-gradient(160deg, rgba(201,163,92,.12), rgba(10,11,13,0)); outline: none; }
+.pf-cards { display: flex; gap: 14px; overflow-x: auto; padding: 2px 2px 10px; }
+.pf-card { position: relative; flex: 0 0 auto; width: 134px; aspect-ratio: 3 / 4.3; border: 1px solid var(--pf-line); border-radius: 9px; overflow: hidden; display: flex; flex-direction: column; text-align: left; cursor: pointer; background: linear-gradient(180deg, #101217, #0b0c10); transition: border-color .18s, transform .08s, box-shadow .22s; }
+.pf-card:hover, .pf-card:focus-visible { border-color: var(--pf-gold); box-shadow: 0 12px 30px rgba(0,0,0,.45); outline: none; }
 .pf-card:active { transform: translateY(1px); }
-.pf-card__k { font-family: var(--pf-mono); font-size: 9.5px; letter-spacing: .16em; text-transform: uppercase; color: var(--pf-ghost); }
-.pf-card__n { font-family: var(--pf-serif); font-size: 17px; color: var(--pf-cream); line-height: 1.15; }
-.pf-card__seal { align-self: flex-end; width: 22px; height: 22px; color: var(--pf-gold); opacity: .85; }
+/* the art plate — where the mint image sits; ghosted seal placeholder for now */
+.pf-card__art { flex: 1; display: grid; place-items: center; border-bottom: 1px solid var(--pf-line-soft); background: radial-gradient(120% 80% at 50% 22%, rgba(162,134,74,.12), rgba(10,11,13,0) 68%), linear-gradient(158deg, rgba(162,134,74,.07), rgba(10,11,13,0) 60%); }
+.pf-card__art svg { width: 32px; height: 32px; color: var(--pf-gold); opacity: .32; }
+.pf-card:hover .pf-card__art svg { opacity: .5; }
+.pf-card__cap { padding: 9px 11px 11px; }
+.pf-card__k { display: block; font-family: var(--pf-mono); font-size: 8px; letter-spacing: .18em; text-transform: uppercase; color: var(--pf-ghost); }
+.pf-card__n { display: block; font-family: var(--pf-serif); font-size: 15px; color: var(--pf-cream); line-height: 1.15; margin-top: 3px; }
 
 /* showcase + privacy (expandable/closable per item) */
 .pf-show { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; }
@@ -258,5 +251,5 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .pf * { transition: none !important; }
-  .pf-halo, .pf-halo::before, .pf-halo::after { animation: none !important; }
+  .pf-nitro { filter: none !important; }
 }
