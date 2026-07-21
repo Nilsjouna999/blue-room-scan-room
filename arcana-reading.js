@@ -7,7 +7,7 @@
 ============================================================ */
 (function () {
   "use strict";
-  var SKELETON = "<header class=\"top\">\n  <a href=\"#\" id=\"home\">Blue&nbsp;Room &middot; Arcana</a>\n  <span class=\"bar\"><i id=\"bar\"></i></span>\n  <button class=\"redraw\" id=\"redraw\" type=\"button\">Draw again</button>\n</header>\n<main id=\"app\"></main>\n<script id=\"codex\" type=\"application/json\"></script>\n<script id=\"kb\" type=\"application/json\"></script>\n<script id=\"practical\" type=\"application/json\"></script>\n<script id=\"kwcolor\" type=\"application/json\"></script>\n";
+  var SKELETON = "<header class=\"top\"><a href=\"?dev=profile\" class=\"top__back\">\u2190 Profile</a>\n  <a href=\"#\" id=\"home\">Blue&nbsp;Room &middot; Arcana</a>\n  <span class=\"bar\"><i id=\"bar\"></i></span>\n  <button class=\"redraw\" id=\"redraw\" type=\"button\">Draw again</button>\n</header>\n<main id=\"app\"></main>\n<script id=\"codex\" type=\"application/json\"></script>\n<script id=\"kb\" type=\"application/json\"></script>\n<script id=\"practical\" type=\"application/json\"></script>\n<script id=\"kwcolor\" type=\"application/json\"></script>\n";
   var cssDone = false;
   function injectCSS() {
     if (cssDone || document.getElementById("arc-full-css")) return;

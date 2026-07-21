@@ -251,3 +251,4 @@ a{color:inherit}
   .wheel{width:min(240px,80vw);height:min(240px,80vw)}
 }
 @media (prefers-reduced-motion:reduce){.read.anim{opacity:1;transform:none;transition:none}}
+.top__back{border:1px solid var(--edge);border-radius:2px;padding:6px 12px}

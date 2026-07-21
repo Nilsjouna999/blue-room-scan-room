@@ -13,6 +13,7 @@ head  = open(os.path.join(BASE, 'gen_head.css'), encoding='utf-8').read()
 fonts = open(os.path.join(BASE, 'fonts.css'),    encoding='utf-8').read()
 css   = head.replace('__FONTS__', fonts)
 css   = css[css.index('<style>') + len('<style>') : css.rindex('</style>')].strip()
+css  += '\n.top__back{border:1px solid var(--edge);border-radius:2px;padding:6px 12px}'   # in-app back-to-profile button
 open(os.path.join(REPO, 'arcana-reading.css'), 'w', encoding='utf-8').write(css)
 
 # ---- JS: gen_body.js -> arcana-reading.js ----
@@ -21,6 +22,8 @@ skeleton, _, rest = body.partition('<script>')       # split at the engine scrip
 engine, _, _      = rest.rpartition('</script>')     # the IIFE:  (function(){ ... })();
 for ph in ('__CODEX__', '__KB__', '__PRACTICAL__', '__KWCOLOR__'):
     skeleton = skeleton.replace(ph, '')              # data filled at runtime, not build time
+# in-app only: a back-to-profile link in the reading header (the standalone artifact has none)
+skeleton = skeleton.replace('<header class="top">', '<header class="top"><a href="?dev=profile" class="top__back">← Profile</a>', 1)
 eng = engine.strip()
 assert eng.startswith('(function(){') and eng.endswith('})();'), eng[:40]
 eng_body = eng[len('(function(){'):-len('})();')]    # unwrap the IIFE
