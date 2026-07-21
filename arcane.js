@@ -224,9 +224,7 @@
     var unlocked = acctUnlocked();
     var chips = WHOFOR.map(function (w, i) {
       var locked = w.gated && !unlocked;
-      var extra = locked
-        ? '<span class="ac-forwhom__lock" aria-hidden="true">&#128274; after your first reading</span>'
-        : (w.pick ? '<span class="ac-forwhom__crown">choose who &rsaquo;</span>' : "");
+      var extra = (!locked && w.pick) ? '<span class="ac-forwhom__sub">choose who</span>' : "";
       return '<button type="button" class="ac-forwhom__chip' + (locked ? " is-locked" : "") + (w.pick ? " ac-forwhom__chip--fam" : "") + '"' +
         ' role="radio" aria-checked="' + (i === 0 ? "true" : "false") + '"' + (locked ? ' aria-disabled="true"' : "") +
         ' data-forwhom="' + w.id + '"' + (w.pick && !locked ? ' data-fampick aria-haspopup="menu" aria-expanded="false"' : "") + ">" +
@@ -240,7 +238,7 @@
     return '<div class="ac-forwhom" data-ac-forwhom>' +
       '<span class="ac-forwhom__label">For whom is this drawn?</span>' +
       '<div class="ac-forwhom__opts" role="radiogroup" aria-label="For whom is this drawn?">' + chips + "</div>" +
-      (unlocked ? "" : '<p class="ac-forwhom__note">Your first reading is for yourself. Family and friends unlock once you have completed a reading.</p>') +
+      (unlocked ? "" : '<p class="ac-forwhom__note">Reading for family and friends unlocks after your first personal reading.</p>') +
       famMenu +
       "</div>";
   }

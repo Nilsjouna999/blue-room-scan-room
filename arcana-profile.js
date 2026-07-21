@@ -143,43 +143,45 @@
       '</nav></header>';
   }
 
-  /* ---------- the identity header — a quiet LEFT header at the column edge ---------- */
+  /* ---------- the hero — identity name + crown, LEFT-aligned, above the Rings ---------- */
   function surfaceHTML() {
-    return '<section class="pf-surface">' +
-      '<div class="pf-id">' +
-        '<span class="pf-id__av" aria-hidden="true">' + esc(SEEKER.avatar) + '</span>' +
-        '<span class="pf-id__txt">' +
-          '<span class="pf-id__name">' + esc(SEEKER.display_name) + '</span>' +
-          '<span class="pf-id__handle">' + esc(SEEKER.handle) +
-            (SEEKER.birth ? '<span class="pf-id__born"> · ' + esc(SEEKER.place) + ' · ' + esc(SEEKER.birth) + '</span>' : '') +
-          '</span>' +
-        '</span></div>' +
-    '</section>';
-  }
-
-  /* ---------- the Crown — the reading button, sat above the Rings (no name headline) ---------- */
-  function crownBlockHTML() {
     var c = SEEKER.crown_record, taken = c && c.result_count > 0;
     var points = 3 + (c ? c.inputs_provided.length : 0), gems = c ? c.result_count : 0;
+
+    var id = '<div class="pf-id">' +
+      '<span class="pf-id__av" aria-hidden="true">' + esc(SEEKER.avatar) + '</span>' +
+      '<span class="pf-id__txt">' +
+        '<span class="pf-id__name">' + esc(SEEKER.display_name) + '</span>' +
+        '<span class="pf-id__handle">' + esc(SEEKER.handle) +
+          (SEEKER.birth ? '<span class="pf-id__born"> · ' + esc(SEEKER.place) + ' · ' + esc(SEEKER.birth) + '</span>' : '') +
+        '</span>' +
+      '</span></div>';
+
+    // the Crown — the reading button; "Open this reading" IS the full arcana result page.
+    // No profile-side redraw: to get a new reading, draw one from the Arcana Room.
+    var crown;
     if (taken) {
-      return '<div class="pf-crownblock">' +
+      crown = '<div class="pf-crownrow">' +
         '<button type="button" class="pf-crownbtn" data-open-reading="' + esc(c.reading_id) + '" aria-label="Open your Arcana reading">' +
           crownSVG(points, gems, { cls: "pf-crown-svg", aria: "Crown holding " + gems + " readings" }) +
         '</button>' +
-        (c.spine ? '<p class="pf-spine">' + esc(c.spine) + '</p>' : '') +
-        '<p class="pf-prov">' + gems + ' rubies set — one for each reading it holds.</p>' +
-        '<div class="pf-crownacts">' +
+        '<div class="pf-crownrow__txt">' +
+          (c.spine ? '<p class="pf-spine">' + esc(c.spine) + '</p>' : '') +
+          '<p class="pf-prov">' + gems + ' rubies set — one for each reading it holds.</p>' +
           '<a class="pf-openreading pf-openreading--lg" href="#" data-open-reading="' + esc(c.reading_id) + '">Open this reading &rarr;</a>' +
-          '<a class="pf-redraw pf-paid" href="#" data-draw="self" data-intent="redraw">&#8635; Redraw with more marks &middot; $4.99</a>' +
+        '</div></div>';
+    } else {
+      crown = '<div class="pf-crownrow">' +
+        '<button type="button" class="pf-crownbtn pf-crownbtn--empty pf-paid" data-draw="self" data-intent="new" aria-label="Draw your Arcana reading">' +
+          '<span class="pf-crown-empty">No crown yet<br>draw a reading</span>' +
+        '</button>' +
+        '<div class="pf-crownrow__txt">' +
+          '<p class="pf-prov">A crown is earned by taking a reading — it gains a ruby for each reading it holds.</p>' +
+          '<a class="pf-openreading pf-openreading--lg pf-paid" href="#" data-draw="self" data-intent="new">Draw your Arcana &middot; $4.99 &rarr;</a>' +
         '</div></div>';
     }
-    return '<div class="pf-crownblock">' +
-      '<button type="button" class="pf-crownbtn pf-crownbtn--empty pf-paid" data-draw="self" data-intent="new" aria-label="Draw your Arcana reading">' +
-        '<span class="pf-crown-empty">No crown yet<br>draw a reading</span>' +
-      '</button>' +
-      '<p class="pf-prov">A crown is earned by taking a reading — it gains a ruby for each reading it holds.</p>' +
-      '<div class="pf-crownacts"><a class="pf-openreading pf-openreading--lg pf-paid" href="#" data-draw="self" data-intent="new">Draw your Arcana &middot; $4.99 &rarr;</a></div>' +
-    '</div>';
+
+    return '<section class="pf-surface">' + id + crown + '</section>';
   }
 
   /* ---------- Rings — family + friend crowns (§3.4) ---------- */
@@ -283,7 +285,6 @@
       headerHTML() +
       '<div class="pf-wrap">' +
         surfaceHTML() +
-        crownBlockHTML() +
         ringsHTML() +
         vaultHTML() +
         showcaseHTML() +

@@ -60,13 +60,13 @@
 .ac-forwhom__chip:hover { border-color: var(--gold, #c9a35c); color: var(--t-display); }
 .ac-forwhom__chip[aria-checked="true"] { border-color: var(--gold, #c9a35c); color: var(--t-display); background: rgba(201,163,92,0.06); }
 .ac-forwhom__chip--new { border-style: dashed; }
-.ac-forwhom__crown { font-family: var(--font-display); font-style: italic; font-size: 11.5px; color: var(--t-ghost); }
-.ac-forwhom__chip[aria-checked="true"] .ac-forwhom__crown { color: var(--gold, #c9a35c); }
-/* locked chips — Family/Friend, until the first reading is done */
-.ac-forwhom__chip.is-locked { border-style: dashed; border-color: rgba(201,163,92,0.12); color: var(--t-ghost); cursor: not-allowed; opacity: .7; }
-.ac-forwhom__chip.is-locked:hover { border-color: rgba(201,163,92,0.12); color: var(--t-ghost); background: none; }
-.ac-forwhom__lock { font-family: var(--font-ui); font-size: 9px; letter-spacing: .05em; color: var(--t-ghost); }
-.ac-forwhom__note { font-family: var(--font-display); font-style: italic; font-size: 13px; color: var(--t-meta); margin: 14px auto 0; max-width: 46ch; line-height: 1.5; }
+.ac-forwhom__sub { font-family: var(--font-ui); font-size: 9.5px; letter-spacing: .05em; color: var(--t-ghost); }
+.ac-forwhom__chip[aria-checked="true"] .ac-forwhom__sub { color: var(--gold, #c9a35c); }
+/* locked chips — Family/Friend, until the first personal reading is done */
+.ac-forwhom__chip.is-locked { border-style: dashed; border-color: rgba(201,163,92,0.1); color: var(--t-ghost); cursor: not-allowed; opacity: .6; }
+.ac-forwhom__chip.is-locked:hover { border-color: rgba(201,163,92,0.1); color: var(--t-ghost); background: none; }
+/* the dull line beneath — what it is + when it unlocks */
+.ac-forwhom__note { font-family: var(--font-ui); font-size: 10.5px; letter-spacing: .05em; color: var(--t-ghost); margin: 16px auto 0; max-width: 46ch; line-height: 1.6; }
 /* the family-member picker (opens when Family is chosen, once unlocked) */
 .ac-fammenu { display: flex; flex-wrap: wrap; justify-content: center; gap: 7px; margin: 16px auto 0; max-width: 480px; }
 .ac-fammenu[hidden] { display: none; }

@@ -90,19 +90,17 @@
 .pf-id__handle { font-family: var(--pf-mono); font-size: 11px; letter-spacing: .14em; color: var(--pf-meta); margin-top: 4px; }
 .pf-id__born { color: var(--pf-ghost); letter-spacing: .1em; }
 
-/* the Crown — placeholder art wrapped as the reading button; sits above the Rings (no name headline) */
-.pf-crownblock { display: flex; flex-direction: column; align-items: center; text-align: center; margin: clamp(18px, 3.5vh, 34px) auto clamp(4px, 1vh, 10px); }
-.pf-crownbtn { display: flex; flex-direction: column; align-items: center; gap: 8px; background: none; border: 1px solid transparent; border-radius: 12px; padding: 10px 20px; cursor: pointer; transition: border-color .18s, background .18s; }
+/* the Crown — the reading button; a LEFT-aligned row (crown + reading info) above the Rings */
+.pf-crownrow { display: flex; align-items: center; gap: clamp(14px, 2.5vw, 24px); padding-left: 23px; margin: clamp(16px, 3vh, 28px) 0 0; }
+.pf-crownbtn { display: inline-flex; flex: none; background: none; border: 1px solid transparent; border-radius: 12px; padding: 8px; cursor: pointer; transition: border-color .18s, background .18s; }
 .pf-crownbtn:hover, .pf-crownbtn:focus-visible { border-color: var(--pf-line); background: rgba(162,134,74,.035); outline: none; }
-.pf-crown-svg { width: clamp(148px, 26vw, 208px); height: auto; filter: drop-shadow(0 12px 16px rgba(0,0,0,.5)) drop-shadow(0 5px 14px rgba(162,134,74,.13)) drop-shadow(0 0 12px rgba(162,134,74,.09)); }
-.pf-crownbtn:hover .pf-crown-svg { filter: drop-shadow(0 12px 16px rgba(0,0,0,.5)) drop-shadow(0 5px 16px rgba(162,134,74,.2)) drop-shadow(0 0 14px rgba(162,134,74,.15)); }
-.pf-crown-empty { width: clamp(160px, 30vw, 210px); aspect-ratio: 1 / .62; display: grid; place-items: center; border: 1px dashed var(--pf-violet-line); border-radius: 4px; color: var(--pf-violet-lit); font-family: var(--pf-mono); font-size: 9px; letter-spacing: .2em; text-transform: uppercase; text-align: center; line-height: 1.9; padding: 12px; }
-/* the reading's spine under the name — the three named draws, in gold */
-.pf-spine { font-family: var(--pf-mono); font-size: 10px; letter-spacing: .2em; text-transform: uppercase; color: var(--pf-gold); opacity: .9; margin: 13px 0 0; }
-.pf-prov { font-family: var(--pf-serif); font-style: italic; font-size: 14.5px; color: var(--pf-meta); margin: 6px auto 0; max-width: 42ch; line-height: 1.5; }
-
-/* crown actions — Open this reading (free, gold) + Redraw (paid, violet), kept tight under the crown */
-.pf-crownacts { display: flex; flex-direction: column; align-items: center; gap: 11px; margin: 13px 0 0; }
+.pf-crown-svg { width: clamp(104px, 17vw, 148px); height: auto; filter: drop-shadow(0 10px 14px rgba(0,0,0,.5)) drop-shadow(0 4px 12px rgba(162,134,74,.13)) drop-shadow(0 0 10px rgba(162,134,74,.09)); }
+.pf-crownbtn:hover .pf-crown-svg { filter: drop-shadow(0 10px 14px rgba(0,0,0,.5)) drop-shadow(0 4px 14px rgba(162,134,74,.2)) drop-shadow(0 0 12px rgba(162,134,74,.15)); }
+.pf-crownrow__txt { display: flex; flex-direction: column; align-items: flex-start; gap: 9px; }
+.pf-crown-empty { width: clamp(140px, 24vw, 180px); aspect-ratio: 1 / .62; display: grid; place-items: center; border: 1px dashed var(--pf-violet-line); border-radius: 4px; color: var(--pf-violet-lit); font-family: var(--pf-mono); font-size: 9px; letter-spacing: .2em; text-transform: uppercase; text-align: center; line-height: 1.9; padding: 12px; }
+/* the reading's spine + provenance — left-aligned beside the crown */
+.pf-spine { font-family: var(--pf-mono); font-size: 10px; letter-spacing: .2em; text-transform: uppercase; color: var(--pf-gold); opacity: .9; margin: 0; }
+.pf-prov { font-family: var(--pf-serif); font-style: italic; font-size: 14.5px; color: var(--pf-meta); margin: 0; max-width: 40ch; line-height: 1.5; }
 .pf-openreading--lg { padding: 10px 22px; font-size: 10.5px; letter-spacing: .18em; border: 1px solid var(--pf-line-cut); border-radius: 999px; }
 .pf-openreading--lg:hover, .pf-openreading--lg:focus-visible { border-color: var(--pf-gold); }
 
