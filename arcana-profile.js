@@ -32,9 +32,12 @@
     display_name: "Antton Aikio",
     handle: "@antton",
     avatar: "A",
+    birth: "9 April 2001",
+    place: "Inari, Finland",
     crown_record: {
       reading_id: "BR-3F9A2C",
       name: "The Twice-Kindled Founder",
+      spine: "Aries · Snake · Life Path 7",
       inputs_provided: ["name", "birth date", "birthplace"],
       result_count: 3, created_at: "2026-07-09", is_current: true
     },
@@ -194,7 +197,9 @@
       '<span class="pf-id__av" aria-hidden="true">' + esc(SEEKER.avatar) + '</span>' +
       '<span class="pf-id__txt">' +
         '<span class="pf-id__name">' + esc(SEEKER.display_name) + '</span>' +
-        '<span class="pf-id__handle">' + esc(SEEKER.handle) + '</span>' +
+        '<span class="pf-id__handle">' + esc(SEEKER.handle) +
+          (SEEKER.birth ? '<span class="pf-id__born"> · ' + esc(SEEKER.place) + ' · ' + esc(SEEKER.birth) + '</span>' : '') +
+        '</span>' +
       '</span></div>';
 
     // the Crown = the reading button (placeholder art; final crown comes later, wraps this same button)
@@ -205,6 +210,7 @@
           crownSVG(points, gems, { cls: "pf-crown-svg", aria: "Crown holding " + gems + " readings" }) +
           '<span class="pf-crown-name pf-nitro">' + esc(c.name) + '</span>' +
         '</button>' +
+        (c.spine ? '<p class="pf-spine">' + esc(c.spine) + '</p>' : '') +
         '<p class="pf-prov">' + gems + ' rubies set — one for each reading it holds.</p>' +
         '<div class="pf-crownacts">' +
           '<a class="pf-openreading pf-openreading--lg" href="#" data-open-reading="' + esc(c.reading_id) + '">Open this reading &rarr;</a>' +

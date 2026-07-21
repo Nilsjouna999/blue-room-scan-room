@@ -1246,6 +1246,7 @@ function renderMenu(reveal) {
         </div>
 
         <div class="menu__portals">
+          <a class="menu__codex" href="?dev=profile"><span class="menu__codex__mark" aria-hidden="true">◆</span> The Reliquary <span class="menu__codex__arr" aria-hidden="true">→</span></a>
           <a class="menu__codex" href="codex.html"><span class="menu__codex__mark" aria-hidden="true">◆</span> The Codex <span class="menu__codex__arr" aria-hidden="true">→</span></a>
           <a class="menu__codex" href="?dev=arcane"><span class="menu__codex__mark" aria-hidden="true">◆</span> The Arcane Reading <span class="menu__codex__arr" aria-hidden="true">→</span></a>
         </div>

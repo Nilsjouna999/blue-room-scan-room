@@ -43,17 +43,51 @@
     '<path d="M3.2 16 L20.8 16" stroke="currentColor" stroke-width="1.05"/></svg>';
 
   /* ---------- the draw ---------- */
-  function draw(by, seed) {
+  function byName(arr, name) {
+    var n = String(name).toLowerCase();
+    return (arr || []).filter(function (e) { return String(e.name || "").toLowerCase() === n; })[0] || (arr && arr[0]);
+  }
+
+  /* Antton Aikio · 9 April 2001 · Inari, Finland — the canonical birth reading.
+     Deterministic from the birth data: Aries (sun, 9 Apr) · Snake (year 2001,
+     fixed element Fire) · Life Path 7 (0+9+0+4+2+0+0+1 = 16 → 7) · The Emperor
+     draw → assembles to "The Twice-Kindled Founder" (Fire×Fire = Twice-Kindled,
+     Emperor = Founder). Counsel/rune/trigram/hexagram are seeded from his stable
+     identity so they never re-roll. */
+  function anttonPicks(by) {
+    var P = window.BRArcanaName.pick, s = "antton-2001-04-09-inari";
+    return {
+      sun: byName(by.sun, "Aries"),
+      chinese: byName(by.chinese, "Snake"),
+      lifePath: byName(by.lifePath, "7"),
+      tarotMajor: byName(by.tarotMajor, "The Emperor"),
+      tarotCounsel: P(by.tarotMajor, s + "-tc"),
+      rune: P(by.rune, s + "-rn"),
+      trigram: P(by.trigram, s + "-tg"),
+      hexagram: P(by.hexagram, s + "-hx")
+    };
+  }
+
+  function seededPicks(by, seed) {
     var P = window.BRArcanaName.pick;
+    return {
+      sun: P(by.sun, seed + "-sun"), chinese: P(by.chinese, seed + "-chi"),
+      lifePath: P(by.lifePath, seed + "-lp"), tarotMajor: P(by.tarotMajor, seed + "-tm"),
+      tarotCounsel: P(by.tarotMajor, seed + "-tc"), rune: P(by.rune, seed + "-rn"),
+      trigram: P(by.trigram, seed + "-tg"), hexagram: P(by.hexagram, seed + "-hx")
+    };
+  }
+
+  function drawFromPicks(p) {
     return [
-      { chapter: "I · The Named",    slot: "Sun sign",     entry: P(by.sun, seed + "-sun") },
-      { chapter: "I · The Named",    slot: "Year animal",  entry: P(by.chinese, seed + "-chi") },
-      { chapter: "I · The Named",    slot: "Life path",    entry: P(by.lifePath, seed + "-lp") },
-      { chapter: "II · The Counsel", slot: "The draw",     entry: P(by.tarotMajor, seed + "-tm") },
-      { chapter: "II · The Counsel", slot: "Counsel card", entry: P(by.tarotMajor, seed + "-tc") },
-      { chapter: "II · The Counsel", slot: "Rune",         entry: P(by.rune, seed + "-rn") },
-      { chapter: "II · The Counsel", slot: "Trigram",      entry: P(by.trigram, seed + "-tg") },
-      { chapter: "III · The Standing", slot: "Hexagram",   entry: P(by.hexagram, seed + "-hx") }
+      { chapter: "I · The Named",    slot: "Sun sign",     entry: p.sun },
+      { chapter: "I · The Named",    slot: "Year animal",  entry: p.chinese },
+      { chapter: "I · The Named",    slot: "Life path",    entry: p.lifePath },
+      { chapter: "II · The Counsel", slot: "The draw",     entry: p.tarotMajor },
+      { chapter: "II · The Counsel", slot: "Counsel card", entry: p.tarotCounsel },
+      { chapter: "II · The Counsel", slot: "Rune",         entry: p.rune },
+      { chapter: "II · The Counsel", slot: "Trigram",      entry: p.trigram },
+      { chapter: "III · The Standing", slot: "Hexagram",   entry: p.hexagram }
     ].filter(function (d) { return !!d.entry; });
   }
 
@@ -137,14 +171,14 @@
     }
     fetch(CODEX_URL).then(function (res) { return res.json(); }).then(function (codex) {
       var by = window.BRArcanaName.indexCodex(codex);
-      var seed = new URLSearchParams(location.search).get("seed") || "br-01";
-      var draws = draw(by, seed);
-      var P = window.BRArcanaName.pick;
+      // Default (no ?seed) = Antton's canonical birth reading; ?seed rolls a demo draw.
+      var seed = new URLSearchParams(location.search).get("seed");
+      var picks = seed ? seededPicks(by, seed) : anttonPicks(by);
+      var draws = drawFromPicks(picks);
       var crown = window.BRArcanaName.assemble({
-        sun: P(by.sun, seed + "-sun"), chinese: P(by.chinese, seed + "-chi"),
-        lifePath: P(by.lifePath, seed + "-lp"), tarotMajor: P(by.tarotMajor, seed + "-tm"),
-        tarotCounsel: P(by.tarotMajor, seed + "-tc"), rune: P(by.rune, seed + "-rn"),
-        trigram: P(by.trigram, seed + "-tg")
+        sun: picks.sun, chinese: picks.chinese, lifePath: picks.lifePath,
+        tarotMajor: picks.tarotMajor, tarotCounsel: picks.tarotCounsel,
+        rune: picks.rune, trigram: picks.trigram
       });
       host.innerHTML = render(draws, crown);
       wire(host);

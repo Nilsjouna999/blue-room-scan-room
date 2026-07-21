@@ -86,6 +86,7 @@
 .pf-id__txt { display: flex; flex-direction: column; }
 .pf-id__name { font-family: var(--pf-serif); font-weight: 600; font-size: clamp(24px, 3vw, 32px); line-height: 1.05; letter-spacing: .012em; color: var(--pf-cream-display); }
 .pf-id__handle { font-family: var(--pf-mono); font-size: 11px; letter-spacing: .14em; color: var(--pf-meta); margin-top: 4px; }
+.pf-id__born { color: var(--pf-ghost); letter-spacing: .1em; }
 
 /* the Crown — placeholder art wrapped as the reading button; centred monument, the most negative space */
 .pf-crownwrap { display: flex; flex-direction: column; align-items: center; text-align: center; margin: clamp(22px, 4.5vh, 44px) auto clamp(8px, 2vh, 16px); }
@@ -98,7 +99,9 @@
 .pf-nitro { filter: url(#pfNitro); color: var(--pf-crown); }
 @media (prefers-reduced-motion: reduce) { .pf-nitro { filter: none; } }
 .pf-crown-empty { width: clamp(160px, 30vw, 210px); aspect-ratio: 1 / .62; display: grid; place-items: center; border: 1px dashed var(--pf-violet-line); border-radius: 4px; color: var(--pf-violet-lit); font-family: var(--pf-mono); font-size: 9px; letter-spacing: .2em; text-transform: uppercase; text-align: center; line-height: 1.9; padding: 12px; }
-.pf-prov { font-family: var(--pf-serif); font-style: italic; font-size: 14.5px; color: var(--pf-meta); margin: 8px auto 0; max-width: 42ch; line-height: 1.5; }
+/* the reading's spine under the name — the three named draws, in gold */
+.pf-spine { font-family: var(--pf-mono); font-size: 10px; letter-spacing: .2em; text-transform: uppercase; color: var(--pf-gold); opacity: .9; margin: 13px 0 0; }
+.pf-prov { font-family: var(--pf-serif); font-style: italic; font-size: 14.5px; color: var(--pf-meta); margin: 6px auto 0; max-width: 42ch; line-height: 1.5; }
 
 /* crown actions — Open this reading (free, gold) + Redraw (paid, violet), kept tight under the crown */
 .pf-crownacts { display: flex; flex-direction: column; align-items: center; gap: 11px; margin: 13px 0 0; }
