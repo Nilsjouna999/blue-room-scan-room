@@ -1,212 +1,263 @@
 /* =============================================================
    THE DRAWING ROOM (?dev=drawing-room) — window.BRDrawingRoom
 
-   The tarot room. A question-led draw where the SAVE is the product:
-   a card is drawn, CUT, and filed to the Reliquary. STEP 1 = the free
-   single-card "taste" — Majors-only, upright — built on the museum .pf-*
-   language and the deterministic FNV-1a engine. NO AI. Reproducible on
-   reopen via the sealed token in the URL. The 22 Majors are read from
-   codex-data.json (the Codex's own voice — no duplication).
+   The tarot room. Three tiers, all DETERMINISTIC (no AI):
+     • THE PULL (first page, free, unlimited) — draw a single card to meet
+       the deck. A showcase; not filed.
+     • A SITTING (free once, then paid) — a 3-card reading, FILED to the
+       Reliquary. Positions: The Ground / The Crossing / The Turn.
+     • THE DEEP READ (paid) — a 5-card reading, filed. The flagship.
 
-   Canon: DESCRIBE, never predict; "the cut does not choose the cards, it
-   closes the question"; colour law "crown + hairline ink"; reduced-motion
-   safe; a11y (aria-live for draw + filing, keyboard reveal). Exposes
-   window.BRDrawingRoom. Step 2 = write the 56 Minors (+ Codex); Step 3 =
-   the paid 10-card full-deck flagship + real Vault filing.
+   A reading carries what the Codex cannot: WHERE each card fell (its
+   position) and WHICH WAY (upright/reversed), a filing stamp (date + BR
+   accession), a deterministic BINDING line woven from the drawn cards'
+   own keywords, a seeded HALLMARK, and the credo "Drawn once. Not
+   reissued." Cards + meanings come live from codex-data.json (Majors +
+   Minors = the full 78-card DECK). Reproducible on reopen via the sealed
+   token in the URL. Canon: DESCRIBE, never predict; "the cut closes the
+   question, it does not choose the cards"; colour law; reduced-motion safe.
 ============================================================= */
 (function () {
   "use strict";
 
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
-
-  /* FNV-1a — the same deterministic hash the reading uses. No randomness. */
   function hash(s) { var h = 2166136261; for (var i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = (h * 16777619) >>> 0; } return h >>> 0; }
   function pick(list, seed) { return list && list.length ? list[hash(seed) % list.length] : null; }
   function norm(s) { return String(s == null ? "" : s).toLowerCase().replace(/[^a-z0-9]+/g, " ").trim(); }
   function inApp() { return /[?&]dev=/.test(location.search); }
-
-  /* sealed token = the minute the cut is made, base36. Stored in the URL so a
-     reopen reproduces the identical draw. The cut CLOSES the question. */
   function sealNow() { return Math.floor(Date.now() / 60000).toString(36); }
-  function seedOf(q, t) { return "draw~" + norm(q) + "~" + t; }
-  function brCode(seed) { return "BR-" + ("00000" + (hash(seed) % 0xFFFFF).toString(16).toUpperCase()).slice(-5); }
-
+  function brCode(seed) { return "BR-" + ("00000" + (hash(seed + "br") % 0xFFFFF).toString(16).toUpperCase()).slice(-5); }
   function param(k) { var m = new RegExp("[?&]" + k + "=([^&]*)").exec(location.search); return m ? decodeURIComponent(m[1].replace(/\+/g, " ")) : ""; }
-
-  var DECK = [];   // the full 78-card deck (Majors + Minors), loaded from codex-data.json
   var MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-
-  function numeralOf(m) { return String((m && m.tag) || "").trim().split(/\s+/)[0] || ""; }
-  function firstKw(m) { return (m && m.keywords && m.keywords[0]) || ""; }
   function filedDate() { var d = new Date(); return d.getDate() + " " + MONTHS[d.getMonth()] + " " + d.getFullYear(); }
+  function numeralOf(c) { return String((c && c.tag) || "").trim().split(/\s+/)[0] || ""; }
+  function firstKw(c) { return (c && c.keywords && c.keywords[0]) || (c ? c.name : ""); }
 
-  /* ---- gradient defs: reuse the crown gold + a warm-grey ink ---- */
+  var DECK = [];            // full 78-card deck (Majors + Minors), from codex-data.json
+  var HOST = null, SESSION = "s", pullN = 0;
+
+  var SPREADS = {
+    sitting: { key: "sitting", title: "A Sitting", n: 3, paid: false,
+      positions: ["The Ground", "The Crossing", "The Turn"],
+      notes: ["what the matter rests on", "what stands against it", "where it tends, left as it stands"] },
+    deep: { key: "deep", title: "The Deep Read", n: 5, paid: true,
+      positions: ["The Ground", "The Crossing", "The Root", "The Crown", "The Turn"],
+      notes: ["what it rests on", "what stands against it", "what it grew from", "what it reaches for", "where it tends"] }
+  };
+
+  /* draw N DISTINCT cards + orientations, deterministically from the seed */
+  function drawSpread(seed, n) {
+    var out = [], used = {}, i = 0, cap = (DECK.length || 78) * 4;
+    while (out.length < n && i < cap) {
+      var c = pick(DECK, seed + "~" + i); i++;
+      if (!c || used[c.name]) continue;
+      used[c.name] = 1;
+      out.push({ card: c, reversed: (hash(seed + "o" + out.length) & 1) === 1 });
+    }
+    return out;
+  }
+
+  /* the BINDING line — the light synthesis, woven from the drawn cards' OWN
+     first keywords + the positions. Fully deterministic; no AI. */
+  function bindingLine(sp, drawn) {
+    function kw(i) { return firstKw(drawn[i] && drawn[i].card); }
+    if (sp.n === 3) return "Read as one — the matter rests on " + kw(0) + ", is crossed by " + kw(1) + ", and tends toward " + kw(2) + ".";
+    return "Read as one — it rests on " + kw(0) + ", is crossed by " + kw(1) + ", grew from " + kw(2) + ", reaches for " + kw(3) + ", and tends toward " + kw(4) + ".";
+  }
+
+  /* a seeded assay HALLMARK — a small mark that varies per reading (bury-the-treasure) */
+  function hallmarkSVG(seed) {
+    var n = 9 + (hash(seed + "hm") % 5), t = "", i, a;
+    for (i = 0; i < n; i++) { a = (i / n) * Math.PI * 2; t += '<line x1="' + (12 + Math.cos(a) * 6.6).toFixed(1) + '" y1="' + (12 + Math.sin(a) * 6.6).toFixed(1) + '" x2="' + (12 + Math.cos(a) * 9).toFixed(1) + '" y2="' + (12 + Math.sin(a) * 9).toFixed(1) + '"/>'; }
+    return '<svg viewBox="0 0 24 24" class="dr-hallmark" role="img" aria-label="assay hallmark"><g stroke="url(#drInk)" stroke-width=".7" fill="none"><circle cx="12" cy="12" r="5.2"/><circle cx="12" cy="12" r="1.4"/>' + t + '</g></svg>';
+  }
+
   var DEFS = '<svg class="pf-defs" width="0" height="0" aria-hidden="true"><defs>' +
     '<linearGradient id="drGold" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#c8ad70"/><stop offset=".55" stop-color="#a2864a"/><stop offset="1" stop-color="#5f471f"/></linearGradient>' +
     '<linearGradient id="drInk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9c9790"/><stop offset="1" stop-color="#6f6b64"/></linearGradient>' +
     '</defs></svg>';
 
-  /* the card BACK — purely geometric, symmetric; never hints orientation */
   function backSVG() {
     return '<svg class="dr-plate" viewBox="0 0 120 190" aria-hidden="true">' +
       '<rect x="7" y="7" width="106" height="176" rx="7" fill="none" stroke="url(#drInk)" stroke-width="1"/>' +
       '<rect x="13" y="13" width="94" height="164" rx="5" fill="none" stroke="url(#drInk)" stroke-width=".5" opacity=".6"/>' +
-      '<g stroke="url(#drInk)" stroke-width=".6" fill="none" opacity=".7">' +
-      '<path d="M60 42 L86 95 L60 148 L34 95 Z"/><path d="M60 64 L74 95 L60 126 L46 95 Z"/><circle cx="60" cy="95" r="4.5"/>' +
-      '</g></svg>';
+      '<g stroke="url(#drInk)" stroke-width=".6" fill="none" opacity=".7"><path d="M60 42 L86 95 L60 148 L34 95 Z"/><path d="M60 64 L74 95 L60 126 L46 95 Z"/><circle cx="60" cy="95" r="4.5"/></g></svg>';
   }
-  /* the card FACE — an engraved Card of Record (per-card art drops in later) */
-  function faceSVG(m) {
-    return '<svg class="dr-plate" viewBox="0 0 120 190" aria-hidden="true">' +
+  /* the engraved plate; the emblem inverts for a reversed card (per-card art drops in later) */
+  function faceSVG(c, reversed) {
+    return '<svg class="dr-plate' + (reversed ? ' dr-plate--rev' : '') + '" viewBox="0 0 120 190" aria-hidden="true">' +
       '<rect x="6" y="6" width="108" height="178" rx="7" fill="none" stroke="url(#drGold)" stroke-width="1.1"/>' +
       '<rect x="11" y="11" width="98" height="168" rx="5" fill="none" stroke="url(#drInk)" stroke-width=".5" opacity=".7"/>' +
-      '<text x="60" y="30" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9" letter-spacing="2.5" fill="url(#drGold)">' + esc(numeralOf(m)) + '</text>' +
-      '<g stroke="url(#drGold)" fill="none">' +
-      '<circle cx="60" cy="98" r="31" stroke-width=".8" opacity=".5"/><circle cx="60" cy="98" r="23" stroke-width=".6" opacity=".35"/>' +
-      '<path d="M60 71 L75 98 L60 125 L45 98 Z" stroke-width=".9" opacity=".7"/>' +
-      '<circle cx="60" cy="98" r="3.2" fill="url(#drGold)" stroke="none"/>' +
-      '</g></svg>';
+      '<g class="dr-plate__mark">' +
+      '<text x="60" y="30" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9" letter-spacing="2.5" fill="url(#drGold)">' + esc(numeralOf(c)) + '</text>' +
+      '<g stroke="url(#drGold)" fill="none"><circle cx="60" cy="98" r="31" stroke-width=".8" opacity=".5"/><circle cx="60" cy="98" r="23" stroke-width=".6" opacity=".35"/>' +
+      '<path d="M60 71 L75 98 L60 125 L45 98 Z" stroke-width=".9" opacity=".7"/><circle cx="60" cy="98" r="3.2" fill="url(#drGold)" stroke="none"/></g></g></svg>';
   }
 
-  /* ---------- render pieces ---------- */
+  /* ---------- shell ---------- */
   function shellOpen() {
-    return '<div class="pf pf--drawing" data-drawing>' + DEFS +
-      '<div class="pf-wrap">' +
+    return '<div class="pf pf--drawing" data-drawing>' + DEFS + '<div class="pf-wrap">' +
       '<a class="pf-back" href="#" data-door="menu">&larr; Back to the menu</a>' +
       '<div class="pf-vaulthead">' +
       '<span class="pf-vaulteyebrow">Blue Room Archive&nbsp;&nbsp;·&nbsp;&nbsp;The Drawing Room</span>' +
       '<h1 class="pf-vaulttitle">The Drawing Room</h1>' +
-      '<p class="pf-vaultintro">One card, drawn to a question and filed to your record.</p>' +
       '<p class="dr-fineprint">The tarot does not predict the future. A card is drawn once, offers a reflection on your situation, and is kept.</p>' +
-      '</div>' +
-      '<div class="dr-stage" data-dr-stage>';
+      '</div><div class="dr-stage" data-dr-stage>';
   }
   function shellClose() { return '</div></div></div>'; }
 
-  function intakeHTML() {
-    return '<div class="dr-intake">' +
-      '<label class="dr-field">' +
-      '<span class="dr-field__label">Lay a matter on the table <span class="dr-field__opt">— optional</span></span>' +
-      '<input type="text" class="dr-field__in" data-dr-question maxlength="120" autocomplete="off" ' +
-      'aria-label="A question or situation you are consulting about. Optional. It is kept with your reading, and it does not choose the cards." placeholder="a question, in your own words" />' +
-      '</label>' +
-      '<button type="button" class="dr-cut" data-dr-cut>Cut the deck</button>' +
-      '<p class="dr-cut__note">The cut does not choose the cards. It closes the question.</p>' +
-      '</div>';
+  /* ---------- the landing: the free single-card pull + the two reading doors ---------- */
+  function landingHTML(pulled) {
+    var card = "";
+    if (pulled) {
+      card = '<div class="dr-pull__card"><div class="dr-card is-revealed"><div class="dr-cardface dr-cardface--back">' + backSVG() + '</div>' +
+        '<div class="dr-cardface dr-cardface--front">' + faceSVG(pulled.card, pulled.reversed) + '<span class="dr-cardface__name">' + esc(pulled.card.name) + '</span></div></div></div>' +
+        '<p class="dr-pull__num">' + esc(numeralOf(pulled.card)) + (pulled.reversed ? ' &middot; reversed' : '') + (firstKw(pulled.card) ? ' &middot; ' + esc(firstKw(pulled.card)) : '') + '</p>' +
+        '<h2 class="dr-pull__name">' + esc(pulled.card.name) + '</h2>' +
+        '<p class="dr-pull__mean">' + esc((pulled.reversed && pulled.card.reversed) ? pulled.card.reversed : pulled.card.meaning) + '</p>';
+    } else {
+      card = '<p class="dr-pull__invite">Pull a card to meet the deck — for looking, not keeping.</p>';
+    }
+    return '<div class="dr-landing">' +
+      '<section class="dr-pull">' + card +
+      '<button type="button" class="dr-cut dr-pull__btn" data-dr-pull>' + (pulled ? "Pull another" : "Pull a card") + '</button>' +
+      '<div class="dr-live" role="status" aria-live="polite" data-dr-live></div>' +
+      '</section>' +
+      '<section class="dr-tiers">' +
+      '<p class="dr-tiers__label">Draw a reading — it is cut, and kept in your Reliquary.</p>' +
+      tierDoor(SPREADS.sitting, "Three cards to one question — your first is free.") +
+      tierDoor(SPREADS.deep, "Five cards, a deeper read.") +
+      '</section></div>';
+  }
+  function tierDoor(sp, sub) {
+    return '<a class="dr-tier' + (sp.paid ? " dr-tier--paid" : "") + '" href="#" data-dr-read="' + sp.key + '">' +
+      '<span class="dr-tier__n">' + esc(sp.title) + '</span>' +
+      '<span class="dr-tier__cards">' + sp.n + ' cards</span>' +
+      '<span class="dr-tier__sub">' + esc(sub) + '</span>' +
+      '<span class="dr-tier__arr" aria-hidden="true">&rarr;</span></a>';
   }
 
-  /* the single card — face-down (a button to reveal) or revealed + read + filed */
-  function drawHTML(card, seed, revealed) {
-    var back = '<div class="dr-cardface dr-cardface--back" aria-hidden="true">' + backSVG() + '</div>';
-    var face = '<div class="dr-cardface dr-cardface--front" aria-hidden="true">' + faceSVG(card) +
-      '<span class="dr-cardface__name">' + esc(card.name) + '</span></div>';
-    var flip = '<div class="dr-card' + (revealed ? ' is-revealed' : '') + '">' + back + face + '</div>';
+  /* ---------- a reading: intake -> cut -> spread reveal -> binding + filed ---------- */
+  function intakeHTML(sp) {
+    return '<div class="dr-intake">' +
+      '<p class="dr-intake__which">' + esc(sp.title) + ' &middot; ' + sp.n + ' cards</p>' +
+      '<label class="dr-field"><span class="dr-field__label">Lay a matter on the table <span class="dr-field__opt">— optional</span></span>' +
+      '<input type="text" class="dr-field__in" data-dr-question maxlength="120" autocomplete="off" placeholder="a question, in your own words" ' +
+      'aria-label="A question or situation. Optional. It is kept with your reading, and it does not choose the cards."></label>' +
+      '<button type="button" class="dr-cut" data-dr-cut>Cut the deck</button>' +
+      '<p class="dr-cut__note">The cut does not choose the cards. It closes the question.</p>' +
+      '<a class="dr-intake__back" href="#" data-dr-home>&larr; the deck</a></div>';
+  }
 
-    if (!revealed) {
-      return '<div class="dr-draw">' +
-        '<button type="button" class="dr-cardbtn" data-dr-reveal aria-label="A card, face down. Press to turn it.">' + flip + '</button>' +
-        '<p class="dr-draw__cue">Turn the card.</p>' +
-        '<div class="dr-live" role="status" aria-live="polite" data-dr-live></div>' +
+  function readingHTML(st) {
+    var sp = SPREADS[st.spread], drawn = st.drawn, done = st.revealed >= sp.n, i;
+    var cards = "";
+    for (i = 0; i < sp.n; i++) {
+      var d = drawn[i], shown = d.shown;
+      var flip = '<div class="dr-card' + (shown ? " is-revealed" : "") + '">' +
+        '<div class="dr-cardface dr-cardface--back">' + backSVG() + '</div>' +
+        '<div class="dr-cardface dr-cardface--front">' + faceSVG(d.card, d.reversed) +
+        '<span class="dr-cardface__name">' + esc(d.card.name) + '</span></div></div>';
+      cards += '<div class="dr-slot' + (shown ? " is-shown" : "") + '">' +
+        '<span class="dr-slot__pos">' + esc(sp.positions[i]) + '</span>' +
+        (shown ? flip : '<button type="button" class="dr-cardbtn" data-dr-turn="' + i + '" aria-label="' + esc(sp.positions[i]) + ', card ' + (i + 1) + ' of ' + sp.n + ', face down. Press to turn it.">' + flip + '</button>') +
         '</div>';
     }
-    return '<div class="dr-draw dr-draw--read">' +
-      '<div class="dr-cardbtn dr-cardbtn--still">' + flip + '</div>' +
-      '<div class="dr-read">' +
-      '<p class="dr-read__num">' + esc(numeralOf(card)) + (firstKw(card) ? ' &middot; ' + esc(firstKw(card)) : '') + '</p>' +
-      '<h2 class="dr-read__name">' + esc(card.name) + '</h2>' +
-      '<p class="dr-read__meaning">' + esc(card.meaning || "") + '</p>' +
-      '<p class="dr-read__frame">Drawn to the matter you laid down — a reflection to sit with, not a forecast.</p>' +
-      '</div>' +
-      '<div class="dr-filed" data-dr-filed>' +
-      '<span class="dr-filed__mark" aria-hidden="true">&#9670;</span>' +
-      '<p class="dr-filed__line">Filed to your Reliquary &middot; ' + esc(brCode(seed)) + ' &middot; ' + esc(filedDate()) + '</p>' +
-      '<a class="pf-openreading pf-openreading--lg" href="#" data-door="profile">Open your Reliquary &rarr;</a>' +
-      '</div>' +
-      '<div class="dr-live" role="status" aria-live="assertive" data-dr-live></div>' +
-      '</div>';
+    var readings = "";
+    for (i = 0; i < sp.n; i++) {
+      if (!drawn[i].shown) continue;
+      var c = drawn[i].card, rev = drawn[i].reversed;
+      readings += '<div class="dr-read"><p class="dr-read__pos">' + esc(sp.positions[i]) + ' <span class="dr-read__posn">— ' + esc(sp.notes[i]) + '</span></p>' +
+        '<h3 class="dr-read__name">' + esc(c.name) + '<span class="dr-read__orient">' + (rev ? "Reversed" : "Upright") + '</span></h3>' +
+        '<p class="dr-read__mean">' + esc((rev && c.reversed) ? c.reversed : c.meaning) + '</p></div>';
+    }
+    var tail = "";
+    if (done) {
+      tail = '<div class="dr-filed" data-dr-filed>' +
+        '<p class="dr-binding">' + esc(bindingLine(sp, drawn)) + '</p>' +
+        '<p class="dr-read__frame">Drawn to the matter you laid down — a reflection to sit with, not a forecast.</p>' +
+        '<div class="dr-stamp">' + hallmarkSVG(st.seed) +
+        '<p class="dr-filed__line">Filed to your Reliquary &middot; ' + esc(brCode(st.seed)) + ' &middot; ' + esc(filedDate()) + '</p></div>' +
+        '<p class="dr-credo">Drawn once. Not reissued.</p>' +
+        '<a class="pf-openreading pf-openreading--lg" href="#" data-door="profile">Open your Reliquary &rarr;</a>' +
+        '<a class="dr-intake__back" href="#" data-dr-home>&larr; the deck</a></div>';
+    } else {
+      tail = '<p class="dr-draw__cue">Turn each card.</p><a class="dr-intake__back" href="#" data-dr-home>&larr; the deck</a>';
+    }
+    return '<div class="dr-reading">' + (st.question ? '<p class="dr-reading__matter">Drawn to: “' + esc(st.question) + '”</p>' : '') +
+      '<div class="dr-spread dr-spread--' + sp.n + '">' + cards + '</div>' +
+      '<div class="dr-reads">' + readings + '</div>' + tail +
+      '<div class="dr-live" role="status" aria-live="assertive" data-dr-live></div></div>';
   }
 
   /* ---------- flow ---------- */
-  var STAGE = null;
-
-  function stageEl() { return STAGE || (STAGE = HOST.querySelector("[data-dr-stage]")); }
-  var HOST = null;
-
-  function showIntake() { stageEl().innerHTML = intakeHTML(); var f = HOST.querySelector("[data-dr-question]"); if (f) f.focus(); }
-
-  function showDraw(card, seed, revealed) {
-    stageEl().innerHTML = drawHTML(card, seed, revealed);
-    if (revealed) announce("Card drawn: " + card.name + ". " + firstSentence(card.meaning) + " Filed to your Reliquary, " + brCode(seed) + ".");
-  }
-
-  function announce(msg) { var l = HOST.querySelector("[data-dr-live]"); if (l) l.textContent = msg; }
+  var STATE = { view: "landing", pulled: null, spread: null, question: "", seed: "", drawn: [], revealed: 0 };
+  function stage() { return HOST.querySelector("[data-dr-stage]"); }
+  function announce(m) { var l = HOST.querySelector("[data-dr-live]"); if (l) l.textContent = m; }
   function firstSentence(s) { var m = String(s || "").match(/^[^.]+\./); return m ? m[0] : String(s || ""); }
 
-  function drawForSeed(seed) { return pick(DECK, seed + "1"); }
-
-  function cut() {
-    var q = (HOST.querySelector("[data-dr-question]") || {}).value || "";
-    var t = sealNow();
-    var seed = seedOf(q, t);
-    // persist the sealed moment + question in the URL so a reopen reproduces
-    if (inApp() && window.history && window.history.replaceState) {
-      window.history.replaceState(null, "", "?dev=drawing-room&t=" + encodeURIComponent(t) + (q ? "&q=" + encodeURIComponent(q) : ""));
-    }
-    showDraw(drawForSeed(seed), seed, false);
+  function showLanding() { STATE.view = "landing"; stage().innerHTML = landingHTML(STATE.pulled); if (inApp() && history.replaceState) history.replaceState(null, "", "?dev=drawing-room"); }
+  function pull() {
+    STATE.pulled = drawSpread("pull~" + SESSION + "~" + (pullN++), 1)[0];
+    stage().innerHTML = landingHTML(STATE.pulled);
+    if (STATE.pulled) announce("Pulled: " + STATE.pulled.card.name + (STATE.pulled.reversed ? ", reversed" : "") + ".");
   }
-
-  function reveal() {
-    var t = param("t"), q = param("q");
-    if (!t) { t = sealNow(); }
-    var seed = seedOf(q, t);
-    showDraw(drawForSeed(seed), seed, true);
+  function startReading(key) { STATE.view = "intake"; STATE.spread = key; stage().innerHTML = intakeHTML(SPREADS[key]); var f = HOST.querySelector("[data-dr-question]"); if (f) f.focus(); }
+  function cut() {
+    var sp = SPREADS[STATE.spread];
+    STATE.question = (HOST.querySelector("[data-dr-question]") || {}).value || "";
+    var t = sealNow();
+    STATE.seed = "read~" + sp.key + "~" + norm(STATE.question) + "~" + t;
+    STATE.drawn = drawSpread(STATE.seed, sp.n).map(function (d) { d.shown = false; return d; });
+    STATE.revealed = 0; STATE.view = "reading";
+    if (inApp() && history.replaceState) history.replaceState(null, "", "?dev=drawing-room&read=" + sp.key + "&t=" + encodeURIComponent(t) + (STATE.question ? "&q=" + encodeURIComponent(STATE.question) : ""));
+    stage().innerHTML = readingHTML(STATE);
+  }
+  function turn(i) {
+    if (!STATE.drawn[i] || STATE.drawn[i].shown) return;
+    var el = HOST.querySelector('[data-dr-turn="' + i + '"] .dr-card');
+    STATE.drawn[i].shown = true; STATE.revealed++;
+    var sp = SPREADS[STATE.spread], c = STATE.drawn[i].card, rev = STATE.drawn[i].reversed;
+    var msg = sp.positions[i] + ": " + c.name + ", " + (rev ? "reversed" : "upright") + ". " + firstSentence((rev && c.reversed) ? c.reversed : c.meaning);
+    if (STATE.revealed >= sp.n) msg += " Filed to your Reliquary, " + brCode(STATE.seed) + ".";
+    var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    var done = function () { stage().innerHTML = readingHTML(STATE); announce(msg); };
+    if (el && !reduce) { el.classList.add("is-revealed"); setTimeout(done, 720); } else done();  // flip, then reveal the read
+  }
+  function reopen() {
+    var key = param("read"), t = param("t"); if (!SPREADS[key] || !t) return false;
+    var sp = SPREADS[key];
+    STATE.spread = key; STATE.question = param("q"); STATE.seed = "read~" + key + "~" + norm(STATE.question) + "~" + t;
+    STATE.drawn = drawSpread(STATE.seed, sp.n).map(function (d) { d.shown = true; return d; });
+    STATE.revealed = sp.n; STATE.view = "reading"; stage().innerHTML = readingHTML(STATE); return true;
   }
 
   function wire(root) {
     root.addEventListener("click", function (ev) {
-      var door = ev.target.closest("[data-door]");
-      if (door) {
-        ev.preventDefault();
-        var d = door.getAttribute("data-door");
-        if (d === "menu") { if (inApp()) location.href = location.pathname; }
-        else if (d === "profile") { if (inApp()) location.href = "?dev=profile"; }
-        return;
-      }
-      if (ev.target.closest("[data-dr-cut]")) { ev.preventDefault(); cut(); return; }
-      if (ev.target.closest("[data-dr-reveal]")) { ev.preventDefault(); reveal(); return; }
+      var el = ev.target.closest("[data-door],[data-dr-pull],[data-dr-read],[data-dr-cut],[data-dr-turn],[data-dr-home]");
+      if (!el) return;
+      ev.preventDefault();
+      if (el.hasAttribute("data-door")) { var d = el.getAttribute("data-door"); if (inApp()) location.href = d === "profile" ? "?dev=profile" : location.pathname; return; }
+      if (el.hasAttribute("data-dr-pull")) return pull();
+      if (el.hasAttribute("data-dr-read")) return startReading(el.getAttribute("data-dr-read"));
+      if (el.hasAttribute("data-dr-cut")) return cut();
+      if (el.hasAttribute("data-dr-turn")) return turn(+el.getAttribute("data-dr-turn"));
+      if (el.hasAttribute("data-dr-home")) return showLanding();
     });
-    root.addEventListener("keydown", function (ev) {
-      if ((ev.key === "Enter" || ev.key === " ") && ev.target.closest("[data-dr-reveal]")) { ev.preventDefault(); reveal(); }
-    });
-  }
-
-  function boot(root) {
-    HOST = root; STAGE = null;
-    var t = param("t");
-    if (t) {
-      // reopen a filed reading — reproduce it exactly (revealed + filed)
-      var seed = seedOf(param("q"), t);
-      showDraw(drawForSeed(seed), seed, true);
-    } else {
-      showIntake();
-    }
+    root.addEventListener("keydown", function (ev) { if ((ev.key === "Enter" || ev.key === " ") && ev.target.closest("[data-dr-turn]")) { ev.preventDefault(); turn(+ev.target.closest("[data-dr-turn]").getAttribute("data-dr-turn")); } });
   }
 
   window.BRDrawingRoom = {
     mount: function (host) {
       if (!host) return;
+      HOST = host; SESSION = sealNow(); pullN = 0;
       host.innerHTML = shellOpen() + '<p class="dr-loading">Opening the room…</p>' + shellClose();
       wire(host);
       fetch("codex-data.json").then(function (r) { return r.text(); }).then(function (txt) {
         var codex = JSON.parse(txt);
-        // gather the full 78-card deck: the "Tarot — Major Arcana" + "The Minor Arcana" systems
-        DECK = codex.filter(function (s) { return /tarot|minor arcana/i.test(String(s.system || "")); })
-          .reduce(function (a, s) { return a.concat(s.entries || []); }, []);
-        boot(host);
-      }).catch(function () {
-        var st = host.querySelector("[data-dr-stage]");
-        if (st) st.innerHTML = '<p class="dr-loading">The deck could not be reached. (This is a standalone preview.)</p>';
-      });
+        DECK = codex.filter(function (s) { return /tarot|minor arcana/i.test(String(s.system || "")); }).reduce(function (a, s) { return a.concat(s.entries || []); }, []);
+        if (!reopen()) showLanding();
+      }).catch(function () { var st = host.querySelector("[data-dr-stage]"); if (st) st.innerHTML = '<p class="dr-loading">The deck could not be reached. (Standalone preview.)</p>'; });
     }
   };
 })();
