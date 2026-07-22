@@ -279,7 +279,6 @@
   function roomsHTML() {
     var rooms = [
       ["arcane", "The Arcana Room", "Where a new reading is drawn"],
-      ["ceremony", "The Ceremony", "Where the crown is forged"],
       ["reading", "The Reading", "Your draw, laid out in full"],
       ["codex", "The Codex", "The archive of meanings"]
     ];
