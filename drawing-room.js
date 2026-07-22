@@ -4,9 +4,18 @@
    The tarot room. Three tiers, all DETERMINISTIC (no AI):
      • THE PULL (first page, free, unlimited) — draw a single card to meet
        the deck. A showcase; not filed.
-     • A SITTING (free once, then paid) — a 3-card reading, FILED to the
-       Reliquary. Positions: The Ground / The Crossing / The Turn.
-     • THE DEEP READ (paid) — a 5-card reading, filed. The flagship.
+     • A SITTING (first is free — a repeat is $1.99) — a 3-card reading,
+       FILED to the Reliquary. Positions: The Ground / The Crossing / The Turn.
+     • THE DEEP READ ($2.99, violet) — a 5-card reading, filed. The flagship.
+
+   COMMERCE IS MOCK (BR-S190): the price rides the door's specimen label
+   and the cut button (violet, house pf-paid register); pressing a paid
+   cut "settles" (violet resolves to gold, ~620ms) and the reading runs —
+   no real payment in this build. The first-sitting bit is a try/catch
+   localStorage flag ("br_dr_sitting_used") set AT THE CUT (the cut
+   closes the question — an abandoned reveal still consumed it), failing
+   OPEN (storage blocked → free). A crafted ?read= URL skips the gate:
+   accepted for a mock — reopen is the receipt path and must never gate.
 
    A reading carries what the Codex cannot: WHERE each card fell (its
    position) and WHICH WAY (upright/reversed), a filing stamp (date + BR
@@ -37,13 +46,17 @@
   var HOST = null, SESSION = "s", pullN = 0;
 
   var SPREADS = {
-    sitting: { key: "sitting", title: "A Sitting", n: 3, paid: false,
+    sitting: { key: "sitting", title: "A Sitting", n: 3, paid: false, price: "$1.99",
       positions: ["The Ground", "The Crossing", "The Turn"],
       notes: ["what the matter rests on", "what stands against it", "where it tends, left as it stands"] },
-    deep: { key: "deep", title: "The Deep Read", n: 5, paid: true,
+    deep: { key: "deep", title: "The Deep Read", n: 5, paid: true, price: "$2.99",
       positions: ["The Ground", "The Crossing", "The Root", "The Crown", "The Turn"],
       notes: ["what it rests on", "what stands against it", "what it grew from", "what it reaches for", "where it tends"] }
   };
+
+  /* mock commerce state — one bit, house try/catch pattern (see arcane.js), FAIL-OPEN */
+  function sittingUsed() { try { return localStorage.getItem("br_dr_sitting_used") === "1"; } catch (e) { return false; } }
+  function isPaidNow(key) { var sp = SPREADS[key]; return !!(sp && (sp.paid || (key === "sitting" && sittingUsed()))); }
 
   /* draw N DISTINCT cards + orientations, deterministically from the seed */
   function drawSpread(seed, n) {
@@ -125,27 +138,33 @@
       '</section>' +
       '<section class="dr-tiers">' +
       '<p class="dr-tiers__label">Draw a reading — it is cut, and kept in your Reliquary.</p>' +
-      tierDoor(SPREADS.sitting, "Three cards to one question — your first is free.") +
+      tierDoor(SPREADS.sitting, sittingUsed()
+        ? "Three cards to one question — your first is filed."
+        : "Three cards to one question — your first is free.") +
       tierDoor(SPREADS.deep, "Five cards, a deeper read.") +
       '</section></div>';
   }
+  /* a paid door carries its price in the specimen label; the free-first sitting stays untouched */
   function tierDoor(sp, sub) {
-    return '<a class="dr-tier' + (sp.paid ? " dr-tier--paid" : "") + '" href="#" data-dr-read="' + sp.key + '">' +
+    var paidNow = isPaidNow(sp.key);
+    return '<a class="dr-tier' + (paidNow ? " dr-tier--paid" : "") + '" href="#" data-dr-read="' + sp.key + '">' +
       '<span class="dr-tier__n">' + esc(sp.title) + '</span>' +
-      '<span class="dr-tier__cards">' + sp.n + ' cards</span>' +
+      '<span class="dr-tier__cards">' + sp.n + ' cards' + (paidNow ? ' &middot; ' + sp.price : '') + '</span>' +
       '<span class="dr-tier__sub">' + esc(sub) + '</span>' +
       '<span class="dr-tier__arr" aria-hidden="true">&rarr;</span></a>';
   }
 
   /* ---------- a reading: intake -> cut -> spread reveal -> binding + filed ---------- */
   function intakeHTML(sp) {
+    var paid = isPaidNow(sp.key);   // paid: the price rides the cut button; free: byte-identical to before
     return '<div class="dr-intake">' +
       '<p class="dr-intake__which">' + esc(sp.title) + ' &middot; ' + sp.n + ' cards</p>' +
       '<label class="dr-field"><span class="dr-field__label">Lay a matter on the table <span class="dr-field__opt">— optional</span></span>' +
       '<input type="text" class="dr-field__in" data-dr-question maxlength="120" autocomplete="off" placeholder="a question, in your own words" ' +
       'aria-label="A question or situation. Optional. It is kept with your reading, and it does not choose the cards."></label>' +
-      '<button type="button" class="dr-cut" data-dr-cut>Cut the deck</button>' +
+      '<button type="button" class="dr-cut' + (paid ? ' dr-cut--paid' : '') + '" data-dr-cut>Cut the deck' + (paid ? ' &middot; ' + sp.price : '') + '</button>' +
       '<p class="dr-cut__note">The cut does not choose the cards. It closes the question.</p>' +
+      (paid ? '<p class="dr-mocknote">Dev mock &mdash; no real payment in this build.</p>' : '') +
       '<a class="dr-intake__back" href="#" data-dr-home>&larr; the deck</a></div>';
   }
 
@@ -203,15 +222,28 @@
     if (STATE.pulled) announce("Pulled: " + STATE.pulled.card.name + (STATE.pulled.reversed ? ", reversed" : "") + ".");
   }
   function startReading(key) { STATE.view = "intake"; STATE.spread = key; stage().innerHTML = intakeHTML(SPREADS[key]); var f = HOST.querySelector("[data-dr-question]"); if (f) f.focus(); }
-  function cut() {
+  function doCut() {
     var sp = SPREADS[STATE.spread];
     STATE.question = (HOST.querySelector("[data-dr-question]") || {}).value || "";
     var t = sealNow();
     STATE.seed = "read~" + sp.key + "~" + norm(STATE.question) + "~" + t;
+    if (sp.key === "sitting") { try { localStorage.setItem("br_dr_sitting_used", "1"); } catch (e) {} }   // the cut consumes the free sitting — the cut closes the question
     STATE.drawn = drawSpread(STATE.seed, sp.n).map(function (d) { d.shown = false; return d; });
     STATE.revealed = 0; STATE.view = "reading";
     if (inApp() && history.replaceState) history.replaceState(null, "", "?dev=drawing-room&read=" + sp.key + "&t=" + encodeURIComponent(t) + (STATE.question ? "&q=" + encodeURIComponent(STATE.question) : ""));
     stage().innerHTML = readingHTML(STATE);
+  }
+  function cut() {
+    var sp = SPREADS[STATE.spread];
+    if (!isPaidNow(sp.key)) return doCut();
+    /* the mock settle — on a paid cut the violet button resolves to gold ("Settled"),
+       then the cut runs. No sheet, no charge; the beat IS the whole transaction. */
+    var btn = HOST.querySelector("[data-dr-cut]");
+    var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    var settle = function () { if (STATE.view !== "intake") return; doCut(); announce("Settled. The deck is cut."); };
+    if (!btn || reduce) return settle();
+    btn.disabled = true; btn.classList.add("is-settled"); btn.textContent = "Settled";
+    setTimeout(settle, 620);
   }
   function turn(i) {
     if (!STATE.drawn[i] || STATE.drawn[i].shown) return;
@@ -225,6 +257,7 @@
     if (el && !reduce) { el.classList.add("is-revealed"); setTimeout(done, 720); } else done();  // flip, then reveal the read
   }
   function reopen() {
+    // a filed reading is already drawn and settled — its URL is the receipt; never gate here.
     var key = param("read"), t = param("t"); if (!SPREADS[key] || !t) return false;
     var sp = SPREADS[key];
     STATE.spread = key; STATE.question = param("q"); STATE.seed = "read~" + key + "~" + norm(STATE.question) + "~" + t;

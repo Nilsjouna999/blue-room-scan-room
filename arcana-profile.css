@@ -482,6 +482,11 @@ a.pf-redraw.pf-paid:hover, a.pf-redraw.pf-paid:focus-visible { color: #bda6e4; b
 .dr-field__in:focus { outline: none; border-bottom-color: var(--pf-gold); }
 .dr-cut { background: none; border: 1px solid var(--pf-line-cut); border-radius: 999px; padding: 12px 30px; cursor: pointer; font-family: var(--pf-mono); font-size: 10.5px; font-weight: 500; letter-spacing: .2em; text-transform: uppercase; color: var(--pf-cream-display); transition: border-color .2s, color .2s; }
 .dr-cut:hover, .dr-cut:focus-visible { border-color: var(--pf-gold); color: var(--pf-gold-lit); outline: none; }
+/* PAID cut — the mock settle (BR-S190): violet price on the button (pf-paid register); on press it settles violet→gold, then the cut runs */
+.dr-cut--paid { border-color: var(--pf-violet-line); color: var(--pf-violet-lit); }
+.dr-cut--paid:hover, .dr-cut--paid:focus-visible { border-color: var(--pf-violet); color: #bda6e4; }
+.dr-cut--paid.is-settled, .dr-cut--paid.is-settled:hover { border-color: var(--pf-gold); color: var(--pf-gold-lit); transition: border-color .45s ease, color .45s ease; cursor: default; }
+.dr-mocknote { font-family: var(--pf-mono); font-size: 8.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--pf-ghost); margin: 0; }
 .dr-cut__note { font-family: var(--pf-serif); font-style: italic; font-size: 14px; color: var(--pf-meta); margin: 0; }
 .dr-intake__back { font-family: var(--pf-mono); font-size: 9px; letter-spacing: .14em; text-transform: uppercase; color: var(--pf-meta); text-decoration: none; margin-top: 6px; }
 .dr-intake__back:hover, .dr-intake__back:focus-visible { color: var(--pf-cream-display); outline: none; }
