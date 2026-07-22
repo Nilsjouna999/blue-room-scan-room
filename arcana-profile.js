@@ -169,22 +169,24 @@
     // the Crown — the reading button; "Open this reading" IS the full arcana result page.
     // No profile-side redraw: to get a new reading, draw one from the Arcana Room.
     var crown;
+    // the crown as a single-object museum display: its own centered band, lit,
+    // enlarged, with the caption BELOW it and nothing crowding either side.
     if (taken) {
-      crown = '<div class="pf-crownrow">' +
+      crown = '<div class="pf-crownstage">' +
         '<button type="button" class="pf-crownbtn" data-open-reading="' + esc(c.reading_id) + '" aria-label="Open your Arcana reading">' +
           crownSVG(points, gems, { cls: "pf-crown-svg", aria: "Crown holding " + gems + " readings" }) +
         '</button>' +
-        '<div class="pf-crownrow__txt">' +
+        '<div class="pf-crownstage__cap">' +
           '<p class="pf-prov">' + gems + ' gems set — one for each reading it holds.</p>' +
           '<a class="pf-openreading pf-openreading--lg" href="#" data-open-reading="' + esc(c.reading_id) + '">Open this reading &rarr;</a>' +
         '</div></div>';
     } else {
-      crown = '<div class="pf-crownrow">' +
+      crown = '<div class="pf-crownstage">' +
         '<button type="button" class="pf-crownbtn pf-crownbtn--empty pf-paid" data-draw="self" data-intent="new" aria-label="Draw your Arcana reading">' +
           '<span class="pf-crown-empty">No crown yet<br>draw a reading</span>' +
         '</button>' +
-        '<div class="pf-crownrow__txt">' +
-          '<p class="pf-prov">A crown is earned by taking a reading — it gains a ruby for each reading it holds.</p>' +
+        '<div class="pf-crownstage__cap">' +
+          '<p class="pf-prov">A crown is earned by taking a reading — it gains a gem for each reading it holds.</p>' +
           '<a class="pf-openreading pf-openreading--lg pf-paid" href="#" data-draw="self" data-intent="new">Draw your Arcana &middot; $4.99 &rarr;</a>' +
         '</div></div>';
     }

@@ -287,6 +287,38 @@ a.pf-redraw.pf-paid:hover, a.pf-redraw.pf-paid:focus-visible { color: #bda6e4; b
 .pf-slot__hint { color: var(--pf-meta); }
 .pf-foot { color: var(--pf-meta); }
 
+/* ============================================================
+   BR-S181 — the crown gets its own centered band: a single-object
+   museum display (warm pool of light + lit-object shadow stack),
+   enlarged, generous air above/below, caption below, nothing beside.
+============================================================ */
+.pf-crownstage {
+  position: relative; isolation: isolate;
+  display: flex; flex-direction: column; align-items: center; text-align: center;
+  margin: clamp(40px, 8vh, 88px) 0 clamp(44px, 9vh, 96px);
+  padding: clamp(24px, 5vh, 52px) 0 0;
+}
+/* the pool of light — warm, fades fully to transparent (no box edge, no halation) */
+.pf-crownstage::before {
+  content: ""; position: absolute; z-index: -1; pointer-events: none;
+  left: 50%; top: 46%; transform: translate(-50%, -50%);
+  width: min(440px, 96%); height: 330px;
+  background: radial-gradient(ellipse at center, rgba(201, 163, 92, .11) 0%, rgba(201, 163, 92, .045) 38%, transparent 68%);
+}
+/* enlarged centerpiece + lit-object shadow stack (contact + warm glow + soft halo) */
+.pf-crownstage .pf-crown-svg {
+  width: clamp(160px, 24vw, 210px);
+  filter: drop-shadow(0 14px 10px rgba(0, 0, 0, .5)) drop-shadow(0 6px 22px rgba(201, 163, 92, .22)) drop-shadow(0 0 40px rgba(201, 163, 92, .10));
+}
+.pf-crownstage .pf-crownbtn:hover .pf-crown-svg,
+.pf-crownstage .pf-crownbtn:focus-visible .pf-crown-svg {
+  filter: drop-shadow(0 14px 10px rgba(0, 0, 0, .5)) drop-shadow(0 6px 24px rgba(201, 163, 92, .30)) drop-shadow(0 0 46px rgba(201, 163, 92, .15));
+}
+/* caption below the crown, centered — nothing sits beside the object */
+.pf-crownstage__cap { margin-top: clamp(16px, 2.6vh, 26px); }
+.pf-crownstage__cap .pf-prov { max-width: 42ch; margin: 0 auto; text-align: center; }
+.pf-crownstage__cap .pf-openreading { display: inline-block; margin-top: 14px; }
+
 @media (max-width: 620px) {
   .pf-top { gap: 10px 14px; }
   .pf-mini { width: calc(50% - 7px); }
