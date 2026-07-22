@@ -67,7 +67,8 @@
 
   // crown name from the draw
   var EP={"fire|wood":"Kindling-Fed","fire|fire":"Twice-Kindled","fire|earth":"Ember-Banked","fire|metal":"Forge-Hot","fire|water":"Steam-Tempered","earth|wood":"Root-Bound","earth|fire":"Slow-Burning","earth|earth":"Unmoved","earth|metal":"Ore-Veined","earth|water":"Deep-Rooted","air|wood":"Branch-Borne","air|fire":"Quick-Kindled","air|earth":"Ballasted","air|metal":"Keen-Edged","air|water":"Mist-Minded","water|wood":"Sap-Risen","water|fire":"Quenched","water|earth":"Silt-Bearing","water|metal":"Cold-Forged","water|water":"Twice-Tided"};
-  var RO={"fool":"Wanderer","magician":"Maker","high priestess":"Knower","empress":"Cultivator","emperor":"Founder","hierophant":"Ordainer","lovers":"Chooser","chariot":"Driver","strength":"Tamer","hermit":"Lampbearer","wheel of fortune":"Turner","justice":"Weigher","hanged man":"Reverser","death":"Ender","temperance":"Temperer","devil":"Binder","tower":"Breaker","star":"Beacon","moon":"Dreamer","sun":"Daybringer","judgement":"Summoner","judgment":"Summoner","world":"Completer"};
+  // ROLE ← the RUNE (BR-S191 — tarot moved to the Drawing Room; keys = norm(rune name), agent-nouns, no EP-epithet stem echoes)
+  var RO={"fehu":"Steward","uruz":"Stalwart","thurisaz":"Breaker","ansuz":"Speaker","raidho":"Wayfarer","kenaz":"Illuminator","gebo":"Giver","wunjo":"Gladdener","hagalaz":"Weatherer","nauthiz":"Endurer","isa":"Stillholder","jera":"Harvester","eihwaz":"Upholder","perthro":"Caster","algiz":"Warder","sowilo":"Daybringer","tiwaz":"Oathkeeper","berkano":"Cultivator","ehwaz":"Rider","mannaz":"Knower","laguz":"Seafarer","ingwaz":"Seedkeeper","dagaz":"Awakener","othala":"Inheritor"};
   var BIND={qian:"under an unresting sky",kun:"on ground that receives",zhen:"at the first shock",xun:"by patient penetration",kan:"through the defile",li:"in clinging light",gen:"at the stopping place",dui:"in open water"};
   var DENY=/^(wealth|success|victory|achievement|abundance|earned|reward|prosperity|triumph|glory|luck|fortune|gain|win|journey|destiny|blessing|harmony)$/i;
   function wEl(t){var m=/\b(fire|earth|air|water)\b/i.exec(String(t||""));return m?m[1].toLowerCase():null}
@@ -77,12 +78,12 @@
     for(i=0;i<pool.length;i++){w=String(pool[i]).toLowerCase().trim();if(/^[a-z-]+$/.test(w)&&!DENY.test(w))return w}
     for(i=0;i<pool.length;i++){var p=String(pool[i]).toLowerCase().trim().split(/[\s\/]+/);w=p[p.length-1];if(w&&!DENY.test(w))return w}return "record"}
   function crownOf(d){var el=(wEl(d.sun.tag)||"earth")+"|"+(cEl(d.chinese.tag)||"earth");
-    return {name:"The "+(EP[el]||"Twice-Marked")+" "+(RO[norm(d.tarot.name)]||"Bearer"),epithet:EP[el]||"Twice-Marked",role:RO[norm(d.tarot.name)]||"Bearer",binding:BIND[triKey(d.trigram.name)]||"in the open",lexicon:lex(d.rune,d.trigram),sunEl:wEl(d.sun.tag),chiEl:cEl(d.chinese.tag)}}
+    return {name:"The "+(EP[el]||"Twice-Marked")+" "+(RO[norm(d.rune.name)]||"Bearer"),epithet:EP[el]||"Twice-Marked",role:RO[norm(d.rune.name)]||"Bearer",binding:BIND[triKey(d.trigram.name)]||"in the open",lexicon:lex(d.rune,d.trigram),sunEl:wEl(d.sun.tag),chiEl:cEl(d.chinese.tag)}}
 
   var CH=[["I · The Named",[["Sun sign","sun","sun"],["Year animal","chinese","chinese"],["Life path","lifePath","life"]]],
-          ["II · The Counsel",[["The draw","tarotMajor","tarot"],["Counsel card","tarotMajor","tarot2"],["Rune","rune","rune"],["Trigram","trigram","trigram"]]],
+          ["II · The Counsel",[["Rune","rune","rune"],["Trigram","trigram","trigram"]]],
           ["III · The Standing",[["Hexagram","hexagram","hex"]]]];
-  function drawFor(seed){var d={sun:pick(by.sun,seed+"a"),chinese:pick(by.chinese,seed+"b"),life:pick(by.lifePath,seed+"c"),tarot:pick(by.tarotMajor,seed+"d"),tarot2:pick(by.tarotMajor,seed+"e"),rune:pick(by.rune,seed+"f"),trigram:pick(by.trigram,seed+"g"),hex:pick(by.hexagram,seed+"h")};
+  function drawFor(seed){var d={sun:pick(by.sun,seed+"a"),chinese:pick(by.chinese,seed+"b"),life:pick(by.lifePath,seed+"c"),rune:pick(by.rune,seed+"f"),trigram:pick(by.trigram,seed+"g"),hex:pick(by.hexagram,seed+"h")};
     return {d:d,marks:marksFor(d),crown:crownOf(d)}}
   function marksFor(d){var marks=[];CH.forEach(function(ch){ch[1].forEach(function(p){var e=d[p[2]];if(e)marks.push({slot:p[0],key:p[1],entry:e,chapter:ch[0]})})});return marks}
   // ---- birth-derived reading: sun sign from the date, animal from the year, life path from the digit sum; the rest drawn from the name+date seed ----
@@ -96,14 +97,13 @@
     var life=null,lp=String(lifePathNum(y,m,d));
     for(var i=0;i<by.lifePath.length;i++){if(String(by.lifePath[i].name)===lp){life=by.lifePath[i];break}}
     var dd={sun:findByName(by.sun,sunSign(m,d)),chinese:findByName(by.chinese,chineseAnimal(y)),life:life||pick(by.lifePath,seed+"c"),
-      tarot:pick(by.tarotMajor,seed+"d"),tarot2:pick(by.tarotMajor,seed+"e"),rune:pick(by.rune,seed+"f"),trigram:pick(by.trigram,seed+"g"),hex:pick(by.hexagram,seed+"h")};
+      rune:pick(by.rune,seed+"f"),trigram:pick(by.trigram,seed+"g"),hex:pick(by.hexagram,seed+"h")};
     return {d:dd,marks:marksFor(dd),crown:crownOf(dd),person:{name:name,born:d+" "+MON[m-1]+" "+y}}}
   function readingForSeed(seed){if(seed&&seed.indexOf("birth~")===0){var p=seed.split("~");return birthReading(p[1],+p[2],+p[3],+p[4],seed)}return drawFor(seed)}
   function fragment(mark,c){
     if(mark.slot==="Sun sign"||mark.slot==="Year animal")return "This mark supplied the "+(mark.slot==="Sun sign"?(c.sunEl||"element"):(c.chiEl||"element"))+" behind “"+c.epithet+"” to the name borne.";
-    if(mark.slot==="The draw")return "This mark supplied “"+c.role+"” to the name borne.";
     if(mark.slot==="Trigram")return "This mark filed the reading “"+c.binding+"”.";
-    if(mark.slot==="Rune")return "This mark set “"+c.lexicon+"” — the word the record keeps returning to.";
+    if(mark.slot==="Rune")return "This mark supplied “"+c.role+"” to the name borne and set “"+c.lexicon+"” — the word the record keeps returning to.";
     return null;}
   var ROMAN=["","I","II","III","IV","V","VI","VII","VIII"];
   function paras(t,cls){var s=String(t||"").trim().split(/(?:\.\s+)/),o=[],b=[];s.forEach(function(x,i){b.push(x.replace(/\.?$/,"."));if(b.join(" ").length>250||i===s.length-1){o.push(b.join(" "));b=[]}});return o.map(function(p){return '<p class="'+cls+'">'+esc(p)+'</p>'}).join("")}
@@ -278,7 +278,7 @@
     });
     var c=R.crown;
     var eyebrow=R.person?(esc(R.person.name)+' &middot; born '+esc(R.person.born)):'The name borne';
-    var sub=R.person?'The name borne &middot; eight systems consulted.':'Eight systems consulted. The record follows.';
+    var sub=R.person?'The name borne &middot; six systems consulted.':'Six systems consulted. The record follows.';
     return '<section class="crown">'+CROWN_SVG+'<div class="eyebrow">'+eyebrow+'</div><h1>'+esc(c.name)+'</h1><p>'+sub+'</p></section>'+
       '<div class="col">'+html+'<div class="seal"><div class="seal__name"><b>'+esc(c.epithet)+'</b> · <b>'+esc(c.role)+'</b> · filed '+esc(c.binding)+' · keyed to <b>'+esc(c.lexicon)+'</b></div>'+
         '<div class="seal__foot">The marks are set in the order drawn<br>Nothing is re-rolled on re-view<br>BR-'+hash(seed).toString(16).toUpperCase().slice(0,6)+'</div></div></div>';
@@ -291,7 +291,7 @@
     var e=f.entry, filed=null;
     if(seed){var R=readingForSeed(seed);for(var i=0;i<R.marks.length;i++){var m=R.marks[i];if(m.key===key&&slugify(m.entry.name)===slug){filed={R:R,m:m,pos:i+1,frag:fragment(m,R.crown)};break}}}
     var head=filed?'<a class="acc__back" href="#/">← '+esc(filed.R.crown.name)+'</a>':'<a class="acc__back" href="#/">← Browse the codex</a>';
-    var mark=filed?'<div class="acc__mark">Mark '+ROMAN[filed.pos]+' of VIII &nbsp;·&nbsp; filed under <span style="color:var(--gold)">'+esc(filed.R.crown.name)+'</span></div>'+(filed.frag?'<div class="acc__frag">'+esc(filed.frag)+'</div>':""):'<div class="acc__mark">Unfiled &nbsp;·&nbsp; codex source only. No record attached.</div>';
+    var mark=filed?'<div class="acc__mark">Mark '+ROMAN[filed.pos]+' of VI &nbsp;·&nbsp; filed under <span style="color:var(--gold)">'+esc(filed.R.crown.name)+'</span></div>'+(filed.frag?'<div class="acc__frag">'+esc(filed.frag)+'</div>':""):'<div class="acc__mark">Unfiled &nbsp;·&nbsp; codex source only. No record attached.</div>';
 
     var kb=kbFor(key,e), pr=pracFor(key,e);
     // TIER 1 - source

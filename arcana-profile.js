@@ -46,7 +46,7 @@
     place: "Inari, Finland",
     crown_record: {
       reading_id: "BR-3F9A2C",
-      name: "The Twice-Kindled Founder",
+      name: "The Twice-Kindled Giver",
       spine: "Aries · Snake · Life Path 7",
       inputs_provided: ["name", "birth date", "birthplace"],
       result_count: 3, created_at: "2026-07-09", is_current: true
@@ -56,11 +56,11 @@
     vault_slots: 4,
     // What the Showcase can feature: the seeker's OWN reading results, and minted cards.
     reading_results: [
-      { kind: "Reading", name: "The Twice-Kindled Founder" },
+      { kind: "Reading", name: "The Twice-Kindled Giver" },
       { kind: "Sun sign", name: "Aries" },
       { kind: "Year animal", name: "Snake" },
       { kind: "Life path", name: "Life Path 7" },
-      { kind: "Tarot", name: "The Emperor" }
+      { kind: "Rune", name: "Gebo" }
     ],
     minted_cards: [],   // none yet — the Vault is not open
     showcase: [
