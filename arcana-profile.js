@@ -135,12 +135,11 @@
 
   /* ---------- masthead (§3.1) — room doors, above the surface box ---------- */
   function headerHTML() {
-    var doors = [["arcane", "The Arcana Room"], ["codex", "The Codex"]];
+    // Room-nav is consolidated into the in-body "The Rooms" doors block below; the
+    // masthead keeps only the wordmark — a quiet door back to the Main Menu.
     return '<header class="pf-top">' +
       '<a class="pf-wordmark" href="#" data-door="menu" aria-label="Main Menu" title="Main Menu"><span class="pf-wordmark__mark" aria-hidden="true">&#9670;</span> Blue&nbsp;Room</a>' +
-      '<nav class="pf-doors" aria-label="Wayfinding">' +
-        doors.map(function (d) { return '<a class="pf-door" href="#" data-door="' + d[0] + '">' + esc(d[1]) + '</a>'; }).join("") +
-      '</nav></header>';
+      '</header>';
   }
 
   /* ---------- the hero — identity name + crown, LEFT-aligned, above the Rings ---------- */
@@ -274,6 +273,26 @@
       '<button type="button" class="pf-addfriend" data-action="add-friend">+ Add a friend</button>');
   }
 
+  // The Rooms — the hub's purpose: a labelled door to every room, each with a
+  // deadpan one-line descriptor. (The Vault has its own section above, so it is
+  // not repeated here.) Commerce is not shown on the hub — price lives in the room.
+  function roomsHTML() {
+    var rooms = [
+      ["arcane", "The Arcana Room", "Where a new reading is drawn"],
+      ["ceremony", "The Ceremony", "Where the crown is forged"],
+      ["reading", "The Reading", "Your draw, laid out in full"],
+      ["codex", "The Codex", "The archive of meanings"]
+    ];
+    var rows = rooms.map(function (r) {
+      return '<a class="pf-roomdoor" href="#" data-door="' + r[0] + '">' +
+        '<span class="pf-roomdoor__n">' + esc(r[1]) + '</span>' +
+        '<span class="pf-roomdoor__d">' + esc(r[2]) + '</span>' +
+        '<span class="pf-roomdoor__arr" aria-hidden="true">&rarr;</span></a>';
+    }).join("");
+    return section("The Rooms", null, "Every room in the archive — one door each.",
+      '<div class="pf-rooms">' + rows + '</div>');
+  }
+
   // referral is a single door, not a section
   function referralHTML() {
     return '<a class="pf-doorbar pf-doorbar--referral" href="#" data-action="referral">' +
@@ -298,6 +317,7 @@
         vaultHTML() +
         showcaseHTML() +
         friendsHTML() +
+        roomsHTML() +
         referralHTML() +
         '<footer class="pf-foot">A reflective record, for insight, not instruction.<br>Nothing here is medical, legal, or financial counsel. You decide what to do with it.</footer>' +
       '</div>' +
@@ -339,6 +359,8 @@
         if (d === "menu") { if (inApp()) location.href = location.pathname; else note(root, "Returns to the main menu. (Inert in preview.)"); }
         else if (d === "codex") { if (inApp()) location.href = "codex.html"; else note(root, "Opens the Codex. (Inert in preview.)"); }
         else if (d === "arcane") toInput("", "Opens the Arcana Room. (Inert in preview.)");
+        else if (d === "ceremony") { if (inApp()) location.href = "?dev=ceremony"; else note(root, "Opens the Ceremony — the arcana forge. (Inert in preview.)"); }
+        else if (d === "reading") { if (inApp()) location.href = "?dev=arcana-reading"; else note(root, "Opens your reading, laid out. (Inert in preview.)"); }
         else if (d === "vault") { if (inApp()) location.href = "?dev=vault"; else note(root, "Opens the Vault. (Inert in preview.)"); }
         return;
       }

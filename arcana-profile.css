@@ -319,6 +319,30 @@ a.pf-redraw.pf-paid:hover, a.pf-redraw.pf-paid:focus-visible { color: #bda6e4; b
 .pf-crownstage__cap .pf-prov { max-width: 42ch; margin: 0 auto; text-align: center; }
 .pf-crownstage__cap .pf-openreading { display: inline-block; margin-top: 14px; }
 
+/* ============================================================
+   BR-S182 — "The Rooms": the hub's doors block (a labelled door per
+   room + deadpan descriptor), plus incised (letterpress) dividers.
+============================================================ */
+.pf-rooms { display: flex; flex-direction: column; }
+.pf-roomdoor {
+  display: flex; align-items: baseline; gap: 14px; padding: 13px 2px;
+  text-decoration: none; color: inherit; cursor: pointer;
+  border-bottom: 1px solid var(--pf-line-soft);
+  box-shadow: 0 1px 0 rgba(224, 218, 205, .025);   /* incised lip — a groove, not a drawn line */
+  transition: background .18s;
+}
+.pf-roomdoor:last-of-type { border-bottom: 0; box-shadow: none; }
+.pf-roomdoor:hover, .pf-roomdoor:focus-visible { background: rgba(233, 229, 220, .02); outline: none; }
+.pf-roomdoor__n { font-family: var(--pf-serif); font-size: 18px; color: var(--pf-cream); flex: none; }
+.pf-roomdoor:hover .pf-roomdoor__n, .pf-roomdoor:focus-visible .pf-roomdoor__n { color: var(--pf-cream-display); }
+.pf-roomdoor__d { font-family: var(--pf-mono); font-size: 9.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--pf-meta); }
+.pf-roomdoor__arr { margin-left: auto; color: var(--pf-meta); font-size: 15px; transition: transform .18s; }
+.pf-roomdoor:hover .pf-roomdoor__arr, .pf-roomdoor:focus-visible .pf-roomdoor__arr { transform: translateX(3px); }
+
+/* incised dividers elsewhere — a whisper of highlight below the hairline = a cut groove */
+.pf-friend { box-shadow: 0 1px 0 rgba(224, 218, 205, .022); }
+.pf-friend:last-of-type { box-shadow: none; }
+
 @media (max-width: 620px) {
   .pf-top { gap: 10px 14px; }
   .pf-mini { width: calc(50% - 7px); }
