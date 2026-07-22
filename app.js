@@ -1926,108 +1926,71 @@ function vaultQR(seed) {
   return `<svg class="vqr__svg" viewBox="-1 -1 ${N + 2} ${N + 2}" role="img" aria-label="Mint access code (placeholder)"><g fill="currentColor">${cells}</g></svg>`;
 }
 
+// "HALO MINT · DEVELOPED" -> "Halo Mint · Developed" (match the crown caption's serif register)
+function vaultState(m) { return String(m.state || "").toLowerCase().replace(/(^|\s)\S/g, function (c) { return c.toUpperCase(); }); }
+
+/* BR-S185: the Vault, ported into the profile's museum language — one intimate
+   .pf-wrap column, the mint enshrined in a light pool like the crown, a quiet
+   access line, and a SAVED MINTS ledger. Every marketing widget (the 4-bullet
+   explainer, quote, wax seal, credit block, boxed QR/Open-Reading panels, wave
+   squiggles) is cut. Reuses .pf-* classes + --pf-* vars (both stylesheets load
+   globally); the bespoke .vault__* CSS in styles.css is now dead (left for a
+   later cleanup sweep). */
 function renderVault() {
   const m = VAULT_MINTS[0];
-  const crop = '<span class="vcrop vcrop--tl"></span><span class="vcrop vcrop--tr"></span><span class="vcrop vcrop--bl"></span><span class="vcrop vcrop--br"></span>';
+  const goldCrop = '<span class="pf-vcrop pf-vcrop--tl"></span><span class="pf-vcrop pf-vcrop--tr"></span><span class="pf-vcrop pf-vcrop--bl"></span><span class="pf-vcrop pf-vcrop--br"></span>';
 
-  const aboutRows = [
-    ["Your archive, secured", "Every mint you save is filed, sealed, and recorded."],
-    ["Reopen any reading", "Return to the full Stats &amp; Readings at any time."],
-    ["QR access", "Scan to verify, share, or open the mint anywhere."],
-    ["Favorite moments", "The images and instances that matter, always within reach."],
-  ].map(([t, c]) =>
-    `<div class="vrow"><span class="vrow__d" aria-hidden="true">◆</span><div class="vrow__txt"><span class="vrow__t">${t}</span><p class="vrow__c">${c}</p></div></div>`
-  ).join('<span class="vrow__div" aria-hidden="true"></span>');
-
-  /* the saved-mint COLLECTION — a quiet vertical list on the left (3 saved + 1
-     placeholder). Example-light: a calm row each (thumb + title + id), not a
-     strong tile grid; the selected row carries a soft violet edge. */
-  const collection = VAULT_MINTS.map((mt, i) => {
+  /* SAVED MINTS — a quiet ledger in the profile's friend-row idiom. BR-S156: only
+     Checkpoint Wave is a live control; other moments are static filed cues. */
+  const rows = VAULT_MINTS.map((mt, i) => {
     const inner =
-      `<span class="vcard__thumb">${imgOrPlaceholder(mt.thumb, "vcard__img")}</span>` +
-      `<span class="vcard__meta"><span class="vcard__title">${esc(mt.label)}</span><span class="vcard__id">${esc(mt.id)}</span></span>`;
-    /* BR-S156: only the ONE real example (Checkpoint Wave) is a live control; the other saved
-       moments are static filed-image CUES — present, but not selectable (no data-vault-select). */
+      `<span class="pf-mintrow__thumb">${imgOrPlaceholder(mt.thumb, "pf-mintrow__img")}</span>` +
+      `<span class="pf-mintrow__n">${esc(mt.label)}</span>` +
+      `<span class="pf-mintrow__id">${esc(mt.id)}</span>`;
     return i === 0
-      ? `<button type="button" class="vcard is-selected" data-vault-select="0" aria-pressed="true">${inner}</button>`
-      : `<div class="vcard vcard--cue">${inner}</div>`;
+      ? `<button type="button" class="pf-mintrow pf-mintrow--sel" data-vault-select="0" aria-pressed="true">${inner}</button>`
+      : `<div class="pf-mintrow pf-mintrow--cue">${inner}</div>`;
   }).join("") +
-    `<div class="vcard vcard--empty" aria-hidden="true">
-       <span class="vcard__thumb vcard__thumb--empty">+</span>
-       <span class="vcard__meta"><span class="vcard__title">New mint</span><span class="vcard__id">appears here</span></span>
-     </div>`;
+    `<div class="pf-mintrow pf-mintrow--empty" aria-hidden="true">` +
+      `<span class="pf-mintrow__thumb pf-mintrow__thumb--empty">+</span>` +
+      `<span class="pf-mintrow__n">New mint</span><span class="pf-mintrow__id">appears here</span></div>`;
 
   return `
-    <div class="vault" data-vault>
-      <header class="vault__top">
-        <button type="button" class="vault__back" data-view-to="menu">← Back to the menu</button>
-        <span class="vault__eyebrow">BLUE ROOM ARCHIVE&nbsp;&nbsp;·&nbsp;&nbsp;THE VAULT</span>
-        <h1 class="vault__title">The Vault</h1>
-        <span class="vault__wave" aria-hidden="true">${VAULT_WAVE}</span>
-        <p class="vault__intro">Saved minted cards are filed here.<br>Revisit favorite moments or images, reopen their readings, or access each mint by QR code.</p>
-        <span class="vault__example" aria-hidden="true">◆ Example · Showcase — not the final Vault</span>
-      </header>
+    <div class="pf pf--vault" data-vault>
+      <div class="pf-wrap">
+        <a class="pf-back" href="#" data-view-to="menu">&larr; Back to the menu</a>
 
-      <div class="vault__main">
-        <aside class="vault__collection">
-          <span class="vcoll__label">Favorite Moments</span>
-          <span class="vcoll__wave" aria-hidden="true">${VAULT_WAVE_SM}</span>
-          <div class="vcoll__list">${collection}</div>
-        </aside>
-
-        <div class="vault__center">
-          <div class="vault__frame">
-            ${crop}
-            <span class="vguide vguide--l" aria-hidden="true"></span>
-            <span class="vguide vguide--r" aria-hidden="true"></span>
-            <div class="vault__cardwrap" data-vault-card>${renderCard(m.src, "shiny")}</div>
-          </div>
-          <div class="vault__cardfoot">
-            <span class="vault__cardcap" data-vault-cardcap>${esc(m.state)}</span>
-            <span class="vault__cardprov">${VAULT_LOCK}<span data-vault-provtext>Filed ${esc(m.filed.split(" · ")[0])} → Sealed → Recorded</span></span>
-          </div>
+        <div class="pf-vaulthead">
+          <span class="pf-vaulteyebrow">Blue Room Archive&nbsp;&nbsp;·&nbsp;&nbsp;The Vault</span>
+          <h1 class="pf-vaulttitle">The Vault</h1>
+          <p class="pf-vaultintro">Saved minted cards are filed here.</p>
         </div>
 
-        <div class="vault__access">
-          <div class="vqr">
-            <span class="vqr__label">Access Mint</span>
-            <div class="vqr__frame">
-              ${crop}
-              <div class="vqr__code" data-vault-qr>${vaultQR(m.id)}</div>
+        <div class="pf-vaultstage">
+          <div class="pf-vaultcard">${goldCrop}<div class="pf-vaultcard__inner" data-vault-card>${renderCard(m.src, "shiny")}</div></div>
+          <div class="pf-crownstage__cap">
+            <p class="pf-prov" data-vault-cardcap>${esc(vaultState(m))}</p>
+            <p class="pf-crownstage__filed">${VAULT_LOCK} <span data-vault-provtext>Filed ${esc(m.filed.split(" · ")[0])} &rarr; Sealed &rarr; Recorded</span></p>
+            <div class="pf-access">
+              <div class="pf-access__qr" data-vault-qr>${vaultQR(m.id)}</div>
+              <span class="pf-access__id" data-vault-qrid>${esc(m.id)}</span>
+              <span class="pf-access__cta">scan to access</span>
             </div>
-            <span class="vqr__id" data-vault-qrid>${esc(m.id)}</span>
-            <span class="vqr__cta">Scan to access</span>
+            <a class="pf-openreading pf-openreading--lg" href="#" data-vault-openreading>Open this reading &rarr;</a>
           </div>
-          <button type="button" class="vread" data-vault-openreading>
-            <span class="vread__mark" aria-hidden="true">${VAULT_HEX}</span>
-            <span class="vread__txt">
-              <span class="vread__t">Open Reading</span>
-              <span class="vread__d">Reopen this card’s Stats &amp; Readings</span>
-            </span>
-          </button>
         </div>
 
-        <aside class="vault__about">
-          <span class="vabout__head">What is the Vault?</span>
-          <span class="vabout__wave" aria-hidden="true">${VAULT_WAVE_SM}</span>
-          <div class="vabout__rows">${aboutRows}</div>
-          <p class="vabout__note">Each mint is a record.<br>Each record is yours.<span class="vabout__seal" aria-hidden="true">◈</span></p>
-        </aside>
-
-        <div class="vault__credit" aria-hidden="true">
-          <div class="vcredit__txt">
-            <span class="vcredit__l1">Blue Room Archive</span>
-            <span class="vcredit__l2">A private record system</span>
-            <span class="vcredit__l3">Not for public release</span>
-          </div>
-          <span class="vcredit__seal">${VAULT_SEAL}</span>
-        </div>
+        <section class="pf-sec">
+          <h2 class="pf-sec__h">Saved Mints<span class="pf-sec__note">example data</span></h2>
+          <p class="pf-lede">Your saved mints — choose one to bring it forward.</p>
+          <div class="pf-mintlist">${rows}</div>
+        </section>
       </div>
     </div>`;
 }
 
 function wireVault() {
-  const root = document.querySelector(".vault");
+  const root = document.querySelector(".pf--vault");
   if (!root) return;
   let sel = 0;
   const $ = (s) => root.querySelector(s);
@@ -2039,13 +2002,13 @@ function wireVault() {
     sel = i;
     const m = VAULT_MINTS[i];
     if (cardSlot) cardSlot.innerHTML = renderCard(m.src, "shiny");
-    if (cardCap) cardCap.textContent = m.state;
+    if (cardCap) cardCap.textContent = vaultState(m);
     if (cardProv) cardProv.textContent = `Filed ${m.filed.split(" · ")[0]} → Sealed → Recorded`;
     if (qrSlot) qrSlot.innerHTML = vaultQR(m.id);
     if (qrId) qrId.textContent = m.id;
     root.querySelectorAll("[data-vault-select]").forEach((b) => {
       const on = Number(b.dataset.vaultSelect) === i;
-      b.classList.toggle("is-selected", on);
+      b.classList.toggle("pf-mintrow--sel", on);
       b.setAttribute("aria-pressed", on ? "true" : "false");
     });
   }

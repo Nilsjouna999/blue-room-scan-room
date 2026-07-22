@@ -372,6 +372,64 @@ a.pf-redraw.pf-paid:hover, a.pf-redraw.pf-paid:focus-visible { color: #bda6e4; b
 /* honour high-contrast mode — drop the animated ink rim on the name */
 @media (prefers-contrast: more) { .pf-id__name { filter: none; } }
 
+/* ============================================================
+   BR-S185 — THE VAULT ported into the profile's museum language.
+   Vault-specific .pf-* additions only; the rest reuses profile classes
+   (.pf-wrap / .pf-sec / .pf-crownstage__cap / .pf-prov / .pf-openreading).
+============================================================ */
+.pf-back { display: inline-block; margin: 0 0 clamp(16px, 3.5vh, 30px); font-family: var(--pf-mono); font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: var(--pf-meta); text-decoration: none; transition: color .18s; }
+.pf-back:hover, .pf-back:focus-visible { color: var(--pf-cream-display); outline: none; }
+
+.pf-vaulthead { text-align: center; }
+.pf-vaulteyebrow { font-family: var(--pf-mono); font-size: 9.5px; letter-spacing: .28em; text-transform: uppercase; color: var(--pf-meta); }
+.pf-vaulttitle { font-family: var(--pf-serif); font-weight: 600; font-size: clamp(30px, 4.6vw, 46px); line-height: 1.05; letter-spacing: .01em; color: var(--pf-cream-display); margin: 8px 0 0; }
+.pf-vaultintro { font-family: var(--pf-serif); font-size: 15px; color: var(--pf-body); margin: 12px 0 0; }
+
+/* the mint enshrined in a light pool — the crownstage form, sized for a portrait card */
+.pf-vaultstage {
+  position: relative; isolation: isolate;
+  display: flex; flex-direction: column; align-items: center; text-align: center;
+  margin: clamp(30px, 6vh, 64px) 0 clamp(38px, 8vh, 78px); padding: clamp(20px, 4vh, 42px) 0 0;
+}
+.pf-vaultstage::before {
+  content: ""; position: absolute; z-index: -1; pointer-events: none;
+  left: 50%; top: 44%; transform: translate(-50%, -50%);
+  width: min(460px, 100%); height: 110%;
+  background: radial-gradient(ellipse 62% 54% at 50% 42%, rgba(201, 163, 92, .10) 0%, rgba(201, 163, 92, .04) 40%, transparent 70%);
+}
+@media (prefers-reduced-motion: no-preference) { .pf-vaultstage::before { animation: pfBreath 12s ease-in-out infinite; } }
+
+.pf-vaultcard { position: relative; width: fit-content; max-width: min(340px, 86vw); margin: 0 auto; }
+.pf-vaultcard__inner { position: relative; z-index: 1; }
+/* faint gold vitrine brackets — the one retained museum motif */
+.pf-vcrop { position: absolute; width: 14px; height: 14px; border: 1px solid var(--pf-line-cut); z-index: 2; pointer-events: none; }
+.pf-vcrop--tl { top: -9px; left: -9px; border-right: 0; border-bottom: 0; }
+.pf-vcrop--tr { top: -9px; right: -9px; border-left: 0; border-bottom: 0; }
+.pf-vcrop--bl { bottom: -9px; left: -9px; border-right: 0; border-top: 0; }
+.pf-vcrop--br { bottom: -9px; right: -9px; border-left: 0; border-top: 0; }
+
+/* the quiet access micro-stack — no box, no header tab */
+.pf-access { display: flex; flex-direction: column; align-items: center; gap: 5px; margin: 16px 0 0; }
+.pf-access__qr { width: 88px; height: 88px; color: var(--pf-meta); opacity: .85; }
+.pf-access__qr svg { width: 100%; height: 100%; display: block; }
+.pf-access__id { font-family: var(--pf-mono); font-size: 10px; letter-spacing: .16em; color: var(--pf-meta); }
+.pf-access__cta { font-family: var(--pf-mono); font-size: 8.5px; letter-spacing: .2em; text-transform: uppercase; color: var(--pf-ghost); }
+
+/* SAVED MINTS — the profile's friend-row idiom */
+.pf-mintlist { display: flex; flex-direction: column; }
+.pf-mintrow { position: relative; display: flex; align-items: center; gap: 14px; width: 100%; padding: 12px 2px; text-align: left; background: none; border: 0; border-bottom: 1px solid var(--pf-line-soft); box-shadow: 0 1px 0 rgba(224, 218, 205, .022); color: inherit; cursor: default; }
+.pf-mintrow:last-of-type { border-bottom: 0; box-shadow: none; }
+.pf-mintrow--sel { cursor: pointer; }
+.pf-mintrow--sel::before { content: ""; position: absolute; left: -6px; top: 24%; bottom: 24%; width: 2px; background: var(--pf-gold); border-radius: 1px; }
+.pf-mintrow--sel:focus-visible { outline: 2px solid var(--pf-gold-lit); outline-offset: 3px; }
+.pf-mintrow--cue { opacity: .6; }
+.pf-mintrow--empty { opacity: .5; }
+.pf-mintrow__thumb { width: 34px; height: 34px; border-radius: 5px; overflow: hidden; flex: none; border: 1px solid var(--pf-line); display: grid; place-items: center; background: rgba(233, 229, 220, .02); }
+.pf-mintrow__thumb img, .pf-mintrow__img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.pf-mintrow__thumb--empty { border-style: dashed; color: var(--pf-ghost); font-family: var(--pf-mono); font-size: 15px; }
+.pf-mintrow__n { font-family: var(--pf-serif); font-size: 17px; color: var(--pf-cream); flex: 0 1 auto; }
+.pf-mintrow__id { font-family: var(--pf-mono); font-size: 9px; letter-spacing: .1em; text-transform: uppercase; color: var(--pf-meta); margin-left: auto; }
+
 @media (max-width: 620px) {
   .pf-top { gap: 10px 14px; }
   .pf-mini { width: calc(50% - 7px); }
