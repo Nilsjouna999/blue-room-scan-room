@@ -151,11 +151,20 @@
     var id = '<div class="pf-id">' +
       '<span class="pf-id__av" aria-hidden="true">' + esc(SEEKER.avatar) + '</span>' +
       '<span class="pf-id__txt">' +
-        '<span class="pf-id__name">' + esc(SEEKER.display_name) + '</span>' +
+        '<span class="pf-id__bearer">' + esc(SEEKER.display_name) + '</span>' +
         '<span class="pf-id__handle">' + esc(SEEKER.handle) +
           (SEEKER.birth ? '<span class="pf-id__born"> · ' + esc(SEEKER.place) + ' · ' + esc(SEEKER.birth) + '</span>' : '') +
         '</span>' +
       '</span></div>';
+
+    // the assembled name — the artifact, the largest type on the page (oil-edge treatment).
+    // The spine (the systems that composed it) drops beneath as quiet mono provenance.
+    var crownname = (taken && c.name)
+      ? '<div class="pf-crownname">' +
+          '<h1 class="pf-id__name">' + esc(c.name) + '</h1>' +
+          (c.spine ? '<p class="pf-crownname__spine">' + esc(c.spine) + '</p>' : '') +
+        '</div>'
+      : '';
 
     // the Crown — the reading button; "Open this reading" IS the full arcana result page.
     // No profile-side redraw: to get a new reading, draw one from the Arcana Room.
@@ -166,8 +175,7 @@
           crownSVG(points, gems, { cls: "pf-crown-svg", aria: "Crown holding " + gems + " readings" }) +
         '</button>' +
         '<div class="pf-crownrow__txt">' +
-          (c.spine ? '<p class="pf-spine">' + esc(c.spine) + '</p>' : '') +
-          '<p class="pf-prov">' + gems + ' rubies set — one for each reading it holds.</p>' +
+          '<p class="pf-prov">' + gems + ' gems set — one for each reading it holds.</p>' +
           '<a class="pf-openreading pf-openreading--lg" href="#" data-open-reading="' + esc(c.reading_id) + '">Open this reading &rarr;</a>' +
         '</div></div>';
     } else {
@@ -181,7 +189,7 @@
         '</div></div>';
     }
 
-    return '<section class="pf-surface">' + id + crown + '</section>';
+    return '<section class="pf-surface">' + id + crownname + crown + '</section>';
   }
 
   /* ---------- Rings — family + friend crowns (§3.4) ---------- */
@@ -212,12 +220,11 @@
         '<span class="pf-card__cap"><span class="pf-card__k">' + esc(m.kind) + '</span>' +
         '<span class="pf-card__n">' + esc(m.name) + '</span></span></div>';
     }).join("");
-    var empty = "";
-    var n = Math.max(0, (SEEKER.vault_slots || 4) - SEEKER.minted_cards.length);
-    for (var i = 0; i < n; i++) empty += '<div class="pf-card pf-card--empty" aria-hidden="true"><span class="pf-card__slot">empty slot</span></div>';
+    // Empty state is one calm line (the lede) — no ghost slots. Cards appear when minting is live.
+    var body = cards ? '<div class="pf-vault"><div class="pf-cards">' + cards + '</div></div>' : "";
     return section("The Vault", "not open yet",
       "Your minted cards are filed here — nothing has been minted yet. The Vault opens once minting is live.",
-      '<div class="pf-vault"><div class="pf-cards">' + cards + empty + '</div></div>');
+      body);
   }
 
   function pickOpt(id, o) {

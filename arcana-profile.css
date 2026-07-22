@@ -7,11 +7,10 @@
    UNDERGROUND — content sections as open L-bracket ledger panels (spine + gold
      top-rule + folder-tab heading), clearly contained, flat, nothing lifted.
 
-   Colour law: gold (value + all wayfinding) over warm-grey text and ivory/near-black
-   surfaces. NO pure white. Violet reserved for commerce — absent here by design
-   (commerce lives in the Arcana Room); tokens kept defined. The ONE exception is the
-   red/purple liquid-flame HALO — a cosmetic avatar-frame flair, deliberately off-law.
-   [OPEN DECISION 4] violet hex remains the brief's suggested value.
+   Colour law: "crown + hairline ink" — the crown SVG is the ONE gold object; the hairline
+   section rules/spines stay as low-alpha warm ink; saturated gold is pulled off wayfinding
+   (doors, tabs, labels, CTAs, the '+') to warm-grey. Focus ring stays gold (canon). NO pure
+   white. Violet reserved for commerce — the one paid register (the Rings "read for someone").
 ============================================================= */
 
 .pf {
@@ -229,6 +228,64 @@ a.pf-redraw.pf-paid:hover, a.pf-redraw.pf-paid:focus-visible { color: #bda6e4; b
 
 /* footer — bedrock */
 .pf-foot { margin: clamp(44px, 8vh, 72px) 0 0; padding-top: 24px; border-top: 1px solid var(--pf-line-soft); font-family: var(--pf-mono); font-size: 9px; letter-spacing: .1em; color: var(--pf-ghost); line-height: 1.9; text-align: center; }
+
+/* ============================================================
+   BR-S180 EASY BATCH — append-only overrides (leaves the praised
+   section rules + crown untouched; specificity keeps the paid violet).
+   1) the assembled name as hero  2) gold law "crown + hairline ink"
+   3) intimate 620px column  4) ground grain  5) friends-row fix
+   6) small-text contrast lift
+============================================================ */
+
+/* 1 — the assembled name is the artifact: the largest type, oil-edge treatment.
+   The bearer's real name + the spine that composed it drop to quiet provenance. */
+.pf-id__name { font-size: clamp(30px, 4.6vw, 46px); margin: 0; }
+.pf-id__bearer { font-family: var(--pf-serif); font-weight: 600; font-size: 19px; line-height: 1.12; color: var(--pf-cream-display); }
+.pf-crownname { padding-left: 23px; margin: clamp(14px, 2.6vh, 22px) 0 0; }
+.pf-crownname__spine { font-family: var(--pf-mono); font-size: 10px; letter-spacing: .2em; text-transform: uppercase; color: var(--pf-meta); margin: 9px 0 0; }
+
+/* 2 — gold law: saturated gold pulled off wayfinding → warm-grey.
+   Crown SVG, hairline section rules, and the focus ring KEEP their gold. */
+.pf-wordmark__mark,
+.pf-doorbar__seal, .pf-doorbar__arr,
+.pf-sec__h,
+.pf-openreading,
+.pf-mini__plus, .pf-slot__plus, .pf-slot__kind,
+.pf-pickopt__k,
+.pf-friend__av { color: var(--pf-meta); }
+.pf-id__av { color: var(--pf-cream-display); }
+.pf-door::after { background: var(--pf-meta); }
+.pf-door:hover, .pf-door:focus-visible,
+.pf-openreading:hover, .pf-openreading:focus-visible,
+.pf-mini--add:hover, .pf-mini--add:focus-visible,
+.pf-slot--empty:hover, .pf-slot--empty:focus-visible,
+.pf-addfriend:hover, .pf-addfriend:focus-visible { color: var(--pf-cream-display); }
+.pf-doorbar:hover, .pf-doorbar:focus-visible,
+.pf-openreading--lg:hover, .pf-openreading--lg:focus-visible,
+.pf-slot--empty:hover, .pf-slot--empty:focus-visible,
+.pf-slot--filled:hover, .pf-slot--filled:focus-visible,
+.pf-pickopt:hover, .pf-pickopt:focus-visible,
+.pf-mini--add:hover, .pf-mini--add:focus-visible,
+.pf-addfriend:hover, .pf-addfriend:focus-visible,
+.pf-card:hover, .pf-card:focus-visible { border-color: var(--pf-line-cut); }
+.pf-doorbar:hover, .pf-doorbar:focus-visible,
+.pf-pickopt:hover, .pf-pickopt:focus-visible { background: rgba(233, 229, 220, .03); }
+
+/* 3 + 4 — intimate column, and a fine static grain on the ground (rendered once,
+   under content, kills banding + gives the void a paper tooth). Not animated. */
+.pf-wrap { width: min(620px, 92vw); position: relative; z-index: 1; }
+.pf::before {
+  content: ""; position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+  opacity: .05; mix-blend-mode: soft-light;
+}
+
+/* 5 — friends row: the crown-epithet rides beside the name instead of the far edge */
+.pf-friend__n { flex: 0 1 auto; }
+
+/* 6 — lift instructive small text off the dim ghost tier */
+.pf-slot__hint { color: var(--pf-meta); }
+.pf-foot { color: var(--pf-meta); }
 
 @media (max-width: 620px) {
   .pf-top { gap: 10px 14px; }
