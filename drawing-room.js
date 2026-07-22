@@ -33,7 +33,7 @@
 
   function param(k) { var m = new RegExp("[?&]" + k + "=([^&]*)").exec(location.search); return m ? decodeURIComponent(m[1].replace(/\+/g, " ")) : ""; }
 
-  var MAJORS = [];   // the Tarot system's entries, loaded from codex-data.json
+  var DECK = [];   // the full 78-card deck (Majors + Minors), loaded from codex-data.json
   var MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
   function numeralOf(m) { return String((m && m.tag) || "").trim().split(/\s+/)[0] || ""; }
@@ -142,7 +142,7 @@
   function announce(msg) { var l = HOST.querySelector("[data-dr-live]"); if (l) l.textContent = msg; }
   function firstSentence(s) { var m = String(s || "").match(/^[^.]+\./); return m ? m[0] : String(s || ""); }
 
-  function drawForSeed(seed) { return pick(MAJORS, seed + "1"); }
+  function drawForSeed(seed) { return pick(DECK, seed + "1"); }
 
   function cut() {
     var q = (HOST.querySelector("[data-dr-question]") || {}).value || "";
@@ -199,8 +199,9 @@
       wire(host);
       fetch("codex-data.json").then(function (r) { return r.text(); }).then(function (txt) {
         var codex = JSON.parse(txt);
-        var sys = codex.filter(function (s) { return /tarot/i.test(String(s.system || "")); })[0];
-        MAJORS = (sys && sys.entries) ? sys.entries : [];
+        // gather the full 78-card deck: the "Tarot — Major Arcana" + "The Minor Arcana" systems
+        DECK = codex.filter(function (s) { return /tarot|minor arcana/i.test(String(s.system || "")); })
+          .reduce(function (a, s) { return a.concat(s.entries || []); }, []);
         boot(host);
       }).catch(function () {
         var st = host.querySelector("[data-dr-stage]");
