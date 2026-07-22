@@ -89,16 +89,13 @@
 .pf-id__handle { font-family: var(--pf-mono); font-size: 11px; letter-spacing: .14em; color: var(--pf-meta); margin-top: 4px; }
 .pf-id__born { color: var(--pf-ghost); letter-spacing: .1em; }
 
-/* the Crown — the reading button; a LEFT-aligned row (crown + reading info) above the Rings */
-.pf-crownrow { display: flex; align-items: center; gap: clamp(14px, 2.5vw, 24px); padding-left: 23px; margin: clamp(16px, 3vh, 28px) 0 0; }
+/* the Crown — the reading button (staged centrally by .pf-crownstage, see below) */
 .pf-crownbtn { display: inline-flex; flex: none; background: none; border: 1px solid transparent; border-radius: 12px; padding: 8px; cursor: pointer; transition: border-color .18s, background .18s; }
 .pf-crownbtn:hover, .pf-crownbtn:focus-visible { border-color: var(--pf-line); background: rgba(162,134,74,.035); outline: none; }
 .pf-crown-svg { width: clamp(104px, 17vw, 148px); height: auto; filter: drop-shadow(0 10px 14px rgba(0,0,0,.5)) drop-shadow(0 4px 12px rgba(162,134,74,.13)) drop-shadow(0 0 10px rgba(162,134,74,.09)); }
 .pf-crownbtn:hover .pf-crown-svg { filter: drop-shadow(0 10px 14px rgba(0,0,0,.5)) drop-shadow(0 4px 14px rgba(162,134,74,.2)) drop-shadow(0 0 12px rgba(162,134,74,.15)); }
-.pf-crownrow__txt { display: flex; flex-direction: column; align-items: flex-start; gap: 9px; }
 .pf-crown-empty { width: clamp(140px, 24vw, 180px); aspect-ratio: 1 / .62; display: grid; place-items: center; border: 1px dashed var(--pf-violet-line); border-radius: 4px; color: var(--pf-violet-lit); font-family: var(--pf-mono); font-size: 9px; letter-spacing: .2em; text-transform: uppercase; text-align: center; line-height: 1.9; padding: 12px; }
-/* the reading's spine + provenance — left-aligned beside the crown */
-.pf-spine { font-family: var(--pf-mono); font-size: 10px; letter-spacing: .2em; text-transform: uppercase; color: var(--pf-gold); opacity: .9; margin: 0; }
+/* the reading's provenance line under the crown */
 .pf-prov { font-family: var(--pf-serif); font-style: italic; font-size: 14.5px; color: var(--pf-meta); margin: 0; max-width: 40ch; line-height: 1.5; }
 .pf-openreading--lg { padding: 10px 22px; font-size: 10.5px; letter-spacing: .18em; border: 1px solid var(--pf-line-cut); border-radius: 999px; }
 .pf-openreading--lg:hover, .pf-openreading--lg:focus-visible { border-color: var(--pf-gold); }
@@ -143,8 +140,8 @@ a.pf-redraw.pf-paid:hover, a.pf-redraw.pf-paid:focus-visible { color: #bda6e4; b
   border-left: 1px solid var(--pf-line-cut);
   background: linear-gradient(to right, rgba(233,229,220,.020) 0%, rgba(233,229,220,.007) 30%, transparent 62%);
 }
-.pf-sec::before { content: ""; position: absolute; left: -1px; top: 0; width: min(58%, 340px); height: 1px; background: linear-gradient(to right, var(--pf-gold) 0%, var(--pf-line) 42%, transparent 100%); }
-.pf-sec::after { content: ""; position: absolute; left: -1px; bottom: 0; width: 38px; height: 1px; background: linear-gradient(to right, rgba(201,163,92,.5), transparent); }
+.pf-sec::before { content: ""; position: absolute; left: -1px; top: 0; width: min(58%, 340px); height: 1px; background: linear-gradient(to right, var(--pf-line-cut) 0%, var(--pf-line) 42%, transparent 100%); }
+.pf-sec::after { content: ""; position: absolute; left: -1px; bottom: 0; width: 38px; height: 1px; background: linear-gradient(to right, rgba(201,163,92,.25), transparent); }
 /* folder-tab heading — an opaque chip straddling the elbow, knocking a clean gap in the top-rule */
 .pf-sec__h { position: absolute; top: 0; left: 14px; transform: translateY(-50%); z-index: 1; display: inline-flex; align-items: center; gap: 10px; margin: 0; padding: 3px 12px; background: var(--pf-tab-bg); border: 1px solid var(--pf-line); border-radius: 4px; font-family: var(--pf-mono); font-size: 9.5px; font-weight: 500; letter-spacing: .22em; text-transform: uppercase; color: var(--pf-gold); }
 .pf-sec__note { font-family: var(--pf-mono); font-size: 8.5px; letter-spacing: .16em; text-transform: uppercase; color: var(--pf-ghost); }
@@ -342,6 +339,38 @@ a.pf-redraw.pf-paid:hover, a.pf-redraw.pf-paid:focus-visible { color: #bda6e4; b
 /* incised dividers elsewhere — a whisper of highlight below the hairline = a cut groove */
 .pf-friend { box-shadow: 0 1px 0 rgba(224, 218, 205, .022); }
 .pf-friend:last-of-type { box-shadow: none; }
+
+/* ============================================================
+   BR-S184 ELEVATION — "one lamp, one room": the crown lights the
+   whole column with a warm falloff, and its pool breathes; plus the
+   dated museum label, last contrast lifts, and a high-contrast opt-out.
+============================================================ */
+
+/* the room lamp — one soft warm pool anchored at the crown, falling off down
+   the column so the ledger sits in residual warmth then recedes to archive-dark.
+   Sits above the ground + grain, below content. */
+.pf-wrap::before {
+  content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  background: radial-gradient(130% 52% at 50% 15%, rgba(201, 163, 92, .065) 0%, rgba(201, 163, 92, .02) 42%, transparent 70%);
+}
+
+/* the crown's pool breathes — a candle-slow swell, never a pulse (motion-safe) */
+@keyframes pfBreath { 0%, 100% { opacity: .82; } 50% { opacity: 1; } }
+@media (prefers-reduced-motion: no-preference) {
+  .pf-crownstage::before { animation: pfBreath 12s ease-in-out infinite; }
+}
+
+/* the dated museum label under the crown — the second thing worth pausing on */
+.pf-crownstage__filed {
+  font-family: var(--pf-mono); font-size: 9.5px; letter-spacing: .16em; text-transform: uppercase;
+  color: var(--pf-meta); margin: 10px 0 0;
+}
+
+/* contrast — lift the last small labels off the dim ghost tier */
+.pf-sec__note, .pf-card__k { color: var(--pf-meta); }
+
+/* honour high-contrast mode — drop the animated ink rim on the name */
+@media (prefers-contrast: more) { .pf-id__name { filter: none; } }
 
 @media (max-width: 620px) {
   .pf-top { gap: 10px 14px; }

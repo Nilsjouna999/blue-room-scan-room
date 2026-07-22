@@ -27,6 +27,16 @@
     });
   }
 
+  // "2026-07-09" -> "9 July 2026" — filed-date format for the crown's museum label.
+  function fmtDate(iso) {
+    var M = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    var p = String(iso == null ? "" : iso).split("-");
+    if (p.length !== 3) return iso || "";
+    var m = +p[1], d = +p[2];
+    if (!m || !d || m < 1 || m > 12) return iso;
+    return d + " " + M[m - 1] + " " + (+p[0]);
+  }
+
   /* ---- MOCK seeker ---- */
   var SEEKER = {
     display_name: "Antton Aikio",
@@ -177,6 +187,7 @@
         '</button>' +
         '<div class="pf-crownstage__cap">' +
           '<p class="pf-prov">' + gems + ' gems set — one for each reading it holds.</p>' +
+          '<p class="pf-crownstage__filed">Filed ' + esc(fmtDate(c.created_at)) + ' &middot; ' + esc(c.reading_id) + '</p>' +
           '<a class="pf-openreading pf-openreading--lg" href="#" data-open-reading="' + esc(c.reading_id) + '">Open this reading &rarr;</a>' +
         '</div></div>';
     } else {
@@ -211,7 +222,7 @@
         '<div class="pf-relmenu__grid">' + relOpts + '</div>' +
       '</div></div>';
     return section("Rings", null,
-      "A ring is earned by reading for someone close. Read for someone to set the first.",
+      "A ring is earned by reading for someone close — none set yet.",
       '<div class="pf-family">' + add + '</div>');
   }
 
@@ -224,7 +235,7 @@
     // Empty state is one calm line (the lede) — no ghost slots. Cards appear when minting is live.
     var body = cards ? '<div class="pf-vault"><div class="pf-cards">' + cards + '</div></div>' : "";
     return section("The Vault", "not open yet",
-      "Your minted cards are filed here — nothing has been minted yet. The Vault opens once minting is live.",
+      "Your minted cards are filed here — nothing has been minted yet. The Vault opens once minting begins.",
       body);
   }
 
@@ -244,20 +255,27 @@
     '</div>';
   }
   function showcaseHTML() {
-    var slots = SEEKER.showcase.map(function (s) {
-      var inner = s.chosen
-        ? '<button type="button" class="pf-slot pf-slot--filled" data-showpick="' + s.id + '" aria-haspopup="menu" aria-expanded="false">' +
-            '<span class="pf-slot__kind">' + esc(s.chosen.kind) + '</span>' +
-            '<span class="pf-slot__t">' + esc(s.chosen.name) + '</span>' +
-            '<span class="pf-slot__change">change &rsaquo;</span></button>'
-        : '<button type="button" class="pf-slot pf-slot--empty" data-showpick="' + s.id + '" aria-haspopup="menu" aria-expanded="false">' +
-            '<span class="pf-slot__plus" aria-hidden="true">+</span>' +
-            '<span class="pf-slot__hint">Feature a result<br>or a minted card</span></button>';
-      return '<div class="pf-slotwrap" data-slot="' + s.id + '">' + inner + pickMenu(s.id) + '</div>';
-    }).join("");
+    // Show the filled picks, then ONE quiet invite slot — never a grid of cloned
+    // empty boxes (the Vault's own subtraction discipline, applied here too).
+    var out = SEEKER.showcase.filter(function (s) { return s.chosen; }).map(function (s) {
+      return '<div class="pf-slotwrap" data-slot="' + s.id + '">' +
+        '<button type="button" class="pf-slot pf-slot--filled" data-showpick="' + s.id + '" aria-haspopup="menu" aria-expanded="false">' +
+          '<span class="pf-slot__kind">' + esc(s.chosen.kind) + '</span>' +
+          '<span class="pf-slot__t">' + esc(s.chosen.name) + '</span>' +
+          '<span class="pf-slot__change">change &rsaquo;</span></button>' +
+        pickMenu(s.id) + '</div>';
+    });
+    var next = SEEKER.showcase.filter(function (s) { return !s.chosen; })[0];
+    if (next) {
+      out.push('<div class="pf-slotwrap" data-slot="' + next.id + '">' +
+        '<button type="button" class="pf-slot pf-slot--empty" data-showpick="' + next.id + '" aria-haspopup="menu" aria-expanded="false">' +
+          '<span class="pf-slot__plus" aria-hidden="true">+</span>' +
+          '<span class="pf-slot__hint">Feature a result<br>or a minted card</span></button>' +
+        pickMenu(next.id) + '</div>');
+    }
     return section("Showcase", null,
-      "Feature what you choose — a result from your own reading, or a minted card. Click a slot to pick.",
-      '<div class="pf-show">' + slots + '</div>');
+      "Feature what you choose — a result from your reading, or a minted card. Choose a slot to fill it.",
+      '<div class="pf-show">' + out.join("") + '</div>');
   }
 
   function friendsHTML() {
@@ -297,7 +315,7 @@
     return '<a class="pf-doorbar pf-doorbar--referral" href="#" data-action="referral">' +
       '<span class="pf-doorbar__seal">' + SHARE + '</span>' +
       '<span class="pf-doorbar__txt"><span class="pf-doorbar__t">Share Blue Room</span>' +
-      '<span class="pf-doorbar__s">A quiet door to the referral programme — its own surface, later.</span></span>' +
+      '<span class="pf-doorbar__s">A quiet door to the referral programme — not open yet.</span></span>' +
       '<span class="pf-doorbar__arr" aria-hidden="true">&rarr;</span></a>';
   }
 
