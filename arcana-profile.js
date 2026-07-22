@@ -297,6 +297,7 @@
   function roomsHTML() {
     var rooms = [
       ["arcane", "The Arcana Room", "Where a new reading is drawn"],
+      ["drawing-room", "The Drawing Room", "Where cards are cut and filed"],
       ["reading", "The Reading", "Your draw, laid out in full"],
       ["codex", "The Codex", "The archive of meanings"]
     ];
@@ -376,6 +377,7 @@
         if (d === "menu") { if (inApp()) location.href = location.pathname; else note(root, "Returns to the main menu. (Inert in preview.)"); }
         else if (d === "codex") { if (inApp()) location.href = "codex.html"; else note(root, "Opens the Codex. (Inert in preview.)"); }
         else if (d === "arcane") toInput("", "Opens the Arcana Room. (Inert in preview.)");
+        else if (d === "drawing-room") { if (inApp()) location.href = "?dev=drawing-room"; else note(root, "Opens the Drawing Room — the tarot room. (Inert in preview.)"); }
         else if (d === "ceremony") { if (inApp()) location.href = "?dev=ceremony"; else note(root, "Opens the Ceremony — the arcana forge. (Inert in preview.)"); }
         else if (d === "reading") { if (inApp()) location.href = "?dev=arcana-reading"; else note(root, "Opens your reading, laid out. (Inert in preview.)"); }
         else if (d === "vault") { if (inApp()) location.href = "?dev=vault"; else note(root, "Opens the Vault. (Inert in preview.)"); }

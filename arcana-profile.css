@@ -430,6 +430,57 @@ a.pf-redraw.pf-paid:hover, a.pf-redraw.pf-paid:focus-visible { color: #bda6e4; b
 .pf-mintrow__n { font-family: var(--pf-serif); font-size: 17px; color: var(--pf-cream); flex: 0 1 auto; }
 .pf-mintrow__id { font-family: var(--pf-mono); font-size: 9px; letter-spacing: .1em; text-transform: uppercase; color: var(--pf-meta); margin-left: auto; }
 
+/* ============================================================
+   BR-S186 — THE DRAWING ROOM (?dev=drawing-room): the tarot room's
+   Step-1 single-card draw, in the museum .pf-* language.
+============================================================ */
+.dr-fineprint { font-family: var(--pf-mono); font-size: 9.5px; letter-spacing: .06em; color: var(--pf-ghost); line-height: 1.7; margin: 14px auto 0; max-width: 48ch; }
+.dr-stage { margin: clamp(30px, 6vh, 60px) 0 0; }
+.dr-loading { font-family: var(--pf-mono); font-size: 11px; letter-spacing: .1em; color: var(--pf-meta); text-align: center; }
+
+/* intake */
+.dr-intake { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 18px; }
+.dr-field { display: block; width: min(420px, 100%); text-align: left; }
+.dr-field__label { display: block; font-family: var(--pf-mono); font-size: 9.5px; letter-spacing: .16em; text-transform: uppercase; color: var(--pf-meta); margin: 0 0 8px; }
+.dr-field__opt { color: var(--pf-ghost); }
+.dr-field__in { width: 100%; background: rgba(233, 229, 220, .02); border: 0; border-bottom: 1px solid var(--pf-line); border-radius: 0; padding: 9px 2px; font-family: var(--pf-serif); font-style: italic; font-size: 17px; color: var(--pf-cream); }
+.dr-field__in::placeholder { color: var(--pf-ghost); font-style: italic; }
+.dr-field__in:focus { outline: none; border-bottom-color: var(--pf-gold); }
+.dr-cut { margin-top: 6px; background: none; border: 1px solid var(--pf-line-cut); border-radius: 999px; padding: 12px 30px; cursor: pointer; font-family: var(--pf-mono); font-size: 10.5px; font-weight: 500; letter-spacing: .2em; text-transform: uppercase; color: var(--pf-cream-display); transition: border-color .2s, color .2s; }
+.dr-cut:hover, .dr-cut:focus-visible { border-color: var(--pf-gold); color: var(--pf-gold-lit); outline: none; }
+.dr-cut__note { font-family: var(--pf-serif); font-style: italic; font-size: 14px; color: var(--pf-meta); margin: 4px 0 0; }
+
+/* the draw — the flip card */
+.dr-draw { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 20px; }
+.dr-cardbtn { background: none; border: 0; padding: 0; cursor: pointer; perspective: 1200px; }
+.dr-cardbtn--still { cursor: default; }
+.dr-cardbtn:focus-visible { outline: 2px solid var(--pf-gold-lit); outline-offset: 6px; border-radius: 12px; }
+.dr-card { position: relative; width: clamp(180px, 40vw, 220px); aspect-ratio: 120 / 190; transform-style: preserve-3d; transition: transform .7s cubic-bezier(.4, 0, .2, 1); }
+.dr-card.is-revealed { transform: rotateY(180deg); }
+.dr-cardface { position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden; border-radius: 12px; background: linear-gradient(180deg, #111319, #0c0d11); }
+.dr-cardface--front { transform: rotateY(180deg); box-shadow: 0 14px 34px rgba(0, 0, 0, .5), 0 0 30px rgba(201, 163, 92, .10); }
+.dr-plate { width: 100%; height: 100%; display: block; }
+.dr-cardface__name { position: absolute; bottom: 15px; left: 8px; right: 8px; font-family: var(--pf-serif); font-weight: 600; font-size: 16px; line-height: 1.05; color: var(--pf-cream-display); text-align: center; }
+.dr-draw__cue { font-family: var(--pf-mono); font-size: 9px; letter-spacing: .2em; text-transform: uppercase; color: var(--pf-meta); }
+
+/* the read */
+.dr-draw--read { gap: 24px; }
+.dr-read { max-width: 46ch; }
+.dr-read__num { font-family: var(--pf-mono); font-size: 9px; letter-spacing: .2em; text-transform: uppercase; color: var(--pf-meta); margin: 0; }
+.dr-read__name { font-family: var(--pf-serif); font-weight: 600; font-size: clamp(26px, 4vw, 36px); color: var(--pf-cream-display); line-height: 1.05; margin: 8px 0 0; }
+.dr-read__meaning { font-family: var(--pf-serif); font-size: 16.5px; line-height: 1.6; color: var(--pf-body); margin: 16px 0 0; }
+.dr-read__frame { font-family: var(--pf-serif); font-style: italic; font-size: 14px; color: var(--pf-meta); margin: 14px 0 0; }
+
+/* the filed moment */
+.dr-filed { display: flex; flex-direction: column; align-items: center; gap: 10px; margin-top: 8px; padding-top: 22px; border-top: 1px solid var(--pf-line-soft); box-shadow: 0 1px 0 rgba(224, 218, 205, .02); width: min(420px, 100%); }
+.dr-filed__mark { color: var(--pf-gold); font-size: 12px; }
+.dr-filed__line { font-family: var(--pf-mono); font-size: 9.5px; letter-spacing: .12em; text-transform: uppercase; color: var(--pf-meta); margin: 0; }
+
+/* sr-only live region (screen-reader announcements) */
+.dr-live { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+@media (prefers-reduced-motion: reduce) { .dr-card { transition: none; } }
+
 @media (max-width: 620px) {
   .pf-top { gap: 10px 14px; }
   .pf-mini { width: calc(50% - 7px); }

@@ -91,7 +91,7 @@ const state ={ source: 0, treatment: "free", tab: "diagram", view: "menu", draft
      uploaded-blocked renders a validated DEV fixture, never a user scan.
      free-scan-sim = Free Pull mock · halo-gate = sealed card-back mock. */
   const dev = q.get("dev");
-  if (["uploaded-result", "uploaded-blocked", "free-scan-sim", "halo-gate", "before-after", "review-map", "proto-cards", "staged-reveal", "menu-reveal", "vault", "arcane", "arcana-reading", "profile", "ceremony"].includes(dev)) { state.view = "dev"; state.dev = dev; }
+  if (["uploaded-result", "uploaded-blocked", "free-scan-sim", "halo-gate", "before-after", "review-map", "proto-cards", "staged-reveal", "menu-reveal", "vault", "arcane", "arcana-reading", "profile", "ceremony", "drawing-room"].includes(dev)) { state.view = "dev"; state.dev = dev; }
   else if (q.has("src") || q.has("t") || q.has("tab")) state.view = "room";
 }
 
@@ -2061,6 +2061,14 @@ function mountDev() {
     const host = document.getElementById("devView");
     if (window.BRArcanaProfile && typeof window.BRArcanaProfile.mount === "function") window.BRArcanaProfile.mount(host);
     else host.innerHTML = '<p style="padding:48px;color:#948f87;text-align:center;font-family:sans-serif">The profile failed to load (arcana-profile.js).</p>';
+    return;
+  }
+  if (state.dev === "drawing-room") {
+    // The Drawing Room — the tarot room (Step 1: free single-card draw).
+    // In drawing-room.js (window.BRDrawingRoom); this branch hands it the node.
+    const host = document.getElementById("devView");
+    if (window.BRDrawingRoom && typeof window.BRDrawingRoom.mount === "function") window.BRDrawingRoom.mount(host);
+    else host.innerHTML = '<p style="padding:48px;color:#948f87;text-align:center;font-family:sans-serif">The Drawing Room failed to load (drawing-room.js).</p>';
     return;
   }
   if (state.dev === "ceremony") {
