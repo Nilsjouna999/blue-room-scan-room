@@ -57,7 +57,8 @@ header.top{text-align:center;padding:66px 0 26px}
 .title{font-size:clamp(38px,6vw,60px);font-weight:600;letter-spacing:.01em;margin:12px 0 6px;color:var(--ink)}
 .tagline{font-style:italic;font-size:15px;color:var(--dim);margin:0}
 .count{font-family:"SFMono-Regular",ui-monospace,Consolas,monospace;font-size:10.5px;letter-spacing:.24em;text-transform:uppercase;color:var(--faint);margin-top:16px}
-nav.index{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,rgba(16,14,12,.97),rgba(16,14,12,.86));backdrop-filter:blur(6px);border-top:1px solid var(--hair-2);border-bottom:1px solid var(--hair-2);padding:12px 0;margin-top:26px}
+.stickybar{position:sticky;top:0;z-index:8;background:linear-gradient(180deg,rgba(16,14,12,.98),rgba(16,14,12,.9));backdrop-filter:blur(8px);border-bottom:1px solid var(--hair-2);margin-top:26px}
+nav.index{border-top:1px solid var(--hair-2);border-bottom:1px solid var(--hair-2);padding:12px 0}
 nav.index .wrap{display:flex;gap:20px;flex-wrap:wrap;align-items:center;justify-content:center}
 nav.index a{font-family:"SFMono-Regular",ui-monospace,Consolas,monospace;font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim);text-decoration:none;transition:color .15s}
 nav.index a:hover{color:var(--gold)}
@@ -85,9 +86,11 @@ main{padding:20px 0 90px}
 footer{text-align:center;color:var(--faint);font-family:"SFMono-Regular",ui-monospace,Consolas,monospace;font-size:10px;letter-spacing:.24em;text-transform:uppercase;padding:30px 0 60px;border-top:1px solid var(--hair-2)}
 .back{position:fixed;top:20px;left:24px;z-index:10;font-family:"SFMono-Regular",ui-monospace,Consolas,monospace;font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim);text-decoration:none;transition:color .15s}
 .back:hover{color:var(--gold)}
-.searchrow{display:flex;gap:14px;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;margin-top:6px}
+.searchrow{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-top:6px;padding-bottom:12px}
 .searchrow .search{margin:0}
 .searchrow #q{flex:1 1 300px;max-width:520px}
+.totop{flex:0 0 auto;width:38px;height:38px;border-radius:50%;background:#0d0b09;border:1px solid var(--hair);color:var(--dim);font-size:16px;line-height:1;cursor:pointer;display:grid;place-items:center;transition:color .15s,border-color .15s,transform .15s}
+.totop:hover,.totop:focus-visible{color:var(--gold);border-color:var(--gold-dim);transform:translateY(-2px);outline:none}
 .dict{position:relative;flex:0 1 300px;margin-left:auto}
 .search--dict{width:100%}
 .dict-out{position:absolute;right:0;top:calc(100% + 8px);z-index:6;width:min(380px,86vw);background:#0d0b09;border:1px solid var(--hair);border-radius:10px;padding:14px 16px;box-shadow:0 18px 44px rgba(0,0,0,.55)}
@@ -110,6 +113,8 @@ function dlookup(w){w=(w||'').trim();if(!w){dout.hidden=true;return;}dstat("look
 fetch('https://api.dictionaryapi.dev/api/v2/entries/en/'+encodeURIComponent(w.toLowerCase())).then(function(r){return r.ok?r.json():Promise.reject();}).then(function(data){var e=data[0]||{};var ph=e.phonetic||((e.phonetics||[]).map(function(p){return p.text;}).filter(Boolean)[0]||'');var h='<div class="dict-word">'+de(e.word||w)+(ph?'<span class="dict-phon">'+de(ph)+'</span>':'')+'</div>';(e.meanings||[]).slice(0,3).forEach(function(m){h+='<div class="dict-pos">'+de(m.partOfSpeech||'')+'</div>';(m.definitions||[]).slice(0,2).forEach(function(d,i){h+='<div class="dict-def">'+(i+1)+'. '+de(d.definition||'')+'</div>';});});h+='<div class="dict-src">Free Dictionary · English</div>';dout.hidden=false;dout.innerHTML=h;}).catch(function(){dstat("No English definition found for “"+de(w)+"”.");});}
 dq.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();dlookup(dq.value);}});
 document.addEventListener('click',function(e){if(!e.target.closest('.dict'))dout.hidden=true;});
+/* back-to-top — beside the search; shoots you up smoothly */
+var tt=document.getElementById('totop');if(tt)tt.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'});});
 """
 doc = (
     '<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
@@ -118,10 +123,13 @@ doc = (
     + '<header class="top"><div class="wrap"><div class="brand">◆ Blue Room · Codex</div>'
     + '<h1 class="title">The Codex</h1><p class="tagline">the archive’s standing meanings — what each sign, number, card, animal, rune, and hexagram holds</p>'
     + f'<div class="count">{total} entries · {len(data)} systems · the first bank</div></div></header>'
-    + '<nav class="index"><div class="wrap">' + ''.join(navs) + '</div></nav>'
-    + '<div class="wrap searchrow">'
-    +   '<input id="q" class="search" type="search" placeholder="search the codex — a sign, a card, a keyword…" autocomplete="off">'
-    +   '<div class="dict"><input id="dq" class="search search--dict" type="search" placeholder="define an English word…" autocomplete="off"><div id="dict-out" class="dict-out" hidden></div></div>'
+    + '<div class="stickybar">'
+    +   '<nav class="index"><div class="wrap">' + ''.join(navs) + '</div></nav>'
+    +   '<div class="wrap searchrow">'
+    +     '<input id="q" class="search" type="search" placeholder="search the codex — a sign, a card, a keyword…" autocomplete="off">'
+    +     '<button id="totop" class="totop" type="button" aria-label="Back to top" title="Back to top">&#8593;</button>'
+    +     '<div class="dict"><input id="dq" class="search search--dict" type="search" placeholder="define an English word…" autocomplete="off"><div id="dict-out" class="dict-out" hidden></div></div>'
+    +   '</div>'
     + '</div>'
     + '<main><div class="wrap">' + ''.join(secs) + '<div id="nr" class="no-results">No entry matches.</div></div></main>'
     + '<footer>Blue Room Codex · first bank · canonical meanings, plainly stated</footer>'
