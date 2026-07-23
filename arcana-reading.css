@@ -83,6 +83,7 @@
   --gold:#c9a35c; --gold-lit:#e2c489; --ember:#b25f39; --ember-text:#d1794f;
   --cream:#ece7dc; --cream-display:#dcd6c9; --crown:#e0dacd;
   --t-body:#b1ada4; --t-meta:#9c9790; --t-ghost:#96918a;
+  --violet:#8a6fb0; --violet-lit:#a487c8; --violet-line:rgba(138,111,176,.4);   /* the one commerce colour (BR-S196) */
   --serif:"Cormorant Garamond","Iowan Old Style","Palatino Linotype",Georgia,serif;
   --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
   --ui:system-ui,-apple-system,"Segoe UI",sans-serif;
@@ -239,6 +240,44 @@ a{color:inherit}
 /* counsel plates (BR-S195) — each counsel page's single structure plate */
 .hexlines{width:250px;max-width:100%;height:auto}
 .aett{width:302px;max-width:100%;height:auto}
+
+/* ---------- THE CONCORD (BR-S196) — the two-person reading ---------- */
+.cc-pair{display:grid;grid-template-columns:1fr auto 1fr;align-items:start;gap:clamp(16px,4vw,44px);margin:8px auto 4px;max-width:640px}
+.cc-col{display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px}
+.cc-col svg{width:40px;height:auto;color:var(--gold)}
+.cc-name{font-family:var(--serif);font-weight:600;font-size:clamp(21px,3vw,28px);line-height:1.12;color:var(--crown);text-wrap:balance;max-width:15ch}
+.cc-div{align-self:center;color:var(--edge);font-size:13px}
+.cc-crown>p{color:var(--t-meta);font-style:italic}
+.cc-claim{margin-top:14px}
+.cc-claimnote{font-family:var(--mono);font-size:9px;letter-spacing:.04em;line-height:1.6;color:var(--t-ghost);max-width:30ch;margin:8px auto 0}
+.cc-bondline{font-family:var(--serif);font-style:italic;font-size:17px;line-height:1.6;color:var(--cream-display);text-align:center;max-width:52ch;margin:26px auto 0}
+.cc-half{margin-top:8px}
+.cc-filed{font-family:var(--mono);font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--t-ghost);margin:0 0 8px}
+.cc-credo{font-family:var(--mono);font-size:9px;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);text-align:center;opacity:.8;margin:18px 0 0}
+/* the seal / claim buttons — violet at rest, resolving to gold when settled */
+.ck-seal{background:none;border:1px solid var(--violet-line);border-radius:999px;padding:12px 30px;cursor:pointer;
+  font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:var(--violet-lit);
+  transition:border-color .2s,color .2s}
+.ck-seal:hover,.ck-seal:focus-visible{border-color:var(--violet);color:#bda6e4;outline:none}
+.ck-seal.is-settled,.ck-seal.is-settled:hover{border-color:var(--gold);color:var(--gold-lit);cursor:default;transition:border-color .45s ease,color .45s ease}
+.dr-mocknote{font-family:var(--mono);font-size:8.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--t-ghost);margin:10px 0 0}
+.cc-heldnote,.cc-onfile{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);margin:0}
+/* the desk form */
+.cc-desk{max-width:440px}
+.ck-mark{margin-bottom:26px}
+.ck-mark__label{font-family:var(--mono);font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--t-ghost);margin-bottom:12px}
+.ck-field{background:rgba(233,229,220,.02);border:0;border-bottom:1px solid var(--edge);border-radius:0;padding:8px 2px;
+  font-family:var(--serif);font-size:19px;color:var(--cream);width:100%}
+.ck-field:focus{outline:none;border-bottom-color:var(--gold)}
+.ck-name{margin-bottom:12px}
+.ck-date{display:flex;gap:12px}
+.ck-date .ck-field{text-align:center}
+.ck-d,.ck-m{max-width:56px}.ck-y{max-width:84px}
+.cc-fine{font-family:var(--mono);font-size:9px;letter-spacing:.04em;line-height:1.7;color:var(--t-ghost);max-width:44ch;margin:6px 0 20px}
+.cc-notice{font-family:var(--mono);font-size:10px;letter-spacing:.06em;color:var(--ember-text);min-height:1em;margin:12px 0 0}
+.cc-ref{font-family:var(--serif);font-style:italic;font-size:14px;color:var(--t-meta);margin:26px 0 0}
+.cc-standlink{display:inline-block;margin-top:12px;font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold)}
+@media (max-width:639px){.cc-pair{grid-template-columns:1fr;gap:24px}.cc-div{display:none}}
 .wux{width:200px;height:200px}
 .dec{width:min(320px,90%);height:auto}
 .num{width:auto;height:auto;max-width:240px;max-height:360px}

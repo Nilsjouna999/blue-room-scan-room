@@ -302,17 +302,31 @@
   }
 
   // ---------- READING VIEW ----------
+  // one mark article — shared by the reading and the concord (BR-S196 extraction).
+  // withAff=false drops the "Open the record" link (concord halves have no back-route yet).
+  function markArticle(m,seed,withAff){
+    var e=m.entry;
+    var aff=withAff?'<div class="aff"><a class="aff__open" href="#/e/'+m.key+'/'+slugify(e.name)+'/'+encodeURIComponent(seed)+'">Open the record<span class="arr" aria-hidden="true">→</span></a></div>':'';
+    return '<article class="read anim"><div>'+
+      '<div class="read__head">'+emblemHTML(m.key,e,"emblem--sm")+'<span class="slot">'+esc(m.slot)+'</span></div>'+
+      '<h2>'+esc(e.name)+'</h2>'+keysHTML(e.keywords)+(e.tag?'<div class="tag">'+esc(e.tag)+'</div>':"")+
+      paras(e.meaning,"body")+(e.reversed?'<div class="rev"><b><span class="revdot" aria-hidden="true"></span>Reversed</b>'+esc(e.reversed)+'</div>':"")+
+      '</div>'+aff+'</article>';
+  }
+  // the six marks in their chapters, for one reading (shared markup)
+  function marksColumn(R,seed,withAff){
+    var lastCh=null,html="";
+    R.marks.forEach(function(m){
+      if(m.chapter!==lastCh){html+='<div class="chap">'+esc(m.chapter)+'</div>';lastCh=m.chapter}
+      html+=markArticle(m,seed,withAff);
+    });
+    return html;
+  }
   function renderReading(seed){
     var R=readingForSeed(seed),lastCh=null,html="";
     R.marks.forEach(function(m){
       if(m.chapter!==lastCh){html+='<div class="chap">'+esc(m.chapter)+'</div>';lastCh=m.chapter}
-      var e=m.entry;
-      var href="#/e/"+m.key+"/"+slugify(e.name)+"/"+encodeURIComponent(seed);
-      html+='<article class="read anim"><div>'+
-        '<div class="read__head">'+emblemHTML(m.key,e,"emblem--sm")+'<span class="slot">'+esc(m.slot)+'</span></div>'+
-        '<h2>'+esc(e.name)+'</h2>'+keysHTML(e.keywords)+(e.tag?'<div class="tag">'+esc(e.tag)+'</div>':"")+
-        paras(e.meaning,"body")+(e.reversed?'<div class="rev"><b><span class="revdot" aria-hidden="true"></span>Reversed</b>'+esc(e.reversed)+'</div>':"")+
-        '</div><div class="aff"><a class="aff__open" href="'+href+'">Open the record<span class="arr" aria-hidden="true">→</span></a></div></article>';
+      html+=markArticle(m,seed,true);
     });
     var c=R.crown;
     var eyebrow=R.person?(esc(R.person.name)+' &middot; born '+esc(R.person.born)):'The name borne';
@@ -391,18 +405,164 @@
       '<div class="acc__close"><a href="#/">← '+(filed?"Back to the reading":"The reading")+'</a></div></section>';
   }
 
+  // ======== THE CONCORD (BR-S196) — the two-person reading ========
+  // Two whole readings + the bond the traditions draw between them. $7.99 mock, one bond
+  // per pair. Reads TWO people together; relates ONLY where the engine already holds a
+  // tradition table (sun triplicities, animal San He/Liu He/clash). No score, no verdict,
+  // no pair-epithet, no third drawn object — a roll-up over the relations IS the verdict.
+  var REF_CONCORD_A="birth~Antton Aikio~2001~4~9", REF_CONCORD_B="birth~Ingrid Sandberg~1993~8~10";
+  function encSeed(s){return encodeURIComponent(s)}
+  function concordURL(a,b){return "#/c/"+encSeed(a)+"/"+encSeed(b)}
+  // order-independent pair key from the two normalized half-seeds (norm strips ~, so join on |)
+  function normHalf(s){var p=String(s).split("~");return norm(p[1]||"")+"~"+(+p[2]||0)+"~"+(+p[3]||0)+"~"+(+p[4]||0)}
+  function pairKey(a,b){var x=normHalf(a),y=normHalf(b);return "br_concord~"+(x<y?x+"|"+y:y+"|"+x)}
+  function concordStanding(a,b){try{return localStorage.getItem(pairKey(a,b))}catch(e){return null}}
+
+  // the bond — each relation rendered separately in tradition-voice; NO aggregate.
+  function bondSun(RA,RB){
+    var iA=ZOD.indexOf(RA.d.sun.name),iB=ZOD.indexOf(RB.d.sun.name);if(iA<0||iB<0)return null;
+    var c=sunCompat(iA),A=RA.d.sun.name,B=RB.d.sun.name,rel,kind=null;
+    if(iA===iB)rel=A+" and "+B+" share one sign — read as recognition, with the same blind side held twice.";
+    else if(c.kindred.indexOf(iB)>=0){rel=A+" and "+B+" stand a trine apart — kindred; read as easy recognition, the two said to burn at one temperature.";kind="gold"}
+    else if(iB===c.mirror){rel=A+" and "+B+" stand opposed — the mirror; read as the missing half a sign is measured against, not the enemy.";kind="ember"}
+    else if(c.tension.indexOf(iB)>=0){rel=A+" and "+B+" stand square — in tension; read as friction that sharpens or exhausts, depending.";kind="ember"}
+    else rel=A+" and "+B+" stand at an angle the tradition does not chart. No line is drawn; the suns are left unremarked.";
+    return {text:rel,kind:kind,iA:iA,iB:iB};
+  }
+  function bondYear(RA,RB){
+    var iA=ANI.indexOf(RA.d.chinese.name),iB=ANI.indexOf(RB.d.chinese.name);if(iA<0||iB<0)return null;
+    var c=chiCompat(iA),A=RA.d.chinese.name,B=RB.d.chinese.name,rel,kind=null;
+    if(iA===iB)rel="Both years run under the "+A+" — one nature, held twice.";
+    else if(c.sanhe.indexOf(iB)>=0){rel="The "+A+" and the "+B+" fall in one San He (三合) triangle — the tradition’s strongest alliance.";kind="gold"}
+    else if(iB===c.liuhe){rel="The "+A+" and the "+B+" are a Liu He (六合) pair — the quiet, reliable secret-friend match.";kind="gold"}
+    else if(iB===c.clash)  {rel="The "+A+" and the "+B+" sit opposite — a clash (六冲); read as friction to work with, not doom.";kind="ember"}
+    else rel="The "+A+" and the "+B+" the tradition leaves unpaired — neither allied nor opposed.";
+    return {text:rel,kind:kind,iA:iA,iB:iB};
+  }
+  function bondElements(RA,RB){
+    var a=RA.crown.chiEl,b=RB.crown.chiEl;if(!a||!b)return null;
+    var ia=wuIdx(a),ib=wuIdx(b);if(ia<0||ib<0)return null;
+    if(ia===ib)return "Both stand under "+WUXING[ia][0]+" — a single phase, doubled.";
+    if((ia+1)%5===ib)return WUXING[ia][0]+" feeds "+WUXING[ib][0]+" — the first year nourishes the second.";
+    if((ib+1)%5===ia)return WUXING[ib][0]+" feeds "+WUXING[ia][0]+" — the second year nourishes the first.";
+    if((ia+3)%5===ib)return WUXING[ia][0]+" checks "+WUXING[ib][0]+" — the first tempers the second.";
+    return WUXING[ib][0]+" checks "+WUXING[ia][0]+" — the second tempers the first.";
+  }
+  function bondLine(RA,RB){
+    var a=RA.crown,b=RB.crown,first,second;
+    // collision-aware: two people can draw the same rune (role+lexicon) or trigram (binding)
+    first=(a.role===b.role&&a.lexicon===b.lexicon)
+      ? "both come as the "+a.role+", keyed alike to “"+a.lexicon+"”"
+      : "the "+a.role+" brings “"+a.lexicon+"”, the "+b.role+" answers with “"+b.lexicon+"”";
+    second=(a.binding===b.binding) ? "both stand "+a.binding : "one stands "+a.binding+", the other "+b.binding;
+    return "Read as one — "+first+"; "+second+".";
+  }
+
+  function crownCol(R,cls){
+    var c=R.crown,eye=R.person?(esc(R.person.name)+' &middot; born '+esc(R.person.born)):'The name borne';
+    return '<div class="cc-col'+(cls?' '+cls:'')+'">'+CROWN_SVG+'<div class="eyebrow">'+eye+'</div><div class="cc-name">'+esc(c.name)+'</div>'+(cls==="cc-col--b"?
+      '<div class="cc-claim" data-cc-claimwrap><button type="button" class="ck-seal ck-claim" data-cc-claim>Your reading, held &middot; $4.99</button>'+
+      '<p class="cc-claimnote">Reading this page is free, always — claiming files your half to a Reliquary of your own.</p>'+
+      '<p class="dr-mocknote">Dev mock &mdash; no account, no payment in this build.</p></div>':'')+'</div>';
+  }
+
+  function renderConcord(sa,sb){
+    var RA=readingForSeed(sa),RB=readingForSeed(sb);
+    var sun=bondSun(RA,RB),yr=bondYear(RA,RB),el=bondElements(RA,RB);
+    // ONE plate, dosage law: the sun wheel if the suns are marked, else the animal wheel if marked, else none.
+    var plate="";
+    if(sun&&sun.kind)plate=sec("The suns drawn",'<div class="dia">'+wheel(ZOD,ZGL,sun.iA,sun.kind==="gold"?[sun.iB]:[],sun.kind==="ember"?[sun.iB]:[])+'<p class="dia__cap">Both suns on one wheel — '+esc(RA.d.sun.name)+' lit, the line drawn to '+esc(RB.d.sun.name)+'.</p></div>');
+    else if(yr&&yr.kind)plate=sec("The years drawn",'<div class="dia">'+wheel(ANI,ANI.map(function(a){return KAN[a]}),yr.iA,yr.kind==="gold"?[yr.iB]:[],yr.kind==="ember"?[yr.iB]:[])+'<p class="dia__cap">Both years on one wheel — the '+esc(RA.d.chinese.name)+' lit, the line drawn to the '+esc(RB.d.chinese.name)+'.</p></div>');
+    var bond='<div class="chap">The Bond &middot; what the traditions draw between</div>'+
+      sec("The meeting of elements",'<p class="prose">'+esc(el||"The two years share no charted phase.")+'</p>'+
+        '<p class="prose" style="color:var(--t-meta);font-style:italic;font-size:14px;margin-top:12px">Element pairings are Ptolemaic and Han-dynasty in origin; what they draw between two charts is a tendency the tradition keeps, never a rule about the pair.</p>')+
+      (sun?sec("The suns",'<p class="prose">'+esc(sun.text)+'</p>'):"")+
+      (yr?sec("The years",'<p class="prose">'+esc(yr.text)+'</p>'):"")+
+      plate+
+      '<p class="cc-bondline">'+esc(bondLine(RA,RB))+'</p>';
+    var pk=hash("concord~"+normHalf(sa)+"|"+normHalf(sb)).toString(16).toUpperCase().slice(0,6);
+    var seal='<div class="seal"><div class="seal__name"><b>'+esc(RA.crown.name)+'</b> &middot; <b>'+esc(RB.crown.name)+'</b> &middot; filed as one concord</div>'+
+      '<div class="seal__foot">Two names · one record · asked once<br>Nothing is re-rolled on re-view<br>The link is the receipt — it reopens whole<br>BR-'+pk+'</div></div>'+
+      '<p class="cc-credo">Asked once. The answer holds.</p>';
+    var disc='<div class="disclaimer">A reflective record, not a prediction. Blue Room reads the figures the two charts draw, never the pair — a tendency the tradition keeps, never a rule about people. Nothing here is medical, legal, or financial counsel.</div>';
+    return '<section class="crown cc-crown"><div class="eyebrow" style="text-align:center">Two names · one record</div>'+
+        '<div class="cc-pair">'+crownCol(RA,"cc-col--a")+'<span class="cc-div" aria-hidden="true">◆</span>'+crownCol(RB,"cc-col--b")+'</div>'+
+        '<p style="text-align:center">Two readings, set side by side, and what the traditions draw between them.</p></section>'+
+      '<div class="col">'+bond+
+        '<div class="cc-half"><div class="chap">The record · '+esc((RA.person&&RA.person.name)||"the first name")+'</div><p class="cc-filed">This half stands complete — filed as your own reading. The link is the record.</p>'+marksColumn(RA,sa,false)+'</div>'+
+        '<div class="cc-half"><div class="chap">The record · '+esc((RB.person&&RB.person.name)||"the second name")+'</div>'+marksColumn(RB,sb,false)+'</div>'+
+        seal+disc+'</div>';
+  }
+
+  function renderDesk(){
+    var std=concordStanding(REF_CONCORD_A,REF_CONCORD_B);   // not used to gate the ref link, just the showcase
+    function fs(n,label){return '<div class="ck-mark"><div class="ck-mark__label">'+label+'</div>'+
+      '<input type="text" class="ck-field ck-name" data-ck="'+n+'name" maxlength="40" autocomplete="off" placeholder="a name">'+
+      '<div class="ck-date"><input inputmode="numeric" class="ck-field ck-d" data-ck="'+n+'d" maxlength="2" placeholder="D"> <input inputmode="numeric" class="ck-field ck-m" data-ck="'+n+'m" maxlength="2" placeholder="M"> <input inputmode="numeric" class="ck-field ck-y" data-ck="'+n+'y" maxlength="4" placeholder="Y"></div></div>';}
+    return '<section class="crown"><div class="eyebrow" style="text-align:center">The Concord · two names, one bond</div>'+
+        '<h1 style="text-align:center">A Concord</h1>'+
+        '<p style="text-align:center">Two people, read together — both whole readings, and the bond the traditions draw between them.</p></section>'+
+      '<div class="col cc-desk">'+fs("a","The first name borne")+fs("b","The second name borne")+
+        '<p class="cc-fine">One concord per pair. The same two names, the same dates — the same concord, always. A drawn concord is open to both names at its link, forever.</p>'+
+        '<div data-cc-sealwrap><button type="button" class="ck-seal cc-seal" data-cc-seal>Seal the concord &middot; $7.99</button>'+
+        '<p class="dr-mocknote">Dev mock &mdash; no real payment in this build.</p></div>'+
+        '<p class="cc-notice" data-cc-notice role="status" aria-live="polite"></p>'+
+        '<p class="cc-ref">The standing concord of Antton Aikio &amp; Ingrid Sandberg — <a href="'+concordURL(REF_CONCORD_A,REF_CONCORD_B)+'">open to any visitor &rarr;</a></p>'+
+      '</div>';
+  }
+
   // router — the reading comes from ?seed= (the intake builds "birth~name~y~m~d");
   // with no seed it opens the reference reading (Antton Aikio, 9 April 2001).
   var curSeed=(function(){try{return new URLSearchParams(location.search).get("seed")||""}catch(e){return ""}})()||"birth~Antton Aikio~2001~4~9",n=0;
   function route(){
     var h=location.hash.replace(/^#/,""),m=h.match(/^\/e\/([^\/]+)\/([^\/]+)(?:\/([^\/]+))?$/),app=document.getElementById("app");
+    var redraw=document.getElementById("redraw"),isCC=/^\/(c|concord)(\/|$)/.test(h);
+    if(redraw)redraw.style.display=isCC?"none":"";   // a concord never redraws (one-bond law)
+    var mc=h.match(/^\/c\/([^\/]+)\/([^\/]+)$/);
+    if(mc){app.innerHTML=renderConcord(decodeURIComponent(mc[1]),decodeURIComponent(mc[2]));document.getElementById("bar").style.width="0";window.scrollTo(0,0);return}
+    if(h==="/concord"||h==="/concord/"){app.innerHTML=renderDesk();document.getElementById("bar").style.width="0";window.scrollTo(0,0);return}
     if(m){app.innerHTML=renderEntry(m[1],decodeURIComponent(m[2]),m[3]?decodeURIComponent(m[3]):null);document.getElementById("bar").style.width="0";window.scrollTo(0,0);return}
     app.innerHTML=renderReading(curSeed);window.scrollTo(0,0);
     var reads=[].slice.call(document.querySelectorAll(".read"));
     if("IntersectionObserver" in window){var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add("in");io.unobserve(e.target)}})},{threshold:.12,rootMargin:"0px 0px -6% 0px"});reads.forEach(function(el){io.observe(el)})}else reads.forEach(function(el){el.classList.add("in")});
   }
   addEventListener("hashchange",route);
-  addEventListener("scroll",function(){var mx=document.documentElement.scrollHeight-innerHeight,b=document.getElementById("bar");if(b&&!location.hash.match(/\/e\//))b.style.width=(mx>0?scrollY/mx*100:0)+"%"},{passive:true});
+  addEventListener("scroll",function(){var mx=document.documentElement.scrollHeight-innerHeight,b=document.getElementById("bar");if(b&&!location.hash.match(/\/(e|c|concord)/))b.style.width=(mx>0?scrollY/mx*100:0)+"%"},{passive:true});
+
+  // ---- Concord wiring (BR-S196): the desk seal + the claim, one delegated listener ----
+  function ckVal(k){var el=document.querySelector('[data-ck="'+k+'"]');return el?el.value.trim():""}
+  function sealBeat(btn,label,after){
+    var reduce=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if(!btn||reduce)return after();
+    btn.disabled=true;btn.classList.add("is-settled");btn.textContent=label;setTimeout(after,620);
+  }
+  function sealConcord(){
+    var nameA=ckVal("aname")||"Seeker",nameB=ckVal("bname")||"Seeker";
+    var da=+ckVal("ad"),ma=+ckVal("am"),ya=+ckVal("ay"),db=+ckVal("bd"),mb=+ckVal("bm"),yb=+ckVal("by");
+    var notice=document.querySelector("[data-cc-notice]");
+    function clean(s){return String(s).replace(/[~\/|]/g," ").replace(/\s+/g," ").trim()||"Seeker"}
+    if(!da||!ma||!ya||!db||!mb||!yb||ya<1000||yb<1000){if(notice)notice.textContent="Two names and two full birth dates are needed to seal a concord.";return;}
+    var sa="birth~"+clean(nameA)+"~"+ya+"~"+ma+"~"+da, sb="birth~"+clean(nameB)+"~"+yb+"~"+mb+"~"+db;
+    /* ONE BOND PER PAIR (mock, BR-S190 pattern): try/catch localStorage keyed on the two
+       normalized half-seeds, sorted (order-independent), value = the standing concord hash.
+       FAIL-OPEN: storage blocked (private mode) -> the desk draws. A crafted #/c/ URL never
+       consults this lock — the URL is the receipt and reopening must never gate; the lock
+       guards only the desk's drawing act, on this device. Real enforcement is backend, later. */
+    var standing=concordStanding(sa,sb);
+    if(standing){var w=document.querySelector("[data-cc-sealwrap]");if(w)w.innerHTML='<p class="cc-onfile">The answer is on file.</p><p class="prose" style="font-style:italic">One bond is drawn per pair. The concord stands.</p><a class="cc-standlink" href="'+standing+'">The standing concord &rarr;</a>';return;}
+    var btn=document.querySelector("[data-cc-seal]");
+    sealBeat(btn,"Settled",function(){try{localStorage.setItem(pairKey(sa,sb),concordURL(sa,sb));}catch(e){}location.hash=concordURL(sa,sb);});
+  }
+  function claimHalf(){
+    var btn=document.querySelector("[data-cc-claim]"),wrap=document.querySelector("[data-cc-claimwrap]");
+    sealBeat(btn,"Held",function(){if(wrap)wrap.innerHTML='<p class="cc-heldnote">Held. This page is the record; the link is the receipt.</p><p class="dr-mocknote">Dev mock &mdash; no account in this build.</p>';});
+  }
+  document.getElementById("app").addEventListener("click",function(ev){
+    var el=ev.target.closest("[data-cc-seal],[data-cc-claim]");if(!el)return;
+    ev.preventDefault();
+    if(el.hasAttribute("data-cc-seal"))return sealConcord();
+    if(el.hasAttribute("data-cc-claim"))return claimHalf();
+  });
   document.getElementById("home").addEventListener("click",function(ev){ev.preventDefault();if(location.hash)location.hash="";else route()});
   document.getElementById("redraw").addEventListener("click",function(){n++;curSeed="draw-"+n+"-"+(n*7919);if(location.hash)location.hash="";else route()});
   route();
