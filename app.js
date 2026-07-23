@@ -1225,6 +1225,65 @@ const ANNEX_BACK =
   + '<button type="button" class="menu__go-btn menu__go-btn--back" data-annex-back aria-label="Back to the desk">' + ANNEX_ARROW + '</button>'
   + '</div>';
 
+/* BR-S203 — the down-cue on the desk: "come down slowly" (scroll to About Blue Room) */
+const ANNEX_DOWNCUE =
+  '<a class="menu__downcue" href="#about" aria-label="About Blue Room — scroll down">'
+  + '<span class="menu__downcue-txt">About Blue Room</span>'
+  + '<span class="menu__downcue-arr" aria-hidden="true">&#8964;</span></a>';
+
+/* BR-S203 — THE PROCESSION: the "About Blue Room" nuggets surface, the vertical scroll-depth
+   below the desk. Five bite-size nuggets walk down a candle-lit spine; each wears its room's
+   own engraved mark (currentColor, so the colour law tints it: gold=free, violet=paid). They
+   reveal on scroll-down and fade on scroll-up (IntersectionObserver, wired in mountMenu). */
+const AB_EMBLEMS = {
+  codex: '<svg class="about__emblem-svg" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true"><path d="M20 9 v23"/><path d="M20 9 C15 6 8.5 6 5.5 8 v22 c3 -2 9.5 -2 14.5 1"/><path d="M20 9 C25 6 31.5 6 34.5 8 v22 c-3 -2 -9.5 -2 -14.5 1" /><path d="M8.5 13.5 h8 M8.5 17.5 h8 M8.5 21.5 h6 M23.5 13.5 h8 M23.5 17.5 h8 M23.5 21.5 h6" stroke-width=".7" opacity=".55"/></svg>',
+  tarot: '<svg class="about__emblem-svg" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.15" aria-hidden="true"><rect x="7" y="12.5" width="14" height="20" rx="2" transform="rotate(-11 14 22.5)" opacity=".45"/><rect x="19" y="12.5" width="14" height="20" rx="2" transform="rotate(11 26 22.5)" opacity=".45"/><rect x="13" y="9" width="14" height="23" rx="2"/><path d="M20 15 l3.5 5.5 l-3.5 5.5 l-3.5 -5.5 z" stroke-width=".9"/></svg>',
+  arcana: '<svg class="about__emblem-svg" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linejoin="round" aria-hidden="true"><path d="M6 30 L7.2 12 L15 19 L20 6 L25 19 L32.8 12 L34 30 Z"/><path d="M8.4 30 L31.6 30"/></svg>',
+  mint: '<svg class="about__emblem-svg" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true"><rect x="9" y="8" width="22" height="24" rx="2"/><path d="M9 25 l6 -6 l4 4 l6 -7 l6 6.5" stroke-width="1"/><circle cx="16" cy="15" r="2.3"/><path d="M12 5.5 l1.6 1.6 M28 5.5 l-1.6 1.6 M12 34.5 l1.6 -1.6 M28 34.5 l-1.6 -1.6" stroke-width=".85" opacity=".55"/></svg>',
+  unlit: '<svg class="about__emblem-svg" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true"><circle cx="20" cy="20" r="11"/><circle cx="20" cy="20" r="4.5" opacity=".5"/><path d="M20 6.5 v-2.5 M20 36 v-2.5 M6.5 20 h-2.5 M36 20 h-2.5" stroke-width=".8" opacity=".4"/></svg>'
+};
+function aboutNugget(o) {
+  return '<li class="about__nugget' + (o.cls ? ' ' + o.cls : '') + '" data-side="' + o.side + '" data-nug="' + o.key + '">'
+    + '<span class="about__ord" aria-hidden="true">' + o.ord + '</span>'
+    + '<div class="about__plate">'
+    +   '<span class="about__emblem" aria-hidden="true">' + AB_EMBLEMS[o.key] + '</span>'
+    +   '<p class="about__name">' + o.name + '</p>'
+    +   '<span class="about__rule" aria-hidden="true"></span>'
+    +   '<p class="about__line">' + o.line + '</p>'
+    +   '<p class="about__micro">' + o.micro + '</p>'
+    +   (o.door || '')
+    + '</div></li>';
+}
+function renderAbout() {
+  const N = [
+    { key: 'codex', ord: 'I', side: 'left', cls: 'is-free', name: 'The Codex',
+      line: 'The whole archive of meanings — every card, sign and rune, yours to search.', micro: 'Free · always open',
+      door: '<a class="about__door" href="codex.html">Open the Codex &rarr;</a>' },
+    { key: 'tarot', ord: 'II', side: 'right', cls: '', name: 'Tarot Divination',
+      line: 'Cut the full deck to a question — the Pull, a Sitting, or the Deep Read — and what falls is read and filed.', micro: 'Drawn once. Not reissued.',
+      door: '<a class="about__door" href="?dev=drawing-room">Enter the room &rarr;</a>' },
+    { key: 'arcana', ord: 'III', side: 'left', cls: 'is-paid', name: 'The Arcana Reading',
+      line: 'A person, read by birth through six systems into a crowned name — a record kept for every mark.', micro: 'By birth · or a Concord of two',
+      door: '<a class="about__door" href="?dev=arcane">Enter the room &rarr;</a>' },
+    { key: 'mint', ord: 'IV', side: 'right', cls: 'is-free', name: 'Card Mint',
+      line: 'Bring a photo — it is already a card; the room only develops it.', micro: 'The Free Pull · the Halo Mint',
+      door: '<button type="button" class="about__door" data-view-to="room">See a card develop &rarr;</button>' },
+    { key: 'unlit', ord: 'V', side: 'center', cls: 'about__nugget--unlit', name: 'The Unlit Room',
+      line: 'Something is taking shape here — still too dim to name. The candle has not reached it yet.', micro: 'Not yet lit',
+      door: '' }
+  ];
+  return '<section id="about" class="about" aria-label="About Blue Room">'
+    + '<header class="about__intro">'
+    +   '<p class="about__eyebrow"><span class="about__eyemark" aria-hidden="true">◆</span> BLUE ROOM</p>'
+    +   '<h2 class="about__headline">We hold the candle.</h2>'
+    +   '<p class="about__lede">Blue Room draws the readings and develops the cards, then keeps every one on a shelf that is yours to find and stand before. Come down slowly; the light stays on while you read your way into what you did not know was here.</p>'
+    +   '<span class="about__wick" aria-hidden="true"></span>'
+    + '</header>'
+    + '<ol class="about__rail">' + N.map(aboutNugget).join('') + '</ol>'
+    + '<p class="about__foot">One archive. Every door kept.</p>'
+    + '</section>';
+}
+
 /* The wall itself — a pure static template (no state variance). Specimen geometry is
    the rooms' OWN art: the reading's crown (arcana-build/gen_body.js CROWN_SVG) and the
    Drawing Room's engraved plates (drawing-room.js backSVG/faceSVG), gradients copied
@@ -1360,12 +1419,14 @@ function renderMenu(reveal) {
       </div>
     </div>
     ${ANNEX_GO}
+    ${ANNEX_DOWNCUE}
     </section>
     <section class="menu__panel menu__panel--wall is-offstage" inert aria-hidden="true" aria-label="The Reading Rooms">
     ${ANNEX_BACK}
     ${renderWall()}
     </section>
-    </div>${reveal ? `
+    </div>
+    ${renderAbout()}${reveal ? `
     <button type="button" class="menurev__back" aria-label="Return to the menu">← Back to the menu</button>
     ${MENUREV_FWD_ARROW}` : ""}`;
 }
@@ -1384,6 +1445,24 @@ function mountMenu() {
   host.innerHTML = renderMenu(canReveal);
   if (canReveal) wireMenuReveal(host);
   wireMenuAnnex(host);   // BR-S192: the desk↔wall slide (works with or without the reveal)
+  wireMenuAbout(host);   // BR-S203: the About surface scroll-reveal
+}
+
+/* BR-S203 — the About "Procession" scroll-reveal. Base state is VISIBLE (freeze-safe, the
+   front door never breaks); we ARM the hidden state with .is-motion only when
+   IntersectionObserver exists and reduced-motion is off, then toggle .is-lit as each nugget
+   enters/leaves the viewport (appear coming down, fade going up). */
+function wireMenuAbout(host) {
+  const about = host.querySelector("#about");
+  if (!about) return;
+  const reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const nuggets = [].slice.call(about.querySelectorAll(".about__nugget"));
+  if (reduce || !("IntersectionObserver" in window) || !nuggets.length) return;   // all shown, no motion
+  about.classList.add("is-motion");
+  const io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) { e.target.classList.toggle("is-lit", e.isIntersecting); });
+  }, { threshold: 0.35, rootMargin: "0px 0px -12% 0px" });
+  nuggets.forEach(function (n) { io.observe(n); });
 }
 
 function wireMenuReveal(host) {
@@ -1445,6 +1524,7 @@ function openWall(opts = {}) {
   const { host, track, desk, wall } = els;
   if (host.classList.contains("is-fullview")) return;               // belt to the CSS hide
   if (host.classList.contains("is-wall") && !opts.seed) return;     // idempotent
+  try { window.scrollTo(0, 0); } catch (e) {}   // BR-S203: reset any About scroll-depth before the slide
   cancelAnnexSettle();
   desk.classList.remove("is-offstage"); wall.classList.remove("is-offstage");
   host.classList.add("is-wall");

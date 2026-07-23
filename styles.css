@@ -68,6 +68,7 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 html, body { height: 100%; }
+html { background: var(--ink-950); }   /* BR-S203: dark page canvas — the body's fixed-gradient no longer covers content that scrolls past the first viewport (the About surface) */
 
 body {
   font-family: var(--font-ui);
@@ -2915,9 +2916,7 @@ body[data-view="room"] .dev { display: none; }
 .menu {
   min-height: 100vh;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 34px 24px;
+  flex-direction: column;   /* BR-S203: the desk stage (100vh) then the About surface below it */
 }
 /* Archive Desk (BR-S083): the entrance is a horizontal CONTROL DESK — brand +
    controls on the LEFT, the real Free card as the dominant artifact on the RIGHT.
@@ -3053,13 +3052,84 @@ body[data-view="room"] .dev { display: none; }
 ============================================================ */
 .menu { overflow-x: clip; }   /* belt; clip ≠ scroll container, never clips fixed els */
 
-.menu__track { display: flex; width: 100%; transition: transform 640ms cubic-bezier(.22, .61, .25, 1); }
+.menu__track { display: flex; width: 100%; min-height: 100vh; flex: none; transition: transform 640ms cubic-bezier(.22, .61, .25, 1); }
+  /* BR-S203: the stage is the first full-viewport screen; the desk/wall centre inside their panels, the About surface flows below */
   /* literal ease — --rv-ease is scoped to .reveal-stage and does not resolve here */
 .menu.is-wall .menu__track { transform: translateX(-100%); }
-.menu__panel { flex: 0 0 100%; min-width: 0; position: relative; display: flex; align-items: center; justify-content: center; }
+.menu__panel { flex: 0 0 100%; min-width: 0; min-height: 100vh; padding: 34px 24px; position: relative; display: flex; align-items: center; justify-content: center; }
 .menu__panel.is-offstage { visibility: hidden; height: 0; min-height: 0; overflow: hidden; }
   /* off-stage panel contributes zero height → no phantom scrollbar on short desks */
 @media (prefers-reduced-motion: reduce) { .menu__track { transition: none; } }
+
+/* ============================================================
+   BR-S203 — THE PROCESSION: "About Blue Room" (the vertical scroll-depth below the desk).
+   Hidden whenever the menu is off the desk (wall slide / reveal fullview).
+============================================================ */
+.menu.is-wall #about, .menurev.is-fullview #about { display: none; }
+
+/* the desk down-cue — a quiet centred hint to scroll into the About surface */
+.menu__downcue { position: absolute; left: 50%; bottom: clamp(18px, 4vh, 34px); transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 3px; text-decoration: none; color: var(--t-meta); transition: color 160ms ease; }
+.menu__downcue:hover, .menu__downcue:focus-visible { color: var(--t-display); outline: none; }
+.menu__downcue-txt { font-family: var(--font-mono); font-size: 8.5px; letter-spacing: 0.2em; text-transform: uppercase; }
+.menu__downcue-arr { font-size: 13px; line-height: 1; animation: downcue-bob 2.6s ease-in-out infinite; }
+@keyframes downcue-bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(3px); } }
+.menurev.is-fullview .menu__downcue { opacity: 0; visibility: hidden; pointer-events: none; }
+@media (prefers-reduced-motion: reduce) { .menu__downcue-arr { animation: none; } }
+
+.about { position: relative; padding: clamp(48px, 9vh, 96px) 24px 22vh; }
+.about__intro { width: min(620px, 88vw); margin: 0 auto clamp(80px, 18vh, 190px); display: grid; justify-items: center; text-align: center; gap: 15px; }
+.about__eyebrow { font-family: var(--font-mono); font-size: 9.5px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--faint); }
+.about__eyemark { color: var(--silver-dim); }
+.about__headline { font-family: var(--font-display); font-size: clamp(30px, 6vw, 46px); font-weight: 600; color: var(--t-display); }
+.about__lede { font-family: var(--font-display); font-size: clamp(15px, 2.4vw, 18px); line-height: 1.62; color: var(--t-primary); max-width: 46ch; }
+.about__wick { width: 1px; height: clamp(40px, 8vh, 72px); background: linear-gradient(var(--line-strong), transparent); margin-top: 4px; }
+
+/* the rail + its hairline candle-spine */
+.about__rail { position: relative; list-style: none; margin: 0 auto; padding: 0; width: min(760px, 90vw); display: grid; row-gap: clamp(110px, 22vh, 240px); }
+.about__rail::before { content: ""; position: absolute; inset-block: 0; left: 50%; width: 1px; transform: translateX(-.5px); background: linear-gradient(transparent, var(--line-faint) 8%, var(--line-faint) 92%, transparent); }
+
+.about__nugget { position: relative; display: flex; }
+.about__nugget[data-side="left"] { justify-content: flex-start; }
+.about__nugget[data-side="right"] { justify-content: flex-end; }
+.about__nugget[data-side="center"] { justify-content: center; }
+
+/* ghost ordinal watermark — the "pop"/weight behind each plate */
+.about__ord { position: absolute; top: -.34em; z-index: 0; font-family: var(--font-display); font-size: clamp(78px, 14vw, 144px); line-height: 1; color: var(--line); pointer-events: none; user-select: none; }
+.about__nugget[data-side="left"] .about__ord { left: -.08em; }
+.about__nugget[data-side="right"] .about__ord { right: -.08em; }
+.about__nugget[data-side="center"] .about__ord { left: 50%; transform: translateX(-50%); }
+
+/* the plate = the wall-plaque double-rule mat, shrunk to bite-size */
+.about__plate { position: relative; z-index: 1; width: min(400px, 100%); display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 26px 26px 22px; border: 1px solid var(--line); border-radius: 10px; background: linear-gradient(180deg, rgba(233, 229, 220, .02), transparent 62%), var(--ink-850); }
+.about__plate::before { content: ""; position: absolute; inset: 6px; border: 1px solid var(--line-faint); border-radius: 6px; pointer-events: none; }
+.about__emblem { display: block; color: var(--silver-dim); filter: drop-shadow(0 6px 14px rgba(0, 0, 0, .45)); }   /* the lift is on the emblem, never a shadow on the tile */
+.about__emblem-svg { width: 46px; height: 46px; display: block; }
+.about__name { font-family: var(--font-ui); font-size: 13px; font-weight: 600; letter-spacing: 0.15em; text-transform: uppercase; color: var(--t-display); }
+.about__rule { width: 40px; height: 1px; background: var(--line-faint); }
+.about__line { font-family: var(--font-display); font-size: clamp(16px, 2.4vw, 19px); line-height: 1.48; color: var(--t-primary); text-align: center; max-width: 30ch; margin: 0; }
+.about__micro { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--t-meta); margin: 0; }
+.about__door { margin-top: 4px; display: inline-block; padding: 10px 18px; border: 1px solid var(--line-strong); border-radius: 7px; background: none; cursor: pointer; font-family: var(--font-ui); font-size: 11.5px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--t-display); text-decoration: none; transition: border-color 160ms ease, transform 160ms ease; }
+.about__door:hover, .about__door:focus-visible { border-color: var(--silver-dim); transform: translateY(-1px); outline: none; }
+
+/* colour law at the tile — one violet (paid Arcana), two gold (free heroes), Tarot neutral */
+.about__nugget.is-free .about__emblem, .about__nugget.is-free .about__micro { color: #c8ad70; }
+.about__nugget.is-paid .about__emblem { color: var(--violet); }
+.about__nugget.is-paid .about__door { border-color: color-mix(in srgb, var(--violet) 45%, var(--line-strong)); }
+
+/* THE UNLIT ROOM — veiled, coming, not walled */
+.about__nugget--unlit .about__plate { border-style: dashed; border-color: var(--line-faint); background: var(--ink-900); }
+.about__nugget--unlit .about__emblem { filter: blur(7px); opacity: .5; }   /* static blur only — never animated */
+.about__nugget--unlit .about__name { filter: blur(1.4px); opacity: .7; }
+.about__nugget--unlit .about__line, .about__nugget--unlit .about__micro { color: var(--faint); }
+.about__nugget--unlit .about__plate::after { content: ""; position: absolute; inset: 0; border-radius: inherit; background: radial-gradient(120% 80% at 50% 120%, rgba(200, 173, 112, .06), transparent 60%); pointer-events: none; }
+
+.about__foot { text-align: center; margin: clamp(90px, 18vh, 190px) 0 0; font-family: var(--font-mono); font-size: 8.5px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--faint); }
+
+/* scroll-reveal — base is VISIBLE (freeze-safe); .is-motion (JS, only w/ IO + no reduced-motion) arms the hidden state */
+.about__nugget { opacity: 1; transform: none; }
+.about.is-motion .about__nugget { opacity: 0; transform: translateY(22px) scale(.99); transition: opacity 600ms cubic-bezier(.2, .7, .2, 1), transform 600ms cubic-bezier(.2, .7, .2, 1); will-change: opacity, transform; }
+.about.is-motion .about__nugget.is-lit { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) { .about.is-motion .about__nugget { opacity: 1; transform: none; transition: none; } }
 
 /* edge arrows — bottom-corner dog-ears (right-center is owned by the menustage
    develop arrow at rest and the purple vault arrow in fullview) */
