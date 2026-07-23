@@ -234,11 +234,13 @@ a{color:inherit}
 .dia{display:flex;flex-direction:column;align-items:center;gap:13px;margin:0 auto}
 .dia svg{display:block;overflow:visible}
 .dia__cap{font-family:var(--serif);font-style:italic;font-size:14.5px;line-height:1.6;color:var(--t-meta);text-align:center;max-width:52ch;margin:0}
-/* soul-signature bloom &#8212; the page's own crest, where a portrait would sit, under the title */
-.dia--bloom{margin:24px auto 6px}
-.bloom{width:132px;height:132px;color:var(--gold);
-  filter:drop-shadow(0 4px 14px rgba(201,163,92,.13)) drop-shadow(0 0 8px rgba(201,163,92,.16))}
-.dia--bloom .dia__cap{font-style:normal;font-family:var(--mono);font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--t-ghost)}
+/* soul-signature crest &#8212; heraldry, not a diagram (BR-S195): seal-scale beside the filing line */
+.bloom{color:var(--gold)}
+.acc__crest{display:inline-block;vertical-align:-8px;margin-right:10px}
+.acc__crest .bloom{width:26px;height:26px;opacity:.85}
+/* counsel plates (BR-S195) &#8212; each counsel page's single structure plate */
+.hexlines{width:250px;max-width:100%;height:auto}
+.aett{width:302px;max-width:100%;height:auto}
 .wux{width:200px;height:200px}
 .dec{width:min(320px,90%);height:auto}
 .num{width:auto;height:auto;max-width:240px;max-height:360px}
@@ -296,6 +298,11 @@ a{color:inherit}
   var IDENTITY={sun:1,chinese:1,lifePath:1};
 
   var RUNE={Fehu:"\u16a0",Uruz:"\u16a2",Thurisaz:"\u16a6",Ansuz:"\u16a8",Raidho:"\u16b1",Kenaz:"\u16b2",Gebo:"\u16b7",Wunjo:"\u16b9",Hagalaz:"\u16ba",Nauthiz:"\u16be",Isa:"\u16c1",Jera:"\u16c3",Eihwaz:"\u16c7",Perthro:"\u16c8",Algiz:"\u16c9",Sowilo:"\u16ca",Tiwaz:"\u16cf",Berkano:"\u16d2",Ehwaz:"\u16d6",Mannaz:"\u16d7",Laguz:"\u16da",Ingwaz:"\u16dc",Dagaz:"\u16de",Othala:"\u16df"};
+  /* BR-S195: the eight trigrams keyed by the hexagram tags' own words ("X over Y");
+     l = lines bottom\u2192top (1 yang solid, 0 yin broken), fam = the bagua family role.
+     TRIG_RING is the ring order with all four complementary pairs facing (+4 = opposite). */
+  var TRIG={Heaven:{g:"\u2630",l:[1,1,1],fam:"the father"},Earth:{g:"\u2637",l:[0,0,0],fam:"the mother"},Thunder:{g:"\u2633",l:[1,0,0],fam:"the eldest son"},Water:{g:"\u2635",l:[0,1,0],fam:"the middle son"},Mountain:{g:"\u2636",l:[0,0,1],fam:"the youngest son"},Wind:{g:"\u2634",l:[0,1,1],fam:"the eldest daughter"},Fire:{g:"\u2632",l:[1,0,1],fam:"the middle daughter"},Lake:{g:"\u2631",l:[1,1,0],fam:"the youngest daughter"}};
+  var TRIG_RING=["Heaven","Wind","Water","Mountain","Earth","Thunder","Fire","Lake"];
   var ZOD=["Aries","Taurus","Gemini","Cancer","Leo","Virgo","Libra","Scorpio","Sagittarius","Capricorn","Aquarius","Pisces"];
   var ZGL=["\u2648","\u2649","\u264a","\u264b","\u264c","\u264d","\u264e","\u264f","\u2650","\u2651","\u2652","\u2653"];
   var ANI=["Rat","Ox","Tiger","Rabbit","Dragon","Snake","Horse","Goat","Monkey","Rooster","Dog","Pig"];
@@ -450,7 +457,7 @@ a{color:inherit}
       s+='<line x1="'+sx+'" y1="'+sy+'" x2="'+ex+'" y2="'+ey+'" stroke="currentColor" stroke-width="2" opacity=".82"/>';
       s+=bits[i]?'<circle cx="'+ex+'" cy="'+ey+'" r="7" fill="currentColor"/>':'<circle cx="'+ex+'" cy="'+ey+'" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/>';}
     return '<svg class="bloom" viewBox="0 0 200 200" role="img" aria-label="Soul-signature crest">'+s+'</svg>';}
-  function bloomBlock(name){return '<div class="dia dia--bloom">'+bloomSVG(name)+'<p class="dia__cap">Soul-signature &middot; nine marks read from the name</p></div>';}
+  // (bloomBlock removed BR-S195 \u2014 the crest now renders seal-scale beside the filing line)
 
   // 2 \u00b7 ELEMENTAL CYCLE (Wu Xing) \u2014 generative ring + inner controlling pentagram; fixed element is the one gold node
   var WUXING=[["Wood","\u6728"],["Fire","\u706b"],["Earth","\u571f"],["Metal","\u91d1"],["Water","\u6c34"]];
@@ -512,6 +519,46 @@ a{color:inherit}
     var cap=st.digits?('The birth digits are summed, then reduced until one root remains'+(st.master?' \u2014 save at 11, 22 and 33, where the tradition holds the reduction.':'.')):('The life path reduces to a single root'+(st.master?'; at 11, 22 and 33 the reduction is held.':'.'));
     return sec("How the number reduces",'<div class="dia dia--num">'+numgeoSVG(st)+'<p class="dia__cap">'+cap+'</p></div>');}
 
+  // 5 \u00b7 THE SIX LINES (BR-S195) \u2014 the hexagram drawn as its six strokes, braced into its
+  // two trigrams. Strokes ghost (the figure); the two gate labels gold (the insight).
+  function hexLinesBlock(e){
+    var m=/^(\w+) over (\w+)/.exec(String(e.tag||""));if(!m)return "";
+    var up=TRIG[m[1]],lo=TRIG[m[2]];if(!up||!lo)return "";
+    var lines=lo.l.concat(up.l),s='',k,x=20,w=120;
+    for(k=0;k<6;k++){var y=162-k*26;
+      if(lines[k])s+='<line x1="'+x+'" y1="'+y+'" x2="'+(x+w)+'" y2="'+y+'" stroke="'+GHOST+'" stroke-width="7"/>';
+      else s+='<line x1="'+x+'" y1="'+y+'" x2="'+(x+50)+'" y2="'+y+'" stroke="'+GHOST+'" stroke-width="7"/><line x1="'+(x+70)+'" y1="'+y+'" x2="'+(x+w)+'" y2="'+y+'" stroke="'+GHOST+'" stroke-width="7"/>';}
+    function grp(top,bot,label,sub){return '<path d="M150 '+top+' L156 '+top+' L156 '+bot+' L150 '+bot+'" fill="none" stroke="'+GOLD+'" stroke-width="1" opacity=".35"/>'
+      +'<text x="168" y="'+(((top+bot)/2)-2)+'" font-size="13" fill="'+GOLD+'">'+label+'</text>'
+      +'<text x="168" y="'+(((top+bot)/2)+14)+'" font-size="8" letter-spacing="1.5" fill="'+GHOST+'" font-family="IBM Plex Mono,monospace">'+sub+'</text>';}
+    s+=grp(24,88,up.g+' '+esc(m[1]),'ABOVE')+grp(102,166,lo.g+' '+esc(m[2]),'BELOW');
+    var svg='<svg class="hexlines" viewBox="0 0 262 190" aria-hidden="true">'+s+'</svg>';
+    return sec("The six lines",'<div class="dia dia--hexlines">'+svg+'<p class="dia__cap">Read from the bottom line up \u2014 '+esc(m[2])+' below, '+esc(m[1])+' above. The standing is these two gates set together.</p></div>');
+  }
+
+  // 6 \u00b7 THE AETT STRIP (BR-S195) \u2014 the elder futhark in its three rows of eight; the drawn stave gold
+  function aettBlock(e){
+    var names=Object.keys(RUNE),idx=names.indexOf(e.name);if(idx<0)return "";
+    var s='',k,cw=35,rh=38;
+    for(k=0;k<24;k++){var r=Math.floor(k/8),c=k%8,ax=11+c*cw+cw/2,ay=26+r*rh,cur=k===idx;
+      if(cur)s+='<circle cx="'+ax+'" cy="'+(ay-5)+'" r="14" fill="rgba(201,163,92,.10)" stroke="'+GOLD+'" stroke-width="1.2"/>';
+      s+='<text x="'+ax+'" y="'+ay+'" text-anchor="middle" font-size="15" fill="'+(cur?GOLDLIT:GHOST)+'" opacity="'+(cur?'1':'.5')+'">'+RUNE[names[k]]+'</text>';}
+    var svg='<svg class="aett" viewBox="0 0 302 128" aria-hidden="true">'+s+'</svg>';
+    var row=["first","second","third"][Math.floor(idx/8)];
+    return sec("The three rows",'<div class="dia dia--aett">'+svg+'<p class="dia__cap">Stave '+(idx+1)+' of 24, in the '+row+' row of eight. The elder futhark keeps its staves in three rows; the names later tradition gave those rows are a modern convention.</p></div>');
+  }
+
+  // 7 \u00b7 THE EIGHT GATES (BR-S195) \u2014 the bagua ring, complementary gates facing; the drawn gate gold
+  function gatesBlock(e){
+    var g0=String(e.name).trim().charAt(0),i=-1,k;
+    for(k=0;k<TRIG_RING.length;k++){if(TRIG[TRIG_RING[k]].g===g0){i=k;break}}
+    if(i<0)return "";
+    var w=wheel(TRIG_RING,TRIG_RING.map(function(n){return TRIG[n].g}),i,[],[]);
+    var parts=String(e.tag||"").split("\u00b7").map(function(x){return x.trim()});
+    var cap=(parts[2]||"one gate of eight")+' \u2014 '+(parts[1]||"").toLowerCase()+'. Opposite gates face each other across the ring.';
+    return sec("The eight gates",'<div class="dia dia--gates">'+w+'<p class="dia__cap">'+esc(cap.charAt(0).toUpperCase()+cap.slice(1))+'</p></div>');
+  }
+
   // ---------- READING VIEW ----------
   function renderReading(seed){
     var R=readingForSeed(seed),lastCh=null,html="";
@@ -540,7 +587,9 @@ a{color:inherit}
     var e=f.entry, filed=null;
     if(seed){var R=readingForSeed(seed);for(var i=0;i<R.marks.length;i++){var m=R.marks[i];if(m.key===key&&slugify(m.entry.name)===slug){filed={R:R,m:m,pos:i+1,frag:fragment(m,R.crown)};break}}}
     var head=filed?'<a class="acc__back" href="#/">\u2190 '+esc(filed.R.crown.name)+'</a>':'<a class="acc__back" href="#/">\u2190 Browse the codex</a>';
-    var mark=filed?'<div class="acc__mark">Mark '+ROMAN[filed.pos]+' of VI &nbsp;\u00b7&nbsp; filed under <span style="color:var(--gold)">'+esc(filed.R.crown.name)+'</span></div>'+(filed.frag?'<div class="acc__frag">'+esc(filed.frag)+'</div>':""):'<div class="acc__mark">Unfiled &nbsp;\u00b7&nbsp; codex source only. No record attached.</div>';
+    // BR-S195: the bloom is heraldry, not a diagram \u2014 seal-scale crest beside the filing line, caption gone
+    var crest='<span class="acc__crest" aria-hidden="true">'+bloomSVG(e.name)+'</span>';
+    var mark=filed?'<div class="acc__mark">'+crest+'Mark '+ROMAN[filed.pos]+' of VI &nbsp;\u00b7&nbsp; filed under <span style="color:var(--gold)">'+esc(filed.R.crown.name)+'</span></div>'+(filed.frag?'<div class="acc__frag">'+esc(filed.frag)+'</div>':""):'<div class="acc__mark">'+crest+'Unfiled &nbsp;\u00b7&nbsp; codex source only. No record attached.</div>';
 
     var kb=kbFor(key,e), pr=pracFor(key,e);
     // TIER 1 - source
@@ -553,7 +602,7 @@ a{color:inherit}
       if(pr.es)depth+=sec("Essence",'<p class="prose lead-prose">'+esc(pr.es)+'</p>');
       depth+=glance(key,e);
       if(pr.gi&&pr.gi.length)depth+=sec("Gifts",'<ul class="facts">'+list(pr.gi)+'</ul>');
-      depth+=sec("Strengths &amp; shadow",'<div class="two"><div class="strengths"><div class="lbl">Strengths</div><ul>'+list(pr.s)+'</ul></div><div class="shadow"><div class="lbl">Shadow</div><ul>'+list(pr.d)+'</ul></div></div>');
+      depth+=sec("Strengths & shadow",'<div class="two"><div class="strengths"><div class="lbl">Strengths</div><ul>'+list(pr.s)+'</ul></div><div class="shadow"><div class="lbl">Shadow</div><ul>'+list(pr.d)+'</ul></div></div>');
       if(pr.ha)depth+=sec("Hardships",'<p class="prose">'+esc(pr.ha)+'</p>');
       depth+=sec("What it turns on",'<div class="turn"><p class="prose"><span class="lead">What matters</span>'+esc(pr.m)+'</p><p class="prose"><span class="lead med">The turn</span>'+esc(pr.g)+'</p></div>');
       // RELATIONSHIPS
@@ -569,6 +618,10 @@ a{color:inherit}
       if(key==="lifePath")depth+=numgeoBlock(seed,e.name);
     } else if(kb&&kb.y){
       depth+=sec("The symbol",'<p class="prose">'+esc(kb.y)+'</p>');
+      // BR-S195 counsel plates \u2014 each counsel page's single structure plate, between symbol and counsel
+      if(key==="hexagram")depth+=hexLinesBlock(e);
+      else if(key==="rune")depth+=aettBlock(e);
+      else if(key==="trigram")depth+=gatesBlock(e);
       depth+=sec("As counsel",'<p class="prose" style="color:var(--t-body)">'+esc(JOB[key])+'</p>');
     }
 
@@ -576,7 +629,7 @@ a{color:inherit}
     var lin="";
     if(kb){
       lin+='<div class="acc__rule"></div>';
-      if(kb.o)lin+=sec("Origin &amp; lineage",'<p class="prose">'+esc(kb.o)+'</p>',1);
+      if(kb.o)lin+=sec("Origin & lineage",'<p class="prose">'+esc(kb.o)+'</p>',1);
       if(kb.a&&kb.a.length)lin+=sec("Attributions",'<ul class="facts dim">'+list(kb.a)+'</ul>',1);
       if(kb.c&&kb.c.length)lin+=sec("Correspondences",'<ul class="facts dim">'+list(kb.c)+'</ul>',1);
       if(kb.h&&kb.h.length)lin+=sec("Deeper in the record",'<ul class="facts">'+list(kb.h)+'</ul>',1);
@@ -592,7 +645,6 @@ a{color:inherit}
 
     return '<section class="acc">'+head+
       '<div class="acc__head">'+emblemHTML(key,e,"emblem--hero")+'<div class="acc__filing"><div class="acc__slot">'+esc(filed?filed.m.slot:LABEL[key])+'</div><h1>'+esc(e.name)+'</h1>'+(e.tag?'<div class="acc__tag">'+esc(e.tag)+'</div>':"")+'<div class="acc__job">'+esc(JOB[key])+'</div>'+keysHTML(e.keywords)+'</div></div>'+
-      bloomBlock(e.name)+
       mark+source+depth+lin+adj+agency+disc+
       '<div class="acc__close"><a href="#/">\u2190 '+(filed?"Back to the reading":"The reading")+'</a></div></section>';
   }

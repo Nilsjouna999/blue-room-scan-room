@@ -155,11 +155,13 @@ a{color:inherit}
 .dia{display:flex;flex-direction:column;align-items:center;gap:13px;margin:0 auto}
 .dia svg{display:block;overflow:visible}
 .dia__cap{font-family:var(--serif);font-style:italic;font-size:14.5px;line-height:1.6;color:var(--t-meta);text-align:center;max-width:52ch;margin:0}
-/* soul-signature bloom — the page's own crest, where a portrait would sit, under the title */
-.dia--bloom{margin:24px auto 6px}
-.bloom{width:132px;height:132px;color:var(--gold);
-  filter:drop-shadow(0 4px 14px rgba(201,163,92,.13)) drop-shadow(0 0 8px rgba(201,163,92,.16))}
-.dia--bloom .dia__cap{font-style:normal;font-family:var(--mono);font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--t-ghost)}
+/* soul-signature crest — heraldry, not a diagram (BR-S195): seal-scale beside the filing line */
+.bloom{color:var(--gold)}
+.acc__crest{display:inline-block;vertical-align:-8px;margin-right:10px}
+.acc__crest .bloom{width:26px;height:26px;opacity:.85}
+/* counsel plates (BR-S195) — each counsel page's single structure plate */
+.hexlines{width:250px;max-width:100%;height:auto}
+.aett{width:302px;max-width:100%;height:auto}
 .wux{width:200px;height:200px}
 .dec{width:min(320px,90%);height:auto}
 .num{width:auto;height:auto;max-width:240px;max-height:360px}

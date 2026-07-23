@@ -44,7 +44,7 @@ js = (
 '    if (cssDone || document.getElementById("arc-full-css")) return;\n'
 '    cssDone = true;\n'
 '    var l = document.createElement("link");\n'
-'    l.id = "arc-full-css"; l.rel = "stylesheet"; l.href = "arcana-reading.css";\n'
+'    l.id = "arc-full-css"; l.rel = "stylesheet"; l.href = "arcana-reading.css?v=195";\n'   # version param: bump with index.html's arcana-reading.js?v= (cache-bust law)
 '    document.head.appendChild(l);\n'
 '  }\n'
 '  function ENGINE() {\n'
