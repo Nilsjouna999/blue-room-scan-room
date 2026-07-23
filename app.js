@@ -1255,7 +1255,7 @@ function renderWall() {
     + '<div class="menu__wall-plaques">'
     + '<article class="menu__plaque menu__plaque--arcane">'
     + '<p class="menu__plaque-kicker">Room I · By Birth</p>'
-    + '<h3 class="menu__plaque-name">The Arcane Reading</h3>'
+    + '<h3 class="menu__plaque-name">The Arcana Reading</h3>'
     + '<span class="menu__plaque-rule" aria-hidden="true"></span>'
     + '<div class="menu__plaque-spec">'
     + '<svg class="menu__spec-crown" viewBox="0 0 24 18" aria-hidden="true"><path d="M2 16 L2.6 5 L8 9.5 L12 2 L16 9.5 L21.4 5 L22 16 Z" fill="none" stroke="url(#mwGold)" stroke-width=".75" stroke-linejoin="round"/><path d="M3.2 16 L20.8 16" fill="none" stroke="url(#mwGold)" stroke-width=".75"/></svg>'
@@ -1270,7 +1270,7 @@ function renderWall() {
     // BR-S197: the Concord door — By Birth only (two Arcane Readings + the bond), so it lives INSIDE
     // Room I, above the door (sits where Plaque B's credo sits — keeps the two doors level). No price here.
     + '<a class="menu__plaque-aside" href="?dev=arcana-reading#/concord">Or two names, one bond — a Concord &rarr;</a>'
-    + '<a class="menu__plaque-door" href="?dev=arcane" aria-label="Enter the Arcane Reading">Enter the room &rarr;</a>'
+    + '<a class="menu__plaque-door" href="?dev=arcane" aria-label="Enter the Arcana Reading">Enter the room &rarr;</a>'
     + '</article>'
     + '<article class="menu__plaque menu__plaque--drawing">'
     + '<p class="menu__plaque-kicker">Room II · By the Draw</p>'

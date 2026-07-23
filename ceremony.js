@@ -201,7 +201,9 @@
     function stop() { if (iv) { clearInterval(iv); iv = null; } }
     function start() { stop(); setDone(false); var f = 0; renderFrame(0); iv = setInterval(function () { f++; renderFrame(f); if (f >= TOTAL) { stop(); setDone(true); } }, TICK_MS); }
     function jumpToEnd() { stop(); renderFrame(TOTAL); setDone(true); }
-    function onKey(e) { if (e.key === "Escape") { done ? proceed() : jumpToEnd(); } }
+    // BR-S201: Escape on the finished forge returns to the marks (matching the visible Back button),
+    // not forward into the reading; only the "Enter the reading" button goes forward.
+    function onKey(e) { if (e.key === "Escape") { if (done) { if (opts.onExit) opts.onExit(); else proceed(); } else jumpToEnd(); } }
     function proceed() { if (opts.onDone) opts.onDone(); else location.href = "?dev=arcana-reading"; }
 
     if (skipEl) skipEl.addEventListener("click", jumpToEnd);

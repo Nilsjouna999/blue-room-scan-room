@@ -74,7 +74,7 @@
   function lex(r,t){var pool=(r.keywords||[]).concat(t.keywords||[]),i,w;
     for(i=0;i<pool.length;i++){w=String(pool[i]).toLowerCase().trim();if(/^[a-z-]+$/.test(w)&&!DENY.test(w))return w}
     for(i=0;i<pool.length;i++){var p=String(pool[i]).toLowerCase().trim().split(/[\s\/]+/);w=p[p.length-1];if(w&&!DENY.test(w))return w}return "record"}
-  function crownOf(d){var el=(wEl(d.sun.tag)||"earth")+"|"+(cEl(d.chinese.tag)||"earth");
+  function crownOf(d){var el=(wEl(d.sun&&d.sun.tag)||"earth")+"|"+(cEl(d.chinese&&d.chinese.tag)||"earth");   /* BR-S201: tolerate a null sun/chinese (bad date) */
     return {name:"The "+(EP[el]||"Twice-Marked")+" "+(RO[norm(d.rune.name)]||"Bearer"),epithet:EP[el]||"Twice-Marked",role:RO[norm(d.rune.name)]||"Bearer",binding:BIND[triKey(d.trigram.name)]||"in the open",lexicon:lex(d.rune,d.trigram),sunEl:wEl(d.sun.tag),chiEl:cEl(d.chinese.tag)}}
 
   var CH=[["I · The Named",[["Sun sign","sun","sun"],["Year animal","chinese","chinese"],["Life path","lifePath","life"]]],
@@ -85,7 +85,7 @@
   function marksFor(d){var marks=[];CH.forEach(function(ch){ch[1].forEach(function(p){var e=d[p[2]];if(e)marks.push({slot:p[0],key:p[1],entry:e,chapter:ch[0]})})});return marks}
   // ---- birth-derived reading: sun sign from the date, animal from the year, life path from the digit sum; the rest drawn from the name+date seed ----
   var MON=["January","February","March","April","May","June","July","August","September","October","November","December"];
-  function sunSign(m,d){var b=[[1,20,"Aquarius"],[2,19,"Pisces"],[3,21,"Aries"],[4,20,"Taurus"],[5,21,"Gemini"],[6,21,"Cancer"],[7,23,"Leo"],[8,23,"Virgo"],[9,23,"Libra"],[10,23,"Scorpio"],[11,22,"Sagittarius"],[12,22,"Capricorn"]];var cur=b[m-1];return d>=cur[1]?cur[2]:b[(m+10)%12][2]}
+  function sunSign(m,d){var b=[[1,20,"Aquarius"],[2,19,"Pisces"],[3,21,"Aries"],[4,20,"Taurus"],[5,21,"Gemini"],[6,21,"Cancer"],[7,23,"Leo"],[8,23,"Virgo"],[9,23,"Libra"],[10,23,"Scorpio"],[11,22,"Sagittarius"],[12,22,"Capricorn"]];var cur=b[m-1];if(!cur)return null;return d>=cur[1]?cur[2]:b[(m+10)%12][2]}   /* BR-S201: fail-open on an out-of-range month (crafted seed / mis-entered date) — never crash */
   function chineseAnimal(y){return ANI[((y-4)%12+12)%12]}
   function reduceNum(n){while(n>9&&n!==11&&n!==22&&n!==33){var t=0;String(n).split("").forEach(function(c){t+=+c});n=t}return n}
   function lifePathNum(y,m,d){var s=""+y+(m<10?"0"+m:m)+(d<10?"0"+d:d),sum=0;s.split("").forEach(function(c){sum+=+c});return reduceNum(sum)}
@@ -95,7 +95,7 @@
     for(var i=0;i<by.lifePath.length;i++){if(String(by.lifePath[i].name)===lp){life=by.lifePath[i];break}}
     var dd={sun:findByName(by.sun,sunSign(m,d)),chinese:findByName(by.chinese,chineseAnimal(y)),life:life||pick(by.lifePath,seed+"c"),
       rune:pick(by.rune,seed+"f"),trigram:pick(by.trigram,seed+"g"),hex:pick(by.hexagram,seed+"h")};
-    return {d:dd,marks:marksFor(dd),crown:crownOf(dd),person:{name:name,born:d+" "+MON[m-1]+" "+y}}}
+    return {d:dd,marks:marksFor(dd),crown:crownOf(dd),person:{name:name,born:d+" "+(MON[m-1]||"")+" "+y}}}   /* BR-S201: MON guard for out-of-range month */
   function readingForSeed(seed){if(seed&&seed.indexOf("birth~")===0){var p=seed.split("~");return birthReading(p[1],+p[2],+p[3],+p[4],seed)}return drawFor(seed)}
   function fragment(mark,c){
     if(mark.slot==="Sun sign"||mark.slot==="Year animal")return "This mark supplied the "+(mark.slot==="Sun sign"?(c.sunEl||"element"):(c.chiEl||"element"))+" behind “"+c.epithet+"” to the name borne.";
@@ -472,7 +472,7 @@
     return '<div class="cc-col'+(cls?' '+cls:'')+'">'+CROWN_SVG+'<div class="eyebrow">'+eye+'</div><div class="cc-name">'+esc(c.name)+'</div>'+(cls==="cc-col--b"?
       '<div class="cc-claim" data-cc-claimwrap><button type="button" class="ck-seal ck-claim" data-cc-claim>Your reading, held &middot; $4.99</button>'+
       '<p class="cc-claimnote">Reading this page is free, always — claiming files your half to a Reliquary of your own.</p>'+
-      '<p class="dr-mocknote">Dev mock &mdash; no account, no payment in this build.</p></div>':'')+'</div>';
+      '<p class="dr-mocknote">Dev mock &mdash; no account, no real payment in this build.</p></div>':'')+'</div>';
   }
 
   function renderConcord(sa,sb){
@@ -499,7 +499,7 @@
         '<p style="text-align:center">Two readings, set side by side, and what the traditions draw between them.</p></section>'+
       '<div class="col">'+bond+
         '<div class="cc-half"><div class="chap">The record · '+esc((RA.person&&RA.person.name)||"the first name")+'</div><p class="cc-filed">This half stands complete — filed as your own reading. The link is the record.</p>'+marksColumn(RA,sa,true,[sa,sb])+'</div>'+
-        '<div class="cc-half"><div class="chap">The record · '+esc((RB.person&&RB.person.name)||"the second name")+'</div>'+marksColumn(RB,sb,true,[sa,sb])+'</div>'+
+        '<div class="cc-half"><div class="chap">The record · '+esc((RB.person&&RB.person.name)||"the second name")+'</div><p class="cc-filed">The second name, read in full — free to read at this link, and theirs to keep.</p>'+marksColumn(RB,sb,true,[sa,sb])+'</div>'+
         seal+disc+'</div>';
   }
 
@@ -551,6 +551,7 @@
     var notice=document.querySelector("[data-cc-notice]");
     function clean(s){return String(s).replace(/[~\/|]/g," ").replace(/\s+/g," ").trim()||"Seeker"}
     if(!da||!ma||!ya||!db||!mb||!yb||ya<1000||yb<1000){if(notice)notice.textContent="Two names and two full birth dates are needed to seal a concord.";return;}
+    if(ma<1||ma>12||da<1||da>31||mb<1||mb>12||db<1||db>31){if(notice)notice.textContent="A birth date reads day, month, year — check the month (1–12) and day (1–31).";return;}   /* BR-S201: bound the date before it reaches sunSign */
     var sa="birth~"+clean(nameA)+"~"+ya+"~"+ma+"~"+da, sb="birth~"+clean(nameB)+"~"+yb+"~"+mb+"~"+db;
     /* ONE BOND PER PAIR (mock, BR-S190 pattern): try/catch localStorage keyed on the two
        normalized half-seeds, sorted (order-independent), value = the standing concord hash.

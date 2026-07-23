@@ -246,7 +246,7 @@ a{color:inherit}
 .cc-col{display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px}
 .cc-col svg{width:40px;height:auto;color:var(--gold)}
 .cc-name{font-family:var(--serif);font-weight:600;font-size:clamp(21px,3vw,28px);line-height:1.12;color:var(--crown);text-wrap:balance;max-width:15ch}
-.cc-div{align-self:center;color:var(--edge);font-size:13px}
+.cc-div{align-self:start;margin-top:14px;color:var(--edge);font-size:13px}   /* BR-S201: anchor to the crown band (both columns share it), not the B-taller row centre */
 .cc-crown>p{color:var(--t-meta);font-style:italic}
 .cc-claim{margin-top:14px}
 .cc-claimnote{font-family:var(--mono);font-size:9px;letter-spacing:.04em;line-height:1.6;color:var(--t-ghost);max-width:30ch;margin:8px auto 0}

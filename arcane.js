@@ -300,7 +300,7 @@
               '<span data-ac-draw-label>Draw the reading</span>' + (recipient ? '' : ' <span class="ac-draw__price">$4.99</span>') +
             "</button>" +
             '<p class="ac-hope">' + (recipient ? "Each mark, once set, is hope." : "Each mark, once set, is hope.") + '</p>' +
-            '<p class="ac-notice" data-ac-notice></p>' +
+            '<p class="ac-notice" data-ac-notice role="status" aria-live="polite" aria-atomic="true"></p>' +
             (recipient ? '' : '<a class="ac-giftlink" href="?dev=arcane&gift=compose">Giving this to someone? Send it as a gift &rarr;</a>') +
           "</div>" +
         "</div>" +
@@ -861,7 +861,11 @@
     function labelFamily(member) { var who = root.querySelector('[data-forwhom="family"] .ac-forwhom__who'); if (who) who.textContent = member ? "Family · " + member : "Family"; }
     function setForWhom(id) {
       forWhom = id;
-      chips.forEach(function (c) { c.setAttribute("aria-checked", String(c.getAttribute("data-forwhom") === id)); });
+      chips.forEach(function (c) {
+        var on = c.getAttribute("data-forwhom") === id;
+        c.setAttribute("aria-checked", String(on));
+        c.setAttribute("tabindex", on ? "0" : "-1");   // BR-S201: roving tabindex (ARIA radio pattern)
+      });
     }
     chips.forEach(function (c) {
       c.addEventListener("click", function () {
@@ -878,6 +882,35 @@
         setForWhom("family"); labelFamily(famSubject); closeFam();
       });
     });
+    // BR-S201 a11y: arrow-key navigation across the forwhom radiogroup (roving tabindex set in setForWhom)
+    var forwhomGrp = root.querySelector(".ac-forwhom__opts");
+    if (forwhomGrp) forwhomGrp.addEventListener("keydown", function (ev) {
+      var enabled = chips.filter(function (c) { return !c.classList.contains("is-locked"); });
+      if (!enabled.length) return;
+      var cur = enabled.indexOf(document.activeElement); if (cur < 0) cur = 0;
+      var to = -1;
+      if (ev.key === "ArrowRight" || ev.key === "ArrowDown") to = (cur + 1) % enabled.length;
+      else if (ev.key === "ArrowLeft" || ev.key === "ArrowUp") to = (cur - 1 + enabled.length) % enabled.length;
+      else if (ev.key === "Home") to = 0;
+      else if (ev.key === "End") to = enabled.length - 1;
+      if (to < 0) return;
+      ev.preventDefault();
+      var c = enabled[to];
+      setForWhom(c.getAttribute("data-forwhom")); closeFam(); c.focus();
+    });
+    // BR-S201 a11y: close the family menu on Escape / outside-click (mirrors the profile)
+    function famDocClose(ev) {
+      if (!famMenu || famMenu.hidden) return;
+      var t = root.querySelector("[data-fampick]");
+      if (t && !t.contains(ev.target) && !famMenu.contains(ev.target)) closeFam();
+    }
+    root.addEventListener("keydown", function (ev) {
+      if (ev.key === "Escape" && famMenu && !famMenu.hidden) {
+        ev.preventDefault(); closeFam();
+        var t = root.querySelector("[data-fampick]"); if (t) t.focus();
+      }
+    });
+    document.addEventListener("click", famDocClose);
     // pre-select from the profile's "read for someone" (?for=other&subject=…) → Family + member
     var wantId = "self";
     if (params["for"] === "other") {
@@ -952,7 +985,7 @@
     drawBtn.addEventListener("click", startCeremony);
     refresh();
 
-    return { destroy: function () { clearTimeout(noticeT); exitCeremony(); } };
+    return { destroy: function () { clearTimeout(noticeT); document.removeEventListener("click", famDocClose); exitCeremony(); } };
   }
 
   // BR-S199: the gift deed composer — send a deed link; the recipient sits their own free reading.
