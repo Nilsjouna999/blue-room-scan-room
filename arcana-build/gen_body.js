@@ -365,9 +365,13 @@
       depth+=sec("Strengths & shadow",'<div class="two"><div class="strengths"><div class="lbl">Strengths</div><ul>'+list(pr.s)+'</ul></div><div class="shadow"><div class="lbl">Shadow</div><ul>'+list(pr.d)+'</ul></div></div>');
       if(pr.ha)depth+=sec("Hardships",'<p class="prose">'+esc(pr.ha)+'</p>');
       depth+=sec("What it turns on",'<div class="turn"><p class="prose"><span class="lead">What matters</span>'+esc(pr.m)+'</p><p class="prose"><span class="lead med">The turn</span>'+esc(pr.g)+'</p></div>');
+      // THE WORK (BR-S200) — the labor dimension, bridging the self to the relational sections
+      if(pr.wk)depth+=sec("The work",'<p class="prose">'+esc(pr.wk)+'</p>');
       // RELATIONSHIPS
       depth+=sec((key==="lifePath"?"In relationship":"In love"),'<p class="prose">'+esc(pr.l)+'</p>');
       if(pr.fr)depth+=sec("Friendships",'<p class="prose">'+esc(pr.fr)+'</p>');
+      // WHEN CROSSED (BR-S200) — quarrel + repair, closing the relational set
+      if(pr.cr)depth+=sec("When crossed",'<p class="prose">'+esc(pr.cr)+'</p>');
       // system diagram, after Hardships, before the compatibility wheel
       if(key==="chinese")depth+=wuxingBlock(e.name,cEl(e.tag));
       else if(key==="sun")depth+=decanBlock(e.name);

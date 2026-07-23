@@ -44,7 +44,7 @@ js = (
 '    if (cssDone || document.getElementById("arc-full-css")) return;\n'
 '    cssDone = true;\n'
 '    var l = document.createElement("link");\n'
-'    l.id = "arc-full-css"; l.rel = "stylesheet"; l.href = "arcana-reading.css?v=198";\n'   # version param: bump with index.html's arcana-reading.js?v= (cache-bust law)
+'    l.id = "arc-full-css"; l.rel = "stylesheet"; l.href = "arcana-reading.css?v=200";\n'   # version param: bump with index.html's arcana-reading.js?v= (cache-bust law)
 '    document.head.appendChild(l);\n'
 '  }\n'
 '  function ENGINE() {\n'
@@ -53,10 +53,10 @@ js = (
 '  window.BRArcanaReading = { mount: function (host) {\n'
 '    injectCSS();\n'
 '    Promise.all([\n'
-'      fetch("codex-data.json").then(function (r) { return r.text(); }),\n'
-'      fetch("arcana-build/kb_compact.json").then(function (r) { return r.text(); }),\n'
-'      fetch("arcana-build/practical.json").then(function (r) { return r.text(); }),\n'
-'      fetch("arcana-build/kwcolor.json").then(function (r) { return r.text(); })\n'
+'      fetch("codex-data.json?v=200").then(function (r) { return r.text(); }),\n'
+'      fetch("arcana-build/kb_compact.json?v=200").then(function (r) { return r.text(); }),\n'
+'      fetch("arcana-build/practical.json?v=200").then(function (r) { return r.text(); }),\n'
+'      fetch("arcana-build/kwcolor.json?v=200").then(function (r) { return r.text(); })\n'
 '    ]).then(function (t) {\n'
 '      host.innerHTML = SKELETON;\n'
 '      host.querySelector("#codex").textContent = t[0];\n'
