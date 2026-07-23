@@ -1207,16 +1207,22 @@ const MENUREV_FWD_ARROW =
 
 /* BR-S192 — THE READING ROOMS (the Gallery Wall). The desk slides left to a museum
    wall of two framed room-plaques. Silver arrows = neutral instrument (no purple —
-   that register stays reserved for the vault/see-deeper offers). */
+   that register stays reserved for the vault/see-deeper offers).
+   BR-S193: plain hairline arrow (builder call — "normal looking arrow"), not the scribble. */
+const ANNEX_ARROW =
+  '<svg class="menu__go-svg" viewBox="0 0 44 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">'
+  + '<line x1="2" y1="8" x2="40" y2="8"/>'
+  + '<path d="M33 2.5 L40 8 L33 13.5"/>'
+  + '</svg>';
 const ANNEX_GO =
   '<div class="menu__go menu__go--rooms">'
   + '<span class="menu__go-cap" aria-hidden="true">The Reading Rooms</span>'
-  + '<button type="button" class="rv-arrow menu__go-btn" data-annex-go aria-label="Open the Reading Rooms">' + ARROW_GLYPH + '</button>'
+  + '<button type="button" class="menu__go-btn" data-annex-go aria-label="Open the Reading Rooms">' + ANNEX_ARROW + '</button>'
   + '</div>';
 const ANNEX_BACK =
   '<div class="menu__go menu__go--desk">'
   + '<span class="menu__go-cap" aria-hidden="true">The Desk</span>'
-  + '<button type="button" class="rv-arrow menu__go-btn menu__go-btn--back" data-annex-back aria-label="Back to the desk">' + ARROW_GLYPH + '</button>'
+  + '<button type="button" class="menu__go-btn menu__go-btn--back" data-annex-back aria-label="Back to the desk">' + ANNEX_ARROW + '</button>'
   + '</div>';
 
 /* The wall itself — a pure static template (no state variance). Specimen geometry is
@@ -1274,8 +1280,8 @@ function renderWall() {
     + '<span class="menu__plaque-rule" aria-hidden="true"></span>'
     + '<div class="menu__plaque-spec">'
     + '<svg class="menu__spec-fan" viewBox="0 0 260 216" aria-hidden="true">'
-    + '<g transform="translate(10 26) rotate(-9 60 95)">' + backPlate + '</g>'
-    + '<g transform="translate(130 26) rotate(9 60 95)">' + backPlate + '</g>'
+    + '<g transform="translate(10 26) rotate(-9 60 95)" opacity=".55">' + backPlate + '</g>'
+    + '<g transform="translate(130 26) rotate(9 60 95)" opacity=".55">' + backPlate + '</g>'
     + '<g transform="translate(70 12)">' + facePlate + '</g>'
     + '</svg>'
     + '<p class="menu__spec-cap">The Star · XVII · drawn from seventy-eight.</p>'

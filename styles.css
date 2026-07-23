@@ -3067,15 +3067,16 @@ body[data-view="room"] .dev { display: none; }
 .menu__go--rooms { right: clamp(12px, 2.6vw, 40px); bottom: clamp(26px, 6vh, 54px); transition: opacity 240ms ease, visibility 0s linear 0s; }
 .menu__go--desk { left: clamp(12px, 2.6vw, 40px); bottom: clamp(26px, 6vh, 54px); }
 .menu__go-cap { font-family: var(--font-mono); font-size: 8.5px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--t-meta); }
-/* explicit global-token colour + easing — the .rv-arrow base uses reveal-scoped vars invalid here */
-.menu__go .menu__go-btn { background: none; border: 0; padding: 6px; cursor: pointer; color: var(--t-meta); transition: transform 200ms ease, color 200ms ease; }
-.menu__go .menu__go-btn .rv-arrow__svg { width: 56px; height: 56px; display: block; }
-.menu__go .menu__go-btn:hover, .menu__go .menu__go-btn:focus-visible { color: var(--t-display); transform: scale(1.06); }
-.menu__go .menu__go-btn:active { transform: scale(0.97); }
-.menu__go .menu__go-btn:focus-visible { outline: 2px solid var(--silver-dim); outline-offset: 4px; border-radius: 50%; }
-.menu__go .menu__go-btn:hover .rv-arrow__svg { transform: translateX(2px); }
-.menu__go .menu__go-btn--back .rv-arrow__svg { transform: scaleX(-1); }
-.menu__go .menu__go-btn--back:hover .rv-arrow__svg { transform: scaleX(-1) translateX(-2px); }
+/* BR-S193: plain hairline arrow (builder call) — long tail + head, silver, nudges on hover */
+.menu__go-btn { background: none; border: 0; padding: 8px 6px; cursor: pointer; color: var(--t-meta); transition: color 200ms ease; }
+.menu__go-svg { width: 46px; height: auto; display: block; transition: transform 200ms ease; }
+.menu__go-btn:hover, .menu__go-btn:focus-visible { color: var(--t-display); }
+.menu__go-btn:hover .menu__go-svg, .menu__go-btn:focus-visible .menu__go-svg { transform: translateX(3px); }
+.menu__go-btn:active .menu__go-svg { transform: translateX(1px); }
+.menu__go-btn:focus-visible { outline: 1px solid var(--silver-dim); outline-offset: 5px; border-radius: 3px; }
+.menu__go-btn--back .menu__go-svg { transform: scaleX(-1); }
+.menu__go-btn--back:hover .menu__go-svg, .menu__go-btn--back:focus-visible .menu__go-svg { transform: scaleX(-1) translateX(3px); }
+.menu__go-btn--back:active .menu__go-svg { transform: scaleX(-1) translateX(1px); }
 /* hide states: never beside the purple vault arrow; steps aside during the in-place scribble read */
 .menurev.is-fullview .menu__go--rooms,
 .menurev:has(.reveal-stage--menustage.is-reading) .menu__go--rooms {
@@ -3106,7 +3107,7 @@ body[data-view="room"] .dev { display: none; }
 .menu__spec-honesty { font-family: var(--font-display); font-style: italic; font-size: 12.5px; color: var(--t-meta); }
 .menu__spec-fan { width: 240px; max-width: 100%; height: auto; }
 .menu__spec-cap { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.1em; color: var(--t-meta); }
-.menu__plaque-marks { font-family: var(--font-mono); font-size: 8.5px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--faint); }
+.menu__plaque-marks { font-family: var(--font-mono); font-size: 8px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--faint); }
 .menu__plaque-expl { font-family: var(--font-display); font-style: italic; font-size: 13.5px; line-height: 1.5; color: var(--silver); max-width: 34ch; }
 .menu__plaque-ledger { width: 100%; max-width: 340px; }
 .menu__ledger-row { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; padding: 9px 2px; border-bottom: 1px solid var(--line-faint); margin: 0; }
@@ -3123,6 +3124,18 @@ body[data-view="room"] .dev { display: none; }
 .menu__wall-rail { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
 .menu__wall-rail .menu__codex { margin-top: 0; align-self: auto; }
 .menu__wall-foot { font-family: var(--font-mono); font-size: 8.5px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--faint); }
+
+/* height mastery: on short desks (1600×900 class) the wall tightens to fit
+   the viewport with zero scroll — large displays keep the grand scale */
+@media (max-height: 949px) {
+  .menu__wall { row-gap: 20px; }
+  .menu__wall-head { gap: 7px; }
+  .menu__plaque { min-height: 480px; padding: 26px 26px 20px; }
+  .menu__plaque-spec { gap: 8px; }
+  .menu__spec-crown { width: clamp(88px, 8vw, 104px); }
+  .menu__spec-fan { width: 216px; }
+  .menu__spec-name { font-size: 23px; }
+}
 
 /* route-chrome partition: desktop = arrows only, mobile = text routes only */
 .menu__codex--rooms { display: none; }
