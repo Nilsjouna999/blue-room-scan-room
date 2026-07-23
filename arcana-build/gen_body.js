@@ -303,10 +303,12 @@
 
   // ---------- READING VIEW ----------
   // one mark article — shared by the reading and the concord (BR-S196 extraction).
-  // withAff=false drops the "Open the record" link (concord halves have no back-route yet).
-  function markArticle(m,seed,withAff){
+  // BR-S198: cPair=[sa,sb] carries the concord identity so a concord mark's record
+  // returns to the concord (buyer-first) instead of the reference reading.
+  function markArticle(m,seed,withAff,cPair){
     var e=m.entry;
-    var aff=withAff?'<div class="aff"><a class="aff__open" href="#/e/'+m.key+'/'+slugify(e.name)+'/'+encodeURIComponent(seed)+'">Open the record<span class="arr" aria-hidden="true">→</span></a></div>':'';
+    var ret=(cPair&&cPair[0]&&cPair[1])?"/"+encodeURIComponent(cPair[0])+"/"+encodeURIComponent(cPair[1]):"";
+    var aff=withAff?'<div class="aff"><a class="aff__open" href="#/e/'+m.key+'/'+slugify(e.name)+'/'+encodeURIComponent(seed)+ret+'">Open the record<span class="arr" aria-hidden="true">→</span></a></div>':'';
     return '<article class="read anim"><div>'+
       '<div class="read__head">'+emblemHTML(m.key,e,"emblem--sm")+'<span class="slot">'+esc(m.slot)+'</span></div>'+
       '<h2>'+esc(e.name)+'</h2>'+keysHTML(e.keywords)+(e.tag?'<div class="tag">'+esc(e.tag)+'</div>':"")+
@@ -314,11 +316,11 @@
       '</div>'+aff+'</article>';
   }
   // the six marks in their chapters, for one reading (shared markup)
-  function marksColumn(R,seed,withAff){
+  function marksColumn(R,seed,withAff,cPair){
     var lastCh=null,html="";
     R.marks.forEach(function(m){
       if(m.chapter!==lastCh){html+='<div class="chap">'+esc(m.chapter)+'</div>';lastCh=m.chapter}
-      html+=markArticle(m,seed,withAff);
+      html+=markArticle(m,seed,withAff,cPair);
     });
     return html;
   }
@@ -337,12 +339,14 @@
   }
 
   // ---------- ACCESSION (DETAIL) VIEW ----------
-  function renderEntry(key,slug,seed){
+  function renderEntry(key,slug,seed,cA,cB){
+    // BR-S198: cA/cB present = reached from a concord; back-routes return there, not the reference reading.
+    var fromCC=!!(cA&&cB), backHref=fromCC?concordURL(cA,cB):"#/";
     var f=findEntry(key,slug);
-    if(!f)return '<section class="acc"><a class="acc__back" href="#/">← Return</a><div class="acc__mark" style="margin-top:40px">Not on file. No holding answers to that mark.</div><div class="acc__close"><a href="#/">← Back to the reading</a></div></section>';
+    if(!f)return '<section class="acc"><a class="acc__back" href="'+backHref+'">← Return</a><div class="acc__mark" style="margin-top:40px">Not on file. No holding answers to that mark.</div><div class="acc__close"><a href="'+backHref+'">← Back to '+(fromCC?"the concord":"the reading")+'</a></div></section>';
     var e=f.entry, filed=null;
     if(seed){var R=readingForSeed(seed);for(var i=0;i<R.marks.length;i++){var m=R.marks[i];if(m.key===key&&slugify(m.entry.name)===slug){filed={R:R,m:m,pos:i+1,frag:fragment(m,R.crown)};break}}}
-    var head=filed?'<a class="acc__back" href="#/">← '+esc(filed.R.crown.name)+'</a>':'<a class="acc__back" href="#/">← Browse the codex</a>';
+    var head=fromCC?'<a class="acc__back" href="'+backHref+'">← the concord</a>':(filed?'<a class="acc__back" href="#/">← '+esc(filed.R.crown.name)+'</a>':'<a class="acc__back" href="#/">← Browse the codex</a>');
     // BR-S195: the bloom is heraldry, not a diagram — seal-scale crest beside the filing line, caption gone
     var crest='<span class="acc__crest" aria-hidden="true">'+bloomSVG(e.name)+'</span>';
     var mark=filed?'<div class="acc__mark">'+crest+'Mark '+ROMAN[filed.pos]+' of VI &nbsp;·&nbsp; filed under <span style="color:var(--gold)">'+esc(filed.R.crown.name)+'</span></div>'+(filed.frag?'<div class="acc__frag">'+esc(filed.frag)+'</div>':""):'<div class="acc__mark">'+crest+'Unfiled &nbsp;·&nbsp; codex source only. No record attached.</div>';
@@ -393,7 +397,8 @@
     }
 
     // adjacency + agency + disclaimer
-    function elink(x){return x?"#/e/"+key+"/"+slugify(x.name)+(seed?"/"+encodeURIComponent(seed):""):null}
+    var ccRet=fromCC?"/"+encodeURIComponent(cA)+"/"+encodeURIComponent(cB):"";
+    function elink(x){return x?"#/e/"+key+"/"+slugify(x.name)+(seed?"/"+encodeURIComponent(seed)+ccRet:""):null}
     var prev=f.idx>0?f.list[f.idx-1]:null, next=f.idx<f.list.length-1?f.list[f.idx+1]:null;
     var adj='<div class="acc__adj">'+(prev?'<a href="'+elink(prev)+'"><span class="lbl">Preceding in '+esc(LABEL[key])+'</span>← '+esc(prev.name)+'</a>':'<span></span>')+(next?'<a href="'+elink(next)+'" style="text-align:right"><span class="lbl">Following in '+esc(LABEL[key])+'</span>'+esc(next.name)+' →</a>':'<span></span>')+'</div>';
     var agency='<div class="agency">Read as a mirror, not a verdict. What here matches something you already suspected — and what does not fit at all? The record holds; you decide what to do with it.</div>';
@@ -402,7 +407,7 @@
     return '<section class="acc">'+head+
       '<div class="acc__head">'+emblemHTML(key,e,"emblem--hero")+'<div class="acc__filing"><div class="acc__slot">'+esc(filed?filed.m.slot:LABEL[key])+'</div><h1>'+esc(e.name)+'</h1>'+(e.tag?'<div class="acc__tag">'+esc(e.tag)+'</div>':"")+'<div class="acc__job">'+esc(JOB[key])+'</div>'+keysHTML(e.keywords)+'</div></div>'+
       mark+source+depth+lin+adj+agency+disc+
-      '<div class="acc__close"><a href="#/">← '+(filed?"Back to the reading":"The reading")+'</a></div></section>';
+      '<div class="acc__close"><a href="'+backHref+'">← '+(fromCC?"Back to the concord":(filed?"Back to the reading":"The reading"))+'</a></div></section>';
   }
 
   // ======== THE CONCORD (BR-S196) — the two-person reading ========
@@ -489,8 +494,8 @@
         '<div class="cc-pair">'+crownCol(RA,"cc-col--a")+'<span class="cc-div" aria-hidden="true">◆</span>'+crownCol(RB,"cc-col--b")+'</div>'+
         '<p style="text-align:center">Two readings, set side by side, and what the traditions draw between them.</p></section>'+
       '<div class="col">'+bond+
-        '<div class="cc-half"><div class="chap">The record · '+esc((RA.person&&RA.person.name)||"the first name")+'</div><p class="cc-filed">This half stands complete — filed as your own reading. The link is the record.</p>'+marksColumn(RA,sa,false)+'</div>'+
-        '<div class="cc-half"><div class="chap">The record · '+esc((RB.person&&RB.person.name)||"the second name")+'</div>'+marksColumn(RB,sb,false)+'</div>'+
+        '<div class="cc-half"><div class="chap">The record · '+esc((RA.person&&RA.person.name)||"the first name")+'</div><p class="cc-filed">This half stands complete — filed as your own reading. The link is the record.</p>'+marksColumn(RA,sa,true,[sa,sb])+'</div>'+
+        '<div class="cc-half"><div class="chap">The record · '+esc((RB.person&&RB.person.name)||"the second name")+'</div>'+marksColumn(RB,sb,true,[sa,sb])+'</div>'+
         seal+disc+'</div>';
   }
 
@@ -515,13 +520,13 @@
   // with no seed it opens the reference reading (Antton Aikio, 9 April 2001).
   var curSeed=(function(){try{return new URLSearchParams(location.search).get("seed")||""}catch(e){return ""}})()||"birth~Antton Aikio~2001~4~9",n=0;
   function route(){
-    var h=location.hash.replace(/^#/,""),m=h.match(/^\/e\/([^\/]+)\/([^\/]+)(?:\/([^\/]+))?$/),app=document.getElementById("app");
+    var h=location.hash.replace(/^#/,""),m=h.match(/^\/e\/([^\/]+)\/([^\/]+)(?:\/([^\/]+))?(?:\/([^\/]+))?(?:\/([^\/]+))?$/),app=document.getElementById("app");
     var redraw=document.getElementById("redraw"),isCC=/^\/(c|concord)(\/|$)/.test(h);
     if(redraw)redraw.style.display=isCC?"none":"";   // a concord never redraws (one-bond law)
     var mc=h.match(/^\/c\/([^\/]+)\/([^\/]+)$/);
     if(mc){app.innerHTML=renderConcord(decodeURIComponent(mc[1]),decodeURIComponent(mc[2]));document.getElementById("bar").style.width="0";window.scrollTo(0,0);return}
     if(h==="/concord"||h==="/concord/"){app.innerHTML=renderDesk();document.getElementById("bar").style.width="0";window.scrollTo(0,0);return}
-    if(m){app.innerHTML=renderEntry(m[1],decodeURIComponent(m[2]),m[3]?decodeURIComponent(m[3]):null);document.getElementById("bar").style.width="0";window.scrollTo(0,0);return}
+    if(m){app.innerHTML=renderEntry(m[1],decodeURIComponent(m[2]),m[3]?decodeURIComponent(m[3]):null,m[4]?decodeURIComponent(m[4]):null,m[5]?decodeURIComponent(m[5]):null);document.getElementById("bar").style.width="0";window.scrollTo(0,0);return}
     app.innerHTML=renderReading(curSeed);window.scrollTo(0,0);
     var reads=[].slice.call(document.querySelectorAll(".read"));
     if("IntersectionObserver" in window){var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add("in");io.unobserve(e.target)}})},{threshold:.12,rootMargin:"0px 0px -6% 0px"});reads.forEach(function(el){io.observe(el)})}else reads.forEach(function(el){el.classList.add("in")});
