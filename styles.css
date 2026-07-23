@@ -3056,6 +3056,7 @@ body[data-view="room"] .dev { display: none; }
   /* BR-S203: the stage is the first full-viewport screen; the desk/wall centre inside their panels, the About surface flows below */
   /* literal ease — --rv-ease is scoped to .reveal-stage and does not resolve here */
 .menu.is-wall .menu__track { transform: translateX(-100%); }
+.menu.is-reliquary .menu__track { transform: translateX(-200%); }   /* BR-S204: slide 3 (source-ordered AFTER is-wall so it wins if both ever coexist) */
 .menu__panel { flex: 0 0 100%; min-width: 0; min-height: 100vh; padding: 34px 24px; position: relative; display: flex; align-items: center; justify-content: center; }
 .menu__panel.is-offstage { visibility: hidden; height: 0; min-height: 0; overflow: hidden; }
   /* off-stage panel contributes zero height → no phantom scrollbar on short desks */
@@ -3065,7 +3066,7 @@ body[data-view="room"] .dev { display: none; }
    BR-S203 — THE PROCESSION: "About Blue Room" (the vertical scroll-depth below the desk).
    Hidden whenever the menu is off the desk (wall slide / reveal fullview).
 ============================================================ */
-.menu.is-wall #about, .menurev.is-fullview #about { display: none; }
+.menu.is-wall #about, .menu.is-reliquary #about, .menurev.is-fullview #about { display: none; }   /* BR-S204: About hides on slide 3 too */
 
 /* the desk down-cue — a quiet centred hint to scroll into the About surface */
 .menu__downcue { position: absolute; left: 50%; bottom: clamp(18px, 4vh, 34px); transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 3px; text-decoration: none; color: var(--t-meta); transition: color 160ms ease; }
@@ -3136,6 +3137,8 @@ body[data-view="room"] .dev { display: none; }
 .menu__go { position: absolute; z-index: 5; display: flex; flex-direction: column; align-items: center; gap: 4px; }
 .menu__go--rooms { right: clamp(12px, 2.6vw, 40px); bottom: clamp(26px, 6vh, 54px); transition: opacity 240ms ease, visibility 0s linear 0s; }
 .menu__go--desk { left: clamp(12px, 2.6vw, 40px); bottom: clamp(26px, 6vh, 54px); }
+.menu__go--reliq { right: clamp(12px, 2.6vw, 40px); bottom: clamp(26px, 6vh, 54px); }   /* BR-S204: wall→reliquary (right edge) */
+.menu__go--reliq-back { left: clamp(12px, 2.6vw, 40px); bottom: clamp(26px, 6vh, 54px); }   /* reliquary→wall (left edge) */
 .menu__go-cap { font-family: var(--font-mono); font-size: 8.5px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--t-meta); }
 /* BR-S193: plain hairline arrow (builder call) — long tail + head, silver, nudges on hover */
 .menu__go-btn { background: none; border: 0; padding: 8px 6px; cursor: pointer; color: var(--t-meta); transition: color 200ms ease; }
@@ -3190,6 +3193,29 @@ body[data-view="room"] .dev { display: none; }
 .menu__wall-rail .menu__codex { margin-top: 0; align-self: auto; }
 .menu__wall-foot { font-family: var(--font-mono); font-size: 8.5px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--faint); }
 
+/* ── BR-S204: the Reliquary threshold (slide 3) — a conservation niche in the
+   wall-plaque double-rule register. Sealed (locked) by default, lit when opened.
+   Colour law: gold/neutral throughout; violet ONLY on the open --enter door. */
+.menu__reliq { position: relative; z-index: 1; width: min(440px, 92vw); display: flex; flex-direction: column; align-items: center; text-align: center; gap: 15px; }
+.menu__reliq-navback { display: none; }   /* desktop uses the edge arrow / Esc; shown as text <=1199px (below) */
+.menu__reliq-eyebrow { font-family: var(--font-mono); font-size: 9.5px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--faint); margin: 0; }
+.menu__reliq-eyemark { color: var(--silver-dim); }
+.menu__reliq-niche { position: relative; width: 100%; display: flex; flex-direction: column; align-items: center; gap: 13px; padding: 34px 30px 30px; border: 1px solid var(--line); border-radius: 12px; background: linear-gradient(180deg, rgba(233, 229, 220, .02), transparent 60%), var(--ink-850); }
+.menu__reliq-niche::before { content: ""; position: absolute; inset: 6px; border: 1px solid var(--line-faint); border-radius: 8px; pointer-events: none; }   /* double-rule museum mat */
+.menu__reliq-emblem { display: block; color: var(--silver-dim); opacity: .6; filter: drop-shadow(0 6px 14px rgba(0, 0, 0, .45)); }   /* veiled sealed — static, nothing to reduce-motion */
+.menu__reliq-emblem--lit { color: #c8ad70; opacity: 1; }   /* opened → the gold hero register */
+.menu__reliq-emblem-svg { width: 52px; height: auto; display: block; }
+.menu__reliq-title { font-family: var(--font-display); font-size: 26px; font-weight: 600; color: var(--t-display); }
+.menu__reliq-title:focus { outline: none; }   /* programmatic focus target */
+.menu__reliq-rule { width: 40px; height: 1px; background: var(--line-faint); }
+.menu__reliq-line { font-family: var(--font-display); font-size: clamp(15px, 2.2vw, 18px); line-height: 1.5; color: var(--t-primary); max-width: 34ch; margin: 0; }
+.menu__reliq-how { font-family: var(--font-mono); font-size: 9.5px; letter-spacing: 0.14em; text-transform: uppercase; line-height: 1.7; color: var(--t-meta); max-width: 40ch; margin: 0; }
+.menu__reliq-door { margin-top: 6px; display: inline-block; padding: 11px 20px; border: 1px solid var(--line-strong); border-radius: 7px; background: none; font-family: var(--font-ui); font-size: 11.5px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--t-display); text-decoration: none; transition: border-color 160ms ease, transform 160ms ease; }
+.menu__reliq-door:hover, .menu__reliq-door:focus-visible { border-color: var(--silver-dim); transform: translateY(-1px); outline: none; }
+.menu__reliq-door--enter { border-color: color-mix(in srgb, var(--violet) 45%, var(--line-strong)); }   /* the paid/kept register — the only violet here */
+.menu__reliq-door--enter:hover, .menu__reliq-door--enter:focus-visible { border-color: var(--violet); }
+.menu__reliq-foot { font-family: var(--font-mono); font-size: 8.5px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--faint); margin: 0; }
+
 /* height mastery: on short desks (1600×900 class) the wall tightens to fit
    the viewport with zero scroll — large displays keep the grand scale */
 @media (max-height: 949px) {
@@ -3208,8 +3234,8 @@ body[data-view="room"] .dev { display: none; }
 @media (max-width: 1199px) {
   .menu__go { display: none; }
   .menu__codex--rooms { display: inline-flex; background: none; cursor: pointer; }
-  .menu__wall-back { display: inline-block; background: none; border: 0; cursor: pointer; font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.1em; color: var(--t-meta); padding: 6px 10px; }
-  .menu__wall-back:hover { color: var(--t-display); }
+  .menu__wall-back, .menu__reliq-navback { display: inline-block; background: none; border: 0; cursor: pointer; font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.1em; color: var(--t-meta); padding: 6px 10px; }   /* BR-S204: reliquary text-back mirrors the wall's (edge arrows are hidden here) */
+  .menu__wall-back:hover, .menu__reliq-navback:hover { color: var(--t-display); }
   .menu__wall { width: 100%; max-width: 500px; }
   .menu__plaque { min-height: 0; }
 }

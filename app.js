@@ -1231,6 +1231,28 @@ const ANNEX_DOWNCUE =
   + '<span class="menu__downcue-txt">About Blue Room</span>'
   + '<span class="menu__downcue-arr" aria-hidden="true">&#8964;</span></a>';
 
+/* BR-S204 — the Reliquary edge arrows (menu slide 3, stepped past the Reading Rooms).
+   Same hairline glyph + silver register as the desk↔wall arrows; hidden <=1199px
+   (the .menu__go mobile hide), where the wall-rail pill / text back carry the nav. */
+const RELIQ_GO =
+  '<div class="menu__go menu__go--reliq">'
+  + '<span class="menu__go-cap" aria-hidden="true">The Reliquary</span>'
+  + '<button type="button" class="menu__go-btn" data-annex-go aria-label="Open the Reliquary">' + ANNEX_ARROW + '</button>'
+  + '</div>';
+const RELIQ_BACK =
+  '<div class="menu__go menu__go--reliq-back">'
+  + '<span class="menu__go-cap" aria-hidden="true">The Reading Rooms</span>'
+  + '<button type="button" class="menu__go-btn menu__go-btn--back" data-annex-back aria-label="Back to the Reading Rooms">' + ANNEX_ARROW + '</button>'
+  + '</div>';
+/* the sealed-reliquary emblem — a conservation NICHE (cabinet arch) with a seated
+   crown and a ◆ wax-seal centred. NOT a padlock/loot-box. Static veil only. */
+const RELIQ_SEAL_SVG =
+  '<svg class="menu__reliq-emblem-svg" viewBox="0 0 44 46" fill="none" stroke="currentColor" stroke-width="1.15" stroke-linejoin="round" aria-hidden="true">'
+  + '<path d="M9 42 V18 A13 13 0 0 1 35 18 V42 Z" opacity=".85"/>'
+  + '<path d="M13.5 20 L14 12 L19 15 L22 8.5 L25 15 L30 12 L30.5 20 Z" stroke-width=".9"/>'
+  + '<path d="M22 27 l4 4 l-4 4 l-4 -4 z"/>'
+  + '</svg>';
+
 /* BR-S203 — THE PROCESSION: the "About Blue Room" nuggets surface, the vertical scroll-depth
    below the desk. Five bite-size nuggets walk down a candle-lit spine; each wears its room's
    own engraved mark (currentColor, so the colour law tints it: gold=free, violet=paid). They
@@ -1354,15 +1376,55 @@ function renderWall() {
     + '</article>'
     + '</div>'
     + '<div class="menu__wall-rail">'
-    + '<a class="menu__codex" href="?dev=profile"><span class="menu__codex__mark" aria-hidden="true">◆</span> The Reliquary <span class="menu__codex__arr" aria-hidden="true">→</span></a>'
+    + '<button type="button" class="menu__codex menu__codex--reliq" data-annex-go><span class="menu__codex__mark" aria-hidden="true">◆</span> The Reliquary <span class="menu__codex__arr" aria-hidden="true">→</span></button>'
     + '<a class="menu__codex" href="codex.html"><span class="menu__codex__mark" aria-hidden="true">◆</span> The Codex <span class="menu__codex__arr" aria-hidden="true">→</span></a>'
     + '</div>'
     + '<p class="menu__wall-foot">Two rooms · One archive.</p>'
     + '</div>';
 }
 
+/* BR-S204 — the Reliquary threshold (menu slide 3). A GATED conservation niche:
+   locked by default (the mock localStorage `br_holdings` flag unset) → a quiet
+   "held in conservation" sealed teaser; unlocked → an open threshold that doors
+   to the full ?dev=profile route. Both branches are PURE static strings — the menu
+   render never mounts BRArcanaProfile, so the front door can't break and the gate
+   fails CLOSED to the locked teaser. Law: free-as-hero, no dark pattern, no price;
+   violet appears only on the open --enter door (the paid/kept register). The
+   .menu__reliq-navback (first child) is the mobile-only text back to the wall. */
+function renderReliquaryTeaser() {
+  return '<div class="menu__reliq menu__reliq--sealed">'
+    + '<button type="button" class="menu__reliq-navback" data-annex-back>&larr; Back to the Reading Rooms</button>'
+    + '<p class="menu__reliq-eyebrow"><span class="menu__reliq-eyemark" aria-hidden="true">◆</span> THE RELIQUARY</p>'
+    + '<div class="menu__reliq-niche">'
+    +   '<span class="menu__reliq-emblem" aria-hidden="true">' + RELIQ_SEAL_SVG + '</span>'
+    +   '<h2 class="menu__reliq-title" tabindex="-1">Held in conservation</h2>'
+    +   '<span class="menu__reliq-rule" aria-hidden="true"></span>'
+    +   '<p class="menu__reliq-line">The Reliquary is the shelf where the archive keeps what has been filed. Nothing is filed here yet — so the shelf stays sealed.</p>'
+    +   '<p class="menu__reliq-how">It opens the moment a reading is drawn and kept. Looking is free, always; keeping is what fills the shelf.</p>'
+    +   '<a class="menu__reliq-door" href="?dev=arcane">See a reading — free to look &rarr;</a>'
+    + '</div>'
+    + '<p class="menu__reliq-foot">Sealed · held in conservation · Blue Room Archive</p>'
+    + '</div>';
+}
+function renderReliquaryOpen() {
+  return '<div class="menu__reliq menu__reliq--open">'
+    + '<button type="button" class="menu__reliq-navback" data-annex-back>&larr; Back to the Reading Rooms</button>'
+    + '<p class="menu__reliq-eyebrow"><span class="menu__reliq-eyemark" aria-hidden="true">◆</span> THE RELIQUARY</p>'
+    + '<div class="menu__reliq-niche">'
+    +   '<span class="menu__reliq-emblem menu__reliq-emblem--lit" aria-hidden="true">' + RELIQ_SEAL_SVG + '</span>'
+    +   '<h2 class="menu__reliq-title" tabindex="-1">The shelf is open</h2>'
+    +   '<span class="menu__reliq-rule" aria-hidden="true"></span>'
+    +   '<p class="menu__reliq-line">What has been kept is held here — the crowned name, the rings, the vault.</p>'
+    +   '<a class="menu__reliq-door menu__reliq-door--enter" href="?dev=profile">Open the Reliquary &rarr;</a>'
+    + '</div>'
+    + '<p class="menu__reliq-foot">Filed &amp; sealed · Blue Room Archive</p>'
+    + '</div>';
+}
+function renderReliquary(held) { return held ? renderReliquaryOpen() : renderReliquaryTeaser(); }
+
 function renderMenu(reveal) {
   const s = SOURCES[0];
+  const held = hasHoldings();
   return `
     <div class="menu__track">
     <section class="menu__panel menu__panel--desk" aria-label="The Archive Desk">
@@ -1410,7 +1472,6 @@ function renderMenu(reveal) {
         </div>
 
         <div class="menu__portals">
-          <a class="menu__codex" href="?dev=profile"><span class="menu__codex__mark" aria-hidden="true">◆</span> The Reliquary <span class="menu__codex__arr" aria-hidden="true">→</span></a>
           <a class="menu__codex" href="codex.html"><span class="menu__codex__mark" aria-hidden="true">◆</span> The Codex <span class="menu__codex__arr" aria-hidden="true">→</span></a>
           <button type="button" class="menu__codex menu__codex--rooms" data-annex-go><span class="menu__codex__mark" aria-hidden="true">◆</span> The Reading Rooms <span class="menu__codex__arr" aria-hidden="true">→</span></button>
         </div>
@@ -1423,7 +1484,12 @@ function renderMenu(reveal) {
     </section>
     <section class="menu__panel menu__panel--wall is-offstage" inert aria-hidden="true" aria-label="The Reading Rooms">
     ${ANNEX_BACK}
+    ${RELIQ_GO}
     ${renderWall()}
+    </section>
+    <section class="menu__panel menu__panel--reliquary is-offstage" inert aria-hidden="true" aria-label="The Reliquary">
+    ${RELIQ_BACK}
+    ${renderReliquary(held)}
     </section>
     </div>
     ${renderAbout()}${reveal ? `
@@ -1487,96 +1553,139 @@ function wireMenuReveal(host) {
   if (fwd) fwd.addEventListener("click", function () { location.href = "?dev=vault"; });
 }
 
-/* ── BR-S192: the Reading Rooms annex (desk ↔ wall slide) ─────────────────
-   One class on the host (.is-wall) drives one GPU transform on .menu__track.
-   The off-stage panel is always inert + aria-hidden, and after the slide
-   settles it takes .is-offstage (visibility + height collapse — no phantom
-   scrollbar). Settle is idempotent: transitionend + a 900ms fallback so
-   reduced-motion's missing event can never strand focus or inert state.
-   Fullview and wall are mutually unreachable (guard + CSS hide); the vault
-   arrow's route is untouched. Module-level named handlers — never stack. */
-let _annexPushed = false;
-let _annexSettle = null;
+/* ── BR-S204: the horizontal menu ribbon (desk 0 ↔ wall 1 ↔ reliquary 2) ────
+   Generalized from the BR-S192 desk↔wall binary into ONE ordered-index driver.
+   Each non-desk panel owns a state class (.is-wall / .is-reliquary) that drives
+   one GPU transform on .menu__track; the desk rests at transform:none so the
+   reveal fullview's position:fixed machinery keeps its untransformed ancestor.
+   Exactly one panel is interactive (inert + aria-hidden on all others); every
+   non-active panel collapses to .is-offstage after settle (no phantom scrollbar).
+   Moves are stepwise (go = +1, back = −1 from the current index) so the track
+   only ever animates between neighbours. Fullview and any slid state are mutually
+   unreachable (guard + CSS hide). Slide 3 is gated by a MOCK localStorage flag and
+   fails CLOSED (unset/thrown → the locked teaser). Module-level named handlers —
+   never stack across remounts. */
+const MENU_PANELS = [
+  { cls: null,           sel: ".menu__panel--desk",      hash: "",           focus: ".menu__panel--desk .menu__go-btn" },
+  { cls: "is-wall",      sel: ".menu__panel--wall",      hash: "#rooms",     focus: ".menu__wall-title" },
+  { cls: "is-reliquary", sel: ".menu__panel--reliquary", hash: "#reliquary", focus: ".menu__reliq-title" },
+];
+let _menuPushed = 0;     // COUNT of synthetic history entries we pushed (never assign the index)
+let _menuSettle = null;
 
-function _annexEls() {
+function hasHoldings() { try { return localStorage.getItem("br_holdings") === "1"; } catch (e) { return false; } }
+
+function _menuEls() {
   const host = document.getElementById("menuView");
   if (!host) return null;
   const track = host.querySelector(".menu__track");
   if (!track) return null;
-  return { host, track, desk: host.querySelector(".menu__panel--desk"), wall: host.querySelector(".menu__panel--wall") };
+  return { host, track, panels: MENU_PANELS.map(p => host.querySelector(p.sel)) };
+}
+function _menuIndex(host) {
+  for (let i = MENU_PANELS.length - 1; i >= 1; i--) {
+    if (MENU_PANELS[i].cls && host.classList.contains(MENU_PANELS[i].cls)) return i;
+  }
+  return 0;
+}
+function _hashIndex() {                                 // '', '#about', a future '#codex' → the desk (vertical fragments live on slide 0)
+  const h = location.hash;
+  for (let i = 1; i < MENU_PANELS.length; i++) if (MENU_PANELS[i].hash === h) return i;
+  return 0;
 }
 
-function annexEsc(e) { if (e.key === "Escape") { e.preventDefault(); closeWall({}); } }
-
-function cancelAnnexSettle() { if (_annexSettle) { _annexSettle.cancel(); _annexSettle = null; } }
-function annexSettle(track, offPanel, after) {
-  cancelAnnexSettle();
+function cancelMenuSettle() { if (_menuSettle) { _menuSettle.cancel(); _menuSettle = null; } }
+function menuSettle(track, panels, activeIdx, after) {
+  cancelMenuSettle();
   let done = false, t;
-  const fin = () => { if (done) return; done = true; track.removeEventListener("transitionend", onEnd); clearTimeout(t); offPanel.classList.add("is-offstage"); if (after) after(); };
+  const collapse = () => panels.forEach((p, i) => { if (p && i !== activeIdx) p.classList.add("is-offstage"); });   // ALL non-active panels
+  const fin = () => { if (done) return; done = true; track.removeEventListener("transitionend", onEnd); clearTimeout(t); collapse(); if (after) after(); };
   const onEnd = (e) => { if (e.target === track && e.propertyName === "transform") fin(); };
   track.addEventListener("transitionend", onEnd);
-  t = setTimeout(fin, 900);
-  _annexSettle = { cancel() { done = true; track.removeEventListener("transitionend", onEnd); clearTimeout(t); } };
+  t = setTimeout(fin, 900);                             // reduced-motion fires no transitionend — the timer still settles
+  _menuSettle = { cancel() { done = true; track.removeEventListener("transitionend", onEnd); clearTimeout(t); } };
 }
 
-function openWall(opts = {}) {
-  const els = _annexEls(); if (!els) return;
-  const { host, track, desk, wall } = els;
-  if (host.classList.contains("is-fullview")) return;               // belt to the CSS hide
-  if (host.classList.contains("is-wall") && !opts.seed) return;     // idempotent
-  try { window.scrollTo(0, 0); } catch (e) {}   // BR-S203: reset any About scroll-depth before the slide
-  cancelAnnexSettle();
-  desk.classList.remove("is-offstage"); wall.classList.remove("is-offstage");
-  host.classList.add("is-wall");
-  desk.setAttribute("inert", ""); desk.setAttribute("aria-hidden", "true");
-  wall.removeAttribute("inert"); wall.removeAttribute("aria-hidden");
-  if (!opts.seed && !opts.viaHistory) history.pushState({ br_wall: 1 }, "", "#rooms");
-  _annexPushed = !opts.seed;
-  document.addEventListener("keydown", annexEsc);                    // deep links get the same Esc contract
-  if (opts.seed) { desk.classList.add("is-offstage"); return; }      // pre-paint: no transition, no focus steal
-  const title = wall.querySelector(".menu__wall-title");
-  if (title) title.focus({ preventScroll: true });
-  annexSettle(track, desk);
+function menuEsc(e) {
+  if (e.key !== "Escape") return;
+  const host = document.getElementById("menuView");
+  if (!host) return;
+  const cur = _menuIndex(host);
+  if (cur === 0) return;                                // desk: the reveal owns Esc (capture phase); this no-ops
+  e.preventDefault();
+  menuSlideTo(cur - 1, {});                             // step back one panel
 }
 
-function closeWall(opts = {}) {
-  const els = _annexEls(); if (!els) return;
-  const { host, track, desk, wall } = els;
-  if (!host.classList.contains("is-wall")) return;                   // idempotent
-  cancelAnnexSettle();
-  desk.classList.remove("is-offstage"); wall.classList.remove("is-offstage");
-  host.classList.remove("is-wall");
-  wall.setAttribute("inert", ""); wall.setAttribute("aria-hidden", "true");
-  desk.removeAttribute("inert"); desk.removeAttribute("aria-hidden");
-  document.removeEventListener("keydown", annexEsc);
-  if (!opts.viaHistory) {
-    if (_annexPushed) { _annexPushed = false; history.back(); }      // popstate no-ops via the guards above
-    else history.replaceState(null, "", location.pathname + location.search);   // deep-link arrival: strip the hash
-  } else _annexPushed = false;
-  annexSettle(track, wall, () => {
-    const go = host.querySelector(".menu__go-btn");
-    if (go && go.offsetParent) go.focus();                           // desktop: the arrow
-    else { const pill = host.querySelector(".menu__codex--rooms"); if (pill) pill.focus(); }   // mobile: the pill
+function menuHistory(target, cur, opts) {
+  if (opts.seed) { _menuPushed = 0; return; }
+  if (opts.viaHistory) {                                // popstate already moved the URL — adjust our push-count directionally
+    if (target < cur) _menuPushed = Math.max(0, _menuPushed - 1);
+    else if (target > cur) _menuPushed++;
+    return;
+  }
+  const url = MENU_PANELS[target].hash || (location.pathname + location.search);
+  if (target > cur) { history.pushState({ br_menu: target }, "", url); _menuPushed++; }
+  else if (target < cur) {
+    if (_menuPushed > 0) { _menuPushed--; history.back(); }         // unwind OUR entry; the resulting popstate no-ops (idempotent)
+    else history.replaceState(null, "", url);                       // deep-link arrival: rewrite the hash, never step out of the app
+  }
+}
+
+function menuSlideTo(target, opts = {}) {
+  const els = _menuEls(); if (!els) return;
+  const { host, track, panels } = els;
+  if (host.classList.contains("is-fullview")) return;               // fullview + slide mutually exclusive
+  target = Math.max(0, Math.min(MENU_PANELS.length - 1, target));
+  const cur = _menuIndex(host);
+  if (target === cur && !opts.seed) return;                         // idempotent
+  try { window.scrollTo(0, 0); } catch (e) {}                       // reset any About scroll-depth before the slide
+  cancelMenuSettle();
+  panels.forEach(p => p && p.classList.remove("is-offstage"));      // un-offstage ALL for stable geometry during the slide
+  MENU_PANELS.forEach(p => { if (p.cls) host.classList.remove(p.cls); });   // exactly one state class
+  if (MENU_PANELS[target].cls) host.classList.add(MENU_PANELS[target].cls);
+  panels.forEach((p, i) => {                                        // inert/aria: CLEAR on target (before focus()), SET on all others
+    if (!p) return;
+    if (i === target) { p.removeAttribute("inert"); p.removeAttribute("aria-hidden"); }
+    else { p.setAttribute("inert", ""); p.setAttribute("aria-hidden", "true"); }
   });
+  document.removeEventListener("keydown", menuEsc);                 // Esc armed iff off the desk — BEFORE the seed short-circuit
+  if (target > 0) document.addEventListener("keydown", menuEsc);
+  menuHistory(target, cur, opts);
+  if (opts.seed) {                                                  // deep-link paint: no transition, no focus steal
+    panels.forEach((p, i) => { if (p && i !== target) p.classList.add("is-offstage"); });   // re-collapse ALL non-targets
+    return;
+  }
+  if (target > 0) {                                                 // arriving ANY non-desk panel (forward OR back): focus its title now
+    const el = host.querySelector(MENU_PANELS[target].focus);
+    if (el) el.focus({ preventScroll: true });
+    menuSettle(track, panels, target);
+  } else {                                                          // returning to the desk: settle, then focus the rooms arrow/pill
+    menuSettle(track, panels, 0, () => {
+      const arrow = host.querySelector(".menu__panel--desk .menu__go-btn");   // scoped to the desk — never a wall/reliquary arrow
+      if (arrow && arrow.offsetParent) arrow.focus();
+      else { const pill = host.querySelector(".menu__codex--rooms"); if (pill) pill.focus(); }
+    });
+  }
 }
 
-function annexPopstate() {
-  if (document.body.dataset.view !== "menu") return;                 // never mutate hidden menu DOM
-  const els = _annexEls(); if (!els) return;
-  if (location.hash === "#rooms") openWall({ viaHistory: true });
-  else if (els.host.classList.contains("is-wall")) closeWall({ viaHistory: true });
+function menuPopstate() {
+  if (document.body.dataset.view !== "menu") return;                // never mutate hidden menu DOM
+  const els = _menuEls(); if (!els) return;
+  const t = _hashIndex();
+  if (t !== _menuIndex(els.host)) menuSlideTo(t, { viaHistory: true });
 }
 
-function wireMenuAnnex(host) {
-  cancelAnnexSettle();
-  _annexPushed = false;
-  document.removeEventListener("keydown", annexEsc);                 // defensive on remount
-  window.removeEventListener("popstate", annexPopstate);             // remove-then-add: no stacking
-  window.addEventListener("popstate", annexPopstate);
-  host.querySelectorAll("[data-annex-go]").forEach(el => el.addEventListener("click", () => openWall({})));
-  host.querySelectorAll("[data-annex-back]").forEach(el => el.addEventListener("click", () => closeWall({})));
-  if (location.hash === "#rooms") openWall({ seed: true });          // painted composed, no slide
-  else host.classList.remove("is-wall");                             // stale-state guard on remount
+function wireMenuAnnex(host) {                                      // KEEP the name — mountMenu calls it
+  cancelMenuSettle();
+  _menuPushed = 0;
+  document.removeEventListener("keydown", menuEsc);                 // defensive on remount (menuSlideTo owns arm/disarm)
+  window.removeEventListener("popstate", menuPopstate);            // remove-then-add: no stacking
+  window.addEventListener("popstate", menuPopstate);
+  host.querySelectorAll("[data-annex-go]").forEach(el => el.addEventListener("click", () => menuSlideTo(_menuIndex(host) + 1, {})));
+  host.querySelectorAll("[data-annex-back]").forEach(el => el.addEventListener("click", () => menuSlideTo(_menuIndex(host) - 1, {})));
+  const seedIdx = _hashIndex();
+  if (seedIdx > 0) menuSlideTo(seedIdx, { seed: true });            // deep-link: paint composed, no slide
+  else MENU_PANELS.forEach(p => { if (p.cls) host.classList.remove(p.cls); });   // stale-state reset on remount
 }
 
 /* DEV NAV rail markup (dev-only; mounted only when DEVNAV). State navigation
@@ -1591,6 +1700,7 @@ function renderDevnav() {
     b("src:0", "SRC 01"), b("src:1", "SRC 02"), sep,
     b("treat:free", "Free"), b("treat:shiny", "Halo"), b("treat:mint", "Lab"), sep,
     b("tab:diagram", "Diagram"), b("tab:metrics", "Metrics"), sep,
+    b("holdings:toggle", "Holdings"), sep,
     b("dev:free-scan-sim", "Free Sim"), b("dev:halo-gate", "Halo Gate"),
     b("dev:uploaded-result", "Uploaded"), b("dev:uploaded-blocked", "Blocked"),
   ].join("");
@@ -3036,6 +3146,7 @@ document.addEventListener("click", (e) => {
   else if (kind === "treat") { state.treatment = val; if (val !== "mint") state.labMaterial = null; state.view = "room"; render(); window.scrollTo(0, 0); }
   else if (kind === "src") { state.source = Number(val); state.view = "room"; render(); window.scrollTo(0, 0); }
   else if (kind === "tab") { state.tab = val; state.view = "room"; render(); window.scrollTo(0, 0); }
+  else if (kind === "holdings") { try { localStorage.getItem("br_holdings") === "1" ? localStorage.removeItem("br_holdings") : localStorage.setItem("br_holdings", "1"); } catch (e) {} if (state.view === "menu") mountMenu(); return; }   // BR-S204: MOCK holdings flip (re-render the gated slide 3)
   else if (kind === "dev") { const u = new URL(location.href); u.searchParams.set("dev", val); u.searchParams.set("devnav", "1"); location.href = u.toString(); }
 });
 
@@ -3253,6 +3364,18 @@ function renderSourceToggle() {
     `<button type="button" data-source="${i}" class="toggle__btn${i === state.source ? " is-active" : ""}">SRC ${pad2(s.no)} · ${esc(s.short || s.label)}</button>`
   ).join("");
 }
+
+/* BR-S204 — MOCK holdings unlock (dev/testing only; real keep/claim stays offline).
+   ?holdings=1 sets the gate, ?holdings=0 clears it, then self-strips the param
+   (preserving dev/devnav/other params + the hash) so it never persists in the URL.
+   Runs AFTER the search parse and BEFORE mountMenu, so hasHoldings() reads it. */
+try {
+  const hu = new URL(location.href);
+  const hp = hu.searchParams.get("holdings");
+  if (hp === "1") localStorage.setItem("br_holdings", "1");
+  else if (hp === "0") localStorage.removeItem("br_holdings");
+  if (hp !== null) { hu.searchParams.delete("holdings"); history.replaceState(null, "", hu.pathname + (hu.search || "") + hu.hash); }
+} catch (e) {}
 
 mountMenu();
 renderSourceToggle();
