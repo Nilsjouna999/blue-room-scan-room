@@ -243,7 +243,39 @@
       "</div>";
   }
 
-  function intakeHTML() {
+  // BR-S199: THE GIFT — a reading given FOR someone, kept on THEIR wall (THE WALLS §7-8).
+  // The gift is an UN-DRAWN DEED: the giver sends a link; the recipient sits their own free
+  // intake and keeps it. Mock — no real payment/accounts. The deed link carries only the
+  // giver's name; the recipient draws their own marks.
+  function giftFrom(params) { var f = (params && params.from) || ""; return f.replace(/[<>~]/g, "").trim(); }
+  function giftBannerHTML(from) {
+    var who = from ? "A gift from " + esc(from) : "A gift, from someone who thought of you";
+    return '<div class="ac-giftbanner"><span class="ac-giftbanner__mark" aria-hidden="true">&#10022;</span> ' + who +
+      ' — sit your reading below. It is drawn for you, and yours to keep.</div>';
+  }
+  function giftComposeHTML() {
+    return '' +
+      '<div class="arcane" data-arcane>' +
+        '<button type="button" class="ac-back" data-view-to="menu">← Back to the menu</button>' +
+        '<div class="ac-form ac-form--gift">' +
+          '<div class="ac-head">' +
+            '<h1 class="ac-title">Give a Reading</h1>' +
+            '<p class="ac-sub">A gift is un-drawn — you send a deed; they sit their own reading, and keep it.</p>' +
+          "</div>" +
+          '<label class="ac-mark"><span class="ac-mark__label">Sign it — your name</span>' +
+            '<input class="ac-mark__field" data-gift-from autocomplete="off" spellcheck="false" placeholder="so they know who it is from — or leave it open" aria-label="Your name, to sign the gift"></label>' +
+          '<div class="ac-rule"></div>' +
+          '<div class="ac-cta" data-gift-cta>' +
+            '<button type="button" class="ac-draw ac-gift-send" data-gift-send><span>Send the Gift</span> <span class="ac-draw__price">$4.99</span></button>' +
+            '<p class="ac-hope">Nothing is drawn now. They draw it, and it is theirs.</p>' +
+            '<p class="ac-mocknote">Dev mock — no real payment in this build.</p>' +
+          "</div>" +
+        "</div>" +
+      "</div>";
+  }
+
+  function intakeHTML(params) {
+    var recipient = !!(params && params.gift === "1"), from = giftFrom(params);
     var fields = DEFS.map(function (d) {
       return '<label class="ac-mark">' +
         '<span class="ac-mark__label">' + esc(d.label) + "</span>" +
@@ -256,19 +288,20 @@
         '<div class="ac-crown" data-ac-crown></div>' +
         '<div class="ac-form">' +
           '<div class="ac-head">' +
-            '<h1 class="ac-title">The Setting of Marks</h1>' +
-            '<p class="ac-sub">Before the reading is drawn, lay down what it is drawn from.</p>' +
+            '<h1 class="ac-title">' + (recipient ? "Your Reading" : "The Setting of Marks") + '</h1>' +
+            '<p class="ac-sub">' + (recipient ? "The marks are yours to lay down. The gift covers the drawing." : "Before the reading is drawn, lay down what it is drawn from.") + '</p>' +
           "</div>" +
-          forwhomHTML() +
+          (recipient ? giftBannerHTML(from) : forwhomHTML()) +
           '<div class="ac-redraw-banner" data-ac-redraw hidden></div>' +
           '<div class="ac-marks">' + fields + "</div>" +
           '<div class="ac-rule"></div>' +
           '<div class="ac-cta">' +
             '<button type="button" class="ac-draw" data-ac-draw>' +
-              '<span data-ac-draw-label>Draw the reading</span> <span class="ac-draw__price">$4.99</span>' +
+              '<span data-ac-draw-label>Draw the reading</span>' + (recipient ? '' : ' <span class="ac-draw__price">$4.99</span>') +
             "</button>" +
-            '<p class="ac-hope">Each mark, once set, is hope.</p>' +
+            '<p class="ac-hope">' + (recipient ? "Each mark, once set, is hope." : "Each mark, once set, is hope.") + '</p>' +
             '<p class="ac-notice" data-ac-notice></p>' +
+            (recipient ? '' : '<a class="ac-giftlink" href="?dev=arcane&gift=compose">Giving this to someone? Send it as a gift &rarr;</a>') +
           "</div>" +
         "</div>" +
         '<div class="ac-ceremony" data-ac-ceremony hidden></div>' +
@@ -804,7 +837,13 @@
      MOUNT — wire the intake, the crown, and the ceremony
   --------------------------------------------------------------- */
   function mount(host) {
-    host.innerHTML = intakeHTML();
+    var params = {};
+    try { new URLSearchParams(location.search).forEach(function (v, k) { params[k] = v; }); } catch (e) {}
+
+    // BR-S199: the gift deed composer — a distinct small view (?dev=arcane&gift=compose)
+    if (params.gift === "compose") return mountGiftCompose(host);
+
+    host.innerHTML = intakeHTML(params);
     var root = host.querySelector(".arcane");
     var crown = CrownBlueprint(root.querySelector("[data-ac-crown]"));
     var inputs = slice(root.querySelectorAll(".ac-mark__field"));
@@ -813,9 +852,7 @@
     var ceremonyHost = root.querySelector("[data-ac-ceremony]");
     var noticeT = null, ceremony = null;
 
-    // ---- who is it for? (§ from the profile hand-off) ----
-    var params = {};
-    try { new URLSearchParams(location.search).forEach(function (v, k) { params[k] = v; }); } catch (e) {}
+    // ---- who is it for? (§ from the profile hand-off) — skipped in gift-recipient mode ----
     var chips = slice(root.querySelectorAll("[data-forwhom]"));
     var famMenu = root.querySelector(".ac-fammenu");
     var forWhom = "self", famSubject = "";
@@ -916,6 +953,48 @@
     refresh();
 
     return { destroy: function () { clearTimeout(noticeT); exitCeremony(); } };
+  }
+
+  // BR-S199: the gift deed composer — send a deed link; the recipient sits their own free reading.
+  function mountGiftCompose(host) {
+    host.innerHTML = giftComposeHTML();
+    var root = host.querySelector(".arcane");
+    var sendBtn = root.querySelector("[data-gift-send]");
+    var cta = root.querySelector("[data-gift-cta]");
+    var fromEl = root.querySelector("[data-gift-from]");
+    function deedURL() {
+      var from = (fromEl && fromEl.value || "").replace(/[<>~]/g, "").trim();
+      var base = location.origin + location.pathname + "?dev=arcane&gift=1";
+      return base + (from ? "&from=" + encodeURIComponent(from) : "");
+    }
+    function showDeed() {
+      var url = deedURL();
+      cta.innerHTML =
+        '<div class="ac-deed">' +
+          '<p class="ac-deed__title"><span aria-hidden="true">&#10022;</span> The deed is drawn.</p>' +
+          '<p class="ac-deed__line">A Blue Room reading, un-drawn — for the bearer to sit and keep.</p>' +
+          '<input class="ac-deed__link" data-deed-link readonly value="' + esc(url) + '" aria-label="The deed link">' +
+          '<button type="button" class="ac-draw ac-deed__copy" data-gift-copy>Copy the deed link</button>' +
+          '<p class="ac-deed__note" data-deed-note>Hand this to them. They sit the reading free, read it free, and keep it as a Gift of you.</p>' +
+          '<p class="ac-mocknote">Dev mock — the link works; keeping it needs an account, later.</p>' +
+        '</div>';
+      var copyBtn = root.querySelector("[data-gift-copy]"), linkEl = root.querySelector("[data-deed-link]"), note = root.querySelector("[data-deed-note]");
+      copyBtn.addEventListener("click", function () {
+        function done() { note.textContent = "Deed link copied."; }
+        try {
+          if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(linkEl.value).then(done, function () { linkEl.select(); done(); });
+          else { linkEl.select(); document.execCommand && document.execCommand("copy"); done(); }
+        } catch (e) { linkEl.select(); }
+      });
+      linkEl.focus(); linkEl.select();
+    }
+    var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    sendBtn.addEventListener("click", function () {
+      if (reduce) return showDeed();
+      sendBtn.disabled = true; sendBtn.classList.add("is-settled"); sendBtn.textContent = "Sent";
+      setTimeout(showDeed, 620);
+    });
+    return { destroy: function () {} };
   }
 
   window.BRArcane = { mount: mount };
