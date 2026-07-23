@@ -3045,6 +3045,98 @@ body[data-view="room"] .dev { display: none; }
 }
 
 /* ============================================================
+   BR-S192 — THE READING ROOMS (the Gallery Wall). The Archive Desk
+   slides left to a museum wall of two framed room-plaques (Arcane
+   Reading · Drawing Room). One class (.is-wall) → one GPU transform;
+   NO transform and NO will-change at rest — the reveal's fullview
+   position:fixed machinery depends on an untransformed ancestor.
+============================================================ */
+.menu { overflow-x: clip; }   /* belt; clip ≠ scroll container, never clips fixed els */
+
+.menu__track { display: flex; width: 100%; transition: transform 640ms cubic-bezier(.22, .61, .25, 1); }
+  /* literal ease — --rv-ease is scoped to .reveal-stage and does not resolve here */
+.menu.is-wall .menu__track { transform: translateX(-100%); }
+.menu__panel { flex: 0 0 100%; min-width: 0; position: relative; display: flex; align-items: center; justify-content: center; }
+.menu__panel.is-offstage { visibility: hidden; height: 0; min-height: 0; overflow: hidden; }
+  /* off-stage panel contributes zero height → no phantom scrollbar on short desks */
+@media (prefers-reduced-motion: reduce) { .menu__track { transition: none; } }
+
+/* edge arrows — bottom-corner dog-ears (right-center is owned by the menustage
+   develop arrow at rest and the purple vault arrow in fullview) */
+.menu__go { position: absolute; z-index: 5; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.menu__go--rooms { right: clamp(12px, 2.6vw, 40px); bottom: clamp(26px, 6vh, 54px); transition: opacity 240ms ease, visibility 0s linear 0s; }
+.menu__go--desk { left: clamp(12px, 2.6vw, 40px); bottom: clamp(26px, 6vh, 54px); }
+.menu__go-cap { font-family: var(--font-mono); font-size: 8.5px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--t-meta); }
+/* explicit global-token colour + easing — the .rv-arrow base uses reveal-scoped vars invalid here */
+.menu__go .menu__go-btn { background: none; border: 0; padding: 6px; cursor: pointer; color: var(--t-meta); transition: transform 200ms ease, color 200ms ease; }
+.menu__go .menu__go-btn .rv-arrow__svg { width: 56px; height: 56px; display: block; }
+.menu__go .menu__go-btn:hover, .menu__go .menu__go-btn:focus-visible { color: var(--t-display); transform: scale(1.06); }
+.menu__go .menu__go-btn:active { transform: scale(0.97); }
+.menu__go .menu__go-btn:focus-visible { outline: 2px solid var(--silver-dim); outline-offset: 4px; border-radius: 50%; }
+.menu__go .menu__go-btn:hover .rv-arrow__svg { transform: translateX(2px); }
+.menu__go .menu__go-btn--back .rv-arrow__svg { transform: scaleX(-1); }
+.menu__go .menu__go-btn--back:hover .rv-arrow__svg { transform: scaleX(-1) translateX(-2px); }
+/* hide states: never beside the purple vault arrow; steps aside during the in-place scribble read */
+.menurev.is-fullview .menu__go--rooms,
+.menurev:has(.reveal-stage--menustage.is-reading) .menu__go--rooms {
+  opacity: 0; visibility: hidden; pointer-events: none;
+  transition: opacity 240ms ease, visibility 0s linear 240ms;
+}
+
+/* the wall */
+.menu__wall { width: min(1000px, 92vw); display: grid; justify-items: center; text-align: center; row-gap: 26px; }
+.menu__wall-head { display: grid; gap: 8px; justify-items: center; max-width: 560px; }
+.menu__wall-eyebrow { font-family: var(--font-mono); font-size: 9.5px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--faint); }
+.menu__wall-eyemark { color: var(--silver-dim); }
+.menu__wall-title { font-family: var(--font-display); font-size: 26px; font-weight: 600; color: var(--t-display); }
+.menu__wall-title:focus { outline: none; }   /* programmatic focus target */
+.menu__wall-thesis { font-family: var(--font-display); font-size: 19px; line-height: 1.4; color: var(--t-primary); }
+.menu__wall-trust { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em; line-height: 1.5; color: var(--t-body); }
+.menu__wall-plaques { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(360px, 100%), 1fr)); gap: clamp(20px, 3vw, 40px); width: 100%; max-width: 920px; align-items: stretch; }
+.menu__plaque { position: relative; display: flex; flex-direction: column; align-items: center; gap: 14px; padding: 30px 28px 22px; min-height: 520px; border: 1px solid var(--line); border-radius: 10px; background: linear-gradient(180deg, rgba(233, 229, 220, 0.014), transparent 60%); }
+.menu__plaque::before { content: ""; position: absolute; inset: 7px; border: 1px solid var(--line-faint); border-radius: 6px; pointer-events: none; }   /* double-rule museum mat */
+.menu__plaque-kicker { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.26em; text-transform: uppercase; color: var(--t-meta); }
+.menu__plaque-name { font-family: var(--font-ui); font-size: 14.5px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--t-display); }
+.menu__plaque-rule { width: 42px; height: 1px; background: var(--line-faint); }
+.menu__plaque-spec { flex: 1 1 auto; width: 100%; display: grid; justify-items: center; align-content: center; gap: 10px; }
+.menu__spec-crown { width: clamp(96px, 9vw, 120px); height: auto; }
+.menu__spec-name { font-family: var(--font-display); font-size: 25px; font-weight: 600; color: var(--t-display); }   /* the largest type inside the plaque */
+.menu__spec-spine { font-family: var(--font-mono); font-size: 9.5px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--t-meta); }
+.menu__spec-filed { font-family: var(--font-mono); font-size: 8.5px; letter-spacing: 0.08em; color: var(--faint); }
+.menu__spec-honesty { font-family: var(--font-display); font-style: italic; font-size: 12.5px; color: var(--t-meta); }
+.menu__spec-fan { width: 240px; max-width: 100%; height: auto; }
+.menu__spec-cap { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.1em; color: var(--t-meta); }
+.menu__plaque-marks { font-family: var(--font-mono); font-size: 8.5px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--faint); }
+.menu__plaque-expl { font-family: var(--font-display); font-style: italic; font-size: 13.5px; line-height: 1.5; color: var(--silver); max-width: 34ch; }
+.menu__plaque-ledger { width: 100%; max-width: 340px; }
+.menu__ledger-row { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; padding: 9px 2px; border-bottom: 1px solid var(--line-faint); margin: 0; }
+.menu__ledger-name { font-family: var(--font-ui); font-size: 12.5px; color: var(--t-body); text-align: left; }
+.menu__ledger-val { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.04em; color: var(--t-body); text-align: right; white-space: nowrap; }
+  /* "open"/"free" undimmed in body colour — free-as-hero rendered literally */
+.menu__ledger-price { color: var(--violet); }   /* violet ONLY on the $ tokens */
+.menu__plaque-credo { font-family: var(--font-mono); font-size: 8.5px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--faint); }
+.menu__plaque-door { margin-top: auto; display: block; width: 100%; padding: 12px 16px; border: 1px solid var(--line-strong); border-radius: 7px; background: rgba(255, 255, 255, 0.03); font-family: var(--font-ui); font-size: 12px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--t-display); text-align: center; text-decoration: none; transition: border-color 160ms ease, background 160ms ease, transform 160ms ease; }
+.menu__plaque-door:hover, .menu__plaque-door:focus-visible { border-color: var(--silver-dim); background: rgba(255, 255, 255, 0.05); transform: translateY(-1px); }
+  /* quiet ledger-entry register — no CTA fill, no shadow (door law) */
+.menu__plaque-alt { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.1em; color: var(--t-meta); text-decoration: none; }
+.menu__plaque-alt:hover { color: var(--t-display); }
+.menu__wall-rail { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+.menu__wall-rail .menu__codex { margin-top: 0; align-self: auto; }
+.menu__wall-foot { font-family: var(--font-mono); font-size: 8.5px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--faint); }
+
+/* route-chrome partition: desktop = arrows only, mobile = text routes only */
+.menu__codex--rooms { display: none; }
+.menu__wall-back { display: none; }
+@media (max-width: 1199px) {
+  .menu__go { display: none; }
+  .menu__codex--rooms { display: inline-flex; background: none; cursor: pointer; }
+  .menu__wall-back { display: inline-block; background: none; border: 0; cursor: pointer; font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.1em; color: var(--t-meta); padding: 6px 10px; }
+  .menu__wall-back:hover { color: var(--t-display); }
+  .menu__wall { width: 100%; max-width: 500px; }
+  .menu__plaque { min-height: 0; }
+}
+
+/* ============================================================
    BR-S074 — before/after share view (?dev=before-after).
    A screenshot-clean capture surface: source photo → developed card.
    No animation of its own (the card's halo breathing is unchanged);

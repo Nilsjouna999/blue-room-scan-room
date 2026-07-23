@@ -1184,10 +1184,10 @@ function applyView() {
    (identical glyph + neon to the "see deeper" arrows), fixed at the right edge and vertically
    centred. A wrapper carries the fixed position so the inner .rv-arrow keeps its own
    scale/breathe transforms. Shared by the live menu + the ?dev=menu-reveal twin. */
-const MENUREV_FWD_ARROW =
-  '<div class="menurev__fwd">'
-  + '<button type="button" class="rv-arrow menurev__fwdbtn" data-variant="purple" aria-label="Open the example Vault">'
-  + '<svg class="rv-arrow__svg" viewBox="15 6 106 106" aria-hidden="true">'
+/* BR-S192: the scribble-arrow glyph extracted so the desk↔wall edge arrows share it —
+   MENUREV_FWD_ARROW's rendered bytes are unchanged (pure concatenation refactor). */
+const ARROW_GLYPH =
+  '<svg class="rv-arrow__svg" viewBox="15 6 106 106" aria-hidden="true">'
   + '<path class="rv-arrow__out" d="M20 54 C24 28 54 14 82 26 C99 33 106 47 106 62 L120 54 L98 104 L60 80 L77 73 C76 58 66 47 51 45 C39 43 29 49 26 60 Z"/>'
   + '<line class="rv-arrow__h" x1="28" y1="54" x2="37" y2="66"/><line class="rv-arrow__h" x1="36" y1="42" x2="47" y2="56"/>'
   + '<line class="rv-arrow__h" x1="46" y1="35" x2="57" y2="49"/><line class="rv-arrow__h" x1="57" y1="31" x2="69" y2="45"/>'
@@ -1195,13 +1195,114 @@ const MENUREV_FWD_ARROW =
   + '<line class="rv-arrow__h" x1="92" y1="44" x2="102" y2="57"/><line class="rv-arrow__h" x1="100" y1="53" x2="108" y2="64"/>'
   + '<line class="rv-arrow__h" x1="72" y1="76" x2="83" y2="90"/><line class="rv-arrow__h" x1="80" y1="68" x2="91" y2="82"/>'
   + '<line class="rv-arrow__h" x1="66" y1="82" x2="75" y2="95"/>'
-  + '</svg></button>'
+  + '</svg>';
+
+const MENUREV_FWD_ARROW =
+  '<div class="menurev__fwd">'
+  + '<button type="button" class="rv-arrow menurev__fwdbtn" data-variant="purple" aria-label="Open the example Vault">'
+  + ARROW_GLYPH
+  + '</button>'
   + '<span class="menurev__fwd-cap" aria-hidden="true">To the Vault</span>'
   + '</div>';
+
+/* BR-S192 — THE READING ROOMS (the Gallery Wall). The desk slides left to a museum
+   wall of two framed room-plaques. Silver arrows = neutral instrument (no purple —
+   that register stays reserved for the vault/see-deeper offers). */
+const ANNEX_GO =
+  '<div class="menu__go menu__go--rooms">'
+  + '<span class="menu__go-cap" aria-hidden="true">The Reading Rooms</span>'
+  + '<button type="button" class="rv-arrow menu__go-btn" data-annex-go aria-label="Open the Reading Rooms">' + ARROW_GLYPH + '</button>'
+  + '</div>';
+const ANNEX_BACK =
+  '<div class="menu__go menu__go--desk">'
+  + '<span class="menu__go-cap" aria-hidden="true">The Desk</span>'
+  + '<button type="button" class="rv-arrow menu__go-btn menu__go-btn--back" data-annex-back aria-label="Back to the desk">' + ARROW_GLYPH + '</button>'
+  + '</div>';
+
+/* The wall itself — a pure static template (no state variance). Specimen geometry is
+   the rooms' OWN art: the reading's crown (arcana-build/gen_body.js CROWN_SVG) and the
+   Drawing Room's engraved plates (drawing-room.js backSVG/faceSVG), gradients copied
+   verbatim under unique ids (#mwGold/#mwInk) so the views can co-exist. */
+function renderWall() {
+  const backPlate =
+    '<rect x="7" y="7" width="106" height="176" rx="7" fill="none" stroke="url(#mwInk)" stroke-width="1"/>'
+    + '<rect x="13" y="13" width="94" height="164" rx="5" fill="none" stroke="url(#mwInk)" stroke-width=".5" opacity=".6"/>'
+    + '<g stroke="url(#mwInk)" stroke-width=".6" fill="none" opacity=".7"><path d="M60 42 L86 95 L60 148 L34 95 Z"/><path d="M60 64 L74 95 L60 126 L46 95 Z"/><circle cx="60" cy="95" r="4.5"/></g>';
+  const facePlate =
+    '<rect x="6" y="6" width="108" height="178" rx="7" fill="none" stroke="url(#mwGold)" stroke-width="1.1"/>'
+    + '<rect x="11" y="11" width="98" height="168" rx="5" fill="none" stroke="url(#mwInk)" stroke-width=".5" opacity=".7"/>'
+    + '<text x="60" y="30" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9" letter-spacing="2.5" fill="url(#mwGold)">XVII</text>'
+    + '<g stroke="url(#mwGold)" fill="none"><circle cx="60" cy="98" r="31" stroke-width=".8" opacity=".5"/><circle cx="60" cy="98" r="23" stroke-width=".6" opacity=".35"/>'
+    + '<path d="M60 71 L75 98 L60 125 L45 98 Z" stroke-width=".9" opacity=".7"/><circle cx="60" cy="98" r="3.2" fill="url(#mwGold)" stroke="none"/></g>';
+  return '<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>'
+    + '<linearGradient id="mwGold" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#c8ad70"/><stop offset=".55" stop-color="#a2864a"/><stop offset="1" stop-color="#5f471f"/></linearGradient>'
+    + '<linearGradient id="mwInk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9c9790"/><stop offset="1" stop-color="#6f6b64"/></linearGradient>'
+    + '</defs></svg>'
+    + '<div class="menu__wall">'
+    + '<button type="button" class="menu__wall-back" data-annex-back>&larr; Back to the desk</button>'
+    + '<header class="menu__wall-head">'
+    + '<p class="menu__wall-eyebrow"><span class="menu__wall-eyemark" aria-hidden="true">◆</span> BLUE ROOM</p>'
+    + '<h2 class="menu__wall-title" tabindex="-1">The Reading Rooms</h2>'
+    + '<p class="menu__wall-thesis">Not every card is developed. Some are drawn.</p>'
+    + '<p class="menu__wall-trust">These rooms read what you offer — a name, a birth date, a question. Asked the same, they answer the same.</p>'
+    + '</header>'
+    + '<div class="menu__wall-plaques">'
+    + '<article class="menu__plaque menu__plaque--arcane">'
+    + '<p class="menu__plaque-kicker">Room I · By Birth</p>'
+    + '<h3 class="menu__plaque-name">The Arcane Reading</h3>'
+    + '<span class="menu__plaque-rule" aria-hidden="true"></span>'
+    + '<div class="menu__plaque-spec">'
+    + '<svg class="menu__spec-crown" viewBox="0 0 24 18" aria-hidden="true"><path d="M2 16 L2.6 5 L8 9.5 L12 2 L16 9.5 L21.4 5 L22 16 Z" fill="none" stroke="url(#mwGold)" stroke-width=".75" stroke-linejoin="round"/><path d="M3.2 16 L20.8 16" fill="none" stroke="url(#mwGold)" stroke-width=".75"/></svg>'
+    + '<p class="menu__spec-name">The Twice-Kindled Giver</p>'
+    + '<p class="menu__spec-spine">Aries · Snake · Life Path 7</p>'
+    + '<p class="menu__spec-filed">Antton Aikio · BR-3F9A2C</p>'
+    + '<p class="menu__spec-honesty">A reference specimen — a real reading, not yours.</p>'
+    + '</div>'
+    + '<p class="menu__plaque-marks">Sun Sign · Year Animal · Life Path · Rune · Trigram · Hexagram</p>'
+    + '<p class="menu__plaque-expl">A person read without a photo — six born marks, looked up in the Codex, assembled into a name and crowned.</p>'
+    + '<div class="menu__plaque-ledger">'
+    + '<p class="menu__ledger-row"><span class="menu__ledger-name">The reference reading</span><span class="menu__ledger-val">open</span></p>'
+    + '<p class="menu__ledger-row"><span class="menu__ledger-name">Every mark\'s record page</span><span class="menu__ledger-val">open</span></p>'
+    + '<p class="menu__ledger-row"><span class="menu__ledger-name">A reading of your own</span><span class="menu__ledger-val"><span class="menu__ledger-price">$4.99</span> · through the Reliquary</span></p>'
+    + '</div>'
+    + '<a class="menu__plaque-door" href="?dev=arcane" aria-label="Enter the Arcane Reading">Enter the room &rarr;</a>'
+    + '<a class="menu__plaque-alt" href="?dev=arcana-reading">or open the reference reading &rarr;</a>'
+    + '</article>'
+    + '<article class="menu__plaque menu__plaque--drawing">'
+    + '<p class="menu__plaque-kicker">Room II · By the Draw</p>'
+    + '<h3 class="menu__plaque-name">The Drawing Room</h3>'
+    + '<span class="menu__plaque-rule" aria-hidden="true"></span>'
+    + '<div class="menu__plaque-spec">'
+    + '<svg class="menu__spec-fan" viewBox="0 0 260 216" aria-hidden="true">'
+    + '<g transform="translate(10 26) rotate(-9 60 95)">' + backPlate + '</g>'
+    + '<g transform="translate(130 26) rotate(9 60 95)">' + backPlate + '</g>'
+    + '<g transform="translate(70 12)">' + facePlate + '</g>'
+    + '</svg>'
+    + '<p class="menu__spec-cap">The Star · XVII · drawn from seventy-eight.</p>'
+    + '</div>'
+    + '<p class="menu__plaque-expl">The tarot kept the archive\'s way — a reading is cut to a question you lay down, stamped, and filed.</p>'
+    + '<div class="menu__plaque-ledger">'
+    + '<p class="menu__ledger-row"><span class="menu__ledger-name">The Pull · one card</span><span class="menu__ledger-val">free · as often as you like</span></p>'
+    + '<p class="menu__ledger-row"><span class="menu__ledger-name">A Sitting · three cards</span><span class="menu__ledger-val">first free · <span class="menu__ledger-price">$1.99</span> after</span></p>'
+    + '<p class="menu__ledger-row"><span class="menu__ledger-name">The Deep Read · five cards</span><span class="menu__ledger-val"><span class="menu__ledger-price">$2.99</span></span></p>'
+    + '</div>'
+    + '<p class="menu__plaque-credo">Drawn once. Not reissued.</p>'
+    + '<a class="menu__plaque-door" href="?dev=drawing-room" aria-label="Enter the Drawing Room">Enter the room &rarr;</a>'
+    + '</article>'
+    + '</div>'
+    + '<div class="menu__wall-rail">'
+    + '<a class="menu__codex" href="?dev=profile"><span class="menu__codex__mark" aria-hidden="true">◆</span> The Reliquary <span class="menu__codex__arr" aria-hidden="true">→</span></a>'
+    + '<a class="menu__codex" href="codex.html"><span class="menu__codex__mark" aria-hidden="true">◆</span> The Codex <span class="menu__codex__arr" aria-hidden="true">→</span></a>'
+    + '</div>'
+    + '<p class="menu__wall-foot">Two rooms · One archive.</p>'
+    + '</div>';
+}
 
 function renderMenu(reveal) {
   const s = SOURCES[0];
   return `
+    <div class="menu__track">
+    <section class="menu__panel menu__panel--desk" aria-label="The Archive Desk">
     <div class="menu__inner">
       <header class="menu__head">
         <h1 class="menu__brand"><span class="menu__mark">◆</span> BLUE ROOM</h1>
@@ -1248,11 +1349,18 @@ function renderMenu(reveal) {
         <div class="menu__portals">
           <a class="menu__codex" href="?dev=profile"><span class="menu__codex__mark" aria-hidden="true">◆</span> The Reliquary <span class="menu__codex__arr" aria-hidden="true">→</span></a>
           <a class="menu__codex" href="codex.html"><span class="menu__codex__mark" aria-hidden="true">◆</span> The Codex <span class="menu__codex__arr" aria-hidden="true">→</span></a>
-          <a class="menu__codex" href="?dev=arcane"><span class="menu__codex__mark" aria-hidden="true">◆</span> The Arcane Reading <span class="menu__codex__arr" aria-hidden="true">→</span></a>
+          <button type="button" class="menu__codex menu__codex--rooms" data-annex-go><span class="menu__codex__mark" aria-hidden="true">◆</span> The Reading Rooms <span class="menu__codex__arr" aria-hidden="true">→</span></button>
         </div>
 
         <p class="menu__foot">One sample · SRC-01 · Driver.</p>
       </div>
+    </div>
+    ${ANNEX_GO}
+    </section>
+    <section class="menu__panel menu__panel--wall is-offstage" inert aria-hidden="true" aria-label="The Reading Rooms">
+    ${ANNEX_BACK}
+    ${renderWall()}
+    </section>
     </div>${reveal ? `
     <button type="button" class="menurev__back" aria-label="Return to the menu">← Back to the menu</button>
     ${MENUREV_FWD_ARROW}` : ""}`;
@@ -1271,6 +1379,7 @@ function mountMenu() {
   host.classList.remove("is-fullview");   // clean state on (re)mount
   host.innerHTML = renderMenu(canReveal);
   if (canReveal) wireMenuReveal(host);
+  wireMenuAnnex(host);   // BR-S192: the desk↔wall slide (works with or without the reveal)
 }
 
 function wireMenuReveal(host) {
@@ -1293,6 +1402,97 @@ function wireMenuReveal(host) {
      a full reload; the vault's own back returns to a clean menu). */
   const fwd = host.querySelector(".menurev__fwdbtn");
   if (fwd) fwd.addEventListener("click", function () { location.href = "?dev=vault"; });
+}
+
+/* ── BR-S192: the Reading Rooms annex (desk ↔ wall slide) ─────────────────
+   One class on the host (.is-wall) drives one GPU transform on .menu__track.
+   The off-stage panel is always inert + aria-hidden, and after the slide
+   settles it takes .is-offstage (visibility + height collapse — no phantom
+   scrollbar). Settle is idempotent: transitionend + a 900ms fallback so
+   reduced-motion's missing event can never strand focus or inert state.
+   Fullview and wall are mutually unreachable (guard + CSS hide); the vault
+   arrow's route is untouched. Module-level named handlers — never stack. */
+let _annexPushed = false;
+let _annexSettle = null;
+
+function _annexEls() {
+  const host = document.getElementById("menuView");
+  if (!host) return null;
+  const track = host.querySelector(".menu__track");
+  if (!track) return null;
+  return { host, track, desk: host.querySelector(".menu__panel--desk"), wall: host.querySelector(".menu__panel--wall") };
+}
+
+function annexEsc(e) { if (e.key === "Escape") { e.preventDefault(); closeWall({}); } }
+
+function cancelAnnexSettle() { if (_annexSettle) { _annexSettle.cancel(); _annexSettle = null; } }
+function annexSettle(track, offPanel, after) {
+  cancelAnnexSettle();
+  let done = false, t;
+  const fin = () => { if (done) return; done = true; track.removeEventListener("transitionend", onEnd); clearTimeout(t); offPanel.classList.add("is-offstage"); if (after) after(); };
+  const onEnd = (e) => { if (e.target === track && e.propertyName === "transform") fin(); };
+  track.addEventListener("transitionend", onEnd);
+  t = setTimeout(fin, 900);
+  _annexSettle = { cancel() { done = true; track.removeEventListener("transitionend", onEnd); clearTimeout(t); } };
+}
+
+function openWall(opts = {}) {
+  const els = _annexEls(); if (!els) return;
+  const { host, track, desk, wall } = els;
+  if (host.classList.contains("is-fullview")) return;               // belt to the CSS hide
+  if (host.classList.contains("is-wall") && !opts.seed) return;     // idempotent
+  cancelAnnexSettle();
+  desk.classList.remove("is-offstage"); wall.classList.remove("is-offstage");
+  host.classList.add("is-wall");
+  desk.setAttribute("inert", ""); desk.setAttribute("aria-hidden", "true");
+  wall.removeAttribute("inert"); wall.removeAttribute("aria-hidden");
+  if (!opts.seed && !opts.viaHistory) history.pushState({ br_wall: 1 }, "", "#rooms");
+  _annexPushed = !opts.seed;
+  document.addEventListener("keydown", annexEsc);                    // deep links get the same Esc contract
+  if (opts.seed) { desk.classList.add("is-offstage"); return; }      // pre-paint: no transition, no focus steal
+  const title = wall.querySelector(".menu__wall-title");
+  if (title) title.focus({ preventScroll: true });
+  annexSettle(track, desk);
+}
+
+function closeWall(opts = {}) {
+  const els = _annexEls(); if (!els) return;
+  const { host, track, desk, wall } = els;
+  if (!host.classList.contains("is-wall")) return;                   // idempotent
+  cancelAnnexSettle();
+  desk.classList.remove("is-offstage"); wall.classList.remove("is-offstage");
+  host.classList.remove("is-wall");
+  wall.setAttribute("inert", ""); wall.setAttribute("aria-hidden", "true");
+  desk.removeAttribute("inert"); desk.removeAttribute("aria-hidden");
+  document.removeEventListener("keydown", annexEsc);
+  if (!opts.viaHistory) {
+    if (_annexPushed) { _annexPushed = false; history.back(); }      // popstate no-ops via the guards above
+    else history.replaceState(null, "", location.pathname + location.search);   // deep-link arrival: strip the hash
+  } else _annexPushed = false;
+  annexSettle(track, wall, () => {
+    const go = host.querySelector(".menu__go-btn");
+    if (go && go.offsetParent) go.focus();                           // desktop: the arrow
+    else { const pill = host.querySelector(".menu__codex--rooms"); if (pill) pill.focus(); }   // mobile: the pill
+  });
+}
+
+function annexPopstate() {
+  if (document.body.dataset.view !== "menu") return;                 // never mutate hidden menu DOM
+  const els = _annexEls(); if (!els) return;
+  if (location.hash === "#rooms") openWall({ viaHistory: true });
+  else if (els.host.classList.contains("is-wall")) closeWall({ viaHistory: true });
+}
+
+function wireMenuAnnex(host) {
+  cancelAnnexSettle();
+  _annexPushed = false;
+  document.removeEventListener("keydown", annexEsc);                 // defensive on remount
+  window.removeEventListener("popstate", annexPopstate);             // remove-then-add: no stacking
+  window.addEventListener("popstate", annexPopstate);
+  host.querySelectorAll("[data-annex-go]").forEach(el => el.addEventListener("click", () => openWall({})));
+  host.querySelectorAll("[data-annex-back]").forEach(el => el.addEventListener("click", () => closeWall({})));
+  if (location.hash === "#rooms") openWall({ seed: true });          // painted composed, no slide
+  else host.classList.remove("is-wall");                             // stale-state guard on remount
 }
 
 /* DEV NAV rail markup (dev-only; mounted only when DEVNAV). State navigation
