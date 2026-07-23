@@ -273,16 +273,17 @@
   function hexLinesBlock(e){
     var m=/^(\w+) over (\w+)/.exec(String(e.tag||""));if(!m)return "";
     var up=TRIG[m[1]],lo=TRIG[m[2]];if(!up||!lo)return "";
-    var lines=lo.l.concat(up.l),s='',k,x=20,w=120;
-    for(k=0;k<6;k++){var y=162-k*26;
-      if(lines[k])s+='<line x1="'+x+'" y1="'+y+'" x2="'+(x+w)+'" y2="'+y+'" stroke="'+GHOST+'" stroke-width="7"/>';
-      else s+='<line x1="'+x+'" y1="'+y+'" x2="'+(x+50)+'" y2="'+y+'" stroke="'+GHOST+'" stroke-width="7"/><line x1="'+(x+70)+'" y1="'+y+'" x2="'+(x+w)+'" y2="'+y+'" stroke="'+GHOST+'" stroke-width="7"/>';}
-    function grp(top,bot,label,sub){return '<path d="M150 '+top+' L156 '+top+' L156 '+bot+' L150 '+bot+'" fill="none" stroke="'+GOLD+'" stroke-width="1" opacity=".35"/>'
-      +'<text x="168" y="'+(((top+bot)/2)-2)+'" font-size="13" fill="'+GOLD+'">'+label+'</text>'
-      +'<text x="168" y="'+(((top+bot)/2)+14)+'" font-size="8" letter-spacing="1.5" fill="'+GHOST+'" font-family="IBM Plex Mono,monospace">'+sub+'</text>';}
-    s+=grp(24,88,up.g+' '+esc(m[1]),'ABOVE')+grp(102,166,lo.g+' '+esc(m[2]),'BELOW');
-    var svg='<svg class="hexlines" viewBox="0 0 262 190" aria-hidden="true">'+s+'</svg>';
-    return sec("The six lines",'<div class="dia dia--hexlines">'+svg+'<p class="dia__cap">Read from the bottom line up — '+esc(m[2])+' below, '+esc(m[1])+' above. The standing is these two gates set together.</p></div>');
+    // the classic dense form — thick bars, tight square stack, like the ䷀-style glyphs
+    var lines=lo.l.concat(up.l),s='',k,x=24,w=104,th=10,step=22;
+    for(k=0;k<6;k++){var y=124-k*step;   // k=0 = the bottom line
+      if(lines[k])s+='<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+th+'" fill="'+GHOST+'"/>';
+      else s+='<rect x="'+x+'" y="'+y+'" width="42" height="'+th+'" fill="'+GHOST+'"/><rect x="'+(x+62)+'" y="'+y+'" width="42" height="'+th+'" fill="'+GHOST+'"/>';}
+    function grp(top,bot,label,sub){return '<path d="M140 '+top+' L146 '+top+' L146 '+bot+' L140 '+bot+'" fill="none" stroke="'+GOLD+'" stroke-width="1" opacity=".35"/>'
+      +'<text x="158" y="'+(((top+bot)/2)-1)+'" font-size="13" fill="'+GOLD+'">'+label+'</text>'
+      +'<text x="158" y="'+(((top+bot)/2)+15)+'" font-size="8" letter-spacing="1.5" fill="'+GHOST+'" font-family="IBM Plex Mono,monospace">'+sub+'</text>';}
+    s+=grp(14,68,up.g+' '+esc(m[1]),'ABOVE')+grp(80,134,lo.g+' '+esc(m[2]),'BELOW');
+    var svg='<svg class="hexlines" viewBox="0 0 252 148" aria-hidden="true">'+s+'</svg>';
+    return sec("The six lines",'<div class="dia dia--hexlines">'+svg+'<p class="dia__cap">A hexagram is this figure itself — six lines, whole or broken, stacked. Read from the bottom up: '+esc(m[2])+' below, '+esc(m[1])+' above, the two gates set together.</p></div>');
   }
 
   // 6 · THE AETT STRIP (BR-S195) — the elder futhark in its three rows of eight; the drawn stave gold
