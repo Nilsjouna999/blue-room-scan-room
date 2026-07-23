@@ -54,20 +54,6 @@
 .pf-wordmark { display: inline-flex; align-items: baseline; gap: 9px; text-decoration: none; font-family: var(--pf-serif); font-weight: 600; font-size: 20px; letter-spacing: .015em; color: var(--pf-cream-display); transition: color .18s; }
 .pf-wordmark__mark { color: var(--pf-gold); font-size: 12px; transform: translateY(-1px); }
 .pf-wordmark:hover, .pf-wordmark:focus-visible { color: var(--pf-crown); outline: none; }
-.pf-doors { display: flex; align-items: center; }
-/* each door reads as a framed doorway that lights on approach (top lintel + bottom sill) */
-.pf-door {
-  position: relative; background: none; border: 0; cursor: pointer; text-decoration: none;
-  padding: 6px clamp(12px, 1.7vw, 18px);
-  font-family: var(--pf-mono); font-size: 9.5px; font-weight: 500; letter-spacing: .2em; text-transform: uppercase;
-  color: var(--pf-meta); transition: color .18s;
-}
-.pf-door + .pf-door { border-left: 1px solid var(--pf-line-soft); }
-.pf-door::before, .pf-door::after { content: ""; position: absolute; left: 8px; right: 8px; height: 1px; background: var(--pf-gold); transform: scaleX(0); transform-origin: center; transition: transform .22s ease; }
-.pf-door::before { top: 2px; background: var(--pf-line-soft); }
-.pf-door::after { bottom: 0; }
-.pf-door:hover, .pf-door:focus-visible { color: var(--pf-gold-lit); outline: none; }
-.pf-door:hover::before, .pf-door:hover::after, .pf-door:focus-visible::before, .pf-door:focus-visible::after { transform: scaleX(1); }
 
 /* ---------- shell ---------- */
 .pf-wrap { width: min(760px, 92vw); margin: 0 auto; padding: clamp(14px, 3vh, 30px) 0 16vh; }
@@ -101,8 +87,6 @@
 .pf-openreading--lg:hover, .pf-openreading--lg:focus-visible { border-color: var(--pf-gold); }
 
 /* PAID register — violet, the one commerce colour; every control that leads to paid content */
-a.pf-redraw.pf-paid { color: var(--pf-violet-lit); border-bottom-color: var(--pf-violet-line); }
-a.pf-redraw.pf-paid:hover, a.pf-redraw.pf-paid:focus-visible { color: #bda6e4; border-bottom-color: var(--pf-violet); }
 .pf-openreading.pf-paid { color: var(--pf-violet-lit); border-color: var(--pf-violet-line); }
 .pf-openreading.pf-paid:hover, .pf-openreading.pf-paid:focus-visible { border-color: var(--pf-violet); color: #bda6e4; }
 .pf-crownbtn--empty:hover, .pf-crownbtn--empty:focus-visible { border-color: transparent; background: rgba(138,111,176,.06); }
@@ -129,10 +113,6 @@ a.pf-redraw.pf-paid:hover, a.pf-redraw.pf-paid:focus-visible { color: #bda6e4; b
 /* open-this-reading (free, gold) + redraw (a quiet gold door, price lives in the Arcana Room) */
 .pf-openreading { background: none; border: 0; cursor: pointer; padding: 6px 2px; text-decoration: none; font-family: var(--pf-mono); font-size: 10px; font-weight: 500; letter-spacing: .16em; text-transform: uppercase; color: var(--pf-gold); border-bottom: 1px solid var(--pf-line); transition: color .18s, border-color .18s; }
 .pf-openreading:hover, .pf-openreading:focus-visible { color: var(--pf-gold-lit); border-color: var(--pf-gold); outline: none; }
-.pf-openreading--sm { font-size: 9px; letter-spacing: .12em; }
-.pf-redraw { background: none; border: 0; cursor: pointer; padding: 6px 2px; text-decoration: none; font-family: var(--pf-mono); font-size: 10px; font-weight: 500; letter-spacing: .16em; text-transform: uppercase; color: var(--pf-meta); border-bottom: 1px solid var(--pf-line-soft); transition: color .18s, border-color .18s; }
-.pf-redraw:hover, .pf-redraw:focus-visible { color: var(--pf-gold-lit); border-color: var(--pf-line); outline: none; }
-.pf-redraw--sm { font-size: 9px; letter-spacing: .12em; }
 
 /* ---------- UNDERGROUND — sections as open L-bracket ledger panels ---------- */
 .pf-sec {
@@ -181,10 +161,6 @@ a.pf-redraw.pf-paid:hover, a.pf-redraw.pf-paid:focus-visible { color: #bda6e4; b
 .pf-card__cap { padding: 9px 11px 11px; }
 .pf-card__k { display: block; font-family: var(--pf-mono); font-size: 8px; letter-spacing: .18em; text-transform: uppercase; color: var(--pf-ghost); }
 .pf-card__n { display: block; font-family: var(--pf-serif); font-size: 15px; color: var(--pf-cream); line-height: 1.15; margin-top: 3px; }
-/* empty minted-card slot — the Vault isn't open yet */
-.pf-card--empty { background: none; border: 1px dashed var(--pf-line-soft); cursor: default; align-items: center; justify-content: center; }
-.pf-card--empty:hover { border-color: var(--pf-line-soft); box-shadow: none; }
-.pf-card__slot { font-family: var(--pf-mono); font-size: 8px; letter-spacing: .22em; text-transform: uppercase; color: var(--pf-ghost); opacity: .7; }
 
 /* showcase — choosable slots: feature a reading result or a minted card */
 .pf-show { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px; }
@@ -251,8 +227,6 @@ a.pf-redraw.pf-paid:hover, a.pf-redraw.pf-paid:focus-visible { color: #bda6e4; b
 .pf-pickopt__k,
 .pf-friend__av { color: var(--pf-meta); }
 .pf-id__av { color: var(--pf-cream-display); }
-.pf-door::after { background: var(--pf-meta); }
-.pf-door:hover, .pf-door:focus-visible,
 .pf-openreading:hover, .pf-openreading:focus-visible,
 .pf-mini--add:hover, .pf-mini--add:focus-visible,
 .pf-slot--empty:hover, .pf-slot--empty:focus-visible,

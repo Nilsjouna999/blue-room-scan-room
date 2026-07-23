@@ -59,7 +59,6 @@
 }
 .ac-forwhom__chip:hover { border-color: var(--gold, #c9a35c); color: var(--t-display); }
 .ac-forwhom__chip[aria-checked="true"] { border-color: var(--gold, #c9a35c); color: var(--t-display); background: rgba(201,163,92,0.06); }
-.ac-forwhom__chip--new { border-style: dashed; }
 .ac-forwhom__sub { font-family: var(--font-ui); font-size: 9.5px; letter-spacing: .05em; color: var(--t-ghost); }
 .ac-forwhom__chip[aria-checked="true"] .ac-forwhom__sub { color: var(--gold, #c9a35c); }
 /* locked chips — Family/Friend, until the first personal reading is done */
