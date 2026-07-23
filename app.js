@@ -1267,6 +1267,9 @@ function renderWall() {
     + '<p class="menu__ledger-row"><span class="menu__ledger-name">Asks for</span><span class="menu__ledger-val">a name · a birth date · a birthplace</span></p>'
     + '<p class="menu__ledger-row"><span class="menu__ledger-name">Returns</span><span class="menu__ledger-val">a crowned name · a record for every mark</span></p>'
     + '</div>'
+    // BR-S197: the Concord door — By Birth only (two Arcane Readings + the bond), so it lives INSIDE
+    // Room I, above the door (sits where Plaque B's credo sits — keeps the two doors level). No price here.
+    + '<a class="menu__plaque-aside" href="?dev=arcana-reading#/concord">Or two names, one bond — a Concord &rarr;</a>'
     + '<a class="menu__plaque-door" href="?dev=arcane" aria-label="Enter the Arcane Reading">Enter the room &rarr;</a>'
     + '</article>'
     + '<article class="menu__plaque menu__plaque--drawing">'

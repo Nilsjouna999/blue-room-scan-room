@@ -3113,6 +3113,9 @@ body[data-view="room"] .dev { display: none; }
 .menu__plaque-door { margin-top: auto; display: block; width: 100%; padding: 12px 16px; border: 1px solid var(--line-strong); border-radius: 7px; background: rgba(255, 255, 255, 0.03); font-family: var(--font-ui); font-size: 12px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--t-display); text-align: center; text-decoration: none; transition: border-color 160ms ease, background 160ms ease, transform 160ms ease; }
 .menu__plaque-door:hover, .menu__plaque-door:focus-visible { border-color: var(--silver-dim); background: rgba(255, 255, 255, 0.05); transform: translateY(-1px); }
   /* quiet ledger-entry register — no CTA fill, no shadow (door law) */
+/* BR-S197: the Concord aside — a tier below the door (quiet italic, no border/fill), sits where Plaque B's credo sits */
+.menu__plaque-aside { display: block; margin-bottom: 12px; font-family: var(--font-display); font-style: italic; font-size: 13px; line-height: 1.4; color: var(--silver-dim); text-align: center; text-decoration: none; transition: color 160ms ease; }
+.menu__plaque-aside:hover, .menu__plaque-aside:focus-visible { color: var(--t-display); }
 .menu__wall-rail { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
 .menu__wall-rail .menu__codex { margin-top: 0; align-self: auto; }
 .menu__wall-foot { font-family: var(--font-mono); font-size: 8.5px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--faint); }
