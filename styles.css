@@ -3102,25 +3102,17 @@ body[data-view="room"] .dev { display: none; }
 .menu__plaque-spec { flex: 1 1 auto; width: 100%; display: grid; justify-items: center; align-content: center; gap: 10px; }
 .menu__spec-crown { width: clamp(96px, 9vw, 120px); height: auto; }
 .menu__spec-name { font-family: var(--font-display); font-size: 25px; font-weight: 600; color: var(--t-display); }   /* the largest type inside the plaque */
-.menu__spec-spine { font-family: var(--font-mono); font-size: 9.5px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--t-meta); }
-.menu__spec-filed { font-family: var(--font-mono); font-size: 8.5px; letter-spacing: 0.08em; color: var(--faint); }
-.menu__spec-honesty { font-family: var(--font-display); font-style: italic; font-size: 12.5px; color: var(--t-meta); }
+.menu__spec-spine { font-family: var(--font-mono); font-size: 8px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--faint); }   /* the rail under the art — one line at plaque width */
 .menu__spec-fan { width: 240px; max-width: 100%; height: auto; }
-.menu__spec-cap { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.1em; color: var(--t-meta); }
-.menu__plaque-marks { font-family: var(--font-mono); font-size: 8px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--faint); }
 .menu__plaque-expl { font-family: var(--font-display); font-style: italic; font-size: 13.5px; line-height: 1.5; color: var(--silver); max-width: 34ch; }
 .menu__plaque-ledger { width: 100%; max-width: 340px; }
 .menu__ledger-row { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; padding: 9px 2px; border-bottom: 1px solid var(--line-faint); margin: 0; }
 .menu__ledger-name { font-family: var(--font-ui); font-size: 12.5px; color: var(--t-body); text-align: left; }
 .menu__ledger-val { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.04em; color: var(--t-body); text-align: right; white-space: nowrap; }
-  /* "open"/"free" undimmed in body colour — free-as-hero rendered literally */
-.menu__ledger-price { color: var(--violet); }   /* violet ONLY on the $ tokens */
 .menu__plaque-credo { font-family: var(--font-mono); font-size: 8.5px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--faint); }
 .menu__plaque-door { margin-top: auto; display: block; width: 100%; padding: 12px 16px; border: 1px solid var(--line-strong); border-radius: 7px; background: rgba(255, 255, 255, 0.03); font-family: var(--font-ui); font-size: 12px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--t-display); text-align: center; text-decoration: none; transition: border-color 160ms ease, background 160ms ease, transform 160ms ease; }
 .menu__plaque-door:hover, .menu__plaque-door:focus-visible { border-color: var(--silver-dim); background: rgba(255, 255, 255, 0.05); transform: translateY(-1px); }
   /* quiet ledger-entry register — no CTA fill, no shadow (door law) */
-.menu__plaque-alt { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.1em; color: var(--t-meta); text-decoration: none; }
-.menu__plaque-alt:hover { color: var(--t-display); }
 .menu__wall-rail { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
 .menu__wall-rail .menu__codex { margin-top: 0; align-self: auto; }
 .menu__wall-foot { font-family: var(--font-mono); font-size: 8.5px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--faint); }
