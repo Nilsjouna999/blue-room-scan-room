@@ -1,8 +1,13 @@
 /* ============================================================================
-   Blue Room Tarot v2 — app.js
+   Blue Room Tarot v2 — app.js  ·  "THE LOW LAMP"
    The engine + choreography wiring. Everything below the cut is a pure function
    of the sealed seed; all animation is decoupled theater over an already-decided
    outcome. The cut is the sole decision point (draw + seal + gate + receipt).
+
+   PRESERVED VERBATIM (canon, D2): hash/pick/norm/makeSeed/makeToken/drawSpread/
+   accession/bindRead; SPREADS/TIER_STYLE; the cut→seed→draw seal; ?read= receipt +
+   cold-open reopen; localStorage fail-open gate; deal choreography constants;
+   the 3D flip timing; two live regions; window.__BRTarot.
    ========================================================================== */
 (function () {
   "use strict";
@@ -13,16 +18,14 @@
 
   var motionOK = !(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
 
-  /* ---------------------------------------------------------------- engine
+  /* ---------------------------------------------------------------- engine (PRESERVED)
      Pure, deterministic. FNV-1a 32-bit — structurally the live engine, with the
      one canon correction below (the multiply). pick/norm/drawSpread are verbatim. */
   function hash(s) {
     // FNV-1a 32-bit. Math.imul keeps the multiply in true 32-bit space — the live
     // `h*16777619` (float) reaches ~2^56 for h·16777619, past 2^53, so the low 3
     // bits round away and (&1) collapses reversal to ~5% instead of 50/50. §3.3
-    // requires exactly 50/50, so the multiply is corrected here. This is the ONE
-    // engine primitive that changed from live — logged in INTEGRATION.md §B as the
-    // graft-back correction live drawing-room.js must adopt.
+    // requires exactly 50/50, so the multiply is corrected here.
     var h = 2166136261;
     for (var i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619) >>> 0; }
     return h >>> 0;
@@ -30,10 +33,6 @@
   function pick(list, seed) { return list && list.length ? list[hash(seed) % list.length] : null; }
   function norm(s) { return String(s == null ? "" : s).toLowerCase().replace(/[^a-z0-9]+/g, " ").trim(); }
   function makeSeed(key, q, token) { return "read~" + key + "~" + norm(q) + "~" + token; }
-  // Token = base36 timestamp + a GUARANTEED-6-char base36 random suffix. dateFromToken()
-  // recovers the timestamp with slice(0,-6), so the suffix width is a hard contract:
-  // pad+slice pins it to exactly 6 (a short random string, or Math.random()===0, would
-  // otherwise under-run 6 and let slice(0,-6) eat into the timestamp).
   function makeToken() {
     var suffix = ("000000" + Math.floor(Math.random() * 2176782336).toString(36)).slice(-6); // 36^6
     return Date.now().toString(36) + suffix;
@@ -52,16 +51,53 @@
   function accession(seed) {
     return "BR-" + ("00000" + (hash(seed + "br") % 0xFFFFF).toString(16).toUpperCase()).slice(-5);
   }
-  function bindRead(card, rev) {
-    if (rev) return card.reversed;                       // codex reversed prose (major OR minor)
+  function extPivot(card, rev) {                          // authored pivot for the rest of the deck
+    try { var vx = window.BRArcanaVoiceExt; if (vx) { var p = vx.pivot(card.name, rev); if (p) return p; } }
+    catch (e) { /* fail open to codex prose */ }
+    return null;
+  }
+  function bindRead(card, rev) {                          // the spoken LEAD (also the ARIA announce)
+    if (rev) {
+      return extPivot(card, true) || card.reversed;      // authored reversed pivot, else codex reversed prose
+    }
     if (card.group === "major") {
       try { var v = window.BRArcanaVoice && window.BRArcanaVoice.get("tarot", card.name); if (v && v.p) return v.p; }
       catch (e) { /* fail open */ }
+      return card.meaning;
     }
-    return card.meaning;                                 // codex upright prose
+    return extPivot(card, false) || card.meaning;        // authored minor-upright pivot, else codex upright prose
   }
 
-  /* ---------------------------------------------------------------- tiers */
+  /* PRESENTATION split (data.js/voice.js stay locked): a taut LEAD (the room's voice) plus
+     the fuller CITED record. Major+upright leads on its authored pivot and files the whole
+     codex meaning as the record; every other state leads on the codex prose's own first
+     sentence and files the remainder. The lead is kept short (italic-worthy); the record is
+     long-form roman. This is why the reading no longer reads like a textbook in the room's
+     own voice — the encyclopedic register is quoted, not spoken. */
+  function splitFirstSentence(text) {
+    var t = String(text == null ? "" : text).trim();
+    var m = t.match(/^([\s\S]*?[.!?])\s+([\s\S]+)$/);
+    if (m && m[2].trim().length > 24) return { lead: m[1].trim(), rest: m[2].trim() };
+    return { lead: t, rest: "" };
+  }
+  function computeRead(card, rev) {
+    // Major + upright leads on its locked voice.js pivot, files the whole codex meaning as the record.
+    if (!rev && card.group === "major") {
+      try {
+        var v = window.BRArcanaVoice && window.BRArcanaVoice.get("tarot", card.name);
+        if (v && v.p) return { lead: v.p, voiced: true, rest: String(card.meaning || "").trim() };
+      } catch (e) { /* fail open to ext / codex split below */ }
+    }
+    // Every other state (all Minors upright, all 78 reversed) leads on its authored pivot from
+    // voice-ext.js and files the FULL codex prose as the cited record — the codex is now pure citation.
+    var xp = extPivot(card, rev);
+    if (xp) return { lead: xp, voiced: true, rest: String((rev ? card.reversed : card.meaning) || "").trim() };
+    // Fail open: no authored pivot present — split the codex prose's own first sentence as the lead.
+    var s = splitFirstSentence(rev ? card.reversed : card.meaning);
+    return { lead: s.lead, voiced: false, rest: s.rest };
+  }
+
+  /* ---------------------------------------------------------------- tiers (PRESERVED) */
   var SPREADS = {
     pull:    { key: "pull",    title: "A Glance",     n: 1, paid: false, price: null,    filed: false,
                positions: [null], notes: [null] },
@@ -78,7 +114,36 @@
     deep:    { w: "clamp(92px,18vw,138px)",  ar: "150 / 238" }
   };
 
-  /* ---------------------------------------------------------------- gate */
+  /* ---------------------------------------------------------------- copy: matter station */
+  // R4 example pool (COPY §3) — declaratives, tap-to-fill, never auto-submit, never a timer.
+  var POOL = [
+    "what I keep circling back to",
+    "where this is actually heading",
+    "what I already know but haven't said aloud",
+    "what I'm not seeing here",
+    "what this season is asking of me",
+    "what I'd ask if I weren't bracing for the answer",
+    "what holds this together",
+    "whether it's time",
+    "what I owe myself"
+  ];
+  var DEFAULT_PLACEHOLDER = "a question, in your own words";
+  var SILENT_PLACEHOLDER = "Laid in silence.";
+  var chipOffset = 0; // rotation is deterministic per tier-entry, never a timer
+
+  // R3/COPY §9 connective bridges — position-structural, keyed by position name.
+  var BRIDGES = {
+    "The Crossing": "Set against the ground just laid —",
+    "The Root":     "Underneath both of those —",
+    "The Crown":    "Reaching up out of that —",
+    "The Turn":     "Which leaves it here —"
+  };
+  var ROMAN = ["", "I", "II", "III", "IV", "V"];
+  function roman(n) { return ROMAN[n] || String(n); }
+
+  function ariaFor(key) { return key === "pull" ? "Tarot glance" : key === "deep" ? "Tarot deep read" : "Tarot sitting"; }
+
+  /* ---------------------------------------------------------------- gate (PRESERVED) */
   function sittingUsed() { try { return localStorage.getItem("br_dr_sitting_used") === "1"; } catch (e) { return false; } }
   function isPaidNow(key) { var sp = SPREADS[key]; return !!(sp && (sp.paid || (key === "sitting" && sittingUsed()))); }
 
@@ -87,7 +152,9 @@
 
   /* ---------------------------------------------------------------- state */
   var STATE = { phase: "tier", tierKey: null, question: "", token: null, seed: null,
-                drawn: [], revealed: 0, replay: false, paidRun: false };
+                drawn: [], revealed: 0, replay: false, paidRun: false, done: false };
+
+  var readIO = null;
 
   /* ---------------------------------------------------------------- DOM refs */
   var D = {};
@@ -98,6 +165,11 @@
     D.reopen = $("[data-reopen]");
     D.intake = $("[data-intake]");
     D.input = $("#question");
+    D.chips = $("[data-intake-chips]");
+    D.refresh = $("[data-intake-refresh]");
+    D.silence = $("[data-intake-silence]");
+    D.intakeLocked = $("[data-intake-locked]");
+    D.pullNote = $("[data-pullnote]");
     D.cutnote = $("[data-cutnote]");
     D.mocknote = $("[data-mocknote]");
     D.subline = $("[data-subline]");
@@ -105,27 +177,39 @@
     D.glow = $("[data-glow]");
     D.deck = $("[data-deck]");
     D.spread = $("[data-spread]");
+    D.say = $("[data-say]");
     D.controls = $("[data-controls]");
     D.cut = $("[data-cut]");
     D.status = $("[data-status]");
     D.again = $("[data-again]");
+    D.pretierNav = $("[data-pretier-nav]");
+    D.backTier = $("[data-back-tier]");
     D.hint = $("[data-hint]");
+    D.descend = $("[data-descend]");
+    D.descendBtn = $("[data-descend-btn]");
     D.reading = $("[data-reading]");
+    D.closingBlock = $("[data-closing-block]");
     D.closing = $("[data-closing]");
+    D.closenote = $("[data-closenote]");
+    D.confidential = $("[data-confidential]");
     D.accession = $("[data-accession]");
+    D.closeActions = $("[data-close-actions]");
+    D.againBottom = $("[data-again-bottom]");
+    D.backRoom = $("[data-back-room]");
     D.polite = $("[data-live-polite]");
     D.assertive = $("[data-live-assertive]");
   }
 
-  /* ---------------------------------------------------------------- aria */
+  /* ---------------------------------------------------------------- mood */
+  function setMood(name) { document.body.setAttribute("data-mood", name); }
+
+  /* ---------------------------------------------------------------- aria (two regions, PRESERVED) */
   function announce(msg, mode) {
     var region = mode === "assertive" ? D.assertive : D.polite;
     if (!region) return;
     var n = el("span");
     n.textContent = msg + " ";
     region.appendChild(n);
-    // cap growth — a deep run appends 6 (5 turns + closing); repeated sittings would
-    // otherwise accumulate forever. Keep the last 12 so one run is never trimmed.
     while (region.childNodes.length > 12) region.removeChild(region.firstChild);
   }
 
@@ -135,15 +219,13 @@
   function fmtDate(d) { return d.getDate() + " " + MONTHS[d.getMonth()] + " " + d.getFullYear(); }
   function dateFromToken(token) {
     try {
-      // relies on makeToken()'s fixed 6-char suffix contract; cosmetic ("Filed <date>")
-      // only — the reading + ?read= round-trip use the full token string verbatim.
       var ms = parseInt(String(token).slice(0, -6), 36);
       if (ms && isFinite(ms)) return new Date(ms);
     } catch (e) {}
     return new Date();
   }
 
-  /* ---------------------------------------------------------------- accent register */
+  /* ---------------------------------------------------------------- accent register (PRESERVED) */
   function setAccent(mode) {
     var r = D.room.style;
     if (mode === "gold") { r.setProperty("--accent", "#a2864a"); r.setProperty("--accent-lit", "#c0a05d"); }
@@ -151,42 +233,34 @@
     else { r.setProperty("--accent", "#8f8266"); r.setProperty("--accent-lit", "#b6a179"); } // neutral
   }
 
-  /* ---------------------------------------------------------------- card back markup (shared) */
-  function backHTML() {
+  /* ---------------------------------------------------------------- card backs (R1)
+     No args → generic deck-pile back. (pos,sub) → prints the withheld question band. */
+  function backHTML(pos, sub) {
+    var has = !!pos;
+    var prompt = has
+      ? '<div class="back-prompt" aria-hidden="true"><span class="bp-pos">' + esc(pos) + '</span>' +
+        '<span class="bp-sub">' + esc(sub) + '</span></div>'
+      : '';
     return '' +
-      '<div class="back">' +
+      '<div class="back' + (has ? ' has-prompt' : '') + '">' +
         '<div class="back-frame"></div>' +
         '<div class="back-ring"></div>' +
         '<div class="back-diamond">&#9670;</div>' +
         '<div class="back-mono top">ARCANA</div>' +
+        prompt +
         '<div class="back-mono bot">BLUE ROOM</div>' +
         '<span class="tick tl"></span><span class="tick tr"></span>' +
         '<span class="tick bl"></span><span class="tick br"></span>' +
       '</div>';
   }
 
-  function suitGlyph(suit) {
-    var g = {
-      Wands:     '<line x1="7" y1="2" x2="7" y2="12"/><line x1="5" y1="2" x2="9" y2="2"/><line x1="5" y1="12" x2="9" y2="12"/>',
-      Cups:      '<path d="M3 5 C3.4 10.2 10.6 10.2 11 5"/>',
-      Swords:    '<line x1="7" y1="2" x2="7" y2="12"/><line x1="4" y1="5" x2="10" y2="5"/>',
-      Pentacles: '<circle cx="7" cy="7" r="4.4"/>'
-    }[suit] || '';
-    return '<svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1" aria-hidden="true">' + g + '</svg>';
-  }
-
-  /* face content for a drawn card */
+  /* face content for a drawn card (LOCKED — reused verbatim for the reading echo card) */
   function faceHTML(card, rev) {
     var headLeft, glyph;
-    if (card.group === "major") {
-      headLeft = "ARCANA · " + card.rank;
-    } else {
-      headLeft = String(card.suit).toUpperCase() + " · " + String(card.element).toUpperCase();
-    }
-    glyph = "&#9670;"; // the diamond — the original card art, on EVERY card (majors + minors)
+    if (card.group === "major") { headLeft = "ARCANA · " + card.rank; }
+    else { headLeft = String(card.suit).toUpperCase() + " · " + String(card.element).toUpperCase(); }
+    glyph = "&#9670;"; // the diamond — the original card art, on EVERY card
     var longName = card.name.length >= 13 ? " is-long" : "";
-    // Card face carries name + orientation only — no keyword line (kept clean; keywords/meaning
-    // live in the reading panel below).
     return '' +
       '<div class="face-head">' +
         '<span class="face-meta">' + headLeft + '</span>' +
@@ -195,11 +269,11 @@
       '<div class="face-name' + longName + '">' + esc(card.name) + '</div>' +
       '<div class="face-div"></div>' +
       '<div class="face-orient">' + (rev ? "Reversed" : "Upright") + '</div>' +
-      '<span class="tick tl"></span><span class="tick br"></span>'; // the original 2-tick corners (tl + br)
+      '<span class="tick tl"></span><span class="tick br"></span>';
   }
   function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
 
-  /* ---------------------------------------------------------------- deck render */
+  /* ---------------------------------------------------------------- deck render (PRESERVED) */
   function renderDeck() {
     var html = '<div class="deck-back-body">';
     for (var k = 0; k < 7; k++) {
@@ -210,8 +284,44 @@
               'background:linear-gradient(158deg,hsl(34 22% ' + light + '%),hsl(32 20% ' + dark + '%));"></div>';
     }
     html += '</div>';
-    html += '<div class="deck-top">' + backHTML() + '</div>';
+    html += '<div class="deck-top">' + backHTML() + '</div>'; // generic pile back
     D.deck.innerHTML = html;
+  }
+
+  /* ---------------------------------------------------------------- matter station (R4) */
+  function renderChips(off) {
+    if (!D.chips) return;
+    D.chips.innerHTML = "";
+    for (var k = 0; k < 3; k++) {
+      var text = POOL[(off + k) % POOL.length];
+      var b = document.createElement("button");
+      b.type = "button"; b.className = "intake-chip";
+      b.setAttribute("data-chip-text", text);
+      b.textContent = text;
+      (function (t) { b.addEventListener("click", function () { fillFromChip(t); }); })(text);
+      D.chips.appendChild(b);
+    }
+  }
+  function fillFromChip(text) {
+    // route through the exact input path (seed integrity) — never auto-submit, never re-seed
+    setSilent(false);
+    D.input.value = text;
+    STATE.question = text;
+    D.input.focus();
+    try { var l = D.input.value.length; D.input.setSelectionRange(l, l); } catch (e) {}
+  }
+  function setSilent(on) {
+    if (!D.input) return;
+    if (on) {
+      D.input.value = ""; STATE.question = "";
+      D.input.classList.add("is-silent");
+      D.input.placeholder = SILENT_PLACEHOLDER;
+      if (D.silence) D.silence.setAttribute("aria-pressed", "true");
+    } else {
+      D.input.classList.remove("is-silent");
+      D.input.placeholder = DEFAULT_PLACEHOLDER;
+      if (D.silence) D.silence.setAttribute("aria-pressed", "false");
+    }
   }
 
   /* ---------------------------------------------------------------- tier chooser */
@@ -225,80 +335,161 @@
 
   function chooseTier(key) {
     STATE = { phase: "intake", tierKey: key, question: "", token: null, seed: null,
-              drawn: [], revealed: 0, replay: false, paidRun: false };
-    var sp = SPREADS[key], st = TIER_STYLE[key];
+              drawn: [], revealed: 0, replay: false, paidRun: false, done: false };
+    var sp = SPREADS[key], st = TIER_STYLE[key], isPull = (key === "pull");
 
     D.tiers.setAttribute("hidden", "");
     D.ceremony.removeAttribute("hidden");
-    D.ceremony.setAttribute("aria-label", key === "pull" ? "Tarot glance" : key === "deep" ? "Tarot deep read" : "Tarot sitting");
+    D.ceremony.setAttribute("aria-label", ariaFor(key));
 
     D.stage.style.setProperty("--card-w", st.w);
     D.stage.style.setProperty("--ar", st.ar);
-    D.stage.classList.toggle("is-pull", key === "pull");
-    D.stage.classList.toggle("is-deep", key === "deep");   // narrow-phone 3-over-2 wrap
+    D.stage.classList.toggle("is-pull", isPull);
+    D.stage.classList.toggle("is-deep", key === "deep");
 
-    // intake + notes
+    // matter station reset
     D.input.value = "";
     D.input.readOnly = false;
-    D.input.classList.remove("is-locked");
+    D.input.classList.remove("is-locked", "is-silent");
     D.input.removeAttribute("aria-readonly");
-    D.cutnote.hidden = (key === "pull");                 // A Glance shows no cut-note
-    var paid = isPaidNow(key);
-    D.mocknote.hidden = !paid;
+    D.input.placeholder = DEFAULT_PLACEHOLDER;
+    D.intake.classList.remove("is-locked");
+    if (D.intakeLocked) D.intakeLocked.hidden = true;
+    if (D.silence) D.silence.setAttribute("aria-pressed", "false");
 
+    D.intake.hidden = isPull;
+    D.pullNote.hidden = !isPull;
+    if (!isPull) { chipOffset = (chipOffset + 3) % POOL.length; renderChips(chipOffset); }
+
+    D.cutnote.hidden = isPull;                 // A Glance shows no cut-note
+    var paid = isPaidNow(key);
+    if (paid) {
+      D.mocknote.hidden = false;
+      D.mocknote.textContent = "No payment in this build. The settle stages a charge of " + sp.price + ", and nothing more.";
+    } else {
+      D.mocknote.hidden = true;
+    }
+
+    setMood("tier");
     setAccent("neutral");
     renderDeck();
     renderSkeleton(sp);
-    renderReadingSkeleton(sp);
+    renderReadingSkeleton(sp, false);
 
     D.reopen.hidden = true;
-    D.closing.hidden = true;
-    D.accession.hidden = true;
+    D.closingBlock.hidden = true;
+    D.closingBlock.classList.remove("is-sealing");
+    D.accession.hidden = true;                 // clear any prior stamp before a fresh ceremony
+    D.descend.hidden = true;
     D.again.hidden = true;
     D.status.hidden = true;
     D.hint.hidden = true;
+    D.subline.hidden = false;
+    clearSay();
 
     D.cut.hidden = false;
     D.cut.disabled = false;
     D.cut.classList.toggle("is-paid", paid);
     D.cut.classList.remove("is-settling");
     D.cut.textContent = "Shuffle";
-    STATE.phase = "ready";
 
+    D.pretierNav.hidden = false;
+    D.backTier.disabled = false;
+
+    STATE.phase = "ready";
     positionDeck();
-    D.input.focus();
+    if (isPull) D.cut.focus(); else D.input.focus();
   }
 
-  /* empty slots (labels + face-down placeholders reserve space; no jump on deal) */
+  /* R1 — empty label ships textless; the position lives on the BACK until the turn */
   function renderSkeleton(sp) {
     D.spread.innerHTML = "";
     for (var i = 0; i < sp.n; i++) {
       var slot = el("div", "slot");
       var label = el("div", "slot-label");
       if (sp.positions[i]) {
-        label.innerHTML = '<span class="pos">' + esc(sp.positions[i]) + '</span>' +
-                          '<span class="sub">' + esc(sp.notes[i]) + '</span>';
+        label.innerHTML = '<span class="label-wait" aria-hidden="true"></span>' +
+                          '<span class="pos"></span><span class="sub"></span>';
       }
       slot.appendChild(label);
-      var box = el("div", "card-slot");     // reserves the card footprint
+      var box = el("div", "card-slot");
       slot.appendChild(box);
       D.spread.appendChild(slot);
     }
   }
 
-  function renderReadingSkeleton(sp) {
+  /* R2/R3 — the descent skeleton: epigraph, head, per-card items (+ bridges), synthesis */
+  function renderReadingSkeleton(sp, coldOpen) {
     D.reading.className = "reading" + (sp.key === "pull" ? " is-pull" : "");
     D.reading.innerHTML = "";
+    var isPull = sp.key === "pull";
+
+    if (!isPull) {
+      var matter = el("div", "reading-matter");
+      matter.setAttribute("data-matter", "");
+      D.reading.appendChild(matter);
+
+      var head = el("div", "reading-head");
+      head.innerHTML = '<h2 class="rh-eyebrow">THE READING</h2><p class="rh-sub">Read in the order it fell.</p>';
+      D.reading.appendChild(head);
+    }
+
     for (var i = 0; i < sp.n; i++) {
-      var col = el("div", "read-col");
-      var ghost = el("p", "read-ghost");
-      ghost.textContent = "Awaiting the turn";
-      col.appendChild(ghost);
-      D.reading.appendChild(col);
+      if (!isPull && i > 0) {
+        var bridgeText = BRIDGES[sp.positions[i]];
+        if (bridgeText) {
+          var br = el("p", "ri-bridge");
+          br.textContent = bridgeText;
+          D.reading.appendChild(br);
+        }
+      }
+      var item = document.createElement("article");
+      item.className = "read-item" + (isPull ? " is-pull" : "");
+      item.setAttribute("data-read-item", "");
+      item.setAttribute("aria-labelledby", (isPull ? "rn-" : "rh-") + i);
+
+      var card = el("div", "ri-card");
+      card.setAttribute("aria-hidden", "true");
+      card.innerHTML = '<div class="ri-silhouette"></div>';
+      item.appendChild(card);
+
+      var body = el("div", "ri-body");
+      var html = "";
+      if (!isPull) {
+        html += '<p class="ri-index">' + roman(i + 1) + ' &middot; ' + esc(String(sp.positions[i]).toUpperCase()) + '</p>';
+        html += '<p class="ri-eyebrow" id="rh-' + i + '"><span class="pos">' + esc(sp.positions[i]) + '</span>' +
+                ' &middot; <span class="sub">' + esc(sp.notes[i]) + '</span></p>';
+      }
+      html += '<h3 class="ri-name" id="rn-' + i + '"><span class="nm">&mdash;</span></h3>';
+      html += '<div class="ri-read-wrap" data-read-wrap><p class="ri-lead ri-ghost">Awaiting the turn.</p></div>';
+      body.innerHTML = html;
+      item.appendChild(body);
+
+      D.reading.appendChild(item);
+      if (!coldOpen) observeItem(item);
+    }
+
+    if (!isPull) {
+      var syn = el("p", "reading-synthesis");
+      syn.setAttribute("data-synthesis", "");
+      syn.hidden = true;
+      D.reading.appendChild(syn);
     }
   }
 
-  /* ---------------------------------------------------------------- deck placement */
+  /* ---------------------------------------------------------------- reveal engine (R2) */
+  function initReadIO() {
+    if (!("IntersectionObserver" in window) || !motionOK) return;
+    document.documentElement.classList.add("js-io");
+    readIO = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) { e.target.classList.add("in"); readIO.unobserve(e.target); }
+      });
+    }, { threshold: 0.28, rootMargin: "0px 0px -18% 0px" });
+  }
+  function observeItem(it) { if (readIO && it) readIO.observe(it); }
+
+  /* ---------------------------------------------------------------- deck placement (PRESERVED) */
   function positionDeck() {
     var box = $(".card-slot", D.spread);
     if (!box) return;
@@ -306,7 +497,7 @@
     D.stage.style.setProperty("--deck-top", (br.top - sr.top) + "px");
   }
 
-  /* ---------------------------------------------------------------- shuffle */
+  /* ---------------------------------------------------------------- shuffle (PRESERVED timings) */
   function onCutButton() {
     if (STATE.phase === "ready") { runShuffle(); return; }
     if (STATE.phase === "shuffled") { cut(); return; }
@@ -316,6 +507,7 @@
     STATE.phase = "shuffling";
     D.cut.disabled = true;
     D.cut.hidden = true;
+    D.backTier.disabled = true;          // escape stays visible, non-operable mid-shuffle
     D.status.hidden = false;
     D.status.textContent = "Mixing.";
     announce("Mixing.", "polite");
@@ -328,6 +520,7 @@
       D.status.hidden = true;
       D.cut.hidden = false;
       D.cut.disabled = false;
+      D.backTier.disabled = false;
       D.cut.textContent = cutLabel();
     }, wait);
   }
@@ -339,11 +532,16 @@
     return "Cut the deck · " + SPREADS[key].price;
   }
 
-  /* ---------------------------------------------------------------- the cut = the seal */
+  /* ---------------------------------------------------------------- the cut = the seal (PRESERVED) */
   function cut() {
     var key = STATE.tierKey;
     var paid = isPaidNow(key);                 // snapshot BEFORE the gate bit is written
     STATE.paidRun = paid;
+    // the escape hatch closes the instant the cut fires — synchronously, before the
+    // paid settle's own delay, so "back to tier" can never race a pending doCut() and
+    // fire resetToTiers() into a STATE the settle callback is about to write into.
+    D.pretierNav.hidden = true;
+    D.backTier.disabled = true;
     if (paid) runSettle(function () { doCut(paid); });
     else doCut(paid);
   }
@@ -359,21 +557,21 @@
   function doCut(paid) {
     var key = STATE.tierKey, sp = SPREADS[key];
 
-    // controls row shows exactly one control at a time: the cut/settle button's job
-    // ends here — hide it now so "Filing." (set by runCutlift, next) is the only
-    // visible control, on both the free path (never disabled/hidden before this) and
-    // the paid path (runSettle only disabled it, never hid it).
+    // the escape hatch closes the instant the cut fires — synchronously, before any draw
+    D.pretierNav.hidden = true;
+    D.backTier.disabled = true;
+    setMood("cut");
+
+    // controls row shows exactly one control at a time
     D.cut.hidden = true;
     D.cut.disabled = true;
 
     if (key === "pull") {
-      // A Glance: ephemeral. No token, no seal, no gate, no receipt.
       var pseed = "pull~" + SESSION + "~" + (pullN++);
       STATE.token = null; STATE.seed = pseed;
       STATE.drawn = drawSpread(pseed, sp.n).map(function (d) { d.shown = false; return d; });
       announce("The deck is cut.", "polite");
     } else {
-      // filed tiers: freeze token → seed → DRAW (cards chosen HERE, nowhere else)
       var token = makeToken();
       var seed = makeSeed(key, STATE.question, token);
       STATE.token = token; STATE.seed = seed;
@@ -391,14 +589,15 @@
   }
 
   function lockInk() {
-    // native readonly + aria-readonly: the filed value stays focusable and reviewable.
-    // (aria-disabled would signal a non-operable control and SRs may skip/dim it.)
+    // native readonly + aria-readonly: the filed value stays focusable and reviewable
     D.input.readOnly = true;
     D.input.setAttribute("aria-readonly", "true");
     D.input.classList.add("is-locked");
+    D.intake.classList.add("is-locked");                 // R4 echo: collapse the station
+    if (D.intakeLocked) D.intakeLocked.hidden = false;   // "Asked. The record won't revise it."
   }
 
-  /* ---------------------------------------------------------------- receipt */
+  /* ---------------------------------------------------------------- receipt (PRESERVED) */
   function writeReceipt(key, q, token) {
     if (!history.replaceState) return;
     var payload;
@@ -419,38 +618,40 @@
     STATE = {
       phase: "complete", tierKey: o.k, question: o.q || "", token: o.t, seed: seed,
       drawn: drawSpread(seed, sp.n).map(function (d) { d.shown = true; return d; }),
-      revealed: sp.n, replay: true, paidRun: false
+      revealed: sp.n, replay: true, paidRun: false, done: true
     };
     renderColdOpen(sp);
     return true;
   }
 
-  /* cold open — no deck, no ceremony, cards already face-up */
+  /* cold open — no deck, no ceremony, cards already face-up, IO bypassed */
   function renderColdOpen(sp) {
     D.tiers.setAttribute("hidden", "");
     D.ceremony.removeAttribute("hidden");
-    D.ceremony.setAttribute("aria-label", sp.key === "pull" ? "Tarot glance" : sp.key === "deep" ? "Tarot deep read" : "Tarot sitting");
+    D.ceremony.setAttribute("aria-label", ariaFor(sp.key));
     var st = TIER_STYLE[sp.key];
     D.stage.style.setProperty("--card-w", st.w);
     D.stage.style.setProperty("--ar", st.ar);
     D.stage.classList.toggle("is-pull", sp.key === "pull");
-    D.stage.classList.toggle("is-deep", sp.key === "deep");   // reopened deep read: same 3-over-2 on phones
+    D.stage.classList.toggle("is-deep", sp.key === "deep");
 
     D.intake.hidden = true;
+    D.pullNote.hidden = true;
     D.cutnote.hidden = true;
     D.mocknote.hidden = true;
-    // A reopened receipt still needs a way out — show ONLY the "New reading" button so the
-    // ?read= URL is never a dead end. Clicking it runs resetToTiers(), which clears the token
-    // from the URL, so a refresh no longer replays this old read.
+    D.pretierNav.hidden = true;
+
+    // A reopened receipt still needs a way out — a forward control + the bottom cluster.
     D.controls.hidden = false;
     D.cut.hidden = true;
     D.again.hidden = false;
-    D.again.textContent = "New reading";
+    D.again.textContent = againLabel(sp);      // was hardcoded "Begin a new sitting" for every tier
     D.status.hidden = true;
     D.hint.hidden = true;
     D.glow.style.display = "none";
     D.deck.style.display = "none";
     D.subline.hidden = true;
+    setMood("reading");
     setAccent(sp.paid || sp.key === "sitting" ? "gold" : "neutral");
 
     var d = dateFromToken(STATE.token);
@@ -458,22 +659,41 @@
     D.reopen.textContent = "Reopened from your record. Filed " + fmtDate(d) + ".";
 
     renderSkeleton(sp);
-    renderReadingSkeleton(sp);
-    // seat every card, face-up, no motion
+    renderReadingSkeleton(sp, true);   // coldOpen: never observe (no scroll dependence)
+
     var slots = D.spread.querySelectorAll(".slot");
     for (var i = 0; i < sp.n; i++) {
       var dd = STATE.drawn[i];
       var flip = mountCard(slots[i], i, sp, dd);
-      flip.style.transition = "none";              // cold open: no flip animation
+      flip.style.transition = "none";
       flip.classList.add("is-turned");
       flip.setAttribute("aria-disabled", "true");
       flip.disabled = true;
+      // deliver the label STATICALLY (R1 §5.6)
+      var label = $(".slot-label", slots[i]);
+      if (label && sp.positions[i]) {
+        var pe = $(".pos", label), se = $(".sub", label);
+        if (pe) pe.textContent = sp.positions[i];
+        if (se) se.textContent = sp.notes[i];
+        label.classList.add("is-answered", "no-anim");
+      }
       $(".card-travel", slots[i]).classList.add("is-mounted");
       slots[i].classList.add("is-dealt");
       fillReadCol(i, sp, dd);
     }
-    showClosing(sp);
-    if (sp.filed) stampAccession(accession(STATE.seed), d);
+
+    // reopen bypasses IO: force every reading item + head visible
+    var items = D.reading.querySelectorAll("[data-read-item]");
+    for (var j = 0; j < items.length; j++) items[j].classList.add("in");
+    var rh = $(".reading-head", D.reading);
+    if (rh) rh.classList.add("is-shown");
+
+    fillEpigraph(sp);
+    if (sp.key !== "pull") fillSynthesis(sp);
+    D.descend.hidden = false;                  // signpost shown for every reopened tier
+    showClose(sp);
+    if (sp.filed) stampAccession(accession(STATE.seed), d); else D.accession.hidden = true;
+    D.againBottom.textContent = againLabel(sp);   // was hardcoded "Begin a new sitting"
     D.stage.classList.add("is-launched");
   }
 
@@ -489,7 +709,8 @@
     flip.setAttribute("aria-label", faceDownLabel(i, sp));
 
     var back = el("div", "back-face");
-    back.innerHTML = backHTML();
+    back.innerHTML = backHTML(sp.positions[i], sp.notes[i]);   // filed → carries its question
+    if (sp.positions[i]) slot.classList.add("has-prompt");     // hold the flip a beat (CSS)
     var face = el("div", "face");
     face.innerHTML = faceHTML(dd.card, dd.reversed);
 
@@ -506,7 +727,7 @@
   function faceDownLabel(i, sp) {
     var sp2 = SPREADS[STATE.tierKey] || sp;
     if (sp2.key === "pull") return "Card, face down. Press to turn it.";
-    return sp2.positions[i] + ", card " + (i + 1) + " of " + sp2.n + ", face down. Press to turn it.";
+    return sp2.positions[i] + ", card " + (i + 1) + " of " + sp2.n + ", face down. Turn it to hear what it holds.";
   }
   function faceUpLabel(i, sp, dd) {
     var orient = dd.reversed ? "Reversed" : "Upright";
@@ -514,7 +735,7 @@
     return sp.positions[i] + ": " + dd.card.name + ", " + orient + ".";
   }
 
-  /* ---------------------------------------------------------------- cutlift */
+  /* ---------------------------------------------------------------- cutlift (PRESERVED) */
   function runCutlift(next) {
     D.status.hidden = false;
     D.status.textContent = "Filing.";
@@ -527,7 +748,7 @@
     }
   }
 
-  /* ---------------------------------------------------------------- deal */
+  /* ---------------------------------------------------------------- deal (PRESERVED choreography) */
   function stagger(n) { return n === 5 ? 0.42 : 0.52; }
 
   function runDeal() {
@@ -545,7 +766,6 @@
     }
 
     if (!motionOK) {
-      // reduced motion: opacity-only fade in, short waits, no transform
       D.stage.classList.add("is-launched");
       for (var j = 0; j < n; j++) {
         (function (idx) {
@@ -559,7 +779,6 @@
       return;
     }
 
-    // full motion — mount every card ON the deck first
     var deckRect = D.deck.getBoundingClientRect();
     for (var k = 0; k < n; k++) {
       var tr = travels[k], r = tr.getBoundingClientRect();
@@ -569,17 +788,12 @@
       tr.classList.add("is-mounted");
     }
 
-    // hold ~520ms of anticipation, then launch all from one committed frame.
-    // A forced reflow (not rAF) commits the on-deck transform so the travel animates —
-    // rAF is paused in throttled/backgrounded tabs; setTimeout + reflow is robust.
     setTimeout(function () {
-      void D.spread.offsetWidth;                  // commit the mounted (on-deck) transforms
-      D.stage.classList.add("is-launched");       // deck + glow fade
+      void D.spread.offsetWidth;                  // commit the on-deck transforms
+      D.stage.classList.add("is-launched");
       for (var m = 0; m < n; m++) {
         (function (idx) {
           var tr = travels[idx], land = lands[idx];
-          // transient will-change: only resident for this card's active travel+land
-          // window (~1.6s), then dropped — never left resident on an idle face-down card.
           tr.style.willChange = "transform";
           land.style.willChange = "transform";
           tr.addEventListener("transitionend", function () { tr.style.willChange = "auto"; }, { once: true });
@@ -592,10 +806,9 @@
           setTimeout(function () { slots[idx].classList.add("is-dealt"); }, (idx * stag + 0.54) * 1000);
         })(m);
       }
-      // last card's slam settles at (n-1)*stag+540+560ms; +320ms is the ritual's held
-      // breath after the final landing before the turn hint appears — the beat that
-      // separates "the filing is done" from "now turn one" so it doesn't feel rushed.
-      setTimeout(enterDealt, (n - 1) * stag * 1000 + 540 + 560 + 320);
+      // trailing post-deal hush extended to +560 (§8): "the filing is done" separates
+      // from "now turn one" (reduced-motion path uses the short fixed wait above).
+      setTimeout(enterDealt, (n - 1) * stag * 1000 + 540 + 560);
     }, 520);
   }
 
@@ -604,25 +817,23 @@
     D.status.hidden = true;
     announce("Awaiting the turn.", "polite");
     if (STATE.tierKey !== "pull") { D.hint.hidden = false; D.hint.textContent = turnHint(); }
-    // focus the first card so keyboard users can turn immediately
     var first = $(".flip", D.spread);
     if (first) first.focus();
   }
 
-  /* ---------------------------------------------------------------- turn hints */
+  /* ---------------------------------------------------------------- turn hints (PRESERVED copy) */
   function turnHint() {
     var n = SPREADS[STATE.tierKey].n, r = STATE.revealed, left = n - r;
     if (r === 0) return "Turn the first.";
     if (left === 1) return "One left. Turn the last.";
     if (n === 3) return "One turned, two to go.";
-    // n === 5
     if (r === 1) return "One turned, four to go.";
     if (r === 2) return "Two turned, three to go.";
     if (r === 3) return "Two left.";
     return "";
   }
 
-  /* ---------------------------------------------------------------- turn a card */
+  /* ---------------------------------------------------------------- turn a card (R1 + deferred read) */
   function turnCard(i) {
     if (STATE.phase !== "dealt" && STATE.phase !== "revealing") return;
     var sp = SPREADS[STATE.tierKey], dd = STATE.drawn[i];
@@ -637,54 +848,165 @@
       flip.style.willChange = "transform";
       flip.addEventListener("transitionend", function () { flip.style.willChange = "auto"; }, { once: true });
     }
+
+    // R1 — hand the question UP into the label, lift the printed prompt off the back;
+    // the flip itself is held back .18s in CSS so the ask departs before the answer turns.
+    var label = $(".slot-label", slot);
+    if (label && sp.positions[i]) {
+      var posEl = $(".pos", label), subEl = $(".sub", label);
+      if (posEl) posEl.textContent = sp.positions[i];
+      if (subEl) subEl.textContent = sp.notes[i];
+      label.classList.add("is-answered");
+    }
+    var bp = $(".back-prompt", slot);
+    if (bp) bp.classList.add("is-lifting");
+
     flip.classList.add("is-turned");
     flip.setAttribute("aria-label", faceUpLabel(i, sp, dd));
 
-    fillReadCol(i, sp, dd);
-
-    // assertive: one append per turn (never rewrite the region)
+    // assertive announce fires NOW — a screen reader never waits on visuals
     var read = bindRead(dd.card, dd.reversed);
     var pre = sp.key === "pull" ? "" : sp.positions[i] + ": ";
     announce(pre + dd.card.name + ", " + (dd.reversed ? "Reversed" : "Upright") + ". " + read, "assertive");
 
-    if (STATE.revealed >= sp.n) {
-      complete(sp);
-    } else if (sp.key !== "pull") {
-      D.hint.textContent = turnHint();
+    // the VISIBLE read arrives at/after the face — deferred, STATE-guarded (§6.4).
+    // R1/R6: the same beat surfaces the card's line at the TABLE (a sliver of the answer),
+    // then fills its full record below. The turn now speaks where the eye already is.
+    var idx = i, delay = motionOK ? 930 : 150;
+    setTimeout(function () {
+      if (STATE.phase !== "revealing" && STATE.phase !== "complete") return; // reset aborted the beat
+      if (STATE.drawn[idx] !== dd) return;                                    // spread rebuilt
+      sayAtStage(dd);
+      fillReadCol(idx, sp, dd);
+      if (STATE.revealed >= sp.n && !STATE.done) { STATE.done = true; complete(sp); }
+    }, delay);
+
+    // turn-hint lags the read reveal so two content changes never share a frame (§8/§13-25)
+    if (STATE.revealed < sp.n && sp.key !== "pull") {
+      setTimeout(function () {
+        if (STATE.phase === "revealing" || STATE.phase === "dealt") D.hint.textContent = turnHint();
+      }, delay + 200);
     }
+  }
+
+  /* R1/R6 — the card's line, spoken at the table on turn (the sliver of the answer) */
+  function sayAtStage(dd) {
+    if (!D.say) return;
+    var rr = computeRead(dd.card, dd.reversed);
+    D.say.textContent = rr.lead;
+    D.say.classList.remove("is-said");
+    void D.say.offsetWidth;                    // restart the fade for each successive turn
+    D.say.classList.add("is-said");
+  }
+  function clearSay() {
+    if (!D.say) return;
+    D.say.textContent = "";
+    D.say.classList.remove("is-said");
   }
 
   function fillReadCol(i, sp, dd) {
-    var col = D.reading.children[i];
-    col.innerHTML = "";
-    var head = el("p", "read-head");
-    var orient = dd.reversed ? "Reversed" : "Upright";
-    head.textContent = sp.key === "pull"
-      ? dd.card.name + ", " + orient
-      : sp.positions[i] + " — " + dd.card.name + ", " + orient;
-    var body = el("p", "read-body");
-    body.textContent = bindRead(dd.card, dd.reversed);
-    col.appendChild(head);
-    col.appendChild(body);
-    col.classList.add("is-revealed");
+    setMood("reading");                       // first item mounts → deepest register
+    var items = D.reading.querySelectorAll("[data-read-item]");
+    var item = items[i];
+    if (!item) return;
+
+    var faceWrap = $(".ri-card", item);
+    if (faceWrap) {
+      var face = document.createElement("div");
+      face.className = "ri-face" + (dd.reversed ? " card-rev" : "");
+      face.innerHTML = faceHTML(dd.card, dd.reversed);
+      faceWrap.appendChild(face);            // layered over the silhouette
+    }
+
+    var nameEl = $(".ri-name", item);
+    if (nameEl) {
+      var orient = dd.reversed ? "Reversed" : "Upright";
+      nameEl.innerHTML = '<span class="nm">' + esc(dd.card.name) + '</span>' +
+                         '<span class="ri-orient' + (dd.reversed ? " is-rev" : "") + '">' + orient + '</span>';
+    }
+
+    var wrap = $("[data-read-wrap]", item);
+    if (wrap) {
+      var rr = computeRead(dd.card, dd.reversed);
+      var h = '<p class="ri-lead' + (rr.voiced ? " is-voiced" : "") + '">' + esc(rr.lead) + '</p>';
+      if (rr.rest) {
+        h += '<div class="ri-record">' +
+               '<p class="ri-record-label">From the codex</p>' +
+               '<p class="ri-record-body">' + esc(rr.rest) + '</p>' +
+             '</div>';
+      }
+      wrap.innerHTML = h;
+    }
+
+    item.classList.add("is-revealed");
+    var head = $(".reading-head", D.reading);
+    if (head) head.classList.add("is-shown");
   }
 
-  /* ---------------------------------------------------------------- complete */
+  /* ---------------------------------------------------------------- epigraph + synthesis */
+  function fillEpigraph(sp) {
+    if (sp.key === "pull") return;
+    var m = $("[data-matter]", D.reading);
+    if (!m) return;
+    var q = (STATE.question || "").trim();
+    if (q) {
+      m.innerHTML = '<p class="rm-eyebrow">THE MATTER</p><p class="rm-quote">&ldquo;' + esc(q) + '&rdquo;</p>';
+    } else {
+      m.innerHTML = '<p class="rm-none">No question was put. The sitting stands on its own, position by position.</p>';
+    }
+    m.classList.add("is-shown");
+  }
+  function fillSynthesis(sp) {
+    var s = $("[data-synthesis]", D.reading);
+    if (!s) return;
+    var hasQ = !!(STATE.question || "").trim(), base, ret;
+    if (sp.key === "sitting") {
+      base = "Ground, crossing, turn — what it rests on, what stands against it, where it leans if nothing changes.";
+      ret = "That is what the sitting returns to it.";
+    } else {
+      base = "Ground and root beneath it, crossing and crown against and above it, and the turn where it leans if nothing changes.";
+      ret = "That is what the read returns to it.";
+    }
+    s.innerHTML = esc(base) + (hasQ ? '<br><span class="syn-return">' + esc(ret) + '</span>' : "");
+    s.hidden = false;
+  }
+
+  /* ---------------------------------------------------------------- complete + close */
   function complete(sp) {
     STATE.phase = "complete";
+    STATE.done = true;
     D.hint.hidden = true;
-    showClosing(sp);
+    D.cutnote.hidden = true;                  // the cut-note is spent — clear it from the reading view
+
+    fillEpigraph(sp);
+    if (sp.key !== "pull") fillSynthesis(sp);
+
+    // Pull has no descent, but its single read still needs to be present and reachable:
+    // surface it in place so the glance is self-contained.
+    if (sp.key === "pull") {
+      var firstItem = $("[data-read-item]", D.reading);
+      if (firstItem) firstItem.classList.add("in");
+    }
+    D.descend.hidden = false;                  // the ONE signpost down — now shown for every tier
+
+    showClose(sp);
     if (sp.filed) {
       var d = dateFromToken(STATE.token || makeToken());
       stampAccession(accession(STATE.seed), d);
+    } else {
+      D.accession.hidden = true;               // a Glance is not filed — never carry a stale stamp in
     }
     announce(closingLine(sp), "assertive");
 
+    // The climax points DOWN into the record, never at a reset. The stage-level "again" is
+    // retired here — restart lives only at the true end, in the close block — and focus lands
+    // on "Read it down", so a reflexive keyboard Enter descends into the reading instead of
+    // destroying the just-drawn record.
     D.cut.hidden = true;
     D.status.hidden = true;
-    D.again.hidden = false;
-    D.again.textContent = sp.key === "pull" ? "Another glance" : "New sitting";
-    D.again.focus();
+    D.again.hidden = true;
+    D.againBottom.textContent = againLabel(sp);
+    if (D.descendBtn) D.descendBtn.focus();
   }
 
   function closingLine(sp) {
@@ -692,33 +1014,79 @@
     if (sp.key === "sitting") return "The sitting is filed.";
     return "The read is filed, in full.";
   }
-  function showClosing(sp) {
-    D.closing.hidden = false;
+  function closeNote(sp) {
+    if (sp.key === "pull") return "No question was set down, so nothing here repeats.";
+    if (sp.key === "sitting") return "Three cards, read in the order they were asked to answer: what the matter rests on, what stands against it, where it tends, left as it stands.";
+    return "Five cards, read in full: what it rests on, what stands against it, what it grew from, what it reaches for, and where it tends.";
+  }
+  function againLabel(sp) {
+    if (sp.key === "pull") return "Another glance";
+    if (sp.key === "sitting") return "New sitting";
+    return "New reading";
+  }
+
+  function showClose(sp) {
+    D.closingBlock.hidden = false;
     D.closing.textContent = closingLine(sp);
+    D.closenote.textContent = closeNote(sp);
+    if (sp.key !== "pull") {
+      D.confidential.hidden = false;
+      D.confidential.textContent = "Kept for you, and no one else.";
+    } else {
+      D.confidential.hidden = true;
+    }
+    // one-shot seal gesture — never re-fires on re-scroll
+    if (!D.closingBlock.classList.contains("is-sealing")) {
+      void D.closingBlock.offsetWidth;
+      D.closingBlock.classList.add("is-sealing");
+    }
   }
   function stampAccession(code, d) {
     D.accession.hidden = false;
-    D.accession.innerHTML = '<span class="code">' + esc(code) + '</span>' +
+    D.accession.innerHTML = '<span class="cap">Accession</span>' +
+                            '<span class="code">' + esc(code) + '</span>' +
                             '<span class="filed">filed ' + esc(fmtDate(d)) + '</span>';
   }
 
-  /* ---------------------------------------------------------------- new sitting */
+  /* ---------------------------------------------------------------- new sitting / back */
   function resetToTiers() {
-    // clear the URL receipt so a fresh sitting isn't mistaken for a reopen
     if (history.replaceState) history.replaceState(null, "", location.pathname);
     STATE = { phase: "tier", tierKey: null, question: "", token: null, seed: null,
-              drawn: [], revealed: 0, replay: false, paidRun: false };
+              drawn: [], revealed: 0, replay: false, paidRun: false, done: false };
     D.ceremony.setAttribute("hidden", "");
     D.tiers.removeAttribute("hidden");
     D.spread.innerHTML = "";
     D.reading.innerHTML = "";
+    D.reading.className = "reading";
     D.stage.classList.remove("is-launched", "is-pull", "is-deep");
     D.glow.style.display = "";
     D.deck.style.display = "";
+
     D.intake.hidden = false;
+    D.intake.classList.remove("is-locked");
+    if (D.intakeLocked) D.intakeLocked.hidden = true;
+    D.input.readOnly = false;
+    D.input.removeAttribute("aria-readonly");
+    D.input.classList.remove("is-locked", "is-silent");
+    D.input.value = "";
+    D.input.placeholder = DEFAULT_PLACEHOLDER;
+    if (D.silence) D.silence.setAttribute("aria-pressed", "false");
+    D.pullNote.hidden = true;
+
     D.controls.hidden = false;
     D.subline.hidden = false;
     D.reopen.hidden = true;
+    D.pretierNav.hidden = true;
+    D.descend.hidden = true;
+    D.closingBlock.hidden = true;
+    D.closingBlock.classList.remove("is-sealing");
+    D.accession.hidden = true;                 // clear any prior stamp on the way back to the doors
+    D.again.hidden = true;
+    D.status.hidden = true;
+    D.hint.hidden = true;
+    clearSay();
+
+    setMood("tier");
     setAccent("neutral");
     refreshDoorCopy();
     var firstDoor = $(".door", D.tiers);
@@ -731,8 +1099,37 @@
       door.addEventListener("click", function () { chooseTier(door.getAttribute("data-tier")); });
     });
     D.cut.addEventListener("click", onCutButton);
-    D.again.addEventListener("click", resetToTiers);
-    D.input.addEventListener("input", function () { STATE.question = D.input.value; });
+    D.again.addEventListener("click", resetToTiers);           // stage/reopen restart → the chooser
+    // Close-block controls now lead to DIFFERENT places (no twin buttons to the same screen):
+    // "New sitting/reading" re-enters the same tier fresh; "Back to the room" returns to the doors.
+    D.againBottom.addEventListener("click", function () {
+      var k = STATE.tierKey;
+      if (k && SPREADS[k]) chooseTier(k); else resetToTiers();
+    });
+    D.backRoom.addEventListener("click", resetToTiers);
+    D.backTier.addEventListener("click", resetToTiers);
+
+    D.descendBtn.addEventListener("click", function () {
+      // begin the descent at the head of the record — the question echo, then "THE READING" —
+      // not mid-record at card one (falls through gracefully for the head-less pull tier)
+      var target = $("[data-matter]", D.reading) || $(".reading-head", D.reading) || $("[data-read-item]", D.reading);
+      if (target) target.scrollIntoView({ behavior: motionOK ? "smooth" : "auto", block: "start" });
+    });
+
+    D.input.addEventListener("input", function () {
+      if (D.input.classList.contains("is-silent")) setSilent(false);
+      STATE.question = D.input.value;
+    });
+    D.input.addEventListener("focus", function () {
+      if (!D.input.readOnly && D.input.classList.contains("is-silent")) setSilent(false);
+    });
+    if (D.silence) D.silence.addEventListener("click", function () {
+      setSilent(!D.input.classList.contains("is-silent"));
+    });
+    if (D.refresh) D.refresh.addEventListener("click", function () {
+      chipOffset = (chipOffset + 3) % POOL.length;
+      renderChips(chipOffset);
+    });
 
     var t;
     window.addEventListener("resize", function () {
@@ -743,33 +1140,11 @@
     });
   }
 
-  /* ------------------------------------------------------------- card finish */
-  function setCardVariant(v) {
-    document.documentElement.setAttribute("data-card", v);
-    try { localStorage.setItem("br_card_variant", v); } catch (e) {}
-    var btns = document.querySelectorAll("[data-cardvar]");
-    for (var i = 0; i < btns.length; i++) {
-      btns[i].classList.toggle("is-active", btns[i].getAttribute("data-cardvar") === v);
-    }
-  }
-  function initCardSwitch() {
-    var saved = null;
-    try { saved = localStorage.getItem("br_card_variant"); } catch (e) {}
-    var urlv = new URLSearchParams(location.search).get("card");
-    var v = (urlv === "copper" || urlv === "white") ? urlv : (saved === "copper" ? "copper" : "white");
-    setCardVariant(v);
-    var sw = document.querySelector("[data-cardswitch]");
-    if (sw) sw.addEventListener("click", function (e) {
-      var b = e.target && e.target.closest ? e.target.closest("[data-cardvar]") : null;
-      if (b) setCardVariant(b.getAttribute("data-cardvar"));
-    });
-  }
-
   /* ---------------------------------------------------------------- boot */
   function boot() {
     grab();
-    initCardSwitch();
-    // dev reset for the sitting gate
+    if (motionOK) document.documentElement.classList.add("js-anim");  // gate arrival entrance
+    initReadIO();
     if (new URLSearchParams(location.search).get("resetgate") === "1") {
       try { localStorage.removeItem("br_dr_sitting_used"); } catch (e) {}
     }

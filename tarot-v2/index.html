@@ -16,14 +16,14 @@
 
   <link rel="stylesheet" href="./style.css" />
 </head>
-<body>
+<body data-mood="tier">
+  <!-- MOOD LAYER — achromatic vignette that deepens by phase; never above z-index 0, never clickable -->
+  <div class="mood-field" aria-hidden="true"></div>
+
   <main class="room" id="room">
-    <!-- card-finish chooser (temporary — both variants saved; remove once the white/copper call is made) -->
-    <div class="cardswitch" data-cardswitch aria-label="Card finish">
-      <span class="cardswitch-label">Card</span>
-      <button type="button" class="cardswitch-btn" data-cardvar="white">White</button>
-      <button type="button" class="cardswitch-btn" data-cardvar="copper">Copper</button>
-    </div>
+    <!-- Persistent quiet wayfinding mark — the one way back to Blue Room, present in every state.
+         Reuses the freed corner where the card-finish chooser used to sit (D1). -->
+    <a class="leave-mark" data-leave href="../index.html" aria-label="Leave the room">Blue Room</a>
 
     <header class="masthead">
       <p class="kicker">THE DRAWING ROOM</p>
@@ -32,18 +32,21 @@
 
     <!-- ============ TIER DOORS ============ -->
     <section class="tiers" data-view="tier" aria-label="Choose a reading">
-      <button type="button" class="door" data-tier="pull">
-        <span class="door-title">A Glance</span>
-        <span class="door-sub" data-door-sub="pull">One card, for looking, not keeping.</span>
-      </button>
-      <button type="button" class="door" data-tier="sitting">
-        <span class="door-title">A Sitting</span>
-        <span class="door-sub" data-door-sub="sitting">Three cards to one question — your first is free.</span>
-      </button>
-      <button type="button" class="door" data-tier="deep">
-        <span class="door-title">The Deep Read</span>
-        <span class="door-sub" data-door-sub="deep">Five cards, the fuller record.<span class="door-price"> · $2.99</span></span>
-      </button>
+      <p class="tiers-lede">Choose, then ask, then cut. The cards answer once — after that, the record stands.</p>
+      <div class="tiers-doors">
+        <button type="button" class="door" data-tier="pull">
+          <span class="door-title">A Glance</span>
+          <span class="door-sub" data-door-sub="pull">One card, for looking, not keeping.</span>
+        </button>
+        <button type="button" class="door" data-tier="sitting">
+          <span class="door-title">A Sitting</span>
+          <span class="door-sub" data-door-sub="sitting">Three cards to one question — your first is free.</span>
+        </button>
+        <button type="button" class="door" data-tier="deep">
+          <span class="door-title">The Deep Read</span>
+          <span class="door-sub" data-door-sub="deep">Five cards, the fuller record.<span class="door-price"> · $2.99</span></span>
+        </button>
+      </div>
     </section>
 
     <!-- ============ CEREMONY ============ -->
@@ -51,22 +54,39 @@
 
       <p class="reopen-note" data-reopen hidden></p>
 
-      <p class="cut-note" data-cutnote>The cut does not choose the cards. It closes the question.</p>
-      <p class="mock-note" data-mocknote hidden>Dev mock — no real payment in this build.</p>
+      <!-- CONFIDED — the matter station leads, above the deck (filed tiers) -->
+      <div class="intake" data-intake>
+        <p class="intake-eyebrow">THE QUESTION</p>
+        <label class="intake-label" for="question">Lay a matter on the table.</label>
+        <p class="intake-guide">Ask it as it sits in you — plainly, in your own words. The cards answer what's asked, not what's meant.</p>
+        <input class="intake-input" id="question" type="text" maxlength="120" autocomplete="off"
+               placeholder="a question, in your own words" aria-describedby="intake-help" />
+        <p class="intake-help" id="intake-help">It is kept with your reading, and it does not choose the cards.</p>
+        <div class="intake-examples" data-intake-examples>
+          <span class="intake-examples-label">or lean on one —</span>
+          <div class="intake-chips" data-intake-chips role="group" aria-label="Example questions"></div>
+          <button type="button" class="intake-refresh" data-intake-refresh aria-label="Show other examples">&#10227; others</button>
+        </div>
+        <button type="button" class="intake-silence" data-intake-silence aria-pressed="false">Or leave it blank, and let the cards find the edge of it.</button>
+        <p class="intake-locked-note" data-intake-locked hidden>Asked. The record won't revise it.</p>
+      </div>
 
-      <!-- Stage -->
+      <!-- Pull replaces the whole matter station with one line -->
+      <p class="pull-note" data-pullnote hidden>A glance takes no question. Look, and let it pass.</p>
+
+      <!-- Stage — the table -->
       <div class="stage" data-stage>
         <div class="glow" data-glow aria-hidden="true"></div>
         <div class="deck" data-deck aria-hidden="true"></div>
         <div class="spread" data-spread></div>
       </div>
 
-      <!-- Intake — under the cards -->
-      <div class="intake" data-intake>
-        <label class="intake-label" for="question">Lay a matter on the table — optional</label>
-        <input class="intake-input" id="question" type="text" maxlength="120" autocomplete="off"
-               placeholder="a question, in your own words" />
-      </div>
+      <!-- R1/R6 — the card's small spoken payoff at the table, surfaced after each turn's beat -->
+      <p class="stage-say" data-say aria-hidden="true"></p>
+
+      <!-- COMMITTED — the cut -->
+      <p class="cut-note" data-cutnote>The cut does not choose the cards. It closes the question.</p>
+      <p class="mock-note" data-mocknote hidden></p>
 
       <!-- Controls row — exactly ONE visible control at a time -->
       <div class="controls" data-controls>
@@ -75,12 +95,36 @@
         <button type="button" class="btn btn-ghost" data-again hidden>New sitting</button>
       </div>
 
-      <p class="turn-hint" data-hint aria-live="polite" hidden></p>
+      <!-- Pre-cut escape — quiet secondary, never inside the controls row -->
+      <p class="pretier-nav" data-pretier-nav hidden>
+        <button type="button" class="link-quiet" data-back-tier>&#8249; Choose a different reading</button>
+      </p>
 
-      <!-- Reading panel -->
+      <p class="turn-hint" data-hint aria-hidden="true" hidden></p>
+
+      <!-- The one signpost down into the record — the primary post-turn act -->
+      <div class="descend" data-descend hidden>
+        <button type="button" class="descend-btn" data-descend-btn aria-label="Read the record below">
+          <span class="descend-btn-label">Read it down</span>
+          <span class="descend-btn-chev" aria-hidden="true">&#8964;</span>
+        </button>
+      </div>
+
+      <!-- ACCOMPANIED — the descent: each card follows to its own reading (JS-emitted structure) -->
       <div class="reading" data-reading></div>
-      <p class="closing" data-closing hidden></p>
-      <div class="accession" data-accession hidden></div>
+
+      <!-- FILED — the close -->
+      <div class="closing-block" data-closing-block hidden>
+        <div class="close-rule" aria-hidden="true"><span class="close-mark">&#9670;</span></div>
+        <p class="closing" data-closing></p>
+        <p class="close-note" data-closenote></p>
+        <p class="close-confidential" data-confidential hidden></p>
+        <div class="accession" data-accession hidden></div>
+        <div class="close-actions" data-close-actions>
+          <button type="button" class="btn btn-ghost" data-again-bottom></button>
+          <button type="button" class="link-quiet" data-back-room>Back to the room</button>
+        </div>
+      </div>
     </section>
 
     <!-- ============ SCREEN-READER LIVE REGIONS ============ -->
@@ -91,6 +135,7 @@
   <!-- data → voice → app -->
   <script src="./data.js"></script>
   <script src="./voice.js"></script>
+  <script src="./voice-ext.js"></script>
   <script src="./app.js" defer></script>
 </body>
 </html>
