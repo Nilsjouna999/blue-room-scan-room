@@ -55,11 +55,13 @@
   // hard per-frame guarantee, not an emergent target-sign property). FRAME_MARGIN = px the
   // outward crest is kept clear of the viewport edge (no hard clip on the near-edge lines).
   var FLOW_MARGIN=6, FRAME_MARGIN=10;
-  // BR-S231 [refine, one-at-a-time — RHYTHM high]: how far a plate's presence is dimmed by its
-  // distance from mid-band, so the plate NEAREST the centre holds full presence and neighbours
-  // recede — restores solo cadence on the 92% band without moving the shipped lines. Opacity
-  // only (blur/scale still key off true line-proximity), so a receding plate stays sharp+still.
-  var CENTER_DIM=0.5;
+  // BR-S232 [aperture, sole plate dissolve]: center-weight is now the ONLY plate dissolve (the
+  // opaque mask owns the line cut, and plate blur/scale are retired). Gentler (0.28, floor 0.72)
+  // so lit neighbours stay readable — the dark bands already supply the separation — and a HIGH
+  // floor so the relic still has body at the lip where the mask (not opacity) performs the final
+  // cut. THE one on-device knob to eyeball (0.20-0.35): too low => wall-of-stone; too near 1 =>
+  // dissolve finishes AWAY from the line. Its floor MUST stay well above 0.
+  var CENTER_DIM=0.28;
   // BR-S231 [refine, calmer settle — MOTION]: DAMP 0.24->0.36 (zeta ~0.32->~0.48) cuts the
   // release overshoot the inward clamp would otherwise arrest, so the line reads as settling
   // into its edge rather than being pinned at a wall. FOLLOW still drives outward arrival, and
@@ -71,7 +73,14 @@
   // membrane from a "HUD underline" toward a "quiet membrane" — every value here
   // is still multiplied by env at its call site, so the materialize/release
   // BREATHING is unchanged; only the resting ceiling + drift symmetry move.
-  var STROKE_A=0.78, GLOW_A=0.40, GLOW_BLUR=3, MAX_BLUR=5.5;
+  var STROKE_A=0.78, GLOW_A=0.40, GLOW_BLUR=3;
+
+  // BR-S232 [aperture, mask lip-softener]: FEATHER_LIP is the width AND shadowBlur of the mask
+  // inner-edge feather — the SOLE lip-softener now that plate blur is gone. A contour-FOLLOWING
+  // shadow-blurred re-stroke of the band inner edge (NOT a fixed-y gradient, which misaligns at
+  // the bulge crest — exactly where a relic presses). Widen this (never re-add plate blur) if the
+  // lip ever reads as a hard guillotine.
+  var FEATHER_LIP=3.5;
 
   // BR PULSE-2 [upper, latch/hold windows]: expressed as fractions of the LIVING
   // BAND (LOWER_Y-UPPER_Y) so a later UPPER_FRAC/LOWER_FRAC retune auto-rescales
@@ -92,6 +101,7 @@
   var LOWER_ENT=0.42;
 
   var canvas, ctx;
+  var maskGrad=null;   // BR-S232 [aperture]: cached viewport-space vertical bg-match gradient for the occluding bands; rebuilt in resize() (keys off H)
   var W=0, H=0, DPR=1, UPPER_Y=0, LOWER_Y=0, MID_Y=0;
   var lines=[], particles=[], PMAX=260, last=0, accT=0;
   var upperEnv=0, lowerEnv=0;     // BR PULSE-2: split per-line presence — upper=quintic latch/hold, lower=content-anchored fade. Written each frame by aboutEnvelope(); zero per-frame alloc.
@@ -128,6 +138,22 @@
     refreshBaselines();
   }
   function refreshBaselines(){ if(lines.length===2){ lines[0].baseY=H*UPPER_FRAC; lines[1].baseY=H*LOWER_FRAC; } UPPER_Y=H*UPPER_FRAC; LOWER_Y=H*LOWER_FRAC; MID_Y=(UPPER_Y+LOWER_Y)/2; }
+  // BR-S232 [aperture]: single viewport-space vertical gradient that matches the fixed body radial
+  // (styles.css body: radial-gradient(110% 80% at 50% -10%, #161411, --ink-900 #100f0c 55%,
+  // --ink-950 #0a0b0d 100%); background-attachment:fixed). The overlay canvas is position:fixed;
+  // inset:0, so a vertical linear in canvas space is seamless with the page's vertical gradient
+  // component at the ONLY strips the bands ever touch (top ~[0,0.04H] ~= #161411, bottom
+  // ~[0.96H,H] ~= #0a0b0d) — the ellipse's horizontal variance is negligible there. Reused for
+  // BOTH bands, uniform across x (NOT edgeGrad — its x-edge alpha fade would leak page content
+  // into the corners). FALLBACK if it ever reads unseamless on-device: collapse to a flat
+  // ctx.fillStyle='#0a0b0d' (one-line swap).
+  function buildMaskGrad(){
+    var g=ctx.createLinearGradient(0,0,0,H);
+    g.addColorStop(0,'#161411');   // matches the body radial's 0% top colour
+    g.addColorStop(0.5,'#100f0c'); // --ink-900
+    g.addColorStop(1,'#0a0b0d');   // --ink-950 (LOCKED base)
+    return g;
+  }
   function resize(){
     DPR=Math.min(2, window.devicePixelRatio||1);
     var nW=window.innerWidth, nH=window.innerHeight, widthChanged=(nW!==W)||lines.length!==2;
@@ -136,6 +162,7 @@
     canvas.width=Math.round(W*DPR); canvas.height=Math.round(H*DPR);
     canvas.style.width=W+'px'; canvas.style.height=H+'px';
     ctx.setTransform(DPR,0,0,DPR,0,0);
+    maskGrad=buildMaskGrad();   // BR-S232: rebuild the bg-match gradient on every resize (keys off H)
     if(widthChanged) rebuildLattice(); else refreshBaselines();
   }
 
@@ -278,27 +305,23 @@
       // Blend the position-based dimming toward "fully lit" by env so the plate
       // reaction breathes in/out with the lines: env=0 -> untouched, env=1 -> full
       // position-based effect. Kills any dim-on-appear pop.
-      var effPos = 1 - env*(1 - life);      // TRUE line-proximity presence — drives the dissolve (blur/scale) ONLY
+      var effPos = 1 - env*(1 - life);      // TRUE line-proximity presence — now feeds the pointer gate + particle shed ONLY (the opaque mask owns the line dissolve)
       // BR-S231 [refine, one-at-a-time — RHYTHM high]: the 92% band lets two engraved plates
       // read at full presence at once (fully-lit zone ~= plate spacing) -> a wall of stone.
       // Center-weight the plate's *opacity* by its distance from mid-band so only the plate
-      // nearest the centre holds full presence and neighbours recede. cy is transform-invariant
-      // (center-origin scale), so this is pure scroll-driven dimming, not a feedback hunt. Applied
-      // to opacity ONLY — a receding plate stays SHARP + FULL-SCALE (still + readable), never
-      // blurred just for being off-centre. env-gated so env=0 leaves it fully lit (no appear-pop).
+      // nearest the centre holds full presence and neighbours recede. cy is transform-invariant,
+      // so this is pure scroll-driven dimming, not a feedback hunt.
       var cw = 1 - CENTER_DIM * smoothstep(0, 0.5*(LOWER_Y-UPPER_Y), Math.abs(cy-MID_Y));
-      var effLife = 1 - env*(1 - life*cw);  // center-weighted presence — drives OPACITY (+ pointer gate)
-      // BR-S230 [item 3, calm the boxes]: a lit plate must sit STILL and readable, dissolving
-      // cleanly ONLY at the lines. scale-only (center-origin, so cy is invariant → stable
-      // measure), gentler floor (0.97), and the blur layer attaches only past the dissolve onset
-      // so a lit/near-lit plate never toggles its compositing layer. BR-S231: blur/scale key off
-      // effPos (line-proximity) NOT the center-weight, and the blur RAMPS from 0 at the d>=0.10
-      // onset (was an instant 0.55px pop) so the dissolve is monotonic from the threshold.
-      var dPos=1-effPos, sc=0.97+0.03*effPos;
-      el.style.opacity=effLife.toFixed(3);
-      el.style.filter=dPos<0.10?'':'blur('+((dPos-0.10)/0.90*MAX_BLUR).toFixed(2)+'px)';
-      el.style.transform='scale('+sc.toFixed(3)+')';
-      el.style.pointerEvents=effLife<0.4?'none':'';
+      // BR-S232 [aperture, resolved conflict A2]: the opaque mask now owns the LINE dissolve, so
+      // fading opacity at the line too would be a fade-AND-sink double-up. effCW keeps ONLY the
+      // orthogonal solo-cadence center-weight (no line-proximity term) — the relic stays high-
+      // opacity right up to the lip so the MASK performs the cut on a VISIBLE relic (soft feathered
+      // lip, unforgiving result). Both opacity-dim and the mask key off the same env => no
+      // independent-failure path. Plate blur + scale are RETIRED (the mask feather is the sole
+      // lip-softener; scale insetting from the contour would de-sync the bulge from the relic edge).
+      var effCW = 1 - env*(1 - cw);         // center-weighted presence — drives OPACITY only
+      el.style.opacity=effCW.toFixed(3);
+      el.style.pointerEvents=(effPos<0.4)?'none':'';   // BR-S232: gate by TRUE line-proximity so a past-line relic the mask has covered can't be hovered/clicked while invisible (opacity ~effCW leaves it in the DOM)
       touched.push(el);
       // box carries raw position-based life: the line deflection is geometric and
       // particle shed keys off the true line crossing; env scales their visible alpha.
@@ -373,17 +396,81 @@
     g.addColorStop(0,'rgba(255,255,255,0)'); g.addColorStop(e,'rgba(255,255,255,'+alpha+')');
     g.addColorStop(1-e,'rgba(255,255,255,'+alpha+')'); g.addColorStop(1,'rgba(255,255,255,0)'); return g;
   }
+  // BR-S232 [refine, line/mask coverage-SYNC — MOTION risk-1 + RHYTHM establish-ramp transient]:
+  // render the lit lip through the EXACT coverage-lerp the occluding band uses (drawBand's cy), so
+  // during the env iris (entrance/exit) the white lip RIDES the mask inner edge instead of floating
+  // at the fixed true contour ahead of the closing dark (which briefly showed a strip of beyond-the-
+  // line page content between the darkening edge and the line — breaking "the line IS the edge"
+  // exactly while the aperture is performed). top => cy=contour*env ; bottom => cy=H-(H-contour)*env,
+  // bit-identical to drawBand. At env=1 cy==contour, so the HOLD state is byte-for-byte unchanged;
+  // only the transient syncs. Thickness (th) is added in device px AFTER the lerp (never scaled).
   function drawLine(L,t,env){
-    var N=L.N, xs=L.xs, y=L.y, v=L.v, baseY=L.baseY, i, th;
+    var N=L.N, xs=L.xs, y=L.y, v=L.v, baseY=L.baseY, i, th, c, cy, cp, cpy, cc, ccy;
+    var top=(baseY<MID_Y);
     ctx.beginPath();
-    for(i=0;i<N;i++){ th=thick(xs[i],v[i],t); ctx.lineTo(xs[i], baseY+y[i]-th); }
-    for(i=N-1;i>=0;i--){ th=thick(xs[i],v[i],t); ctx.lineTo(xs[i], baseY+y[i]+th); }
+    for(i=0;i<N;i++){ c=baseY+y[i]; cy=top? c*env : H-(H-c)*env; th=thick(xs[i],v[i],t); ctx.lineTo(xs[i], cy-th); }
+    for(i=N-1;i>=0;i--){ c=baseY+y[i]; cy=top? c*env : H-(H-c)*env; th=thick(xs[i],v[i],t); ctx.lineTo(xs[i], cy+th); }
     ctx.closePath(); ctx.fillStyle=edgeGrad(0.10*env); ctx.fill();
-    ctx.beginPath(); ctx.moveTo(xs[0], baseY+y[0]);
-    for(i=1;i<N;i++){ var xm=(xs[i-1]+xs[i])/2, ym=(baseY+y[i-1]+baseY+y[i])/2; ctx.quadraticCurveTo(xs[i-1], baseY+y[i-1], xm, ym); }
-    ctx.lineTo(xs[N-1], baseY+y[N-1]);
+    ctx.beginPath(); c=baseY+y[0]; cy=top? c*env : H-(H-c)*env; ctx.moveTo(xs[0], cy);
+    for(i=1;i<N;i++){ cp=baseY+y[i-1]; cpy=top? cp*env : H-(H-cp)*env; cc=baseY+y[i]; ccy=top? cc*env : H-(H-cc)*env; var xm=(xs[i-1]+xs[i])/2, ym=(cpy+ccy)/2; ctx.quadraticCurveTo(xs[i-1], cpy, xm, ym); }
+    c=baseY+y[N-1]; cy=top? c*env : H-(H-c)*env; ctx.lineTo(xs[N-1], cy);
     ctx.strokeStyle=edgeGrad(STROKE_A*env); ctx.lineWidth=1.1; ctx.lineJoin='round';
     ctx.shadowColor='rgba(255,255,255,'+(GLOW_A*env).toFixed(3)+')'; ctx.shadowBlur=GLOW_BLUR; ctx.stroke(); ctx.shadowBlur=0;
+  }
+  // BR-S232 — THE APERTURE: two OPAQUE occluding bands that turn the living band between the
+  // lines into a SLIT you look through. Everything BEYOND each line goes to the page's own dark
+  // (bg-matched maskGrad), so a relic surfaces up out of the dark into the opening and sinks back
+  // as it passes a line. The band's INNER EDGE reuses drawLine's EXACT per-column baseY+y[i]
+  // quadratic-midpoint contour, so the outward bulge BOWS the slit edge where a relic presses.
+  //
+  // SAFETY (the #1 regression vector): the TOP band is scaled by upperEnv ONLY and the BOTTOM by
+  // lowerEnv ONLY (NEVER vis=max) — during the "We hold the candle" intro lowerEnv=0 while
+  // upperEnv>0, so a vis-driven bottom band would black out a strip while its line is absent.
+  // Each band is COVERAGE-lerp'd (env scales the inner-edge y, i.e. band HEIGHT, not alpha) and
+  // wrapped in if(env>0.001): at env=0 the inner edge collapses onto the frame edge => ZERO height
+  // => paint-free even here, strictly after frame()'s vis<=0.001 early-return. Fills run at
+  // globalAlpha=1, shadowBlur=0, source-over.
+  function drawBands(){
+    if(!maskGrad) return;
+    if(upperEnv>0.001) drawBand(lines[0], upperEnv, true,  '#151310');   // top: local bg near 0.04H (~#161411/#151310)
+    if(lowerEnv>0.001) drawBand(lines[1], lowerEnv, false, '#0a0b0d');   // bottom: local bg near 0.96H (~--ink-950)
+  }
+  // One occluding band. top=true => fills [0 .. inner-edge]; top=false => [inner-edge .. H].
+  // Coverage-lerp: inner-edge y = top ? contour*env : H-(H-contour)*env  (env=0 => collapses onto
+  // the frame edge => zero height). edgeCol = the mask base colour used for the contour-following
+  // shadow-blurred feather (the SOLE lip-softener). Contour trace is IDENTICAL to drawLine's.
+  function drawBand(L, env, top, edgeCol){
+    var N=L.N, xs=L.xs, y=L.y, baseY=L.baseY, i, c, cy, pc, pcy, xm, ym;
+    ctx.globalAlpha=1; ctx.shadowBlur=0;
+    // --- opaque fill ---
+    ctx.beginPath();
+    c=baseY+y[0]; cy = top ? c*env : H-(H-c)*env;
+    ctx.moveTo(xs[0], cy);
+    for(i=1;i<N;i++){
+      pc=baseY+y[i-1]; pcy = top ? pc*env : H-(H-pc)*env;
+      c =baseY+y[i];   cy  = top ? c*env  : H-(H-c)*env;
+      xm=(xs[i-1]+xs[i])/2; ym=(pcy+cy)/2;
+      ctx.quadraticCurveTo(xs[i-1], pcy, xm, ym);
+    }
+    c=baseY+y[N-1]; cy = top ? c*env : H-(H-c)*env;
+    ctx.lineTo(xs[N-1], cy);
+    if(top){ ctx.lineTo(W,0); ctx.lineTo(0,0); } else { ctx.lineTo(W,H); ctx.lineTo(0,H); }
+    ctx.closePath();
+    ctx.fillStyle=maskGrad; ctx.fill();
+    // --- feather (contour-FOLLOWING, so it tracks the bulge crest where a relic presses) ---
+    ctx.beginPath();
+    c=baseY+y[0]; cy = top ? c*env : H-(H-c)*env;
+    ctx.moveTo(xs[0], cy);
+    for(i=1;i<N;i++){
+      pc=baseY+y[i-1]; pcy = top ? pc*env : H-(H-pc)*env;
+      c =baseY+y[i];   cy  = top ? c*env  : H-(H-c)*env;
+      xm=(xs[i-1]+xs[i])/2; ym=(pcy+cy)/2;
+      ctx.quadraticCurveTo(xs[i-1], pcy, xm, ym);
+    }
+    c=baseY+y[N-1]; cy = top ? c*env : H-(H-c)*env;
+    ctx.lineTo(xs[N-1], cy);
+    ctx.strokeStyle=edgeCol; ctx.lineWidth=FEATHER_LIP; ctx.lineJoin='round';
+    ctx.shadowColor=edgeCol; ctx.shadowBlur=FEATHER_LIP; ctx.stroke(); ctx.shadowBlur=0;
   }
   function emitParticles(boxes){
     for(var b=0;b<boxes.length;b++){ var box=boxes[b]; if(box.life<0.06||box.life>0.62)continue;
@@ -417,11 +504,18 @@
     var boxes=gatherBoxes(envPlate);
 
     if(reduce){                               // static: flat lines, each independently env-faded, plates fully lit
-      ctx.clearRect(0,0,W,H); ctx.lineWidth=1;
+      ctx.clearRect(0,0,W,H);
+      drawBands();                            // BR-S232: static coverage-lerp'd bands (physics never runs => y stays 0 => flat contour), each still gated by its own env; the flat white strokes below sit on the lip
+      // BR-S232 [refine, line/mask coverage-SYNC — reduced-motion parity]: draw each flat lip at the
+      // SAME coverage-lerp'd y as its band edge (not the bare UPPER_Y/LOWER_Y), so the static lip
+      // rides the band edge through the env iris here too. y stays 0 in this path, so contour==perch.
+      var uy=UPPER_Y*upperEnv;                // top band edge = contour*env
+      var ly=H-(H-LOWER_Y)*lowerEnv;          // bottom band edge = H-(H-contour)*env
+      ctx.lineWidth=1;
       ctx.strokeStyle='rgba(255,255,255,'+(STROKE_A*upperEnv).toFixed(3)+')';
-      ctx.beginPath(); ctx.moveTo(0,UPPER_Y); ctx.lineTo(W,UPPER_Y); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(0,uy); ctx.lineTo(W,uy); ctx.stroke();
       ctx.strokeStyle='rgba(255,255,255,'+(STROKE_A*lowerEnv).toFixed(3)+')';
-      ctx.beginPath(); ctx.moveTo(0,LOWER_Y); ctx.lineTo(W,LOWER_Y); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(0,ly); ctx.lineTo(W,ly); ctx.stroke();
       clearTouched();
       requestAnimationFrame(frame); return;
     }
@@ -429,6 +523,7 @@
     for(l=0;l<lines.length;l++) computeTarget(lines[l], boxes, t);
     accT+=dt; var steps=0; while(accT>=STEP && steps<3){ for(l=0;l<lines.length;l++) integrate(lines[l]); accT-=STEP; steps++; }
     ctx.clearRect(0,0,W,H);
+    drawBands();                              // BR-S232: opaque bg-matched occluding bands OWN the cut — drawn FIRST so the white line reads as the lit lip on top of the mask (strictly after the vis<=0.001 gate above, so a non-About view is never occluded)
     drawLine(lines[0], t, upperEnv);          // upper (UPPER_FRAC): quintic latch/hold, releases at the very end
     drawLine(lines[1], t, lowerEnv);          // lower (LOWER_FRAC): content-anchored fade (last-plate exit)
     emitParticles(boxes); stepParticles(); drawParticles();
