@@ -25,6 +25,16 @@
   .disc-wrap{position:absolute;left:7.143%;top:9.143%;width:85.714%;height:68.571%;z-index:2;
     filter:drop-shadow(0 16px 26px rgba(0,0,0,.55)) drop-shadow(0 4px 8px rgba(0,0,0,.4));}
   #wheel{display:block;width:100%;height:100%;border-radius:50%;transform-origin:50% 50%}
+  /* ---- wagon-wheel strobe overlay: rides #wheel's rotation, fades before the landing; under .glass ---- */
+  .strobe{
+    position:absolute; inset:0; width:100%; height:100%;
+    border-radius:50%;
+    pointer-events:none;
+    transform-origin:50% 50%;
+    transition:none;          /* rAF owns the transform, same as #wheel */
+    opacity:0;                /* invisible at rest; only a live spin lifts it */
+    will-change:transform,opacity;
+  }
 
   /* ---- compass glass: fixed dome cover over the disc, under the pointer; never rotates ---- */
   .glass{
@@ -134,7 +144,7 @@
       </defs>
     </svg>
 
-    <div class="disc-wrap"><canvas id="wheel" width="480" height="480" role="img" aria-label="Fortune wheel"></canvas></div>
+    <div class="disc-wrap"><canvas id="wheel" width="480" height="480" role="img" aria-label="Fortune wheel"></canvas><canvas id="strobe" class="strobe" width="480" height="480" aria-hidden="true"></canvas></div>
 
     <!-- fixed compass glass: over the disc, under the pointer; never rotates -->
     <div class="glass" aria-hidden="true"></div>
@@ -189,6 +199,24 @@
   var FREE_DIST  = 0.95;   // fL — distance covered by end of coast (brake covers only ~5% → a tad, precise)
   var DROOP      = 0.05;   // k  — gentle coast velocity sag so it reads as a real coasting wheel (0 = dead-flat)
   var DETENT_DEG = 1.6;    // tiny compass-needle settle at the very instant of landing (0 = pure crisp stop)
+
+  // ---- draw-length selector (swaps only ms + turn-count fed to the UNCHANGED normalized curve) ----
+  var DRAW       = 'normal';                                  // 'quick' | 'normal' | 'long'
+  var DRAW_MS    = { quick:2600, normal:SPIN_MS, long:4400 }; // 'normal' === current SPIN_MS
+  var DRAW_TURNS = { quick:[6,3], normal:[8,4], long:[12,5] };// [base, randSpan]; 'normal' === 8+floor(rand*4)
+
+  // ---- wagon-wheel strobe layer (additive, rides main θ, dissolves before landing) ----
+  var STROBE_SPOKES        = 24;      // S — 4× the 6 wedges; T = 360/24 = 15°
+  var STROBE_R_IN          = 112;     // annulus inner radius (disc-space, R_WEDGE=232)
+  var STROBE_R_OUT         = 182;     // annulus outer radius (inside the vignette)
+  var STROBE_LINE_W        = 1;       // hairline
+  var STROBE_BAKE_ALPHA    = 0.16;    // per-stroke peak alpha (feathered 0->peak->0); on-screen ~0.06-0.08
+  var STROBE_BLOOM         = 1.5;     // shadowBlur ghost bloom
+  var STROBE_COLOR         = '200,209,224';   // cool silver rgb (used as rgba(...,a))
+  var STROBE_LAYER_OPACITY = 1.0;     // element-opacity cap / max envelope value
+  var STROBE_FADE_IN_P     = 0.05;    // ramp-in end (p) -> ~160ms, never pops
+  var STROBE_FADE_OUT_START_P = 0.78; // dissolve begins (p)
+  var STROBE_FADE_END_P    = 0.88;    // fully gone (p) — < FREE_END(0.90): landing is uncontested
 
   // ---- state ---- (unchanged functional model)
   var state = { options: [], draft: '', preview: null, spinning: false, result: null, winner: null };
@@ -292,39 +320,15 @@
   // ---- shared obsidian glass light rig (fixed in disc-space; caller supplies the clip) ----
   // screen-composited light lifts each jewel base a fixed amount (never blows to white, hue kept);
   // computed disc-space + only CLIPPED per wedge -> six hues share one dome/rim = one lacquered sphere.
+  // PERF BAKE: dome+belly+rim are pre-rendered once (ensureGloss, screen-blit) and the vignette once
+  // (ensureVig, source-over blit). Geometry is fixed at R_WEDGE / cx=cy=DISC_S/2, so both call sites
+  // (draw + drawTransition, both pass R_WEDGE) reproduce the live geometry exactly; passed cx/cy/R unused.
   function glassRig(ctx, cx, cy, R){
     ctx.save();
     ctx.globalCompositeOperation = 'screen';
-    // A) dome sheen (primary specular) — warm-neutral grey, upper-left-of-center
-    var dome = ctx.createRadialGradient(216,136,0, 216,136,R*1.05);
-    dome.addColorStop(0.00,'rgba(60,60,64,0.55)');
-    dome.addColorStop(0.12,'rgba(60,60,64,0.40)');
-    dome.addColorStop(0.30,'rgba(60,60,64,0.18)');
-    dome.addColorStop(0.60,'rgba(60,60,64,0.05)');
-    dome.addColorStop(1.00,'rgba(60,60,64,0)');
-    ctx.fillStyle = dome; ctx.fillRect(cx-R,cy-R,R*2,R*2);
-    // B) belly pool (secondary reflection) — low-center
-    var belly = ctx.createRadialGradient(264,316,0, 264,316,R*0.62);
-    belly.addColorStop(0.00,'rgba(32,32,34,0.34)');
-    belly.addColorStop(0.35,'rgba(32,32,34,0.15)');
-    belly.addColorStop(0.70,'rgba(32,32,34,0.04)');
-    belly.addColorStop(1.00,'rgba(32,32,34,0)');
-    ctx.fillStyle = belly; ctx.fillRect(cx-R,cy-R,R*2,R*2);
-    // C) rim catch — cool crescent on the lower / lower-right circumference (upper rim stays dark)
-    ctx.lineCap = 'round';
-    ctx.strokeStyle = 'rgba(72,72,80,0.14)'; ctx.lineWidth = 8;
-    ctx.beginPath(); ctx.arc(cx,cy,R-1.5, 15*Math.PI/180, 130*Math.PI/180); ctx.stroke();
-    ctx.strokeStyle = 'rgba(72,72,80,0.50)'; ctx.lineWidth = 3;
-    ctx.beginPath(); ctx.arc(cx,cy,R-1.5, 35*Math.PI/180, 100*Math.PI/180); ctx.stroke();
-    // D) edge vignette (source-over) — darken to pure black at the circumference so the orb seats on the room
+    ctx.drawImage(ensureGloss(), 0,0, DISC_S, DISC_S);
     ctx.globalCompositeOperation = 'source-over';
-    var vig = ctx.createRadialGradient(cx,cy,0, cx,cy,R);
-    vig.addColorStop(0.00,'rgba(0,0,0,0)');
-    vig.addColorStop(0.62,'rgba(0,0,0,0)');
-    vig.addColorStop(0.80,'rgba(0,0,0,0.22)');
-    vig.addColorStop(0.92,'rgba(0,0,0,0.55)');
-    vig.addColorStop(1.00,'rgba(0,0,0,0.92)');
-    ctx.fillStyle = vig; ctx.fillRect(cx-R,cy-R,R*2,R*2);
+    ctx.drawImage(ensureVig(), 0,0, DISC_S, DISC_S);
     ctx.restore();
   }
 
@@ -404,7 +408,7 @@
     // 6) thin dark edge seating the painted disc on black; hub (suppressed on the clean empty orb)
     ctx.save(); ctx.beginPath(); ctx.arc(cx,cy,R-1,0,Math.PI*2); ctx.lineWidth=2.5; ctx.strokeStyle='rgba(18,11,5,0.85)'; ctx.stroke(); ctx.restore();
     var isEmptyOrb = (n===1 && !segs[0].text);
-    if (!isEmptyOrb) drawHub(ctx,cx,cy,HUB_R);   // brass axle-cap once wedges exist; clean sphere when empty
+    if (!isEmptyOrb) ctx.drawImage(ensureHub(),0,0,DISC_S,DISC_S);   // brass axle-cap once wedges exist; clean sphere when empty
   }
 
   // ======================================================================
@@ -416,9 +420,9 @@
   // ---- tuning knobs ----
   var DUR_POP   = 360;   // ms — re-partition pop (adds 1->2 .. 5->6); 7 held steps -> ~51ms/step
   var DUR_FIRST = 240;   // ms — first add (single-wedge confirm punch)
-  var DUR_REMOVE= 560;   // ms — full remove (vanish beat + gravity reflow)
-  var VANISH_FRAC = 0.28;// fraction of a REMOVE spent on the blocky vanish
-  var OVERSHOOT = 0.15;  // back-out overshoot of the gravity settle (~9% bounce)
+  var DUR_REMOVE= 520;   // was 560 — a continuous eased curve reads faster at equal ms; real snap-up
+  var VANISH_FRAC = 0.24;// was 0.28 — beat A ≈ 125ms; trim comes out of the dissolve, reflow keeps ~395ms
+  var OVERSHOOT = 0.11;  // was 0.15 — softer back-out; survivors glide closed, still alive not floaty
 
   // BLOCKY POP — held waypoints for the re-partition scalar s, jump-cut (never tweened between).
   // The hold-then-snap rhythm is the stop-motion "chunk"; 1.18 = the overshoot slam past full, then a
@@ -429,9 +433,10 @@
   function popS(p){ return POP_STEPS[Math.min(POP_STEPS.length-1, Math.floor(p*POP_STEPS.length))]; }
   // back-out settle — the shared "gravity into place" curve (overshoot then damp); SMOOTH by design (the remove reflow)
   function settle(p,s){ var u=p-1; return 1+(s+1)*u*u*u+s*u*u; }
-  // stepped radius retract — the "there -> chunk -> chunk -> gone" blocky vanish that opens the gap
-  var VANISH_STEPS = [1, 0.56, 0.24, 0];
-  function vanishRadius(pA){ return VANISH_STEPS[Math.min(VANISH_STEPS.length-1, Math.floor(pA*VANISH_STEPS.length))]; }
+  // smooth vanish — eased S radius collapse + a quadratic alpha dissolve (the removed wedge fades as it shrinks)
+  function easeInOutCubic(t){ return t<0.5 ? 4*t*t*t : 1-Math.pow(-2*t+2,3)/2; }
+  function vanishRadius(pA){ return 1 - easeInOutCubic(Math.min(1,pA)); }        // smooth S collapse 1->0
+  function vanishAlpha(pA){ var t = Math.min(1, pA/0.75); return (1-t)*(1-t); }  // fade to 0 by 75% of beat A
   function prefersReduced(){ return !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches); }
 
   var anim = null;     // active wheel transition, or null (idle)
@@ -447,6 +452,100 @@
     tctx.setTransform(dpr,0,0,dpr,0,0);
     weather(tctx, DISC_S/2, DISC_S/2, 0, R_WEDGE, 0x5EED09, {});
     return texCanvas;
+  }
+
+  // ---- perf-baked light layers (dome+belly+rim / vignette / hub) — geometry-fixed, blitted every frame ----
+  var glossCanvas = null, vigCanvas = null, hubCanvas = null;
+  function makeDiscCanvas(){
+    var c = document.createElement('canvas');
+    c.width = DISC_S*dpr; c.height = DISC_S*dpr;
+    var g = c.getContext('2d'); g.setTransform(dpr,0,0,dpr,0,0);   // same recipe as ensureTexture
+    return c;                                                       // drawImage(c,0,0,DISC_S,DISC_S) maps 1:1
+  }
+  // dome + belly + rim, baked source-over onto transparent (caller blits with 'screen')
+  function ensureGloss(){
+    if (glossCanvas) return glossCanvas;
+    glossCanvas = makeDiscCanvas();
+    var g = glossCanvas.getContext('2d'), cx = DISC_S/2, cy = DISC_S/2, R = R_WEDGE;
+    // A) dome sheen (verbatim stops)
+    var dome = g.createRadialGradient(216,136,0, 216,136,R*1.05);
+    dome.addColorStop(0.00,'rgba(60,60,64,0.55)'); dome.addColorStop(0.12,'rgba(60,60,64,0.40)');
+    dome.addColorStop(0.30,'rgba(60,60,64,0.18)'); dome.addColorStop(0.60,'rgba(60,60,64,0.05)');
+    dome.addColorStop(1.00,'rgba(60,60,64,0)');
+    g.fillStyle = dome; g.fillRect(cx-R,cy-R,R*2,R*2);
+    // B) belly pool (verbatim stops)
+    var belly = g.createRadialGradient(264,316,0, 264,316,R*0.62);
+    belly.addColorStop(0.00,'rgba(32,32,34,0.34)'); belly.addColorStop(0.35,'rgba(32,32,34,0.15)');
+    belly.addColorStop(0.70,'rgba(32,32,34,0.04)'); belly.addColorStop(1.00,'rgba(32,32,34,0)');
+    g.fillStyle = belly; g.fillRect(cx-R,cy-R,R*2,R*2);
+    // C) rim catch (verbatim)
+    g.lineCap = 'round';
+    g.strokeStyle = 'rgba(72,72,80,0.14)'; g.lineWidth = 8;
+    g.beginPath(); g.arc(cx,cy,R-1.5, 15*Math.PI/180, 130*Math.PI/180); g.stroke();
+    g.strokeStyle = 'rgba(72,72,80,0.50)'; g.lineWidth = 3;
+    g.beginPath(); g.arc(cx,cy,R-1.5, 35*Math.PI/180, 100*Math.PI/180); g.stroke();
+    return glossCanvas;
+  }
+  // edge vignette, baked source-over onto transparent (caller blits with 'source-over')
+  function ensureVig(){
+    if (vigCanvas) return vigCanvas;
+    vigCanvas = makeDiscCanvas();
+    var g = vigCanvas.getContext('2d'), cx = DISC_S/2, cy = DISC_S/2, R = R_WEDGE;
+    var vig = g.createRadialGradient(cx,cy,0, cx,cy,R);           // verbatim stops
+    vig.addColorStop(0.00,'rgba(0,0,0,0)');    vig.addColorStop(0.62,'rgba(0,0,0,0)');
+    vig.addColorStop(0.80,'rgba(0,0,0,0.22)'); vig.addColorStop(0.92,'rgba(0,0,0,0.55)');
+    vig.addColorStop(1.00,'rgba(0,0,0,0.92)');
+    g.fillStyle = vig; g.fillRect(cx-R,cy-R,R*2,R*2);
+    return vigCanvas;
+  }
+  // hub, baked once via the existing drawHub (blit source-over)
+  function ensureHub(){
+    if (hubCanvas) return hubCanvas;
+    hubCanvas = makeDiscCanvas();
+    drawHub(hubCanvas.getContext('2d'), DISC_S/2, DISC_S/2, HUB_R);   // reuse existing drawHub verbatim
+    return hubCanvas;
+  }
+
+  // ---- wagon-wheel strobe overlay: ghost-silver spokes baked once, ridden by θ, faded by opacity ----
+  var strobeCanvas = null, strobe = document.getElementById('strobe');
+  function ensureStrobe(){
+    if (strobeCanvas) return strobeCanvas;
+    strobeCanvas = strobe;                    // draw straight onto the live overlay (baked once)
+    strobe.width  = DISC_S*dpr;
+    strobe.height = DISC_S*dpr;
+    var c = strobe.getContext('2d');
+    c.setTransform(dpr,0,0,dpr,0,0);
+    c.clearRect(0,0,DISC_S,DISC_S);
+    c.globalCompositeOperation = 'lighter';   // additive ghost light — never a dark line on obsidian
+    c.lineWidth = STROBE_LINE_W;
+    c.lineCap   = 'round';
+    c.shadowColor = 'rgba('+STROBE_COLOR+','+STROBE_BAKE_ALPHA+')';
+    c.shadowBlur  = STROBE_BLOOM;             // soft ghostly bloom
+    var cx=DISC_S/2, cy=DISC_S/2;
+    for (var i=0;i<STROBE_SPOKES;i++){
+      var a  = (i/STROBE_SPOKES)*Math.PI*2 - Math.PI/2;
+      var x0 = cx+Math.cos(a)*STROBE_R_IN,  y0 = cy+Math.sin(a)*STROBE_R_IN;
+      var x1 = cx+Math.cos(a)*STROBE_R_OUT, y1 = cy+Math.sin(a)*STROBE_R_OUT;
+      // feather alpha along the spoke: 0 at both ends -> peak mid (soft filament)
+      var g = c.createLinearGradient(x0,y0,x1,y1);
+      g.addColorStop(0.00,'rgba('+STROBE_COLOR+',0)');
+      g.addColorStop(0.50,'rgba('+STROBE_COLOR+','+STROBE_BAKE_ALPHA+')');
+      g.addColorStop(1.00,'rgba('+STROBE_COLOR+',0)');
+      c.strokeStyle = g;
+      c.beginPath(); c.moveTo(x0,y0); c.lineTo(x1,y1); c.stroke();
+    }
+    c.globalCompositeOperation = 'source-over';
+    return strobeCanvas;
+  }
+  // opacity envelope keyed to spin progress p — gone before FREE_END(0.90) so the landing is uncontested
+  function strobeOpacity(p){
+    if (p<=0 || p>=STROBE_FADE_END_P) return 0;
+    var env;
+    if      (p < STROBE_FADE_IN_P)        env = p / STROBE_FADE_IN_P;                 // ramp in
+    else if (p < STROBE_FADE_OUT_START_P) env = 1;                                    // hold through coast
+    else { var q=(p-STROBE_FADE_OUT_START_P)/(STROBE_FADE_END_P-STROBE_FADE_OUT_START_P);
+           env = 1 - q*q*(3-2*q); }                                                   // smoothstep out
+    return STROBE_LAYER_OPACITY * env;
   }
 
   // ---- per-frame layout builders (angles in DEGREES; each entry: {color,a0,a1,r,full?}) ----
@@ -468,11 +567,11 @@
   function removeLayout(oldSegs, i, p){
     var n=oldSegs.length, arr=[];
     if (p < VANISH_FRAC){
-      var pA = p/VANISH_FRAC, rr = vanishRadius(pA), segDeg=360/n;
+      var pA = p/VANISH_FRAC, rr = vanishRadius(pA), av = vanishAlpha(pA), segDeg = 360/n;
       for (var k=0;k<n;k++){
         var a0=-90+(k-0.5)*segDeg, a1=-90+(k+0.5)*segDeg;
-        if (k===i){ if (rr<=0) continue; arr.push({color:oldSegs[k].color,a0:a0,a1:a1,r:R_WEDGE*rr}); }
-        else arr.push({color:oldSegs[k].color,a0:a0,a1:a1,r:R_WEDGE});
+        if (k===i){ if (av<=0.02) continue; arr.push({color:oldSegs[k].color,a0:a0,a1:a1,r:R_WEDGE*rr,alpha:av}); }
+        else arr.push({color:oldSegs[k].color,a0:a0,a1:a1,r:R_WEDGE});   // survivors: no alpha field -> 1 downstream
       }
     } else {
       var pB=(p-VANISH_FRAC)/(1-VANISH_FRAC), e=settle(pB,OVERSHOOT), m=n-1;
@@ -504,7 +603,7 @@
     for (i=0;i<layout.length;i++){
       w=layout[i]; a0=w.a0*D2R; a1=w.a1*D2R; span=a1-a0;
       if (!w.full && span<0.0009) continue;
-      ctx.save(); ctx.beginPath();
+      ctx.save(); ctx.globalAlpha = (w.alpha==null?1:w.alpha); ctx.beginPath();
       if (isFull(w,span)) ctx.arc(cx,cy,w.r,0,TAU);
       else { ctx.moveTo(cx,cy); ctx.arc(cx,cy,w.r,a0,a1); ctx.closePath(); }
       ctx.clip(); ctx.fillStyle=w.color; ctx.fillRect(cx-R_WEDGE,cy-R_WEDGE,R_WEDGE*2,R_WEDGE*2); ctx.restore();
@@ -526,6 +625,7 @@
     if (layout.length>1){
       for (i=0;i<layout.length;i++){
         w=layout[i]; a0=w.a0*D2R; a1=w.a1*D2R; if ((a1-a0)<0.0009) continue;
+        ctx.globalAlpha = (w.alpha==null?1:w.alpha);
         var dx=Math.cos(a0), dy=Math.sin(a0);
         ctx.strokeStyle='rgba(0,0,0,0.6)'; ctx.lineWidth=2.5;
         ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(cx+dx*w.r,cy+dy*w.r); ctx.stroke();
@@ -533,19 +633,22 @@
         ctx.strokeStyle='rgba(210,214,222,0.09)'; ctx.lineWidth=1;
         ctx.beginPath(); ctx.moveTo(cx+ox,cy+oy); ctx.lineTo(cx+dx*w.r+ox,cy+dy*w.r+oy); ctx.stroke();
       }
+      ctx.globalAlpha = 1;
     }
 
     // 4) dark seating edge — per wedge arc so it follows coverage and skips any gap
     for (i=0;i<layout.length;i++){
       w=layout[i]; a0=w.a0*D2R; a1=w.a1*D2R; span=a1-a0;
       if (!w.full && span<0.0009) continue;
+      ctx.globalAlpha = (w.alpha==null?1:w.alpha);
       ctx.strokeStyle='rgba(18,11,5,0.85)'; ctx.lineWidth=2.5; ctx.beginPath();
       if (isFull(w,span)) ctx.arc(cx,cy,w.r-1,0,TAU); else ctx.arc(cx,cy,w.r-1,a0,a1);
       ctx.stroke();
     }
+    ctx.globalAlpha = 1;
 
     // 5) hub
-    drawHub(ctx,cx,cy,HUB_R);
+    ctx.drawImage(ensureHub(),0,0,DISC_S,DISC_S);
   }
 
   // ---- rAF controller: runs ONLY while a transition is alive ----
@@ -565,6 +668,7 @@
   function finalizeTransition(){
     if (rafId){ cancelAnimationFrame(rafId); rafId=0; }
     if (spinRAF){ cancelAnimationFrame(spinRAF); spinRAF=0; canvas.style.willChange=''; }
+    strobe.style.opacity='0';
     if (anim){ anim=null; sig=null; draw(); }
   }
 
@@ -606,7 +710,7 @@
     if (state.spinning) return;
     finalizeTransition();
     var reduce = prefersReduced();
-    var turns = 8 + Math.floor(Math.random()*4);        // 8–11 turns — the free, fast feel
+    var turns = DRAW_TURNS[DRAW][0] + Math.floor(Math.random()*DRAW_TURNS[DRAW][1]);   // draw-length turns — the free, fast feel
     var start = rot;
     rot = rot + turns*360 + Math.random()*360;          // θ_final — the ONLY source of truth for the winner
     state.spinning = true; state.result = null; state.winner = null; render();
@@ -615,6 +719,7 @@
       canvas.style.transition='transform 0.6s cubic-bezier(0.2,0.8,0.2,1)';
       void canvas.offsetWidth;
       canvas.style.transform='rotate('+rot+'deg)';
+      strobe.style.opacity='0'; strobe.style.transform='rotate('+rot+'deg)';   // no strobe on the reduced-motion path
       canvas.addEventListener('transitionend', resolveWinner, {once:true});
       return;
     }
@@ -623,10 +728,13 @@
     canvas.style.willChange='transform';
     var dist=rot-start, t0=performance.now();
     (function frame(now){
-      var p=(now-t0)/SPIN_MS; if (p>1) p=1;
+      var p=(now-t0)/DRAW_MS[DRAW]; if (p>1) p=1;
       canvas.style.transform='rotate('+(start + spinEase(p)*dist + spinDetent(p))+'deg)';
+      strobe.style.transform = canvas.style.transform;   // strobe rides the identical θ
+      strobe.style.opacity   = strobeOpacity(p);         // opacity on its own p-keyed schedule
       if (p<1){ spinRAF=requestAnimationFrame(frame); }
       else { spinRAF=0; canvas.style.transform='rotate('+rot+'deg)';   // exact lock onto rot
+             strobe.style.transform='rotate('+rot+'deg)'; strobe.style.opacity='0';
              canvas.style.willChange=''; resolveWinner(); }
     })(performance.now());
   }
@@ -669,6 +777,7 @@
     if (state.spinning) return;
     finalizeTransition();
     rot = 0; canvas.style.transition='none'; canvas.style.transform='rotate(0deg)';
+    strobe.style.transition='none'; strobe.style.transform='rotate(0deg)'; strobe.style.opacity='0';
     state.options=[]; state.draft=''; state.preview=null; state.result=null; state.winner=null;
     document.getElementById('draft').value='';
     render();
@@ -718,6 +827,7 @@
   document.getElementById('spin').addEventListener('click', spin);
   document.getElementById('reset').addEventListener('click', reset);
 
+  ensureStrobe();   // bake the ghost-spoke overlay once at init (invisible until a spin lifts its opacity)
   render();
 })();
 </script>
