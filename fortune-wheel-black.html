@@ -21,7 +21,7 @@
   .brand .label{font:600 12px 'IBM Plex Mono',monospace;letter-spacing:.3em;color:var(--t-meta);text-transform:uppercase}
 
   /* ---- wheel assembly ---- */
-  .wheel-area{position:relative;width:560px;max-width:100%;aspect-ratio:560/700;margin-top:8px}
+  .wheel-area{position:relative;width:560px;max-width:100%;aspect-ratio:560/700;margin-top:30px}
   .disc-wrap{position:absolute;left:7.143%;top:9.143%;width:85.714%;height:68.571%;z-index:2;}
   /* static drop-shadow sibling — box-shadow on a circle == the old disc drop-shadow, but never re-rasters per frame */
   .disc-shadow{position:absolute;left:7.143%;top:9.143%;width:85.714%;height:68.571%;border-radius:50%;z-index:1;pointer-events:none;box-shadow:0 16px 26px rgba(0,0,0,.55),0 4px 8px rgba(0,0,0,.4)}
@@ -77,21 +77,33 @@
   }
   @media (prefers-reduced-motion: reduce){ .glass::before{ opacity:0.32; } }
 
-  .pointer{position:absolute;left:0;top:0;width:100%;height:28.571%;z-index:3;pointer-events:none;
-    filter:drop-shadow(0 8px 10px rgba(0,0,0,.5))}
+  .pointer{display:none}   /* retired — the rasterized bitmap arrow is now the sole, permanently-visible pointer */
 
-  /* rigid string-orbit arm: a FROZEN bitmap on a block div = guaranteed own GPU layer,
-     composited transform, immune to main-thread jank. Pivot = disc center by pure %.
+  /* OUTER — owns the magnetic radial breathe; NEVER rotates. Centred on the disc centre (280,304). */
+  .orbit-hover{
+    position:absolute;
+    left:50%; top:43.43%;                  /* disc centre y = 43.43% × 700 = 304 */
+    width:135.714%; aspect-ratio:1;        /* 760 / 560 = 135.714% ⇒ 760px square */
+    transform:translate(-50%,-50%);
+    transform-origin:50% 50%;
+    z-index:3; pointer-events:none; will-change:transform;
+    animation:armHover 3400ms ease-in-out infinite;
+  }
+  /* INNER — fills the outer, so its centre IS the disc centre ⇒ rotate() orbits about the disc centre by containment.
+     A FROZEN bitmap on a block div = own GPU layer, composited transform, immune to main-thread jank.
      NEVER set willChange:'auto' inline anywhere — de-promotes + reintroduces same-tick promotion jank. */
   .orbit-arm{
-    position:absolute;
-    left:50%; top:43.43%;                 /* disc center of .wheel-area (9.143 + 68.571/2 = 43.429%) */
-    width:107.143%; aspect-ratio:1;        /* 600px square = 1.25x the 480 disc box; whole arrow lives inside */
-    transform:translate(-50%,-50%) rotate(0deg);
-    transform-origin:50% 50%;              /* element center; the translate lands it ON the disc center */
+    position:absolute; inset:0; width:100%; height:100%;
+    transform:rotate(0deg); transform-origin:50% 50%;
     background-position:center; background-size:100% 100%; background-repeat:no-repeat;
-    z-index:3; pointer-events:none; opacity:0; will-change:transform;   /* will-change PERMANENT (~one small layer) */
+    z-index:3; pointer-events:none; opacity:1; will-change:transform;   /* VISIBLE AT REST — this bitmap is the pointer */
   }
+  @keyframes armHover{                     /* at 12 o'clock, screen-Y === radial ⇒ pure in/out breathe, no sway, no rotation */
+    0%   { transform:translate(-50%,-50%) translateY(0) }
+    50%  { transform:translate(-50%,-50%) translateY(-2.3px) }
+    100% { transform:translate(-50%,-50%) translateY(0) }
+  }
+  @media (prefers-reduced-motion:reduce){ .orbit-hover{ animation:none } }   /* static arrow, fixed gap */
 
   .result{min-height:48px;height:auto;display:flex;align-items:center;justify-content:center;flex-wrap:wrap;max-width:100%;padding:0 16px;margin:-16px 0 16px}
   .result .k{font:600 11px 'IBM Plex Mono',monospace;letter-spacing:.28em;color:var(--t-ghost);text-transform:uppercase;margin-right:12px}
@@ -152,6 +164,15 @@
     pointer-events:none;z-index:2;opacity:0;mix-blend-mode:screen;
     background:radial-gradient(120% 105% at 38% 30%, rgba(224,226,232,0.55) 0%, rgba(224,226,232,0.14) 30%, rgba(224,226,232,0) 56%);}
 
+  /* impact-to-core: a converging shockwave ring (rim → centre) + a core absorb-flash at the hub — compositor-only */
+  .shock{position:absolute;left:7.143%;top:9.143%;width:85.714%;height:68.571%;border-radius:50%;
+    pointer-events:none;z-index:4;opacity:0;transform-origin:50% 50%;mix-blend-mode:screen;
+    border:2px solid rgba(226,232,240,0.9);
+    box-shadow:0 0 12px rgba(226,232,240,0.55), inset 0 0 12px rgba(226,232,240,0.35);}
+  .coreflash{position:absolute;left:50%;top:43.43%;width:34%;aspect-ratio:1;transform:translate(-50%,-50%);
+    border-radius:50%;pointer-events:none;z-index:4;opacity:0;mix-blend-mode:screen;
+    background:radial-gradient(circle, rgba(255,255,255,0.95) 0%, rgba(226,232,240,0.6) 34%, rgba(226,232,240,0) 70%);}
+
   /* B3b tick flash — light at the 12 o'clock rim; NOT inside .glass (its mask/blur would mute the blend) */
   .spark,.ring{position:absolute;left:50%;top:9.143%;transform:translate(-50%,-50%);pointer-events:none;z-index:4;opacity:0}
   .spark{width:12px;height:12px;border-radius:50%;mix-blend-mode:screen;
@@ -162,7 +183,7 @@
   .fx{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:4;display:none}
   .fx.live{display:block}
   /* transform-box:view-box makes WAAPI px == viewBox units (load-bearing); drop authored around local (0,0) */
-  .fx .drop{transform-box:view-box;transform-origin:0 0;opacity:0}
+  .fx .drop,.fx .dropA,.fx .dropB{transform-box:view-box;transform-origin:0 0;opacity:0}
   .fx .splat{opacity:0}
 </style>
 </head>
@@ -215,18 +236,24 @@
             stroke="rgba(32,15,6,0.8)" stroke-width="2.5" stroke-linejoin="round"/>
     </svg>
 
-    <!-- rigid string-orbit arm: a frozen bitmap (rasterized once at init), composited orbit -->
-    <div class="orbit-arm" aria-hidden="true"></div>
+    <!-- rigid string-orbit arm: outer = magnetic breathe (translate only, never rotates); inner = frozen bitmap + lap rotate -->
+    <div class="orbit-hover" aria-hidden="true"><div class="orbit-arm"></div></div>
 
     <!-- ===== verdict-ceremony overlays (display:none / opacity:0 at rest — no effect on the resting frame) ===== -->
     <!-- B4b vitrify glaze: over the disc, under the pointer; baked brightness-lift + crescent glint, opacity-pulsed -->
     <div class="vitrify" aria-hidden="true"></div>
+    <!-- impact-to-core: converging shockwave ring (rim → centre) + core absorb-flash (hub); opacity/transform-pulsed -->
+    <div class="shock" aria-hidden="true"></div>
+    <div class="coreflash" aria-hidden="true"></div>
     <!-- B3b tick flash: a sharp point of light + one hairline ring at the 12 o'clock rim -->
     <span class="spark" aria-hidden="true"></span>
     <span class="ring"  aria-hidden="true"></span>
     <!-- B6-B8 milk-drop FX overlay; viewBox matches wheel-area aspect ⇒ every coordinate auto-scales on mobile -->
     <svg class="fx" viewBox="0 0 560 700" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-      <!-- the white verdict bead: short soft trailing tail (plain white, static, low-opacity) + head + one static cel highlight -->
+      <!-- twin stream beads: born together on the top rim (deposited by the arrow), split down the left/right arcs, meet at the bottom -->
+      <g class="dropA"><circle cx="0" cy="0" r="7" fill="#FFFFFF"/><ellipse cx="-2" cy="-2.3" rx="1.6" ry="2.2" fill="#FFFFFF"/></g>
+      <g class="dropB"><circle cx="0" cy="0" r="7" fill="#FFFFFF"/><ellipse cx="-2" cy="-2.3" rx="1.6" ry="2.2" fill="#FFFFFF"/></g>
+      <!-- the merged drip bead: short soft trailing tail (plain white, static, low-opacity) + head + one static cel highlight -->
       <g class="drop">
         <path class="tail" d="M-3.5,0 C-2,-14 -1,-24 0,-30 C1,-24 2,-14 3.5,0 Z" fill="#FFFFFF" opacity="0.35"/>
         <circle class="bead" cx="0" cy="0" r="9" fill="#FFFFFF"/>
@@ -884,18 +911,21 @@
   function syncCeremonyToggle(){ var b=document.getElementById('ceremonyToggle'); if(!b) return;
     b.setAttribute('aria-checked', ceremonyOn?'true':'false');
     b.textContent = ceremonyOn ? 'Ceremony · On' : 'Ceremony · Off'; }
-  var CEREMONY_MAX_FULL   = 2200;    // watchdog — force-fires endCeremony(true) if a callback is throttled/dropped
+  var CEREMONY_MAX_FULL   = 2400;    // watchdog — force-fires endCeremony(true) if a callback is throttled/dropped (bumped for the ~820ms linear lap)
   var CEREMONY_MAX_LEAN   = 1200;
-  var CHARGE_MS      = 60;           // B1 held-breath inhale
-  var ORBIT_GLIDE_MS = 250;          // B2a 0->312deg near-linear
-  var ORBIT_WHIP_MS  = 130;          // B2b 312->360deg easeIn, peaks at contact
+  // ---- lap = ONE STEADY LINEAR orbit (the confirmed lag/teleport fix) ----
+  // rotate(0deg)→rotate(360deg), easing:'linear'. NO whip, NO velocity dip, NO ease-in, NO charge, NO deceleration.
+  // The arrow reaches the top at FULL speed and the animation simply ENDS — that abrupt stop IS the impact.
+  var LAP_MS         = 820;          // tunable lap duration (constant angular velocity throughout)
   var ORBIT_DIR      = 1;            // 1 = clockwise
   var TICK_SPARK_MS  = 80;
   var TICK_RING_MS   = 120;
-  var REVERB_MS      = 170;          // B4 over-damped shudder
-  var REVERB_TY      = 1.4;          // px translateY peak (CEILING)
-  var REVERB_SC      = 0.008;        // scale dip peak (CEILING)
   var VITRIFY_MS     = 160;          // B4b glaze opacity pulse, peak 0.6
+  // ---- impact-to-the-core (replaces the old reverb + the refine spec's magnetCatch) ----
+  var IMPACT_MS      = 220;          // orb compression-absorb duration
+  var IMPACT_SCALE   = 0.965;        // compression depth: 1 → 0.965 → 1, over-damped, NO overshoot (it ABSORBS)
+  var SHOCK_MS       = 260;          // converging shockwave ring: rim → core, fading
+  var COREFLASH_MS   = 180;          // core absorb-flash at the hub
 
   // ---- element refs ----
   var wheelArea  = document.querySelector('.wheel-area');
@@ -908,22 +938,27 @@
   var sparkEls   = [sparkEl, ringEl];
   var dropEl  = fxLayer ? fxLayer.querySelector('.drop')  : null;
   var splatEl = fxLayer ? fxLayer.querySelector('.splat') : null;
+  var dropA   = fxLayer ? fxLayer.querySelector('.dropA') : null;
+  var dropB   = fxLayer ? fxLayer.querySelector('.dropB') : null;
+  var shockEl = document.querySelector('.shock');
+  var coreEl  = document.querySelector('.coreflash');
 
   // rasterize the arrow ONCE to a PNG data-URI: a frozen bitmap on a permanently-promoted block layer
   function rasterizeArrow(){
-    var S=600, OFF=(S-480)/2 /*=60*/, ss=3;                 // supersample x3 for crisp edges
+    var S=760, OFF=(S-480)/2 /*=140*/, ss=3;                // bigger canvas fits the outward-shifted base; tip → r=254 (outside the rim)
     var c=document.createElement('canvas'); c.width=c.height=S*ss;
-    var g=c.getContext('2d'); g.scale(ss,ss); g.translate(OFF,OFF);   // now in 480-space, same coords as old SVG
-    function tri(){ g.beginPath(); g.moveTo(192,-44); g.lineTo(288,-44); g.lineTo(240,52); g.closePath(); }
-    var grad=g.createLinearGradient(192,-44,288,52);
+    var g=c.getContext('2d'); g.scale(ss,ss); g.translate(OFF,OFF);   // 480-space, centre still (240,240)
+    // compact hover pointer: tip at r=254 (20px gap outside the rim), base r~307 so it clears the header
+    function tri(){ g.beginPath(); g.moveTo(214,-67); g.lineTo(266,-67); g.lineTo(240,-14); g.closePath(); }
+    var grad=g.createLinearGradient(214,-67,266,-14);
     grad.addColorStop(0,'#eb9a52'); grad.addColorStop(0.55,'#d2691e'); grad.addColorStop(1,'#a05019');
     g.lineJoin='round'; g.lineCap='round';
-    g.save(); g.shadowColor='rgba(0,0,0,0.5)'; g.shadowBlur=10; g.shadowOffsetY=8;
-      tri(); g.lineWidth=14; g.strokeStyle='#c15f1a'; g.stroke();          // soft round body + cast shadow
+    g.save(); g.shadowColor='rgba(0,0,0,0.5)'; g.shadowBlur=8; g.shadowOffsetY=6;
+      tri(); g.lineWidth=9; g.strokeStyle='#c15f1a'; g.stroke();           // soft round body + cast shadow
     g.restore();
     tri(); g.fillStyle=grad; g.fill();                                     // orange body (matches #ptrGrad)
-    g.lineWidth=14; g.strokeStyle='#c15f1a'; tri(); g.stroke();            // matte-orange rounded edge
-    g.lineWidth=2.5; g.strokeStyle='rgba(32,15,6,0.8)'; tri(); g.stroke(); // crisp dark definition edge
+    g.lineWidth=9; g.strokeStyle='#c15f1a'; tri(); g.stroke();             // matte-orange rounded edge
+    g.lineWidth=2; g.strokeStyle='rgba(32,15,6,0.8)'; tri(); g.stroke();   // crisp dark definition edge
     return c.toDataURL('image/png');
   }
 
@@ -934,8 +969,12 @@
   function showFx(el){ if (el) el.style.opacity='1'; }
   function hideFx(el){ if (el) el.style.opacity='0'; }
   function resetFx(){
-    [dropEl, splatEl].forEach(function(el){ if (el) el.style.opacity='0'; });
+    [dropEl, dropA, dropB, splatEl, shockEl, coreEl].forEach(function(el){ if (el) el.style.opacity='0'; });
     if (dropEl) dropEl.style.transform='';
+    if (dropA)  dropA.style.transform='';
+    if (dropB)  dropB.style.transform='';
+    if (shockEl) shockEl.style.transform='';
+    if (coreEl)  coreEl.style.transform='translate(-50%,-50%)';
   }
 
   function armCeremony(arc, onDone){          // arc = 'full' | 'lean'
@@ -950,18 +989,18 @@
     resetFx();
     if (fxLayer) fxLayer.classList.add('live');
 
-    if (lean){                                // repeat spins: no orbit lap; pointer already at top, so "born at top" holds
-      ct(function(){ tickFlash(); reverb(); vitrify(); },   0);
-      ct(beadBirth,                                       120);
-      ct(function(){ beadFall(true); },                   210);    // unchanged
-      ct(function(){ dripImpact(true, onDone); },         730);    // was 470 → 210 + FALL_LEAN(520)
-      ct(function(){ endCeremony(false); },              1050);    // was 780
-    } else {                                  // first spin of a set: the full ritual
-      arrowLap(function(){ tickFlash(); reverb(); vitrify(); });   // cold seal on the true arrival frame (unchanged)
-      ct(beadBirth,                                   620);        // ~180ms held breath after the seal
-      ct(function(){ beadFall(false); },              710);        // unchanged
-      ct(function(){ dripImpact(false, onDone); },   1390);        // was 1070 → 710 + FALL_FULL(680)
-      ct(function(){ endCeremony(false); },          1720);        // was 1400
+    if (lean){                                // repeat spins: no orbit lap; arrow already at top → impact + beads fire immediately
+      ct(function(){ tickFlash(); impactToCore(); vitrify(); },  0);   // impact absorbed to the core at once
+      ct(beadBirth,                                            120);   // twin beads born from the arrow at the top rim
+      ct(function(){ beadStream(true); },                      210);   // split → down both edges → merge at bottom
+      ct(function(){ dripImpact(true, onDone); },              730);   // 210 + FALL_LEAN(520)
+      ct(function(){ endCeremony(false); },                   1050);
+    } else {                                  // first spin of a set: steady LINEAR lap, then impact-to-core
+      arrowLap(function(){ tickFlash(); impactToCore(); vitrify(); }); // seal on the true 360=top arrival, at FULL speed
+      ct(beadBirth,                                            860);   // ~40ms after the ~820ms lap: beads deposited by the just-landed arrow
+      ct(function(){ beadStream(false); },                     950);   // split → down both edges → merge at bottom
+      ct(function(){ dripImpact(false, onDone); },            1630);   // 950 + FALL_FULL(680)
+      ct(function(){ endCeremony(false); },                   1960);
     }
   }
 
@@ -975,10 +1014,14 @@
     document.removeEventListener('visibilitychange', ceremonyVis);
     wheelArea.removeEventListener('click', ceremonySkip);
     // hard-reset every decorative overlay to rest:
-    if (orbitArm){ orbitArm.style.opacity='0'; orbitArm.style.transform=ARM_BASE+'rotate(0deg)'; }
+    if (orbitArm){ orbitArm.style.transform='rotate(0deg)'; }   // arrow stays VISIBLE (it is the pointer); revert inner to the rest angle
     if (ptr){ ptr.style.transform=''; ptr.style.willChange=''; ptr.style.opacity=''; ptr.style.transition=''; }
     if (fxLayer)   fxLayer.classList.remove('live');   // display:none hides the drop + splat
     if (vitrifyEl) vitrifyEl.style.opacity='0';
+    if (shockEl)   shockEl.style.opacity='0';
+    if (coreEl)    coreEl.style.opacity='0';
+    // defensively zero every bead so an interrupt mid-stream leaves nothing stranded (fx is also display:none)
+    [dropEl, dropA, dropB, splatEl].forEach(function(el){ if (el) el.style.opacity='0'; });
     canvas.style.transform = 'rotate('+rot+'deg)';     // byte-identical to the lock — nothing drifts
     if (reveal) commitReveal(); else state.revealPending = false;
   }
@@ -986,25 +1029,17 @@
   function ceremonyVis(){ if (document.hidden) endCeremony(true); }
   function ceremonySkip(){ endCeremony(true); }
 
-  // ---- B1+B2+B3 arrow lap — ONE fused compositor animation (charge+glide+whip), zero main-thread motion code ----
-  var ARM_BASE = 'translate(-50%,-50%) ';
+  // ---- LINEAR arrow lap — ONE steady constant-speed sweep 0→360 on the INNER arm; the abrupt STOP at the top IS the impact ----
+  // The magnetic breathe lives on the OUTER (.orbit-hover) and never rotates, so this rotate() never shares a transform with it.
   function arrowLap(onImpact){
     if (!orbitArm){ if (onImpact) onImpact(); return; }
-    orbitArm.style.transform = ARM_BASE+'rotate(0deg) scale(1)';
-    orbitArm.style.opacity = '1';                                        // fade the bitmap in AT REST (top, stationary)
-    if (ptr){ ptr.style.transition='opacity 60ms linear'; ptr.style.opacity='0'; }  // motionless crossfade — mismatch hidden
-    var TOTAL = CHARGE_MS + ORBIT_GLIDE_MS + ORBIT_WHIP_MS;              // 60+250+130 = 440
+    orbitArm.style.transform = 'rotate(0deg)';
     var lap = reg(orbitArm.animate([
-      { transform: ARM_BASE+'rotate(0deg) scale(1)',                          offset:0.000, easing:'ease-out' },                       // charge
-      { transform: ARM_BASE+'rotate(0deg) scale(1.03)',                       offset:0.068 },                                          // charge peak (30/440)
-      { transform: ARM_BASE+'rotate(0deg) scale(1)',                          offset:0.136, easing:'cubic-bezier(0.15,0.15,0.5,0.35)'},// glide start (60/440)
-      { transform: ARM_BASE+'rotate('+(312*ORBIT_DIR)+'deg) scale(1)',        offset:0.705, easing:'cubic-bezier(0.9,0.03,0.97,0.20)'},// whip start (310/440) — velocity MIN
-      { transform: ARM_BASE+'rotate('+(360*ORBIT_DIR)+'deg) scale(1)',        offset:1.000 }                                           // whip -> peak velocity AT contact
-    ], { duration: TOTAL, fill:'forwards' }));
+      { transform:'rotate(0deg)' },
+      { transform:'rotate('+(360*ORBIT_DIR)+'deg)' }
+    ], { duration: LAP_MS, easing:'linear', fill:'forwards' }));       // constant angular velocity — no whip, no dip, no ease
     lap.finished.then(function(){
-      if (ceremony.active && onImpact) onImpact();                       // tickFlash/reverb/vitrify on the TRUE 360=top arrival
-      if (ptr){ ptr.style.transition='opacity 60ms linear'; ptr.style.opacity=''; }  // pointer back, overlapped at top
-      orbitArm.style.opacity='0'; orbitArm.style.transform=ARM_BASE+'rotate(0deg)';
+      if (ceremony.active && onImpact) onImpact();                     // impact fires on the true 360=top arrival, at FULL speed
     }).catch(function(){ /* cancelled by endCeremony */ });
   }
 
@@ -1021,16 +1056,42 @@
       {duration:TICK_RING_MS, easing:'ease-out'}));
   }
 
-  // ---- B4 reverb (over-damped, monotonic, no zero-crossing) on #wheel; translate/scale LEFT of rotate ----
-  function reverb(){
-    var kf=[], N=12;
+  // ---- IMPACT-TO-THE-CORE: the orb takes the massive energy IN and contains it (never rebounds) ----
+  function impactToCore(){ orbAbsorb(); shockToCore(); coreFlash(); }
+
+  // ORB COMPRESSION-ABSORB on #wheel: 1 → IMPACT_SCALE fast, then over-damped e^-decay back to 1 (NO bounce/overshoot).
+  // scale is PREPENDED (left of rotate(rot)) so the locked rotation stays byte-identical.
+  function orbAbsorb(){
+    var min=IMPACT_SCALE, N=12, kf=[], cFrac=0.16;
     for (var i=0;i<=N;i++){
-      var u=i/N, env=Math.exp(-6*u);
-      var ty=(REVERB_TY*env).toFixed(3), sc=(1-REVERB_SC*env).toFixed(4);
-      kf.push({ transform:'translateY('+ty+'px) scale('+sc+') rotate('+rot+'deg)' });
+      var u=i/N, sc;
+      if (u<=cFrac) sc = 1-(1-min)*(u/cFrac);                              // quick compress into the impact
+      else { var v=(u-cFrac)/(1-cFrac); sc = 1-(1-min)*Math.exp(-4.4*v); } // monotonic absorb back toward 1 (over-damped)
+      kf.push({ transform:'scale('+sc.toFixed(4)+') rotate('+rot+'deg)' });
     }
-    var a = reg(canvas.animate(kf, {duration:REVERB_MS, easing:'linear'}));   // fill:none → reverts to inline rotate(rot)
+    kf[N] = { transform:'scale(1) rotate('+rot+'deg)' };                   // land exactly at rest scale
+    var a = reg(canvas.animate(kf, {duration:IMPACT_MS, easing:'linear'}));  // fill:none → reverts to inline rotate(rot)
     a.onfinish = function(){ canvas.style.transform='rotate('+rot+'deg)'; };
+  }
+
+  // CONVERGING SHOCKWAVE: a bright cool-white ring born at the RIM, contracting to the centre while fading — energy to the core.
+  function shockToCore(){
+    if (!shockEl) return;
+    reg(shockEl.animate([
+      { opacity:0.0, transform:'scale(1.00)', offset:0.00, easing:'cubic-bezier(.35,.6,.2,1)' },
+      { opacity:0.9, transform:'scale(0.80)', offset:0.16 },
+      { opacity:0.0, transform:'scale(0.00)', offset:1.00 }
+    ], {duration:SHOCK_MS}));
+  }
+
+  // CORE FLASH: a brief radial glow at the hub — the core absorbing the impact in.
+  function coreFlash(){
+    if (!coreEl) return;
+    reg(coreEl.animate([
+      { opacity:0,   transform:'translate(-50%,-50%) scale(0.6)' },
+      { opacity:0.8, transform:'translate(-50%,-50%) scale(1.0)', offset:0.4 },
+      { opacity:0,   transform:'translate(-50%,-50%) scale(1.15)' }
+    ], {duration:COREFLASH_MS, easing:'ease-out'}));
   }
 
   // ---- B4b vitrify (opacity-only glaze pulse; filter animation banned) ----
@@ -1040,31 +1101,67 @@
   }
 
   // ---- the white verdict bead: born at the arrow-landing (top), falls the full instrument, drips + paints ----
-  var DROP_BIRTH   = [280, 88];    // 24px below the top rim, under the arrow tip on the withheld 12-o'clock winner
-  var DROP_LAND    = [280, 684];   // kisses the top edge of the #result row
-  var FALL_FULL    = 680;          // full-path descent+drip duration
-  var FALL_LEAN    = 520;          // lean-path duration
-  var BEAD_SWELL_MS = 90;          // birth pop at the top (unchanged)
+  var DROP_TOP   = [280, 64];    // born on TOP of the ball (top rim), right under the landed arrow tip (r254 → tip at y≈50)
+  var DROP_MEET  = [280, 540];   // twins meet at the bottom of the glass (4px inside the 544 rim)
+  var DROP_LAND  = [280, 684];   // kisses the #result row (UNCHANGED)
+  var FALL_FULL  = 680;          // full surface journey (arc+pool+drip) — total unchanged ⇒ beat timers hold
+  var FALL_LEAN  = 520;          // lean total — unchanged
+  var BEAD_SWELL_MS = 90;        // birth pop at the top
 
-  function beadBirth(){            // white bead forms at the arrow-landing spot
-    if (!dropEl) return;
-    dropEl.style.opacity='1';
-    reg(dropEl.animate([
-      {transform:'translate('+DROP_BIRTH[0]+'px,'+DROP_BIRTH[1]+'px) scale(.3)',  opacity:0},
-      {transform:'translate('+DROP_BIRTH[0]+'px,'+DROP_BIRTH[1]+'px) scale(1)',   opacity:1}
-    ], {duration:BEAD_SWELL_MS, easing:'cubic-bezier(.2,.7,.2,1)', fill:'forwards'}));
+  function beadBirth(){          // twin beads form co-located on the top rim — reads as ONE drop the arrow deposited
+    if (!dropA||!dropB) return;
+    dropA.style.opacity='1'; dropB.style.opacity='1';
+    var kf=[{transform:'translate(280px,64px) scale(.3)',opacity:0},
+            {transform:'translate(280px,64px) scale(1)', opacity:1}];
+    var o={duration:BEAD_SWELL_MS, easing:'cubic-bezier(.2,.7,.2,1)', fill:'forwards'};
+    reg(dropA.animate(kf,o)); reg(dropB.animate(kf,o));   // fully overlapped birth
   }
-  function beadFall(lean){         // surface-hugs down the ball face, gathers/hangs at the rim, drips off
-    if (!dropEl) return;
-    reg(dropEl.animate([
-      { transform:'translate(280px,88px)  scale(1,1)',    offset:0.00, easing:'cubic-bezier(.5,.05,.7,.4)' },  // release, slow start
-      { transform:'translate(296px,210px) scale(1,1.03)', offset:0.22, easing:'cubic-bezier(.4,.15,.6,.8)' },  // drifts off the meridian onto the face
-      { transform:'translate(316px,322px) scale(1,1.05)', offset:0.42, easing:'cubic-bezier(.4,.2,.6,.85)' },  // EQUATOR: +36px bow = the across-the-ball read
-      { transform:'translate(298px,452px) scale(1,1.03)', offset:0.60, easing:'cubic-bezier(.5,.1,.72,.5)' },  // curving back as the glass wraps under
-      { transform:'translate(282px,542px) scale(1.08,.94)',offset:0.70, easing:'cubic-bezier(.6,0,.9,.32)' }, // REACHES BOTTOM RIM: pools wide/short
-      { transform:'translate(281px,543px) scale(1.06,.95)',offset:0.78, easing:'cubic-bezier(.5,0,.9,.3)' },  // ~40ms HANG at the rim (reach-then-drip reads)
-      { transform:'translate(280px,684px) scale(.9,1.22)', offset:1.00 }                                      // DRIPS OFF: necks tall/thin, accelerates into the text
-    ], { duration:(lean?FALL_LEAN:FALL_FULL), easing:'linear', fill:'forwards' }));
+  // TWO-STREAM descent: split from the top, run down the left/right circumference, meet + pool at the bottom, hand off to the merged drip.
+  function beadStream(lean){
+    if (!dropA||!dropB||!dropEl) return;
+    var TOTAL   = lean?FALL_LEAN:FALL_FULL;   // 520 | 680
+    var DRIP    = lean?115:150;               // drip-off portion
+    var ARCPOOL = TOTAL - DRIP;               // 405 | 530  (arc + short pool)
+    // RIGHT arc (dropA): equal 18° steps on R=236 about (280,304); last keyframe = pool (flatten in place). Time front-loaded (gravity).
+    reg(dropA.animate([
+      {transform:'translate(280px,64px)  scale(1,1)',    offset:0.000, easing:'linear'},
+      {transform:'translate(353px,80px)  scale(1,1)',    offset:0.016},
+      {transform:'translate(419px,113px) scale(1,1)',    offset:0.053},
+      {transform:'translate(471px,165px) scale(1,1)',    offset:0.108},
+      {transform:'translate(504px,231px) scale(1,1)',    offset:0.178},
+      {transform:'translate(516px,304px) scale(1,1)',    offset:0.263},   // equator right (r=236)
+      {transform:'translate(504px,377px) scale(1,1)',    offset:0.363},
+      {transform:'translate(471px,443px) scale(1,1)',    offset:0.475},
+      {transform:'translate(419px,495px) scale(1,1)',    offset:0.600},
+      {transform:'translate(353px,529px) scale(1,1)',    offset:0.738},
+      {transform:'translate(280px,540px) scale(1,1)',    offset:0.887},   // bottom meet
+      {transform:'translate(280px,540px) scale(1.3,0.7)',offset:1.000}    // POOL: beads coincide + flatten
+    ],{duration:ARCPOOL, easing:'linear', fill:'forwards'}));
+    // LEFT arc (dropB): x-mirror (560 − x), identical y + offsets
+    reg(dropB.animate([
+      {transform:'translate(280px,64px)  scale(1,1)',    offset:0.000, easing:'linear'},
+      {transform:'translate(207px,80px)  scale(1,1)',    offset:0.016},
+      {transform:'translate(141px,113px) scale(1,1)',    offset:0.053},
+      {transform:'translate(89px,165px)  scale(1,1)',    offset:0.108},
+      {transform:'translate(56px,231px)  scale(1,1)',    offset:0.178},
+      {transform:'translate(44px,304px)  scale(1,1)',    offset:0.263},   // equator left
+      {transform:'translate(56px,377px)  scale(1,1)',    offset:0.363},
+      {transform:'translate(89px,443px)  scale(1,1)',    offset:0.475},
+      {transform:'translate(141px,495px) scale(1,1)',    offset:0.600},
+      {transform:'translate(207px,529px) scale(1,1)',    offset:0.738},
+      {transform:'translate(280px,540px) scale(1,1)',    offset:0.887},
+      {transform:'translate(280px,540px) scale(1.3,0.7)',offset:1.000}
+    ],{duration:ARCPOOL, easing:'linear', fill:'forwards'}));
+    // MEET+MERGE handoff — REGISTERED timer (cancel-safe via ceremony.timers). Same-frame coincident-white swap.
+    ct(function(){
+      hideFx(dropA); hideFx(dropB);
+      showFx(dropEl);                                   // .drop appears exactly where the pool sat (280,540)
+      reg(dropEl.animate([
+        {transform:'translate(280px,540px) scale(1.25,0.72)', offset:0.00, easing:'cubic-bezier(.4,0,.7,.35)'},
+        {transform:'translate(280px,566px) scale(0.82,1.28)', offset:0.30, easing:'cubic-bezier(.5,0,.85,.4)'},  // necks → hanging teardrop detaches
+        {transform:'translate(280px,684px) scale(0.9,1.24)',  offset:1.00}                                       // DRIPS onto the text
+      ],{duration:DRIP, easing:'linear', fill:'forwards'}));
+    }, ARCPOOL);
   }
   function dripImpact(lean, onDone){   // lands ON the text → drip + PAINT the white verdict, one frame
     hideFx(dropEl);
