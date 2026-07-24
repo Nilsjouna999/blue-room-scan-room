@@ -80,19 +80,22 @@
   .pointer{position:absolute;left:0;top:0;width:100%;height:28.571%;z-index:3;pointer-events:none;
     filter:drop-shadow(0 8px 10px rgba(0,0,0,.5))}
 
-  /* rigid string-orbit stand-in arm: filter-free ⇒ compositor-promotable; box IDENTICAL to .disc-wrap (line 25)
-     so transform-origin:50% 50% IS the disc center by construction — no rect math, cannot drift on resize */
+  /* rigid string-orbit arm: a FROZEN bitmap on a block div = guaranteed own GPU layer,
+     composited transform, immune to main-thread jank. Pivot = disc center by pure %.
+     NEVER set willChange:'auto' inline anywhere — de-promotes + reintroduces same-tick promotion jank. */
   .orbit-arm{
-    position:absolute; left:7.143%; top:9.143%; width:85.714%; height:68.571%;
-    z-index:3; pointer-events:none; overflow:visible;
-    transform-origin:50% 50%;   /* = disc center, EXACT */
-    opacity:0; visibility:hidden;
+    position:absolute;
+    left:50%; top:43.43%;                 /* disc center of .wheel-area (9.143 + 68.571/2 = 43.429%) */
+    width:107.143%; aspect-ratio:1;        /* 600px square = 1.25x the 480 disc box; whole arrow lives inside */
+    transform:translate(-50%,-50%) rotate(0deg);
+    transform-origin:50% 50%;              /* element center; the translate lands it ON the disc center */
+    background-position:center; background-size:100% 100%; background-repeat:no-repeat;
+    z-index:3; pointer-events:none; opacity:0; will-change:transform;   /* will-change PERMANENT (~one small layer) */
   }
-  .orbit-arm.live{ opacity:1; visibility:visible; }
 
   .result{min-height:48px;height:auto;display:flex;align-items:center;justify-content:center;flex-wrap:wrap;max-width:100%;padding:0 16px;margin:-16px 0 16px}
   .result .k{font:600 11px 'IBM Plex Mono',monospace;letter-spacing:.28em;color:var(--t-ghost);text-transform:uppercase;margin-right:12px}
-  .result .v{font:600 clamp(22px,6.4vw,32px) 'Cormorant Garamond',serif;color:#F6EFDE;line-height:1.05;max-width:92vw;overflow-wrap:anywhere;text-align:center}
+  .result .v{font:600 clamp(22px,6.4vw,32px) 'Cormorant Garamond',serif;color:#FFFFFF;line-height:1.05;max-width:92vw;overflow-wrap:anywhere;text-align:center}
   .result .spin{background:none;padding:0;border-radius:0;box-shadow:none;border:0;font:600 12px 'IBM Plex Mono',monospace;letter-spacing:.3em;color:var(--t-ghost);text-transform:uppercase}
 
   .controls{display:flex;flex-direction:column;gap:16px;width:min(560px,100%)}
@@ -136,7 +139,7 @@
   .result .v.paint{
     color:transparent; -webkit-text-fill-color:transparent;
     -webkit-background-clip:text; background-clip:text;
-    background-image:linear-gradient(to top,#fff 0%,#fff 84%,#fff 100%);
+    background-image:linear-gradient(to top,#FFFFFF 0%,#FFFFFF 84%,#FFFFFF 100%);
     background-repeat:no-repeat; background-position:left bottom;
     background-size:100% 0%;
     animation:paintRise var(--paint-ms,520ms) cubic-bezier(.35,.9,.25,1) forwards;
@@ -212,14 +215,8 @@
             stroke="rgba(32,15,6,0.8)" stroke-width="2.5" stroke-linejoin="round"/>
     </svg>
 
-    <!-- rigid string-orbit stand-in: filter-free, pivots about the disc center by construction -->
-    <svg class="orbit-arm" viewBox="0 0 480 480" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-      <!-- tip apex at (240,52) → r=188 from center(240,240); base centered on x=240 → perfect circle -->
-      <path d="M192,-44 L288,-44 L240,52 Z" fill="url(#ptrGrad)"
-            stroke="#c15f1a" stroke-width="14" stroke-linejoin="round" stroke-linecap="round"/>
-      <path d="M192,-44 L288,-44 L240,52 Z" fill="none"
-            stroke="rgba(32,15,6,0.8)" stroke-width="2.5" stroke-linejoin="round"/>
-    </svg>
+    <!-- rigid string-orbit arm: a frozen bitmap (rasterized once at init), composited orbit -->
+    <div class="orbit-arm" aria-hidden="true"></div>
 
     <!-- ===== verdict-ceremony overlays (display:none / opacity:0 at rest — no effect on the resting frame) ===== -->
     <!-- B4b vitrify glaze: over the disc, under the pointer; baked brightness-lift + crescent glint, opacity-pulsed -->
@@ -273,7 +270,7 @@
   var HUB_R = 30;            // center axle-cap radius
   // deep jewel set — obsidian · citrine gold · carnelian · garnet · deep teal glass · emerald (ADD ORDER, black first)
   var JEWEL = ['#0b0b0d','#8a6a16','#8f4212','#6e1020','#0e5150','#10502e'];
-  var LABEL_INK = '#EBE6DC';   // warm off-white — dark ink is invisible on deep jewel/black
+  var LABEL_INK = '#FFFFFF';   // the single white token — dark ink is invisible on deep jewel/black
   var GRAIN = 0.04;          // glass wants ~no tooth; a whisper only to dither the gradients; 0 = dead-flat
 
   // ---- spin feel (rAF free-coast + crisp precise-landing settle) ----
@@ -291,19 +288,19 @@
   var DRAW_TURNS = { quick:[6,3], normal:[8,4], long:[12,5] };// [base, randSpan]; 'normal' === 8+floor(rand*4)
 
   // ---- wagon-wheel strobe layer (additive, rides main θ, dissolves before landing) ----
-  var STROBE_MARKS         = 36;      // glyph slots — multiple of 6 ⇒ slot 0 pins at −90° and marks register on the 6 wedge seams; T = 360/36 = 10°
-  var STROBE_R_IN          = 188;     // band inner radius (disc-space, R_WEDGE=232)
-  var STROBE_R_OUT         = 216;     // band outer radius — pulled in from 222 so glyph tips clear the heaviest edge vignette
-  var STROBE_STAVE_ALPHA   = 0.20;    // per-stave PEAK alpha (feathered 0→peak→0); resting on-screen ~0.09–0.10. STAGE: push to 0.24 only if still faint
-  var STROBE_ORN_ALPHA     = 0.13;    // ornament alpha ≈ 0.6× the stave
-  var STROBE_RAIL_ALPHA    = 0.10;    // static frame-rail arcs
-  var STROBE_BLOOM         = 2.5;     // shadowBlur ghost bloom (was 1.5)
-  var STROBE_COLOR         = '200,214,224';   // cool silver-patina rgb — NEVER warm-tint (would break the two-gesture law)
-  var STROBE_LINE_W        = 1.4;
-  var STROBE_LAYER_OPACITY = 1.0;     // element-opacity cap / max envelope value
-  var STROBE_FADE_IN_P     = 0.05;    // ramp-in end (p) -> ~160ms, never pops
-  var STROBE_FADE_OUT_START_P = 0.78; // dissolve begins (p)
-  var STROBE_FADE_END_P    = 0.88;    // fully gone (p) — < FREE_END(0.90): landing is uncontested
+  var STROBE_MARKS         = 36;      // CONFIRM 36 — multiple of 6, marks register on the 6 wedge seams; T=10°
+  var STROBE_R_IN          = 176;     // was 188 — pulled inward off the heaviest vignette
+  var STROBE_R_OUT         = 214;     // was 216 — band = 38px thick
+  var STROBE_STAVE_ALPHA   = 0.52;    // was 0.20 — additive over obsidian ≈ clear mid-grey engraving
+  var STROBE_ORN_ALPHA     = 0.42;    // was 0.13 — node + serifs + barb
+  var STROBE_RAIL_ALPHA    = 0.30;    // was 0.10 — visible band rails (fallback 0.24 if an outer seam shows)
+  var STROBE_BLOOM         = 3;       // was 2.5 (design proposed 4; critique dials to 3 to keep it "engraved", not "gaudy gear")
+  var STROBE_COLOR         = '200,214,224';   // UNCHANGED cool silver-patina — never warm-tint
+  var STROBE_LINE_W        = 1.6;     // was 1.4
+  var STROBE_LAYER_OPACITY = 1.0;     // unchanged
+  var STROBE_FADE_IN_P     = 0.05;    // envelope UNCHANGED
+  var STROBE_FADE_OUT_START_P = 0.78; // UNCHANGED
+  var STROBE_FADE_END_P    = 0.88;    // UNCHANGED (< FREE_END 0.90 → landing uncontested)
 
   // ---- state ---- (unchanged functional model + ceremony reveal-deferral fields)
   var state = { options: [], draft: '', preview: null, spinning: false, result: null, winner: null, revealPending: false };
@@ -609,7 +606,7 @@
     var cx=DISC_S/2, cy=DISC_S/2;
     c.globalCompositeOperation = 'lighter';       // additive ghost light — never a dark line on obsidian
     c.lineCap = 'round';
-    c.shadowColor = 'rgba('+STROBE_COLOR+','+STROBE_STAVE_ALPHA+')';
+    c.shadowColor = 'rgba('+STROBE_COLOR+',0.5)';
     c.shadowBlur  = STROBE_BLOOM;
 
     // (2) 36 IDENTICAL engraved glyphs — the strobe carrier + the relic detail
@@ -617,25 +614,31 @@
       var a = (-90 + i*(360/STROBE_MARKS)) * Math.PI/180;
       c.save();
       c.translate(cx,cy);
-      c.rotate(a + Math.PI/2);            // orient stave along local +Y, pointing outward
-      // dominant radial STAVE — feathered 0→peak→0 along its length (the wagon-wheel spoke)
-      var y0 = STROBE_R_IN+4, y1 = STROBE_R_OUT-4;
-      var g = c.createLinearGradient(0,y0, 0,y1);
+      c.rotate(a + Math.PI/2);                       // stave along local +Y, pointing outward
+      // 1) STAVE — the wagon-wheel spoke; bright zone CENTERED (lands where vignette is lighter)
+      var g = c.createLinearGradient(0,179, 0,211);
       g.addColorStop(0.00,'rgba('+STROBE_COLOR+',0)');
-      g.addColorStop(0.55,'rgba('+STROBE_COLOR+','+STROBE_STAVE_ALPHA+')');   // bright zone biased slightly OUTWARD (clears vignette)
+      g.addColorStop(0.50,'rgba('+STROBE_COLOR+','+STROBE_STAVE_ALPHA+')');
       g.addColorStop(1.00,'rgba('+STROBE_COLOR+',0)');
-      c.strokeStyle = g; c.lineWidth = STROBE_LINE_W;
-      c.beginPath(); c.moveTo(0,y0); c.lineTo(0,y1); c.stroke();
-      // ONE small ancient mark — an open ring at r_m (identical at every slot)
-      c.strokeStyle = 'rgba('+STROBE_COLOR+','+STROBE_ORN_ALPHA+')';
-      c.lineWidth = 1;
-      c.beginPath(); c.arc(0, (STROBE_R_IN+STROBE_R_OUT)/2, 2.2, 0, Math.PI*2); c.stroke();
+      c.strokeStyle=g; c.lineWidth=STROBE_LINE_W; c.lineCap='round';
+      c.beginPath(); c.moveTo(0,179); c.lineTo(0,211); c.stroke();
+      // 2) SERIFS — inner + outer rune stave-caps (also thicken the band ends)
+      c.strokeStyle='rgba('+STROBE_COLOR+','+STROBE_ORN_ALPHA+')'; c.lineWidth=1.4;
+      c.beginPath(); c.moveTo(-4,180); c.lineTo(4,180); c.stroke();
+      c.beginPath(); c.moveTo(-4,210); c.lineTo(4,210); c.stroke();
+      // 3) LOZENGE NODE at mid — a bold engraved bead (replaces the invisible r2.2 open ring)
+      c.fillStyle='rgba('+STROBE_COLOR+','+STROBE_ORN_ALPHA+')';
+      c.beginPath(); c.moveTo(0,191); c.lineTo(2.6,195); c.lineTo(0,199); c.lineTo(-2.6,195); c.closePath(); c.fill();
+      // 4) OUTWARD BARB (ratchet tooth) — small V; reinforces the wheel. FIRST TO CUT if it reads "gear" not "relic".
+      c.strokeStyle='rgba('+STROBE_COLOR+',0.36)'; c.lineWidth=1.3;
+      c.beginPath(); c.moveTo(0,211); c.lineTo(3.5,216); c.stroke();
+      c.beginPath(); c.moveTo(0,211); c.lineTo(-3.5,216); c.stroke();
       c.restore();
     }
-    // (1) STATIC RAILS — two full-circle hairline arcs = the band "thickness"; rotation-invariant ⇒ they DO NOT strobe
+    // STATIC RAILS — two full-circle arcs = the band frame; rotation-invariant ⇒ they DO NOT strobe
     c.shadowBlur = 2;
     c.strokeStyle = 'rgba('+STROBE_COLOR+','+STROBE_RAIL_ALPHA+')';
-    c.lineWidth = 1.3;
+    c.lineWidth = 1.6;
     c.beginPath(); c.arc(cx,cy,STROBE_R_IN, 0,Math.PI*2); c.stroke();
     c.beginPath(); c.arc(cx,cy,STROBE_R_OUT,0,Math.PI*2); c.stroke();
 
@@ -906,6 +909,24 @@
   var dropEl  = fxLayer ? fxLayer.querySelector('.drop')  : null;
   var splatEl = fxLayer ? fxLayer.querySelector('.splat') : null;
 
+  // rasterize the arrow ONCE to a PNG data-URI: a frozen bitmap on a permanently-promoted block layer
+  function rasterizeArrow(){
+    var S=600, OFF=(S-480)/2 /*=60*/, ss=3;                 // supersample x3 for crisp edges
+    var c=document.createElement('canvas'); c.width=c.height=S*ss;
+    var g=c.getContext('2d'); g.scale(ss,ss); g.translate(OFF,OFF);   // now in 480-space, same coords as old SVG
+    function tri(){ g.beginPath(); g.moveTo(192,-44); g.lineTo(288,-44); g.lineTo(240,52); g.closePath(); }
+    var grad=g.createLinearGradient(192,-44,288,52);
+    grad.addColorStop(0,'#eb9a52'); grad.addColorStop(0.55,'#d2691e'); grad.addColorStop(1,'#a05019');
+    g.lineJoin='round'; g.lineCap='round';
+    g.save(); g.shadowColor='rgba(0,0,0,0.5)'; g.shadowBlur=10; g.shadowOffsetY=8;
+      tri(); g.lineWidth=14; g.strokeStyle='#c15f1a'; g.stroke();          // soft round body + cast shadow
+    g.restore();
+    tri(); g.fillStyle=grad; g.fill();                                     // orange body (matches #ptrGrad)
+    g.lineWidth=14; g.strokeStyle='#c15f1a'; tri(); g.stroke();            // matte-orange rounded edge
+    g.lineWidth=2.5; g.strokeStyle='rgba(32,15,6,0.8)'; tri(); g.stroke(); // crisp dark definition edge
+    return c.toDataURL('image/png');
+  }
+
   // ---- the controller (single owner of all beats + all teardown) ----
   var ceremony = { active:false, raf:0, timers:[], anims:[], watchdog:0 };
   function ct(fn, delay){ ceremony.timers.push(setTimeout(fn, delay)); }   // registered timer
@@ -932,15 +953,15 @@
     if (lean){                                // repeat spins: no orbit lap; pointer already at top, so "born at top" holds
       ct(function(){ tickFlash(); reverb(); vitrify(); },   0);
       ct(beadBirth,                                       120);
-      ct(function(){ beadFall(true); },                   210);    // ~260ms fall (above the 240 floor)
-      ct(function(){ dripImpact(true, onDone); },         470);    // paint-ms 300 → text done ≈770
-      ct(function(){ endCeremony(false); },               780);
+      ct(function(){ beadFall(true); },                   210);    // unchanged
+      ct(function(){ dripImpact(true, onDone); },         730);    // was 470 → 210 + FALL_LEAN(520)
+      ct(function(){ endCeremony(false); },              1050);    // was 780
     } else {                                  // first spin of a set: the full ritual
       arrowLap(function(){ tickFlash(); reverb(); vitrify(); });   // cold seal on the true arrival frame (unchanged)
       ct(beadBirth,                                   620);        // ~180ms held breath after the seal
-      ct(function(){ beadFall(false); },              710);        // 360ms full-span descent
-      ct(function(){ dripImpact(false, onDone); },   1070);        // drip + white verdict painted
-      ct(function(){ endCeremony(false); },          1400);
+      ct(function(){ beadFall(false); },              710);        // unchanged
+      ct(function(){ dripImpact(false, onDone); },   1390);        // was 1070 → 710 + FALL_FULL(680)
+      ct(function(){ endCeremony(false); },          1720);        // was 1400
     }
   }
 
@@ -954,8 +975,8 @@
     document.removeEventListener('visibilitychange', ceremonyVis);
     wheelArea.removeEventListener('click', ceremonySkip);
     // hard-reset every decorative overlay to rest:
-    if (orbitArm){ orbitArm.classList.remove('live'); orbitArm.style.transform=''; orbitArm.style.willChange=''; }
-    if (ptr){ ptr.style.transform=''; ptr.style.willChange=''; ptr.style.opacity=''; }
+    if (orbitArm){ orbitArm.style.opacity='0'; orbitArm.style.transform=ARM_BASE+'rotate(0deg)'; }
+    if (ptr){ ptr.style.transform=''; ptr.style.willChange=''; ptr.style.opacity=''; ptr.style.transition=''; }
     if (fxLayer)   fxLayer.classList.remove('live');   // display:none hides the drop + splat
     if (vitrifyEl) vitrifyEl.style.opacity='0';
     canvas.style.transform = 'rotate('+rot+'deg)';     // byte-identical to the lock — nothing drifts
@@ -965,32 +986,25 @@
   function ceremonyVis(){ if (document.hidden) endCeremony(true); }
   function ceremonySkip(){ endCeremony(true); }
 
-  // ---- B1+B2+B3 arrow lap + magnet snap (filter-free .orbit-arm stand-in, ONE continuous rotation) ----
+  // ---- B1+B2+B3 arrow lap — ONE fused compositor animation (charge+glide+whip), zero main-thread motion code ----
+  var ARM_BASE = 'translate(-50%,-50%) ';
   function arrowLap(onImpact){
     if (!orbitArm){ if (onImpact) onImpact(); return; }
-    if (ptr) ptr.style.opacity = '0';               // hand off: hide the filtered pointer
-    orbitArm.classList.add('live');
-    orbitArm.style.willChange = 'transform';
-    // B1 charge — a local inhale at REST (0deg, stationary ⇒ the charge→lap seam is invisible)
-    var charge = reg(orbitArm.animate(
-      [{transform:'rotate(0deg) scale(1)'},
-       {transform:'rotate(0deg) scale(1.03)', offset:0.5},
-       {transform:'rotate(0deg) scale(1)'}],
-      {duration:CHARGE_MS, easing:'ease-out'}));
-    charge.finished.then(function(){
-      if (!ceremony.active) return Promise.reject();
-      // THE ONE CONTINUOUS ORBIT — glide→whip as a SINGLE compositor rotation; no mid-motion seam
-      var lap = reg(orbitArm.animate(
-        [{transform:'rotate(0deg)',                     easing:'cubic-bezier(0.15,0.15,0.5,0.35)'},              // glide 0→312 near-linear
-         {transform:'rotate('+(312*ORBIT_DIR)+'deg)', offset:0.66, easing:'cubic-bezier(0.9,0.03,0.97,0.20)'},  // seam = velocity MIN (held breath)
-         {transform:'rotate('+(360*ORBIT_DIR)+'deg)', offset:1}],                                                // whip → peak velocity AT contact
-        {duration:ORBIT_GLIDE_MS+ORBIT_WHIP_MS, fill:'forwards'}));
-      return lap.finished;
-    }).then(function(){
-      if (ceremony.active && onImpact) onImpact();    // tickFlash/reverb/vitrify on the TRUE arrival frame
-      orbitArm.classList.remove('live');              // reseat: swap back to the real pointer (identical px ⇒ invisible)
-      orbitArm.style.transform=''; orbitArm.style.willChange='';
-      if (ptr) ptr.style.opacity='';
+    orbitArm.style.transform = ARM_BASE+'rotate(0deg) scale(1)';
+    orbitArm.style.opacity = '1';                                        // fade the bitmap in AT REST (top, stationary)
+    if (ptr){ ptr.style.transition='opacity 60ms linear'; ptr.style.opacity='0'; }  // motionless crossfade — mismatch hidden
+    var TOTAL = CHARGE_MS + ORBIT_GLIDE_MS + ORBIT_WHIP_MS;              // 60+250+130 = 440
+    var lap = reg(orbitArm.animate([
+      { transform: ARM_BASE+'rotate(0deg) scale(1)',                          offset:0.000, easing:'ease-out' },                       // charge
+      { transform: ARM_BASE+'rotate(0deg) scale(1.03)',                       offset:0.068 },                                          // charge peak (30/440)
+      { transform: ARM_BASE+'rotate(0deg) scale(1)',                          offset:0.136, easing:'cubic-bezier(0.15,0.15,0.5,0.35)'},// glide start (60/440)
+      { transform: ARM_BASE+'rotate('+(312*ORBIT_DIR)+'deg) scale(1)',        offset:0.705, easing:'cubic-bezier(0.9,0.03,0.97,0.20)'},// whip start (310/440) — velocity MIN
+      { transform: ARM_BASE+'rotate('+(360*ORBIT_DIR)+'deg) scale(1)',        offset:1.000 }                                           // whip -> peak velocity AT contact
+    ], { duration: TOTAL, fill:'forwards' }));
+    lap.finished.then(function(){
+      if (ceremony.active && onImpact) onImpact();                       // tickFlash/reverb/vitrify on the TRUE 360=top arrival
+      if (ptr){ ptr.style.transition='opacity 60ms linear'; ptr.style.opacity=''; }  // pointer back, overlapped at top
+      orbitArm.style.opacity='0'; orbitArm.style.transform=ARM_BASE+'rotate(0deg)';
     }).catch(function(){ /* cancelled by endCeremony */ });
   }
 
@@ -1026,9 +1040,11 @@
   }
 
   // ---- the white verdict bead: born at the arrow-landing (top), falls the full instrument, drips + paints ----
-  var DROP_BIRTH   = [280, 86];    // a hair inside the top rim under the arrow tip, on the (withheld) winning wedge @12 o'clock
-  var DROP_LAND    = [280, 684];   // bottom of the fx viewBox (<700) = the top edge of the #result row → the drip kisses the text
-  var BEAD_SWELL_MS = 90;          // birth pop at the top
+  var DROP_BIRTH   = [280, 88];    // 24px below the top rim, under the arrow tip on the withheld 12-o'clock winner
+  var DROP_LAND    = [280, 684];   // kisses the top edge of the #result row
+  var FALL_FULL    = 680;          // full-path descent+drip duration
+  var FALL_LEAN    = 520;          // lean-path duration
+  var BEAD_SWELL_MS = 90;          // birth pop at the top (unchanged)
 
   function beadBirth(){            // white bead forms at the arrow-landing spot
     if (!dropEl) return;
@@ -1038,12 +1054,17 @@
       {transform:'translate('+DROP_BIRTH[0]+'px,'+DROP_BIRTH[1]+'px) scale(1)',   opacity:1}
     ], {duration:BEAD_SWELL_MS, easing:'cubic-bezier(.2,.7,.2,1)', fill:'forwards'}));
   }
-  function beadFall(lean){         // detaches, accelerates straight down the centreline (gravity ~t²)
+  function beadFall(lean){         // surface-hugs down the ball face, gathers/hangs at the rim, drips off
     if (!dropEl) return;
     reg(dropEl.animate([
-      {transform:'translate('+DROP_BIRTH[0]+'px,'+DROP_BIRTH[1]+'px) scale(1,1)'},
-      {transform:'translate('+DROP_LAND[0]+'px,'+DROP_LAND[1]+'px) scale(1,1.15)'}   // slight speed-stretch
-    ], {duration:(lean?260:360), easing:'cubic-bezier(.45,0,.75,.45)', fill:'forwards'}));   // FLOOR 240 — never shorten
+      { transform:'translate(280px,88px)  scale(1,1)',    offset:0.00, easing:'cubic-bezier(.5,.05,.7,.4)' },  // release, slow start
+      { transform:'translate(296px,210px) scale(1,1.03)', offset:0.22, easing:'cubic-bezier(.4,.15,.6,.8)' },  // drifts off the meridian onto the face
+      { transform:'translate(316px,322px) scale(1,1.05)', offset:0.42, easing:'cubic-bezier(.4,.2,.6,.85)' },  // EQUATOR: +36px bow = the across-the-ball read
+      { transform:'translate(298px,452px) scale(1,1.03)', offset:0.60, easing:'cubic-bezier(.5,.1,.72,.5)' },  // curving back as the glass wraps under
+      { transform:'translate(282px,542px) scale(1.08,.94)',offset:0.70, easing:'cubic-bezier(.6,0,.9,.32)' }, // REACHES BOTTOM RIM: pools wide/short
+      { transform:'translate(281px,543px) scale(1.06,.95)',offset:0.78, easing:'cubic-bezier(.5,0,.9,.3)' },  // ~40ms HANG at the rim (reach-then-drip reads)
+      { transform:'translate(280px,684px) scale(.9,1.22)', offset:1.00 }                                      // DRIPS OFF: necks tall/thin, accelerates into the text
+    ], { duration:(lean?FALL_LEAN:FALL_FULL), easing:'linear', fill:'forwards' }));
   }
   function dripImpact(lean, onDone){   // lands ON the text → drip + PAINT the white verdict, one frame
     hideFx(dropEl);
@@ -1163,6 +1184,11 @@
   syncCeremonyToggle();   // reflect persisted state onto the toggle at load
 
   ensureStrobe();   // bake the ghost-spoke overlay once at init (invisible until a spin lifts its opacity)
+  if (orbitArm){
+    var _arrowURI = rasterizeArrow();
+    orbitArm.style.backgroundImage = 'url('+_arrowURI+')';
+    var _im=new Image(); _im.src=_arrowURI; if(_im.decode) _im.decode().catch(function(){}); // GPU-ready, kills first-frame flash
+  }
   render();
 })();
 </script>
