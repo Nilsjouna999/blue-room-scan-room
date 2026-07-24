@@ -341,46 +341,6 @@ body[data-devnav="1"] .toggle--treatment { display: inline-flex; }
 .scanframe__meta--br { bottom: 9px; right: 9px; }
 .scanframe__meta--bl { bottom: 9px; left: 9px; }
 
-.marker {
-  position: absolute;
-  transform: translate(-50%, -50%);
-  width: 26px;
-  height: 26px;
-  pointer-events: none;
-}
-.marker__ring {
-  position: absolute;
-  inset: 0;
-  border: 1px solid rgba(228, 224, 215, 0.55);
-  border-radius: 50%;
-  box-shadow: 0 0 8px rgba(0, 0, 0, 0.4), inset 0 0 6px rgba(0, 0, 0, 0.3);
-}
-.marker__ring::after {
-  content: "";
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 3px;
-  height: 3px;
-  border-radius: 50%;
-  background: rgba(228, 224, 215, 0.8);
-  transform: translate(-50%, -50%);
-}
-.marker__no {
-  position: absolute;
-  top: -4px;
-  right: -7px;
-  font-family: var(--font-mono);
-  font-size: 7.5px;
-  color: var(--ink-900);
-  background: var(--silver);
-  border-radius: 50%;
-  width: 12px;
-  height: 12px;
-  display: grid;
-  place-items: center;
-}
-
 .horizonline {
   position: absolute;
   left: 0;
@@ -388,28 +348,6 @@ body[data-devnav="1"] .toggle--treatment { display: inline-flex; }
   height: 1px;
   background: repeating-linear-gradient(90deg, rgba(228, 224, 215, 0.5) 0 6px, transparent 6px 12px);
   opacity: 0.5;
-}
-
-.markerlegend { list-style: none; display: grid; gap: 7px; }
-.markerlegend li {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  font-family: var(--font-mono);
-  font-size: 10.5px;
-  letter-spacing: 0.05em;
-  color: var(--muted);
-}
-.markerlegend__no {
-  font-size: 7.5px;
-  color: var(--ink-900);
-  background: var(--silver-dim);
-  border-radius: 50%;
-  width: 13px;
-  height: 13px;
-  display: grid;
-  place-items: center;
-  flex: none;
 }
 
 /* missing-image drop target */
@@ -1683,14 +1621,6 @@ details.seal[open] .seal__act { opacity: 0.4; }
 /* ---- diagram tab: scan sheet overlay ---- */
 
 .scanframe--diagram .scanframe__img { filter: saturate(0.65) brightness(0.78); }
-
-/* Source merged into Diagram (BR-S044): ANNOTATED = overlay read + desaturated photo
-   (default); CLEAN = raw full-saturation photo + numbered markers + legend. Flat toggle. */
-.diagwrap.is-clean .scanframe--diagram .scanframe__img { filter: none; }
-.diagwrap.is-clean .diagsvg, .diagwrap.is-clean .diaglabels { display: none; }
-.diagwrap:not(.is-clean) .marker { display: none; }
-.diagwrap:not(.is-clean) .markerlegend { display: none; }
-.diagwrap .markerlegend { margin-top: 11px; }
 
 .diagsvg {
   position: absolute;

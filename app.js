@@ -17,7 +17,7 @@
 
    helpers       esc · pad2 · STAT_LABELS/statLabel · tierBand
    state+routing state{} · URL-param parse · DEVNAV gate
-   scan access   getScanResult · getActiveScan · getTierOutput   (the seam)
+   scan access   getScanResult · getActiveScan   (the seam)
    shared        moduleHead · imgOrPlaceholder
    left panel    renderLeftPanel · renderSourceTab · renderDiagramTab · renderMetricsTab · mountMetricsReel
    center card   renderCard
@@ -68,7 +68,7 @@ function tierBand(v) {
   return "Muted";
 }
 
-const state ={ source: 0, treatment: "free", tab: "diagram", view: "menu", draftGate: false, dev: null, labMaterial: null, diagramView: "annotated" };
+const state = { source: 0, treatment: "free", tab: "diagram", view: "menu", draftGate: false, dev: null, labMaterial: null };
 
 /* Deep-link support: ?src=1|2&t=free|shiny|mint&tab=source|diagram|metrics
    (used by reviewers and the screenshot pipeline). Any of these params
@@ -82,7 +82,6 @@ const state ={ source: 0, treatment: "free", tab: "diagram", view: "menu", draft
   /* Source is its own tab again (BR-S115): the original photo, viewable whole. */
   const tabParam = q.get("tab");
   if (["source", "diagram", "metrics"].includes(tabParam)) state.tab = tabParam;
-  if (["clean", "annotated"].includes(q.get("dv"))) state.diagramView = q.get("dv");
   /* Lab material study (CARD_TECH_LAB §20) — reproducible-capture deep link.
      Applies ONLY in the Lab state (t=mint); ignored otherwise. Does not, on its
      own, open the room — only t/src/tab do that (below). */
@@ -120,13 +119,6 @@ function getScanResult(src) {
 
 function getActiveScan() {
   return getScanResult(SOURCES[state.source]);
-}
-
-/* Free gets the preview tier; Halo Mint and the internal Lab state
-   both get the developed tier (matches current gating: paid = !free). */
-function getTierOutput(scan, treatment) {
-  if (!scan) return null;
-  return treatment === "free" ? scan.tierOutputs.free : scan.tierOutputs.halo;
 }
 
 /* ---------- shared bits ---------- */
@@ -178,8 +170,8 @@ function renderLeftPanel(src, treatment, tab) {
   return `<div class="panel__nav">${tabbar}</div><div class="panel__scroll">${body}</div>`;
 }
 
-/* ---------- tab 1: diagram (visual scan sheet — Source merged in BR-S044:
-   CLEAN = raw photo + numbered markers + legend; ANNOTATED = overlays) ---------- */
+/* ---------- tab 1: diagram (visual scan sheet — always the annotated overlay
+   read; the clean/original photo lives in its own Source tab since BR-S115) ---------- */
 
 /* Lines/shapes live in a stretched SVG (viewBox 0..100 both axes,
    preserveAspectRatio none) with non-scaling strokes; labels are
@@ -188,10 +180,6 @@ function renderDiagramTab(src, treatment) {
   const full = treatment !== "free";
   const d = src.diagram;
   const focal = src.markers[0];
-  const clean = false; // BR-S115: Diagram is always annotated; the clean/original view moved to the Source tab
-  const markers = src.markers
-    .map((m, i) => `<span class="marker" style="left:${m.x}%; top:${m.y}%;"><span class="marker__ring"></span><span class="marker__no">${i + 1}</span></span>`)
-    .join("");
   const horizon = src.horizon == null ? "" : `<span class="horizonline" style="top:${src.horizon}%"></span>`;
   /* The overlay SVG is stretched to the image (preserveAspectRatio
      none), so circular shapes must be drawn as ellipses with the
@@ -297,21 +285,17 @@ function renderDiagramTab(src, treatment) {
   return `
     <div class="module">
       ${moduleHead(`${src.label} — Diagram`)}
-      <div class="diagwrap ${clean ? "is-clean" : ""}">
+      <div class="diagwrap">
         <div class="scanframe scanframe--diagram" data-imgwrap>
           ${imgOrPlaceholder(src.file, "scanframe__img")}
           <span class="scanframe__corners"></span>
           ${horizon}
-          ${markers}
           <svg class="diagsvg" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">${svg}</svg>
           <span class="diaglabels">${labels}</span>
-          <span class="scanframe__meta scanframe__meta--tl">${clean ? `BR-SRC ${pad2(src.no)}` : `SCAN SHEET ${pad2(src.no)}`}</span>
+          <span class="scanframe__meta scanframe__meta--tl">SCAN SHEET ${pad2(src.no)}</span>
           <span class="scanframe__meta scanframe__meta--br">${esc(src.capture.code)}</span>
           <span class="scanframe__meta scanframe__meta--bl">${esc(src.capture.lens)} · ${esc(src.capture.light)}</span>
         </div>
-        <ul class="markerlegend">
-          ${src.markers.map((m, i) => `<li><span class="markerlegend__no">${i + 1}</span>${esc(m.label)}</li>`).join("")}
-        </ul>
       </div>
       ${devnote}
     </div>
@@ -843,10 +827,10 @@ function renderReadingPanel(src, treatment) {
    Order: factual → interpretive → identity → collectible → playful.
    Free state reads as undeveloped archive material — never a paywall. */
 
-function dplate(no, title, paid, body, extraClass = "") {
-  /* paid retained in the signature (callers pass it); the per-plate develop/
-     archive tag was CUT (BR-S048) — the single back-seam gate concentrates at
-     Card Record, and per-plate copy carries free-vs-developed state. */
+function dplate(no, title, body, extraClass = "") {
+  /* No per-plate paid arg — the per-plate develop/archive tag was CUT (BR-S048);
+     the single back-seam gate concentrates at Card Record, and per-plate copy
+     carries free-vs-developed state. */
   return `
     <section class="dplate ${extraClass}">
       <span class="dplate__spine" aria-hidden="true">${no}</span>
@@ -1068,7 +1052,6 @@ function renderDossier(src, treatment) {
      front of the free reader. <div>, NOT <section>, so the .dplate nth-of-type
      dossier rhythm is untouched. */
   const editionLabel = treatment === "free" ? "ARCHIVE EDITION" : treatment === "mint" ? "SIGNATURE MINT" : "HALO MINT";
-  const sec = (typeof S107_SECTIONS !== "undefined" && S107_SECTIONS[src.id]) || {};
   const recordGate = `<div class="drecord-gate">◆ ARTIFACT RECORD · ${paid ? esc(c.serial) : "····"} · ${editionLabel}</div>`;
 
   /* BR-S113 (1A): Source Record plate KILLED — it did not earn its place (Mint +
@@ -1085,25 +1068,24 @@ function renderDossier(src, treatment) {
   const cf = (typeof S108_EXTRAS !== "undefined" && (S108_EXTRAS[src.id] || {}).colourField) || [];
   /* BR-S108.3 (#1): Surface Record DROPS the % — Colour Field owns the measurement,
      Surface Record owns the annotated palette (named surface + what it is). */
-  const cfRow = (c, withProof) => `<div class="cfdeep__row"><span class="cfdeep__bar" style="--sw:${esc(c.hex)}"></span><div class="cfdeep__body"><div class="cfdeep__head"><span class="cfdeep__label">${esc(c.label)}</span>${withProof ? `<span class="cfdeep__pct">${c.pct}%</span>` : ""}</div>${withProof ? `<span class="cfdeep__proof">${esc(c.proof)}</span>` : ""}</div></div>`;
-  const board = dplate("01", "Surface Record", paid, paid
+  const cfRow = (c) => `<div class="cfdeep__row"><span class="cfdeep__bar" style="--sw:${esc(c.hex)}"></span><div class="cfdeep__body"><div class="cfdeep__head"><span class="cfdeep__label">${esc(c.label)}</span></div></div></div>`;
+  const board = dplate("01", "Surface Record", paid
     ? renderSurfaceRecord(src)
-    : `<div class="cfdeep">${cf.slice(0, 3).map((c) => cfRow(c, false)).join("")}<p class="dstat__undeveloped">Surface proofs develop with the mint.</p></div>`);
+    : `<div class="cfdeep">${cf.slice(0, 3).map((c) => cfRow(c)).join("")}<p class="dstat__undeveloped">Surface proofs develop with the mint.</p></div>`);
 
   /* 03 — BR-S107: Stat Dossier KILLED (geometry-as-prose, a second time). Its
      numbers live only in Metrics now; nothing renders here. */
-  const statDossier = "";
 
   /* 02 — Archetype (empty stub): a reserved placeholder plate for a future archetype
      read. The Card tag still carries the live archetype; this is scaffold only.
      Replaces the removed Hidden Stat plate. HELD draft. */
-  const archetype = dplate("02", "Archetype", paid, `
+  const archetype = dplate("02", "Archetype", `
     <p class="dstat__undeveloped">Archetype read — reserved. Develops in a later pass.</p>`);
 
   /* 03 — Aura, NAMED AIR (BR-S154): the felt energy/mood a photo radiates, read
      instantly — see renderAuraBody. Free shows the honest fragment; develop names
      the feeling, proves it against the viewer, and records its intensity. */
-  const aura = dplate("03", "Aura", paid, renderAuraBody(src, paid), "dplate--aura");
+  const aura = dplate("03", "Aura", renderAuraBody(src, paid), "dplate--aura");
 
   /* 06 — Mint Record */
   const mintBody = paid
@@ -1133,13 +1115,13 @@ function renderDossier(src, treatment) {
       <span class="unlock__name">Develop this scan</span>
       <span class="unlock__desc">the card finishes developing in place</span>
     </button>`;
-  const mintRecord = dplate("04", "Mint Record", paid, mintBody, "dplate--mint");
+  const mintRecord = dplate("04", "Mint Record", mintBody, "dplate--mint");
 
   /* 07 — Oracle Read */
   /* 06 — Oracle Read (BR-S107: the ONLY verdict; sealed behind a FREE tap-to-
      develop reveal; centered/large/alone form). */
   const oracleText = paid ? (scan?.readings.oracle || d.oracle.full) : (scan?.tierOutputs.free.oracle || d.oracle.short);
-  const oracle = dplate("05", "Oracle Read", paid, `
+  const oracle = dplate("05", "Oracle Read", `
     <details class="seal seal--oracle" ${paid ? "open" : ""}>
       <summary class="seal__cue seal__cue--oracle"><span class="seal__dot">◆</span><span class="seal__name">The verdict</span><span class="seal__act">tap to develop</span></summary>
       <blockquote class="doracle doracle--centered">“${esc(oracleText)}”</blockquote>
@@ -2284,12 +2266,7 @@ function renderBlockedScan(b, actionsHtml) {
         <p class="gatepanel__ready">No card, no stats, no oracle, no receipts were produced.</p>
       </section>
 
-      ${actionsHtml || `<div class="gateactions">
-        <button type="button" class="menu__enter" data-view-to="draft">Return to local draft</button>
-        <button type="button" class="draft__sample" data-draft-pick>Replace image</button>
-        <button type="button" class="draft__sample" data-view-to="room">Enter sample scan room</button>
-        <button type="button" class="draft__back" data-view-to="menu">Main menu</button>
-      </div>`}
+      ${actionsHtml}
     </div>`;
 }
 
