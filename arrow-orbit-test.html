@@ -1,30 +1,44 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Arrow Orbit — Isolation Test</title>
+<title>Arrow Orbit — Easing Test</title>
 <style>
   body{margin:0;min-height:100vh;background:radial-gradient(120% 90% at 50% -10%,#100f0d,#0a0908 55%,#050505);
-    color:#948f87;font:600 12px 'IBM Plex Mono',monospace;display:flex;flex-direction:column;align-items:center;padding:40px 20px}
-  .note{max-width:560px;text-align:center;line-height:1.6;letter-spacing:.06em;margin-bottom:8px;color:#6e6b63}
-  .wheel-area{position:relative;width:560px;max-width:100%;aspect-ratio:560/700;margin-top:8px}
-  .disc{position:absolute;left:7.143%;top:9.143%;width:85.714%;height:68.571%;border-radius:50%;
-    background:radial-gradient(circle at 50% 45%,#16151a,#0b0b0d 70%);box-shadow:0 16px 26px rgba(0,0,0,.55)}
-  .orbit-arm{position:absolute;left:50%;top:43.43%;width:107.143%;aspect-ratio:1;
+    color:#948f87;font:600 12px 'IBM Plex Mono',monospace;display:flex;flex-direction:column;align-items:center;padding:32px 20px}
+  .note{max-width:600px;text-align:center;line-height:1.7;letter-spacing:.05em;margin-bottom:6px;color:#8a857d}
+  .note b{color:#e8842a}
+  .wheel-area{position:relative;width:520px;max-width:92vw;aspect-ratio:520/620;margin-top:6px}
+  .disc{position:absolute;left:9%;top:9%;width:82%;height:68.8%;border-radius:50%;
+    background:radial-gradient(circle at 50% 45%,#17161b,#0b0b0d 70%);box-shadow:0 16px 26px rgba(0,0,0,.55)}
+  .orbit-arm{position:absolute;left:50%;top:43.4%;width:100%;aspect-ratio:1;
     transform:translate(-50%,-50%) rotate(0deg);transform-origin:50% 50%;
     background-position:center;background-size:100% 100%;background-repeat:no-repeat;
     z-index:3;pointer-events:none;opacity:0;will-change:transform}
-  .hud{margin-top:16px;display:flex;gap:18px;align-items:center;letter-spacing:.14em}
+  .row{margin-top:18px;display:flex;gap:10px;flex-wrap:wrap;justify-content:center;align-items:center}
   button{font:inherit;cursor:pointer;color:#d7d3ca;background:rgba(233,229,220,.05);
-    border:1px solid rgba(233,229,220,.2);border-radius:8px;padding:10px 18px;text-transform:uppercase;letter-spacing:.2em}
-  #fps{color:#e8842a}
+    border:1px solid rgba(233,229,220,.2);border-radius:8px;padding:11px 16px;text-transform:uppercase;letter-spacing:.14em}
+  button.on{color:#171310;background:linear-gradient(180deg,#e7e2d7,#cbc6bb);border-color:transparent}
+  #fps{color:#e8842a;min-width:70px;text-align:right}
+  .lab{color:#6e6b63;letter-spacing:.2em}
 </style></head><body>
-  <div class="note">Watch only the arrow. Turn the main-thread hog ON: the FPS meter should drop, but a properly composited arrow keeps orbiting glassy-smooth. If it stutters/jumps even here, the technique is still wrong.</div>
+  <div class="note">Try each easing. Which reads as a smooth rigid orbit vs. <b>lag/teleport</b>?<br>
+  <b>LINEAR</b> = steady sweep · <b>SMOOTH</b> = gentle ease · <b>WHIP</b> = the old ceremony motion (slows at ~10 o'clock, then snaps to top).<br>
+  Then hit <b>HOG</b> to jam the main thread and see if the smooth ones survive it.</div>
   <div class="wheel-area"><div class="disc"></div><div class="orbit-arm" id="arm"></div></div>
-  <div class="hud"><span id="fps">-- fps</span><button id="hog">Main-thread hog: OFF</button></div>
+  <div class="row">
+    <span class="lab">Easing:</span>
+    <button id="b-linear" class="on">Linear</button>
+    <button id="b-smooth">Smooth</button>
+    <button id="b-whip">Whip (old)</button>
+  </div>
+  <div class="row">
+    <span id="fps">-- fps</span>
+    <button id="hog">Main-thread hog: OFF</button>
+  </div>
 <script>(function(){
-  var CHARGE_MS=60, ORBIT_GLIDE_MS=250, ORBIT_WHIP_MS=130, ORBIT_DIR=1, ARM_BASE='translate(-50%,-50%) ';
+  var ORBIT_DIR=1, ARM_BASE='translate(-50%,-50%) ', mode='linear';
   var arm=document.getElementById('arm');
   function rasterizeArrow(){
-    var S=600,OFF=(S-480)/2,ss=3,c=document.createElement('canvas');c.width=c.height=S*ss;
+    var S=600,OFF=(S-480)/2,ss=2,c=document.createElement('canvas');c.width=c.height=S*ss;
     var g=c.getContext('2d');g.scale(ss,ss);g.translate(OFF,OFF);
     function tri(){g.beginPath();g.moveTo(192,-44);g.lineTo(288,-44);g.lineTo(240,52);g.closePath();}
     var grad=g.createLinearGradient(192,-44,288,52);
@@ -36,18 +50,32 @@
   }
   arm.style.backgroundImage='url('+rasterizeArrow()+')';
   function lap(){
-    arm.style.transform=ARM_BASE+'rotate(0deg) scale(1)';arm.style.opacity='1';
-    var TOTAL=CHARGE_MS+ORBIT_GLIDE_MS+ORBIT_WHIP_MS;
-    var a=arm.animate([
-      {transform:ARM_BASE+'rotate(0deg) scale(1)',offset:0,easing:'ease-out'},
-      {transform:ARM_BASE+'rotate(0deg) scale(1.03)',offset:0.068},
-      {transform:ARM_BASE+'rotate(0deg) scale(1)',offset:0.136,easing:'cubic-bezier(0.15,0.15,0.5,0.35)'},
-      {transform:ARM_BASE+'rotate('+(312*ORBIT_DIR)+'deg) scale(1)',offset:0.705,easing:'cubic-bezier(0.9,0.03,0.97,0.20)'},
-      {transform:ARM_BASE+'rotate('+(360*ORBIT_DIR)+'deg) scale(1)',offset:1}
-    ],{duration:TOTAL,fill:'forwards'});
-    a.finished.then(function(){arm.style.opacity='0';});
+    arm.style.transform=ARM_BASE+'rotate(0deg)';arm.style.opacity='1';
+    var kf, opt;
+    if(mode==='linear'){
+      kf=[{transform:ARM_BASE+'rotate(0deg)'},{transform:ARM_BASE+'rotate('+(360*ORBIT_DIR)+'deg)'}];
+      opt={duration:1300, easing:'linear', fill:'forwards'};
+    } else if(mode==='smooth'){
+      kf=[{transform:ARM_BASE+'rotate(0deg)'},{transform:ARM_BASE+'rotate('+(360*ORBIT_DIR)+'deg)'}];
+      opt={duration:1300, easing:'cubic-bezier(.4,0,.2,1)', fill:'forwards'};   // gentle ease-in-out
+    } else { // whip — the old ceremony motion
+      kf=[
+        {transform:ARM_BASE+'rotate(0deg) scale(1)',offset:0,easing:'ease-out'},
+        {transform:ARM_BASE+'rotate(0deg) scale(1.03)',offset:0.068},
+        {transform:ARM_BASE+'rotate(0deg) scale(1)',offset:0.136,easing:'cubic-bezier(0.15,0.15,0.5,0.35)'},
+        {transform:ARM_BASE+'rotate('+(312*ORBIT_DIR)+'deg) scale(1)',offset:0.705,easing:'cubic-bezier(0.9,0.03,0.97,0.20)'},
+        {transform:ARM_BASE+'rotate('+(360*ORBIT_DIR)+'deg) scale(1)',offset:1}
+      ];
+      opt={duration:440, fill:'forwards'};
+    }
+    var a=arm.animate(kf,opt);
+    a.finished.then(function(){arm.style.opacity='0';}).catch(function(){});
   }
-  setInterval(lap,1200); lap();
+  var loopId=setInterval(lap,1700); lap();
+  function pick(m,btn){mode=m;['b-linear','b-smooth','b-whip'].forEach(function(id){document.getElementById(id).classList.remove('on');});btn.classList.add('on');clearInterval(loopId);loopId=setInterval(lap,1700);lap();}
+  document.getElementById('b-linear').addEventListener('click',function(){pick('linear',this);});
+  document.getElementById('b-smooth').addEventListener('click',function(){pick('smooth',this);});
+  document.getElementById('b-whip').addEventListener('click',function(){pick('whip',this);});
   var last=performance.now(),frames=0,fpsEl=document.getElementById('fps');
   (function tick(now){frames++;if(now-last>=500){fpsEl.textContent=Math.round(frames*1000/(now-last))+' fps';frames=0;last=now;}requestAnimationFrame(tick);})(performance.now());
   var hogId=0,hb=document.getElementById('hog');
