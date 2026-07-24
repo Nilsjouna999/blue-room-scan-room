@@ -549,7 +549,7 @@
   // ---- Concord wiring (BR-S196): the desk seal + the claim, one delegated listener ----
   function ckVal(k){var el=document.querySelector('[data-ck="'+k+'"]');return el?el.value.trim():""}
   function sealBeat(btn,label,after){
-    var reduce=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    var reduce=window.matchMedia&&(window.BRMotion ? window.BRMotion.prefersReduced() : window.matchMedia("(prefers-reduced-motion: reduce)").matches);
     if(!btn||reduce)return after();
     btn.disabled=true;btn.classList.add("is-settled");btn.textContent=label;setTimeout(after,620);
   }

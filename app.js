@@ -91,7 +91,7 @@ const state ={ source: 0, treatment: "free", tab: "diagram", view: "menu", draft
      uploaded-blocked renders a validated DEV fixture, never a user scan.
      free-scan-sim = Free Pull mock · halo-gate = sealed card-back mock. */
   const dev = q.get("dev");
-  if (["uploaded-result", "uploaded-blocked", "free-scan-sim", "halo-gate", "before-after", "review-map", "proto-cards", "staged-reveal", "menu-reveal", "vault", "arcane", "arcana-reading", "profile", "ceremony", "drawing-room"].includes(dev)) { state.view = "dev"; state.dev = dev; }
+  if (["uploaded-result", "uploaded-blocked", "free-scan-sim", "halo-gate", "before-after", "review-map", "proto-cards", "staged-reveal", "menu-reveal", "vault", "arcane", "arcana-reading", "profile", "ceremony", "drawing-room", "settings"].includes(dev)) { state.view = "dev"; state.dev = dev; }
   else if (q.has("src") || q.has("t") || q.has("tab")) state.view = "room";
 }
 
@@ -491,7 +491,7 @@ function mountMetricsReel() {
   const track = win.querySelector(".met-plates");
   const plates = Array.prototype.slice.call(track.querySelectorAll(".met-plate"));
   if (!track || !plates.length) return;
-  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const reduce = window.BRMotion ? window.BRMotion.prefersReduced() : window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   let cur = 0, busy = false;
   const setActive = (i) => {
     cur = i;
@@ -919,7 +919,7 @@ let _surfaceResizeBound = false;
 function mountSurfaceRecords() {
   _surfaceRafs.forEach((id) => cancelAnimationFrame(id));
   _surfaceRafs = [];
-  const reduce = window.matchMedia("(prefers-reduced-motion:reduce)").matches;
+  const reduce = window.BRMotion ? window.BRMotion.prefersReduced() : window.matchMedia("(prefers-reduced-motion:reduce)").matches;
   document.querySelectorAll("[data-surface-canvas]").forEach((cv) => {
     let pal; try { pal = JSON.parse(cv.dataset.swatches || "[]"); } catch (e) { pal = []; }
     if (!pal.length) return;
@@ -1385,6 +1385,7 @@ function renderWall() {
     + '<div class="menu__wall-rail">'
     + '<button type="button" class="menu__codex menu__codex--reliq" data-annex-go><span class="menu__codex__mark" aria-hidden="true">◆</span> The Reliquary <span class="menu__codex__arr" aria-hidden="true">→</span></button>'
     + '<a class="menu__codex" href="codex.html" data-codex-open><span class="menu__codex__mark" aria-hidden="true">◆</span> The Codex <span class="menu__codex__arr" aria-hidden="true">→</span></a>'
+    + '<a class="menu__codex" href="?dev=settings"><span class="menu__codex__mark" aria-hidden="true">◆</span> Settings <span class="menu__codex__arr" aria-hidden="true">→</span></a>'
     + '</div>'
     + '<p class="menu__wall-foot">One archive · every door kept.</p>'
     + '</div>';
@@ -1496,6 +1497,7 @@ function renderMenu(reveal) {
 
         <div class="menu__portals">
           <a class="menu__codex" href="codex.html" data-codex-open><span class="menu__codex__mark" aria-hidden="true">◆</span> The Codex <span class="menu__codex__arr" aria-hidden="true">→</span></a>
+          <a class="menu__codex" href="?dev=settings"><span class="menu__codex__mark" aria-hidden="true">◆</span> Settings <span class="menu__codex__arr" aria-hidden="true">→</span></a>
           <button type="button" class="menu__codex menu__codex--rooms" data-annex-go><span class="menu__codex__mark" aria-hidden="true">◆</span> The Reading Rooms <span class="menu__codex__arr" aria-hidden="true">→</span></button>
         </div>
 
@@ -1548,7 +1550,7 @@ function wireMenuAbout(host) {
   if (_aboutBackstop) { window.removeEventListener("scroll", _aboutBackstop); _aboutBackstop = null; }   // remove-then-add: no stacking across remounts
   const about = host.querySelector("#about");
   if (!about) return;
-  const reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const reduce = window.BRMotion ? window.BRMotion.prefersReduced() : (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
   const nuggets = [].slice.call(about.querySelectorAll(".about__nugget"));
   if (reduce || !("IntersectionObserver" in window) || !nuggets.length) return;   // all shown, no motion
   about.classList.add("is-motion");
@@ -1589,7 +1591,7 @@ function wireMenuCodex(host) {
   let loaded = false, isOpen = false, busy = false, bgInert = [];
   let wcT = null, homeT = null, closeT = null, busyT = null;
   const ok = (function () { try { return window.CSS && CSS.supports("clip-path", "circle(0px)"); } catch (e) { return false; } })();
-  const reduced = function () { return window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches; };
+  const reduced = function () { return window.BRMotion ? window.BRMotion.prefersReduced() : (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches); };
   const canBloom = function () { return loaded && ok; };
 
   function geometry() {
@@ -2666,6 +2668,14 @@ function mountDev() {
     else host.innerHTML = '<p style="padding:48px;color:#948f87;text-align:center;font-family:sans-serif">The Drawing Room failed to load (drawing-room.js).</p>';
     return;
   }
+  if (state.dev === "settings") {
+    // BR-S208 — Settings + the "boring page" (about/technical/rules/privacy/legal).
+    // Self-contained in settings.js (window.BRSettings); this branch hands it the node.
+    const host = document.getElementById("devView");
+    if (window.BRSettings && typeof window.BRSettings.mount === "function") window.BRSettings.mount(host);
+    else host.innerHTML = '<p style="padding:48px;color:#948f87;text-align:center;font-family:sans-serif">The Settings page failed to load (settings.js).</p>';
+    return;
+  }
   if (state.dev === "ceremony") {
     // BR-S163 — the forge ceremony (builder's exact art, pixel-perfect + alive).
     // In ceremony.js (window.BRCeremony); this branch hands it the node.
@@ -3235,9 +3245,9 @@ function render() {
    never re-mounting #stageZone — so the finish tweens, the card-in pop does
    not re-fire, and the dossier serial resolves '····'→address in place.
    render() stays the path for boot / source / view / devnav / deep-link init. */
-const MOTION_OFF = window.matchMedia
-  ? window.matchMedia("(prefers-reduced-motion: reduce)").matches
-  : false;
+const MOTION_OFF = window.BRMotion
+  ? window.BRMotion.prefersReduced()
+  : (window.matchMedia ? window.matchMedia("(prefers-reduced-motion: reduce)").matches : false);
 
 function patchCardFront(src, treatment) {
   const card = document.querySelector("#stageZone .card");

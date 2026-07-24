@@ -827,7 +827,7 @@
     function onKey(e) { if (e.key === "Escape") { done ? (onExit && onExit()) : jumpToEnd(); } }
     window.addEventListener("keydown", onKey);
 
-    var rm = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    var rm = window.matchMedia && (window.BRMotion ? window.BRMotion.prefersReduced() : window.matchMedia("(prefers-reduced-motion: reduce)").matches);
     if (rm) jumpToEnd(); else start();
 
     return { destroy: function () { if (iv) clearInterval(iv); window.removeEventListener("keydown", onKey); } };
@@ -1021,7 +1021,7 @@
       });
       linkEl.focus(); linkEl.select();
     }
-    var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    var reduce = window.matchMedia && (window.BRMotion ? window.BRMotion.prefersReduced() : window.matchMedia("(prefers-reduced-motion: reduce)").matches);
     sendBtn.addEventListener("click", function () {
       if (reduce) return showDeed();
       sendBtn.disabled = true; sendBtn.classList.add("is-settled"); sendBtn.textContent = "Sent";

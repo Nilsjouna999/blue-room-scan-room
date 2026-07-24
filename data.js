@@ -10,6 +10,17 @@
    placeholder.
 ============================================================= */
 
+/* BR-S208: global reduced-motion helper — a Settings override (localStorage br_reduced_motion
+   = "reduced" | "full") layered over the OS prefers-reduced-motion query. Stamps <html data-motion>
+   on boot so CSS can key off it too. Defined here (data.js loads first) so every module can call it. */
+window.BRMotion = {
+  get: function () { try { return localStorage.getItem("br_reduced_motion") || "system"; } catch (e) { return "system"; } },
+  set: function (v) { try { (v && v !== "system") ? localStorage.setItem("br_reduced_motion", v) : localStorage.removeItem("br_reduced_motion"); } catch (e) {} this.apply(); },
+  prefersReduced: function () { var v = this.get(); if (v === "reduced") return true; if (v === "full") return false; return !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches); },
+  apply: function () { try { document.documentElement.dataset.motion = this.get(); } catch (e) {} }
+};
+window.BRMotion.apply();
+
 /* House read method — the interpretive lenses shown in Technical
    Receipts (paid). Same for every card: it's the method, not a
    measurement. Phrase as what the read looks THROUGH (rendered as

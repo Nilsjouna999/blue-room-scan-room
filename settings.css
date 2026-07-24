@@ -1,0 +1,248 @@
+/* =============================================================
+   SETTINGS (?dev=settings) — the .st-* ADDENDUM only.
+
+   settings.js renders its document surface with arcana-profile.css's
+   .pf-* system (loaded page-wide); this file adds ONLY the new UI that
+   Settings needs and Profile does not: the tab strip, the segmented
+   Motion control, the setting rows + buttons + inline confirm, the
+   read-only ledger, and the boring-page document layout + jump-rail.
+
+   It does NOT redefine any .pf-* rule or --pf-* token — those are
+   inherited from arcana-profile.css (the settings root is <div class="pf">).
+
+   FLAT ARCHIVE LAW: no shadows, no gradients (beyond the .pf hairlines
+   already in play), no depth, no transforms/parallax — the calmest page
+   in the app. Only ~.15–.18s colour/border hover-focus transitions, all
+   disabled under prefers-reduced-motion. Gold is the only accent besides
+   the single warm-rust destructive control.
+============================================================= */
+
+/* ONE new hue — the single destructive action. Warm rust, not alarm red,
+   staying inside the archive's warm-neutral law. Scoped to the page. */
+.st-page {
+  --st-danger: #c98a6f;
+  --st-danger-lit: #dba38a;
+  --st-danger-line: rgba(201, 138, 111, 0.30);
+}
+
+/* the document column is a touch wider than the profile's intimate 620px,
+   to seat the boring-page's rail + body without crowding the reading measure */
+.st-page .pf-wrap { width: min(880px, 92vw); }
+
+/* ---------- header right link (→ The Reliquary) ---------- */
+.st-toplink {
+  font-family: var(--pf-mono); font-size: 9.5px; font-weight: 500;
+  letter-spacing: .16em; text-transform: uppercase; color: var(--pf-meta);
+  text-decoration: none; padding: 8px 4px; display: inline-flex; align-items: center; gap: 7px;
+  transition: color .18s;
+}
+.st-toplink:hover, .st-toplink:focus-visible { color: var(--pf-cream-display); outline: none; }
+
+/* ---------- page head ---------- */
+.st-head { padding-left: 22px; margin: clamp(6px, 2vh, 18px) 0 clamp(20px, 3.5vh, 34px); }
+.st-title {
+  font-family: var(--pf-serif); font-weight: 600; line-height: 1.04; letter-spacing: .012em;
+  font-size: clamp(30px, 4.6vw, 46px); color: var(--pf-cream-display); margin: 0;
+}
+.st-sub {
+  font-family: var(--pf-serif); font-style: italic; font-size: 15px;
+  color: var(--pf-meta); margin: 8px 0 0; max-width: 52ch;
+}
+
+/* ---------- tab strip ---------- */
+.st-tabs {
+  display: flex; gap: 4px; margin: 0 0 clamp(8px, 2vh, 20px); padding-left: 22px;
+  border-bottom: 1px solid var(--pf-line-soft);
+}
+.st-tab {
+  background: none; border: 0; border-bottom: 2px solid transparent; cursor: pointer;
+  padding: 12px 14px; min-height: 44px;
+  font-family: var(--pf-mono); font-size: 10.5px; font-weight: 500; letter-spacing: .16em;
+  text-transform: uppercase; color: var(--pf-ghost);
+  transition: color .16s, border-color .16s;
+}
+.st-tab:hover { color: var(--pf-cream-display); }
+.st-tab.is-on { color: var(--pf-gold-lit); border-bottom-color: var(--pf-gold); }
+.st-tab:focus-visible { outline: 2px solid var(--pf-gold-lit); outline-offset: 2px; border-radius: 3px; }
+
+.st-panel { margin-top: clamp(10px, 2vh, 22px); }
+/* the controls read intimate; the boring page uses the fuller column */
+#st-panel-controls { max-width: 640px; }
+
+/* control sections sit a little closer than the profile's big section rhythm */
+.st-sec { margin-top: clamp(26px, 4.5vh, 44px); }
+
+/* ---------- segmented control (Motion / locked Appearance) ---------- */
+.st-seg {
+  display: inline-flex; flex-wrap: wrap; gap: 0; margin: 4px 0 0;
+  border: 1px solid var(--pf-line-cut); border-radius: 999px; padding: 3px; background: rgba(233, 229, 220, .015);
+}
+.st-seg__opt {
+  background: none; border: 0; border-radius: 999px; cursor: pointer;
+  padding: 10px 18px; min-height: 40px; min-width: 96px;
+  font-family: var(--pf-mono); font-size: 10px; font-weight: 500; letter-spacing: .14em;
+  text-transform: uppercase; color: var(--pf-meta);
+  transition: color .16s, background .16s;
+}
+.st-seg__opt:hover:not(.is-on):not(:disabled) { color: var(--pf-cream-display); }
+.st-seg__opt.is-on { background: var(--pf-gold); color: #14100a; }
+.st-seg__opt:focus-visible { outline: 2px solid var(--pf-gold-lit); outline-offset: 3px; }
+.st-seg__opt:disabled { cursor: default; }
+/* the honest locked Appearance option — non-interactive, dimmed */
+.st-seg--locked { opacity: 1; }
+.st-seg__opt--locked { cursor: default; opacity: .85; }
+.st-seg__opt--locked.is-on { background: rgba(162, 134, 74, .28); color: var(--pf-cream-display); }
+
+/* small caption under a control */
+.st-note {
+  font-family: var(--pf-mono); font-size: 9.5px; letter-spacing: .04em; line-height: 1.7;
+  color: var(--pf-meta); margin: 14px 0 0; max-width: 52ch;
+}
+
+/* ---------- setting rows ---------- */
+.st-ctrl {
+  display: flex; align-items: flex-start; gap: 18px; justify-content: space-between;
+  padding: 18px 0; border-top: 1px solid var(--pf-line-soft);
+}
+.st-sec .st-ctrl:first-of-type { border-top: 0; }
+.st-ctrl__txt { flex: 1 1 auto; }
+.st-ctrl__t { font-family: var(--pf-serif); font-size: 17px; color: var(--pf-cream); margin: 0; line-height: 1.2; }
+.st-ctrl__d { font-family: var(--pf-serif); font-size: 13.5px; color: var(--pf-meta); margin: 5px 0 0; line-height: 1.5; max-width: 46ch; }
+.st-ctrl__act { flex: 0 0 auto; padding-top: 2px; }
+
+/* ---------- buttons ---------- */
+.st-btn {
+  background: none; border: 1px solid var(--pf-line-cut); border-radius: 999px; cursor: pointer;
+  padding: 11px 22px; min-height: 44px;
+  font-family: var(--pf-mono); font-size: 10px; font-weight: 500; letter-spacing: .16em;
+  text-transform: uppercase; color: var(--pf-gold); white-space: nowrap;
+  transition: color .16s, border-color .16s, background .16s;
+}
+.st-btn:hover:not(:disabled), .st-btn:focus-visible:not(:disabled) {
+  border-color: var(--pf-gold); color: var(--pf-gold-lit); outline: none; background: rgba(162, 134, 74, .05);
+}
+.st-btn:focus-visible { outline: 2px solid var(--pf-gold-lit); outline-offset: 3px; }
+.st-btn:disabled { color: var(--pf-ghost); border-color: var(--pf-line); cursor: default; }
+.st-btn--danger { color: var(--st-danger); border-color: var(--st-danger-line); }
+.st-btn--danger:hover:not(:disabled), .st-btn--danger:focus-visible:not(:disabled) {
+  color: var(--st-danger-lit); border-color: var(--st-danger); background: rgba(201, 138, 111, .06);
+}
+
+/* ---------- inline reset confirm strip ---------- */
+.st-confirm {
+  margin: 2px 0 6px; padding: 14px 16px;
+  border: 1px solid var(--st-danger-line); border-radius: 7px; background: rgba(201, 138, 111, .05);
+}
+.st-confirm[hidden] { display: none; }
+.st-confirm__t { font-family: var(--pf-serif); font-size: 14.5px; color: var(--pf-cream); margin: 0 0 12px; line-height: 1.5; max-width: 52ch; }
+.st-confirm__row { display: flex; gap: 10px; flex-wrap: wrap; }
+
+/* ---------- read-only local ledger ---------- */
+.st-ledger { margin: 20px 0 2px; padding-top: 18px; border-top: 1px solid var(--pf-line); }
+.st-ledger__h {
+  font-family: var(--pf-mono); font-size: 9px; letter-spacing: .2em; text-transform: uppercase;
+  color: var(--pf-meta); margin: 0 0 6px;
+}
+.st-ledger__row {
+  display: flex; align-items: baseline; justify-content: space-between; gap: 14px;
+  padding: 10px 0; border-bottom: 1px solid var(--pf-line-soft);
+}
+.st-ledger__row:last-child { border-bottom: 0; }
+.st-ledger__k { font-family: var(--pf-serif); font-size: 15px; color: var(--pf-body); }
+.st-ledger__v {
+  font-family: var(--pf-mono); font-size: 9.5px; letter-spacing: .14em; text-transform: uppercase;
+  color: var(--pf-ghost);
+}
+.st-ledger__v.is-set { color: var(--pf-gold); }
+
+/* ============================================================
+   THE BORING PAGE — one document, sticky jump-rail, six sections
+============================================================ */
+.st-record { display: grid; grid-template-columns: 168px 1fr; gap: clamp(20px, 3vw, 44px); align-items: start; }
+
+/* the rail — a mono micro-index with a left spine that lights per section */
+.st-jump { position: sticky; top: 84px; display: flex; flex-direction: column; gap: 2px; }
+.st-jump__link {
+  position: relative; display: block; text-decoration: none;
+  padding: 9px 12px; min-height: 40px; box-sizing: border-box;
+  border-left: 2px solid var(--pf-line); color: var(--pf-ghost);
+  font-family: var(--pf-mono); font-size: 9.5px; font-weight: 500; letter-spacing: .12em;
+  text-transform: uppercase; line-height: 1.5;
+  transition: color .16s, border-color .16s, background .16s;
+}
+.st-jump__link:hover { color: var(--pf-cream-display); border-left-color: var(--pf-line-cut); }
+.st-jump__link.is-current {
+  color: var(--pf-gold-lit); border-left-color: var(--pf-gold);
+  background: linear-gradient(to right, rgba(162, 134, 74, .07), transparent 80%);
+}
+.st-jump__link:focus-visible { outline: 2px solid var(--pf-gold-lit); outline-offset: 2px; border-radius: 3px; }
+
+/* the document body */
+.st-doc { min-width: 0; }
+.st-doc__sec { scroll-margin-top: 96px; }
+.st-doc__sec:first-child { margin-top: clamp(6px, 1.5vh, 14px); }
+.st-doc__title {
+  font-family: var(--pf-serif); font-weight: 600; font-size: clamp(23px, 3vw, 30px);
+  line-height: 1.1; letter-spacing: .01em; color: var(--pf-cream-display); margin: 0;
+}
+.st-doc__title:focus-visible { outline: 2px solid var(--pf-gold-lit); outline-offset: 4px; border-radius: 3px; }
+.st-doc__lede { margin-top: 8px; }
+.st-doc__body { max-width: 66ch; margin-top: 4px; }
+
+.st-p { font-family: var(--pf-serif); font-size: 16px; line-height: 1.66; color: var(--pf-body); margin: 15px 0 0; }
+.st-lead { color: var(--pf-cream); font-weight: 600; }
+
+.st-list, .st-romanlist { list-style: none; margin: 16px 0 0; padding: 0; }
+.st-list li {
+  position: relative; padding-left: 22px; margin: 10px 0 0;
+  font-family: var(--pf-serif); font-size: 15.5px; line-height: 1.62; color: var(--pf-body);
+}
+.st-list li::before {
+  content: "\2014"; position: absolute; left: 0; top: 0; color: var(--pf-gold); opacity: .7;
+}
+.st-list li b { color: var(--pf-cream); font-weight: 600; }
+
+.st-romanlist li {
+  padding-left: 0; margin: 14px 0 0;
+  font-family: var(--pf-serif); font-size: 15.5px; line-height: 1.62; color: var(--pf-body);
+}
+.st-roman { display: inline; color: var(--pf-cream-display); font-weight: 600; }
+
+/* ============================================================
+   RESPONSIVE — collapse the rail to a horizontal chip strip
+============================================================ */
+@media (max-width: 767px) {
+  /* let the strip pin cleanly to the top */
+  .st-page .pf-top { position: static; }
+
+  .st-record { grid-template-columns: 1fr; gap: 0; }
+  .st-jump {
+    position: sticky; top: 0; z-index: 12;
+    flex-direction: row; gap: 2px; overflow-x: auto; -webkit-overflow-scrolling: touch;
+    padding: 8px 2px; margin: 0 0 18px;
+    background: rgba(10, 11, 13, .96);
+    border-bottom: 1px solid var(--pf-line); border-left: 0;
+  }
+  .st-jump__link {
+    flex: 0 0 auto; white-space: nowrap; border-left: 0; border-bottom: 2px solid transparent;
+    padding: 8px 12px;
+  }
+  .st-jump__link:hover { border-bottom-color: var(--pf-line-cut); border-left-color: transparent; }
+  .st-jump__link.is-current {
+    border-left-color: transparent; border-bottom-color: var(--pf-gold);
+    background: none;
+  }
+  .st-doc__sec { scroll-margin-top: 64px; }
+
+  .st-ctrl { flex-direction: column; align-items: stretch; gap: 12px; }
+  .st-ctrl__act { padding-top: 0; }
+  .st-btn { width: 100%; }
+  #st-panel-controls { max-width: none; }
+}
+
+/* ============================================================
+   MOTION SAFETY — GPU-only transitions, all cut under reduced-motion
+============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  .st-toplink, .st-tab, .st-seg__opt, .st-btn, .st-jump__link { transition: none; }
+}

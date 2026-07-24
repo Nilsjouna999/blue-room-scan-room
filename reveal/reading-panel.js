@@ -10,7 +10,7 @@
 (function () {
   window.BRReveal = window.BRReveal || {};
   function motionOff() {
-    return !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+    return !!(window.matchMedia && (window.BRMotion ? window.BRMotion.prefersReduced() : window.matchMedia("(prefers-reduced-motion: reduce)").matches));
   }
   function esc(s) {
     return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) {

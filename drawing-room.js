@@ -239,7 +239,7 @@
     /* the mock settle — on a paid cut the violet button resolves to gold ("Settled"),
        then the cut runs. No sheet, no charge; the beat IS the whole transaction. */
     var btn = HOST.querySelector("[data-dr-cut]");
-    var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    var reduce = window.matchMedia && (window.BRMotion ? window.BRMotion.prefersReduced() : window.matchMedia("(prefers-reduced-motion: reduce)").matches);
     var settle = function () { if (STATE.view !== "intake") return; doCut(); announce("Settled. The deck is cut."); };
     if (!btn || reduce) return settle();
     btn.disabled = true; btn.classList.add("is-settled"); btn.textContent = "Settled";
@@ -252,7 +252,7 @@
     var sp = SPREADS[STATE.spread], c = STATE.drawn[i].card, rev = STATE.drawn[i].reversed;
     var msg = sp.positions[i] + ": " + c.name + ", " + (rev ? "reversed" : "upright") + ". " + firstSentence((rev && c.reversed) ? c.reversed : c.meaning);
     if (STATE.revealed >= sp.n) msg += " Filed to your Reliquary, " + brCode(STATE.seed) + ".";
-    var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    var reduce = window.matchMedia && (window.BRMotion ? window.BRMotion.prefersReduced() : window.matchMedia("(prefers-reduced-motion: reduce)").matches);
     var done = function () { stage().innerHTML = readingHTML(STATE); announce(msg); };
     if (el && !reduce) { el.classList.add("is-revealed"); setTimeout(done, 720); } else done();  // flip, then reveal the read
   }

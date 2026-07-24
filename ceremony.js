@@ -215,7 +215,7 @@
     if (backEl && opts.onExit) { backEl.removeAttribute("data-view-to"); backEl.addEventListener("click", function () { opts.onExit(); }); }
     window.addEventListener("keydown", onKey);
 
-    var rm = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    var rm = window.matchMedia && (window.BRMotion ? window.BRMotion.prefersReduced() : window.matchMedia("(prefers-reduced-motion: reduce)").matches);
     if (rm) jumpToEnd(); else start();
 
     return { destroy: function () { stop(); window.removeEventListener("keydown", onKey); } };
