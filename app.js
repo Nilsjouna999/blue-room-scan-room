@@ -104,7 +104,11 @@ const DEVNAV = (function () {                          // BR-S213: persistent de
     if (sp.get("devnav") === "0") { localStorage.removeItem("br_devnav"); return false; }
     if (sp.has("devnav")) { localStorage.setItem("br_devnav", "1"); return true; }
     return localStorage.getItem("br_devnav") === "1";
-  } catch (e) { return new URLSearchParams(location.search).has("devnav"); }
+  } catch (e) {
+    const sp = new URLSearchParams(location.search);   // localStorage unavailable: fall back to the URL, still respecting devnav=0
+    if (sp.get("devnav") === "0") return false;
+    return sp.has("devnav");
+  }
 })();
 
 /* ---------- ScanResult v2 access (SCAN_ENGINE_SPEC) ----------
@@ -436,7 +440,7 @@ function renderMetricsTab(src, treatment) {
   const event = metPlate("04", "Frame Event", mat, `
     <p class="met-lede">The single event the frame is built around — read as an act in the image, not a quality of the person. What happened inside the rectangle.</p>
     <div class="met-event">
-      <div class="met-event__thumb">${imgOrPlaceholder(src.file, "met-event__img")}</div>
+      <div class="met-event__thumb" data-imgwrap>${imgOrPlaceholder(src.file, "met-event__img")}</div>
       <div class="met-event__main">
         <div class="met-event__lab"><span class="met-kicker">Event</span><span class="met-event__v" style="color:${mt};">${esc(fr.event.label)}</span></div>
         <p class="met-event__note">${esc(c.note)}</p>
@@ -1087,7 +1091,7 @@ function renderDossier(src, treatment) {
      the feeling, proves it against the viewer, and records its intensity. */
   const aura = dplate("03", "Aura", renderAuraBody(src, paid), "dplate--aura");
 
-  /* 06 — Mint Record */
+  /* 04 — Mint Record */
   const mintBody = paid
     ? `
     <dl class="drecord drecord--mint">
@@ -1117,8 +1121,7 @@ function renderDossier(src, treatment) {
     </button>`;
   const mintRecord = dplate("04", "Mint Record", mintBody, "dplate--mint");
 
-  /* 07 — Oracle Read */
-  /* 06 — Oracle Read (BR-S107: the ONLY verdict; sealed behind a FREE tap-to-
+  /* 05 — Oracle Read (BR-S107: the ONLY verdict; sealed behind a FREE tap-to-
      develop reveal; centered/large/alone form). */
   const oracleText = paid ? (scan?.readings.oracle || d.oracle.full) : (scan?.tierOutputs.free.oracle || d.oracle.short);
   const oracle = dplate("05", "Oracle Read", `
@@ -1534,16 +1537,17 @@ function mountMenu() {
    front door never breaks); we ARM the hidden state with .is-motion only when
    IntersectionObserver exists and reduced-motion is off, then toggle .is-lit as each nugget
    enters/leaves the viewport (appear coming down, fade going up). */
-let _aboutBackstop = null;
+let _aboutBackstop = null, _aboutIO = null;
 function wireMenuAbout(host) {
   if (_aboutBackstop) { window.removeEventListener("scroll", _aboutBackstop); _aboutBackstop = null; }   // remove-then-add: no stacking across remounts
+  if (_aboutIO) { _aboutIO.disconnect(); _aboutIO = null; }   // the prior mount's observer still holds the old (detached) nuggets — release it
   const about = host.querySelector("#about");
   if (!about) return;
   const reduce = window.BRMotion ? window.BRMotion.prefersReduced() : (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
   const nuggets = [].slice.call(about.querySelectorAll(".about__nugget"));
   if (reduce || !("IntersectionObserver" in window) || !nuggets.length) return;   // all shown, no motion
   about.classList.add("is-motion");
-  const io = new IntersectionObserver(function (entries) {
+  const io = _aboutIO = new IntersectionObserver(function (entries) {
     entries.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add("is-lit"); io.unobserve(e.target); } });   // BR-S206 LATCH: light once, stay lit
   }, { threshold: 0.12, rootMargin: "0px 0px -8% 0px" });
   nuggets.forEach(function (n) { io.observe(n); });
@@ -1682,7 +1686,14 @@ function wireMenuCodex(host) {
   /* the in-flow "The Codex →" pills (desk + wall) — open-only triggers, shielded + href-fallback */
   host.querySelectorAll("[data-codex-open]").forEach(function (el) {
     el.addEventListener("click", function (e) { if (!canBloom()) return; e.preventDefault(); if (!isOpen) toggle(); });
-    el.addEventListener("keydown", function (e) { if (e.key === "Enter") e.stopPropagation(); });
+    el.addEventListener("keydown", function (e) {
+      if (e.key === "Enter") { e.stopPropagation(); }        // shield the global menu Enter→room; the anchor's activation fires the click
+      else if (e.key === " " || e.key === "Spacebar") {      // anchors don't activate on Space natively
+        e.stopPropagation(); e.preventDefault();
+        if (!canBloom()) { location.href = "codex.html"; return; }
+        if (!isOpen) toggle();
+      }
+    });
   });
 
   /* keep geometry true; when open, recompute without animating. Module-level remove-then-add. */
@@ -1792,8 +1803,9 @@ function menuSettle(track, panels, activeIdx, after) {
   const collapse = () => panels.forEach((p, i) => { if (p && i !== activeIdx) p.classList.add("is-offstage"); });   // ALL non-active panels
   const fin = () => { if (done) return; done = true; track.removeEventListener("transitionend", onEnd); clearTimeout(t); collapse(); if (after) after(); };
   const onEnd = (e) => { if (e.target === track && e.propertyName === "transform") fin(); };
+  const reduce = window.BRMotion ? window.BRMotion.prefersReduced() : window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   track.addEventListener("transitionend", onEnd);
-  t = setTimeout(fin, 900);                             // reduced-motion fires no transitionend — the timer still settles
+  t = setTimeout(fin, reduce ? 0 : 900);                // reduced-motion sets .menu__track{transition:none} — no transitionend ever fires, so settle on the next tick instead of after the full fallback
   _menuSettle = { cancel() { done = true; track.removeEventListener("transitionend", onEnd); clearTimeout(t); } };
 }
 
@@ -2235,6 +2247,7 @@ function renderGate() {
         <button type="button" class="draft__sample" data-view-to="room">Enter sample scan room</button>
         <button type="button" class="draft__back" data-view-to="menu">Main menu</button>
       </div>
+      <p class="pickmsg" role="status" aria-live="polite"></p>
     </div>`;
 }
 
@@ -2267,6 +2280,7 @@ function renderBlockedScan(b, actionsHtml) {
       </section>
 
       ${actionsHtml}
+      <p class="pickmsg" role="status" aria-live="polite"></p>
     </div>`;
 }
 
@@ -2515,8 +2529,8 @@ function vaultState(m) { return String(m.state || "").toLowerCase().replace(/(^|
    access line, and a SAVED MINTS ledger. Every marketing widget (the 4-bullet
    explainer, quote, wax seal, credit block, boxed QR/Open-Reading panels, wave
    squiggles) is cut. Reuses .pf-* classes + --pf-* vars (both stylesheets load
-   globally); the bespoke .vault__* CSS in styles.css is now dead (left for a
-   later cleanup sweep). */
+   globally); the bespoke .vault__* CSS in styles.css was removed in BR-S202
+   (only .vqr__svg survives, still emitted by vaultQR). */
 function renderVault() {
   const m = VAULT_MINTS[0];
   const goldCrop = '<span class="pf-vcrop pf-vcrop--tl"></span><span class="pf-vcrop pf-vcrop--tr"></span><span class="pf-vcrop pf-vcrop--bl"></span><span class="pf-vcrop pf-vcrop--br"></span>';
@@ -3328,6 +3342,17 @@ document.addEventListener("click", (e) => {
   window.scrollTo(0, 0);
 });
 
+/* .brand__hit is a role="button" span (not a native <button>), so Enter/Space
+   don't activate it — mirror them to a click so the delegated [data-view-to]
+   handler above runs for keyboard users. Static markup: wire once. */
+(function () {
+  const hit = document.querySelector(".brand__hit");
+  if (!hit) return;
+  hit.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" || e.key === " " || e.key === "Spacebar") { e.preventDefault(); hit.click(); }
+  });
+})();
+
 /* DEV NAV (dev-only, gated by ?devnav=1 + body[data-devnav]) — jumps between
    addressable states for inspection. Separate [data-devnav] namespace so it
    never collides with [data-goto]/[data-view-to]. State navigation only: no
@@ -3341,7 +3366,7 @@ document.addEventListener("click", (e) => {
   else if (kind === "treat") { state.treatment = val; if (val !== "mint") state.labMaterial = null; state.view = "room"; render(); window.scrollTo(0, 0); }
   else if (kind === "src") { state.source = Number(val); state.view = "room"; render(); window.scrollTo(0, 0); }
   else if (kind === "tab") { state.tab = val; state.view = "room"; render(); window.scrollTo(0, 0); }
-  else if (kind === "holdings") { try { localStorage.getItem("br_holdings") === "1" ? localStorage.removeItem("br_holdings") : localStorage.setItem("br_holdings", "1"); } catch (e) {} if (state.view === "menu") mountMenu(); return; }   // BR-S204: MOCK holdings flip (re-render the gated slide 3)
+  else if (kind === "holdings") { try { localStorage.getItem("br_holdings") === "1" ? localStorage.removeItem("br_holdings") : localStorage.setItem("br_holdings", "1"); } catch (e) {} mountMenu(); return; }   // BR-S204: MOCK holdings flip — always remount so the gated slide 3 never goes stale behind another view
   else if (kind === "dev") { const u = new URL(location.href); u.searchParams.set("dev", val); u.searchParams.set("devnav", "1"); location.href = u.toString(); }
 });
 

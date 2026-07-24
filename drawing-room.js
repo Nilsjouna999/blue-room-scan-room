@@ -224,7 +224,7 @@
   function startReading(key) { STATE.view = "intake"; STATE.spread = key; stage().innerHTML = intakeHTML(SPREADS[key]); var f = HOST.querySelector("[data-dr-question]"); if (f) f.focus(); }
   function doCut() {
     var sp = SPREADS[STATE.spread];
-    STATE.question = (HOST.querySelector("[data-dr-question]") || {}).value || "";
+    STATE.question = (((HOST.querySelector("[data-dr-question]") || {}).value) || "").trim();   // whitespace-only must not render `Drawn to: "   "` or pollute the reopen URL (norm() already trims the seed)
     var t = sealNow();
     STATE.seed = "read~" + sp.key + "~" + norm(STATE.question) + "~" + t;
     if (sp.key === "sitting") { try { localStorage.setItem("br_dr_sitting_used", "1"); } catch (e) {} }   // the cut consumes the free sitting — the cut closes the question

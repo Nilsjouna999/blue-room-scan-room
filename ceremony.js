@@ -7,7 +7,7 @@
    gold-line SVG overlays on the anvil. Driven by the 20-agent workshop's
    RENDER-FROM-FRAME controller: deriveState(f) is the sole clock; freeze-safe by
    construction (jumpToEnd = renderFrame(160)). 20.0s / 160 ticks @ 125ms.
-   Exposes window.BRCeremony; mountDev on ?dev=ceremony. Plan: docs/ARCANA_CEREMONY_PLAN.md
+   Exposes window.BRCeremony.mount(host, opts); the ?dev=ceremony route mounts it. Plan: docs/ARCANA_CEREMONY_PLAN.md
 ============================================================= */
 (function () {
   "use strict";

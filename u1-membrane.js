@@ -216,7 +216,8 @@
       '#about.u1lines .about__rail{row-gap:clamp(150px,34vh,340px);}' +
       '#about.u1lines .about__intro{margin-bottom:clamp(96px,26vh,220px);}' +
       '#about.u1lines .about__close{margin-top:clamp(120px,' + closeVh + 'vh,300px);}' +
-      '#about.u1lines{padding-bottom:max(22vh,clamp(200px,' + tailVh + 'vh,380px));}';
+      '#about.u1lines{padding-bottom:max(22vh,clamp(200px,' + tailVh + 'vh,380px));}' +
+      '#about.u1lines .about__plate{transition:none!important;}';   // the shipped 720ms .is-motion transition smears the 60fps inline opacity/filter/transform writes
     (document.head || document.documentElement).appendChild(s);
     styleInjected = true;
   }

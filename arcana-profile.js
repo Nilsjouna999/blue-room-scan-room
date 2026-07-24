@@ -13,10 +13,8 @@
    modal, or violet remains.
 
    Canon: near-black archive, Cormorant + IBM Plex Mono, four-register colour law
-   (gold + warm-grey here; violet reserved for commerce, absent by design). The
-   ONE exception: a red/purple liquid-flame HALO around the identity — a cosmetic
-   avatar-frame flair layer (like a Steam frame), deliberately outside the content
-   law. Exposes window.BRArcanaProfile.
+   (gold + warm-grey here; violet reserved for commerce, absent by design).
+   Exposes window.BRArcanaProfile.
 ============================================================= */
 (function () {
   "use strict";

@@ -922,8 +922,7 @@
     var redrawBanner = root.querySelector("[data-ac-redraw]");
     var drawLabel = root.querySelector("[data-ac-draw-label]");
     if (params.redraw === "1" || params.intent === "redraw") {
-      var w = WHOFOR.filter(function (x) { return x.id === wantId; })[0];
-      var subjName = (w && w.crown) ? w.crown : (wantId === "self" ? "your crown" : "this crown");
+      var subjName = famSubject || (wantId === "self" ? "your crown" : "this crown");   // WHOFOR entries carry no crown name; the chosen family subject is the only personalized handle we have
       redrawBanner.hidden = false;
       redrawBanner.innerHTML = '<span class="ac-redraw-banner__mark" aria-hidden="true">&#10022;</span> Enriching ' +
         esc(subjName) + " — a new reading is drawn and its rubies are added to the crown. The original is kept, never lost.";

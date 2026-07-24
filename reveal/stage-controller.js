@@ -88,7 +88,7 @@
       // pressing reveals its reading, then "see deeper" mints + deepens in the fullview.
       stageName = "FREE";
       card.setMode("free");
-      setArrow({ variant: "grey", disabled: false }, "Read");
+      setArrow({ variant: "grey", disabled: false, label: "Read the free card" }, "Read");   // keep the SR label in step with the visible "Read" caption (onMorph sets the same label)
     } else {
       stageName = "PHOTO";
       card.setMode("photo");
@@ -220,6 +220,7 @@
       if (haloTimer) { clearTimeout(haloTimer); haloTimer = null; }
       if (opts.onBack) opts.onBack();          // un-fullview: the menu chrome fades back in
       stageName = "FREE_READING"; purpleReady = true;
+      cap.style.opacity = "";                  // restore the caption if we came back from HALO_READING (which zeroed it)
       if (panel) panel.clear();
       card.setMode("free");                    // back to the matte free card
       stage.classList.add("is-reading");       // the free read returns where they left it

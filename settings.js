@@ -199,7 +199,7 @@
       ledgerRow("Reliquary shelf", shelf ? "Open" : "Closed", shelf) +
       ledgerRow("First-reading key", keyed ? "Turned" : "Not yet turned", keyed) +
       ledgerRow("Free Sitting", sittingUsed ? "Used" : "Available", sittingUsed) +
-      ledgerRow("Sealed Concords", concords ? plural(concords, "on file", "on file") : "None on file", concords > 0) +
+      ledgerRow("Sealed Concords", concords ? concords + " on file" : "None on file", concords > 0) +
     '</div>';
 
     return '<h2 class="pf-sec__h">The Reliquary</h2>' +
