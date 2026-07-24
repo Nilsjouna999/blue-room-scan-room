@@ -63,9 +63,9 @@ footer{text-align:center;color:var(--faint);font-family:"SFMono-Regular",ui-mono
 .br-grip:active{cursor:grabbing}
 .br-floatunit.br-floating{position:fixed;z-index:20;flex:none;max-width:none;margin:0;box-shadow:0 16px 44px rgba(0,0,0,.5);--grip-o:.55}
 .br-dragging,.br-dragging *{cursor:grabbing!important;user-select:none!important;-webkit-user-select:none!important}
-.br-posctl{position:fixed;left:12px;top:50%;transform:translateY(-50%);z-index:21;display:none;flex-direction:column;gap:7px;align-items:stretch;background:linear-gradient(180deg,rgba(20,17,13,.92),rgba(16,14,12,.86));border:1px solid var(--hair);border-radius:10px;padding:9px 8px;backdrop-filter:blur(6px);box-shadow:0 12px 30px rgba(0,0,0,.45)}
-.br-posctl.on{display:flex}
-.br-posctl .lbl{font-family:"SFMono-Regular",ui-monospace,Consolas,monospace;font-size:8px;letter-spacing:.2em;line-height:1.4;text-transform:uppercase;color:var(--faint);text-align:center;margin:0 0 1px}
+.br-posctl{display:none;align-items:center;gap:7px;flex:none;order:-1;margin-right:2px}
+.br-posctl.on{display:inline-flex}
+.br-posctl .lbl{font-family:"SFMono-Regular",ui-monospace,Consolas,monospace;font-size:8px;letter-spacing:.2em;text-transform:uppercase;color:var(--faint);white-space:nowrap}
 .br-posctl button{font-family:"SFMono-Regular",ui-monospace,Consolas,monospace;font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);background:#0d0b09;border:1px solid var(--hair);border-radius:6px;padding:7px 13px;cursor:pointer;transition:color .15s,border-color .15s}
 .br-posctl button:hover,.br-posctl button:focus-visible{color:var(--gold);border-color:var(--gold-dim);outline:none}
 .br-posctl button.saved{color:var(--gold);border-color:var(--gold-dim)}
@@ -110,27 +110,38 @@ var tt=document.getElementById('totop');if(tt)tt.addEventListener('click',functi
   function drop(u){ u.el.classList.remove('br-floating'); u.el.style.left=u.el.style.top=u.el.style.width=''; if(u.ph){ u.ph.parentNode.insertBefore(u.el,u.ph); u.ph.parentNode.removeChild(u.ph); u.ph=null; } }
 
   function attachDrag(u,g){
-    var sx=0,sy=0,ox=0,oy=0,pending=false,dragging=false;
-    g.addEventListener('pointerdown',function(e){
-      if(e.button!=null&&e.button>0)return;
-      e.preventDefault(); sx=e.clientX; sy=e.clientY; pending=true; dragging=false;
-      try{g.setPointerCapture(e.pointerId);}catch(_){}
-    });
-    g.addEventListener('pointermove',function(e){
-      if(pending&&!dragging){
-        if(Math.abs(e.clientX-sx)<THRESH&&Math.abs(e.clientY-sy)<THRESH)return;
+    var sx=0,sy=0,ox=0,oy=0,pending=false,dragging=false,pid=null;
+    // Drag on the DOCUMENT, not the grip: lift() re-parents the unit to <body>, which in
+    // some engines drops the grip's pointer capture — so the old grip-level pointermove
+    // stalled the instant the cursor left the 24px handle (the "buggy" drag). Capture-phase
+    // document listeners follow the pointer everywhere, through the re-parent.
+    function onMove(e){
+      if(e.pointerId!==pid) return;
+      if(pending){
+        if(Math.abs(e.clientX-sx)<THRESH&&Math.abs(e.clientY-sy)<THRESH) return;
         lift(u); var r=u.el.getBoundingClientRect(); ox=r.left; oy=r.top; sx=e.clientX; sy=e.clientY;
         pending=false; dragging=true; document.body.classList.add('br-dragging');
       }
-      if(dragging) place(u, ox+(e.clientX-sx), oy+(e.clientY-sy));
-    });
-    function end(e){
-      pending=false;
-      try{g.releasePointerCapture(e.pointerId);}catch(_){}
-      if(dragging){ dragging=false; document.body.classList.remove('br-dragging'); showCtl(); }
+      if(dragging){ e.preventDefault(); place(u, ox+(e.clientX-sx), oy+(e.clientY-sy)); }
     }
-    g.addEventListener('pointerup',end);
-    g.addEventListener('pointercancel',end);
+    function onUp(e){
+      if(e.pointerId!==pid) return;
+      document.removeEventListener('pointermove',onMove,true);
+      document.removeEventListener('pointerup',onUp,true);
+      document.removeEventListener('pointercancel',onUp,true);
+      var was=dragging; pending=false; dragging=false; pid=null;
+      document.body.classList.remove('br-dragging');
+      if(was) showCtl();
+    }
+    g.addEventListener('pointerdown',function(e){
+      if(e.button!=null&&e.button>0) return;
+      if(pid!==null) return;                      // one drag at a time (ignore a 2nd pointer)
+      e.preventDefault();
+      pid=e.pointerId; sx=e.clientX; sy=e.clientY; pending=true; dragging=false;
+      document.addEventListener('pointermove',onMove,true);
+      document.addEventListener('pointerup',onUp,true);
+      document.addEventListener('pointercancel',onUp,true);
+    });
     g.addEventListener('keydown',function(e){
       var step=e.shiftKey?24:8,dx=0,dy=0;
       if(e.key==='ArrowLeft')dx=-step; else if(e.key==='ArrowRight')dx=step;
@@ -149,11 +160,11 @@ var tt=document.getElementById('totop');if(tt)tt.addEventListener('click',functi
   });
 
   var ctl=document.createElement('div'); ctl.className='br-posctl';
-  ctl.innerHTML='<div class="lbl">search<br>position</div>';
+  ctl.innerHTML='<span class="lbl">position</span>';
   var saveBtn=document.createElement('button'), resetBtn=document.createElement('button');
   saveBtn.type='button'; saveBtn.textContent='Save'; saveBtn.title='Save the current search-bar positions';
   resetBtn.type='button'; resetBtn.textContent='Reset'; resetBtn.title='Return the search bars to their default spot';
-  ctl.appendChild(saveBtn); ctl.appendChild(resetBtn); document.body.appendChild(ctl);
+  ctl.appendChild(saveBtn); ctl.appendChild(resetBtn); qWrap.parentNode.insertBefore(ctl, qWrap);   // BR-S214: inline, left of the search bar's original slot (was fixed at screen-left)
   function showCtl(){ctl.classList.add('on');}
   function hideCtl(){ctl.classList.remove('on');}
 
