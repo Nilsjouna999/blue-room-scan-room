@@ -107,7 +107,8 @@
 
   .result{min-height:48px;height:auto;display:flex;align-items:center;justify-content:center;flex-wrap:wrap;max-width:100%;padding:0 16px;margin:-16px 0 16px}
   .result .k{font:600 11px 'IBM Plex Mono',monospace;letter-spacing:.28em;color:var(--t-ghost);text-transform:uppercase;margin-right:12px}
-  .result .v{font:600 clamp(22px,6.4vw,32px) 'Cormorant Garamond',serif;color:#FFFFFF;line-height:1.05;max-width:92vw;overflow-wrap:anywhere;text-align:center}
+  .result .v{font:600 clamp(22px,6.4vw,32px) 'Cormorant Garamond',serif;color:#FFFFFF;line-height:1.05;max-width:92vw;overflow-wrap:anywhere;text-align:center;
+    text-shadow:0 0 1px rgba(255,255,255,.85), 0 0 10px rgba(255,255,255,.22), 0 2px 6px rgba(0,0,0,.5)}   /* solid bright white, not a faded thin serif */
   .result .spin{background:none;padding:0;border-radius:0;box-shadow:none;border:0;font:600 12px 'IBM Plex Mono',monospace;letter-spacing:.3em;color:var(--t-ghost);text-transform:uppercase}
 
   .controls{display:flex;flex-direction:column;gap:16px;width:min(560px,100%)}
@@ -493,7 +494,7 @@
         if (n===1) ctx.arc(cx,cy,R,0,Math.PI*2);
         else { ctx.moveTo(cx,cy); ctx.arc(cx,cy,R,w.a0,w.a1); ctx.closePath(); }
         ctx.clip();
-        ctx.fillStyle=(k===winner)?'rgba(0,0,0,0)':'rgba(2,2,4,0.62)';
+        ctx.fillStyle=(k===winner)?'rgba(0,0,0,0)':'rgba(2,2,4,0.48)';
         ctx.fillRect(cx-R,cy-R,R*2,R*2);
         ctx.restore();
       });
