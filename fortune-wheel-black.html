@@ -111,6 +111,41 @@
   .opt .x:hover{border-color:rgba(233,229,220,.4);color:var(--t-display);background:rgba(233,229,220,.09)}
   .opt .sw{flex:none;width:14px;height:14px;border-radius:4px;box-shadow:0 0 0 1px rgba(233,229,220,.18)}
   .opt .tx{flex:1;min-width:0;font:500 15px Inter;color:var(--t-primary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+  /* ===== verdict-ceremony overlays ===== */
+  /* reveal-tick swatch beside the result name */
+  .result .rsw{width:12px;height:12px;border-radius:4px;margin-right:12px;box-shadow:0 0 0 1px rgba(233,229,220,.18)}
+  /* the name's one-shot decisive arrival (no bounce, no blur) */
+  @keyframes nameArrive{ from{opacity:0;transform:translateY(8px) scale(.96)} to{opacity:1;transform:none} }
+  .result .v.reveal{ animation:nameArrive .24s cubic-bezier(.22,1,.36,1) both; }
+
+  /* B4b vitrify glaze — geometry of .glass; baked brightness lift + upper-left crescent glint; opacity-pulsed only */
+  .vitrify{position:absolute;left:7.143%;top:9.143%;width:85.714%;height:68.571%;border-radius:50%;
+    pointer-events:none;z-index:2;opacity:0;mix-blend-mode:screen;
+    background:radial-gradient(120% 105% at 38% 30%, rgba(224,226,232,0.55) 0%, rgba(224,226,232,0.14) 30%, rgba(224,226,232,0) 56%);}
+
+  /* B3b tick flash — light at the 12 o'clock rim; NOT inside .glass (its mask/blur would mute the blend) */
+  .spark,.ring{position:absolute;left:50%;top:9.143%;transform:translate(-50%,-50%);pointer-events:none;z-index:4;opacity:0}
+  .spark{width:12px;height:12px;border-radius:50%;mix-blend-mode:screen;
+    background:radial-gradient(circle,#fff 0%,rgba(255,244,224,.9) 28%,transparent 70%)}
+  .ring{width:20px;height:20px;border-radius:50%;border:1px solid rgba(226,232,240,.9)}
+
+  /* B6-B8 milk-drop overlay */
+  .fx{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:4;display:none}
+  .fx.live{display:block}
+  /* transform-box:view-box makes WAAPI px == viewBox units (load-bearing); drop authored around local (0,0) */
+  .fx .drop{transform-box:view-box;transform-origin:0 0;opacity:0}
+  .fx .stub{transform-box:fill-box;transform-origin:50% 0%;opacity:0}
+  .fx .splat{opacity:0}
+  .fx .crown{opacity:0}
+  .fx .cspike{transform-box:fill-box;transform-origin:50% 100%}   /* scaleY from the waterline */
+  .fx .cpuddle{transform-box:fill-box;transform-origin:50% 100%}
+  .fx .ripple{transform-box:fill-box;transform-origin:50% 50%;opacity:0}
+  .fx .halo{opacity:0}
+
+  /* Plan-B perf: suspend the pointer's feTurbulence grain + blur + drop-shadow for the ~380ms lap (imperceptible at speed) */
+  .pointer.orbiting{filter:none}
+  .pointer.orbiting path{filter:none !important}
 </style>
 </head>
 <body>
@@ -159,6 +194,29 @@
       <!-- crisp dark edge for definition; no glare patch -->
       <path d="M234,20 L330,20 L282,116 Z" fill="none"
             stroke="rgba(32,15,6,0.8)" stroke-width="2.5" stroke-linejoin="round"/>
+    </svg>
+
+    <!-- ===== verdict-ceremony overlays (display:none / opacity:0 at rest — no effect on the resting frame) ===== -->
+    <!-- B4b vitrify glaze: over the disc, under the pointer; baked brightness-lift + crescent glint, opacity-pulsed -->
+    <div class="vitrify" aria-hidden="true"></div>
+    <!-- B3b tick flash: a sharp point of light + one hairline ring at the 12 o'clock rim -->
+    <span class="spark" aria-hidden="true"></span>
+    <span class="ring"  aria-hidden="true"></span>
+    <!-- B6-B8 milk-drop FX overlay; viewBox matches wheel-area aspect ⇒ every coordinate auto-scales on mobile -->
+    <svg class="fx" viewBox="0 0 560 700" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <g class="drop">
+        <path class="teardrop" d="M0,-24 C5,-12 11,-5 11,2 A11,11 0 1 1 -11,2 C-11,-5 -5,-12 0,-24 Z" fill="#F6EFDE"/>
+        <circle class="bead" cx="0" cy="0" r="11" fill="#F6EFDE"/>
+        <ellipse class="hl" cx="-3.5" cy="-4" rx="2.6" ry="3.6" fill="#FFFDF6"/>
+      </g>
+      <g class="stub"><rect x="277.5" y="533" width="5" height="11" rx="2.5" fill="#F6EFDE"/></g>
+      <g class="splat"><ellipse cx="280" cy="650" rx="46" ry="9" fill="#F6EFDE"/></g>
+      <g class="crown">
+        <ellipse class="cpuddle" cx="280" cy="652" rx="52" ry="10" fill="#F6EFDE"/>
+        <!-- ball-on-stalk spikes injected at init (irregular, off-mirror) -->
+      </g>
+      <ellipse class="ripple" cx="280" cy="650" rx="30" ry="7" fill="none" stroke="rgba(230,224,208,0.5)" stroke-width="2"/>
+      <ellipse class="halo"   cx="280" cy="657" rx="64" ry="13" fill="rgba(120,140,170,0.15)"/>
     </svg>
   </div>
 
@@ -218,9 +276,12 @@
   var STROBE_FADE_OUT_START_P = 0.78; // dissolve begins (p)
   var STROBE_FADE_END_P    = 0.88;    // fully gone (p) — < FREE_END(0.90): landing is uncontested
 
-  // ---- state ---- (unchanged functional model)
-  var state = { options: [], draft: '', preview: null, spinning: false, result: null, winner: null };
+  // ---- state ---- (unchanged functional model + ceremony reveal-deferral fields)
+  var state = { options: [], draft: '', preview: null, spinning: false, result: null, winner: null, revealPending: false };
   var rot = 0, sig = null;
+  var justRevealed = false;      // one-shot: the name's arrive-animation flag (consumed synchronously by renderControls)
+  var spunSinceEdit = 0;         // arc auto-decay: 0 => FULL arc on the first spin of a set, else LEAN (reset by add/remove/reset)
+  function busy(){ return state.spinning || state.revealPending; }
 
   var canvas = document.getElementById('wheel');
   var dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -335,7 +396,7 @@
   // ---- wheel rendering ---- (the resting frame is always this)
   function draw(){
     var segs = segments();
-    var winner = (!state.spinning && state.winner!=null) ? state.winner : null;
+    var winner = (!busy() && state.winner!=null) ? state.winner : null;   // verdict withheld while spinning OR revealPending
     var nsig = segs.map(function(s){return s.color+'|'+s.text;}).join(';')+'#w'+(winner==null?'-':winner);
     if (nsig===sig) return; sig=nsig;
 
@@ -666,6 +727,7 @@
   }
   // snap any in-flight transition to its canonical end-state (interrupt / coalesce)
   function finalizeTransition(){
+    abortCeremony();                                    // single interrupt choke point — silently kills any in-flight ceremony
     if (rafId){ cancelAnimationFrame(rafId); rafId=0; }
     if (spinRAF){ cancelAnimationFrame(spinRAF); spinRAF=0; canvas.style.willChange=''; }
     strobe.style.opacity='0';
@@ -694,8 +756,9 @@
   }
 
   var spinRAF = 0;
-  // winner is resolved PURELY from the final rot value — never from the animation path
-  function resolveWinner(){
+  // winner is resolved PURELY from the final rot value — never from the animation path.
+  // The ORIGINAL resolveWinner math, verbatim (segDeg/nrm/idx), minus the render() — decide now, paint later.
+  function resolveWinnerSilently(){
     var segs = segments(), n = segs.length;
     var isDefault = n===1 && !segs[0].text;   // empty state is now the 1-wedge obsidian orb (was the 4-color fan)
     var segDeg = 360/n;
@@ -704,11 +767,34 @@
     state.spinning = false;
     state.result = isDefault ? null : segs[idx].text;
     state.winner = isDefault ? null : idx;
-    render();
+    return isDefault;
+  }
+  // idempotent — the single disclosure tick; wheel light-up + name paint share ONE render() call ⇒ auto-synced
+  function commitReveal(){
+    if (!state.revealPending) return;
+    state.revealPending = false;
+    justRevealed = true;
+    sig = null;                                // bust the cache — force the ONE winner repaint
+    render();                                  // draw() winner-dim + gold rim + renderControls name+swatch, one tick
+    justRevealed = false;                      // flag consumed synchronously by renderControls
+  }
+  // ---- reveal colour helpers ----
+  function mix(a, b, t){                        // a,b = '#rrggbb'; returns 'rgb(r,g,b)'
+    var ar=parseInt(a.slice(1,3),16), ag=parseInt(a.slice(3,5),16), ab=parseInt(a.slice(5,7),16);
+    var br=parseInt(b.slice(1,3),16), bg=parseInt(b.slice(3,5),16), bb=parseInt(b.slice(5,7),16);
+    return 'rgb('+Math.round(ar+(br-ar)*t)+','+Math.round(ag+(bg-ag)*t)+','+Math.round(ab+(bb-ab)*t)+')';
+  }
+  function nameColor(w){
+    if (w==null || !state.options[w]) return '';               // default cream (CSS)
+    var jewel = state.options[w].color;
+    if (jewel === '#0b0b0d') return mix(jewel, '#9aa4b2', .55); // obsidian → cool graphite lift
+    return mix(jewel, '#f2ede0', .5);                          // garnet→rose, teal→aqua, citrine→warm gold
   }
   function spin(){
     if (state.spinning) return;
     finalizeTransition();
+    var arc = CEREMONY_AUTO_DECAY ? (spunSinceEdit===0 ? 'full' : 'lean') : 'full';   // FULL on first spin of a set, LEAN on repeats
+    spunSinceEdit++;
     var reduce = prefersReduced();
     var turns = DRAW_TURNS[DRAW][0] + Math.floor(Math.random()*DRAW_TURNS[DRAW][1]);   // draw-length turns — the free, fast feel
     var start = rot;
@@ -720,7 +806,7 @@
       void canvas.offsetWidth;
       canvas.style.transform='rotate('+rot+'deg)';
       strobe.style.opacity='0'; strobe.style.transform='rotate('+rot+'deg)';   // no strobe on the reduced-motion path
-      canvas.addEventListener('transitionend', resolveWinner, {once:true});
+      canvas.addEventListener('transitionend', function(){ state.revealPending=true; resolveWinnerSilently(); commitReveal(); }, {once:true});
       return;
     }
 
@@ -733,16 +819,292 @@
       strobe.style.transform = canvas.style.transform;   // strobe rides the identical θ
       strobe.style.opacity   = strobeOpacity(p);         // opacity on its own p-keyed schedule
       if (p<1){ spinRAF=requestAnimationFrame(frame); }
-      else { spinRAF=0; canvas.style.transform='rotate('+rot+'deg)';   // exact lock onto rot
+      else { spinRAF=0; canvas.style.transform='rotate('+rot+'deg)';   // exact lock onto rot (unchanged)
              strobe.style.transform='rotate('+rot+'deg)'; strobe.style.opacity='0';
-             canvas.style.willChange=''; resolveWinner(); }
+             canvas.style.willChange='';
+             state.revealPending = true;
+             var isDefault = resolveWinnerSilently();                  // winner decided NOW, silently
+             if (isDefault || prefersReduced()){ commitReveal(); }     // empty orb: instant reveal, no theatre
+             else { renderControls();                                  // result row blanks; wheel stays neutral
+                    armCeremony(arc, commitReveal); } }                // theatre begins; reveals at the splat frame
     })(performance.now());
+  }
+
+  // ======================================================================
+  // ============  THE VERDICT CEREMONY  (100% additive, post-settle)  =====
+  //   The wheel stops but the verdict is withheld: the arrow laps + magnet-
+  //   snaps, the disc shudders once and vitrifies, a held breath, then a
+  //   milk-bead births at the 6 o'clock rim, falls, and SPLATS — and on that
+  //   crown-snap frame commitReveal() paints the verdict everywhere at once.
+  //   Zero per-frame canvas work; all motion is WAAPI on pre-placed overlays.
+  // ======================================================================
+
+  // ---- tunables (spec §7 defaults) ----
+  var CEREMONY_AUTO_DECAY = true;    // FULL arc on the first spin of an option-set, LEAN on repeats
+  var CEREMONY_MAX_FULL   = 2200;    // watchdog — force-fires endCeremony(true) if a callback is throttled/dropped
+  var CEREMONY_MAX_LEAN   = 1200;
+  var CHARGE_MS      = 60;           // B1 held-breath inhale
+  var ORBIT_GLIDE_MS = 250;          // B2a 0->312deg near-linear
+  var ORBIT_WHIP_MS  = 130;          // B2b 312->360deg easeIn, peaks at contact
+  var ORBIT_DIR      = 1;            // 1 = clockwise
+  var TICK_SPARK_MS  = 80;
+  var TICK_RING_MS   = 120;
+  var REVERB_MS      = 170;          // B4 over-damped shudder
+  var REVERB_TY      = 1.4;          // px translateY peak (CEILING)
+  var REVERB_SC      = 0.008;        // scale dip peak (CEILING)
+  var VITRIFY_MS     = 160;          // B4b glaze opacity pulse, peak 0.6
+  var BEAD_SWELL_MS  = 150;
+  var NECK_MS        = 40;
+  var STUB_SNAP_MS   = 70;
+  var FALL_MS        = 200;          // FLOOR 180 — the eye must track the arrival
+  var DROP_ANCHOR    = [280,538];    // painted rim bottom (6 o'clock), viewBox units
+  var DROP_LAND      = [280,648];    // landing point (above #result)
+  var MILK_FILL      = '#F6EFDE';
+  var SPLAT_POSE_MS  = 32;           // ~2 frames pancake squash (baked into schedule)
+  var CROWN_SETTLE_MS= 350;          // ~3x the snap; spikes stagger
+  var CROWN_OVERSHOOT= 1.06;         // toon whisper on spike settle — milk only, never the wheel
+  var RIPPLE_MS      = 300;
+  var HALO_ALPHA     = 0.15;
+  var HALO_MS        = 400;
+  var REBOUND_JET    = false;        // taste call §10 — default OFF (authored path left out)
+
+  // ---- element refs ----
+  var wheelArea  = document.querySelector('.wheel-area');
+  var ptr        = document.querySelector('.pointer');
+  var fxLayer    = document.querySelector('.fx');
+  var vitrifyEl  = document.querySelector('.vitrify');
+  var sparkEl    = document.querySelector('.spark');
+  var ringEl     = document.querySelector('.ring');
+  var sparkEls   = [sparkEl, ringEl];
+  var dropEl         = fxLayer ? fxLayer.querySelector('.drop') : null;
+  var beadShapeEl    = fxLayer ? fxLayer.querySelector('.bead') : null;
+  var teardropShapeEl= fxLayer ? fxLayer.querySelector('.teardrop') : null;
+  var stubEl         = fxLayer ? fxLayer.querySelector('.stub') : null;
+  var splatEl        = fxLayer ? fxLayer.querySelector('.splat') : null;
+  var crownGroup     = fxLayer ? fxLayer.querySelector('.crown') : null;
+  var crownPuddleEl  = fxLayer ? fxLayer.querySelector('.cpuddle') : null;
+  var rippleEl       = fxLayer ? fxLayer.querySelector('.ripple') : null;
+  var haloEl         = fxLayer ? fxLayer.querySelector('.halo') : null;
+  var crownSpikeEls  = [];
+
+  // ---- init: pointer orbit origin + baked crown spikes ----
+  // origin = disc center. Pointer box height = 28.571% of area; disc center = 43.4285% of area.
+  // Ratio 43.4285/28.571 = 1.52 (layout-independent) ⇒ '50% 152%' reseats rotate(360)≡0 on the top mount.
+  if (ptr) ptr.style.transformOrigin = '50% 152%';
+  (function buildCrownSpikes(){
+    if (!crownGroup) return;
+    var SVGNS='http://www.w3.org/2000/svg';
+    // 7 ball-on-stalk spikes, off-mirror, heights varied ±12% — slight wrongness = hand-drawn
+    var defs=[{dx:-50,h:34,r:6},{dx:-32,h:45,r:7.5},{dx:-15,h:38,r:6.5},{dx:1,h:51,r:8.5},{dx:17,h:41,r:7},{dx:34,h:47,r:7.5},{dx:50,h:33,r:6}];
+    var CX=280, BASE_Y=650;
+    defs.forEach(function(d){
+      var x=CX+d.dx, g=document.createElementNS(SVGNS,'g'); g.setAttribute('class','cspike');
+      var sw=d.r*0.6, st=document.createElementNS(SVGNS,'rect');
+      st.setAttribute('x', x-sw/2); st.setAttribute('y', BASE_Y-d.h); st.setAttribute('width', sw); st.setAttribute('height', d.h); st.setAttribute('fill', MILK_FILL);
+      var b=document.createElementNS(SVGNS,'circle');
+      b.setAttribute('cx', x); b.setAttribute('cy', BASE_Y-d.h); b.setAttribute('r', d.r); b.setAttribute('fill', MILK_FILL);
+      g.appendChild(st); g.appendChild(b); crownGroup.appendChild(g); crownSpikeEls.push(g);
+    });
+  })();
+
+  // ---- the controller (single owner of all beats + all teardown) ----
+  var ceremony = { active:false, raf:0, timers:[], anims:[], watchdog:0 };
+  function ct(fn, delay){ ceremony.timers.push(setTimeout(fn, delay)); }   // registered timer
+  function reg(a){ ceremony.anims.push(a); return a; }                     // registered WAAPI anim
+  function showFx(el){ if (el) el.style.opacity='1'; }
+  function hideFx(el){ if (el) el.style.opacity='0'; }
+  function resetFx(){
+    [dropEl, stubEl, splatEl, crownGroup, rippleEl, haloEl].forEach(function(el){ if (el) el.style.opacity='0'; });
+    if (beadShapeEl)     beadShapeEl.style.opacity='1';
+    if (teardropShapeEl) teardropShapeEl.style.opacity='0';
+    if (dropEl)  dropEl.style.transform='';
+    if (crownPuddleEl) crownPuddleEl.style.opacity='';
+  }
+
+  function armCeremony(arc, onDone){          // arc = 'full' | 'lean'
+    var lean = (arc==='lean');
+    ceremony.active = true;
+    ceremony.timers = [];
+    ceremony.anims  = [];
+    ceremony.watchdog = setTimeout(function(){ endCeremony(true); }, lean ? CEREMONY_MAX_LEAN : CEREMONY_MAX_FULL);
+    document.addEventListener('visibilitychange', ceremonyVis);
+    wheelArea.addEventListener('click', ceremonySkip);
+
+    resetFx();
+    if (fxLayer) fxLayer.classList.add('live');
+
+    if (lean){                                // repeat spins: no orbit lap; tick + reverb fire immediately
+      ct(function(){ tickFlash(); reverb(); vitrify(); }, 0);
+      ct(beadBirth, 160);
+      ct(beadNeck,  310);
+      ct(beadPinch, 350);
+      ct(beadFall,  390);
+      ct(splatPose, 590);
+      ct(function(){ crownReveal(true, onDone); }, 622);
+      ct(function(){ endCeremony(false); }, 1050);
+    } else {                                  // first spin of a set: the full ritual
+      arrowLap();
+      ct(function(){ tickFlash(); reverb(); vitrify(); }, 440);
+      ct(beadBirth, 720);
+      ct(beadNeck,  870);
+      ct(beadPinch, 910);
+      ct(beadFall,  950);
+      ct(splatPose, 1150);
+      ct(function(){ crownReveal(false, onDone); }, 1182);
+      ct(function(){ endCeremony(false); }, 1700);
+    }
+  }
+
+  function endCeremony(reveal){               // IDEMPOTENT — the SINGLE teardown
+    if (!ceremony.active) return;
+    ceremony.active = false;
+    if (ceremony.raf){ cancelAnimationFrame(ceremony.raf); ceremony.raf = 0; }
+    ceremony.timers.forEach(clearTimeout); ceremony.timers.length = 0;
+    ceremony.anims.forEach(function(a){ try{ a.cancel(); }catch(e){} }); ceremony.anims.length = 0;
+    clearTimeout(ceremony.watchdog);
+    document.removeEventListener('visibilitychange', ceremonyVis);
+    wheelArea.removeEventListener('click', ceremonySkip);
+    // hard-reset every decorative overlay to rest:
+    if (ptr){ ptr.style.transform=''; ptr.style.willChange=''; ptr.classList.remove('orbiting'); }
+    if (fxLayer)   fxLayer.classList.remove('live');   // display:none hides drop/splat/crown/ripple/halo
+    if (vitrifyEl) vitrifyEl.style.opacity='0';
+    canvas.style.transform = 'rotate('+rot+'deg)';     // byte-identical to the lock — nothing drifts
+    if (reveal) commitReveal(); else state.revealPending = false;
+  }
+  function abortCeremony(){ endCeremony(false); }
+  function ceremonyVis(){ if (document.hidden) endCeremony(true); }
+  function ceremonySkip(){ endCeremony(true); }
+
+  // ---- B1+B2+B3 arrow lap + magnet snap (existing .pointer SVG, one WAAPI chain) ----
+  function arrowLap(){
+    if (!ptr) return;
+    ptr.style.willChange = 'transform';
+    ptr.classList.add('orbiting');                       // Plan-B perf: suspends grain/blur/shadow during the lap
+    var charge = reg(ptr.animate(
+      [{transform:'rotate(0deg) translateY(0)'},
+       {transform:'rotate(0deg) translateY(-2px) scale(1.03)'},
+       {transform:'rotate(0deg)'}],
+      {duration:CHARGE_MS, easing:'ease-out'}));
+    charge.finished.then(function(){
+      if (!ceremony.active) return Promise.reject();
+      var glide = reg(ptr.animate([{transform:'rotate(0deg)'},{transform:'rotate('+(312*ORBIT_DIR)+'deg)'}],
+        {duration:ORBIT_GLIDE_MS, easing:'cubic-bezier(0.15,0.15,0.5,0.35)', fill:'forwards'}));
+      return glide.finished;
+    }).then(function(){
+      if (!ceremony.active) return Promise.reject();
+      var whip = reg(ptr.animate([{transform:'rotate('+(312*ORBIT_DIR)+'deg)'},{transform:'rotate('+(360*ORBIT_DIR)+'deg)'}],
+        {duration:ORBIT_WHIP_MS, easing:'cubic-bezier(0.9,0.03,0.97,0.20)', fill:'forwards'}));   // peaks at contact
+      return whip.finished;
+    }).then(function(){
+      ptr.style.transform=''; ptr.style.willChange=''; ptr.classList.remove('orbiting');   // rotate(360)≡0 → seamless reseat
+    }).catch(function(){ /* cancelled by endCeremony — teardown already handled */ });
+  }
+
+  // ---- B3b tick flash (light, not motion) ----
+  function tickFlash(){
+    if (sparkEl) reg(sparkEl.animate(
+      [{opacity:0,transform:'translate(-50%,-50%) scale(.6)'},
+       {opacity:1,transform:'translate(-50%,-50%) scale(.9)',offset:0.2},
+       {opacity:0,transform:'translate(-50%,-50%) scale(1.1)'}],
+      {duration:TICK_SPARK_MS, easing:'ease-out'}));
+    if (ringEl) reg(ringEl.animate(
+      [{opacity:.9,transform:'translate(-50%,-50%) scale(.4)'},
+       {opacity:0, transform:'translate(-50%,-50%) scale(1.3)'}],
+      {duration:TICK_RING_MS, easing:'ease-out'}));
+  }
+
+  // ---- B4 reverb (over-damped, monotonic, no zero-crossing) on #wheel; translate/scale LEFT of rotate ----
+  function reverb(){
+    var kf=[], N=12;
+    for (var i=0;i<=N;i++){
+      var u=i/N, env=Math.exp(-6*u);
+      var ty=(REVERB_TY*env).toFixed(3), sc=(1-REVERB_SC*env).toFixed(4);
+      kf.push({ transform:'translateY('+ty+'px) scale('+sc+') rotate('+rot+'deg)' });
+    }
+    var a = reg(canvas.animate(kf, {duration:REVERB_MS, easing:'linear'}));   // fill:none → reverts to inline rotate(rot)
+    a.onfinish = function(){ canvas.style.transform='rotate('+rot+'deg)'; };
+  }
+
+  // ---- B4b vitrify (opacity-only glaze pulse; filter animation banned) ----
+  function vitrify(){
+    if (!vitrifyEl) return;
+    reg(vitrifyEl.animate([{opacity:0},{opacity:0.6,offset:0.5},{opacity:0}], {duration:VITRIFY_MS, easing:'ease'}));
+  }
+
+  // ---- B6/B7 bead birth, neck, pinch, fall (one .drop group; opacity via inline style, transform via WAAPI) ----
+  function beadBirth(){
+    if (!dropEl) return;
+    dropEl.style.opacity='1';
+    if (beadShapeEl)     beadShapeEl.style.opacity='1';
+    if (teardropShapeEl) teardropShapeEl.style.opacity='0';
+    reg(dropEl.animate([
+      {transform:'translate('+DROP_ANCHOR[0]+'px,'+DROP_ANCHOR[1]+'px) scale(.15)'},
+      {transform:'translate('+DROP_ANCHOR[0]+'px,'+DROP_ANCHOR[1]+'px) scale(1.06,.9)'}
+    ], {duration:BEAD_SWELL_MS, easing:'cubic-bezier(.2,.7,.2,1)', fill:'forwards'}));
+  }
+  function beadNeck(){
+    if (!dropEl) return;
+    reg(dropEl.animate([
+      {transform:'translate('+DROP_ANCHOR[0]+'px,'+DROP_ANCHOR[1]+'px) scale(1.06,.9)'},
+      {transform:'translate('+DROP_ANCHOR[0]+'px,'+(DROP_ANCHOR[1]+6)+'px) scale(.78,1.55)'}
+    ], {duration:NECK_MS, easing:'ease-in', fill:'forwards'}));
+  }
+  function beadPinch(){
+    if (beadShapeEl)     beadShapeEl.style.opacity='0';   // 2-shape swap (never a morph): bead → comet-teardrop
+    if (teardropShapeEl) teardropShapeEl.style.opacity='1';
+    if (stubEl){ stubEl.style.opacity='1'; reg(stubEl.animate([{transform:'scaleY(1)'},{transform:'scaleY(0)'}], {duration:STUB_SNAP_MS, easing:'ease-in', fill:'forwards'})); }
+  }
+  function beadFall(){
+    if (!dropEl) return;
+    reg(dropEl.animate([
+      {transform:'translate('+DROP_ANCHOR[0]+'px,'+(DROP_ANCHOR[1]+6)+'px) scale(.9,1.5)'},
+      {transform:'translate('+DROP_LAND[0]+'px,'+DROP_LAND[1]+'px) scale(1,1.1)'}
+    ], {duration:FALL_MS, easing:'cubic-bezier(.55,0,.85,.5)', fill:'forwards'}));   // gravity ~t²
+  }
+
+  // ---- B8a splat pose (wide flat pancake, held ~2 frames) ----
+  function splatPose(){
+    if (dropEl) dropEl.style.opacity='0';
+    if (stubEl) stubEl.style.opacity='0';
+    showFx(splatEl);
+  }
+
+  // ---- B8b crown snap + B9 reveal (the same frame) ----
+  function crownReveal(lean, onDone){
+    hideFx(splatEl);
+    showFx(crownGroup);                          // instant snap at max extent — no bloom
+    crownSettle(lean); rippleGo(); haloGo();
+    if (onDone) onDone();                         // commitReveal — verdict paints on THIS frame
+  }
+  function crownSettle(lean){
+    var dur = lean ? 280 : CROWN_SETTLE_MS, stag = lean ? 16 : 26;
+    crownSpikeEls.forEach(function(sp,i){
+      reg(sp.animate(
+        [{transform:'scaleY(1)'},{transform:'scaleY('+CROWN_OVERSHOOT+')',offset:0.2},{transform:'scaleY(0.1)'}],
+        {duration:dur, delay:i*stag, easing:'cubic-bezier(.2,.7,.2,1)', fill:'forwards'}));
+    });
+    if (crownPuddleEl) reg(crownPuddleEl.animate(
+      [{transform:'scaleX(1)',opacity:1},{transform:'scaleX(1.18)',opacity:0}],
+      {duration:dur, easing:'ease-out', fill:'forwards'}));
+  }
+  function rippleGo(){
+    if (!rippleEl) return;
+    reg(rippleEl.animate(
+      [{transform:'scale(.5)',opacity:.7},{transform:'scale(.9)',opacity:.5,offset:0.4},{transform:'scale(1.3)',opacity:0}],
+      {duration:RIPPLE_MS, easing:'ease-out', fill:'forwards'}));
+  }
+  function haloGo(){
+    if (!haloEl) return;
+    reg(haloEl.animate(
+      [{opacity:0},{opacity:HALO_ALPHA,offset:0.2},{opacity:HALO_ALPHA,offset:0.6},{opacity:0}],
+      {duration:HALO_MS, easing:'ease-out', fill:'forwards'}));
   }
 
   function addOption(){
     var t = (state.draft||'').trim();
     if (!t || state.spinning || state.options.length>=MAX) return;
-    finalizeTransition();                                   // collapse any in-flight transition first
+    finalizeTransition();                                   // collapse any in-flight transition first (also aborts any ceremony)
+    spunSinceEdit = 0;                                      // option-set changed → next spin is a FULL arc
     var isFirst = state.options.length===0;
     var col = (isFirst && state.preview) ? state.preview : paletteColor(state.options.length);   // slot-by-add-order
     var oldSegs = segments().slice();                       // snapshot BEFORE the push
@@ -762,6 +1124,7 @@
   function removeOption(i){
     if (state.spinning) return;
     finalizeTransition();
+    spunSinceEdit = 0;                                      // option-set changed → next spin is a FULL arc
     var oldSegs = segments().slice();                       // the n real wedges, BEFORE splice
     var oldN = oldSegs.length;
     state.options.splice(i,1); state.result=null; state.winner=null;
@@ -778,7 +1141,8 @@
     finalizeTransition();
     rot = 0; canvas.style.transition='none'; canvas.style.transform='rotate(0deg)';
     strobe.style.transition='none'; strobe.style.transform='rotate(0deg)'; strobe.style.opacity='0';
-    state.options=[]; state.draft=''; state.preview=null; state.result=null; state.winner=null;
+    spunSinceEdit = 0;                                       // option-set cleared → next spin is a FULL arc
+    state.options=[]; state.draft=''; state.preview=null; state.result=null; state.winner=null; state.revealPending=false;
     document.getElementById('draft').value='';
     render();
   }
@@ -786,9 +1150,17 @@
   // ---- view sync ----  (draw() is suppressed while a transition owns the canvas)
   function renderControls(){
     var r = document.getElementById('result');
-    if (state.spinning) r.innerHTML = '<span class="spin">Spinning…</span>';
-    else if (state.result) r.innerHTML = '<span class="k">Result</span><span class="v"></span>', r.querySelector('.v').textContent = state.result;
-    else r.innerHTML = '';
+    if (state.spinning)            r.innerHTML = '<span class="spin">Spinning…</span>';
+    else if (state.revealPending)  r.innerHTML = '';       // verdict withheld — the drop delivers it
+    else if (state.result){
+      var wc = (state.winner!=null && state.options[state.winner]) ? state.options[state.winner].color : null;
+      r.innerHTML = '<span class="k">Result</span><span class="rsw"></span><span class="v"></span>';
+      if (wc) r.querySelector('.rsw').style.background = wc;
+      var v = r.querySelector('.v');
+      v.textContent = state.result;
+      v.style.color = nameColor(state.winner);             // lifted jewel — the name echoes the lit wedge
+      if (justRevealed) v.classList.add('reveal');         // one-shot arrive animation
+    } else r.innerHTML = '';
     document.getElementById('count').textContent = state.options.length + '/' + MAX;
     var atMax = state.options.length>=MAX;
     var draftOk = !!(state.draft||'').trim();
