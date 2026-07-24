@@ -73,9 +73,9 @@
                notes: ["what it rests on", "what stands against it", "what it grew from", "what it reaches for", "where it tends"] }
   };
   var TIER_STYLE = {
-    pull:    { w: "clamp(170px,38vw,210px)", ar: "120 / 190" },
-    sitting: { w: "clamp(96px,21vw,132px)",  ar: "150 / 238" },
-    deep:    { w: "clamp(80px,16vw,110px)",  ar: "150 / 238" }
+    pull:    { w: "clamp(184px,42vw,216px)", ar: "150 / 238" },
+    sitting: { w: "clamp(120px,26vw,150px)", ar: "150 / 238" },
+    deep:    { w: "clamp(92px,18vw,138px)",  ar: "150 / 238" }
   };
 
   /* ---------------------------------------------------------------- gate */
@@ -185,7 +185,8 @@
     }
     glyph = "&#9670;"; // the diamond — the original card art, on EVERY card (majors + minors)
     var longName = card.name.length >= 13 ? " is-long" : "";
-    var kw = (card.keywords || []).slice(0, 3).join("  ·  ");
+    // Card face carries name + orientation only — no keyword line (kept clean; keywords/meaning
+    // live in the reading panel below).
     return '' +
       '<div class="face-head">' +
         '<span class="face-meta">' + headLeft + '</span>' +
@@ -194,7 +195,6 @@
       '<div class="face-name' + longName + '">' + esc(card.name) + '</div>' +
       '<div class="face-div"></div>' +
       '<div class="face-orient">' + (rev ? "Reversed" : "Upright") + '</div>' +
-      '<div class="face-kw">' + esc(kw) + '</div>' +
       '<span class="tick tl"></span><span class="tick br"></span>'; // the original 2-tick corners (tl + br)
   }
   function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
@@ -743,9 +743,32 @@
     });
   }
 
+  /* ------------------------------------------------------------- card finish */
+  function setCardVariant(v) {
+    document.documentElement.setAttribute("data-card", v);
+    try { localStorage.setItem("br_card_variant", v); } catch (e) {}
+    var btns = document.querySelectorAll("[data-cardvar]");
+    for (var i = 0; i < btns.length; i++) {
+      btns[i].classList.toggle("is-active", btns[i].getAttribute("data-cardvar") === v);
+    }
+  }
+  function initCardSwitch() {
+    var saved = null;
+    try { saved = localStorage.getItem("br_card_variant"); } catch (e) {}
+    var urlv = new URLSearchParams(location.search).get("card");
+    var v = (urlv === "copper" || urlv === "white") ? urlv : (saved === "copper" ? "copper" : "white");
+    setCardVariant(v);
+    var sw = document.querySelector("[data-cardswitch]");
+    if (sw) sw.addEventListener("click", function (e) {
+      var b = e.target && e.target.closest ? e.target.closest("[data-cardvar]") : null;
+      if (b) setCardVariant(b.getAttribute("data-cardvar"));
+    });
+  }
+
   /* ---------------------------------------------------------------- boot */
   function boot() {
     grab();
+    initCardSwitch();
     // dev reset for the sitting gate
     if (new URLSearchParams(location.search).get("resetgate") === "1") {
       try { localStorage.removeItem("br_dr_sitting_used"); } catch (e) {}

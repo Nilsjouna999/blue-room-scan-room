@@ -15,6 +15,13 @@
 </head>
 <body>
   <main class="room" id="room">
+    <!-- card-finish chooser (temporary — both variants saved; remove once the white/copper call is made) -->
+    <div class="cardswitch" data-cardswitch aria-label="Card finish">
+      <span class="cardswitch-label">Card</span>
+      <button type="button" class="cardswitch-btn" data-cardvar="white">White</button>
+      <button type="button" class="cardswitch-btn" data-cardvar="copper">Copper</button>
+    </div>
+
     <header class="masthead">
       <p class="kicker">THE DRAWING ROOM</p>
       <p class="subline" data-subline>A reading, kept exactly as it is drawn.</p>
@@ -55,8 +62,7 @@
       <div class="intake" data-intake>
         <label class="intake-label" for="question">Lay a matter on the table — optional</label>
         <input class="intake-input" id="question" type="text" maxlength="120" autocomplete="off"
-               placeholder="a question, in your own words" aria-describedby="q-help" />
-        <p class="intake-help" id="q-help">It is kept with your reading, and it does not choose the cards.</p>
+               placeholder="a question, in your own words" />
       </div>
 
       <!-- Controls row — exactly ONE visible control at a time -->

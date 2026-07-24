@@ -47,6 +47,17 @@
   --stage-pad-top: 36px;
 }
 
+/* ---------- CARD FINISH VARIANTS ----------
+   Two saved looks for the card face; default (:root above) = WHITE parchment.
+   Toggle via the corner switch or ?card=copper|white. Only the card materials change. */
+:root[data-card="copper"] {
+  --parchment:   linear-gradient(165deg, #e9d4b2, #ccb188);   /* warm, aged copper parchment */
+  --card-ink:    #271a0c;
+  --card-meta:   #6f5636;
+  --card-sub:    #715c3b;
+  --card-accent: #b06a38;   /* burnt copper — reads on the warm face */
+}
+
 * { box-sizing: border-box; }
 
 /* Global hidden-attribute guarantee. Several containers below (.intake, .controls) set
@@ -87,6 +98,25 @@ body {
   outline-offset: 3px;
   border-radius: 6px;
 }
+
+/* ---------- CARD-FINISH CHOOSER ----------
+   A temporary preview affordance while the white/copper call is open; remove once decided. */
+.cardswitch {
+  position: fixed; top: 14px; right: 14px; z-index: 60;
+  display: flex; align-items: center; gap: 6px;
+  font-family: var(--f-mono); font-size: 10px; letter-spacing: 0.1em;
+  opacity: 0.42; transition: opacity .2s ease;
+}
+.cardswitch:hover, .cardswitch:focus-within { opacity: 1; }
+.cardswitch-label { color: var(--t-ghost); text-transform: uppercase; }
+.cardswitch-btn {
+  background: none; border: 1px solid var(--line); border-radius: 6px;
+  color: var(--t-meta); font: inherit; text-transform: uppercase;
+  padding: 5px 9px; cursor: pointer;
+  transition: color .18s ease, border-color .18s ease, background .18s ease;
+}
+.cardswitch-btn:hover { color: var(--t-primary); border-color: rgba(233, 229, 220, 0.28); }
+.cardswitch-btn.is-active { color: #171310; background: linear-gradient(180deg, #e7e2d7, #cbc6bb); border-color: transparent; }
 
 /* ---------- MASTHEAD ---------- */
 .masthead { text-align: center; margin-bottom: 30px; }
@@ -137,8 +167,8 @@ body {
 
 /* ---------- INTAKE ---------- */
 .intake {
-  max-width: 460px; margin: 20px auto 14px;
-  display: flex; flex-direction: column; gap: 8px; text-align: center;
+  max-width: 440px; margin: 10px auto 14px;
+  display: flex; flex-direction: column; gap: 10px; text-align: center;
 }
 .intake-label {
   font-family: var(--f-mono); font-size: 11px; letter-spacing: 0.14em;
@@ -180,8 +210,8 @@ body {
 .stage {
   position: relative;
   width: 100%;
-  margin: 22px auto 0;
-  padding: var(--stage-pad-top) 20px 56px;
+  margin: 18px auto 0;
+  padding: var(--stage-pad-top) 20px 44px;
   min-height: 300px;
   display: flex; justify-content: center; align-items: flex-start;
 }
@@ -397,18 +427,11 @@ body {
 .face-div { width: 26px; height: 1px; background: rgba(28, 21, 13, 0.35); margin: 8px 0; }
 
 .face-orient {
-  font-family: var(--f-mono); font-weight: 600; font-size: 8.5px;
-  letter-spacing: 0.14em; text-transform: uppercase; color: var(--card-sub);
+  margin: 0 0 auto;   /* pairs with .face-name's top auto → the name/rule/orientation trio centres in the face */
+  font-family: var(--f-mono); font-weight: 600; font-size: 9px;
+  letter-spacing: 0.16em; text-transform: uppercase; color: var(--card-sub);
 }
 .card-rev .face-orient { color: var(--card-accent); }
-
-.face-kw {
-  margin: 6px 0 auto;
-  font-family: var(--f-mono); font-weight: 500; font-size: 9px;
-  letter-spacing: 0.06em; text-transform: uppercase; color: var(--card-sub);
-  line-height: 1.5; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  max-width: 100%;
-}
 
 /* ============================================================================
    CONTROLS
