@@ -1,0 +1,628 @@
+/* ============================================================================
+   Blue Room Tarot v2 — style.css
+   All styling: tokens, room, tier doors, intake, stage/deck/glow, cards
+   (parchment face + printed back, 3D flip), reading panel, controls,
+   every @keyframes, responsive, and a single reduced-motion block.
+   Every keyframe animates transform/opacity only — the sole exception is the
+   settle beat (color/background/border), which is currency, not motion.
+   ========================================================================== */
+
+/* ---------- TOKENS ---------- */
+:root {
+  /* text ramp */
+  --t-display: #e9e5dc;
+  --t-primary: #d7d3ca;
+  --t-body:    #b1ada4;
+  --t-meta:    #948f87;
+  --t-ghost:   #6e6b63;
+  --line:      rgba(233, 229, 220, 0.12);
+
+  /* currency law — violet (paid/unsettled) resolves to gold (settled) */
+  --violet:      #8a6fb0;
+  --violet-lit:  #a487c8;
+  --violet-line: rgba(138, 111, 176, 0.4);
+  --gold:        #a2864a;
+  --gold-lit:    #c0a05d;
+  --pf-gold-lit: #c0a05d; /* focus ring */
+
+  /* accent = currency. Default register = neutral gold-adjacent. Reset per state. */
+  --accent:     #c98a5e;
+  --accent-lit: #dba878;
+  --card-accent: #c98a5e;   /* the card's ◆ + reversed tag — the ORIGINAL copper, stable (never shifts to the commerce gold) */
+
+  /* card materials */
+  --parchment:  linear-gradient(165deg, #efe9db, #dcd4c2);
+  --card-ink:   #1c150d;
+  --card-meta:  #5c503c;
+  --card-sub:   #6a5c45;
+
+  /* fonts */
+  --f-display: "Cormorant Garamond", Georgia, serif;
+  --f-ui:      "Inter", system-ui, sans-serif;
+  --f-mono:    "IBM Plex Mono", ui-monospace, monospace;
+
+  /* stage geometry (fluid; overridden per tier by JS via --card-w / --ar) */
+  --card-w: clamp(96px, 21vw, 132px);
+  --ar: 150 / 238;
+  --stage-pad-top: 36px;
+}
+
+* { box-sizing: border-box; }
+
+/* Global hidden-attribute guarantee. Several containers below (.intake, .controls) set
+   their own `display` (flex) for layout, which — at equal specificity — can beat the UA
+   [hidden]{display:none} rule depending on source order. `!important` here makes the
+   `hidden` attribute authoritative everywhere, regardless of what a component's own
+   display rule says, so JS's `el.hidden = true` always actually hides it. */
+[hidden] { display: none !important; }
+
+html, body { margin: 0; }
+
+body {
+  min-height: 100vh;
+  background: radial-gradient(120% 90% at 50% -8%, #191512 0%, #100f0c 52%, #0a0b0d 100%);
+  background-attachment: fixed;
+  color: var(--t-body);
+  font-family: var(--f-ui);
+  font-weight: 500;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+.room {
+  width: min(980px, 96vw);
+  margin: 0 auto;
+  padding: 40px 20px 72px;
+}
+
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+
+/* ---------- FOCUS RINGS ---------- */
+:focus { outline: none; }
+:focus-visible {
+  outline: 2px solid var(--pf-gold-lit);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+/* ---------- MASTHEAD ---------- */
+.masthead { text-align: center; margin-bottom: 30px; }
+.kicker {
+  margin: 0;
+  font-family: var(--f-mono); font-weight: 600; font-size: 11px;
+  letter-spacing: 0.34em; color: var(--t-meta); text-transform: uppercase;
+}
+.subline {
+  margin: 10px 0 0;
+  font-family: var(--f-display); font-style: italic; font-weight: 500;
+  font-size: 18px; color: var(--t-ghost);
+}
+
+/* ---------- TIER DOORS ---------- */
+.tiers {
+  display: flex; flex-wrap: wrap; justify-content: center;
+  gap: 14px; margin-top: 8px;
+}
+.door {
+  flex: 1 1 260px; max-width: 320px;
+  display: flex; flex-direction: column; gap: 8px;
+  text-align: left;
+  padding: 22px 22px 24px;
+  min-height: 108px;
+  background: rgba(233, 229, 220, 0.02);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  color: var(--t-primary);
+  cursor: pointer;
+  font-family: var(--f-ui);
+  transition: border-color .25s ease, background .25s ease, transform .25s ease;
+}
+.door:hover { border-color: rgba(233, 229, 220, 0.24); background: rgba(233, 229, 220, 0.045); transform: translateY(-2px); }
+.door-title { font-family: var(--f-display); font-weight: 600; font-size: 25px; color: var(--t-display); line-height: 1; }
+.door-sub { font-size: 13.5px; color: var(--t-meta); line-height: 1.5; }
+.door-price { color: var(--gold-lit); font-family: var(--f-mono); font-size: 12px; }
+
+/* ---------- CEREMONY WRAPPER ---------- */
+.ceremony { margin-top: 6px; }
+.ceremony[hidden] { display: none; }
+
+.reopen-note {
+  margin: 0 0 22px; text-align: center;
+  font-family: var(--f-mono); font-size: 12px; letter-spacing: 0.06em;
+  color: var(--t-meta);
+}
+
+/* ---------- INTAKE ---------- */
+.intake {
+  max-width: 460px; margin: 20px auto 14px;
+  display: flex; flex-direction: column; gap: 8px; text-align: center;
+}
+.intake-label {
+  font-family: var(--f-mono); font-size: 11px; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--t-meta);
+}
+.intake-input {
+  width: 100%; padding: 12px 14px;
+  background: rgba(233, 229, 220, 0.03);
+  border: 1px solid var(--line); border-radius: 8px;
+  color: var(--t-primary); font-family: var(--f-display); font-size: 19px;
+  text-align: center; letter-spacing: 0.005em;
+  transition: color .3s ease, letter-spacing .3s ease, border-color .25s ease;
+}
+.intake-input::placeholder { color: var(--t-ghost); font-style: italic; }
+.intake-input:focus-visible { border-color: var(--gold-lit); outline-offset: 2px; }
+.intake-input.is-locked {
+  color: var(--t-display); letter-spacing: -0.005em;
+  background: rgba(233, 229, 220, 0.015);
+  cursor: default;
+}
+.intake-help { margin: 0; font-size: 12.5px; color: var(--t-ghost); line-height: 1.4; }
+
+.cut-note {
+  margin: 0 auto 4px; max-width: 420px; text-align: center;
+  font-family: var(--f-display); font-style: italic; font-size: 16px;
+  color: var(--t-meta); line-height: 1.4;
+}
+.cut-note[hidden] { display: none; }
+.mock-note {
+  margin: 6px auto 0; text-align: center;
+  font-family: var(--f-mono); font-size: 10.5px; letter-spacing: 0.08em;
+  color: var(--t-ghost);
+}
+.mock-note[hidden] { display: none; }
+
+/* ============================================================================
+   STAGE  (fluid DOM — deck absolutely positioned, aligned by JS)
+   ========================================================================== */
+.stage {
+  position: relative;
+  width: 100%;
+  margin: 22px auto 0;
+  padding: var(--stage-pad-top) 20px 56px;
+  min-height: 300px;
+  display: flex; justify-content: center; align-items: flex-start;
+}
+/* A Glance: narrower stage — deck sits directly on its one slot, short vertical hop */
+.stage.is-pull { max-width: min(480px, 92vw); margin-left: auto; margin-right: auto; }
+
+/* ambient glow under the deck */
+.glow {
+  position: absolute;
+  width: calc(var(--card-w) * 2.2);
+  height: calc(var(--card-w) * 2.2);
+  aspect-ratio: 1;
+  left: 50%;
+  top: var(--deck-top, var(--stage-pad-top));
+  transform: translate(-50%, -12%);
+  background: radial-gradient(circle at 50% 50%, rgba(150, 112, 74, 0.09) 0%, transparent 66%);
+  opacity: 1;
+  transition: opacity .6s ease;
+  pointer-events: none;
+}
+
+/* ---------- DECK PILE ---------- */
+.deck {
+  position: absolute;
+  left: 50%;
+  top: var(--deck-top, var(--stage-pad-top));
+  width: var(--card-w);
+  aspect-ratio: var(--ar);
+  transform: translateX(-50%);
+  transition: opacity .6s ease;
+  pointer-events: none;
+}
+.deck-layer,
+.deck-top {
+  position: absolute; inset: 0;
+  border-radius: 12px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+}
+.deck-top { z-index: 8; }
+
+/* glow + deck fade once the first card launches */
+.stage.is-launched .glow,
+.stage.is-launched .deck { opacity: 0; }
+
+/* cutlift plays on the deck's top card */
+.deck-top.is-cutting { animation: cutlift 1.02s cubic-bezier(.3, .72, .2, 1) both; }
+/* No will-change on the 7 static deck layers, per §4 — they never get promoted; only the
+   travelling/landing/flipping card gets a transient will-change, added+removed by JS. */
+.deck.is-riffling .deck-back-body { animation: riffle 0.8s cubic-bezier(.3, .7, .2, 1) both; }
+.deck.is-riffling .deck-top { animation: rifTop 0.8s cubic-bezier(.3, .7, .2, 1) both; }
+
+/* ============================================================================
+   CARD BACK  (one shared design for deck pile + unrevealed dealt cards)
+   ========================================================================== */
+.back {
+  position: absolute; inset: 0;
+  border-radius: 12px;
+  background: linear-gradient(158deg, #241c13, #120f0a 70%, #0e0b07);
+  overflow: hidden; /* OK on the back — it is NOT a backface-hidden 3D face */
+}
+.back::before { /* radial sheen, upper-left biased */
+  content: ""; position: absolute; inset: 0;
+  background: radial-gradient(120% 120% at 28% 22%, rgba(233, 229, 220, 0.08), transparent 52%);
+  pointer-events: none;
+}
+.back-frame { /* double inset hairline frame */
+  position: absolute; inset: 7px; border: 1px solid rgba(233, 229, 220, 0.12); border-radius: 7px;
+}
+.back-frame::after {
+  content: ""; position: absolute; inset: 5px; border: 1px solid rgba(233, 229, 220, 0.08); border-radius: 4px;
+}
+/* Ring + diamond are the deck's DEFAULT ink on every tier, so they use neutral warm-
+   ink hairlines (matching the back frame + micro-mono), NOT violet — violet is reserved
+   for currency work (the cut button + the settle beat), never ambient deck chrome. */
+.back-ring { /* concentric double-ring diamond */
+  position: absolute; left: 50%; top: 50%;
+  width: 82px; height: 82px; margin: -41px 0 0 -41px;
+  border: 1px solid rgba(233, 229, 220, 0.14);
+  transform: rotate(45deg);
+}
+.back-ring::after {
+  content: ""; position: absolute; inset: 12px;
+  border: 1px solid rgba(233, 229, 220, 0.10);
+}
+.back-diamond { /* centered diamond glyph */
+  position: absolute; left: 0; right: 0; top: 50%;
+  transform: translateY(-50%);
+  text-align: center;
+  font-family: var(--f-display); font-weight: 700; font-size: 26px;
+  color: rgba(233, 229, 220, 0.42);
+  line-height: 1;
+}
+.back-mono {
+  position: absolute; left: 0; right: 0; text-align: center;
+  font-family: var(--f-mono); font-weight: 600; font-size: 7.5px;
+  letter-spacing: 0.34em;
+}
+.back-mono.top { top: 16px; color: rgba(233, 229, 220, 0.18); }
+.back-mono.bot { bottom: 16px; color: rgba(233, 229, 220, 0.32); }
+
+/* corner ticks — reused on face + back */
+.tick { position: absolute; width: 10px; height: 10px; }
+.tick.tl { left: 9px; top: 9px; border-left: 1.5px solid; border-top: 1.5px solid; }
+.tick.tr { right: 9px; top: 9px; border-right: 1.5px solid; border-top: 1.5px solid; }
+.tick.bl { left: 9px; bottom: 9px; border-left: 1.5px solid; border-bottom: 1.5px solid; }
+.tick.br { right: 9px; bottom: 9px; border-right: 1.5px solid; border-bottom: 1.5px solid; }
+.back .tick { border-color: rgba(233, 229, 220, 0.12); }
+.face .tick { border-color: rgba(28, 21, 13, 0.5); }
+
+/* ============================================================================
+   SPREAD + SLOTS
+   ========================================================================== */
+.spread {
+  display: flex; flex-wrap: wrap; justify-content: center; align-items: flex-start;
+  gap: 16px 14px; width: 100%;
+}
+
+.slot { display: flex; flex-direction: column; align-items: center; gap: 8px; width: var(--card-w); }
+
+.slot-label {
+  width: 100%; text-align: center; min-height: 34px;
+  display: flex; flex-direction: column; justify-content: flex-end; gap: 2px;
+  opacity: 0; transition: opacity .5s ease;
+}
+.slot.is-dealt .slot-label { opacity: 1; }
+.slot-label .pos {
+  font-family: var(--f-mono); font-weight: 600; font-size: 11px;
+  letter-spacing: 0.22em; text-transform: uppercase; color: var(--t-primary);
+}
+.slot-label .sub {
+  font-family: var(--f-mono); font-weight: 500; font-size: 10.5px;
+  letter-spacing: 0.14em; color: var(--t-ghost);
+}
+
+/* the card box (holds travel → land → flip layers) */
+.card-slot { position: relative; width: var(--card-w); aspect-ratio: var(--ar); }
+
+/* travel layer — does the deal translate */
+.card-travel {
+  position: absolute; inset: 0;
+  opacity: 0; /* mounted invisible until deal seats it on the deck */
+}
+.card-travel.is-mounted { opacity: 1; }
+
+/* land layer — does the slam + carries the shockwave ring */
+.card-land { position: absolute; inset: 0; }
+.card-land.is-landing { animation: slam 0.56s cubic-bezier(.22, .9, .28, 1) var(--land-delay, 0s) both; }
+.card-land.is-landing::after {
+  content: ""; position: absolute; inset: 0; border-radius: 12px;
+  border: 1px solid var(--accent-lit);
+  animation: shock 0.5s ease-out var(--land-delay, 0s) both;
+  pointer-events: none;
+}
+
+/* flip layer — the interactive turn control (a real <button>) */
+.flip {
+  position: absolute; inset: 0;
+  display: block; padding: 0; margin: 0; border: 0; background: none;
+  cursor: pointer;
+  transform-style: preserve-3d;
+  -webkit-transform-style: preserve-3d;
+  transition: transform 0.75s cubic-bezier(.3, .7, .2, 1);
+  /* will-change:transform is NOT resident here — a face-down card can sit idle for
+     minutes awaiting its turn. JS promotes it only for the ~1.6s deal window and the
+     ~0.75s flip window, then drops it back to auto. */
+}
+.flip.is-turned { transform: rotateY(180deg); }
+.flip:focus-visible {
+  outline: 2px solid var(--pf-gold-lit); outline-offset: 6px; border-radius: 12px;
+}
+
+/* both faces — backface-hidden, NO overflow:hidden */
+.face, .back-face {
+  position: absolute; inset: 0;
+  border-radius: 12px;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+.back-face { /* the printed back, resting side */ }
+.face { /* the parchment front */
+  transform: rotateY(180deg);
+  background: var(--parchment);
+  border: 1px solid rgba(20, 14, 8, 0.35);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+  color: var(--card-ink);
+  padding: 14px 12px;
+  display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
+  text-align: center;
+}
+
+/* ---------- FACE BANDS ---------- */
+.face-head { width: 100%; display: flex; align-items: center; justify-content: space-between; }
+.face-meta {
+  font-family: var(--f-mono); font-weight: 600; font-size: 11px;
+  letter-spacing: 0.12em; color: var(--card-meta);
+}
+.face-glyph {
+  font-family: var(--f-display); font-weight: 700; font-size: 13px; line-height: 1;
+  color: var(--card-accent);
+  display: inline-flex; align-items: center;
+}
+.face-glyph svg { width: 12px; height: 12px; display: block; }
+.card-rev .face-glyph { transform: rotate(180deg); }
+
+.face-name {
+  margin: auto 0 0;
+  font-family: var(--f-display); font-weight: 600; font-size: 20px;
+  line-height: 1.05; color: var(--card-ink);
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.face-name.is-long { font-size: 18px; }
+
+.face-div { width: 26px; height: 1px; background: rgba(28, 21, 13, 0.35); margin: 8px 0; }
+
+.face-orient {
+  font-family: var(--f-mono); font-weight: 600; font-size: 8.5px;
+  letter-spacing: 0.14em; text-transform: uppercase; color: var(--card-sub);
+}
+.card-rev .face-orient { color: var(--card-accent); }
+
+.face-kw {
+  margin: 6px 0 auto;
+  font-family: var(--f-mono); font-weight: 500; font-size: 9px;
+  letter-spacing: 0.06em; text-transform: uppercase; color: var(--card-sub);
+  line-height: 1.5; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+/* ============================================================================
+   CONTROLS
+   ========================================================================== */
+.controls {
+  min-height: 56px; margin-top: 8px;
+  display: flex; align-items: center; justify-content: center;
+}
+.btn {
+  font-family: var(--f-ui); font-weight: 700; font-size: 14px;
+  letter-spacing: 0.02em;
+  padding: 13px 26px; min-height: 44px;
+  border-radius: 9px; cursor: pointer;
+  border: 1px solid rgba(20, 14, 8, 0.3);
+  color: #171310;
+  background: linear-gradient(180deg, #e7e2d7, #cbc6bb);
+  transition: transform .2s ease, box-shadow .2s ease, background .25s ease, color .25s ease, border-color .25s ease;
+}
+.btn:hover { transform: translateY(-1px); box-shadow: 0 8px 18px rgba(0, 0, 0, 0.35); }
+.btn[hidden] { display: none; }
+.btn:disabled { cursor: default; }
+
+/* paid, unsettled = violet register */
+.btn-cut.is-paid {
+  background: linear-gradient(180deg, #2a2436, #221d2e);
+  color: var(--violet-lit);
+  border-color: var(--violet-line);
+}
+/* settling → resolves to gold (currency into ink) */
+.btn-cut.is-settling {
+  background: linear-gradient(180deg, #2a2618, #221f13);
+  color: var(--gold-lit);
+  border-color: rgba(162, 134, 74, 0.5);
+  transition: background .62s ease, color .62s ease, border-color .62s ease;
+}
+.btn-ghost {
+  background: none; border: 1px solid var(--line); color: var(--t-primary);
+}
+.btn-ghost:hover { border-color: rgba(233, 229, 220, 0.28); background: rgba(233, 229, 220, 0.04); }
+
+.status-line {
+  margin: 0;
+  font-family: var(--f-mono); font-weight: 500; font-size: 12px;
+  letter-spacing: 0.1em; color: var(--t-meta);
+}
+.status-line[hidden] { display: none; }
+
+.turn-hint {
+  margin: 12px 0 0; text-align: center;
+  font-family: var(--f-mono); font-size: 11px; letter-spacing: 0.12em;
+  color: var(--t-ghost);
+}
+.turn-hint[hidden] { display: none; }
+
+/* ============================================================================
+   READING PANEL  (always a single vertical column)
+   ========================================================================== */
+.reading {
+  display: flex; flex-direction: column; gap: 22px;
+  margin: 34px auto 0; max-width: 48ch;
+}
+.reading.is-pull { max-width: 380px; }
+
+.read-col {
+  border: 1px solid var(--line);
+  border-inline-start: 2px solid var(--line);
+  padding: 16px 16px 18px; min-height: 120px;
+  background: rgba(233, 229, 220, 0.03);
+  border-radius: 8px;
+  transition: border-inline-start-color .5s ease;
+}
+.read-col.is-revealed { border-inline-start-color: var(--accent); }
+
+.read-head {
+  font-family: var(--f-mono); font-weight: 600; font-size: 11px;
+  letter-spacing: 0.14em; text-transform: uppercase; color: var(--t-meta);
+  margin: 0 0 10px;
+}
+.read-ghost {
+  font-family: var(--f-display); font-style: italic; font-size: 17px;
+  color: var(--t-ghost); margin: 0;
+}
+.read-body {
+  font-family: var(--f-display); font-style: italic; font-size: 18px;
+  line-height: 1.5; color: var(--t-primary); margin: 0;
+}
+
+.closing {
+  margin: 30px auto 0; text-align: center;
+  font-family: var(--f-display); font-style: italic; font-weight: 500; font-size: 24px;
+  color: var(--t-display);
+}
+.closing[hidden] { display: none; }
+
+.accession {
+  margin: 14px auto 0; text-align: center;
+}
+.accession[hidden] { display: none; }
+.accession .code {
+  font-family: var(--f-mono); font-weight: 600; font-size: 12px;
+  letter-spacing: 0.18em; color: var(--gold-lit);
+}
+.accession .filed {
+  display: block; margin-top: 3px;
+  font-family: var(--f-mono); font-weight: 500; font-size: 11px;
+  letter-spacing: 0.12em; color: var(--t-ghost);
+}
+
+/* ============================================================================
+   KEYFRAMES  (transform/opacity only, per §4.1)
+   ========================================================================== */
+@keyframes riffle {
+  0%   { transform: translate(0, 0) rotate(0) scaleY(1); }
+  12%  { transform: translate(-11px, 6px) rotate(-4deg) scaleY(.965); }
+  28%  { transform: translate(9px, -5px) rotate(3deg) scaleY(.98); }
+  44%  { transform: translate(-7px, 4px) rotate(-3deg) scaleY(.97); }
+  60%  { transform: translate(11px, -6px) rotate(4deg) scaleY(.985); }
+  78%  { transform: translate(-5px, 3px) rotate(-2deg) scaleY(.99); }
+  100% { transform: translate(0, 0) rotate(0) scaleY(1); }
+}
+@keyframes rifTop {
+  0%   { transform: translate(0, 0) rotate(0); }
+  12%  { transform: translate(-17px, -13px) rotate(-8deg); }
+  40%  { transform: translate(14px, -9px) rotate(7deg); }
+  68%  { transform: translate(-9px, -5px) rotate(-4deg); }
+  100% { transform: translate(0, 0) rotate(0); }
+}
+@keyframes cutlift {
+  0%   { transform: translate(0, 0) rotate(0); }
+  18%  { transform: translate(0, -108px) rotate(-3deg); }
+  40%  { transform: translate(172px, -100px) rotate(6deg); }
+  62%  { transform: translate(172px, -22px) rotate(3deg); }
+  82%  { transform: translate(34px, 6px) rotate(1deg); }
+  92%  { transform: translate(0, -7px) rotate(0); }
+  100% { transform: translate(0, 0) rotate(0); }
+}
+/* slam — RETUNED, 3 interior stops only (no 58%/78%) */
+@keyframes slam {
+  0%   { transform: scale(1.10, 1.10); }
+  18%  { transform: scale(1.13, 0.90); }
+  45%  { transform: scale(0.97, 1.04); }
+  100% { transform: scale(1, 1); }
+}
+/* shock — RETUNED, pressure-ring; peak opacity .30 */
+@keyframes shock {
+  0%   { transform: scale(.85); opacity: .30; }
+  100% { transform: scale(1.22); opacity: 0; }
+}
+
+/* ============================================================================
+   RESPONSIVE  (single hard breakpoint at 620px; optional padding tighten 900)
+   ========================================================================== */
+@media (max-width: 900px) {
+  .stage { padding-left: 14px; padding-right: 14px; }
+}
+@media (max-width: 620px) {
+  .room { padding: 28px 14px 56px; }
+  .stage { padding: 24px 14px 40px; min-height: 260px; }
+  .controls { min-height: 48px; }
+  .door { flex-basis: 100%; max-width: 420px; }
+  .closing { font-size: 21px; }
+}
+
+/* Deep Read (5) on a narrow phone: below ~520px the fifth card orphans onto its own row
+   (a 4+1 accident). Cap the spread to exactly 3 card-widths so it wraps into a composed
+   3-over-2 ritual line instead. (28px = the .spread 14px column-gap × 2.) */
+@media (max-width: 520px) {
+  .stage.is-deep .spread {
+    max-width: calc(var(--card-w) * 3 + 28px);
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+/* coarse-pointer: bump control hit area */
+@media (hover: none) and (pointer: coarse) {
+  .btn { padding: 17px 28px; }
+  .door { padding: 24px 22px 26px; }
+}
+
+/* ============================================================================
+   REDUCED MOTION  (single terse block — kills all ceremony motion,
+   collapses to opacity; the paid settle stays as a color-only crossfade)
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  .deck.is-riffling .deck-back-body,
+  .deck.is-riffling .deck-top,
+  .deck-top.is-cutting,
+  .card-land.is-landing,
+  .card-land.is-landing::after {
+    animation: none !important;
+  }
+  .card-land.is-landing::after { opacity: 0 !important; }
+
+  /* deal: opacity only, no transform */
+  .card-travel { transition: opacity .22s ease !important; }
+  .flip {
+    transition: opacity .18s ease !important;
+    transform: none !important;
+    transform-style: flat !important;
+    -webkit-transform-style: flat !important;
+    will-change: auto;
+  }
+  /* flip collapses to an opacity crossfade of the two faces, no rotateY */
+  .face, .back-face { transform: none !important; }
+  .face { opacity: 0; transition: opacity .18s ease; }
+  .flip.is-turned .face { opacity: 1; }
+  .flip.is-turned .back-face { opacity: 0; }
+
+  /* settle kept as a ≤150ms color-only crossfade */
+  .btn-cut.is-settling { transition: background .15s linear, color .15s linear, border-color .15s linear; }
+
+  /* hover micro-motions → no translate */
+  .door:hover, .btn:hover { transform: none; }
+
+  .glow, .deck, .slot-label, .read-col, .intake-input { transition-duration: .12s; }
+}

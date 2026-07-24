@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>The Drawing Room — A Sitting</title>
+  <meta name="description" content="A Blue Room tarot sitting: a record entered into an archive, kept exactly as it is drawn." />
+
+  <!-- Only external dependency: Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+  <main class="room" id="room">
+    <header class="masthead">
+      <p class="kicker">THE DRAWING ROOM</p>
+      <p class="subline" data-subline>A reading, kept exactly as it is drawn.</p>
+    </header>
+
+    <!-- ============ TIER DOORS ============ -->
+    <section class="tiers" data-view="tier" aria-label="Choose a reading">
+      <button type="button" class="door" data-tier="pull">
+        <span class="door-title">A Glance</span>
+        <span class="door-sub" data-door-sub="pull">One card, for looking, not keeping.</span>
+      </button>
+      <button type="button" class="door" data-tier="sitting">
+        <span class="door-title">A Sitting</span>
+        <span class="door-sub" data-door-sub="sitting">Three cards to one question — your first is free.</span>
+      </button>
+      <button type="button" class="door" data-tier="deep">
+        <span class="door-title">The Deep Read</span>
+        <span class="door-sub" data-door-sub="deep">Five cards, the fuller record.<span class="door-price"> · $2.99</span></span>
+      </button>
+    </section>
+
+    <!-- ============ CEREMONY ============ -->
+    <section class="ceremony" data-view="ceremony" role="region" aria-label="Tarot sitting" hidden>
+
+      <p class="reopen-note" data-reopen hidden></p>
+
+      <p class="cut-note" data-cutnote>The cut does not choose the cards. It closes the question.</p>
+      <p class="mock-note" data-mocknote hidden>Dev mock — no real payment in this build.</p>
+
+      <!-- Stage -->
+      <div class="stage" data-stage>
+        <div class="glow" data-glow aria-hidden="true"></div>
+        <div class="deck" data-deck aria-hidden="true"></div>
+        <div class="spread" data-spread></div>
+      </div>
+
+      <!-- Intake — under the cards -->
+      <div class="intake" data-intake>
+        <label class="intake-label" for="question">Lay a matter on the table — optional</label>
+        <input class="intake-input" id="question" type="text" maxlength="120" autocomplete="off"
+               placeholder="a question, in your own words" aria-describedby="q-help" />
+        <p class="intake-help" id="q-help">It is kept with your reading, and it does not choose the cards.</p>
+      </div>
+
+      <!-- Controls row — exactly ONE visible control at a time -->
+      <div class="controls" data-controls>
+        <button type="button" class="btn btn-cut" data-cut>Shuffle</button>
+        <p class="status-line" data-status hidden></p>
+        <button type="button" class="btn btn-ghost" data-again hidden>New sitting</button>
+      </div>
+
+      <p class="turn-hint" data-hint aria-live="polite" hidden></p>
+
+      <!-- Reading panel -->
+      <div class="reading" data-reading></div>
+      <p class="closing" data-closing hidden></p>
+      <div class="accession" data-accession hidden></div>
+    </section>
+
+    <!-- ============ SCREEN-READER LIVE REGIONS ============ -->
+    <div class="sr-only" aria-live="polite" data-live-polite></div>
+    <div class="sr-only" aria-live="assertive" data-live-assertive></div>
+  </main>
+
+  <!-- data → voice → app -->
+  <script src="./data.js"></script>
+  <script src="./voice.js"></script>
+  <script src="./app.js" defer></script>
+</body>
+</html>
