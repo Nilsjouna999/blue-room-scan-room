@@ -26,12 +26,13 @@
 (function(){
   "use strict";
 
-  // ---- flag gate -------------------------------------------------------
+  // ---- flag gate (BR-S228: LIVE by default; kill-switch preserved) -----
+  // ?u1lines=0 persists an OFF preference; ?u1lines clears it back to default-on.
   try {
-    if(/[?&]u1lines\b/i.test(location.search)) localStorage.setItem('u1lines','1');
-    if(/[?&]u1lines=0\b/i.test(location.search)) localStorage.removeItem('u1lines');
+    if(/[?&]u1lines=0\b/i.test(location.search)) localStorage.setItem('u1lines','0');
+    else if(/[?&]u1lines\b/i.test(location.search)) localStorage.removeItem('u1lines');
   } catch(e){}
-  var ON = false; try { ON = localStorage.getItem('u1lines') === '1'; } catch(e){}
+  var ON = true; try { ON = localStorage.getItem('u1lines') !== '0'; } catch(e){}
   if(!ON) return;
 
   var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
