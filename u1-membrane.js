@@ -40,7 +40,7 @@
   // ---- tunables (identical to the prototype) --------------------------
   // BR PULSE-1: lines pushed toward the edges (was 0.20/0.80) to open the
   // living band from 0.60H to 0.72H so each plate is the single lit box longer.
-  var DX=6, UPPER_FRAC=0.08, LOWER_FRAC=0.92, TFADE=92;   // BR PULSE-3: lines pushed to the edges (was 0.14/0.86) — "not so in the middle"
+  var DX=6, UPPER_FRAC=0.04, LOWER_FRAC=0.96, TFADE=92;   // BR-S229: lines pushed a LOT closer to the edges (was 0.08/0.92) — builder wants them near the frame
   var PUSH=32, REPEL_RANGE=150, FEATHER=14, DEAD=16;
   var STEP=1/60, FOLLOW=0.14, TENSION=0.10, DAMP=0.24, VMAX=40, EDGE_FEATHER=90;
 
@@ -214,7 +214,7 @@
     var s = document.createElement('style');
     s.id = 'u1-membrane-style';
     s.textContent =
-      '#about.u1lines .about__rail{row-gap:clamp(150px,34vh,340px);}' +
+      '#about.u1lines .about__rail{row-gap:clamp(210px,46vh,460px);}' +   /* BR-S229: more air between boxes (was 150/34vh/340) */
       '#about.u1lines .about__intro{margin-bottom:clamp(96px,26vh,220px);}' +
       '#about.u1lines .about__close{margin-top:clamp(120px,' + closeVh + 'vh,300px);}' +
       '#about.u1lines{padding-bottom:max(22vh,clamp(200px,' + tailVh + 'vh,380px));}' +
