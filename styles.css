@@ -2556,9 +2556,15 @@ body[data-view="room"] .dev { display: none; }
 .about__eyebrow { font-family: var(--font-mono); font-size: 9.5px; letter-spacing: 0.32em; text-transform: uppercase; color: var(--faint); margin: 0; }
 .about__eyemark { color: var(--silver-dim); }
 /* BR-S206: the yin/yang caesura — a leaned hairline "/" pivot between two EQUAL-weight halves (the split IS the division; the pivot is the same hairline material as the wick + spine) */
-.about__headline { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: clamp(13px, 2.3vw, 26px); font-family: var(--font-display); font-weight: 600; font-size: clamp(30px, 6vw, 46px); line-height: 1.08; letter-spacing: -0.012em; color: var(--t-display); margin: 0; }
+/* BR-S233 — the headline splits clean at its natural clause break ("We hold" / "the candle.")
+   into a two-line YIN-YANG descent: the first half leans up-left, the second settles down-right,
+   the pivot becomes the diagonal bridge between them. 180deg-balanced so the eye sweeps a gentle
+   diagonal instead of hitting one chunky centred line. DOM order (hx · pivot · hx) already stacks. */
+.about__headline { display: grid; grid-auto-flow: row; justify-items: center; align-items: center; row-gap: clamp(3px, 0.9vw, 9px); font-family: var(--font-display); font-weight: 600; font-size: clamp(30px, 6vw, 46px); line-height: 1.04; letter-spacing: -0.012em; color: var(--t-display); margin: 0; }
 .about__hx { white-space: nowrap; color: var(--t-display); }
-.about__pivot { flex: 0 0 auto; align-self: center; width: 1.6px; height: 1em; transform: rotate(15deg); background: linear-gradient(transparent, var(--line-strong) 14%, var(--line-strong) 86%, transparent); opacity: .85; border-radius: 1px; }
+.about__hx:first-of-type { transform: translateX(clamp(-58px, -5.4vw, -26px)); }   /* "We hold" — leans up-left */
+.about__hx:last-of-type  { transform: translateX(clamp(26px, 5.4vw, 58px)); }      /* "the candle." — settles down-right */
+.about__pivot { justify-self: center; align-self: center; width: clamp(30px, 5vw, 54px); height: 1.6px; transform: rotate(21deg); background: linear-gradient(90deg, transparent, var(--line-strong) 22%, var(--line-strong) 78%, transparent); opacity: .72; border-radius: 1px; }
 .about__lede { font-family: var(--font-display); font-size: clamp(14.5px, 2.2vw, 16.5px); line-height: 1.68; letter-spacing: 0.006em; color: var(--t-primary); max-width: 44ch; margin: 0; opacity: .95; }
 .about__wick { width: 1px; height: clamp(34px, 8vh, 55px); margin-top: 5px; background: linear-gradient(var(--hair-1), var(--hair-3) 70%, transparent); }
 
@@ -2629,8 +2635,10 @@ body[data-view="room"] .dev { display: none; }
   .about__emblem-svg { width: 42px; height: 42px; }
 }
 @media (max-width: 479px) {
-  .about__headline { flex-direction: column; gap: clamp(9px, 3vw, 15px); }
-  .about__pivot { transform: none; height: .7em; }
+  .about__headline { row-gap: clamp(5px, 2vw, 12px); }
+  .about__hx:first-of-type { transform: translateX(-7vw); }   /* gentler stagger on narrow screens */
+  .about__hx:last-of-type  { transform: translateX(7vw); }
+  .about__pivot { width: clamp(24px, 8vw, 40px); height: 1.4px; transform: rotate(19deg); }
   .about__nugget[data-side="left"], .about__nugget[data-side="right"] { justify-content: center; }
   .about__nugget[data-side="left"] .about__ord, .about__nugget[data-side="right"] .about__ord { left: 50%; right: auto; transform: translateX(-50%); }
 }
