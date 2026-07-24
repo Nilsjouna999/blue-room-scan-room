@@ -3873,3 +3873,153 @@ body[data-devnav="1"] .devnav {
 .devnav__btn:hover { color: var(--t-display); border-color: var(--line-strong); }
 .devnav__sep { color: var(--t-ghost); font-size: 9px; padding: 0 1px; }
 
+/* ============================================================
+   BR-S205 — THE APERTURE (Codex bloom). A bottom-right wax-seal
+   fixed-leaf irises the real codex.html open across the menu via
+   clip-path: circle() from the seal, reversing HOME into it. Ported
+   verbatim from the approved prototype; scoped to #menuView (never
+   transformed — the fixed leaves ride the viewport on every slide).
+   Motion GPU-only; reduced-motion + @supports floors; commit-not-push
+   perf gate. Namespaced state (.is-codex-open/.is-codex-closing) so it
+   never cross-fires with the room lightbox's .is-open.
+============================================================ */
+#menuView {
+  --cx-bg: #100e0c; --cx-bg2: #1c1712; --cx-gold: #c69b63; --cx-golddim: #8f7145;
+  --cx-frontier: #05060a;   /* the frontier ink — cool near-black (renamed from --ink to dodge the --ink-950.. family) */
+  --ease-bloom: cubic-bezier(0.16, 0.84, 0.30, 1);
+  --ease-settle: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --ease-collapse: cubic-bezier(0.4, 0, 0.7, 0.4);
+  --ease-edge: cubic-bezier(0.22, 0.50, 0.16, 1.0);   /* a real leap, then a slow-burn crawl to the land */
+  --edge-dur: 680ms; --ember-dur: 380ms; --ember-peak: .90;
+  --catch-peak: 1.075; --reverb-dur: 520ms; --reverb-delay: 260ms; --ping-op: .30;
+}
+
+/* THE SEAL — resting codex affordance AND the way back (an <a href=codex.html> front-door) */
+#menuView .seed { position: fixed; right: clamp(12px,2.6vw,40px); bottom: clamp(118px,19vh,150px);
+  z-index: 60; width: 44px; height: 44px; border-radius: 50%; padding: 0; cursor: pointer; text-decoration: none;
+  display: grid; place-items: center;
+  background: radial-gradient(circle at 50% 38%, #1a1510 0%, var(--cx-bg) 74%);
+  border: 1px solid rgba(198,155,99,.34);
+  box-shadow: inset 0 1px 0 rgba(233,226,213,.05), 0 2px 10px rgba(0,0,0,.35);
+  transition: transform 200ms var(--ease-settle), border-color 200ms ease; }
+#menuView .seed__glyph { grid-area: 1 / 1; font-family: var(--font-display); line-height: 1; color: var(--cx-gold); transition: opacity 220ms ease; }
+#menuView .seed__open  { font-size: 15px; opacity: .82; }
+#menuView .seed__close { font-size: 17px; opacity: 0; font-weight: 300; }
+#menuView .seed:hover, #menuView .seed:focus-visible { border-color: var(--cx-gold); transform: scale(1.03); outline: none; }
+#menuView .seed:hover .seed__open, #menuView .seed:focus-visible .seed__open { opacity: 1; }
+#menuView .seed:focus-visible { box-shadow: inset 0 1px 0 rgba(233,226,213,.05), 0 0 0 1px var(--cx-golddim), 0 0 0 4px rgba(198,155,99,.18); }
+#menuView.is-codex-open .seed, #menuView.is-codex-closing .seed { z-index: 210; }
+#menuView .seed::after { content: ""; position: absolute; inset: 0; border-radius: 50%;
+  border: 1px solid rgba(198,155,99,.55); transform: scale(.6); opacity: 0; pointer-events: none; }
+
+/* THE BLOOM (the aperture overlay) — born inert+aria-hidden in markup, always PAINTED (hidden only by clip) */
+#menuView .bloom { position: fixed; inset: 0; z-index: 200;
+  clip-path: circle(0px at var(--cx, 90%) var(--cy, 88%));
+  transition: clip-path 340ms var(--ease-collapse); }
+#menuView .bloom__backfill { position: absolute; inset: 0;
+  background: radial-gradient(130% 90% at 50% -8%, var(--cx-bg2) 0%, var(--cx-bg) 62%); }
+#menuView .bloom__frame { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; background: var(--cx-bg); }
+#menuView .bloom__ink { position: fixed; left: var(--cx, 90%); top: var(--cy, 88%);
+  width: calc(var(--r, 1400px) * 2); height: calc(var(--r, 1400px) * 2);
+  margin-left: calc(var(--r, 1400px) * -1); margin-top: calc(var(--r, 1400px) * -1);
+  border-radius: 50%; box-sizing: border-box; z-index: 205; pointer-events: none;
+  border: 1.75px solid var(--cx-frontier); box-shadow: inset 0 0 0 1px rgba(198,155,99,.5);
+  transform: scale(0); opacity: 0; }
+#menuView .bloom__ember { position: fixed; left: var(--cx, 90%); top: var(--cy, 88%);
+  width: calc(var(--r, 1400px) * 2); height: calc(var(--r, 1400px) * 2);
+  margin-left: calc(var(--r, 1400px) * -1); margin-top: calc(var(--r, 1400px) * -1);
+  border-radius: 50%; box-sizing: border-box; z-index: 206; pointer-events: none;
+  border: 1.5px solid rgba(224,138,66,.92); box-shadow: 0 0 6px 0 rgba(230,120,50,.34);
+  mix-blend-mode: screen; transform: scale(.981); opacity: 0; }
+#menuView .bloom__sheen { position: absolute; inset: -60%; z-index: 3; pointer-events: none; opacity: 0;
+  mix-blend-mode: screen;
+  background: linear-gradient(135deg, transparent 0 44%, rgba(255,246,228,.05) 47.5%, rgba(255,249,235,.16) 50%, rgba(255,246,228,.05) 52.5%, transparent 56% 100%);
+  transform: translate3d(70%, 70%, 0); }
+
+/* OPEN — seal charge→swallow→re-form as ✕; aperture slow-burn leap to land; ink frontier; ember; sheen */
+#menuView.is-codex-open .seed { animation: seedToClose 660ms var(--ease-bloom); }
+#menuView.is-codex-open .seed__open  { opacity: 0; transition-delay: 150ms; }
+#menuView.is-codex-open .seed__close { opacity: .82; transition-delay: 400ms; }
+#menuView.is-codex-open .bloom { clip-path: circle(var(--r, 1400px) at var(--cx) var(--cy));
+  transition: clip-path var(--edge-dur) var(--ease-edge) 90ms; }
+#menuView.is-codex-open .bloom__ink, #menuView.is-codex-closing .bloom__ink { will-change: transform, opacity; }
+#menuView.is-codex-open .bloom__ink { animation: inkOpen var(--edge-dur) var(--ease-edge) 90ms forwards; }
+#menuView.is-codex-open .bloom__ember { will-change: transform, opacity; animation: emberBurn var(--ember-dur) linear 560ms forwards; }
+#menuView.is-codex-open .bloom__sheen { will-change: transform, opacity; animation: codexSheen 680ms cubic-bezier(.4,.1,.2,1) 800ms forwards; }
+
+/* REVERSE — content-frame collapse via clip; ink irises home; the seal is CAUGHT by a damped ring-out + echo-ping */
+#menuView.is-codex-closing .bloom { clip-path: circle(0px at var(--cx) var(--cy));
+  transition: clip-path 340ms var(--ease-collapse) 120ms; }
+#menuView.is-codex-closing .bloom__ink { animation: inkClose 340ms var(--ease-collapse) 120ms forwards; }
+#menuView.is-codex-closing .seed { animation: seedReverb var(--reverb-dur) linear var(--reverb-delay) both; }
+#menuView.is-codex-closing .seed::after { will-change: transform, opacity; animation: seedPing 380ms linear 420ms both; }
+#menuView.is-codex-closing .seed__open  { opacity: .82; transition-delay: 90ms; }
+#menuView.is-codex-closing .seed__close { opacity: 0; }
+
+@keyframes seedToClose {
+  0%   { transform: scale(1);   opacity: 1; }
+  14%  { transform: scale(.90); opacity: 1; }
+  23%  { transform: scale(.86); opacity: .24; }
+  100% { transform: scale(1);   opacity: 1; }
+}
+@keyframes inkOpen {
+  0%   { transform: scale(0); opacity: 0; }
+  6%   { opacity: 1; }
+  90%  { opacity: 1; }
+  100% { transform: scale(1); opacity: 0; }
+}
+@keyframes emberBurn {
+  0%   { transform: scale(.981);   opacity: 0; }
+  40%  { transform: scale(.992);   opacity: .80; }
+  57%  { transform: scale(1.0006); opacity: var(--ember-peak, .90); }
+  65%  { transform: scale(.9995);  opacity: .42; }
+  73%  { transform: scale(1.0004); opacity: .68; }
+  81%  { transform: scale(.9998);  opacity: .28; }
+  89%  { transform: scale(1.0001); opacity: .46; }
+  95%  { transform: scale(1.0);    opacity: .14; }
+  100% { transform: scale(1.0);    opacity: 0; }
+}
+@keyframes codexSheen {
+  0%   { transform: translate3d(70%, 70%, 0);   opacity: 0; }
+  22%  { opacity: .9; }
+  78%  { opacity: .9; }
+  100% { transform: translate3d(-70%, -70%, 0); opacity: 0; }
+}
+@keyframes inkClose {
+  0%   { transform: scale(1); opacity: 0; }
+  18%  { opacity: 1; }
+  100% { transform: scale(0); opacity: 1; }
+}
+@keyframes seedReverb {
+  0%   { transform: scale(1);                        animation-timing-function: cubic-bezier(.4,0,.7,.5); }
+  30%  { transform: scale(.992);                     animation-timing-function: cubic-bezier(.2,.7,.3,1); }
+  38%  { transform: scale(var(--catch-peak, 1.075)); animation-timing-function: cubic-bezier(.45,0,.55,1); }
+  54%  { transform: scale(.970);                     animation-timing-function: cubic-bezier(.45,0,.55,1); }
+  70%  { transform: scale(1.013);                    animation-timing-function: cubic-bezier(.45,0,.55,1); }
+  84%  { transform: scale(.995);                     animation-timing-function: cubic-bezier(.3,.6,.35,1); }
+  100% { transform: scale(1); }
+}
+@keyframes seedPing {
+  0%   { transform: scale(.6);  opacity: 0;              animation-timing-function: cubic-bezier(.16,.7,.3,1); }
+  16%  { opacity: var(--ping-op, .30); }
+  100% { transform: scale(1.75); opacity: 0; }
+}
+
+/* the seal + aperture step aside during the reveal fullview takeover (mutually exclusive) */
+#menuView.menurev.is-fullview .seed, #menuView.menurev.is-fullview .bloom { opacity: 0; visibility: hidden; pointer-events: none; }
+
+/* @supports floor: on engines without clip-path circle, hide the aperture entirely — the seal <a> navigates to codex.html */
+@supports not (clip-path: circle(0px)) {
+  #menuView .bloom, #menuView .bloom__ink, #menuView .bloom__ember, #menuView .seed__close { display: none; }
+}
+
+/* reduced motion: instant open/close, fully functional, zero bloom/ink/ember/sheen/ping */
+@media (prefers-reduced-motion: reduce) {
+  #menuView .seed, #menuView .seed__glyph, #menuView .seed::after, #menuView .bloom, #menuView .bloom__ink,
+  #menuView .bloom__ember, #menuView .bloom__sheen { transition: none !important; animation: none !important; }
+  #menuView.is-codex-open .bloom { clip-path: inset(0) !important; }
+  #menuView .bloom__ink, #menuView .bloom__ember, #menuView .bloom__sheen, #menuView .seed::after { display: none; }
+  #menuView.is-codex-open .seed__open { opacity: 0; }
+  #menuView.is-codex-open .seed__close { opacity: .82; }
+}
+

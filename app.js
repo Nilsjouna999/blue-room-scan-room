@@ -1377,7 +1377,7 @@ function renderWall() {
     + '</div>'
     + '<div class="menu__wall-rail">'
     + '<button type="button" class="menu__codex menu__codex--reliq" data-annex-go><span class="menu__codex__mark" aria-hidden="true">◆</span> The Reliquary <span class="menu__codex__arr" aria-hidden="true">→</span></button>'
-    + '<a class="menu__codex" href="codex.html"><span class="menu__codex__mark" aria-hidden="true">◆</span> The Codex <span class="menu__codex__arr" aria-hidden="true">→</span></a>'
+    + '<a class="menu__codex" href="codex.html" data-codex-open><span class="menu__codex__mark" aria-hidden="true">◆</span> The Codex <span class="menu__codex__arr" aria-hidden="true">→</span></a>'
     + '</div>'
     + '<p class="menu__wall-foot">Two rooms · One archive.</p>'
     + '</div>';
@@ -1421,6 +1421,22 @@ function renderReliquaryOpen() {
     + '</div>';
 }
 function renderReliquary(held) { return held ? renderReliquaryOpen() : renderReliquaryTeaser(); }
+
+/* BR-S205: the fixed-leaf Codex aperture — appended unconditionally as trailing #menuView
+   children (siblings of .menu__track, NEVER inside it). The seal is a real <a href> so the
+   front door survives any JS failure; the bloom is born CLOSED (inert+aria-hidden) + painted. */
+const CX_LEAVES =
+  '<a class="seed" id="codexSeed" href="codex.html" role="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="codexBloom" aria-label="Open the Codex">'
+  + '<span class="seed__glyph seed__open" aria-hidden="true">&#9670;</span>'
+  + '<span class="seed__glyph seed__close" aria-hidden="true">&#10005;</span>'
+  + '</a>'
+  + '<div class="bloom" id="codexBloom" role="dialog" aria-modal="true" aria-label="The Codex" inert aria-hidden="true">'
+  + '<div class="bloom__backfill"></div>'
+  + '<iframe class="bloom__frame" data-src="codex.html" title="The Codex" tabindex="-1"></iframe>'
+  + '<div class="bloom__sheen" aria-hidden="true"></div>'
+  + '</div>'
+  + '<div class="bloom__ink" aria-hidden="true"></div>'
+  + '<div class="bloom__ember" aria-hidden="true"></div>';
 
 function renderMenu(reveal) {
   const s = SOURCES[0];
@@ -1472,7 +1488,7 @@ function renderMenu(reveal) {
         </div>
 
         <div class="menu__portals">
-          <a class="menu__codex" href="codex.html"><span class="menu__codex__mark" aria-hidden="true">◆</span> The Codex <span class="menu__codex__arr" aria-hidden="true">→</span></a>
+          <a class="menu__codex" href="codex.html" data-codex-open><span class="menu__codex__mark" aria-hidden="true">◆</span> The Codex <span class="menu__codex__arr" aria-hidden="true">→</span></a>
           <button type="button" class="menu__codex menu__codex--rooms" data-annex-go><span class="menu__codex__mark" aria-hidden="true">◆</span> The Reading Rooms <span class="menu__codex__arr" aria-hidden="true">→</span></button>
         </div>
 
@@ -1494,7 +1510,8 @@ function renderMenu(reveal) {
     </div>
     ${renderAbout()}${reveal ? `
     <button type="button" class="menurev__back" aria-label="Return to the menu">← Back to the menu</button>
-    ${MENUREV_FWD_ARROW}` : ""}`;
+    ${MENUREV_FWD_ARROW}` : ""}
+    ${CX_LEAVES}`;
 }
 
 /* BR-S150: the LIVE entrance IS the develop reveal (promoted from ?dev=menu-reveal — this
@@ -1512,6 +1529,7 @@ function mountMenu() {
   if (canReveal) wireMenuReveal(host);
   wireMenuAnnex(host);   // BR-S192: the desk↔wall slide (works with or without the reveal)
   wireMenuAbout(host);   // BR-S203: the About surface scroll-reveal
+  wireMenuCodex(host);   // BR-S205: the bottom-right Codex aperture (seal → in-page codex.html)
 }
 
 /* BR-S203 — the About "Procession" scroll-reveal. Base state is VISIBLE (freeze-safe, the
@@ -1531,10 +1549,173 @@ function wireMenuAbout(host) {
   nuggets.forEach(function (n) { io.observe(n); });
 }
 
+/* ── BR-S205: THE APERTURE — the Codex bloom wired into the live menu ─────────
+   The seal (#codexSeed, an <a href=codex.html> front-door) irises the real
+   codex.html open in-page (an iframe revealed under a growing clip-path circle
+   from the seal) and reverses HOME into the same seal. Motion ported verbatim
+   from the approved prototype (CSS owns every beat; JS flips one namespaced
+   class). Front-door law: if JS/clip/iframe fail the seal simply navigates to
+   codex.html. Module-level _cxOpen shields the ribbon/reveal/global-Enter Esc &
+   Enter handlers; _cxTeardown tears a prior mount's wiring so nothing stacks. */
+let _cxOpen = false, _cxTeardown = null, _cxResize = null;
+
+function wireMenuCodex(host) {
+  if (_cxTeardown) { _cxTeardown(); _cxTeardown = null; }   // defensive: never stack across remounts
+  _cxOpen = false;
+  const seed = host.querySelector("#codexSeed");
+  const bloom = host.querySelector("#codexBloom");
+  const frame = bloom && bloom.querySelector(".bloom__frame");
+  if (!seed || !bloom || !frame) return;                   // the seal's href still opens codex.html
+
+  let loaded = false, isOpen = false, busy = false, bgInert = [];
+  let wcT = null, homeT = null, closeT = null, busyT = null;
+  const ok = (function () { try { return window.CSS && CSS.supports("clip-path", "circle(0px)"); } catch (e) { return false; } })();
+  const reduced = function () { return window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches; };
+  const canBloom = function () { return loaded && ok; };
+
+  function geometry() {
+    const r = seed.getBoundingClientRect();
+    const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+    const vw = window.innerWidth, vh = window.innerHeight;
+    const rc = Math.hypot(Math.max(cx, vw - cx), Math.max(cy, vh - cy)) + 6;
+    host.style.setProperty("--cx", cx + "px");
+    host.style.setProperty("--cy", cy + "px");
+    host.style.setProperty("--r", rc + "px");
+  }
+
+  /* inert every #menuView child EXCEPT the seal + the bloom; record only what WE inerted so
+     the ribbon's own panel-inert (nested in .menu__track) is never cleared on close. */
+  function bg(on) {
+    if (on) {
+      bgInert = [];
+      for (let i = 0; i < host.children.length; i++) {
+        const el = host.children[i];
+        if (el === seed || el === bloom) continue;
+        if (!el.hasAttribute("inert")) { el.setAttribute("inert", ""); bgInert.push(el); }
+      }
+    } else { bgInert.forEach(function (el) { el.removeAttribute("inert"); }); bgInert = []; }
+  }
+
+  function focusFrame() {
+    try {
+      const d = frame.contentDocument;
+      const t = d && (d.querySelector(".search") || d.querySelector("nav a") || d.body);
+      if (t && t.focus) t.focus({ preventScroll: true }); else frame.focus({ preventScroll: true });
+    } catch (e) { try { frame.focus({ preventScroll: true }); } catch (_) {} }
+  }
+
+  function onEsc(e) { if (e.key === "Escape") { e.preventDefault(); e.stopImmediatePropagation(); close(); } }
+
+  function open() {
+    if (isOpen) return;
+    if (!canBloom()) { location.href = "codex.html"; return; }   // load-gate / unsupported → real full-page codex
+    isOpen = true; _cxOpen = true;
+    clearTimeout(homeT); clearTimeout(closeT);
+    geometry();
+    bloom.removeAttribute("inert"); bloom.removeAttribute("aria-hidden");
+    bg(true);
+    host.classList.remove("is-codex-closing");
+    bloom.style.willChange = "clip-path";
+    // force a style commit of the closed clip before opening (mirror the proto reflow)
+    void bloom.offsetWidth;
+    host.classList.add("is-codex-open");
+    seed.setAttribute("aria-expanded", "true");
+    seed.setAttribute("aria-label", "Close the Codex");
+    focusFrame();
+    document.addEventListener("keydown", onEsc, true);
+    clearTimeout(wcT);
+    wcT = setTimeout(function () { bloom.style.willChange = ""; }, reduced() ? 60 : 1000);
+  }
+
+  function close() {
+    if (!isOpen) return;
+    isOpen = false; _cxOpen = false;
+    clearTimeout(wcT);
+    document.removeEventListener("keydown", onEsc, true);
+    seed.setAttribute("aria-expanded", "false");
+    seed.setAttribute("aria-label", "Open the Codex");
+    bloom.style.willChange = "clip-path";
+    host.classList.remove("is-codex-open");
+    host.classList.add("is-codex-closing");
+    const rm = reduced();
+    clearTimeout(homeT); clearTimeout(closeT);
+    homeT = setTimeout(function () {                       // clip-home ~480ms: free the background + return focus
+      bloom.setAttribute("inert", ""); bloom.setAttribute("aria-hidden", "true");
+      bg(false);
+      seed.focus({ preventScroll: true });
+    }, rm ? 0 : 480);
+    closeT = setTimeout(function () {                      // ring-out ~840ms: end the reverb, hide will-change
+      host.classList.remove("is-codex-closing");
+      bloom.style.willChange = "";
+    }, rm ? 0 : 840);
+  }
+
+  function toggle() {
+    if (busy) return;
+    busy = true; clearTimeout(busyT); busyT = setTimeout(function () { busy = false; }, 160);
+    isOpen ? close() : open();
+  }
+
+  /* the seal: an <a href> that becomes an aperture when it can, a door when it can't */
+  seed.addEventListener("click", function (e) {
+    if (!canBloom()) return;              // let the anchor navigate to codex.html (front-door fallback)
+    e.preventDefault(); toggle();
+  });
+  seed.addEventListener("keydown", function (e) {
+    if (e.key === "Enter") { e.stopPropagation(); }        // shield the global menu Enter→room; the anchor's activation fires the click
+    else if (e.key === " " || e.key === "Spacebar") {      // anchors don't activate on Space natively
+      e.stopPropagation(); e.preventDefault();
+      if (canBloom()) toggle(); else location.href = "codex.html";
+    }
+  });
+
+  /* the in-flow "The Codex →" pills (desk + wall) — open-only triggers, shielded + href-fallback */
+  host.querySelectorAll("[data-codex-open]").forEach(function (el) {
+    el.addEventListener("click", function (e) { if (!canBloom()) return; e.preventDefault(); if (!isOpen) toggle(); });
+    el.addEventListener("keydown", function (e) { if (e.key === "Enter") e.stopPropagation(); });
+  });
+
+  /* keep geometry true; when open, recompute without animating. Module-level remove-then-add. */
+  if (_cxResize) window.removeEventListener("resize", _cxResize);
+  _cxResize = function () {
+    if (!isOpen) { geometry(); return; }
+    bloom.style.transition = "none"; geometry(); void bloom.offsetWidth; bloom.style.transition = "";
+  };
+  window.addEventListener("resize", _cxResize);
+
+  /* iframe: pre-warm from data-src (rIC + setTimeout shim so it fires on every engine), painted
+     under the opaque backfill; on load, mark loaded + neutralize codex's .back + route its Escape. */
+  function onFrameLoad() {
+    loaded = true;
+    try {
+      const d = frame.contentDocument;
+      if (d) {
+        const back = d.querySelector(".back");
+        if (back && !back._cxBound) { back._cxBound = true; back.addEventListener("click", function (ev) { ev.preventDefault(); close(); }); }
+        if (!d._cxEscBound) { d._cxEscBound = true; d.addEventListener("keydown", function (ev) { if (ev.key === "Escape") { ev.preventDefault(); close(); } }); }
+      }
+    } catch (e) {}
+  }
+  frame.addEventListener("load", onFrameLoad);
+  if (ok && !frame.getAttribute("src")) {
+    const src = frame.getAttribute("data-src");
+    const warm = function () { if (src && !frame.getAttribute("src")) frame.setAttribute("src", src); };
+    (window.requestIdleCallback || function (cb) { return setTimeout(cb, 200); })(warm);
+  }
+
+  _cxTeardown = function () {
+    try { document.removeEventListener("keydown", onEsc, true); } catch (e) {}
+    if (_cxResize) { try { window.removeEventListener("resize", _cxResize); } catch (e) {} _cxResize = null; }
+    clearTimeout(wcT); clearTimeout(homeT); clearTimeout(closeT); clearTimeout(busyT);
+    _cxOpen = false;
+  };
+}
+
 function wireMenuReveal(host) {
   const mountEl = host.querySelector(".menurev__mount");
   if (!mountEl) return;
   function _escBack(e) {
+    if (_cxOpen) return;                                  // BR-S205: aperture owns Escape (belt; the seal is hidden in fullview)
     if (e.key === "Escape") { e.preventDefault(); document.removeEventListener("keydown", _escBack, true); if (rev && rev.toFree) rev.toFree(); }
   }
   const rev = window.BRReveal.mount(mountEl, {
@@ -1608,6 +1789,7 @@ function menuSettle(track, panels, activeIdx, after) {
 
 function menuEsc(e) {
   if (e.key !== "Escape") return;
+  if (_cxOpen) return;                                   // BR-S205: the Codex aperture owns Escape while open
   const host = document.getElementById("menuView");
   if (!host) return;
   const cur = _menuIndex(host);
@@ -3330,7 +3512,7 @@ document.addEventListener("keydown", (e) => {
   /* room shortcuts (1/2/F/H/M) only fire inside the room. On the front
      door Enter opens the room; on a draft Escape returns to the menu. */
   if (state.view !== "room") {
-    if (state.view === "menu" && e.key === "Enter") { state.view = "room"; applyView(); window.scrollTo(0, 0); }
+    if (state.view === "menu" && e.key === "Enter" && !_cxOpen) { state.view = "room"; applyView(); window.scrollTo(0, 0); }   // BR-S205: don't rip to room while the Codex is open
     else if (state.view === "draft" && e.key === "Escape") {
       /* Escape steps back one level: gate → intake, intake → menu */
       if (state.draftGate) { state.draftGate = false; document.getElementById("draftView").innerHTML = renderDraft(); }
