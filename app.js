@@ -1257,12 +1257,15 @@ const RELIQ_SEAL_SVG =
    below the desk. Five bite-size nuggets walk down a candle-lit spine; each wears its room's
    own engraved mark (currentColor, so the colour law tints it: gold=free, violet=paid). They
    reveal on scroll-down and fade on scroll-up (IntersectionObserver, wired in mountMenu). */
+/* BR-S206 (About master): unified engraving contract — every emblem carries the SAME
+   attribute string (1.2 primary / .75 secondary strokes, round caps+joins, one opacity ladder)
+   so the five read as one instrument set. currentColor → colour law tints them. */
 const AB_EMBLEMS = {
-  codex: '<svg class="about__emblem-svg" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true"><path d="M20 9 v23"/><path d="M20 9 C15 6 8.5 6 5.5 8 v22 c3 -2 9.5 -2 14.5 1"/><path d="M20 9 C25 6 31.5 6 34.5 8 v22 c-3 -2 -9.5 -2 -14.5 1" /><path d="M8.5 13.5 h8 M8.5 17.5 h8 M8.5 21.5 h6 M23.5 13.5 h8 M23.5 17.5 h8 M23.5 21.5 h6" stroke-width=".7" opacity=".55"/></svg>',
-  tarot: '<svg class="about__emblem-svg" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.15" aria-hidden="true"><rect x="7" y="12.5" width="14" height="20" rx="2" transform="rotate(-11 14 22.5)" opacity=".45"/><rect x="19" y="12.5" width="14" height="20" rx="2" transform="rotate(11 26 22.5)" opacity=".45"/><rect x="13" y="9" width="14" height="23" rx="2"/><path d="M20 15 l3.5 5.5 l-3.5 5.5 l-3.5 -5.5 z" stroke-width=".9"/></svg>',
-  arcana: '<svg class="about__emblem-svg" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linejoin="round" aria-hidden="true"><path d="M6 30 L7.2 12 L15 19 L20 6 L25 19 L32.8 12 L34 30 Z"/><path d="M8.4 30 L31.6 30"/></svg>',
-  mint: '<svg class="about__emblem-svg" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true"><rect x="9" y="8" width="22" height="24" rx="2"/><path d="M9 25 l6 -6 l4 4 l6 -7 l6 6.5" stroke-width="1"/><circle cx="16" cy="15" r="2.3"/><path d="M12 5.5 l1.6 1.6 M28 5.5 l-1.6 1.6 M12 34.5 l1.6 -1.6 M28 34.5 l-1.6 -1.6" stroke-width=".85" opacity=".55"/></svg>',
-  unlit: '<svg class="about__emblem-svg" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true"><circle cx="20" cy="20" r="11"/><circle cx="20" cy="20" r="4.5" opacity=".5"/><path d="M20 6.5 v-2.5 M20 36 v-2.5 M6.5 20 h-2.5 M36 20 h-2.5" stroke-width=".8" opacity=".4"/></svg>'
+  codex: '<svg class="about__emblem-svg" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10 V31"/><path d="M20 10 C15 7.5 9 7.3 6 9.2 V29 C9 27.2 15 27.4 20 30"/><path d="M20 10 C25 7.5 31 7.3 34 9.2 V29 C31 27.2 25 27.4 20 30"/><path d="M9.2 14.6 H16 M9.2 18.4 H16 M9.2 22.2 H14.5 M23.8 14.6 H30.6 M23.8 18.4 H30.6 M25.3 22.2 H30.6" stroke-width=".75" opacity=".5"/></svg>',
+  tarot: '<svg class="about__emblem-svg" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="7" y="12" width="13" height="20" rx="2" opacity=".42" transform="rotate(-12 13.5 22)"/><rect x="20" y="12" width="13" height="20" rx="2" opacity=".42" transform="rotate(12 26.5 22)"/><rect x="13.5" y="9.5" width="13" height="21" rx="2"/><path d="M20 15 L23.5 20 L20 25 L16.5 20 Z" stroke-width=".75"/></svg>',
+  arcana: '<svg class="about__emblem-svg" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6.5 29 L7.8 13 L14.5 19.5 L20 8 L25.5 19.5 L32.2 13 L33.5 29 Z"/><path d="M8.6 24.8 H31.4" stroke-width=".75" opacity=".5"/><circle cx="13.5" cy="27" r=".9" stroke-width=".75" opacity=".5"/><circle cx="20" cy="27" r=".9" stroke-width=".75" opacity=".5"/><circle cx="26.5" cy="27" r=".9" stroke-width=".75" opacity=".5"/></svg>',
+  mint: '<svg class="about__emblem-svg" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="7.5" width="22" height="25" rx="2.2"/><path d="M10 26 L15 20 L19 24 L25 16.5 L30 22" stroke-width=".75" opacity=".5"/><circle cx="15.5" cy="15" r="2.4" stroke-width=".75" opacity=".5"/><path d="M6 6 L8 8 M34 6 L32 8 M6 34 L8 32 M34 34 L32 32" stroke-width=".75" opacity=".4"/></svg>',
+  unlit: '<svg class="about__emblem-svg" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="20" cy="20" r="11"/><path d="M20 16.5 L23 20 L20 23.5 L17 20 Z" stroke-width=".75" opacity=".5"/><path d="M20 7 V4.7 M20 33 V35.3 M7 20 H4.7 M33 20 H35.3" stroke-width=".75" opacity=".4"/></svg>'
 };
 function aboutNugget(o) {
   return '<li class="about__nugget' + (o.cls ? ' ' + o.cls : '') + '" data-side="' + o.side + '" data-nug="' + o.key + '">'
@@ -1279,16 +1282,16 @@ function aboutNugget(o) {
 function renderAbout() {
   const N = [
     { key: 'codex', ord: 'I', side: 'left', cls: 'is-free', name: 'The Codex',
-      line: 'The whole archive of meanings — every card, sign and rune, yours to search.', micro: 'Free · always open',
+      line: 'The whole archive of meanings — every card, sign, and rune — yours to search.', micro: 'Free · always open',
       door: '<a class="about__door" href="codex.html">Open the Codex &rarr;</a>' },
     { key: 'tarot', ord: 'II', side: 'right', cls: '', name: 'Tarot Divination',
-      line: 'Cut the full deck to a question — the Pull, a Sitting, or the Deep Read — and what falls is read and filed.', micro: 'Drawn once. Not reissued.',
+      line: 'Cut the full deck to a question — the Pull, a Sitting, or the Deep Read — and what falls is read and filed.', micro: 'Drawn once · not reissued.',
       door: '<a class="about__door" href="?dev=drawing-room">Enter the room &rarr;</a>' },
     { key: 'arcana', ord: 'III', side: 'left', cls: 'is-paid', name: 'The Arcana Reading',
-      line: 'A person, read by birth through six systems into a crowned name — a record kept for every mark.', micro: 'By birth · or a Concord of two',
+      line: 'A person, read by birth through six systems into a crowned name — a record kept for every reading.', micro: 'By birth · or a Concord of two',
       door: '<a class="about__door" href="?dev=arcane">Enter the room &rarr;</a>' },
     { key: 'mint', ord: 'IV', side: 'right', cls: 'is-free', name: 'Card Mint',
-      line: 'Bring a photo — it is already a card; the room only develops it.', micro: 'The Free Pull · the Halo Mint',
+      line: 'Bring a photo — it is already a card. The room only develops it.', micro: 'The Free Pull · the Halo Mint',
       door: '<button type="button" class="about__door" data-view-to="room">See a card develop &rarr;</button>' },
     { key: 'unlit', ord: 'V', side: 'center', cls: 'about__nugget--unlit', name: 'The Unlit Room',
       line: 'Something is taking shape here — still too dim to name. The candle has not reached it yet.', micro: 'Not yet lit',
@@ -1297,12 +1300,16 @@ function renderAbout() {
   return '<section id="about" class="about" aria-label="About Blue Room">'
     + '<header class="about__intro">'
     +   '<p class="about__eyebrow"><span class="about__eyemark" aria-hidden="true">◆</span> BLUE ROOM</p>'
-    +   '<h2 class="about__headline">We hold the candle.</h2>'
+    +   '<h2 class="about__headline" aria-label="We hold the candle."><span class="about__hx" aria-hidden="true">We&nbsp;hold</span><span class="about__pivot" aria-hidden="true"></span><span class="about__hx" aria-hidden="true">the&nbsp;candle.</span></h2>'
     +   '<p class="about__lede">Blue Room draws the readings and develops the cards, then keeps every one on a shelf that is yours to find and stand before. Come down slowly; the light stays on while you read your way into what you did not know was here.</p>'
     +   '<span class="about__wick" aria-hidden="true"></span>'
     + '</header>'
     + '<ol class="about__rail">' + N.map(aboutNugget).join('') + '</ol>'
-    + '<p class="about__foot">One archive. Every door kept.</p>'
+    + '<footer class="about__close">'
+    +   '<span class="about__wick about__wick--close" aria-hidden="true"></span>'
+    +   '<span class="about__seal" aria-hidden="true">◆</span>'
+    +   '<p class="about__foot">One archive. Every door kept.</p>'
+    + '</footer>'
     + '</section>';
 }
 
@@ -1536,7 +1543,9 @@ function mountMenu() {
    front door never breaks); we ARM the hidden state with .is-motion only when
    IntersectionObserver exists and reduced-motion is off, then toggle .is-lit as each nugget
    enters/leaves the viewport (appear coming down, fade going up). */
+let _aboutBackstop = null;
 function wireMenuAbout(host) {
+  if (_aboutBackstop) { window.removeEventListener("scroll", _aboutBackstop); _aboutBackstop = null; }   // remove-then-add: no stacking across remounts
   const about = host.querySelector("#about");
   if (!about) return;
   const reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -1544,9 +1553,19 @@ function wireMenuAbout(host) {
   if (reduce || !("IntersectionObserver" in window) || !nuggets.length) return;   // all shown, no motion
   about.classList.add("is-motion");
   const io = new IntersectionObserver(function (entries) {
-    entries.forEach(function (e) { e.target.classList.toggle("is-lit", e.isIntersecting); });
-  }, { threshold: 0.35, rootMargin: "0px 0px -12% 0px" });
+    entries.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add("is-lit"); io.unobserve(e.target); } });   // BR-S206 LATCH: light once, stay lit
+  }, { threshold: 0.12, rootMargin: "0px 0px -8% 0px" });
   nuggets.forEach(function (n) { io.observe(n); });
+  /* fail-safe backstop: light any plate whose top is above 85% of the viewport even if the
+     observer never reaches its threshold (short/landscape viewports) — a plate must never strand. */
+  function backstop() {
+    const cut = window.innerHeight * 0.85;
+    nuggets.forEach(function (n) { if (!n.classList.contains("is-lit") && n.getBoundingClientRect().top < cut) { n.classList.add("is-lit"); io.unobserve(n); } });
+  }
+  backstop();
+  let raf = null;
+  _aboutBackstop = function () { if (raf) return; raf = requestAnimationFrame(function () { raf = null; backstop(); }); };
+  window.addEventListener("scroll", _aboutBackstop, { passive: true });
 }
 
 /* ── BR-S205: THE APERTURE — the Codex bloom wired into the live menu ─────────

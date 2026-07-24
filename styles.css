@@ -31,6 +31,10 @@
   --line-faint: rgba(233, 229, 220, 0.07);
   --line: rgba(233, 229, 220, 0.12);
   --line-strong: rgba(233, 229, 220, 0.2);
+  /* BR-S206: the hairline alpha ladder (About master) — structural / secondary / ambient */
+  --hair-1: rgba(233, 229, 220, .14);
+  --hair-2: rgba(233, 229, 220, .08);
+  --hair-3: rgba(233, 229, 220, .045);
 
   /* legacy aliases — every existing rule inherits the warm scale */
   --silver: #c8c4bb;
@@ -3077,17 +3081,20 @@ body[data-view="room"] .dev { display: none; }
 .menurev.is-fullview .menu__downcue { opacity: 0; visibility: hidden; pointer-events: none; }
 @media (prefers-reduced-motion: reduce) { .menu__downcue-arr { animation: none; } }
 
-.about { position: relative; padding: clamp(48px, 9vh, 96px) 24px 22vh; }
-.about__intro { width: min(620px, 88vw); margin: 0 auto clamp(80px, 18vh, 190px); display: grid; justify-items: center; text-align: center; gap: 15px; }
-.about__eyebrow { font-family: var(--font-mono); font-size: 9.5px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--faint); }
+.about { position: relative; padding: clamp(55px, 9vh, 89px) 24px 22vh; }
+.about__intro { width: min(640px, 100%); margin: 0 auto clamp(55px, 18vh, 144px); display: grid; justify-items: center; text-align: center; gap: 21px; }
+.about__eyebrow { font-family: var(--font-mono); font-size: 9.5px; letter-spacing: 0.32em; text-transform: uppercase; color: var(--faint); margin: 0; }
 .about__eyemark { color: var(--silver-dim); }
-.about__headline { font-family: var(--font-display); font-size: clamp(30px, 6vw, 46px); font-weight: 600; color: var(--t-display); }
-.about__lede { font-family: var(--font-display); font-size: clamp(15px, 2.4vw, 18px); line-height: 1.62; color: var(--t-primary); max-width: 46ch; }
-.about__wick { width: 1px; height: clamp(40px, 8vh, 72px); background: linear-gradient(var(--line-strong), transparent); margin-top: 4px; }
+/* BR-S206: the yin/yang caesura — a leaned hairline "/" pivot between two EQUAL-weight halves (the split IS the division; the pivot is the same hairline material as the wick + spine) */
+.about__headline { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: clamp(13px, 2.3vw, 26px); font-family: var(--font-display); font-weight: 600; font-size: clamp(30px, 6vw, 46px); line-height: 1.08; letter-spacing: -0.012em; color: var(--t-display); margin: 0; }
+.about__hx { white-space: nowrap; color: var(--t-display); }
+.about__pivot { flex: 0 0 auto; align-self: center; width: 1.6px; height: 1em; transform: rotate(15deg); background: linear-gradient(transparent, var(--line-strong) 14%, var(--line-strong) 86%, transparent); opacity: .85; border-radius: 1px; }
+.about__lede { font-family: var(--font-display); font-size: clamp(14.5px, 2.2vw, 16.5px); line-height: 1.68; letter-spacing: 0.006em; color: var(--t-primary); max-width: 44ch; margin: 0; opacity: .95; }
+.about__wick { width: 1px; height: clamp(34px, 8vh, 55px); margin-top: 5px; background: linear-gradient(var(--hair-1), var(--hair-3) 70%, transparent); }
 
-/* the rail + its hairline candle-spine */
-.about__rail { position: relative; list-style: none; margin: 0 auto; padding: 0; width: min(760px, 90vw); display: grid; row-gap: clamp(110px, 22vh, 240px); }
-.about__rail::before { content: ""; position: absolute; inset-block: 0; left: 50%; width: 1px; transform: translateX(-.5px); background: linear-gradient(transparent, var(--line-faint) 8%, var(--line-faint) 92%, transparent); }
+/* the rail + its hairline candle-spine (BR-S206: hair-ladder material; a brighter 46-54% waist, tapered to nothing) */
+.about__rail { position: relative; list-style: none; margin: 0 auto; padding: 0; width: min(760px, 100%); display: grid; row-gap: clamp(89px, 22vh, 233px); }
+.about__rail::before { content: ""; position: absolute; inset-block: -8px; left: 50%; width: 1px; transform: translateX(-.5px); background: linear-gradient(transparent, var(--hair-3) 6%, var(--hair-1) 46%, var(--hair-1) 54%, var(--hair-3) 94%, transparent); }
 
 .about__nugget { position: relative; display: flex; }
 .about__nugget[data-side="left"] { justify-content: flex-start; }
@@ -3100,37 +3107,69 @@ body[data-view="room"] .dev { display: none; }
 .about__nugget[data-side="right"] .about__ord { right: -.08em; }
 .about__nugget[data-side="center"] .about__ord { left: 50%; transform: translateX(-50%); }
 
-/* the plate = the wall-plaque double-rule mat, shrunk to bite-size */
-.about__plate { position: relative; z-index: 1; width: min(400px, 100%); display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 26px 26px 22px; border: 1px solid var(--line); border-radius: 10px; background: linear-gradient(180deg, rgba(233, 229, 220, .02), transparent 62%), var(--ink-850); }
-.about__plate::before { content: ""; position: absolute; inset: 6px; border: 1px solid var(--line-faint); border-radius: 6px; pointer-events: none; }
-.about__emblem { display: block; color: var(--silver-dim); filter: drop-shadow(0 6px 14px rgba(0, 0, 0, .45)); }   /* the lift is on the emblem, never a shadow on the tile */
-.about__emblem-svg { width: 46px; height: 46px; display: block; }
-.about__name { font-family: var(--font-ui); font-size: 13px; font-weight: 600; letter-spacing: 0.15em; text-transform: uppercase; color: var(--t-display); }
-.about__rule { width: 40px; height: 1px; background: var(--line-faint); }
-.about__line { font-family: var(--font-display); font-size: clamp(16px, 2.4vw, 19px); line-height: 1.48; color: var(--t-primary); text-align: center; max-width: 30ch; margin: 0; }
-.about__micro { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--t-meta); margin: 0; }
-.about__door { margin-top: 4px; display: inline-block; padding: 10px 18px; border: 1px solid var(--line-strong); border-radius: 7px; background: none; cursor: pointer; font-family: var(--font-ui); font-size: 11.5px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--t-display); text-decoration: none; transition: border-color 160ms ease, transform 160ms ease; }
-.about__door:hover, .about__door:focus-visible { border-color: var(--silver-dim); transform: translateY(-1px); outline: none; }
+/* the plate = museum mat (BR-S206: hair-1 edge, inset-box-shadow mat rule — never blurs at fractional DPR, top-bevel) */
+.about__plate { position: relative; z-index: 1; width: min(400px, 100%); display: flex; flex-direction: column; align-items: center; gap: 13px; padding: 34px 26px 21px; border: 1px solid var(--hair-1); border-radius: 10px; background: linear-gradient(180deg, rgba(233,229,220,.024) 0%, transparent 65%), var(--ink-850); box-shadow: inset 0 1px 0 rgba(233,229,220,.04); }
+.about__plate::before { content: ""; position: absolute; inset: 7px; border-radius: 6px; box-shadow: inset 0 0 0 1px var(--hair-2); pointer-events: none; }
+.about__emblem { display: block; color: var(--silver-dim); filter: drop-shadow(0 7px 16px rgba(0,0,0,.5)); }   /* the lift is on the emblem, never a shadow on the tile */
+.about__emblem-svg { width: 48px; height: 48px; display: block; }
+.about__name { font-family: var(--font-ui); font-size: 13px; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; color: var(--t-display); margin: 0; }
+.about__rule { width: 44px; height: 1px; background: linear-gradient(90deg, transparent, var(--hair-1) 20%, var(--hair-1) 80%, transparent); }
+.about__line { font-family: var(--font-display); font-size: clamp(16px, 2.3vw, 18.5px); line-height: 1.5; color: var(--t-primary); text-align: center; max-width: 31ch; margin: 0; }
+.about__micro { font-family: var(--font-mono); font-size: 8.5px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--t-meta); margin: 0; }
+.about__door { margin-top: 8px; display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 12px 20px; border: 1px solid var(--hair-1); border-radius: 8px; background: linear-gradient(180deg, rgba(233,229,220,.015), transparent 70%); cursor: pointer; font-family: var(--font-ui); font-size: 11.5px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--t-display); text-decoration: none; transition: border-color 200ms cubic-bezier(.2,.7,.2,1), color 200ms cubic-bezier(.2,.7,.2,1), background 200ms cubic-bezier(.2,.7,.2,1), box-shadow 200ms cubic-bezier(.2,.7,.2,1), transform 160ms cubic-bezier(.2,.7,.2,1); }
+.about__door:hover, .about__door:focus-visible { transform: translateY(-1.5px); outline: none; }
+.about__door:active { transform: translateY(-.5px); transition-duration: 80ms; }
+.about__nugget:not(.is-free):not(.is-paid) .about__door:hover, .about__nugget:not(.is-free):not(.is-paid) .about__door:focus-visible { border-color: var(--silver-dim); }
 
-/* colour law at the tile — one violet (paid Arcana), two gold (free heroes), Tarot neutral */
-.about__nugget.is-free .about__emblem, .about__nugget.is-free .about__micro { color: #c8ad70; }
-.about__nugget.is-paid .about__emblem { color: var(--violet); }
+/* BR-S206 COLOUR LAW — the intensity ladder (ghost ordinal → micro → emblem+glow → gate); free + paid doors bloom EQUAL-and-opposite (free-as-hero) */
+.about__nugget.is-free .about__emblem { color: #c8ad70; filter: drop-shadow(0 7px 16px rgba(0,0,0,.5)) drop-shadow(0 0 9px rgba(200,173,112,.16)); }
+.about__nugget.is-paid .about__emblem { color: var(--violet); filter: drop-shadow(0 7px 16px rgba(0,0,0,.5)) drop-shadow(0 0 9px rgba(139,123,255,.17)); }
+.about__nugget.is-free .about__micro { color: #c8ad70; }
+.about__nugget.is-paid .about__micro { color: color-mix(in srgb, var(--violet) 65%, var(--t-meta)); }
+.about__nugget.is-free .about__ord { color: rgba(200,173,112,.14); }
+.about__nugget.is-paid .about__ord { color: rgba(139,123,255,.13); }
+.about__nugget.is-free .about__door { border-color: color-mix(in srgb, #c8ad70 42%, var(--line-strong)); }
+.about__nugget.is-free .about__door:hover, .about__nugget.is-free .about__door:focus-visible { border-color: #c8ad70; color: #c8ad70; background: color-mix(in srgb, #c8ad70 6%, transparent); box-shadow: 0 0 0 1px rgba(200,173,112,.15), 0 6px 18px rgba(200,173,112,.13); transform: translateY(-2px); }
 .about__nugget.is-paid .about__door { border-color: color-mix(in srgb, var(--violet) 45%, var(--line-strong)); }
+.about__nugget.is-paid .about__door:hover, .about__nugget.is-paid .about__door:focus-visible { border-color: var(--violet); color: var(--violet); background: color-mix(in srgb, var(--violet) 6%, transparent); box-shadow: 0 0 0 1px rgba(139,123,255,.16), 0 6px 18px rgba(139,123,255,.14); transform: translateY(-2px); }
 
-/* THE UNLIT ROOM — veiled, coming, not walled */
-.about__nugget--unlit .about__plate { border-style: dashed; border-color: var(--line-faint); background: var(--ink-900); }
-.about__nugget--unlit .about__emblem { filter: blur(7px); opacity: .5; }   /* static blur only — never animated */
-.about__nugget--unlit .about__name { filter: blur(1.4px); opacity: .7; }
+/* THE UNLIT ROOM — softer veil, coming not walled; keeps its lone gold floor-glow */
+.about__nugget--unlit .about__plate { border-style: dashed; border-color: var(--hair-2); background: var(--ink-900); }
+.about__nugget--unlit .about__emblem { filter: blur(6px); opacity: .45; }   /* static blur only — never animated */
+.about__nugget--unlit .about__name { filter: blur(1.2px); opacity: .66; }
 .about__nugget--unlit .about__line, .about__nugget--unlit .about__micro { color: var(--faint); }
-.about__nugget--unlit .about__plate::after { content: ""; position: absolute; inset: 0; border-radius: inherit; background: radial-gradient(120% 80% at 50% 120%, rgba(200, 173, 112, .06), transparent 60%); pointer-events: none; }
+.about__nugget--unlit .about__plate::after { content: ""; position: absolute; inset: 0; border-radius: inherit; background: radial-gradient(120% 80% at 50% 120%, rgba(200,173,112,.05), transparent 62%); pointer-events: none; }
 
-.about__foot { text-align: center; margin: clamp(90px, 18vh, 190px) 0 0; font-family: var(--font-mono); font-size: 8.5px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--faint); }
+/* THE LANDING — the close bookends the opening ◆ eyebrow (wick burns out → ◆ seal → foot); static, always visible */
+.about__close { display: grid; justify-items: center; gap: clamp(16px, 2.8vh, 26px); margin: clamp(64px, 13vh, 140px) 0 0; }
+.about__wick--close { margin-top: 0; height: clamp(48px, 9vh, 84px); background: linear-gradient(var(--hair-3), transparent); }
+.about__seal { font-family: var(--font-display); font-size: 15px; line-height: 1; color: var(--silver-dim); opacity: .82; }
+.about__foot { margin: 0; text-align: center; font-family: var(--font-mono); font-size: 8.5px; letter-spacing: 0.28em; text-transform: uppercase; color: var(--faint); }
 
-/* scroll-reveal — base is VISIBLE (freeze-safe); .is-motion (JS, only w/ IO + no reduced-motion) arms the hidden state */
-.about__nugget { opacity: 1; transform: none; }
-.about.is-motion .about__nugget { opacity: 0; transform: translateY(22px) scale(.99); transition: opacity 600ms cubic-bezier(.2, .7, .2, 1), transform 600ms cubic-bezier(.2, .7, .2, 1); will-change: opacity, transform; }
-.about.is-motion .about__nugget.is-lit { opacity: 1; transform: none; }
-@media (prefers-reduced-motion: reduce) { .about.is-motion .about__nugget { opacity: 1; transform: none; transition: none; } }
+/* scroll-reveal — base VISIBLE (freeze-safe); .is-motion arms the hidden state; the PLATE rises to its stationary ghost ordinal; LATCH (stays lit — "the light stays on") */
+.about.is-motion .about__nugget .about__plate { opacity: 0; transform: translateY(20px); transition: opacity 720ms cubic-bezier(.16, .84, .29, 1), transform 720ms cubic-bezier(.16, .84, .29, 1); will-change: opacity, transform; }
+.about.is-motion .about__nugget.is-lit .about__plate { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) { .about.is-motion .about__nugget .about__plate { opacity: 1; transform: none; transition: none; } }
+
+/* BR-S206 mobile — single-column reflow + hard scale-downs where clamp() floors fail phones */
+@media (max-width: 559px) {
+  .about__intro { gap: 13px; margin-bottom: clamp(56px, 14vh, 140px); }
+  .about__wick { height: clamp(32px, 6vh, 55px); }
+  .about__plate { padding: 24px 20px 20px; gap: 11px; }
+  .about__emblem-svg { width: 42px; height: 42px; }
+}
+@media (max-width: 479px) {
+  .about__headline { flex-direction: column; gap: clamp(9px, 3vw, 15px); }
+  .about__pivot { transform: none; height: .7em; }
+  .about__nugget[data-side="left"], .about__nugget[data-side="right"] { justify-content: center; }
+  .about__nugget[data-side="left"] .about__ord, .about__nugget[data-side="right"] .about__ord { left: 50%; right: auto; transform: translateX(-50%); }
+}
+@media (max-width: 399px) {
+  .about__ord { font-size: 64px; }
+  .about__emblem-svg { width: 38px; height: 38px; }
+  .about__plate { padding: 20px 18px 18px; }
+  .about__rail { row-gap: clamp(88px, 20vh, 160px); }
+}
 
 /* edge arrows — bottom-corner dog-ears (right-center is owned by the menustage
    develop arrow at rest and the purple vault arrow in fullview) */
@@ -3169,7 +3208,9 @@ body[data-view="room"] .dev { display: none; }
 .menu__wall-plaques { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(360px, 100%), 1fr)); gap: clamp(20px, 3vw, 40px); width: 100%; max-width: 920px; align-items: stretch; }
 .menu__plaque { position: relative; display: flex; flex-direction: column; align-items: center; gap: 14px; padding: 30px 28px 22px; min-height: 520px; border: 1px solid var(--line); border-radius: 10px; background: linear-gradient(180deg, rgba(233, 229, 220, 0.014), transparent 60%); }
 .menu__plaque::before { content: ""; position: absolute; inset: 7px; border: 1px solid var(--line-faint); border-radius: 6px; pointer-events: none; }   /* double-rule museum mat */
-.menu__plaque-kicker { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.26em; text-transform: uppercase; color: var(--t-meta); }
+.menu__plaque-kicker { font-family: var(--font-mono); font-size: 9.5px; letter-spacing: 0.24em; text-transform: uppercase; color: var(--t-body); }
+.menu__plaque--arcane .menu__plaque-kicker { color: #c8ad70; opacity: .82; }   /* Room I · By Birth — gold register, given not chosen */
+.menu__plaque--drawing .menu__plaque-kicker { color: var(--silver-dim); opacity: .92; }   /* Room II · By the Draw — silver register, chance not fixed */
 .menu__plaque-name { font-family: var(--font-ui); font-size: 14.5px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--t-display); }
 .menu__plaque-rule { width: 42px; height: 1px; background: var(--line-faint); }
 .menu__plaque-spec { flex: 1 1 auto; width: 100%; display: grid; justify-items: center; align-content: center; gap: 10px; }
