@@ -1438,6 +1438,20 @@ const CX_LEAVES =
   + '<div class="bloom__ink" aria-hidden="true"></div>'
   + '<div class="bloom__ember" aria-hidden="true"></div>';
 
+/* BR-S226: THE MINI CODEX — the orange ball. A small draggable search puck that rests on
+   the seal's shoulder and reads 1–few Codex entries in-room. Also a trailing #menuView leaf
+   (fixed, rides every slide like the seal). The ghost dock marks home; the panel is born
+   inert+aria-hidden. Front-door law: the "full Codex" link opens the aperture if search fails. */
+const MINI_LEAVES =
+  '<button class="mini-dock" id="codexMiniDock" type="button" aria-label="Return the mini Codex home"></button>'
+  + '<div class="mini" id="codexMini" data-state="docked">'
+  + '<button class="mini__ball" id="codexMiniBall" type="button" aria-haspopup="dialog" aria-expanded="false" aria-label="Open the mini Codex"><span class="mini__glyph" aria-hidden="true">&#9670;</span></button>'
+  + '<div class="mini__panel" role="dialog" aria-label="Mini Codex — search" inert aria-hidden="true">'
+  + '<input class="mini__input" type="search" autocomplete="off" spellcheck="false" placeholder="Search the Codex…" aria-label="Search the Codex" />'
+  + '<div class="mini__results" aria-live="polite"></div>'
+  + '<a class="mini__more" href="codex.html" data-codex-open>Open the full Codex &#8594;</a>'
+  + '</div></div>';
+
 function renderMenu(reveal) {
   const s = SOURCES[0];
   const held = hasHoldings();
@@ -1512,7 +1526,8 @@ function renderMenu(reveal) {
     ${renderAbout()}${reveal ? `
     <button type="button" class="menurev__back" aria-label="Return to the menu">← Back to the menu</button>
     ${MENUREV_FWD_ARROW}` : ""}
-    ${CX_LEAVES}`;
+    ${CX_LEAVES}
+    ${MINI_LEAVES}`;
 }
 
 /* BR-S150: the LIVE entrance IS the develop reveal (promoted from ?dev=menu-reveal — this
@@ -1531,6 +1546,7 @@ function mountMenu() {
   wireMenuAnnex(host);   // BR-S192: the desk↔wall slide (works with or without the reveal)
   wireMenuAbout(host);   // BR-S203: the About surface scroll-reveal
   wireMenuCodex(host);   // BR-S205: the bottom-right Codex aperture (seal → in-page codex.html)
+  wireMiniCodex(host);   // BR-S226: the orange mini-codex ball (drag + in-room search)
 }
 
 /* BR-S203 — the About "Procession" scroll-reveal. Base state is VISIBLE (freeze-safe, the
@@ -1729,6 +1745,158 @@ function wireMenuCodex(host) {
     if (_cxResize) { try { window.removeEventListener("resize", _cxResize); } catch (e) {} _cxResize = null; }
     clearTimeout(wcT); clearTimeout(homeT); clearTimeout(closeT); clearTimeout(busyT);
     _cxOpen = false;
+  };
+}
+
+/* BR-S226 — THE MINI CODEX (the orange ball). A draggable in-room search puck: tap opens a
+   compact reader (1–3 Codex entries), drag it anywhere, recall home by clicking the ghost dock
+   OR by dragging back into the seal's gravity well. The 166-entry index is lazy-fetched from
+   codex-data.json on first open; if that fails, the panel's "full Codex" link opens the aperture.
+   Module-level _miniTeardown so the document listeners never stack across menu remounts. */
+let _miniTeardown = null, _MINI_INDEX = null, _miniLoading = false, _miniFailed = false;
+
+function wireMiniCodex(host) {
+  if (_miniTeardown) { _miniTeardown(); _miniTeardown = null; }
+  const mini = host.querySelector("#codexMini");
+  const ball = host.querySelector("#codexMiniBall");
+  const dock = host.querySelector("#codexMiniDock");
+  const panel = mini && mini.querySelector(".mini__panel");
+  const input = mini && mini.querySelector(".mini__input");
+  const results = mini && mini.querySelector(".mini__results");
+  if (!mini || !ball || !dock || !panel || !input || !results) return;
+
+  const esc = function (s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); };
+  const reduced = function () { return window.BRMotion ? window.BRMotion.prefersReduced() : (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches); };
+
+  let panelOpen = false, away = false;
+  let ox = 0, oy = 0;                                   // current dropped offset from home
+  let dragging = false, moved = false, sx = 0, sy = 0, bx = 0, by = 0, pid = null, homeT = null, qt = null;
+
+  function setOffset(x, y) { ox = x; oy = y; mini.style.setProperty("--mx", x + "px"); mini.style.setProperty("--my", y + "px"); }
+
+  function openPanel() {
+    if (panelOpen) return; panelOpen = true;
+    mini.setAttribute("data-state", "open");
+    ball.setAttribute("aria-expanded", "true");
+    panel.removeAttribute("inert"); panel.removeAttribute("aria-hidden");
+    loadIndex();
+    setTimeout(function () { try { input.focus({ preventScroll: true }); } catch (e) {} }, reduced() ? 0 : 60);
+  }
+  function closePanel() {
+    if (!panelOpen) return; panelOpen = false;
+    mini.setAttribute("data-state", away ? "away" : "docked");
+    ball.setAttribute("aria-expanded", "false");
+    panel.setAttribute("inert", ""); panel.setAttribute("aria-hidden", "true");
+  }
+  function togglePanel() { panelOpen ? closePanel() : openPanel(); }
+
+  function goHome() {                                   // recall: snap the ball back onto the seal's shoulder
+    closePanel(); away = false;
+    dock.classList.remove("is-shown");
+    if (!reduced()) { mini.classList.add("is-homing"); clearTimeout(homeT); homeT = setTimeout(function () { mini.classList.remove("is-homing"); }, 460); }
+    setOffset(0, 0);
+    mini.setAttribute("data-state", "docked");
+  }
+  function dropAway() {                                 // ball left at a dragged spot → reveal the home dock
+    away = true;
+    mini.setAttribute("data-state", panelOpen ? "open" : "away");
+    dock.classList.add("is-shown");
+  }
+
+  /* distance from the ball's centre to the seal's centre — the recall gravity well */
+  function nearSeal() {
+    const seed = host.querySelector("#codexSeed");
+    const b = ball.getBoundingClientRect(), s = seed && seed.getBoundingClientRect();
+    if (!s) return false;
+    return Math.hypot((b.left + b.width / 2) - (s.left + s.width / 2), (b.top + b.height / 2) - (s.top + s.height / 2)) < 46;
+  }
+
+  // ---- drag (pointer capture on the ball; a sub-threshold move is a tap → toggle panel) ----
+  function onDown(e) {
+    if (e.button != null && e.button !== 0) return;
+    pid = e.pointerId; dragging = true; moved = false;
+    sx = e.clientX; sy = e.clientY; bx = ox; by = oy;
+    mini.classList.remove("is-homing"); mini.classList.add("is-dragging");
+    try { ball.setPointerCapture(pid); } catch (_) {}
+  }
+  function onMove(e) {
+    if (!dragging) return;
+    const dx = e.clientX - sx, dy = e.clientY - sy;
+    if (!moved && Math.hypot(dx, dy) > 5) { moved = true; if (panelOpen) closePanel(); }
+    if (moved) setOffset(bx + dx, by + dy);
+  }
+  function onUp(e) {
+    if (!dragging) return; dragging = false;
+    mini.classList.remove("is-dragging");
+    try { ball.releasePointerCapture(pid); } catch (_) {}
+    if (e.type === "pointercancel") { if (moved) { nearSeal() ? goHome() : dropAway(); } return; }
+    if (!moved) { togglePanel(); return; }               // a tap, not a drag
+    nearSeal() ? goHome() : dropAway();
+  }
+  ball.addEventListener("pointerdown", onDown);
+  ball.addEventListener("pointermove", onMove);
+  ball.addEventListener("pointerup", onUp);
+  ball.addEventListener("pointercancel", onUp);
+  ball.addEventListener("click", function (e) { e.preventDefault(); });   // activation is pointer/keydown-driven; kill the synthetic click
+
+  dock.addEventListener("click", function () { goHome(); });
+
+  // keyboard: shield the global menu Enter→room + Space page-scroll; Enter/Space on the ball toggles; Esc closes
+  mini.addEventListener("keydown", function (e) {
+    const k = e.key;
+    if (k === "Escape") { if (panelOpen) { e.preventDefault(); e.stopPropagation(); closePanel(); try { ball.focus({ preventScroll: true }); } catch (_) {} } return; }
+    if (k === "Enter" || k === " " || k === "Spacebar") {
+      e.stopPropagation();
+      if (e.target === ball) { e.preventDefault(); togglePanel(); }
+    }
+  });
+
+  // a pointer outside the mini closes the panel (but not the dock, which recalls)
+  function onDocDown(e) { if (panelOpen && !mini.contains(e.target) && e.target !== dock) closePanel(); }
+  document.addEventListener("pointerdown", onDocDown, true);
+
+  // ---- search index (lazy) ----
+  function loadIndex() {
+    if (_MINI_INDEX || _miniLoading) { renderResults(input.value); return; }
+    _miniLoading = true; renderResults(input.value);
+    fetch("codex-data.json").then(function (r) { return r.json(); }).then(function (data) {
+      const idx = [];
+      (data || []).forEach(function (w) { (w.entries || []).forEach(function (en) {
+        idx.push({ name: en.name || "", tag: en.tag || "", kw: en.keywords || [], meaning: en.meaning || "",
+          hay: ((en.name || "") + " " + (en.keywords || []).join(" ") + " " + (en.tag || "") + " " + (en.meaning || "")).toLowerCase() });
+      }); });
+      _MINI_INDEX = idx;
+    }).catch(function () { _miniFailed = true; }).then(function () { _miniLoading = false; renderResults(input.value); });
+  }
+
+  function renderResults(q) {
+    q = (q || "").trim().toLowerCase();
+    if (!q) { results.innerHTML = '<p class="mini__hint">A sign, number, rune, card, hexagram…</p>'; return; }
+    if (!_MINI_INDEX) { results.innerHTML = '<p class="mini__hint">' + (_miniFailed ? "Search is offline — open the full Codex below." : "Opening the Codex…") + "</p>"; return; }
+    const hits = [];
+    for (let i = 0; i < _MINI_INDEX.length; i++) {
+      const e = _MINI_INDEX[i], nm = e.name.toLowerCase();
+      const p = nm.indexOf(q) === 0 ? 0 : nm.indexOf(q) > -1 ? 1 : e.kw.join(" ").toLowerCase().indexOf(q) > -1 ? 2 : e.hay.indexOf(q) > -1 ? 3 : 9;
+      if (p < 9) hits.push({ e: e, p: p });
+    }
+    hits.sort(function (a, b) { return a.p - b.p; });
+    const top = hits.slice(0, 3);
+    if (!top.length) { results.innerHTML = '<p class="mini__hint">Nothing in the Codex for &ldquo;' + esc(q) + '&rdquo;.</p>'; return; }
+    results.innerHTML = top.map(function (h) {
+      return '<button type="button" class="mini__card">'
+        + '<div class="mini__name">' + esc(h.e.name) + "</div>"
+        + (h.e.tag ? '<div class="mini__tag">' + esc(h.e.tag) + "</div>" : "")
+        + '<div class="mini__mean">' + esc(h.e.meaning) + "</div>"
+        + "</button>";
+    }).join("");
+    results.querySelectorAll(".mini__card").forEach(function (c) { c.addEventListener("click", function () { c.classList.toggle("is-open"); }); });
+  }
+
+  input.addEventListener("input", function () { clearTimeout(qt); qt = setTimeout(function () { renderResults(input.value); }, 90); });
+
+  _miniTeardown = function () {
+    try { document.removeEventListener("pointerdown", onDocDown, true); } catch (e) {}
+    clearTimeout(qt); clearTimeout(homeT);
   };
 }
 
