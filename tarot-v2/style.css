@@ -9,6 +9,8 @@
 
 /* ---------- TOKENS ---------- */
 :root {
+  color-scheme: dark;   /* opt out of browser/OS auto-dark re-inversion — keeps the parchment cards white */
+
   /* text ramp */
   --t-display: #e9e5dc;
   --t-primary: #d7d3ca;
