@@ -1,0 +1,680 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Spin Wheel — Ref FINAL (free-coast · precise landing · compass glass)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600&family=IBM+Plex+Mono:wght@500;600&family=Inter:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-room: radial-gradient(120% 90% at 50% -10%, #100f0d 0%, #0a0908 55%, #050505 100%);
+    --t-display:#e9e5dc; --t-primary:#d7d3ca; --t-meta:#948f87; --t-ghost:#6e6b63;
+    --line:rgba(233,229,220,0.12);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;min-height:100vh;background:var(--bg-room);color:var(--t-primary);
+    font-family:Inter,system-ui,sans-serif;display:flex;flex-direction:column;align-items:center;padding:40px 20px 64px}
+  .brand{display:flex;align-items:center;gap:12px;margin-bottom:8px}
+  .brand .mark{font:700 20px 'Cormorant Garamond',serif;color:#e8842a;line-height:1}
+  .brand .label{font:600 12px 'IBM Plex Mono',monospace;letter-spacing:.3em;color:var(--t-meta);text-transform:uppercase}
+
+  /* ---- wheel assembly ---- */
+  .wheel-area{position:relative;width:560px;max-width:100%;aspect-ratio:560/700;margin-top:8px}
+  .disc-wrap{position:absolute;left:7.143%;top:9.143%;width:85.714%;height:68.571%;z-index:2;
+    filter:drop-shadow(0 16px 26px rgba(0,0,0,.55)) drop-shadow(0 4px 8px rgba(0,0,0,.4));}
+  #wheel{display:block;width:100%;height:100%;border-radius:50%;transform-origin:50% 50%}
+
+  /* ---- compass glass: fixed dome cover over the disc, under the pointer; never rotates ---- */
+  .glass{
+    position:absolute; left:7.143%; top:9.143%;
+    width:85.714%; height:68.571%;
+    z-index:2; border-radius:50%; pointer-events:none;
+    /* (a) broad dome sheen upper-left · (b) soft fill lower-right · (c) edge vignette (center stays clear) */
+    background:
+      radial-gradient(120% 105% at 30% 22%,
+          rgba(255,255,255,0.20) 0%,
+          rgba(255,255,255,0.06) 17%,
+          rgba(255,255,255,0)    40%),
+      radial-gradient(90% 90% at 72% 82%,
+          rgba(255,255,255,0.05) 0%,
+          rgba(255,255,255,0)    34%),
+      radial-gradient(circle at 50% 50%,
+          rgba(0,0,0,0)    60%,
+          rgba(0,0,0,0.10) 84%,
+          rgba(0,0,0,0.26) 100%);
+    /* bezel rim + dome under-shade as inset shadows (no extra element) */
+    box-shadow:
+      inset 0 0 0 1px rgba(255,255,255,0.05),
+      inset 0 2px 5px  rgba(255,255,255,0.05),
+      inset 0 -12px 24px rgba(0,0,0,0.30),
+      inset 0 0 0 2px  rgba(20,12,6,0.35);
+  }
+  /* the signature curved reflection arc — a soft crescent glare hugging the upper-left interior rim */
+  .glass::before{
+    content:""; position:absolute; inset:0; border-radius:50%;
+    background:
+      radial-gradient(circle at 50% 50%,
+          rgba(255,255,255,0) 0 57%,
+          rgba(255,255,255,0.26) 65%,
+          rgba(255,255,255,0) 73%);
+    -webkit-mask-image:linear-gradient(138deg, #000 4%, rgba(0,0,0,0) 46%);
+            mask-image:linear-gradient(138deg, #000 4%, rgba(0,0,0,0) 46%);
+    filter:blur(2px);
+    opacity:0.64;   /* a HINT of glass, not a glare — center stays fully clear, colours read pure */
+  }
+  @media (prefers-reduced-motion: reduce){ .glass::before{ opacity:0.4; } }
+
+  .pointer{position:absolute;left:0;top:0;width:100%;height:28.571%;z-index:3;pointer-events:none;
+    filter:drop-shadow(0 8px 10px rgba(0,0,0,.5))}
+
+  .result{height:48px;display:flex;align-items:center;justify-content:center;margin:10px 0 6px}
+  .result .k{font:600 11px 'IBM Plex Mono',monospace;letter-spacing:.28em;color:var(--t-ghost);text-transform:uppercase;margin-right:14px}
+  .result .v{font:600 32px 'Cormorant Garamond',serif;color:var(--t-display);line-height:1}
+  .result .spin{font:600 12px 'IBM Plex Mono',monospace;letter-spacing:.3em;color:var(--t-meta);text-transform:uppercase}
+
+  .controls{display:flex;flex-direction:column;gap:16px;width:min(560px,92vw)}
+  .inrow{display:flex;gap:12px;align-items:stretch}
+  .field{flex:1;display:flex;align-items:center;gap:10px;padding:0 14px;border:1px solid var(--line);border-radius:8px;background:rgba(233,229,220,.045)}
+  .field input{flex:1;min-width:0;background:transparent;border:none;outline:none;color:var(--t-display);font:500 16px Inter;padding:14px 0}
+  .field .count{font:600 11px 'IBM Plex Mono',monospace;letter-spacing:.12em;color:var(--t-ghost);white-space:nowrap}
+  button{font-family:inherit;cursor:pointer}
+  button:disabled{cursor:default}
+  .add{border:1px solid rgba(233,229,220,.2);border-radius:8px;padding:0 26px;color:var(--t-primary);
+    font:600 12px 'IBM Plex Mono',monospace;letter-spacing:.2em;text-transform:uppercase;background:rgba(233,229,220,.045);transition:all .16s cubic-bezier(.2,.7,.2,1)}
+  .add:not(:disabled):hover{color:var(--t-display);border-color:rgba(233,229,220,.38);background:rgba(233,229,220,.08)}
+  .spin{border:none;border-radius:12px;padding:20px;color:#171310;font:700 17px Inter;letter-spacing:.26em;text-transform:uppercase;
+    background:linear-gradient(180deg,#e7e2d7,#cbc6bb);box-shadow:0 10px 26px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.5);
+    transition:transform .16s cubic-bezier(.2,.7,.2,1), box-shadow .16s ease}
+  .spin:not(:disabled):hover{transform:translateY(-2px);box-shadow:0 16px 32px rgba(0,0,0,.46), inset 0 1px 0 rgba(255,255,255,.6)}
+  .spin:not(:disabled):active{transform:translateY(0)}
+  .reset{align-self:center;border:none;background:transparent;color:var(--t-meta);font:600 11px 'IBM Plex Mono',monospace;
+    letter-spacing:.24em;text-transform:uppercase;padding:4px 10px;transition:color .15s ease}
+  .reset:not(:disabled):hover{color:var(--t-display)}
+  button:disabled{opacity:.4}
+  .opts{display:flex;flex-direction:column;gap:8px;margin-top:2px}
+  .opts h4{margin:0 0 2px;padding:0 2px;font:600 11px 'IBM Plex Mono',monospace;letter-spacing:.24em;text-transform:uppercase;color:var(--t-ghost)}
+  .opt{display:flex;align-items:center;gap:12px;padding:10px 12px;border:1px solid var(--line);border-radius:6px;background:rgba(233,229,220,.04)}
+  .opt .x{flex:none;width:26px;height:26px;border-radius:50%;border:1px solid rgba(233,229,220,.18);background:rgba(233,229,220,.05);
+    color:var(--t-meta);font:400 16px Inter;line-height:1;display:flex;align-items:center;justify-content:center;padding:0;transition:all .15s ease}
+  .opt .x:hover{border-color:rgba(233,229,220,.4);color:var(--t-display);background:rgba(233,229,220,.09)}
+  .opt .sw{flex:none;width:14px;height:14px;border-radius:4px;box-shadow:0 0 0 1px rgba(233,229,220,.18)}
+  .opt .tx{flex:1;min-width:0;font:500 15px Inter;color:var(--t-primary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+</style>
+</head>
+<body>
+  <div class="brand"><span class="mark">◆</span><span class="label">Spin Room · Fortune Wheel</span></div>
+
+  <div class="wheel-area">
+    <!-- shared defs (filters + gradients reused by the pointer SVG) -->
+    <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+      <defs>
+        <linearGradient id="ptrGrad" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#eb9a52"/>
+          <stop offset="0.55" stop-color="#d2691e"/>
+          <stop offset="1" stop-color="#a05019"/>
+        </linearGradient>
+        <filter id="grain" color-interpolation-filters="sRGB" x="-20%" y="-20%" width="140%" height="140%">
+          <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="24" result="t"/>
+          <feColorMatrix in="t" type="matrix"
+            values="0 0 0 0 0
+                    0 0 0 0 0
+                    0 0 0 0 0
+                    0.33 0.33 0.33 0 0" result="g"/>
+          <feComponentTransfer in="g" result="g2">
+            <feFuncA type="gamma" amplitude="1" exponent="3.4" offset="0"/>
+          </feComponentTransfer>
+          <feComposite in="g2" in2="SourceGraphic" operator="in" result="grain"/>
+          <feBlend in="SourceGraphic" in2="grain" mode="multiply"/>
+        </filter>
+        <filter id="blur8" x="-60%" y="-200%" width="220%" height="500%">
+          <feGaussianBlur stdDeviation="9"/>
+        </filter>
+      </defs>
+    </svg>
+
+    <div class="disc-wrap"><canvas id="wheel" width="480" height="480" role="img" aria-label="Fortune wheel"></canvas></div>
+
+    <!-- fixed compass glass: over the disc, under the pointer; never rotates -->
+    <div class="glass" aria-hidden="true"></div>
+
+    <!-- the pointer — fixed, mounted above, does not rotate -->
+    <svg class="pointer" viewBox="0 0 560 200" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <!-- soft cast shadow -->
+      <path d="M238,26 L334,26 L286,124 Z" fill="rgba(30,14,5,0.5)" filter="url(#blur8)"/>
+      <!-- chunky rounded matte-orange body (thick round stroke = soft corners), light grain -->
+      <path d="M234,20 L330,20 L282,116 Z" fill="url(#ptrGrad)" filter="url(#grain)"
+            stroke="#c15f1a" stroke-width="14" stroke-linejoin="round" stroke-linecap="round"/>
+      <!-- crisp dark edge for definition; no glare patch -->
+      <path d="M234,20 L330,20 L282,116 Z" fill="none"
+            stroke="rgba(32,15,6,0.8)" stroke-width="2.5" stroke-linejoin="round"/>
+    </svg>
+  </div>
+
+  <div class="result" id="result"></div>
+
+  <div class="controls">
+    <div class="inrow">
+      <div class="field">
+        <input id="draft" maxlength="24" placeholder="Type an option…">
+        <span class="count" id="count">0/6</span>
+      </div>
+      <button class="add" id="add">Add</button>
+    </div>
+    <button class="spin" id="spin">Spin</button>
+    <button class="reset" id="reset">↺ Reset</button>
+    <div class="opts" id="optsWrap" hidden><h4 id="optsHead">Options</h4><div id="opts"></div></div>
+  </div>
+
+<script>
+(function(){
+  "use strict";
+  // ---- config ----
+  var MAX = 6;
+  var DISC_S = 480;          // canvas logical size (css px)
+  var R_OUTER = 234;         // outer edge reference
+  var R_WEDGE = R_OUTER - 2; // wedges fill to the edge — no frame, a hair of dark rim
+  var HUB_R = 30;            // center axle-cap radius
+  // clean, bright, pure matte set — hot pink · lime · turquoise · golden yellow (equal luminance band)
+  var DEFAULT = ['#ff2d97','#a3e635','#25d0e6','#f7cf1b'];
+  var LABEL_INK = '#1a140d';
+  var GRAIN = 0.12;          // a whisper of matte tooth (balanced neutral, ZERO net darkening — pure bright paint); 0 = dead-flat
+
+  // ---- spin feel (rAF free-coast + crisp precise-landing settle) ----
+  // The feel is the coast/brake SPLIT, not the length: ~90% near-constant free coast
+  // ("could spin all day"), then a short ~10% decisive brake that DROPS it into place.
+  var SPIN_MS    = 3200;   // total spin time — long enough that the fast coast reads "all day", not a crawl
+  var FREE_END   = 0.90;   // pA — near-constant coast ends / landing brake begins (last ~10% ≈ 320ms = the drop)
+  var FREE_DIST  = 0.95;   // fL — distance covered by end of coast (brake covers only ~5% → a tad, precise)
+  var DROOP      = 0.05;   // k  — gentle coast velocity sag so it reads as a real coasting wheel (0 = dead-flat)
+  var DETENT_DEG = 1.6;    // tiny compass-needle settle at the very instant of landing (0 = pure crisp stop)
+
+  // ---- state ---- (unchanged functional model)
+  var state = { options: [], draft: '', preview: null, spinning: false, result: null, winner: null };
+  var rot = 0, sig = null;
+
+  var canvas = document.getElementById('wheel');
+  var dpr = Math.min(window.devicePixelRatio || 1, 2);
+  var wctx = canvas.getContext('2d');   // shared 2d ctx (same object draw() gets)
+
+  // ---- deterministic RNG (stable texture per redraw) ----
+  function hash(str){ var h=7; for(var i=0;i<str.length;i++) h=(Math.imul(h,31)+str.charCodeAt(i))|0; return h>>>0; }
+  function rng(seed){ var s=seed>>>0; return function(){ s=(s+0x6D2B79F5)|0; var t=Math.imul(s^(s>>>15),1|s); t=(t+Math.imul(t^(t>>>7),61|t))^t; return ((t^(t>>>14))>>>0)/4294967296; }; }
+
+  function randColor(){
+    var used = state.options.map(function(o){return o.hue;});
+    var h, tries=0;
+    do { h = Math.floor(Math.random()*360); tries++; }
+    while (tries<40 && used.some(function(u){ return Math.min(Math.abs(u-h),360-Math.abs(u-h))<32; }));
+    var s = 74 + Math.floor(Math.random()*16);   // 74–90  — hold a bright, pure band
+    var l = 54 + Math.floor(Math.random()*7);     // 54–61
+    return { hue:h, color:'hsl('+h+' '+s+'% '+l+'%)' };
+  }
+
+  function segments(){
+    if (state.options.length) return state.options.map(function(o){ return {color:o.color, text:o.text}; });
+    var d = (state.draft||'').trim();
+    if (d && state.preview) return [{ color: state.preview.color, text: d.slice(0,18) }];
+    return DEFAULT.map(function(c){ return {color:c, text:''}; });
+  }
+
+  // ================= clean matte-paint texture (a whisper of even tooth) =================
+  // one shared, position-seeded pass — a sparse BALANCED neutral fleck field (half faint-white,
+  // half faint-black) so it reads as one continuous matte surface with zero net darkening and no brown.
+
+  function clipAnnulus(ctx,cx,cy,rIn,rOut){
+    ctx.beginPath();
+    ctx.arc(cx,cy,rOut,0,Math.PI*2,false);
+    if (rIn>0.5) ctx.arc(cx,cy,rIn,0,Math.PI*2,true);
+    ctx.closePath();
+    ctx.clip();
+  }
+  function drawChipPoly(ctx,x,y,sz,rnd){
+    var verts=3+Math.floor(rnd()*3);
+    ctx.beginPath();
+    for (var i=0;i<verts;i++){
+      var a=(i/verts)*Math.PI*2+rnd()*0.6;
+      var rr=sz*(0.5+rnd()*0.9);
+      var px=x+Math.cos(a)*rr, py=y+Math.sin(a)*rr;
+      if (i===0) ctx.moveTo(px,py); else ctx.lineTo(px,py);
+    }
+    ctx.closePath(); ctx.fill();
+  }
+  // rIn/rOut define an annulus (rIn=0 -> a full disc). seed is a FIXED constant so the field is stable.
+  function weather(ctx,cx,cy,rIn,rOut,seed,o){
+    o = o || {};
+    if (GRAIN<=0) return;                    // dead-flat option
+    var rnd = rng(seed);
+    ctx.save();
+    clipAnnulus(ctx,cx,cy,rIn,rOut);
+    var span = rOut-rIn;
+    var flecks = Math.round(span*GRAIN);     // ~32 total — a whisper (was ~300 dark specks)
+    for (var f=0; f<flecks; f++){
+      var ang = rnd()*Math.PI*2, rad = rIn+span*rnd();
+      var x = cx+Math.cos(ang)*rad, y = cy+Math.sin(ang)*rad, sz = 0.5+rnd()*0.7;
+      // BALANCED neutral: half faint-white, half faint-black -> no net darkening, no brown
+      ctx.fillStyle = rnd()<0.5 ? 'rgba(255,255,255,0.035)' : 'rgba(0,0,0,0.035)';
+      drawChipPoly(ctx,x,y,sz,rnd);
+    }
+    ctx.restore();
+  }
+
+  function drawHub(ctx,cx,cy,r){
+    var halo = ctx.createRadialGradient(cx,cy,r*0.6,cx,cy,r*1.8);
+    halo.addColorStop(0,'rgba(0,0,0,0.35)'); halo.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.fillStyle=halo; ctx.beginPath(); ctx.arc(cx,cy,r*1.8,0,Math.PI*2); ctx.fill();
+
+    ctx.save(); ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.clip();
+    var g = ctx.createRadialGradient(cx-r*0.3,cy-r*0.35,r*0.1,cx,cy,r*1.15);
+    g.addColorStop(0,'#eda058'); g.addColorStop(0.5,'#d2691e'); g.addColorStop(1,'#93481a');
+    ctx.fillStyle=g; ctx.fillRect(cx-r,cy-r,r*2,r*2);
+    ctx.restore();
+    weather(ctx,cx,cy,0,r,0x4B03C7,{});
+    ctx.beginPath(); ctx.arc(cx,cy,r-1,0,Math.PI*2);
+    ctx.lineWidth=2; ctx.strokeStyle='rgba(32,15,6,0.75)'; ctx.stroke();
+  }
+
+  function drawText(ctx, cx, cy, R, w, n, dim){
+    ctx.globalAlpha = dim ? 0.4 : 1;
+    var txt = w.text.length>18 ? w.text.slice(0,17)+'…' : w.text;
+    ctx.save(); ctx.translate(cx,cy);
+    if (n===1){
+      ctx.textAlign='center'; ctx.textBaseline='middle';
+      var fs1 = Math.min(42, Math.max(20, 480/(txt.length+2)));
+      ctx.font='600 '+fs1+'px Inter, sans-serif';
+      ctx.fillStyle=LABEL_INK; ctx.fillText(txt,0,R*0.44);
+      ctx.restore(); ctx.globalAlpha=1; return;
+    }
+    var deg = ((w.mid*180/Math.PI)%360+360)%360;
+    var fs = Math.min(25, Math.max(12, 320/(txt.length+2)));
+    fs = Math.min(fs, (2*Math.PI/n)*R*0.42);
+    ctx.font='600 '+fs+'px Inter, sans-serif'; ctx.textBaseline='middle'; ctx.fillStyle=LABEL_INK;
+    if (deg>90 && deg<270){ ctx.rotate(w.mid+Math.PI); ctx.textAlign='left'; ctx.fillText(txt,-(R*0.9),0); }
+    else { ctx.rotate(w.mid); ctx.textAlign='right'; ctx.fillText(txt,R*0.9,0); }
+    ctx.restore(); ctx.globalAlpha=1;
+  }
+
+  // ---- wheel rendering ---- (the resting frame is always this)
+  function draw(){
+    var segs = segments();
+    var winner = (!state.spinning && state.winner!=null) ? state.winner : null;
+    var nsig = segs.map(function(s){return s.color+'|'+s.text;}).join(';')+'#w'+(winner==null?'-':winner);
+    if (nsig===sig) return; sig=nsig;
+
+    canvas.width = DISC_S*dpr; canvas.height = DISC_S*dpr;
+    var ctx = canvas.getContext('2d');
+    ctx.setTransform(dpr,0,0,dpr,0,0); ctx.clearRect(0,0,DISC_S,DISC_S);
+    var cx=DISC_S/2, cy=DISC_S/2, R=R_WEDGE, n=segs.length, segDeg=360/n;
+
+    var wedges = segs.map(function(s,k){
+      var mid=(-90+k*segDeg)*Math.PI/180, half=Math.PI/n;
+      return {color:s.color, text:s.text, mid:mid, a0:mid-half, a1:mid+half};
+    });
+
+    // 1) flat matte base fills — no per-wedge sheen/gradient
+    wedges.forEach(function(w){
+      ctx.save(); ctx.beginPath();
+      if (n===1) ctx.arc(cx,cy,R,0,Math.PI*2);
+      else { ctx.moveTo(cx,cy); ctx.arc(cx,cy,R,w.a0,w.a1); ctx.closePath(); }
+      ctx.clip();
+      ctx.fillStyle=w.color; ctx.fillRect(cx-R,cy-R,R*2,R*2);
+      ctx.restore();
+    });
+
+    // 2) ONE shared texture — BLIT the baked whisper-grain (same field the transitions use = rock-stable, no flicker)
+    ctx.save();
+    ctx.beginPath(); ctx.arc(cx,cy,R,0,Math.PI*2); ctx.clip();
+    ctx.drawImage(ensureTexture(), 0,0, DISC_S, DISC_S);
+    ctx.restore();
+
+    // 3) winner dim / highlight — the WINNER keeps its full bright colour (no dark tint), losers dim
+    if (winner!=null){
+      wedges.forEach(function(w,k){
+        ctx.save(); ctx.beginPath();
+        if (n===1) ctx.arc(cx,cy,R,0,Math.PI*2);
+        else { ctx.moveTo(cx,cy); ctx.arc(cx,cy,R,w.a0,w.a1); ctx.closePath(); }
+        ctx.clip();
+        ctx.fillStyle=(k===winner)?'rgba(0,0,0,0)':'rgba(8,6,4,0.58)';
+        ctx.fillRect(cx-R,cy-R,R*2,R*2);
+        ctx.restore();
+      });
+    }
+
+    // 4) seams — dark groove + a faint warm sliver, never a bright hairline
+    if (n!==1){
+      wedges.forEach(function(w){
+        var dx=Math.cos(w.a0), dy=Math.sin(w.a0);
+        ctx.strokeStyle='rgba(16,9,5,0.55)'; ctx.lineWidth=2.5;
+        ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(cx+dx*R,cy+dy*R); ctx.stroke();
+        var ox=-dy*1.3, oy=dx*1.3;
+        ctx.strokeStyle='rgba(255,224,184,0.05)'; ctx.lineWidth=1;
+        ctx.beginPath(); ctx.moveTo(cx+ox,cy+oy); ctx.lineTo(cx+dx*R+ox,cy+dy*R+oy); ctx.stroke();
+      });
+    }
+
+    // 5) winner wedge outline — warm gold, not chrome
+    if (winner!=null && n>1){
+      var ww=wedges[winner];
+      ctx.beginPath(); ctx.moveTo(cx,cy); ctx.arc(cx,cy,R-1,ww.a0,ww.a1); ctx.closePath();
+      ctx.strokeStyle='rgba(255,206,132,0.6)'; ctx.lineWidth=2.5; ctx.stroke();
+    }
+
+    wedges.forEach(function(w,k){ if (w.text) drawText(ctx,cx,cy,R,w,n, winner!=null && k!==winner); });
+
+    // 6) thin dark edge seating the painted disc on black; hub
+    ctx.save(); ctx.beginPath(); ctx.arc(cx,cy,R-1,0,Math.PI*2); ctx.lineWidth=2.5; ctx.strokeStyle='rgba(18,11,5,0.85)'; ctx.stroke(); ctx.restore();
+    drawHub(ctx,cx,cy,HUB_R);
+  }
+
+  // ======================================================================
+  // ============  ADD / REMOVE PHYSICS  (kept verbatim)  ==================
+  //   Optimization-forward: rAF only during a transition; whisper texture
+  //   baked ONCE and blitted; spin is rAF over the transform only.
+  // ======================================================================
+
+  // ---- tuning knobs ----
+  var DUR_POP   = 360;   // ms — re-partition pop (adds 1->2 .. 5->6); 7 held steps -> ~51ms/step
+  var DUR_FIRST = 240;   // ms — first add (single-wedge confirm punch)
+  var DUR_REMOVE= 560;   // ms — full remove (vanish beat + gravity reflow)
+  var VANISH_FRAC = 0.28;// fraction of a REMOVE spent on the blocky vanish
+  var OVERSHOOT = 0.15;  // back-out overshoot of the gravity settle (~9% bounce)
+
+  // BLOCKY POP — held waypoints for the re-partition scalar s, jump-cut (never tweened between).
+  // The hold-then-snap rhythm is the stop-motion "chunk"; 1.18 = the overshoot slam past full, then a
+  // damped step-bounce (0.90 -> 1.03 -> 1.0) settles it. addLayout keeps the disc tiling 360 at every s.
+  var POP_STEPS = [0, 0.32, 0.74, 1.18, 0.90, 1.03, 1.0];
+  function popS(p){ return POP_STEPS[Math.min(POP_STEPS.length-1, Math.floor(p*POP_STEPS.length))]; }
+  // back-out settle — the shared "gravity into place" curve (overshoot then damp); SMOOTH by design (the remove reflow)
+  function settle(p,s){ var u=p-1; return 1+(s+1)*u*u*u+s*u*u; }
+  // stepped radius retract — the "there -> chunk -> chunk -> gone" blocky vanish that opens the gap
+  var VANISH_STEPS = [1, 0.56, 0.24, 0];
+  function vanishRadius(pA){ return VANISH_STEPS[Math.min(VANISH_STEPS.length-1, Math.floor(pA*VANISH_STEPS.length))]; }
+  function prefersReduced(){ return !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches); }
+
+  var anim = null;     // active wheel transition, or null (idle)
+  var rafId = 0;
+
+  // ---- memoized whisper texture (baked ONCE, blitted every frame) ----
+  var texCanvas = null;
+  function ensureTexture(){
+    if (texCanvas) return texCanvas;
+    texCanvas = document.createElement('canvas');
+    texCanvas.width = DISC_S*dpr; texCanvas.height = DISC_S*dpr;
+    var tctx = texCanvas.getContext('2d');
+    tctx.setTransform(dpr,0,0,dpr,0,0);
+    weather(tctx, DISC_S/2, DISC_S/2, 0, R_WEDGE, 0x5EED09, {});
+    return texCanvas;
+  }
+
+  // ---- per-frame layout builders (angles in DEGREES; each entry: {color,a0,a1,r,full?}) ----
+  // ADD: one scalar s drives the whole re-partition — always tiles 360 (gap-free), overshoot = the pop
+  function addLayout(oldSegs, newSeg, s){
+    var n=oldSegs.length, segDegEff=360/(n+s), O=-90-segDegEff/2, arr=[];
+    for (var k=0;k<n;k++)
+      arr.push({ color:oldSegs[k].color, a0:O+k*segDegEff, a1:O+(k+1)*segDegEff, r:R_WEDGE });
+    arr.push({ color:newSeg.color, a0:O+n*segDegEff, a1:O+(n+s)*segDegEff, r:R_WEDGE });
+    return arr;
+  }
+  // FIRST add: single full-disc wedge with a tiny whole-disc "confirm" punch
+  function firstLayout(newSeg, p){
+    var rmul = 1 + 0.045*Math.sin(Math.min(1,p)*Math.PI);   // 1 -> ~1.045 -> 1, never dips
+    return [{ color:newSeg.color, a0:0, a1:360, r:R_WEDGE*rmul, full:true }];
+  }
+  // REMOVE: beat A = blocky vanish (removed wedge radius steps to 0, survivors hold);
+  //         beat B = gravity reflow (survivors interpolate old->new seams via settle)
+  function removeLayout(oldSegs, i, p){
+    var n=oldSegs.length, arr=[];
+    if (p < VANISH_FRAC){
+      var pA = p/VANISH_FRAC, rr = vanishRadius(pA), segDeg=360/n;
+      for (var k=0;k<n;k++){
+        var a0=-90+(k-0.5)*segDeg, a1=-90+(k+0.5)*segDeg;
+        if (k===i){ if (rr<=0) continue; arr.push({color:oldSegs[k].color,a0:a0,a1:a1,r:R_WEDGE*rr}); }
+        else arr.push({color:oldSegs[k].color,a0:a0,a1:a1,r:R_WEDGE});
+      }
+    } else {
+      var pB=(p-VANISH_FRAC)/(1-VANISH_FRAC), e=settle(pB,OVERSHOOT), m=n-1;
+      for (var k=0;k<n;k++){
+        if (k===i) continue;
+        var oA0=-90+(k-0.5)*(360/n), oA1=-90+(k+0.5)*(360/n);
+        var np=(k<i)?k:k-1;
+        var nA0=-90+(np-0.5)*(360/m), nA1=-90+(np+0.5)*(360/m);
+        arr.push({ color:oldSegs[k].color, a0:oA0+(nA0-oA0)*e, a1:oA1+(nA1-oA1)*e, r:R_WEDGE });
+      }
+    }
+    return arr;
+  }
+
+  var TAU = Math.PI*2, D2R = Math.PI/180, FULLISH = TAU - 0.0009;
+  function isFull(w, span){ return w.full || span >= FULLISH; }
+
+  // ---- the animated wheel frame (mirrors draw()'s passes; texture is BLITTED, not re-run) ----
+  function drawTransition(a, p){
+    var layout = a.kind==='add'   ? addLayout(a.oldSegs, a.newSeg, popS(p))
+               : a.kind==='first' ? firstLayout(a.newSeg, p)
+               :                     removeLayout(a.oldSegs, a.removed, p);
+
+    var ctx=wctx, cx=DISC_S/2, cy=DISC_S/2, i, w, a0, a1, span;
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+    ctx.clearRect(0,0,DISC_S,DISC_S);
+
+    // 1) flat matte fills
+    for (i=0;i<layout.length;i++){
+      w=layout[i]; a0=w.a0*D2R; a1=w.a1*D2R; span=a1-a0;
+      if (!w.full && span<0.0009) continue;
+      ctx.save(); ctx.beginPath();
+      if (isFull(w,span)) ctx.arc(cx,cy,w.r,0,TAU);
+      else { ctx.moveTo(cx,cy); ctx.arc(cx,cy,w.r,a0,a1); ctx.closePath(); }
+      ctx.clip(); ctx.fillStyle=w.color; ctx.fillRect(cx-R_WEDGE,cy-R_WEDGE,R_WEDGE*2,R_WEDGE*2); ctx.restore();
+    }
+
+    // 2) baked whisper texture — ONE drawImage, clipped to the union of the wedge shapes (gap stays transparent)
+    ctx.save(); ctx.beginPath();
+    for (i=0;i<layout.length;i++){
+      w=layout[i]; a0=w.a0*D2R; a1=w.a1*D2R; span=a1-a0;
+      if (!w.full && span<0.0009) continue;
+      if (isFull(w,span)){ ctx.moveTo(cx+w.r,cy); ctx.arc(cx,cy,w.r,0,TAU); }
+      else { ctx.moveTo(cx,cy); ctx.arc(cx,cy,w.r,a0,a1); ctx.closePath(); }
+    }
+    ctx.clip(); ctx.drawImage(ensureTexture(), 0,0, DISC_S, DISC_S); ctx.restore();
+
+    // 3) seams — dark groove + faint warm sliver (only when >1 wedge)
+    if (layout.length>1){
+      for (i=0;i<layout.length;i++){
+        w=layout[i]; a0=w.a0*D2R; a1=w.a1*D2R; if ((a1-a0)<0.0009) continue;
+        var dx=Math.cos(a0), dy=Math.sin(a0);
+        ctx.strokeStyle='rgba(16,9,5,0.55)'; ctx.lineWidth=2.5;
+        ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(cx+dx*w.r,cy+dy*w.r); ctx.stroke();
+        var ox=-dy*1.3, oy=dx*1.3;
+        ctx.strokeStyle='rgba(255,224,184,0.05)'; ctx.lineWidth=1;
+        ctx.beginPath(); ctx.moveTo(cx+ox,cy+oy); ctx.lineTo(cx+dx*w.r+ox,cy+dy*w.r+oy); ctx.stroke();
+      }
+    }
+
+    // 4) dark seating edge — per wedge arc so it follows coverage and skips any gap
+    for (i=0;i<layout.length;i++){
+      w=layout[i]; a0=w.a0*D2R; a1=w.a1*D2R; span=a1-a0;
+      if (!w.full && span<0.0009) continue;
+      ctx.strokeStyle='rgba(18,11,5,0.85)'; ctx.lineWidth=2.5; ctx.beginPath();
+      if (isFull(w,span)) ctx.arc(cx,cy,w.r-1,0,TAU); else ctx.arc(cx,cy,w.r-1,a0,a1);
+      ctx.stroke();
+    }
+
+    // 5) hub
+    drawHub(ctx,cx,cy,HUB_R);
+  }
+
+  // ---- rAF controller: runs ONLY while a transition is alive ----
+  function kick(){ if(!rafId){ rafId=requestAnimationFrame(loop); } }
+  function loop(now){
+    rafId=0;
+    var running=false;
+    if (anim){
+      var p=(now-anim.start)/anim.dur;
+      if (p>=1){ anim=null; sig=null; draw(); }                 // canonical resting frame (text + winner)
+      else { drawTransition(anim,p); running=true; }
+    }
+    if (running) rafId=requestAnimationFrame(loop);
+    // idle => loop not rescheduled => zero rAF
+  }
+  // snap any in-flight transition to its canonical end-state (interrupt / coalesce)
+  function finalizeTransition(){
+    if (rafId){ cancelAnimationFrame(rafId); rafId=0; }
+    if (spinRAF){ cancelAnimationFrame(spinRAF); spinRAF=0; canvas.style.willChange=''; }
+    if (anim){ anim=null; sig=null; draw(); }
+  }
+
+  // ======================================================================
+  // ============  SPIN — frictionless free coast + landing settle  =======
+  // ======================================================================
+  // Normalized easing f(p): f(0)=0, f(1)=1, f'(1)=0. Near-constant coast for
+  // ~94% of the time, then a short C1-continuous brake that drops it into place.
+  function spinEase(p){
+    if (p>=1) return 1;
+    if (p<=0) return 0;
+    var pA=FREE_END, fL=FREE_DIST, k=DROOP;
+    if (p<=pA){ var u=p/pA; return fL*((1+k)*u - k*u*u); }        // constant-ish coast, slight droop
+    var q=(p-pA)/(1-pA), q2=q*q, q3=q2*q;                          // cubic Hermite brake fL->1, C1 seam, f'(1)=0
+    var s0=(fL*(1-k)/pA)*(1-pA);                                   // = coast exit slope, mapped to q-space
+    return (2*q3-3*q2+1)*fL + (q3-2*q2+q)*s0 + (-2*q3+3*q2);
+  }
+  // tiny compass-needle settle in the final 10% — a single smooth hump, value AND slope = 0 at p=1 (no wobble)
+  function spinDetent(p){
+    if (DETENT_DEG<=0 || p<=0.9) return 0;
+    var q=(p-0.9)/0.1, s=Math.sin(Math.PI*q);
+    return DETENT_DEG*s*s;
+  }
+
+  var spinRAF = 0;
+  // winner is resolved PURELY from the final rot value — never from the animation path
+  function resolveWinner(){
+    var segs = segments(), n = segs.length;
+    var isDefault = n===4 && segs.every(function(s){return !s.text;});
+    var segDeg = 360/n;
+    var nrm = (((-rot + segDeg/2)%360)+360)%360;
+    var idx = Math.floor(nrm/segDeg)%n;
+    state.spinning = false;
+    state.result = isDefault ? null : segs[idx].text;
+    state.winner = isDefault ? null : idx;
+    render();
+  }
+  function spin(){
+    if (state.spinning) return;
+    finalizeTransition();
+    var reduce = prefersReduced();
+    var turns = 8 + Math.floor(Math.random()*4);        // 8–11 turns — the free, fast feel
+    var start = rot;
+    rot = rot + turns*360 + Math.random()*360;          // θ_final — the ONLY source of truth for the winner
+    state.spinning = true; state.result = null; state.winner = null; render();
+
+    if (reduce){                                        // short, no coast/detent
+      canvas.style.transition='transform 0.6s cubic-bezier(0.2,0.8,0.2,1)';
+      void canvas.offsetWidth;
+      canvas.style.transform='rotate('+rot+'deg)';
+      canvas.addEventListener('transitionend', resolveWinner, {once:true});
+      return;
+    }
+
+    canvas.style.transition='none';                     // rAF owns the transform
+    canvas.style.willChange='transform';
+    var dist=rot-start, t0=performance.now();
+    (function frame(now){
+      var p=(now-t0)/SPIN_MS; if (p>1) p=1;
+      canvas.style.transform='rotate('+(start + spinEase(p)*dist + spinDetent(p))+'deg)';
+      if (p<1){ spinRAF=requestAnimationFrame(frame); }
+      else { spinRAF=0; canvas.style.transform='rotate('+rot+'deg)';   // exact lock onto rot
+             canvas.style.willChange=''; resolveWinner(); }
+    })(performance.now());
+  }
+
+  function addOption(){
+    var t = (state.draft||'').trim();
+    if (!t || state.spinning || state.options.length>=MAX) return;
+    finalizeTransition();                                   // collapse any in-flight transition first
+    var isFirst = state.options.length===0;
+    var col = (isFirst && state.preview) ? state.preview : randColor();   // KEEP the base color rule
+    var oldSegs = segments().slice();                       // snapshot BEFORE the push
+    state.options.push({ text:t.slice(0,24), color:col.color, hue:col.hue });
+    state.draft=''; state.preview=null; state.result=null; state.winner=null;
+    document.getElementById('draft').value='';
+    if (prefersReduced()){ sig=null; render(); return; }    // snap — no pop, no rAF
+    renderControls();                                       // list/buttons update now; the canvas is owned by rAF
+    var newSeg = { color: col.color, text: t.slice(0,24) };
+    anim = { kind: isFirst?'first':'add', start: performance.now(),
+             dur: isFirst?DUR_FIRST:DUR_POP, oldSegs: (isFirst?[]:oldSegs),
+             newSeg: newSeg };
+    kick();
+  }
+
+  function removeOption(i){
+    if (state.spinning) return;
+    finalizeTransition();
+    var oldSegs = segments().slice();                       // the n real wedges, BEFORE splice
+    var oldN = oldSegs.length;
+    state.options.splice(i,1); state.result=null; state.winner=null;
+    // snap: reduced-motion, or the last real option leaving (1 real -> 4-color DEFAULT, an unrelated state)
+    if (prefersReduced() || state.options.length===0 || oldN<=1){ sig=null; render(); return; }
+    renderControls();
+    anim = { kind:'remove', start: performance.now(), dur: DUR_REMOVE,
+             oldSegs: oldSegs, removed:i };
+    kick();
+  }
+
+  function reset(){
+    if (state.spinning) return;
+    finalizeTransition();
+    rot = 0; canvas.style.transition='none'; canvas.style.transform='rotate(0deg)';
+    state.options=[]; state.draft=''; state.preview=null; state.result=null; state.winner=null;
+    document.getElementById('draft').value='';
+    render();
+  }
+
+  // ---- view sync ----  (draw() is suppressed while a transition owns the canvas)
+  function renderControls(){
+    var r = document.getElementById('result');
+    if (state.spinning) r.innerHTML = '<span class="spin">Spinning…</span>';
+    else if (state.result) r.innerHTML = '<span class="k">Result</span><span class="v"></span>', r.querySelector('.v').textContent = state.result;
+    else r.innerHTML = '';
+    document.getElementById('count').textContent = state.options.length + '/' + MAX;
+    var atMax = state.options.length>=MAX;
+    var draftOk = !!(state.draft||'').trim();
+    document.getElementById('add').disabled = state.spinning || atMax || !draftOk;
+    document.getElementById('spin').disabled = state.spinning;
+    document.getElementById('spin').textContent = state.spinning ? 'Spinning…' : 'Spin';
+    document.getElementById('reset').disabled = state.spinning || (!state.options.length && !draftOk && !state.result);
+    var wrap = document.getElementById('optsWrap'), list = document.getElementById('opts');
+    wrap.hidden = state.options.length===0;
+    document.getElementById('optsHead').textContent = 'Options · ' + state.options.length;
+    list.innerHTML = '';
+    state.options.forEach(function(o,i){
+      var row=document.createElement('div'); row.className='opt';
+      var x=document.createElement('button'); x.className='x'; x.title='Remove'; x.textContent='×';
+      x.addEventListener('click', function(){ removeOption(i); });
+      var sw=document.createElement('span'); sw.className='sw'; sw.style.background=o.color;
+      var tx=document.createElement('span'); tx.className='tx'; tx.textContent=o.text;
+      row.appendChild(x); row.appendChild(sw); row.appendChild(tx); list.appendChild(row);
+    });
+  }
+  function render(){ if(!anim) draw(); renderControls(); }   // never paint over an in-flight transition
+
+  // ---- events ---- (unchanged)
+  var draftEl = document.getElementById('draft');
+  draftEl.addEventListener('input', function(e){
+    state.draft = e.target.value;
+    if (state.options.length===0){
+      if (state.draft.trim() && !state.preview) state.preview = randColor();
+      if (!state.draft.trim()) state.preview = null;
+    }
+    state.result=null; state.winner=null;
+    sig=null; render();
+  });
+  draftEl.addEventListener('keydown', function(e){ if (e.key==='Enter'){ e.preventDefault(); addOption(); } });
+  document.getElementById('add').addEventListener('click', addOption);
+  document.getElementById('spin').addEventListener('click', spin);
+  document.getElementById('reset').addEventListener('click', reset);
+
+  render();
+})();
+</script>
+</body>
+</html>
