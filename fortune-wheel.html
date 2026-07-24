@@ -383,7 +383,9 @@
   // BLOCKY POP — held waypoints for the re-partition scalar s, jump-cut (never tweened between).
   // The hold-then-snap rhythm is the stop-motion "chunk"; 1.18 = the overshoot slam past full, then a
   // damped step-bounce (0.90 -> 1.03 -> 1.0) settles it. addLayout keeps the disc tiling 360 at every s.
-  var POP_STEPS = [0, 0.32, 0.74, 1.18, 0.90, 1.03, 1.0];
+  // FRAME 0 IS A VISIBLE CHUNK (0.26), not a leading 0 — a 0 held s=0 (zero-width new wedge) for the
+  // first ~51ms, a pixel-identical dead frame that read as "add lag". The wedge now pops on the click tick.
+  var POP_STEPS = [0.26, 0.52, 0.86, 1.18, 0.90, 1.03, 1.0];
   function popS(p){ return POP_STEPS[Math.min(POP_STEPS.length-1, Math.floor(p*POP_STEPS.length))]; }
   // back-out settle — the shared "gravity into place" curve (overshoot then damp); SMOOTH by design (the remove reflow)
   function settle(p,s){ var u=p-1; return 1+(s+1)*u*u*u+s*u*u; }
@@ -603,6 +605,7 @@
     anim = { kind: isFirst?'first':'add', start: performance.now(),
              dur: isFirst?DUR_FIRST:DUR_POP, oldSegs: (isFirst?[]:oldSegs),
              newSeg: newSeg };
+    drawTransition(anim, 0);   // paint the first chunk SYNCHRONOUSLY on the click tick — no one-rAF deferral
     kick();
   }
 
