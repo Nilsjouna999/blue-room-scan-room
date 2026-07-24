@@ -38,11 +38,34 @@
   var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   // ---- tunables (identical to the prototype) --------------------------
-  // BR PULSE-1: lines pushed toward the edges (was 0.20/0.80) to open the
-  // living band from 0.60H to 0.72H so each plate is the single lit box longer.
+  // BR PULSE-1: lines pushed toward the edges to open the living band (now 0.92H at
+  // 0.04/0.96) so each plate is the single lit box longer.
   var DX=6, UPPER_FRAC=0.04, LOWER_FRAC=0.96, TFADE=92;   // BR-S229: lines pushed a LOT closer to the edges (was 0.08/0.92) — builder wants them near the frame
-  var PUSH=32, REPEL_RANGE=150, FEATHER=14, DEAD=16;
-  var STEP=1/60, FOLLOW=0.14, TENSION=0.10, DAMP=0.24, VMAX=40, EDGE_FEATHER=90;
+  // BR-S231 [refine, off-frame bulge — MOTION+RHYTHM+TASTE consensus]: at the shipped near-edge
+  // 0.04/0.96 lines the frame allows only ~0.04H (~26-36px) of outward room, so PUSH 52 (crest
+  // ~59px) spent most of its reach OFF-screen / hard-clipped at the viewport edge. Trimmed
+  // PUSH 52->40 (the excess was invisible), and the crest is now held on-frame by an explicit
+  // FRAME_MARGIN clamp in integrate() (structural — independent of viewport height). REPEL_RANGE
+  // (wider vertical engagement) is the visible, kept half of item 2; it is additionally
+  // band-capped in computeTarget so two lines can't co-pulse on a short viewport.
+  var PUSH=40, REPEL_RANGE=240, FEATHER=14;
+  // BR-S231 [refine, outward-only INVARIANT — MOTION high]: FLOW_MARGIN = the resting flow()
+  // current peak (~5.7px) — integrate() clamps any INWARD recoil to this margin so an
+  // underdamped release overshoot can never dip the line back into the band (item-1 becomes a
+  // hard per-frame guarantee, not an emergent target-sign property). FRAME_MARGIN = px the
+  // outward crest is kept clear of the viewport edge (no hard clip on the near-edge lines).
+  var FLOW_MARGIN=6, FRAME_MARGIN=10;
+  // BR-S231 [refine, one-at-a-time — RHYTHM high]: how far a plate's presence is dimmed by its
+  // distance from mid-band, so the plate NEAREST the centre holds full presence and neighbours
+  // recede — restores solo cadence on the 92% band without moving the shipped lines. Opacity
+  // only (blur/scale still key off true line-proximity), so a receding plate stays sharp+still.
+  var CENTER_DIM=0.5;
+  // BR-S231 [refine, calmer settle — MOTION]: DAMP 0.24->0.36 (zeta ~0.32->~0.48) cuts the
+  // release overshoot the inward clamp would otherwise arrest, so the line reads as settling
+  // into its edge rather than being pinned at a wall. FOLLOW still drives outward arrival, and
+  // the sustained-peak-across-overlap means reach isn't time-critical. VMAX unchanged (it caps
+  // velocity, not reach; inward velocity is zeroed at the clamp so it can't build a return dip).
+  var STEP=1/60, FOLLOW=0.14, TENSION=0.10, DAMP=0.36, VMAX=52, EDGE_FEATHER=90;
 
   // BR PULSE-2 [taste, sole owner of the draw constants]: quiet the resting
   // membrane from a "HUD underline" toward a "quiet membrane" — every value here
@@ -98,7 +121,7 @@
   function rebuildLattice(){
     var N = Math.ceil(W/DX)+1;
     function mk(frac){
-      var L={ baseY:H*frac, N:N, xs:new Float32Array(N), y:new Float32Array(N), v:new Float32Array(N), tgt:new Float32Array(N), side:new Int8Array(24) };
+      var L={ baseY:H*frac, N:N, xs:new Float32Array(N), y:new Float32Array(N), v:new Float32Array(N), tgt:new Float32Array(N) };   // BR-S231: dropped the dead L.side (never read after the fixed-sign switch — outward direction is derived per-line in computeTarget/integrate)
       for(var i=0;i<N;i++) L.xs[i]=i*DX; return L;
     }
     lines=[mk(UPPER_FRAC), mk(LOWER_FRAC)];
@@ -171,11 +194,11 @@
     // 1 as that centre reaches the lower perch — the SAME instant the plate begins to light
     // in gatherBoxes' cy-keyed life. Keyed to the PLATE, never the section top, so at
     // About-top only the upper line reads.
-    var entrance = LOWER_ENT * band;           // ~0.30H at the current fracs
+    var entrance = LOWER_ENT * band;           // ~0.39H at the current 0.04/0.96 fracs
     var fadeIn   = smoothstep(LOWER_Y + entrance, LOWER_Y, firstCy);
     // EXIT (unchanged): full while any of the last plate is in/below the band, releasing
     // only as its bottom edge finally clears the upper perch.
-    var release  = LOWER_REL * band;           // ~0.30H at the current fracs
+    var release  = LOWER_REL * band;           // ~0.39H at the current 0.04/0.96 fracs
     var fadeOut  = smoothstep(UPPER_Y - release, UPPER_Y, lastBottom);
     lowerEnv = Math.min(fadeIn, fadeOut);
 
@@ -208,9 +231,9 @@
     // the band. Both are DERIVED from the band geometry (LOWER_FRAC-UPPER_FRAC) so a
     // later frac retune tracks instead of desyncing. Rail row-gap + intro margin are
     // left VERBATIM (their pulse-1 owners' tuned numbers — not this lane's to touch).
-    var bandPct = (LOWER_FRAC - UPPER_FRAC) * 100;   // 72 today
-    var closeVh = Math.round(bandPct * 0.40);        // ~29vh : last-plate -> seal beat (>= the 26vh intro guard)
-    var tailVh  = Math.round(bandPct * 0.42);        // ~30vh : trailing runway so the seal exits inside calm lines
+    var bandPct = (LOWER_FRAC - UPPER_FRAC) * 100;   // 92 today (0.04/0.96)
+    var closeVh = Math.round(bandPct * 0.40);        // ~37vh : last-plate -> seal beat (>= the 26vh intro guard)
+    var tailVh  = Math.round(bandPct * 0.42);        // ~39vh : trailing runway so the seal exits inside calm lines
     var s = document.createElement('style');
     s.id = 'u1-membrane-style';
     s.textContent =
@@ -218,7 +241,25 @@
       '#about.u1lines .about__intro{margin-bottom:clamp(96px,26vh,220px);}' +
       '#about.u1lines .about__close{margin-top:clamp(120px,' + closeVh + 'vh,300px);}' +
       '#about.u1lines{padding-bottom:max(22vh,clamp(200px,' + tailVh + 'vh,380px));}' +
-      '#about.u1lines .about__plate{transition:none!important;}';   // the shipped 720ms .is-motion transition smears the 60fps inline opacity/filter/transform writes
+      '#about.u1lines .about__plate{transition:none!important;}' +   // the shipped 720ms .is-motion transition smears the 60fps inline opacity/filter/transform writes
+      // BR-S230 [item 4, engraved-relic boxes]: the nuggets read like engraved gravestones /
+      // relics dug from the ground. Stone body = layered gradients; carved bevel = INSET-only
+      // box-shadow (respects the shipped no-outer-shadow doctrine + reads as buried-in-ground);
+      // engraved text = light-below/dark-above text-shadow with the warm-ink fills kept for
+      // legibility. Stone SURFACE scoped to :not(--unlit) so the unlit 'coming' veil survives;
+      // text-carve rules are global + law-safe (text-shadow != color). Gold (#c69b63) touches
+      // ONLY the decorative .about__rule divider, never any law-governed text. Fully reversible
+      // (vanishes with the <style> node on flag-off); no opacity/transform/filter, so the
+      // per-frame inline plate writes are untouched.
+      '#about.u1lines .about__nugget:not(.about__nugget--unlit) .about__plate{' +
+        'background:radial-gradient(130% 90% at 50% -12%, rgba(233,229,220,.05), transparent 55%),radial-gradient(100% 65% at 32% 118%, rgba(0,0,0,.5), transparent 62%),linear-gradient(180deg,#16140f 0%,#100e0b 100%);' +
+        'border-color:rgba(233,229,220,.10);' +
+        'box-shadow:inset 0 1px 0 rgba(233,229,220,.12),inset 0 2px 3px rgba(0,0,0,.42),inset 0 -1px 0 rgba(0,0,0,.55),inset 0 0 26px rgba(0,0,0,.34);' +   /* BR-S231: top catch-light .07->.12 so the relic reads as a solid unearthed stone (top lip) while the bottom keeps melting into the dark */
+      '}' +
+      '#about.u1lines .about__name{text-shadow:0 1px 0 rgba(233,229,220,.10),0 -1px 1px rgba(0,0,0,.55);}' +
+      '#about.u1lines .about__line{text-shadow:0 1px 0 rgba(233,229,220,.05),0 -1px 1px rgba(0,0,0,.4);}' +
+      '#about.u1lines .about__micro{text-shadow:0 1px 1px rgba(0,0,0,.5);}' +
+      '#about.u1lines .about__rule{background:linear-gradient(90deg,transparent,rgba(198,155,99,.5) 30%,rgba(198,155,99,.5) 70%,transparent);}';
     (document.head || document.documentElement).appendChild(s);
     styleInjected = true;
   }
@@ -235,13 +276,28 @@
       var el=els[i], r=el.getBoundingClientRect(), cy=(r.top+r.bottom)/2;
       var life = smoothstep(UPPER_Y-TFADE, UPPER_Y+TFADE, cy) * (1 - smoothstep(LOWER_Y-TFADE, LOWER_Y+TFADE, cy));
       // Blend the position-based dimming toward "fully lit" by env so the plate
-      // reaction breathes in/out with the lines: env=0 -> effLife=1 (untouched),
-      // env=1 -> the full position-based effect. Kills any dim-on-appear pop.
-      var effLife = 1 - env*(1 - life);
-      var blur=(1-effLife)*MAX_BLUR, sc=0.955+0.045*effLife, dir=cy<MID_Y?-1:1, dy=(1-effLife)*dir*7;
+      // reaction breathes in/out with the lines: env=0 -> untouched, env=1 -> full
+      // position-based effect. Kills any dim-on-appear pop.
+      var effPos = 1 - env*(1 - life);      // TRUE line-proximity presence — drives the dissolve (blur/scale) ONLY
+      // BR-S231 [refine, one-at-a-time — RHYTHM high]: the 92% band lets two engraved plates
+      // read at full presence at once (fully-lit zone ~= plate spacing) -> a wall of stone.
+      // Center-weight the plate's *opacity* by its distance from mid-band so only the plate
+      // nearest the centre holds full presence and neighbours recede. cy is transform-invariant
+      // (center-origin scale), so this is pure scroll-driven dimming, not a feedback hunt. Applied
+      // to opacity ONLY — a receding plate stays SHARP + FULL-SCALE (still + readable), never
+      // blurred just for being off-centre. env-gated so env=0 leaves it fully lit (no appear-pop).
+      var cw = 1 - CENTER_DIM * smoothstep(0, 0.5*(LOWER_Y-UPPER_Y), Math.abs(cy-MID_Y));
+      var effLife = 1 - env*(1 - life*cw);  // center-weighted presence — drives OPACITY (+ pointer gate)
+      // BR-S230 [item 3, calm the boxes]: a lit plate must sit STILL and readable, dissolving
+      // cleanly ONLY at the lines. scale-only (center-origin, so cy is invariant → stable
+      // measure), gentler floor (0.97), and the blur layer attaches only past the dissolve onset
+      // so a lit/near-lit plate never toggles its compositing layer. BR-S231: blur/scale key off
+      // effPos (line-proximity) NOT the center-weight, and the blur RAMPS from 0 at the d>=0.10
+      // onset (was an instant 0.55px pop) so the dissolve is monotonic from the threshold.
+      var dPos=1-effPos, sc=0.97+0.03*effPos;
       el.style.opacity=effLife.toFixed(3);
-      el.style.filter=effLife>0.995?'':'blur('+blur.toFixed(2)+'px)';
-      el.style.transform='translateY('+dy.toFixed(2)+'px) scale('+sc.toFixed(3)+')';
+      el.style.filter=dPos<0.10?'':'blur('+((dPos-0.10)/0.90*MAX_BLUR).toFixed(2)+'px)';
+      el.style.transform='scale('+sc.toFixed(3)+')';
       el.style.pointerEvents=effLife<0.4?'none':'';
       touched.push(el);
       // box carries raw position-based life: the line deflection is geometric and
@@ -253,23 +309,33 @@
 
   function computeTarget(L, boxes, t){
     var N=L.N, xs=L.xs, tgt=L.tgt, baseY=L.baseY, i;
+    // BR-S230 [item 1, outward-only bulge]: derive the recoil direction ONCE per call from
+    // the line's geometry, travel-independent. Upper line (baseY < MID_Y) => -1 (y negative =
+    // up = outward toward the top edge); lower line => +1 (down = outward toward the bottom).
+    // Sign proof: drawLine renders baseY+y[i], so +y=down / -y=up. Replaces the old per-box
+    // travel-latched sign (L.side) — the bulge now never flips inward at the crossing.
+    var fixedSide = (baseY < MID_Y) ? -1 : 1;
+    // BR-S231 [refine, short-viewport two-line pulse — MOTION medium]: cap the engagement range
+    // to <=30% of the band so a mid-band plate can never reach BOTH lines at once on a short
+    // window (which read as an unintended global top+bottom "breath"). At a tall band this is a
+    // no-op (0.30*band > REPEL_RANGE), keeping the deeper/longer feel where there is room.
+    var range = Math.min(REPEL_RANGE, (LOWER_Y-UPPER_Y)*0.30);
     for(i=0;i<N;i++) tgt[i]=flow(xs[i],t);
     for(var b=0;b<boxes.length;b++){
       var box=boxes[b], gap=Math.abs(baseY-box.cy), effGap=gap-box.hh; if(effGap<0)effGap=0;
-      // BR PULSE-3 [direction]: LATCH the incoming-travel side ONCE, the first frame this
-      // box enters the line's range while armed (side===0), then HOLD it for the WHOLE
-      // crossing — the recoil no longer flips mid-crossing (the old per-frame sign(d)
-      // recompute IS what flipped, exactly at the crossing). RE-ARM only on range-exit
-      // (prox<=0): REPEL_RANGE overshoots the perch, so on the inner LOWER<->UPPER transit
-      // that reset lands with the box already fully inside the band ("reset only after
-      // inside both lines"), and it is satisfied over a WIDE contiguous span (never a
-      // skippable window), at any viewport height. Magnitude curve below is unchanged.
-      var si = box.idx<L.side.length ? box.idx : 0;
-      var prox = 1 - effGap/REPEL_RANGE; if(prox<=0){ L.side[si]=0; continue; }
+      // BR-S230 [item 1, outward-only bulge]: the recoil sign is now the fixed per-line
+      // fixedSide (hoisted above), so the box's travel direction no longer matters and the
+      // old travel-latch (box.idx/si + L.side read/write + d-based side) is gone. The LOWER
+      // line, which previously recoiled INWARD when approached from below, now recoils
+      // outward (down) for the whole crossing. Magnitude curve (prox smoothstep, wobble)
+      // unchanged. BR-S231: the dead L.side field + its wake-reset are now fully REMOVED
+      // (outward-only is enforced structurally by fixedSide here + the clamp in integrate).
+      var prox = 1 - effGap/range; if(prox<=0) continue;
       prox = prox*prox*(3-2*prox);
-      var side = L.side[si];
-      if(side===0){ var d = baseY - box.cy; side = (d>=0) ? 1 : -1; L.side[si] = side; }
-      var wob=1+0.14*Math.sin(t*2.3+box.cx*0.01), amp=PUSH*prox*side*wob, f=FEATHER;
+      // BR-S231 [refine, deep-and-calm not deep-and-throbbing — TASTE]: wob 0.14->0.07 so the
+      // deepened bulge ARRIVES and HOLDS at the contact point instead of throbbing ~7px while a
+      // card rests at the line (the throb competed with the just-calmed plate for the eye).
+      var wob=1+0.07*Math.sin(t*2.3+box.cx*0.01), amp=PUSH*prox*fixedSide*wob, f=FEATHER;
       var i0=Math.floor((box.l-f)/DX); if(i0<0)i0=0; var i1=Math.ceil((box.r+f)/DX); if(i1>N-1)i1=N-1;
       for(i=i0;i<=i1;i++){ var x=xs[i]; var win=smoothstep(box.l-f,box.l+f,x)-smoothstep(box.r-f,box.r+f,x); if(win>0.0001)tgt[i]+=amp*win; }
     }
@@ -277,7 +343,30 @@
   function integrate(L){
     var N=L.N, y=L.y, v=L.v, tgt=L.tgt, i;
     for(i=1;i<N-1;i++){ var lap=y[i-1]+y[i+1]-2*y[i]; var acc=FOLLOW*(tgt[i]-y[i])+TENSION*lap-DAMP*v[i]; var nv=v[i]+acc; if(nv>VMAX)nv=VMAX; else if(nv<-VMAX)nv=-VMAX; v[i]=nv; }
-    for(i=1;i<N-1;i++) y[i]+=v[i]; y[0]=0; y[N-1]=0;
+    // BR-S231 [refine, outward-only INVARIANT + on-frame guard]: advance y and clamp per line so
+    // (a) the line NEVER recoils inward past FLOW_MARGIN (the resting flow current is untouched,
+    //     but a release-overshoot dip into the band is impossible — item-1 by construction), and
+    // (b) the outward crest NEVER clips the viewport edge (held FRAME_MARGIN inside the frame).
+    // Velocity is zeroed at whichever wall is hit, preventing stick-then-jump. One compare/point,
+    // zero allocation. fixedSide == computeTarget's: upper(baseY<MID_Y) outward=-y, lower outward=+y.
+    if(L.baseY < MID_Y){                         // upper line: outward = -y (toward the top edge)
+      var lo = FRAME_MARGIN - L.baseY;           // outward floor: baseY+y >= FRAME_MARGIN
+      for(i=1;i<N-1;i++){
+        var yu = y[i]+v[i];
+        if(yu > FLOW_MARGIN){ yu=FLOW_MARGIN; if(v[i]>0)v[i]=0; }        // no inward (downward) dip
+        else if(yu < lo){ yu=lo; if(v[i]<0)v[i]=0; }                    // no off-frame crest
+        y[i]=yu;
+      }
+    } else {                                     // lower line: outward = +y (toward the bottom edge)
+      var hi = (H - FRAME_MARGIN) - L.baseY;     // outward ceiling: baseY+y <= H-FRAME_MARGIN
+      for(i=1;i<N-1;i++){
+        var yl = y[i]+v[i];
+        if(yl < -FLOW_MARGIN){ yl=-FLOW_MARGIN; if(v[i]<0)v[i]=0; }     // no inward (upward) dip
+        else if(yl > hi){ yl=hi; if(v[i]>0)v[i]=0; }                    // no off-frame crest
+        y[i]=yl;
+      }
+    }
+    y[0]=0; y[N-1]=0;
   }
   function edgeGrad(alpha){
     var g=ctx.createLinearGradient(0,0,W,0), e=Math.min(0.18, EDGE_FEATHER/Math.max(1,W));
@@ -319,7 +408,7 @@
       requestAnimationFrame(frame); return;
     }
     if(!wasVisible){                          // 0->1 re-entry: settle from a flat, calm line (no stale wobble/velocity/latch)
-      for(l=0;l<lines.length;l++){ lines[l].y.fill(0); lines[l].v.fill(0); lines[l].side.fill(0); }  // + BR PULSE-3: clear latched sides so a box mid-band on wake never inherits a stale direction
+      for(l=0;l<lines.length;l++){ lines[l].y.fill(0); lines[l].v.fill(0); }  // BR-S231: side removed (fixed-sign recoil has no latch); still zero y/v so a mid-band box on wake settles from a flat, calm line
       last=now; accT=0; wasVisible=true;
     }
 
