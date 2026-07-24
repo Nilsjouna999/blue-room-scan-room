@@ -99,7 +99,14 @@ const state ={ source: 0, treatment: "free", tab: "diagram", view: "menu", draft
    when the URL carries ?devnav=1. Defense-in-depth: this flag also sets
    body[data-devnav="1"], and the CSS keeps .devnav display:none without it, so
    the rail can never paint for a real user. Pure dev tooling — no product effect. */
-const DEVNAV = new URLSearchParams(location.search).has("devnav");
+const DEVNAV = (function () {                          // BR-S213: persistent dev nav — the builder's state toggles (incl. M3 lock) stay available across loads. ?devnav=1 turns on + sticks (localStorage), ?devnav=0 clears; the ` key toggles it live.
+  try {
+    const sp = new URLSearchParams(location.search);
+    if (sp.get("devnav") === "0") { localStorage.removeItem("br_devnav"); return false; }
+    if (sp.has("devnav")) { localStorage.setItem("br_devnav", "1"); return true; }
+    return localStorage.getItem("br_devnav") === "1";
+  } catch (e) { return new URLSearchParams(location.search).has("devnav"); }
+})();
 
 /* ---------- ScanResult v2 access (SCAN_ENGINE_SPEC) ----------
    v2 is the preferred source of truth where it cleanly applies;
@@ -1903,7 +1910,7 @@ function renderDevnav() {
     b("src:0", "SRC 01"), b("src:1", "SRC 02"), sep,
     b("treat:free", "Free"), b("treat:shiny", "Halo"), b("treat:mint", "Lab"), sep,
     b("tab:diagram", "Diagram"), b("tab:metrics", "Metrics"), sep,
-    b("holdings:toggle", "Holdings"), sep,
+    b("holdings:toggle", "M3 Lock"), sep,
     b("dev:free-scan-sim", "Free Sim"), b("dev:halo-gate", "Halo Gate"),
     b("dev:uploaded-result", "Uploaded"), b("dev:uploaded-blocked", "Blocked"),
   ].join("");
@@ -3598,5 +3605,19 @@ if (DEVNAV) {
   devnavEl.innerHTML = renderDevnav();
   devnavEl.removeAttribute("hidden");
 }
+/* BR-S213: press ` (backtick) anywhere to toggle the dev nav live — the builder's
+   always-on switch for the state toggles (M3 Lock, view, source, routes). Persisted
+   (localStorage br_devnav); ignored while typing in a field. OK on live (no customers). */
+document.addEventListener("keydown", function (e) {
+  if (e.key !== "`" && e.key !== "~") return;
+  const t = e.target;
+  if (t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.isContentEditable)) return;
+  e.preventDefault();
+  const el = document.getElementById("devnav");
+  const on = document.body.dataset.devnav === "1";
+  try { on ? localStorage.removeItem("br_devnav") : localStorage.setItem("br_devnav", "1"); } catch (_) {}
+  if (on) { delete document.body.dataset.devnav; if (el) el.setAttribute("hidden", ""); }
+  else { document.body.dataset.devnav = "1"; if (el) { el.innerHTML = renderDevnav(); el.removeAttribute("hidden"); } }
+});
 if (state.view === "dev") mountDev();
 render();
