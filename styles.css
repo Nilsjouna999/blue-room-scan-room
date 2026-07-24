@@ -294,22 +294,6 @@ body[data-devnav="1"] .toggle--treatment { display: inline-flex; }
   color: var(--silver);
 }
 
-.kv { display: grid; gap: 8px; }
-.kv div { display: flex; justify-content: space-between; gap: 12px; }
-.kv dt {
-  font-family: var(--font-mono);
-  font-size: 9.5px;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: var(--t-meta);
-}
-.kv dd {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  color: var(--silver);
-  text-align: right;
-}
-
 
 /* =============================================================
    LEFT — scan frame with markers
@@ -961,7 +945,6 @@ body[data-devnav="1"] .toggle--treatment { display: inline-flex; }
     rgba(214, 219, 232, 0.1) 53%,
     transparent 58%
   );
-  animation: shimmer-sweep 7s ease-in-out infinite;
 }
 .card[data-treatment="mint"] .corner::before,
 .card[data-treatment="mint"] .corner::after { background: rgba(220, 224, 234, 0.45); }
@@ -1173,10 +1156,6 @@ body[data-devnav="1"] .toggle--treatment { display: inline-flex; }
     radial-gradient(52% 44% at 50% 64%, color-mix(in srgb, var(--halo-b) 12%, transparent) 0%, transparent 72%);
   filter: blur(6px);
   animation: halo-breathe 5s ease-in-out infinite;
-}
-@keyframes halo-breathe {
-  0%, 100% { opacity: 0.7; transform: scale(1); }
-  50% { opacity: 1; transform: scale(1.04); }
 }
 /* original drifting star specks (twinkle) — part of the first-halo package */
 .card[data-treatment="shiny"] .card__sparkles {
@@ -1415,99 +1394,6 @@ body[data-treatment="shiny"] .panel--reading > .module--oracle { opacity: 1; }
    Each section is a different KIND of object: swatches, badges,
    sealed reveals, centered Oracle. Existing tokens only. */
 
-/* Light & Surface (front · C) — palette at a glance */
-.module--swatch .swatches { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 2px; }
-.swatch { display: inline-flex; align-items: center; gap: 7px; }
-.swatch__chip {
-  width: 16px; height: 16px; border-radius: 4px; flex: none;
-  background: var(--sw, #555);
-  border: 1px solid var(--line-strong);
-  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.35);
-}
-.swatch__label {
-  font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.04em;
-  color: var(--t-meta);
-}
-.module__line--cool { color: var(--t-body); font-size: 13.5px; line-height: 1.5; }
-
-/* Surface Record (back · C) — palette + per-chip proof-noun (a different object) */
-.dswatches { display: grid; gap: 10px; }
-.dswatch { display: grid; grid-template-columns: 22px 1fr; gap: 11px; align-items: start; }
-.dswatch__chip {
-  width: 22px; height: 22px; border-radius: 5px; margin-top: 1px;
-  background: var(--sw, #555);
-  border: 1px solid var(--line-strong);
-  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.4);
-}
-.dswatch__body { display: grid; gap: 2px; }
-.dswatch__label {
-  font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.05em;
-  text-transform: uppercase; color: var(--t-primary);
-}
-.dswatch__proof { font-size: 12.5px; line-height: 1.45; color: var(--t-body); }
-
-/* Fit + Aura (back · E) — ONE struck CLASS designation — a type-specimen plate (BR-S109) */
-/* This plate is DELIBERATELY dimensional — the one minted/struck object in an
-   otherwise-flat dossier. Its job is the card's CHARACTER, stamped: a real deboss
-   (beveled face + engraved designation) so it reads MINTED, not printed. Monochrome
-   only — the weight is in relief, never colour/glow. */
-.dfaplate {
-  position: relative;
-  border: 1px solid var(--line-strong);
-  border-top-color: rgba(233, 229, 220, 0.22);   /* top edge catches light */
-  border-bottom-color: rgba(10, 11, 13, 0.7);     /* bottom edge in shadow */
-  border-left: 2px solid var(--line-strong);      /* struck shelf-edge */
-  border-radius: 3px;
-  background:
-    linear-gradient(180deg,
-      rgba(233, 229, 220, 0.055) 0%,
-      rgba(233, 229, 220, 0.01) 58%,
-      rgba(10, 11, 13, 0.16) 100%);               /* a metal face, lit from above */
-  box-shadow:
-    inset 0 1px 0 rgba(233, 229, 220, 0.13),      /* top inner highlight (the burr) */
-    inset 0 -1px 0 rgba(10, 11, 13, 0.66),        /* bottom inner shadow (the cut) */
-    inset 0 0 24px rgba(10, 11, 13, 0.22),        /* faint struck vignette */
-    0 1px 2px rgba(0, 0, 0, 0.46);                /* the plate sits proud of the page */
-  padding: 18px 22px 16px;
-}
-.dfaplate__type {
-  font-family: var(--font-display);
-  font-weight: 600;
-  font-size: 25px;
-  line-height: 1.12;
-  color: var(--t-display);
-  /* engraved: a dark cut below the letterform + a light burr on its top edge =
-     the type reads pressed INTO the metal, not printed onto it. */
-  text-shadow:
-    0 1px 0 rgba(10, 11, 13, 0.92),
-    0 2px 1px rgba(0, 0, 0, 0.5),
-    0 -1px 0 rgba(233, 229, 220, 0.09);
-}
-.dfaplate__home {
-  font-family: var(--font-mono);
-  font-size: 9.5px;
-  letter-spacing: 0.13em;
-  text-transform: uppercase;
-  color: var(--t-ghost);
-  margin-top: 13px;
-  border-top: 1px solid var(--line-faint);
-  padding-top: 11px;
-  text-shadow: 0 1px 0 rgba(10, 11, 13, 0.6);      /* the lockup is struck-in too */
-}
-/* Aura plate: the developed material aura's tag row (struck chips) + latent free state */
-.dfaplate__aura { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
-.dfaplate__aura span {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--t-meta);
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  padding: 3px 10px;
-}
-.dfaplate__type--latent { color: var(--t-ghost); letter-spacing: 0.3em; }
-
 /* Sealed reveal (Hidden Stat + Oracle) — the shape IS the withholding;
    a FREE tap-to-develop beat, never a paywall. */
 details.seal { border: 1px dashed var(--line); border-radius: var(--r-plate, 8px); overflow: hidden; }
@@ -1541,29 +1427,10 @@ details.seal[open] .seal__act { opacity: 0.4; }
 /* ============================================================
    BR-S108.1 — Colour Field (colour-as-measurement) + 2-line Source Record. */
 
-/* Front: ONE stacked proportion bar + legend (the measurement at a glance) */
-/* BR-S108.2 (B): thin scan-readout bar; ONE colour representation (the bar) +
-   a minimal text key (label + share). No duplicate dots, no chunky chart fill. */
-.module--cfield .cfbar {
-  display: flex; height: 7px; border-radius: 3px; overflow: hidden;
-  border: 1px solid var(--line); margin-bottom: 9px;
-}
+/* .cfbar__seg — the coloured proportion segments; reused live inside .surface__bar
+   (BR-S117). The retired .module--cfield front-bar shell rules were removed. */
 .cfbar__seg { width: var(--pct, 0); background: var(--sw, #555); }
 .cfbar__seg + .cfbar__seg { box-shadow: inset 1px 0 0 rgba(0, 0, 0, 0.3); }
-.cfkey { display: flex; flex-wrap: wrap; gap: 3px 14px; }
-.cfkey__item {
-  font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.04em;
-  color: var(--t-meta); font-weight: 400;
-}
-.cfkey__item b { color: var(--t-body); font-weight: 500; font-variant-numeric: tabular-nums; }
-/* BR-S112 (1): front Colour Field is now bar + one teaser caption (the named % key
-   moved to the back Surface Record, so the % lives in exactly ONE place). */
-.cfcaption { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.05em; color: var(--t-ghost); margin-top: 3px; }
-/* BR-S113 (1B): Colour Field whispers — a sneak-peek strip, not a co-equal panel;
-   the real palette lives in Surface Record below. */
-.module--cfield { gap: 7px; }
-.panel--reading .module--cfield .module__label { font-size: 9px; font-weight: 400; color: var(--t-ghost); letter-spacing: 0.16em; }
-.module--cfield .module__rule { opacity: 0.45; }
 /* BR-S113 (1A): provenance one-liner absorbed into the developed Technical Receipts. */
 .receipts__prov { font-size: 12.5px; line-height: 1.45; color: var(--t-body); font-style: italic; margin: 0 0 12px; }
 /* BR-S113 (1B): free Mint serial — the withheld mint tail reads as a deliberate, ghosted "develops", not a truncation. */
@@ -1573,23 +1440,9 @@ details.seal[open] .seal__act { opacity: 0.4; }
 .readend__rule { width: 100%; height: 1px; background: var(--line-faint); }
 .readend__mark { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--t-ghost); }
 
-/* BR-S108.2 (C): Finish plate — the developed rail gains the material with weight */
-/* BR-S108.3 (#2): de-bulked — thin material chip + name, matching Colour Field restraint */
-.module--finish .finish { display: flex; align-items: center; gap: 10px; }
-.finish__chip {
-  width: 16px; height: 16px; border-radius: 4px; flex: none;
-  background: var(--fhex, #888);
-  border: 1px solid var(--line-strong); box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.3);
-}
-.finish__name {
-  font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.06em;
-  text-transform: uppercase; color: var(--t-display);
-}
-
 /* BR-S117: combined "Surface" module — Finish + Colour Field fused into ONE compact
    record. The proportion bar is the hero, the material chip caps it, name + character
-   note form a single foot line. .cfbar__seg is reused as-is. (The old .module--cfield /
-   .module--finish rules above are now orphaned — left for a follow-up sweep.) */
+   note form a single foot line. .cfbar__seg is reused as-is. */
 .module--surface { gap: 8px; }
 .panel--reading .module--surface .module__label { font-size: 9px; font-weight: 400; color: var(--t-ghost); letter-spacing: 0.16em; }
 .panel--reading .module--surface .module__rule { opacity: 0.45; }
@@ -1618,16 +1471,6 @@ details.seal[open] .seal__act { opacity: 0.4; }
 .cfdeep__body { display: grid; gap: 3px; }
 .cfdeep__head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
 .cfdeep__label { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.05em; text-transform: uppercase; color: var(--t-primary); }
-.cfdeep__pct { font-family: var(--font-mono); font-size: 11px; color: var(--t-body); font-variant-numeric: tabular-nums; }
-.cfdeep__proof { font-size: 12.5px; line-height: 1.45; color: var(--t-body); }
-
-/* Source Record — two breathing lines, no label:value grid */
-.dsource2 { display: grid; gap: 9px; margin-top: 4px; }
-.dsource2__prov { font-size: 13.5px; line-height: 1.5; color: var(--t-primary); }
-.dsource2__cond {
-  font-family: var(--font-mono); font-size: 11.5px; letter-spacing: 0.03em;
-  color: var(--t-meta); border-top: 1px solid var(--line-faint); padding-top: 9px;
-}
 
 /* every reading module sits in its own card */
 .panel--reading .module {
@@ -1669,91 +1512,6 @@ details.seal[open] .seal__act { opacity: 0.4; }
   color: var(--silver);
 }
 .panel--reading .receipts { background: rgba(0, 0, 0, 0.22); }
-
-.reads { display: grid; gap: 15px; }
-.reads__item { display: grid; gap: 5px; }
-.reads__top { display: flex; justify-content: space-between; align-items: baseline; }
-/* cue→effect weight-split (BR-S086): the stat NAME + tier band are the CUE
-   (the measurement) and recede; the read PROSE is the EFFECT (the artifact
-   reasoning) and leads. No new data, no authored cue — a hierarchy shift only. */
-.reads__name {
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: var(--track-caps);
-  text-transform: uppercase;
-  color: var(--t-meta);
-}
-.reads__val { font-family: var(--font-mono); font-size: 11.5px; color: var(--silver-dim); }
-.reads__val--tier { color: var(--faint); }
-.reads__item p { font-size: 13px; line-height: 1.6; color: var(--t-primary); font-weight: 500; }
-
-.aura { display: flex; flex-wrap: wrap; gap: 8px; }
-.aura__chip {
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--silver);
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  padding: 5px 12px;
-  background: rgba(255, 255, 255, 0.02);
-}
-/* accent economy: aura chips stay neutral in every state — the card
-   carries the material, the plates stay quiet */
-
-/* Aura Profile module: scoped ledger entries (bottom rule, flat). Column so each
-   aura word is its OWN full-width ruled row, not side-by-side underlined words.
-   Scoped to .module--aura so the Artifact Archetype chip + dossier Plate 05 aura
-   stay pills. */
-.module--aura .aura { flex-direction: column; gap: 0; }
-.module--aura .aura__chip {
-  border: none;
-  border-bottom: 1px solid var(--line);
-  border-radius: 0;
-  padding: 5px 0;
-  background: none;
-}
-
-.impact { display: flex; align-items: center; gap: 12px; }
-.impact__label {
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--t-body);
-  white-space: nowrap;
-  min-width: 100px;
-}
-.impact__track {
-  flex: 1;
-  position: relative;
-  height: 4px;
-  border-radius: 99px;
-  background: rgba(233, 229, 220, 0.09);
-  overflow: hidden;
-}
-.impact__fill {
-  position: absolute;
-  inset: 0 auto 0 0;
-  width: var(--v);
-  border-radius: 99px;
-  background: linear-gradient(90deg, #6f7480 0%, var(--silver) 100%);
-}
-.impact__val { font-family: var(--font-mono); font-size: 11.5px; color: var(--silver); }
-
-.module--oracle .oracle {
-  font-family: var(--font-display);
-  font-style: italic;
-  font-weight: 500;
-  font-size: 22px;
-  line-height: 1.48;
-  color: var(--silver-bright);
-  text-align: left;
-  padding: 14px 0 4px;
-  border: none;
-  background: none;
-}
 
 .receipts {
   border: 1px solid var(--line-faint);
@@ -2181,26 +1939,6 @@ details.seal[open] .seal__act { opacity: 0.4; }
 
 /* ---- metrics tab ---- */
 
-.diamond { width: 100%; max-width: 320px; justify-self: center; display: block; margin: 0 auto; }
-.diamond text {
-  font-family: var(--font-mono);
-  font-size: 5.6px;
-  letter-spacing: 0.1em;
-  fill: var(--silver);
-}
-.dia-grid { fill: none; stroke: rgba(226, 222, 213, 0.1); stroke-width: 1; vector-effect: non-scaling-stroke; }
-.dia-axis { stroke: rgba(226, 222, 213, 0.08); stroke-width: 1; vector-effect: non-scaling-stroke; }
-.dia-fill {
-  fill: rgba(126, 147, 127, 0.2);
-  stroke: var(--moss-bright);
-  stroke-width: 1.2;
-  vector-effect: non-scaling-stroke;
-}
-.dia-dot { fill: var(--silver-bright); }
-/* accent economy: developed states share one quiet silver diamond */
-body[data-treatment="mint"] .dia-fill,
-body[data-treatment="shiny"] .dia-fill { fill: rgba(200, 196, 187, 0.15); stroke: var(--silver); }
-
 .metriccap {
   font-family: var(--font-mono);
   font-size: 9.5px;
@@ -2434,212 +2172,14 @@ body[data-treatment="shiny"] .dossier__inner .dplate--oracle {
 }
 .drecord__material { color: var(--halo-a, var(--silver)); font-weight: 500; }
 
-/* 01 — filing event + serial lineage (flat captions below the record;
-   plates stay flat — edge + tone + type only, no depth/shadow/glow) */
-.dfile {
-  margin-top: 18px;
-  padding-top: 16px;
-  border-top: 1px solid var(--line-faint);
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 18px 40px;
-}
-.dfile__kick {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: 0.24em;
-  text-transform: uppercase;
-  color: var(--t-meta);
-  margin-bottom: 9px;
-}
-.dfiling__chain {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  line-height: 1.85;
-  letter-spacing: 0.03em;
-  color: var(--t-meta);
-}
-.dfiling__step { display: block; }
-.dfiling__chain b { color: var(--t-body); font-weight: 500; letter-spacing: 0.05em; } /* BR-S089: filing values quieted to provenance */
-.dfiling__arr { color: var(--faint); padding-right: 4px; }
-.dlineage {
-  display: grid;
-  gap: 9px;
-  padding-left: 14px;
-  border-left: 1px solid var(--line-faint);
-}
-.dlineage__row { display: flex; align-items: baseline; gap: 12px; font-family: var(--font-mono); font-size: 11px; }
-.dlineage__k { width: 46px; flex: none; font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--t-meta); }
-.dlineage__v { color: var(--t-body); letter-spacing: 0.04em; } /* BR-S089: lineage values quieted to provenance */
-.dlineage__v--ghost { color: var(--faint); }
-
-/* 02 — evidence board */
-.dboard {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
-}
-.receipt {
-  border: 1px solid var(--line-faint);
-  border-radius: 3px;
-  background: rgba(0, 0, 0, 0.16);
-  padding: 14px 16px;
-  display: grid;
-  gap: 8px;
-  align-content: start;
-}
-.receipt__k {
-  font-family: var(--font-mono);
-  font-size: 9.5px;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: var(--silver);
-}
-/* v2 structured receipts: effect mark + confidence tag + basis line */
-.receipt__top { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
-.receipt__effect {
-  font-family: var(--font-mono);
-  font-size: 10.5px;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--silver);
-}
-.receipt__conf {
-  font-family: var(--font-mono);
-  font-size: 9px;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: var(--t-meta);
-  border: 1px solid var(--line-faint);
-  border-radius: 2px;
-  padding: 2px 5px;
-  white-space: nowrap;
-}
-.receipt__basis {
-  font-family: var(--font-mono);
-  font-size: 9.5px;
-  letter-spacing: 0.08em;
-  color: var(--t-meta);
-}
-.receipt__read { font-size: 13px; line-height: 1.6; color: #bcb7ae; /* half-step between body and primary — cue carries the evidence */ }
-.receipt--undeveloped {
-  border-style: dashed;
-  background: none;
-}
-.receipt--undeveloped .receipt__k { color: var(--faint); letter-spacing: 0.4em; }
-.receipt--undeveloped .receipt__read { color: var(--faint); font-style: italic; }
-
-/* 03 — stat dossier */
-.dstats {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 22px 36px;
-}
-.dstat { display: grid; gap: 7px; align-content: start; }
-.dstat__head { display: flex; align-items: center; gap: 14px; }
-.dstat__name {
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: var(--track-caps);
-  text-transform: uppercase;
-  color: var(--silver-bright);
-  min-width: 76px;
-}
-.dstat__track {
-  flex: 1;
-  position: relative;
-  height: 4px;
-  border-radius: 99px;
-  background: rgba(255, 255, 255, 0.06);
-  overflow: hidden;
-}
-.dstat__fill {
-  position: absolute;
-  inset: 0 auto 0 0;
-  width: var(--v);
-  border-radius: 99px;
-  background: linear-gradient(90deg, #6f7480, var(--silver));
-}
-/* accent economy: dossier stat bars stay silver — the Hidden Stat
-   number is the plate's one accent moment */
-.dstat__val { font-family: var(--font-mono); font-size: 13px; color: var(--silver-bright); }
-.dstat__why { font-size: 13px; line-height: 1.6; color: var(--t-body); }
-/* BR-S088 register lift: the per-stat evidence sentence is card-keyed interpretive
-   prose — render it as a written verdict (serif/lead, brighter, breathing), not an
-   indented admin caption. The tier chip + bar in .dstat__head stay the quiet cue. */
-.dstat__evidence {
-  font-family: var(--font-display);
-  font-size: 15px;
-  line-height: 1.55;
-  color: var(--text);
-  margin-top: 7px;
-}
-.dstat__note {
-  font-family: var(--font-mono);
-  font-size: 9.5px;
-  letter-spacing: 0.05em;
-  color: var(--faint);
-}
+/* .dstat__undeveloped — shared "reserved / develops later" note used by the aura,
+   colour-field and archetype plates (app.js). The retired stat-dossier / evidence-
+   board / filing-lineage sub-components that once surrounded it were removed. */
 .dstat__undeveloped {
   font-size: 11.5px;
   font-style: italic;
   color: var(--faint);
 }
-
-/* 04 — hidden stat: the reveal (LOUD, restrained — number does the work) */
-.dhidden { display: flex; align-items: center; gap: 38px; }
-.dhidden__score { display: grid; gap: 8px; text-align: center; flex: none; }
-.dhidden__val {
-  font-family: var(--font-mono);
-  font-size: 64px;
-  line-height: 1;
-  color: var(--t-display);
-}
-body[data-treatment="shiny"] .dhidden__val { color: var(--halo-a, var(--t-display)); }
-.dhidden__name {
-  font-size: 10.5px;
-  font-weight: 600;
-  letter-spacing: 0.26em;
-  text-transform: uppercase;
-  color: var(--t-meta);
-  white-space: nowrap;
-}
-
-/* Artifact tier-band display (Artifact Language Stabilization v1): tier WORDS
-   replace the old 0-100 numbers in the same slots — sized to read as labels,
-   not oversized digits. Bars/diamond shape still carry magnitude. */
-.dhidden__val--tier { font-size: 26px; letter-spacing: 0.04em; text-transform: uppercase; }
-.reads__val--tier, .impact__val--tier, .dstat__val--tier { text-transform: uppercase; letter-spacing: 0.06em; }
-/* free state reads as an intentionally sealed compartment, not an empty
-   plate: dashed frame + a quiet "development pending" stamp. Value stays
-   withheld; the Halo reveal (bold material number) is untouched. */
-.dhidden--tease .dhidden__score {
-  gap: 7px;
-  padding: 13px 20px;
-  border: 1px dashed var(--line);
-  border-radius: var(--r-plate);
-}
-.dhidden__seal {
-  font-family: var(--font-mono);
-  font-size: 8px;
-  letter-spacing: 0.24em;
-  text-transform: uppercase;
-  color: var(--t-ghost);
-}
-
-/* 05 — fit + aura */
-.dfitaura { display: grid; grid-template-columns: 1.1fr 1fr; gap: 16px 40px; }
-.dfitaura__col { display: grid; gap: 14px; align-content: start; }
-.dfitaura__stance { font-family: var(--font-display); font-size: 15.5px; line-height: 1.6; color: var(--silver); }
-.dfitaura__fit {
-  font-style: italic;
-  font-size: 13px;
-  line-height: 1.55;
-  color: var(--muted);
-  border-left: 2px solid var(--line);
-  padding-left: 12px;
-}
-.dfitaura--tease { grid-template-columns: 1fr; gap: 12px; }
 
 /* 06 — mint record */
 .dplate--mint {
