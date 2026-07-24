@@ -4,3 +4,4 @@ desktop.ini
 # BR-S111: SRC-03/04/05 prototype photos are now PUBLISHED for the public web
 # deploy (GitHub Pages) — owner authorized public faces 2026-06-23. Previously
 # gitignored as personal/local-only; that hold is lifted by explicit consent.
+.claude/
