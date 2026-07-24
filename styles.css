@@ -3201,13 +3201,14 @@ body[data-view="room"] .dev { display: none; }
 .menu__wall-head { display: grid; gap: 8px; justify-items: center; max-width: 560px; }
 .menu__wall-eyebrow { font-family: var(--font-mono); font-size: 9.5px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--faint); }
 .menu__wall-eyemark { color: var(--silver-dim); }
-.menu__wall-title { font-family: var(--font-display); font-size: 26px; font-weight: 600; color: var(--t-display); }
+.menu__wall-title { font-family: var(--font-display); font-size: 30px; font-weight: 600; letter-spacing: -.005em; color: var(--t-display); }   /* BR-S207: opened above the plaque hero (was 26, tied the spec-name) */
 .menu__wall-title:focus { outline: none; }   /* programmatic focus target */
 .menu__wall-thesis { font-family: var(--font-display); font-size: 19px; line-height: 1.4; color: var(--t-primary); }
 .menu__wall-trust { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em; line-height: 1.5; color: var(--t-body); }
 .menu__wall-plaques { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(360px, 100%), 1fr)); gap: clamp(20px, 3vw, 40px); width: 100%; max-width: 920px; align-items: stretch; }
-.menu__plaque { position: relative; display: flex; flex-direction: column; align-items: center; gap: 14px; padding: 30px 28px 22px; min-height: 520px; border: 1px solid var(--line); border-radius: 10px; background: linear-gradient(180deg, rgba(233, 229, 220, 0.014), transparent 60%); }
-.menu__plaque::before { content: ""; position: absolute; inset: 7px; border: 1px solid var(--line-faint); border-radius: 6px; pointer-events: none; }   /* double-rule museum mat */
+/* BR-S207: the plaque = a real lit museum specimen — opaque ink-850 matboard, molding > mat (ranked double rule), a top bevel + one soft mounting shadow so it floats off the wall (fixes the hollow-outline prototype tell) */
+.menu__plaque { position: relative; display: flex; flex-direction: column; align-items: center; gap: 14px; padding: 32px 28px 22px; min-height: 520px; border: 1px solid var(--line-strong); border-radius: 10px; background: linear-gradient(180deg, rgba(233, 229, 220, 0.022), transparent 62%), var(--ink-850); box-shadow: inset 0 1px 0 rgba(233,229,220,.045), 0 18px 40px -24px rgba(0,0,0,.7); }
+.menu__plaque::before { content: ""; position: absolute; inset: 9px; border: 1px solid var(--line); border-radius: 6px; box-shadow: inset 0 1px 0 rgba(0,0,0,.25); pointer-events: none; }   /* the cut-window mat, ranked below the molding */
 .menu__plaque-kicker { font-family: var(--font-mono); font-size: 9.5px; letter-spacing: 0.24em; text-transform: uppercase; color: var(--t-body); }
 .menu__plaque--arcane .menu__plaque-kicker { color: #c8ad70; opacity: .82; }   /* Room I · By Birth — gold register, given not chosen */
 .menu__plaque--drawing .menu__plaque-kicker { color: var(--silver-dim); opacity: .92; }   /* Room II · By the Draw — silver register, chance not fixed */
@@ -3215,17 +3216,21 @@ body[data-view="room"] .dev { display: none; }
 .menu__plaque-rule { width: 42px; height: 1px; background: var(--line-faint); }
 .menu__plaque-spec { flex: 1 1 auto; width: 100%; display: grid; justify-items: center; align-content: center; gap: 10px; }
 .menu__spec-crown { width: clamp(96px, 9vw, 120px); height: auto; }
-.menu__spec-name { font-family: var(--font-display); font-size: 25px; font-weight: 600; color: var(--t-display); }   /* the largest type inside the plaque */
+.menu__spec-name { font-family: var(--font-display); font-size: 26px; font-weight: 600; color: var(--t-display); }   /* BR-S207: the plaque hero, now clearly under the 30px wall title */
 .menu__spec-spine { font-family: var(--font-mono); font-size: 8px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--faint); }   /* the rail under the art — one line at plaque width */
 .menu__spec-fan { width: 240px; max-width: 100%; height: auto; }
 .menu__plaque-expl { font-family: var(--font-display); font-style: italic; font-size: 13.5px; line-height: 1.5; color: var(--silver); max-width: 34ch; }
-.menu__plaque-ledger { width: 100%; max-width: 340px; }
-.menu__ledger-row { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; padding: 9px 2px; border-bottom: 1px solid var(--line-faint); margin: 0; }
-.menu__ledger-name { font-family: var(--font-ui); font-size: 12.5px; color: var(--t-body); text-align: left; }
-.menu__ledger-val { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.04em; color: var(--t-body); text-align: right; white-space: nowrap; }
+/* BR-S207: the ledger bounded as one museum-register plate — quiet mono KEY vs a brighter serif READING; interior dividers, no per-row web-grid */
+.menu__plaque-ledger { width: 100%; max-width: 340px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.menu__ledger-row { display: flex; align-items: baseline; justify-content: space-between; gap: 14px; padding: 9px 2px; border-bottom: 1px solid var(--line-faint); margin: 0; }
+.menu__ledger-row:last-child { border-bottom: 0; }
+.menu__ledger-name { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--t-meta); text-align: left; white-space: nowrap; flex: 0 0 auto; }
+.menu__ledger-val { font-family: var(--font-display); font-size: 13.5px; line-height: 1.35; color: var(--silver); text-align: right; }
 .menu__plaque-credo { font-family: var(--font-mono); font-size: 8.5px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--faint); }
-.menu__plaque-door { margin-top: auto; display: block; width: 100%; padding: 12px 16px; border: 1px solid var(--line-strong); border-radius: 7px; background: rgba(255, 255, 255, 0.03); font-family: var(--font-ui); font-size: 12px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--t-display); text-align: center; text-decoration: none; transition: border-color 160ms ease, background 160ms ease, transform 160ms ease; }
-.menu__plaque-door:hover, .menu__plaque-door:focus-visible { border-color: var(--silver-dim); background: rgba(255, 255, 255, 0.05); transform: translateY(-1px); }
+/* BR-S207: the door as an engraved brass plate — warm-sand top-light + a bevel highlight; door law kept (no CTA fill, no drop-shadow) */
+.menu__plaque-door { margin-top: auto; display: block; width: 100%; padding: 13px 16px; border: 1px solid var(--line-strong); border-radius: 7px; background: linear-gradient(180deg, rgba(233,229,220,.035), rgba(233,229,220,.008) 60%, transparent); box-shadow: inset 0 1px 0 rgba(233,229,220,.06); font-family: var(--font-ui); font-size: 12px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--t-display); text-align: center; text-decoration: none; transition: border-color 180ms ease, background 180ms ease, transform 160ms ease; }
+.menu__plaque-door:hover, .menu__plaque-door:focus-visible { border-color: var(--silver-dim); background: linear-gradient(180deg, rgba(233,229,220,.06), rgba(233,229,220,.015) 60%, transparent); transform: translateY(-1.5px); outline: none; }
+.menu__plaque-door:focus-visible { box-shadow: inset 0 1px 0 rgba(233,229,220,.06), 0 0 0 1px var(--silver-dim); }
   /* quiet ledger-entry register — no CTA fill, no shadow (door law) */
 /* BR-S197: the Concord aside — a tier below the door (quiet italic, no border/fill), sits where Plaque B's credo sits */
 .menu__plaque-aside { display: block; margin-bottom: 12px; font-family: var(--font-display); font-style: italic; font-size: 13px; line-height: 1.4; color: var(--silver-dim); text-align: center; text-decoration: none; transition: color 160ms ease; }

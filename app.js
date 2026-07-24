@@ -1327,7 +1327,7 @@ function renderWall() {
     + '<rect x="11" y="11" width="98" height="168" rx="5" fill="none" stroke="url(#mwInk)" stroke-width=".5" opacity=".7"/>'
     + '<text x="60" y="30" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9" letter-spacing="2.5" fill="url(#mwGold)">XVII</text>'
     + '<g stroke="url(#mwGold)" fill="none"><circle cx="60" cy="98" r="31" stroke-width=".8" opacity=".5"/><circle cx="60" cy="98" r="23" stroke-width=".6" opacity=".35"/>'
-    + '<path d="M60 71 L75 98 L60 125 L45 98 Z" stroke-width=".9" opacity=".7"/><circle cx="60" cy="98" r="3.2" fill="url(#mwGold)" stroke="none"/></g>';
+    + '<path d="M60 69 L64.6 86.9 L80.5 77.5 L71.1 93.4 L89 98 L71.1 102.6 L80.5 118.5 L64.6 109.1 L60 127 L55.4 109.1 L39.5 118.5 L48.9 102.6 L31 98 L48.9 93.4 L39.5 77.5 L55.4 86.9 Z" stroke-width=".9" opacity=".8"/><circle cx="60" cy="98" r="3.2" fill="url(#mwGold)" stroke="none"/></g>';
   return '<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>'
     + '<linearGradient id="mwGold" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#c8ad70"/><stop offset=".55" stop-color="#a2864a"/><stop offset="1" stop-color="#5f471f"/></linearGradient>'
     + '<linearGradient id="mwInk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9c9790"/><stop offset="1" stop-color="#6f6b64"/></linearGradient>'
@@ -1346,11 +1346,11 @@ function renderWall() {
     + '<h3 class="menu__plaque-name">The Arcana Reading</h3>'
     + '<span class="menu__plaque-rule" aria-hidden="true"></span>'
     + '<div class="menu__plaque-spec">'
-    + '<svg class="menu__spec-crown" viewBox="0 0 24 18" aria-hidden="true"><path d="M2 16 L2.6 5 L8 9.5 L12 2 L16 9.5 L21.4 5 L22 16 Z" fill="none" stroke="url(#mwGold)" stroke-width=".75" stroke-linejoin="round"/><path d="M3.2 16 L20.8 16" fill="none" stroke="url(#mwGold)" stroke-width=".75"/></svg>'
+    + '<svg class="menu__spec-crown" viewBox="0 0 120 90" aria-hidden="true"><path d="M16 64 L26 28 L45 50 L60 18 L75 50 L94 28 L104 64" fill="none" stroke="url(#mwInk)" stroke-width="4" opacity=".28" stroke-linejoin="round"/><path d="M16 64 L26 28 L45 50 L60 18 L75 50 L94 28 L104 64" fill="none" stroke="url(#mwGold)" stroke-width="1.7" stroke-linejoin="round"/><path d="M15 64 H105" stroke="url(#mwGold)" stroke-width="2"/><path d="M19 71 H101" stroke="url(#mwGold)" stroke-width="1" opacity=".45"/><circle cx="26" cy="28" r="3.1" fill="url(#mwGold)"/><circle cx="60" cy="18" r="3.8" fill="url(#mwGold)"/><circle cx="94" cy="28" r="3.1" fill="url(#mwGold)"/><circle cx="42" cy="67.5" r="2.1" fill="url(#mwGold)" opacity=".7"/><circle cx="60" cy="67.5" r="2.5" fill="url(#mwGold)"/><circle cx="78" cy="67.5" r="2.1" fill="url(#mwGold)" opacity=".7"/></svg>'
     + '<p class="menu__spec-name">Six marks. One name.</p>'
     + '<p class="menu__spec-spine">Sun Sign · Year Animal · Life Path · Rune · Trigram · Hexagram</p>'
     + '</div>'
-    + '<p class="menu__plaque-expl">The marks are given, not chosen — the room looks each one up in the Codex and assembles what it finds.</p>'
+    + '<p class="menu__plaque-expl">The marks are given, not chosen — the Codex holds their meanings; the crown is their sum.</p>'
     + '<div class="menu__plaque-ledger">'
     + '<p class="menu__ledger-row"><span class="menu__ledger-name">Asks for</span><span class="menu__ledger-val">a name · a birth date · a birthplace</span></p>'
     + '<p class="menu__ledger-row"><span class="menu__ledger-name">Returns</span><span class="menu__ledger-val">a crowned name · a record for every mark</span></p>'
@@ -1366,13 +1366,13 @@ function renderWall() {
     + '<span class="menu__plaque-rule" aria-hidden="true"></span>'
     + '<div class="menu__plaque-spec">'
     + '<svg class="menu__spec-fan" viewBox="0 0 260 216" aria-hidden="true">'
-    + '<g transform="translate(10 26) rotate(-9 60 95)" opacity=".55">' + backPlate + '</g>'
-    + '<g transform="translate(130 26) rotate(9 60 95)" opacity=".55">' + backPlate + '</g>'
+    + '<g transform="translate(18 24) rotate(-10 60 175)" opacity=".72">' + backPlate + '</g>'
+    + '<g transform="translate(122 24) rotate(10 60 175)" opacity=".72">' + backPlate + '</g>'
     + '<g transform="translate(70 12)">' + facePlate + '</g>'
     + '</svg>'
     + '<p class="menu__spec-name">Seventy-eight cards. One question.</p>'
     + '</div>'
-    + '<p class="menu__plaque-expl">The deck is cut to a question you lay down. What falls is read, stamped, and filed.</p>'
+    + '<p class="menu__plaque-expl">The deck is cut to the question laid down. What falls is read, stamped, and filed.</p>'
     + '<div class="menu__plaque-ledger">'
     + '<p class="menu__ledger-row"><span class="menu__ledger-name">The Pull</span><span class="menu__ledger-val">one card</span></p>'
     + '<p class="menu__ledger-row"><span class="menu__ledger-name">A Sitting</span><span class="menu__ledger-val">three cards</span></p>'
@@ -1386,7 +1386,7 @@ function renderWall() {
     + '<button type="button" class="menu__codex menu__codex--reliq" data-annex-go><span class="menu__codex__mark" aria-hidden="true">◆</span> The Reliquary <span class="menu__codex__arr" aria-hidden="true">→</span></button>'
     + '<a class="menu__codex" href="codex.html" data-codex-open><span class="menu__codex__mark" aria-hidden="true">◆</span> The Codex <span class="menu__codex__arr" aria-hidden="true">→</span></a>'
     + '</div>'
-    + '<p class="menu__wall-foot">Two rooms · One archive.</p>'
+    + '<p class="menu__wall-foot">One archive · every door kept.</p>'
     + '</div>';
 }
 
