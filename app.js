@@ -1598,7 +1598,7 @@ function wireMenuCodex(host) {
   if (!seed || !bloom || !frame) return;                   // the seal's href still opens codex.html
 
   let loaded = false, isOpen = false, busy = false, bgInert = [];
-  let wcT = null, homeT = null, closeT = null, busyT = null;
+  let wcT = null, homeT = null, closeT = null, busyT = null, focusT = null;
   const ok = (function () { try { return window.CSS && CSS.supports("clip-path", "circle(0px)"); } catch (e) { return false; } })();
   const reduced = function () { return window.BRMotion ? window.BRMotion.prefersReduced() : (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches); };
   const canBloom = function () { return loaded && ok; };
@@ -1629,7 +1629,7 @@ function wireMenuCodex(host) {
   function focusFrame() {
     try {
       const d = frame.contentDocument;
-      const t = d && (d.querySelector(".search") || d.querySelector("nav a") || d.body);
+      const t = d && (d.querySelector("#q") || d.querySelector(".search") || d.querySelector("nav a") || d.body);
       if (t && t.focus) t.focus({ preventScroll: true }); else frame.focus({ preventScroll: true });
     } catch (e) { try { frame.focus({ preventScroll: true }); } catch (_) {} }
   }
@@ -1652,6 +1652,8 @@ function wireMenuCodex(host) {
     seed.setAttribute("aria-expanded", "true");
     seed.setAttribute("aria-label", "Close the Codex");
     focusFrame();
+    clearTimeout(focusT);                                 // re-land on the search bar after the bloom settles (the codex page can steal focus on load)
+    focusT = setTimeout(function () { if (isOpen) focusFrame(); }, reduced() ? 40 : 720);
     document.addEventListener("keydown", onEsc, true);
     clearTimeout(wcT);
     wcT = setTimeout(function () { bloom.style.willChange = ""; }, reduced() ? 60 : 1000);
@@ -1660,7 +1662,7 @@ function wireMenuCodex(host) {
   function close() {
     if (!isOpen) return;
     isOpen = false; _cxOpen = false;
-    clearTimeout(wcT);
+    clearTimeout(wcT); clearTimeout(focusT);
     document.removeEventListener("keydown", onEsc, true);
     seed.setAttribute("aria-expanded", "false");
     seed.setAttribute("aria-label", "Open the Codex");
@@ -1743,7 +1745,7 @@ function wireMenuCodex(host) {
   _cxTeardown = function () {
     try { document.removeEventListener("keydown", onEsc, true); } catch (e) {}
     if (_cxResize) { try { window.removeEventListener("resize", _cxResize); } catch (e) {} _cxResize = null; }
-    clearTimeout(wcT); clearTimeout(homeT); clearTimeout(closeT); clearTimeout(busyT);
+    clearTimeout(wcT); clearTimeout(homeT); clearTimeout(closeT); clearTimeout(busyT); clearTimeout(focusT);
     _cxOpen = false;
   };
 }
@@ -1808,7 +1810,7 @@ function wireMiniCodex(host) {
     const seed = host.querySelector("#codexSeed");
     const b = ball.getBoundingClientRect(), s = seed && seed.getBoundingClientRect();
     if (!s) return false;
-    return Math.hypot((b.left + b.width / 2) - (s.left + s.width / 2), (b.top + b.height / 2) - (s.top + s.height / 2)) < 46;
+    return Math.hypot((b.left + b.width / 2) - (s.left + s.width / 2), (b.top + b.height / 2) - (s.top + s.height / 2)) < 78;   // the seal's "near domain" — drop anywhere close and it finds its spot
   }
 
   // ---- drag (pointer capture on the ball; a sub-threshold move is a tap → toggle panel) ----
@@ -1851,9 +1853,8 @@ function wireMiniCodex(host) {
     }
   });
 
-  // a pointer outside the mini closes the panel (but not the dock, which recalls)
-  function onDocDown(e) { if (panelOpen && !mini.contains(e.target) && e.target !== dock) closePanel(); }
-  document.addEventListener("pointerdown", onDocDown, true);
+  // NOTE: the panel intentionally STAYS OPEN when you click elsewhere on the page (builder's
+  // call) — it only closes on a second tap of the ball, on Esc, or on drag-start. No outside-close.
 
   // ---- search index (lazy) ----
   function loadIndex() {
@@ -1895,7 +1896,6 @@ function wireMiniCodex(host) {
   input.addEventListener("input", function () { clearTimeout(qt); qt = setTimeout(function () { renderResults(input.value); }, 90); });
 
   _miniTeardown = function () {
-    try { document.removeEventListener("pointerdown", onDocDown, true); } catch (e) {}
     clearTimeout(qt); clearTimeout(homeT);
   };
 }
