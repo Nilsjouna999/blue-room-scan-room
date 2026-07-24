@@ -286,7 +286,7 @@
       HOST = host; SESSION = sealNow(); pullN = 0;
       host.innerHTML = shellOpen() + '<p class="dr-loading">Opening the room…</p>' + shellClose();
       wire(host);
-      fetch("codex-data.json").then(function (r) { return r.text(); }).then(function (txt) {
+      fetch("codex-data.json?v=208").then(function (r) { return r.text(); }).then(function (txt) {
         var codex = JSON.parse(txt);
         DECK = codex.filter(function (s) { return /tarot|minor arcana/i.test(String(s.system || "")); }).reduce(function (a, s) { return a.concat(s.entries || []); }, []);
         if (!reopen()) showLanding();
