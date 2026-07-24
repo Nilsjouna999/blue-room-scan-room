@@ -39,7 +39,7 @@
   // ---- tunables (identical to the prototype) --------------------------
   // BR PULSE-1: lines pushed toward the edges (was 0.20/0.80) to open the
   // living band from 0.60H to 0.72H so each plate is the single lit box longer.
-  var DX=6, UPPER_FRAC=0.14, LOWER_FRAC=0.86, TFADE=92;
+  var DX=6, UPPER_FRAC=0.08, LOWER_FRAC=0.92, TFADE=92;   // BR PULSE-3: lines pushed to the edges (was 0.14/0.86) — "not so in the middle"
   var PUSH=32, REPEL_RANGE=150, FEATHER=14, DEAD=16;
   var STEP=1/60, FOLLOW=0.14, TENSION=0.10, DAMP=0.24, VMAX=40, EDGE_FEATHER=90;
 
@@ -54,11 +54,18 @@
   // them — never a bare pixel count. Floor + ceiling clamps keep the ease graceful
   // on a very short section and from ballooning back into a slow fade on a tall one.
   var U_ESTAB=0.26, U_ESTAB_MIN=90, U_ESTAB_MAX=260;   // establish ramp length (+px floor/ceiling)
-  var U_LEAD=0.07;                                      // how far above the perch establish finishes
+  var U_LEAD=0.13;   // BR PULSE-3 [timing, upper]: finish establish a beat earlier so the upper line reads SOLID across the whole intro-reading window (measured upper at section-top=237: 0.69->0.96) — the user's "ensure the top line is clearly present at About-top." Still genuinely 0 through the whole M1->U1 descent (establish begins only at section-top~=377), so the killed descent-ghost stays killed.
   var U_REL=0.22,   U_REL_MIN=90,   U_REL_MAX=260;      // release ramp length (+px floor/ceiling)
   // BR PULSE-2 [lower, content-anchored exit]: release window for the lower line,
   // as a fraction of the band, once the last plate's bottom clears the upper perch.
   var LOWER_REL=0.42;
+  // BR PULSE-3 [timing, lower, content-anchored ENTRANCE]: rise window for the lower line
+  // as the FIRST plate's CENTRE climbs to the lower perch from below — the mirror of the
+  // exit above, and keyed to the SAME cy-vs-perch event that lights the plate in
+  // gatherBoxes, so the line reaches full presence exactly as the first card begins to
+  // light. = LOWER_REL for a symmetric enter/leave; larger => begins sooner (card still
+  // deeper below the band), smaller => later / closer to the perch.
+  var LOWER_ENT=0.42;
 
   var canvas, ctx;
   var W=0, H=0, DPR=1, UPPER_Y=0, LOWER_Y=0, MID_Y=0;
@@ -142,16 +149,33 @@
 
     var band = LOWER_Y - UPPER_Y;              // tracks any later frac/viewport change automatically
 
-    // LOWER — content-anchored exit. Exit edge = the FINAL .about__plate's bottom.
-    // (footer.about__close / the seal is a SIBLING of .about__rail, never a plate,
-    //  so plates[len-1] is always the last nugget — guard this if that ever changes.)
+    // LOWER — content-anchored on BOTH ends. ENTRANCE (BR PULSE-3) rises as the FIRST
+    // plate's centre climbs to the lower perch from below (replaces the old section-top
+    // fade); EXIT (BR PULSE-2, unchanged) releases as the LAST plate's bottom clears the
+    // upper perch. So through the "We hold the candle." intro the bottom line is genuinely
+    // ABSENT — the top line frames it alone — and it only materialises to frame each card
+    // as that card descends into the band.
+    // (footer.about__close / the seal is a SIBLING of .about__rail, never a plate, so
+    //  plates[0] / plates[len-1] are always the first / last nugget — guard if that changes.)
     var plates = document.querySelectorAll('.about__plate');
-    var lastBottom = plates.length
-      ? plates[plates.length - 1].getBoundingClientRect().bottom
-      : r.bottom;                              // fallback: rail not yet mounted
-    var fadeIn  = smoothstep(H, UPPER_Y, r.top);
-    var release = LOWER_REL * band;            // ~0.30H at the current fracs
-    var fadeOut = smoothstep(UPPER_Y - release, UPPER_Y, lastBottom);
+    var firstCy, lastBottom;
+    if(plates.length){
+      var fr     = plates[0].getBoundingClientRect();
+      firstCy    = (fr.top + fr.bottom) / 2;                       // first nugget centre
+      lastBottom = plates[plates.length - 1].getBoundingClientRect().bottom;
+    } else {
+      firstCy = lastBottom = r.bottom;                             // pre-mount fallback: holds both terms off the intro
+    }
+    // ENTRANCE: 0 while the first plate's centre is still below the living band, easing to
+    // 1 as that centre reaches the lower perch — the SAME instant the plate begins to light
+    // in gatherBoxes' cy-keyed life. Keyed to the PLATE, never the section top, so at
+    // About-top only the upper line reads.
+    var entrance = LOWER_ENT * band;           // ~0.30H at the current fracs
+    var fadeIn   = smoothstep(LOWER_Y + entrance, LOWER_Y, firstCy);
+    // EXIT (unchanged): full while any of the last plate is in/below the band, releasing
+    // only as its bottom edge finally clears the upper perch.
+    var release  = LOWER_REL * band;           // ~0.30H at the current fracs
+    var fadeOut  = smoothstep(UPPER_Y - release, UPPER_Y, lastBottom);
     lowerEnv = Math.min(fadeIn, fadeOut);
 
     // UPPER — latch SOLID on a graceful quintic ease, HOLD through the whole section,
@@ -230,10 +254,19 @@
     for(i=0;i<N;i++) tgt[i]=flow(xs[i],t);
     for(var b=0;b<boxes.length;b++){
       var box=boxes[b], gap=Math.abs(baseY-box.cy), effGap=gap-box.hh; if(effGap<0)effGap=0;
-      var prox=1-effGap/REPEL_RANGE; if(prox<=0){ if(box.idx<L.side.length)L.side[box.idx]=0; continue; }
-      prox=prox*prox*(3-2*prox);
-      var d=baseY-box.cy, si=box.idx<L.side.length?box.idx:0, side=L.side[si];
-      if(d>DEAD)side=1; else if(d<-DEAD)side=-1; if(side===0)side=d>=0?1:-1; L.side[si]=side;
+      // BR PULSE-3 [direction]: LATCH the incoming-travel side ONCE, the first frame this
+      // box enters the line's range while armed (side===0), then HOLD it for the WHOLE
+      // crossing — the recoil no longer flips mid-crossing (the old per-frame sign(d)
+      // recompute IS what flipped, exactly at the crossing). RE-ARM only on range-exit
+      // (prox<=0): REPEL_RANGE overshoots the perch, so on the inner LOWER<->UPPER transit
+      // that reset lands with the box already fully inside the band ("reset only after
+      // inside both lines"), and it is satisfied over a WIDE contiguous span (never a
+      // skippable window), at any viewport height. Magnitude curve below is unchanged.
+      var si = box.idx<L.side.length ? box.idx : 0;
+      var prox = 1 - effGap/REPEL_RANGE; if(prox<=0){ L.side[si]=0; continue; }
+      prox = prox*prox*(3-2*prox);
+      var side = L.side[si];
+      if(side===0){ var d = baseY - box.cy; side = (d>=0) ? 1 : -1; L.side[si] = side; }
       var wob=1+0.14*Math.sin(t*2.3+box.cx*0.01), amp=PUSH*prox*side*wob, f=FEATHER;
       var i0=Math.floor((box.l-f)/DX); if(i0<0)i0=0; var i1=Math.ceil((box.r+f)/DX); if(i1>N-1)i1=N-1;
       for(i=i0;i<=i1;i++){ var x=xs[i]; var win=smoothstep(box.l-f,box.l+f,x)-smoothstep(box.r-f,box.r+f,x); if(win>0.0001)tgt[i]+=amp*win; }
@@ -283,8 +316,8 @@
       if(wasVisible){ ctx.clearRect(0,0,W,H); clearTouched(); particles.length=0; wasVisible=false; }
       requestAnimationFrame(frame); return;
     }
-    if(!wasVisible){                          // 0->1 re-entry: settle from a flat, calm line (no stale wobble/velocity)
-      for(l=0;l<lines.length;l++){ lines[l].y.fill(0); lines[l].v.fill(0); }
+    if(!wasVisible){                          // 0->1 re-entry: settle from a flat, calm line (no stale wobble/velocity/latch)
+      for(l=0;l<lines.length;l++){ lines[l].y.fill(0); lines[l].v.fill(0); lines[l].side.fill(0); }  // + BR PULSE-3: clear latched sides so a box mid-band on wake never inherits a stale direction
       last=now; accT=0; wasVisible=true;
     }
 
