@@ -94,20 +94,21 @@
   }
 
   /* ---- THE NAMEPLATE RING: every option is a level, horizontal name riding just inside the band ----
-     Three nested transforms, each with origin 50% 50%:
-       .nameplates : translate(-50%,-50%) scale(k) rotate(W)        1 write/frame
-       .np[i]      : rotate(i*segDeg)                               static, set once at build
-       .np-t[i]    : translate(-50%,-50%) rotate(-(W + i*segDeg))   1 write/frame each
-     Net glyph orientation = W + θ − (W + θ) = 0 for every wedge at every angle: HORIZONTAL BY
-     ALGEBRA, not by a flip heuristic. The 6 o'clock name is as upright as the 12 o'clock one, and
-     there is no upside-down branch, no left/right alignment test, no reading direction to reconcile.
-     LBL_R = 110 ⇒ top:27.083% = (240−110)/480. Envelope [59.5, 160.5] clears the ring's inner rail
-     at 166 by 5.5 and the hub halo at 54 by 5.5. */
+     NOTHING IN THIS SYSTEM ROTATES. Each name is PLACED on the circle by a pure translate:
+       x = LBL_R·sin(W + i·segDeg),  y = −LBL_R·cos(W + i·segDeg)
+     so it revolves without rotating, and there is no rotation anywhere that would have to be
+     cancelled by an equal and opposite one. That matters: the obvious construction — rotate the
+     layer, counter-rotate each word — is exact ONLY while both halves are written in the same style
+     flush, and it degrades into a ±W tumble the moment anything (a CSS transition, a dropped frame,
+     a compositor promotion) applies one half without the other. Placement can't tumble because there
+     is nothing to cancel. It also removes the upside-down branch, the left/right alignment test and
+     the reading-direction question entirely: the 6 o'clock name is as upright as the 12 o'clock one.
+     LBL_R = 110. Envelope [59.5, 160.5] clears the ring's inner rail at 166 by 5.5 and the hub halo
+     at 54 by 5.5. */
   .nameplates{position:absolute;left:50%;top:50%;width:480px;height:480px;
-    transform-origin:50% 50%;transform:translate(-50%,-50%) scale(1) rotate(0deg);
+    transform-origin:50% 50%;transform:translate(-50%,-50%) scale(1);
     pointer-events:none;z-index:5;will-change:transform}
-  .np{position:absolute;inset:0;transform-origin:50% 50%}
-  .np-t{position:absolute;left:50%;top:27.083%;max-width:106px;padding:2px 5px;
+  .np-t{position:absolute;left:50%;top:50%;max-width:106px;padding:2px 5px;
     display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;
     white-space:pre-line;overflow-wrap:anywhere;text-align:center;
     font-family:Inter,system-ui,sans-serif;font-weight:600;line-height:1.14;
@@ -118,7 +119,7 @@
        that fall outside the ellipse (they do sit on bare jewel at 2 lines). */
     background:radial-gradient(68% 68% at 50% 50%, rgba(4,5,9,0.26) 0%, rgba(4,5,9,0.15) 44%, rgba(4,5,9,0) 74%);
     text-shadow:0 1px 2px rgba(0,0,0,0.62), 0 0 3px rgba(0,0,0,0.70), 0 0 7px rgba(0,0,0,0.45);
-    transform-origin:50% 50%;transform:translate(-50%,-50%) rotate(0deg);
+    transform-origin:50% 50%;transform:translate(-50%,-50%) translate(0px,-110px);
     transition:opacity 260ms cubic-bezier(.2,.7,.2,1);will-change:transform}
   /* the winner's bloom is the same species as .result .v's glow — the eye links wheel→word.
      REVEAL ONLY: at rest the top name is brightest by opacity alone, never by light. */
@@ -217,8 +218,13 @@
   }
   @media (prefers-reduced-motion:reduce){ .orbit-hover{ animation:none } }   /* static arrow, fixed gap */
 
-  .result{min-height:48px;height:auto;display:flex;align-items:center;justify-content:center;flex-wrap:wrap;max-width:100%;padding:0 16px;margin:-16px 0 16px}
-  .result .k{font:600 11px 'IBM Plex Mono',monospace;letter-spacing:.28em;color:var(--t-ghost);text-transform:uppercase;margin-right:12px}
+  /* the verdict is a KICKER OVER A WORD, not a row — so the word sits dead centre under the orb and
+     the drop can fall straight down onto it. (In the old single-line row the label and swatch pushed
+     the word ~63px right of the fall line, and a drop cannot drift sideways and still read as falling.) */
+  .result{min-height:56px;height:auto;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:7px;max-width:100%;padding:0 16px;margin:-16px 0 16px}
+  .result .k{font:600 11px 'IBM Plex Mono',monospace;letter-spacing:.28em;color:var(--t-ghost);text-transform:uppercase}
+  .result .line{position:relative;display:flex;align-items:center;justify-content:center;max-width:100%}
   .result .v{font:600 clamp(22px,6.4vw,32px) 'Cormorant Garamond',serif;color:#FFFFFF;line-height:1.05;max-width:92vw;overflow-wrap:anywhere;text-align:center;
     text-shadow:0 0 1px rgba(255,255,255,.85), 0 0 10px rgba(255,255,255,.22), 0 2px 6px rgba(0,0,0,.5)}   /* solid bright white, not a faded thin serif */
   .result .spin{background:none;padding:0;border-radius:0;box-shadow:none;border:0;font:600 12px 'IBM Plex Mono',monospace;letter-spacing:.3em;color:var(--t-ghost);text-transform:uppercase}
@@ -259,7 +265,9 @@
 
   /* ===== verdict-ceremony overlays ===== */
   /* reveal-tick swatch beside the result name */
-  .result .rsw{width:14px;height:14px;border-radius:4px;margin-right:12px;box-shadow:0 0 0 1px rgba(255,206,132,0.5), inset 0 0 0 1px rgba(0,0,0,0.3)}
+  /* absolutely placed so it cannot shift the word off the fall line */
+  .result .rsw{position:absolute;right:calc(100% + 12px);top:50%;transform:translateY(-50%);
+    width:14px;height:14px;border-radius:4px;box-shadow:0 0 0 1px rgba(255,206,132,0.5), inset 0 0 0 1px rgba(0,0,0,0.3)}
   /* verdict is now shown SOLID #FFFFFF the instant the arrow seats (see commitReveal @ impact) — the old
      paint-from-invisible (paintRise) mechanic is retired; the base .result .v carries the solid-white + glow. */
 
@@ -300,10 +308,11 @@
   .fx{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:4;display:none;
     transform-origin:50% 43.43%}   /* the disc centre — so the film rides the orb's squash, not the page box */
   .fx.live{display:block}
-  /* transform-box:view-box makes WAAPI px == viewBox units (load-bearing); drop authored around local (0,0) */
-  .fx .drop,.fx .dropA,.fx .dropB{transform-box:view-box;transform-origin:0 0;opacity:0}
-  .fx .splat{opacity:0;transform-box:view-box;transform-origin:280px 684px}   /* ripple scales about the drip point ON the verdict */
-  .fx .filmR,.fx .channelR,.fx .filmL,.fx .channelL,.fx .coreR,.fx .coreL{ opacity:1; }  /* the dashoffset gates visibility, not opacity */
+  /* transform-box:view-box makes WAAPI px == viewBox units (load-bearing); every sprite is authored
+     around local (0,0) and placed by its own translate — never by an attribute */
+  .fx .well,.fx .headR,.fx .headL,.fx .pool,.fx .teat,.fx .drop{transform-box:view-box;transform-origin:0 0;opacity:0}
+  .fx .splat,.fx .wetmark{opacity:0;transform-box:view-box;transform-origin:280px 684px}   /* the ripple scales about the drip point ON the word */
+  .fx .coatR,.fx .coatL,.fx .chanR,.fx .chanL,.fx .coreR,.fx .coreL,.fx .wet,.fx .wellStain{opacity:0}
 </style>
 </head>
 <body>
@@ -383,37 +392,93 @@
     <span class="ring"  aria-hidden="true"></span>
     <!-- B6-B8 milk-drop FX overlay; viewBox matches wheel-area aspect ⇒ every coordinate auto-scales on mobile -->
     <svg class="fx" viewBox="0 0 560 700" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-      <!-- rivulet gradient: leading (lowest) edge brightest = wet head, no per-frame work -->
+      <!-- THE KEY TRICK: a userSpaceOnUse radialGradient CONCENTRIC WITH THE ARC paints the stroke's
+           CROSS-SECTION. One stroke then carries a meniscus profile — a wet body, a bright lip at the
+           limb, a feather inboard — with no filter and no extra elements. ZERO <filter> in this layer:
+           the cross-gradients ARE the blur. -->
       <defs>
-        <linearGradient id="rillGrad" gradientUnits="userSpaceOnUse" x1="0" y1="67" x2="0" y2="541">
-          <stop offset="0"    stop-color="#FFFFFF" stop-opacity="0.26"/>
-          <stop offset="0.55" stop-color="#FFFFFF" stop-opacity="0.62"/>
-          <stop offset="0.85" stop-color="#FFFFFF" stop-opacity="0.92"/>
-          <stop offset="1"    stop-color="#FFFFFF" stop-opacity="1.0"/>
-        </linearGradient>
+        <radialGradient id="coatCross" gradientUnits="userSpaceOnUse" cx="280" cy="304" r="243">
+          <stop offset="0"      stop-color="#FFFFFF" stop-opacity="0"/>
+          <stop offset="0.9424" stop-color="#FFFFFF" stop-opacity="0"/>      <!-- r=229 inner feather -->
+          <stop offset="0.9630" stop-color="#DCE8F8" stop-opacity="0.10"/>   <!-- r=234 -->
+          <stop offset="0.9753" stop-color="#FFFFFF" stop-opacity="0.30"/>   <!-- r=237 wet body -->
+          <stop offset="0.9877" stop-color="#FFFFFF" stop-opacity="0.40"/>   <!-- r=240 meniscus lip AT the limb -->
+          <stop offset="0.9959" stop-color="#E8F0FC" stop-opacity="0.16"/>   <!-- r=242 -->
+          <stop offset="1"      stop-color="#CFE0F2" stop-opacity="0"/></radialGradient>
+        <radialGradient id="chanCross" gradientUnits="userSpaceOnUse" cx="280" cy="304" r="240">
+          <stop offset="0"      stop-color="#FFFFFF" stop-opacity="0"/>
+          <stop offset="0.9729" stop-color="#FFFFFF" stop-opacity="0"/>
+          <stop offset="0.9813" stop-color="#FFFFFF" stop-opacity="0.55"/>
+          <stop offset="0.9875" stop-color="#FFFFFF" stop-opacity="0.92"/>
+          <stop offset="0.9938" stop-color="#FFFFFF" stop-opacity="0.48"/>
+          <stop offset="1"      stop-color="#EAF2FF" stop-opacity="0"/></radialGradient>
+        <radialGradient id="wetCross" gradientUnits="userSpaceOnUse" cx="280" cy="304" r="254">
+          <stop offset="0"      stop-color="#FFFFFF" stop-opacity="0"/>
+          <stop offset="0.8622" stop-color="#FFFFFF" stop-opacity="0"/>      <!-- r=219 -->
+          <stop offset="0.9134" stop-color="#DCE8F8" stop-opacity="0.28"/>   <!-- r=232 -->
+          <stop offset="0.9370" stop-color="#FFFFFF" stop-opacity="0.72"/>   <!-- r=238 -->
+          <stop offset="0.9528" stop-color="#FFFFFF" stop-opacity="0.55"/>   <!-- r=242 -->
+          <stop offset="0.9764" stop-color="#CFE0F2" stop-opacity="0.14"/>   <!-- r=248 -->
+          <stop offset="1"      stop-color="#CFE0F2" stop-opacity="0"/></radialGradient>
+        <radialGradient id="headFill" cx="0.42" cy="0.34" r="0.78">
+          <stop offset="0" stop-color="#FFFFFF" stop-opacity="1"/><stop offset="0.55" stop-color="#FFFFFF" stop-opacity="0.98"/>
+          <stop offset="0.86" stop-color="#EAF1FC" stop-opacity="0.72"/><stop offset="1" stop-color="#CFE0F2" stop-opacity="0"/></radialGradient>
+        <radialGradient id="wellFill" cx="0.5" cy="0.34" r="0.72">
+          <stop offset="0" stop-color="#FFFFFF" stop-opacity="1"/><stop offset="0.46" stop-color="#FFFFFF" stop-opacity="0.92"/>
+          <stop offset="0.80" stop-color="#F2F6FF" stop-opacity="0.55"/><stop offset="1" stop-color="#DDE7F5" stop-opacity="0"/></radialGradient>
+        <linearGradient id="wakeFade" gradientUnits="userSpaceOnUse" x1="0" y1="2" x2="0" y2="-34">
+          <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.62"/><stop offset="0.34" stop-color="#FFFFFF" stop-opacity="0.30"/>
+          <stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/></linearGradient>
+        <linearGradient id="tailFade" gradientUnits="userSpaceOnUse" x1="0" y1="4" x2="0" y2="-34">
+          <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.55"/><stop offset="0.42" stop-color="#FFFFFF" stop-opacity="0.24"/>
+          <stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/></linearGradient>
+        <radialGradient id="poolFill" cx="0.5" cy="0.38" r="0.74">
+          <stop offset="0" stop-color="#FFFFFF" stop-opacity="1"/><stop offset="0.50" stop-color="#FFFFFF" stop-opacity="0.95"/>
+          <stop offset="0.85" stop-color="#EAF1FC" stop-opacity="0.60"/><stop offset="1" stop-color="#CFE0F2" stop-opacity="0"/></radialGradient>
+        <radialGradient id="wetmarkFill" cx="0.5" cy="0.5" r="0.5">
+          <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.30"/><stop offset="0.5" stop-color="#FFFFFF" stop-opacity="0.14"/>
+          <stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/></radialGradient>
       </defs>
-      <!-- RIGHT side: sweep 1 (bulges right). LEFT side: sweep 0 (bulges left). VERIFY on device; swap 1<->0 if mirrored. -->
-      <path class="filmR"    d="M280,67 A237,237 0 0 1 280,541" fill="none" stroke="#FFFFFF"        stroke-opacity="0.13" stroke-width="3.0" stroke-linecap="round" pathLength="1" stroke-dasharray="1 1" stroke-dashoffset="1"/>
-      <path class="channelR" d="M280,67 A237,237 0 0 1 280,541" fill="none" stroke="url(#rillGrad)"                       stroke-width="1.3" stroke-linecap="round" pathLength="1" stroke-dasharray="1 1" stroke-dashoffset="1"/>
-      <path class="coreR"    d="M280,67 A237,237 0 0 1 280,541" fill="none" stroke="#FFFFFF" stroke-opacity="0.92" stroke-width="0.6" stroke-linecap="round" pathLength="1" stroke-dasharray="1 1" stroke-dashoffset="1"/>
-      <path class="filmL"    d="M280,67 A237,237 0 0 0 280,541" fill="none" stroke="#FFFFFF"        stroke-opacity="0.13" stroke-width="3.0" stroke-linecap="round" pathLength="1" stroke-dasharray="1 1" stroke-dashoffset="1"/>
-      <path class="channelL" d="M280,67 A237,237 0 0 0 280,541" fill="none" stroke="url(#rillGrad)"                       stroke-width="1.3" stroke-linecap="round" pathLength="1" stroke-dasharray="1 1" stroke-dashoffset="1"/>
-      <path class="coreL"    d="M280,67 A237,237 0 0 0 280,541" fill="none" stroke="#FFFFFF" stroke-opacity="0.92" stroke-width="0.6" stroke-linecap="round" pathLength="1" stroke-dasharray="1 1" stroke-dashoffset="1"/>
-      <!-- twin stream beads: born together on the top rim (deposited by the arrow), split down the left/right arcs, meet at the bottom -->
-      <g class="dropA"><ellipse cx="0" cy="0" rx="3.0" ry="4.4" fill="#FFFFFF"/></g>
-      <g class="dropB"><ellipse cx="0" cy="0" rx="3.0" ry="4.4" fill="#FFFFFF"/></g>
-      <!-- the merged drip bead: short soft trailing tail (plain white, static, low-opacity) + head + one static cel highlight -->
+      <!-- the whole orb goes faintly WET while the film runs — light on glass, not paint -->
+      <circle class="wet" cx="280" cy="304" r="236" fill="none" stroke="url(#wetCross)" stroke-width="34" opacity="0"/>
+      <!-- the COATING: a broad clinging film behind a narrower channel behind a brilliant core. Together
+           they read as a widening head with a thinning tail and a wet sheen left on the glass.
+           RIGHT = sweep 1 (bulges right), LEFT = sweep 0. Both run well (280,68) → pool (280,540). -->
+      <path class="coatL" d="M280,68 A236,236 0 0 0 280,540" fill="none" stroke="url(#coatCross)" stroke-width="9"   stroke-linecap="round" pathLength="1" stroke-dasharray="1 1.60"   stroke-dashoffset="1.00"/>
+      <path class="coatR" d="M280,68 A236,236 0 0 1 280,540" fill="none" stroke="url(#coatCross)" stroke-width="9"   stroke-linecap="round" pathLength="1" stroke-dasharray="1 1.60"   stroke-dashoffset="1.00"/>
+      <path class="chanL" d="M280,68 A236,236 0 0 0 280,540" fill="none" stroke="url(#chanCross)" stroke-width="4.6" stroke-linecap="round" pathLength="1" stroke-dasharray="0.30 1.40" stroke-dashoffset="2.00"/>
+      <path class="chanR" d="M280,68 A236,236 0 0 1 280,540" fill="none" stroke="url(#chanCross)" stroke-width="4.6" stroke-linecap="round" pathLength="1" stroke-dasharray="0.30 1.40" stroke-dashoffset="2.00"/>
+      <path class="coreL" d="M280,68 A236,236 0 0 0 280,540" fill="none" stroke="#FFFFFF" stroke-opacity="0.90" stroke-width="2.4" stroke-linecap="round" pathLength="1" stroke-dasharray="0.10 1.40" stroke-dashoffset="1.60"/>
+      <path class="coreR" d="M280,68 A236,236 0 0 1 280,540" fill="none" stroke="#FFFFFF" stroke-opacity="0.90" stroke-width="2.4" stroke-linecap="round" pathLength="1" stroke-dasharray="0.10 1.40" stroke-dashoffset="1.60"/>
+      <!-- THE SOURCE, made legible: the glass sweats at the strike point and the meniscus rises until it
+           TOUCHES the gem's culet, then breaks. That contact frame is the causal beat the viewer reads. -->
+      <ellipse class="wellStain" cx="280" cy="70" rx="34" ry="7" fill="url(#wetmarkFill)" opacity="0"/>
+      <g class="well">
+        <path d="M-26,4 C-26,-6.5 -13,-12 0,-12 C13,-12 26,-6.5 26,4 C26,7.5 13,9 0,9 C-13,9 -26,7.5 -26,4 Z" fill="url(#wellFill)"/>
+        <path d="M-9,-6 C-9,-13 -4.5,-17.5 0,-19 C4.5,-17.5 9,-13 9,-6 C9,-1.5 4.5,0.5 0,0.5 C-4.5,0.5 -9,-1.5 -9,-6 Z" fill="#FFFFFF" opacity="0.9"/>
+        <ellipse cx="-6.5" cy="-6" rx="2.6" ry="3.4" fill="#FFFFFF" opacity="0.55"/></g>
+      <!-- the two heads that drag the film down the meridians -->
+      <g class="headL">
+        <path class="wake" d="M-5.2,0 C-5.6,-9 -4.2,-19 -1.9,-30 C-0.9,-34 0.9,-34 1.9,-30 C4.2,-19 5.6,-9 5.2,0 Z" fill="url(#wakeFade)"/>
+        <path d="M0,8.6 C-4.6,8.6 -7.4,5.2 -7.4,1.2 C-7.4,-3.2 -4.2,-6.4 0,-6.4 C4.2,-6.4 7.4,-3.2 7.4,1.2 C7.4,5.2 4.6,8.6 0,8.6 Z" fill="url(#headFill)"/>
+        <ellipse cx="-2.4" cy="-1.8" rx="1.5" ry="2.1" fill="#FFFFFF" opacity="0.85"/></g>
+      <g class="headR">
+        <path class="wake" d="M-5.2,0 C-5.6,-9 -4.2,-19 -1.9,-30 C-0.9,-34 0.9,-34 1.9,-30 C4.2,-19 5.6,-9 5.2,0 Z" fill="url(#wakeFade)"/>
+        <path d="M0,8.6 C-4.6,8.6 -7.4,5.2 -7.4,1.2 C-7.4,-3.2 -4.2,-6.4 0,-6.4 C4.2,-6.4 7.4,-3.2 7.4,1.2 C7.4,5.2 4.6,8.6 0,8.6 Z" fill="url(#headFill)"/>
+        <ellipse cx="-2.4" cy="-1.8" rx="1.5" ry="2.1" fill="#FFFFFF" opacity="0.85"/></g>
+      <!-- they meet and pool at the bottom pole, a thread necks down, and one drop snaps off -->
+      <g class="pool"><path d="M-19,0 C-19,-6.2 -10.5,-9.4 0,-9.4 C10.5,-9.4 19,-6.2 19,0 C19,5.4 10.5,8.2 0,8.2 C-10.5,8.2 -19,5.4 -19,0 Z" fill="url(#poolFill)"/>
+        <ellipse cx="-5.5" cy="-3.4" rx="3.2" ry="2.0" fill="#FFFFFF" opacity="0.6"/></g>
+      <path class="teat" d="M-3.4,0 C-3.4,6 -1.8,13 0,17 C1.8,13 3.4,6 3.4,0 Z" fill="url(#tailFade)"/>
       <g class="drop">
-        <path class="tail" d="M-2.0,0 C-2,-14 -1,-24 0,-30 C1,-24 2,-14 2.0,0 Z" fill="#FFFFFF" opacity="0.35"/>
-        <circle class="bead" cx="0" cy="0" r="5" fill="#FFFFFF"/>
-        <ellipse class="hl" cx="-2.6" cy="-3" rx="1.2" ry="1.8" fill="#FFFFFF"/>
-      </g>
-      <!-- the drip: compact splat at the text + 2 micro-flecks (held ~2 frames, then fade) -->
-      <g class="splat">
-        <ellipse cx="280" cy="684" rx="9" ry="2.6" fill="#FFFFFF"/>
-        <circle cx="267" cy="681" r="1.4" fill="#FFFFFF"/>
-        <circle cx="294" cy="682" r="1.2" fill="#FFFFFF"/>
-      </g>
+        <path d="M-2.6,2 C-3.0,-10 -1.6,-22 0,-34 C1.6,-22 3.0,-10 2.6,2 Z" fill="url(#tailFade)"/>
+        <path d="M0,9.2 C-5.0,9.2 -8.0,5.6 -8.0,1.2 C-8.0,-3.6 -4.6,-7.0 0,-7.0 C4.6,-7.0 8.0,-3.6 8.0,1.2 C8.0,5.6 5.0,9.2 0,9.2 Z" fill="url(#headFill)"/>
+        <ellipse cx="-2.7" cy="-2.2" rx="1.7" ry="2.3" fill="#FFFFFF" opacity="0.85"/></g>
+      <!-- the landing, on the word itself: a splat crown, then the word drinks the drop -->
+      <ellipse class="wetmark" cx="280" cy="684" rx="30" ry="9" fill="url(#wetmarkFill)" opacity="0"/>
+      <g class="splat"><ellipse cx="280" cy="684" rx="11" ry="3.0" fill="url(#poolFill)"/>
+        <circle cx="264" cy="680" r="1.6" fill="#FFFFFF"/><circle cx="296" cy="681" r="1.4" fill="#FFFFFF"/>
+        <circle cx="272" cy="689" r="1.1" fill="#FFFFFF"/><circle cx="291" cy="690" r="1.0" fill="#FFFFFF"/></g>
     </svg>
   </div>
 
@@ -566,7 +631,7 @@
   //   3.6 characters. So the names take the lane just inside the ring, and the
   //   silver band becomes the FRAME around them.
   // ======================================================================
-  var LBL_R_TOP_PCT = 27.083;   // (240-110)/480 — mirrored in .np-t{top}
+  var LBL_R = 110;              // orbital radius of each plate centre (mirrored in .np-t's rest transform)
   var LBL_MAX_FS = 21, LBL_SPREAD = 5, LBL_FS_MIN_PX = 9.5;
   var LBL_BOX_W = 96, LBL_BOX_W_SOLO = 168;    // content widths (box-sizing:border-box is global)
   // Preference ladder: never drop below 18px merely to avoid a second line; below 18 prefer fewer
@@ -670,25 +735,26 @@
       if (top!==p.top){ p.top=top; p.t.classList.toggle('is-top', top); }
     }
   }
-  // THE PER-FRAME DRIVER. Load-bearing: this MUST be driven from mirrorInk, i.e. the same style flush
-  // as the canvas transform, and never as an animation of its own. Coast angular velocity is ~19.8°
-  // per frame, so ONE frame of pipeline desync between a compositor-driven counter-rotation and the
-  // main-thread orbit would rock every word ±20°. Same-flush is the only construction that can't tumble.
+  // THE PER-FRAME DRIVER. Driven from mirrorInk — the same style flush as the canvas transform — so
+  // the names advance on the identical frame as the wedges they sit on. n translate writes, no layout,
+  // no paint, no measureText, and (by construction, see the CSS note) nothing that can tumble.
   function syncPlates(W){
     if (!plateLayer) return;
     var n=plates.length; if (!n) return;
-    var Weff = (n===1 ? 0 : W);                     // a lone plate is pinned upright under the arrow
+    var Weff = (n===1 ? 0 : W);                     // a lone plate is pinned under the arrow
     var tr = canvas.style.transition, i;
     if (tr !== plateTrans){                         // guarded ⇒ ~3 writes per spin, not per frame
       plateTrans = tr;
       var real = !!(tr && tr!=='none');
-      plateLayer.style.transition = real ? tr : '';
       for (i=0;i<n;i++) plates[i].t.style.transition = real ? (tr+', '+PLATE_OP_TR) : '';
-      if (real) void plateLayer.offsetWidth;        // start the mirrored transition from the CURRENT angle
+      if (real) void plateLayer.offsetWidth;        // start the mirrored transition from the CURRENT place
     }
-    plateLayer.style.transform = 'translate(-50%,-50%) scale('+plateK+') rotate('+Weff+'deg)';
-    var seg=360/n;
-    for (i=0;i<n;i++) plates[i].t.style.transform = 'translate(-50%,-50%) rotate('+(-(Weff+i*seg))+'deg)';
+    var seg=360/n, RAD=Math.PI/180;
+    for (i=0;i<n;i++){
+      var a=(Weff+i*seg)*RAD;
+      plates[i].t.style.transform = 'translate(-50%,-50%) translate('+
+        (LBL_R*Math.sin(a)).toFixed(2)+'px,'+(-LBL_R*Math.cos(a)).toFixed(2)+'px)';
+    }
     pLastW = Weff;
     if (state.spinning && !pWasSpinning){ pv.a=null; pv.w=0; }   // fresh velocity estimate per spin
     pWasSpinning = state.spinning;
@@ -708,20 +774,16 @@
     if (nsig===psig) return; psig=nsig;
     var fsFloor = Math.max(13, Math.ceil(LBL_FS_MIN_PX/plateK));   // never smaller than 9.5 REAL px on screen
     var fit = fitSet(segs.map(function(s){ return s.text||''; }), solo?LBL_BOX_W_SOLO:LBL_BOX_W, fsFloor);
-    var seg=360/n, k;
+    var k;
     if (plates.length!==n){                         // rebuild the DOM only when the COUNT changes —
       plateLayer.innerHTML=''; plates=[];           // otherwise typing re-promotes six layers per keystroke
       for (k=0;k<n;k++){
-        var np=document.createElement('div'); np.className='np';
-        np.style.transform='rotate('+(k*seg)+'deg)';
         var t=document.createElement('span'); t.className='np-t';
         t.setAttribute('dir','auto');               // mixed Latin/RTL names order wrongly without it
-        np.appendChild(t); plateLayer.appendChild(np);
-        plates.push({np:np, t:t, top:false, txt:null, fs:0});
+        plateLayer.appendChild(t);
+        plates.push({t:t, top:false, txt:null, fs:0});
       }
       plateTrans=null;
-    } else {
-      for (k=0;k<n;k++) plates[k].np.style.transform='rotate('+(k*seg)+'deg)';
     }
     for (k=0;k<n;k++){
       var p=plates[k], f=fit[k];
@@ -729,6 +791,7 @@
       if (p.fs!==f.fs){ p.fs=f.fs; p.t.style.fontSize=f.fs+'px'; p.t.style.letterSpacing=lblLS(f.fs)+'em'; }
       p.t.style.maxWidth = solo ? '180px' : '';     // a pinned plate never orbits ⇒ no swept envelope to respect
     }
+    plateLayer.style.transform = 'translate(-50%,-50%) scale('+plateK+')';   // the layer only ever SCALES
     syncPlates(rot);
   }
   function syncPlateVerdict(){
@@ -1441,17 +1504,16 @@
   var sparkEl    = document.querySelector('.spark');
   var ringEl     = document.querySelector('.ring');
   var sparkEls   = [sparkEl, ringEl];
-  var dropEl  = fxLayer ? fxLayer.querySelector('.drop')  : null;
-  var splatEl = fxLayer ? fxLayer.querySelector('.splat') : null;
-  var dropA   = fxLayer ? fxLayer.querySelector('.dropA') : null;
-  var dropB   = fxLayer ? fxLayer.querySelector('.dropB') : null;
-  var filmR    = fxLayer ? fxLayer.querySelector('.filmR')    : null;
-  var channelR = fxLayer ? fxLayer.querySelector('.channelR') : null;
-  var filmL    = fxLayer ? fxLayer.querySelector('.filmL')    : null;
-  var channelL = fxLayer ? fxLayer.querySelector('.channelL') : null;
-  var coreR    = fxLayer ? fxLayer.querySelector('.coreR')    : null;
-  var coreL    = fxLayer ? fxLayer.querySelector('.coreL')    : null;
-  var rills = [filmR, channelR, filmL, channelL, coreR, coreL];
+  function fq(sel){ return fxLayer ? fxLayer.querySelector(sel) : null; }
+  var dropEl=fq('.drop'), splatEl=fq('.splat'), wetmarkEl=fq('.wetmark'), wetEl=fq('.wet'),
+      wellEl=fq('.well'), wellStainEl=fq('.wellStain'), poolEl=fq('.pool'), teatEl=fq('.teat'),
+      headR=fq('.headR'), headL=fq('.headL'),
+      coatR=fq('.coatR'), coatL=fq('.coatL'), chanR=fq('.chanR'), chanL=fq('.chanL'),
+      coreR=fq('.coreR'), coreL=fq('.coreL');
+  var headWakeR = headR ? headR.querySelector('.wake') : null;
+  var headWakeL = headL ? headL.querySelector('.wake') : null;
+  var coats  = [coatR, coatL];
+  var comets = [chanR, chanL, coreR, coreL];
   var coreEl  = document.querySelector('.coreflash');
   var plungeEl = document.querySelector('.plunge');
 
@@ -1602,13 +1664,27 @@
   function reg(a){ ceremony.anims.push(a); return a; }                     // registered WAAPI anim
   function showFx(el){ if (el) el.style.opacity='1'; }
   function hideFx(el){ if (el) el.style.opacity='0'; }
+  // EXPLICIT rest transforms, never ''. A bare '' is what allows a one-frame blob at viewBox (0,0)
+  // when an interrupt lands between a hide and the next placement. And the comets' rest dashoffset
+  // MUST be their exact start value — a naive '1' against dasharray "0.30 1.40" leaves a stray dash.
   function resetFx(){
-    [dropEl, dropA, dropB, splatEl, coreEl, plungeEl].forEach(function(el){ if (el) el.style.opacity='0'; });
-    if (dropEl) dropEl.style.transform='';
-    if (dropA)  dropA.style.transform='';
-    if (dropB)  dropB.style.transform='';
+    [dropEl, splatEl, wetmarkEl, wetEl, wellEl, wellStainEl, poolEl, teatEl, headR, headL, coreEl, plungeEl]
+      .forEach(function(el){ if (el) el.style.opacity='0'; });
+    if (wellEl) wellEl.style.transform='translate(280px,68px) scale(0.18,0.10)';
+    if (headR)  headR.style.transform='translate(280px,68px) rotate(-90deg) scale(0.542,0.576)';
+    if (headL)  headL.style.transform='translate(280px,68px) rotate(90deg) scale(0.542,0.576)';
+    if (poolEl) poolEl.style.transform='translate(280px,540px) scale(0.30,0.16)';
+    if (teatEl) teatEl.style.transform='translate(280px,540px) scale(1,1.15)';
+    if (dropEl) dropEl.style.transform='translate(280px,540px) scale(0.62,0.55)';
+    if (splatEl)   splatEl.style.transform='';
+    if (wetmarkEl) wetmarkEl.style.transform='';
+    [headWakeR, headWakeL].forEach(function(el){ if (el) el.style.opacity='1'; });
     if (coreEl)  coreEl.style.transform='translate(-50%,-50%)';
-    rills.forEach(function(el){ if (el) el.style.strokeDashoffset='1'; });   // re-arm the rivulet strokes undrawn
+    coats.forEach(function(el){ if (el) el.style.strokeDashoffset='1.00'; });
+    if (chanR) chanR.style.strokeDashoffset='2.00';
+    if (chanL) chanL.style.strokeDashoffset='2.00';
+    if (coreR) coreR.style.strokeDashoffset='1.60';
+    if (coreL) coreL.style.strokeDashoffset='1.60';
   }
 
   function armCeremony(arc, onDone){          // arc = 'full' | 'lean'
@@ -1629,18 +1705,15 @@
     resetFx();
     if (fxLayer) fxLayer.classList.add('live');
 
-    if (lean){                                // repeat spins: no orbit lap; arrow already at top → reveal + beads fire immediately
-      ct(function(){ tickFlash(); impactToCore(); vitrify(); if(onDone) onDone(); },  0);   // IMPACT: winner lights + verdict prints SOLID
-      ct(beadBirth,                                            120);   // twin beads born from the arrow at the top rim
-      ct(function(){ beadStream(true); },                      210);   // split → down both edges → merge at bottom
-      ct(function(){ dripImpact(true); },                      730);   // 210 + FALL_LEAN(520): the drip KISSES the already-shown verdict
-      ct(function(){ endCeremony(true); },                    1050);   // normal end = reveal BACKSTOP (idempotent; no-op once impact revealed)
-    } else {                                  // first spin of a set: steady LINEAR lap; the SEAT (impact) reveals
-      arrowLap(function(){ tickFlash(); impactToCore(); vitrify(); if(onDone) onDone(); }); // SEAT=IMPACT: winner lights + verdict prints SOLID
-      ct(beadBirth,                                            940);   // ~40ms after the 900ms lap: beads deposited by the just-landed arrow
-      ct(function(){ beadStream(false); },                    1030);   // split → down both edges → merge at bottom
-      ct(function(){ dripImpact(false); },                    1710);   // 1030 + FALL_FULL(680): the drip lands on the verdict
-      ct(function(){ endCeremony(true); },                    2040);   // normal end = reveal BACKSTOP (idempotent; no-op once impact revealed)
+    // The four seat statements below stay verbatim and FIRST on both paths; liquid() is appended, and
+    // it schedules everything else RELATIVE TO THIS INSTANT — so the whole coating stays glued to the
+    // strike no matter what LAP_MS becomes.
+    if (lean){                                // repeat spins: no orbit lap; the arrow is already at the top
+      ct(function(){ tickFlash(); impactToCore(); vitrify(); if(onDone) onDone(); liquid(true); },  0);
+      ct(function(){ endCeremony(true); }, LIQ.lean.total + 40);          // = 1091 < CEREMONY_MAX_LEAN 1200
+    } else {                                  // first spin of a set: the lap runs and the SEAT reveals
+      arrowLap(function(){ tickFlash(); impactToCore(); vitrify(); if(onDone) onDone(); liquid(false); });
+      ct(function(){ endCeremony(true); }, LAP_MS + LIQ.full.total + 40); // = 2360 < CEREMONY_MAX_FULL 2500
     }
   }
 
@@ -1673,9 +1746,9 @@
     if (vitrifyEl) vitrifyEl.style.opacity='0';
     if (coreEl)    coreEl.style.opacity='0';
     if (plungeEl)  plungeEl.style.opacity='0';
-    // defensively zero every bead so an interrupt mid-stream leaves nothing stranded (fx is also display:none)
-    [dropEl, dropA, dropB, splatEl].forEach(function(el){ if (el) el.style.opacity='0'; });
-    rills.forEach(function(el){ if (el){ el.style.strokeDashoffset='1'; } });   // re-arm rivulet strokes undrawn for the next spin
+    // an interrupt anywhere in the flow leaves nothing stranded, and NEVER leaves the word unpainted
+    if (paintTarget){ paintTarget.style.clipPath=''; paintTarget=null; }
+    resetFx();
     canvas.style.transform = 'rotate('+rot+'deg)';     // byte-identical to the lock — nothing drifts
     if (inkCanvas){ inkCanvas.style.transition='none'; inkCanvas.style.willChange=''; } mirrorInk('rotate('+rot+'deg)');
     if (reveal) commitReveal(); else state.revealPending = false;
@@ -1761,8 +1834,8 @@
     if (fxLayer)   reg(fxLayer.animate(kfR, OPT));                           // the white film clings to the sinking glass
     if (shadowEl)  reg(shadowEl.animate(kfShadow, OPT));                     // the cast shadow compresses toward it
     if (plateLayer){                                                         // the names squash with the wheel they name
-      var pre='translate(-50%,-50%) scale('+plateK+') ', post=' rotate('+(plates.length===1?0:rot)+'deg)';
-      reg(plateLayer.animate(kfR.map(function(k){ return {transform: pre+k.transform+post}; }), OPT));
+      var pre='translate(-50%,-50%) scale('+plateK+') ';
+      reg(plateLayer.animate(kfR.map(function(k){ return {transform: pre+k.transform}; }), OPT));
     }
     ringSlosh();
   }
@@ -1812,91 +1885,219 @@
     reg(vitrifyEl.animate([{opacity:0},{opacity:0.6,offset:0.5},{opacity:0}], {duration:VITRIFY_MS, easing:'ease'}));
   }
 
-  // ---- the white verdict bead: born at the arrow-landing (top), falls the full instrument, drips + paints ----
-  var DROP_TOP   = [280, 64];    // born on TOP of the ball (top rim), right under the landed arrow tip (r254 → tip at y≈50)
-  var DROP_MEET  = [280, 540];   // twins meet at the bottom of the glass (4px inside the 544 rim)
-  var DROP_LAND  = [280, 684];   // kisses the #result row (UNCHANGED)
-  var FALL_FULL  = 680;          // full surface journey (arc+pool+drip) — total unchanged ⇒ beat timers hold
-  var FALL_LEAN  = 520;          // lean total — unchanged
-  var BEAD_SWELL_MS = 90;        // birth pop at the top
+  // ======================================================================
+  // ============  THE COATING FLOW  (the white liquid)  ==================
+  //   The glass SWEATS at the strike point; the meniscus rises until it touches the gem's culet and
+  //   breaks; two heads run the meridians dragging a broad clinging film; they pool at the bottom
+  //   pole; a drop necks, snaps, falls onto the verdict — and PAINTS IT WHITE FROM INVISIBLE.
+  //   Then the whole orb dries, top-down.
+  //
+  //   THE VELOCITY LAW.  S(t) = 0.55t + 2.35t³ − 1.90t⁴   (S(0)=0, S(1)=1)
+  //   S'(1) = 0.55 + 7.05 − 7.60 = 0 EXACTLY. The head cannot hard-cut at speed: its last three
+  //   steps are 5.17°, 3.35°, 1.19°. (The old bead's penultimate keyframe sat at full arc speed and
+  //   its final keyframe was a stationary pool — a literal teleport-stop, which is precisely the
+  //   failure this repo has been chasing.) 26 EQUAL-TIME samples of a C¹ curve keep adjacent-segment
+  //   speed ratios inside 1.035–1.103, under the ~15% velocity-step perception threshold; the old
+  //   code sampled equal ANGLE in unequal TIME, so its biggest step landed at its fastest moment.
+  // ======================================================================
+  var LIQ_S  = function(t){ return 0.55*t + 2.35*t*t*t - 1.90*t*t*t*t; };
+  var LIQ_SP = function(t){ return 0.55 + 7.05*t*t - 7.60*t*t*t; };
+  var LIQ_VMAX = 1.4494, LIQ_N = 25, LIQ_CX = 280, LIQ_CY = 304, LIQ_R = 236;
+  // all beats are Δ FROM THE IMPACT INSTANT, so the liquid stays glued to the strike whatever LAP_MS does
+  var LIQ = {
+   full:{ well:20, wellMs:380, run:150, runMs:560, pool:710, poolMs:150, wetIn:710, wetInMs:250,
+          drip:795, dripMs:220, splatMs:300, markMs:400,
+          drain:940, drainMs:340, poolDry:1060, poolDryMs:320, total:1420 },
+   lean:{ well:15, wellMs:282, run:111, runMs:414, pool:526, poolMs:111, wetIn:526, wetInMs:185,
+          drip:588, dripMs:163, splatMs:222, markMs:296,
+          drain:696, drainMs:252, poolDry:784, poolDryMs:237, total:1051 } };
 
-  function beadBirth(){          // twin beads form co-located on the top rim — reads as ONE drop the arrow deposited
-    if (!dropA||!dropB) return;
-    dropA.style.opacity='1'; dropB.style.opacity='1';
-    var kf=[{transform:'translate(280px,64px) scale(.3)',opacity:0},
-            {transform:'translate(280px,64px) scale(1)', opacity:1}];
-    var o={duration:BEAD_SWELL_MS, easing:'cubic-bezier(.2,.7,.2,1)', fill:'forwards'};
-    reg(dropA.animate(kf,o)); reg(dropB.animate(kf,o));   // fully overlapped birth
+  var LAND = { x:280, y:684, dx:0, dy:0 };   // measured from the live verdict word — see armVerdictPaint
+  var paintTarget = null;
+
+  // THE DROP MUST LAND ON THE WORD, so the word is measured, not assumed: the result row's own
+  // layout (and the wheel's responsive scale) decide where it actually is.
+  function armVerdictPaint(){
+    paintTarget = null;
+    LAND.x=280; LAND.y=684; LAND.dx=0; LAND.dy=0;
+    var v = document.querySelector('.result .v');
+    if (!v || !wheelArea) return;
+    var r = v.getBoundingClientRect(), wa = wheelArea.getBoundingClientRect();
+    if (!r.width || !wa.width || !wa.height) return;
+    var px = r.width/2, py = r.height*0.42;                  // the strike point inside the word's own box
+    LAND.x = (r.left + px - wa.left)/wa.width*560;
+    LAND.y = (r.top  + py - wa.top )/wa.height*700;
+    LAND.dx = LAND.x-280; LAND.dy = LAND.y-684;
+    if (splatEl)   splatEl.style.transform  ='translate('+LAND.dx.toFixed(1)+'px,'+LAND.dy.toFixed(1)+'px)';
+    if (wetmarkEl) wetmarkEl.style.transform='translate('+LAND.dx.toFixed(1)+'px,'+LAND.dy.toFixed(1)+'px)';
+    // the word goes INVISIBLE and waits to be painted; radius covers its furthest corner
+    var R = Math.sqrt(Math.pow(Math.max(px, r.width-px),2) + Math.pow(Math.max(py, r.height-py),2));
+    v.setAttribute('data-paint', px.toFixed(1)+'|'+py.toFixed(1)+'|'+(R*1.04).toFixed(1));
+    v.style.clipPath = 'circle(0px at '+px.toFixed(1)+'px '+py.toFixed(1)+'px)';
+    paintTarget = v;
   }
-  // TWO-STREAM descent: split from the top, run down the left/right circumference, meet + pool at the bottom, hand off to the merged drip.
-  function beadStream(lean){
-    if (!dropA||!dropB||!dropEl) return;
-    var TOTAL   = lean?FALL_LEAN:FALL_FULL;   // 520 | 680
-    var DRIP    = lean?115:150;               // drip-off portion
-    var ARCPOOL = TOTAL - DRIP;               // 405 | 530  (arc + short pool)
-    // RIGHT arc (dropA): equal 18° steps on R=236 about (280,304); last keyframe = pool (flatten in place). Time front-loaded (gravity).
-    reg(dropA.animate([
-      {transform:'translate(280px,64px)  scale(1,1)',        offset:0.000, easing:'linear'},
-      {transform:'translate(353px,80px)  scale(0.997,1.005)',offset:0.016},
-      {transform:'translate(419px,113px) scale(0.989,1.018)',offset:0.053},
-      {transform:'translate(471px,165px) scale(0.978,1.037)',offset:0.108},
-      {transform:'translate(504px,231px) scale(0.964,1.060)',offset:0.178},
-      {transform:'translate(516px,304px) scale(0.947,1.089)',offset:0.263},   // equator right (r=236)
-      {transform:'translate(504px,377px) scale(0.926,1.123)',offset:0.363},
-      {transform:'translate(471px,443px) scale(0.904,1.161)',offset:0.475},
-      {transform:'translate(419px,495px) scale(0.878,1.203)',offset:0.600},
-      {transform:'translate(353px,529px) scale(0.850,1.250)',offset:0.738},
-      {transform:'translate(280px,540px) scale(0.82,1.30)',  offset:0.887},   // bottom meet — head thinned+stretched (accelerating water)
-      {transform:'translate(280px,540px) scale(1.3,0.7)',    offset:1.000}    // POOL: beads coincide + flatten
-    ],{duration:ARCPOOL, easing:'linear', fill:'forwards'}));
-    // LEFT arc (dropB): x-mirror (560 − x), identical y + offsets
-    reg(dropB.animate([
-      {transform:'translate(280px,64px)  scale(1,1)',        offset:0.000, easing:'linear'},
-      {transform:'translate(207px,80px)  scale(0.997,1.005)',offset:0.016},
-      {transform:'translate(141px,113px) scale(0.989,1.018)',offset:0.053},
-      {transform:'translate(89px,165px)  scale(0.978,1.037)',offset:0.108},
-      {transform:'translate(56px,231px)  scale(0.964,1.060)',offset:0.178},
-      {transform:'translate(44px,304px)  scale(0.947,1.089)',offset:0.263},   // equator left
-      {transform:'translate(56px,377px)  scale(0.926,1.123)',offset:0.363},
-      {transform:'translate(89px,443px)  scale(0.904,1.161)',offset:0.475},
-      {transform:'translate(141px,495px) scale(0.878,1.203)',offset:0.600},
-      {transform:'translate(207px,529px) scale(0.850,1.250)',offset:0.738},
-      {transform:'translate(280px,540px) scale(0.82,1.30)',  offset:0.887},
-      {transform:'translate(280px,540px) scale(1.3,0.7)',    offset:1.000}
-    ],{duration:ARCPOOL, easing:'linear', fill:'forwards'}));
-    // draw the rivulet head-first, glued to the bead's own keyframe offsets (do = 1 - arcFraction)
-    var rillKf = [
-      {strokeDashoffset:1, offset:0.000},{strokeDashoffset:0.90, offset:0.016},
-      {strokeDashoffset:0.80, offset:0.053},{strokeDashoffset:0.70, offset:0.108},
-      {strokeDashoffset:0.60, offset:0.178},{strokeDashoffset:0.50, offset:0.263},
-      {strokeDashoffset:0.40, offset:0.363},{strokeDashoffset:0.30, offset:0.475},
-      {strokeDashoffset:0.20, offset:0.600},{strokeDashoffset:0.10, offset:0.738},
-      {strokeDashoffset:0,    offset:0.887},{strokeDashoffset:0,    offset:1.000}
-    ];
-    rills.forEach(function(el){ if (el) reg(el.animate(rillKf, {duration:ARCPOOL, easing:'linear', fill:'forwards'})); });
-    // MEET+MERGE handoff — REGISTERED timer (cancel-safe via ceremony.timers). Same-frame coincident-white swap.
-    ct(function(){
-      hideFx(dropA); hideFx(dropB);
-      showFx(dropEl);                                   // .drop appears exactly where the pool sat (280,540)
-      reg(dropEl.animate([
-        {transform:'translate(280px,540px) scale(1.25,0.72)', offset:0.00, easing:'cubic-bezier(.4,0,.7,.35)'},
-        {transform:'translate(280px,566px) scale(0.82,1.28)', offset:0.30, easing:'cubic-bezier(.5,0,.85,.4)'},  // necks → hanging teardrop detaches
-        {transform:'translate(280px,684px) scale(0.9,1.24)',  offset:1.00}                                       // DRIPS onto the text
-      ],{duration:DRIP, easing:'linear', fill:'forwards'}));
-    }, ARCPOOL);
+  // the drip lands and the white floods OUT of the point it struck
+  function paintVerdict(ms){
+    var v = paintTarget; if (!v) return;
+    paintTarget = null;
+    var p = (v.getAttribute('data-paint')||'').split('|');
+    if (p.length!==3){ v.style.clipPath=''; return; }
+    var at = ' at '+p[0]+'px '+p[1]+'px)';
+    var a = reg(v.animate([{clipPath:'circle(0px'+at},{clipPath:'circle('+p[2]+'px'+at}],
+      {duration:ms, easing:'cubic-bezier(.18,.66,.3,1)', fill:'forwards'}));
+    a.onfinish = function(){ v.style.clipPath=''; };
+    a.oncancel = function(){ v.style.clipPath=''; };   // an interrupt must never leave the word invisible
   }
-  function dripImpact(lean){   // the drip KISSES the already-visible white verdict — a finishing splat/ripple, NO reveal
+
+  function headKf(side){                       // side = +1 right | -1 left
+    var kf=[];
+    for (var i=0;i<=LIQ_N;i++){
+      var t=i/LIQ_N, th=180*LIQ_S(t), u=LIQ_SP(t)/LIQ_VMAX, r=th*Math.PI/180,
+          x=LIQ_CX+side*LIQ_R*Math.sin(r), y=LIQ_CY-LIQ_R*Math.cos(r),
+          g=0.55+0.45*Math.min(1,t/0.30),                  // grows out of the well
+          sx=g*(1.10-0.30*u), sy=g*(0.72+0.86*u),          // stretches with speed, fattens as it slows
+          phi=side*(th-90);
+      kf.push({transform:'translate('+x.toFixed(2)+'px,'+y.toFixed(2)+'px) rotate('+phi.toFixed(2)+'deg) scale('+sx.toFixed(3)+','+sy.toFixed(3)+')', offset:t, easing:'linear'});
+    }
+    kf[0].opacity=0; kf[1].opacity=1; kf[LIQ_N].opacity=1;   // a 22ms fade-in INSIDE the well = never a pop
+    return kf;
+  }
+  // dashoffsets stay POSITIVE by construction (offset = len + gap − h), so no SVG-1.1 negative-offset
+  // risk and no adjacent pattern repeat can land inside [0,1] and paint a stray second dash.
+  function cometKf(len){
+    var kf=[]; for (var i=0;i<=LIQ_N;i++){ var t=i/LIQ_N;
+      kf.push({strokeDashoffset:(len+1.40-LIQ_S(t)).toFixed(4), offset:t, easing:'linear'}); }
+    kf[0].opacity=0; kf[1].opacity=1; kf[LIQ_N].opacity=1; return kf;
+  }
+  // the film LAGS the head — further behind when it is fast, catching up as it slows. That lag is
+  // what makes it read as a coating clinging to glass rather than a line being drawn.
+  function coatKf(){
+    var kf=[]; for (var i=0;i<=LIQ_N;i++){ var t=i/LIQ_N, u=LIQ_SP(t)/LIQ_VMAX;
+      kf.push({strokeDashoffset:(1-Math.max(0,LIQ_S(t)-(0.030+0.045*u))).toFixed(4), offset:t, easing:'linear'}); }
+    kf[0].opacity=0; kf[1].opacity=1; kf[LIQ_N].opacity=1; return kf;
+  }
+
+  function liquid(lean){
+    var L = lean ? LIQ.lean : LIQ.full;
+    armVerdictPaint();
+    ct(function(){ wellSwell(L); }, L.well);
+    ct(function(){ runHeads(L); }, L.run);
+    ct(function(){ drainAll(L); }, L.drain);
+  }
+  function wellSwell(L){
+    if (!wellEl) return;
+    showFx(wellEl);
+    reg(wellEl.animate([
+      {transform:'translate(280px,68px) scale(0.18,0.10)', opacity:0,    offset:0.00, easing:'cubic-bezier(.12,.72,.30,1)'},
+      {transform:'translate(280px,68px) scale(1.06,1.14)', opacity:1,    offset:0.34, easing:'cubic-bezier(.35,0,.42,1)'},   // apex y≈46.3: TOUCHES the gem at r=254
+      {transform:'translate(280px,68px) scale(1.00,0.94)', opacity:1,    offset:0.52, easing:'linear'},                      // surface tension holds
+      {transform:'translate(280px,68px) scale(1.28,0.60)', opacity:0.86, offset:0.72, easing:'cubic-bezier(.4,0,.6,1)'},     // BREAKS as the heads pull out
+      {transform:'translate(280px,68px) scale(1.52,0.22)', opacity:0,    offset:1.00}
+    ], {duration:L.wellMs, easing:'linear', fill:'forwards'}));
+    if (wellStainEl) ct(function(){                        // the source leaves a wetted patch, it doesn't just vanish
+      reg(wellStainEl.animate([{opacity:0},{opacity:0.14}], {duration:180, easing:'ease-out', fill:'forwards'}));
+    }, L.wellMs*0.72);
+  }
+  function runHeads(L){
+    var o = {duration:L.runMs, easing:'linear', fill:'forwards'};
+    if (headR) showFx(headR); if (headL) showFx(headL);
+    var runR = null;
+    if (headR) runR = reg(headR.animate(headKf(+1), o));
+    if (headL) reg(headL.animate(headKf(-1), o));
+    [headWakeR, headWakeL].forEach(function(el){ if (el)                       // no speed, no wake
+      reg(el.animate([{opacity:1,offset:0},{opacity:1,offset:0.80},{opacity:0,offset:1}], o)); });
+    coats.forEach(function(el){ if (el) reg(el.animate(coatKf(), o)); });
+    if (chanR) reg(chanR.animate(cometKf(0.30), o));
+    if (chanL) reg(chanL.animate(cometKf(0.30), o));
+    if (coreR) reg(coreR.animate(cometKf(0.10), o));
+    if (coreL) reg(coreL.animate(cometKf(0.10), o));
+    if (runR) runR.finished.then(function(){ if (ceremony.active) poolAndHang(L); }).catch(function(){});
+    else ct(function(){ if (ceremony.active) poolAndHang(L); }, L.runMs);
+  }
+  function poolAndHang(L){
+    if (poolEl){
+      showFx(poolEl);
+      reg(poolEl.animate([{transform:'translate(280px,540px) scale(0.30,0.16)', opacity:0},
+                          {transform:'translate(280px,540px) scale(1,1)',       opacity:1}],
+        {duration:L.poolMs, easing:'cubic-bezier(.18,.74,.30,1)', fill:'forwards'}));
+    }
+    // CONTAINMENT SWAP: the heads squash into the pool and are hidden only once they are 22x5.9
+    // inside a 38x17.6 pool with their wakes already at 0 — the hide is geometrically undetectable.
+    [headR, headL].forEach(function(el, i){
+      if (!el) return;
+      var side = i===0 ? 1 : -1;
+      // starts from the run's EXACT final state (t=1 ⇒ u=0 ⇒ sx 1.100, sy 0.720) so there is no jump
+      reg(el.animate([{transform:'translate(280px,540px) rotate('+(side*90)+'deg) scale(1.100,0.720)'},
+                      {transform:'translate(280px,540px) rotate('+(side*90)+'deg) scale(1.485,0.396)'}],
+        {duration:110, easing:'cubic-bezier(.35,.6,.4,1)', fill:'forwards'}));
+      ct(function(){ hideFx(el); }, 110);
+    });
+    coats.forEach(function(el){ if (el)                                        // the film closes onto the pool
+      reg(el.animate([{strokeDashoffset:'0.0300'},{strokeDashoffset:'0.0000'}],
+        {duration:150, easing:'cubic-bezier(.3,.6,.4,1)', fill:'forwards'})); });
+    if (wetEl) reg(wetEl.animate([{opacity:0},{opacity:0.16}],                 // the whole orb goes wet
+      {duration:L.wetInMs, easing:'ease-out', fill:'forwards'}));
+    ct(function(){ hangAndDrip(L); }, L.drip - L.pool);
+  }
+  function hangAndDrip(L){
+    if (teatEl){                                                              // the thread retracts once the drop snaps
+      showFx(teatEl);
+      reg(teatEl.animate([{transform:'translate(280px,540px) scale(1,1.15)', opacity:1},
+                          {transform:'translate(280px,540px) scale(0.90,0.16)', opacity:0}],
+        {duration:190, easing:'cubic-bezier(.3,.7,.3,1)', fill:'forwards'}));
+    }
+    if (!dropEl){ ct(function(){ dripImpact(L); }, L.dripMs); return; }
+    // Δy per unit offset 53.8 / 84.6 / 140 / 182 / 188 — monotonically accelerating and landing AT
+    // SPEED, because it is being handed to an impact, not brought to rest.
+    var Y0=540, D=LAND.y-556, X=function(f){ return (280+LAND.dx*f).toFixed(1); };
+    showFx(dropEl);
+    var d = reg(dropEl.animate([
+      {transform:'translate(280px,'+Y0+'px) scale(0.62,0.55)',                     opacity:0, offset:0.00, easing:'cubic-bezier(.25,.55,.35,1)'},
+      {transform:'translate(280px,547px) scale(0.86,1.02)',                        opacity:1, offset:0.13, easing:'cubic-bezier(.42,0,.72,.45)'},
+      {transform:'translate(280px,556px) scale(0.80,1.20)',                        opacity:1, offset:0.26, easing:'cubic-bezier(.36,0,.78,.42)'},  // SNAP — detaches
+      {transform:'translate('+X(0.22)+'px,'+(556+D*0.22).toFixed(1)+'px) scale(0.86,1.26)', opacity:1, offset:0.46, easing:'linear'},
+      {transform:'translate('+X(0.53)+'px,'+(556+D*0.53).toFixed(1)+'px) scale(0.90,1.30)', opacity:1, offset:0.68, easing:'linear'},
+      {transform:'translate('+LAND.x.toFixed(1)+'px,'+LAND.y.toFixed(1)+'px) scale(0.94,1.32)', opacity:1, offset:1.00}
+    ], {duration:L.dripMs, easing:'linear', fill:'forwards'}));
+    d.finished.then(function(){ if (ceremony.active) dripImpact(L); }).catch(function(){});
+  }
+  function dripImpact(L){        // the drop lands ON the word and the white floods out of the strike point
     hideFx(dropEl);
-    showFx(splatEl);
-    // ripple blooms ON the word (origin 280,684 = where the thread lands) then fades — a finishing flourish, not a creator
-    reg(splatEl.animate([
-      {opacity:0, transform:'scale(0.5)'},
-      {opacity:1, transform:'scale(0.92)', offset:0.22},
-      {opacity:1, transform:'scale(1.0)',  offset:0.45},
-      {opacity:0, transform:'scale(1.28)'}
-    ], {duration:300, easing:'ease-out', fill:'forwards'}));
+    paintVerdict(Math.round(L.splatMs*0.72));
+    if (splatEl){
+      showFx(splatEl);
+      reg(splatEl.animate([
+        {opacity:0,   transform:'translate('+LAND.dx.toFixed(1)+'px,'+LAND.dy.toFixed(1)+'px) scale(0.34,0.34)', offset:0.00, easing:'cubic-bezier(.1,.75,.3,1)'},
+        {opacity:1,   transform:'translate('+LAND.dx.toFixed(1)+'px,'+LAND.dy.toFixed(1)+'px) scale(1.00,0.92)', offset:0.18, easing:'cubic-bezier(.3,.4,.4,1)'},
+        {opacity:0.8, transform:'translate('+LAND.dx.toFixed(1)+'px,'+LAND.dy.toFixed(1)+'px) scale(1.30,1.06)', offset:0.46, easing:'cubic-bezier(.35,0,.6,1)'},
+        {opacity:0,   transform:'translate('+LAND.dx.toFixed(1)+'px,'+LAND.dy.toFixed(1)+'px) scale(1.72,1.20)', offset:1.00}
+      ], {duration:L.splatMs, easing:'linear', fill:'forwards'}));
+    }
+    if (wetmarkEl){                                                            // the word drinks the drop
+      showFx(wetmarkEl);
+      reg(wetmarkEl.animate([{opacity:0,offset:0},{opacity:0.55,offset:0.30},{opacity:0.55,offset:0.60},{opacity:0,offset:1}],
+        {duration:L.markMs, easing:'linear', fill:'forwards'}));
+    }
   }
-
+  function drainAll(L){          // THE ORB DRIES, TOP-DOWN
+    // 2.600 ≡ 0.000 (mod the 2.60 dash period) so the first frame is byte-identical to the resting
+    // film; the visible run then goes [0,1] → [0.62,1], i.e. the film RETREATS DOWNWARD and the last
+    // of it clings at the bottom pole. stroke-linecap:round gives the receding edge a wet nose.
+    coats.forEach(function(el){ if (el) reg(el.animate([
+      {strokeDashoffset:'2.6000', opacity:1, offset:0},
+      {strokeDashoffset:'2.2400', opacity:1, offset:0.55},
+      {strokeDashoffset:'1.9800', opacity:0, offset:1}
+    ], {duration:L.drainMs, easing:'cubic-bezier(.32,.06,.62,1)', fill:'forwards'})); });
+    comets.forEach(function(el){ if (el) reg(el.animate([{opacity:1},{opacity:0}],
+      {duration:L.drainMs*0.6, easing:'ease-in', fill:'forwards'})); });
+    if (wetEl) reg(wetEl.animate([{opacity:0.16},{opacity:0}], {duration:L.drainMs, easing:'ease-in', fill:'forwards'}));
+    if (wellStainEl) reg(wellStainEl.animate([{opacity:0.14},{opacity:0}], {duration:L.drainMs, easing:'ease-in', fill:'forwards'}));
+    ct(function(){
+      if (poolEl) reg(poolEl.animate([{transform:'translate(280px,540px) scale(1,1)', opacity:1},
+                                      {transform:'translate(280px,540px) scale(0.70,0.24)', opacity:0}],
+        {duration:L.poolDryMs, easing:'cubic-bezier(.4,.1,.7,1)', fill:'forwards'}));
+    }, L.poolDry - L.drain);
+  }
   function addOption(){
     var t = (state.draft||'').trim();
     if (!t || state.spinning || state.options.length>=MAX) return;
@@ -1954,7 +2155,7 @@
     else if (state.revealPending)  r.innerHTML = '';       // verdict withheld — the drop delivers it
     else if (state.result){
       var wc = (state.winner!=null && state.options[state.winner]) ? state.options[state.winner].color : null;
-      r.innerHTML = '<span class="k">Verdict</span><span class="rsw"></span><span class="v"></span>';
+      r.innerHTML = '<span class="k">Verdict</span><span class="line"><span class="rsw"></span><span class="v"></span></span>';
       if (wc) r.querySelector('.rsw').style.background = wc;
       var v = r.querySelector('.v');
       v.textContent = state.result;                        // solid #FFFFFF + glow, printed the instant the arrow seats (no paint-up)
