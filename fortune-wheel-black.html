@@ -93,6 +93,40 @@
       radial-gradient(circle closest-side at 50% 50%, transparent 84.4%, rgba(0,0,0,0.30) 85.4%, rgba(0,0,0,0.10) 86.9%, transparent 88.0%);
   }
 
+  /* ---- THE NAMEPLATE RING: every option is a level, horizontal name riding just inside the band ----
+     Three nested transforms, each with origin 50% 50%:
+       .nameplates : translate(-50%,-50%) scale(k) rotate(W)        1 write/frame
+       .np[i]      : rotate(i*segDeg)                               static, set once at build
+       .np-t[i]    : translate(-50%,-50%) rotate(-(W + i*segDeg))   1 write/frame each
+     Net glyph orientation = W + θ − (W + θ) = 0 for every wedge at every angle: HORIZONTAL BY
+     ALGEBRA, not by a flip heuristic. The 6 o'clock name is as upright as the 12 o'clock one, and
+     there is no upside-down branch, no left/right alignment test, no reading direction to reconcile.
+     LBL_R = 110 ⇒ top:27.083% = (240−110)/480. Envelope [59.5, 160.5] clears the ring's inner rail
+     at 166 by 5.5 and the hub halo at 54 by 5.5. */
+  .nameplates{position:absolute;left:50%;top:50%;width:480px;height:480px;
+    transform-origin:50% 50%;transform:translate(-50%,-50%) scale(1) rotate(0deg);
+    pointer-events:none;z-index:5;will-change:transform}
+  .np{position:absolute;inset:0;transform-origin:50% 50%}
+  .np-t{position:absolute;left:50%;top:27.083%;max-width:106px;padding:2px 5px;
+    display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;
+    white-space:pre-line;overflow-wrap:anywhere;text-align:center;
+    font-family:Inter,system-ui,sans-serif;font-weight:600;line-height:1.14;
+    color:#FFFFFF;-webkit-font-smoothing:antialiased;
+    /* the wash is a SHADOW THE WORD CASTS on the glass, not a sticker: the 68%/68% radii make the
+       ellipse follow the box's own aspect, so alpha reaches 0 at the edge midpoints and is already 0
+       at the corners — no rectangle can ever read. The 0 0 3px shadow layer covers the glyph corners
+       that fall outside the ellipse (they do sit on bare jewel at 2 lines). */
+    background:radial-gradient(68% 68% at 50% 50%, rgba(4,5,9,0.26) 0%, rgba(4,5,9,0.15) 44%, rgba(4,5,9,0) 74%);
+    text-shadow:0 1px 2px rgba(0,0,0,0.62), 0 0 3px rgba(0,0,0,0.70), 0 0 7px rgba(0,0,0,0.45);
+    transform-origin:50% 50%;transform:translate(-50%,-50%) rotate(0deg);
+    transition:opacity 260ms cubic-bezier(.2,.7,.2,1);will-change:transform}
+  /* the winner's bloom is the same species as .result .v's glow — the eye links wheel→word.
+     REVEAL ONLY: at rest the top name is brightest by opacity alone, never by light. */
+  .nameplates.is-revealed .np-t.is-win{text-shadow:0 1px 2px rgba(0,0,0,.62),0 0 3px rgba(0,0,0,.70),
+    0 0 7px rgba(0,0,0,.45),0 0 9px rgba(255,255,255,0.18)}
+  @media (prefers-reduced-motion:reduce){ .np-t{transition:none} }
+  @media (max-width:560px){ body{padding-left:8px;padding-right:8px} }   /* buys back ~7.5% of type size at 360px */
+
   /* ---- compass glass: fixed dome cover over the disc, under the pointer; never rotates ---- */
   .glass{
     position:absolute; left:7.143%; top:9.143%;
@@ -291,6 +325,8 @@
       <!-- structural-ink overlay: the wheel's black seams, re-asserted OVER the drifting saturn band -->
       <canvas id="wheelInk" width="480" height="480" aria-hidden="true"></canvas>
       <div class="engrave-glass" aria-hidden="true"></div>
+      <!-- the nameplate ring: horizontal option names, orbiting without rotating, framed by the band -->
+      <div class="nameplates" id="nameplates" aria-hidden="true"></div>
     </div>
 
     <!-- fixed compass glass: over the disc, under the pointer; never rotates -->
@@ -386,7 +422,7 @@
   var HUB_R = 30;            // center axle-cap radius
   // deep jewel set — obsidian · citrine gold · carnelian · garnet · deep teal glass · emerald (ADD ORDER, black first)
   var JEWEL = ['#0b0b0d','#8a6a16','#8f4212','#6e1020','#0e5150','#10502e'];
-  var LABEL_INK = '#FFFFFF';   // the single white token — dark ink is invisible on deep jewel/black
+  // the single white token — dark ink is invisible on deep jewel/black. Now lives in .np-t{color}.
   var GRAIN = 0.04;          // glass wants ~no tooth; a whisper only to dither the gradients; 0 = dead-flat
 
   // ---- spin feel (rAF free-coast + crisp precise-landing settle) ----
@@ -416,7 +452,13 @@
   // structural-ink overlay canvas (the black seams re-asserted OVER the drifting saturn band)
   var inkCanvas = document.getElementById('wheelInk');
   var ictx = inkCanvas ? inkCanvas.getContext('2d') : null;
-  function mirrorInk(t){ if (inkCanvas) inkCanvas.style.transform = t; }   // keep the ink layer locked to #wheel's transform
+  // keep the ink layer locked to #wheel's transform. mirrorInk is already THE "the wheel's angle just
+  // changed" broadcast — every call site passes exactly 'rotate(<deg>deg)' — so the nameplates hang off
+  // it too and inherit the sacred curve's frame timing for free. Nothing else needs to know a spin exists.
+  function mirrorInk(t){
+    if (inkCanvas) inkCanvas.style.transform = t;
+    if (plateLayer){ var a=parseFloat(t.slice(7)); syncPlates(isFinite(a)?a:0); }
+  }
 
   // ---- deterministic RNG (stable texture per redraw) ----
   function hash(str){ var h=7; for(var i=0;i<str.length;i++) h=(Math.imul(h,31)+str.charCodeAt(i))|0; return h>>>0; }
@@ -428,7 +470,7 @@
   function segments(){
     if (state.options.length) return state.options.map(function(o){ return {color:o.color, text:o.text}; });
     var d = (state.draft||'').trim();
-    if (d && state.preview) return [{ color: state.preview.color, text: d.slice(0,18) }];
+    if (d && state.preview) return [{ color: state.preview.color, text: Array.from(d).slice(0,18).join('') }];   // surrogate-safe
     return [{ color: JEWEL[0], text: '' }];   // empty state = the single obsidian orb (n=1)
   }
 
@@ -488,25 +530,190 @@
     ctx.lineWidth=2; ctx.strokeStyle='rgba(32,15,6,0.75)'; ctx.stroke();
   }
 
-  function drawText(ctx, cx, cy, R, w, n, dim){
-    ctx.globalAlpha = dim ? 0.4 : 1;
-    var txt = w.text.length>18 ? w.text.slice(0,17)+'…' : w.text;
-    ctx.save(); ctx.translate(cx,cy);
-    ctx.shadowColor='rgba(0,0,0,0.5)'; ctx.shadowBlur=3;   // keep light ink legible over the lit dome (cleared by restore())
-    if (n===1){
-      ctx.textAlign='center'; ctx.textBaseline='middle';
-      var fs1 = Math.min(42, Math.max(20, 480/(txt.length+2)));
-      ctx.font='600 '+fs1+'px Inter, sans-serif';
-      ctx.fillStyle=LABEL_INK; ctx.fillText(txt,0,R*0.44);
-      ctx.restore(); ctx.globalAlpha=1; return;
+  // ======================================================================
+  // ============  THE NAMEPLATE RING  (replaces canvas drawText)  =========
+  //   Option names are horizontal DOM plates orbiting a lane just inside the
+  //   silver band. They are NOT painted on the wheel: glyphs rasterise upright
+  //   at every angle, which canvas-baked rotated text can never do.
+  //
+  //   HONEST NOTE ON THE BRIEF: horizontal text cannot live IN the astrolabe
+  //   band. A level word orbiting at the band's radius sweeps a ring twice its
+  //   own diagonal wide; to fit inside the 36px channel a name could be about
+  //   3.6 characters. So the names take the lane just inside the ring, and the
+  //   silver band becomes the FRAME around them.
+  // ======================================================================
+  var LBL_R_TOP_PCT = 27.083;   // (240-110)/480 — mirrored in .np-t{top}
+  var LBL_MAX_FS = 21, LBL_SPREAD = 5, LBL_FS_MIN_PX = 9.5;
+  var LBL_BOX_W = 96, LBL_BOX_W_SOLO = 168;    // content widths (box-sizing:border-box is global)
+  // Preference ladder: never drop below 18px merely to avoid a second line; below 18 prefer fewer
+  // lines at the same size. Two lines are legal only while 2·fs·1.14 + 4 <= 45  ⇒  fs <= 18.
+  var LBL_ORDER = [[1,21],[1,20],[1,19],[1,18],[2,18],[1,17],[2,17],[1,16],[2,16],
+                   [1,15],[2,15],[1,14],[2,14],[1,13],[2,13]];
+  var PLATE_OP_TR = 'opacity 260ms cubic-bezier(.2,.7,.2,1)';
+  var mctx = document.createElement('canvas').getContext('2d');   // dedicated measurer, never touches wctx
+  var SIGIL_RE = null;   // built defensively: \p{...} is a SyntaxError on older engines, and a literal would kill the file
+  try { SIGIL_RE = new RegExp('^\\p{Extended_Pictographic}+$','u'); } catch(e){ SIGIL_RE = null; }
+
+  function gl(s){ return Array.from(s).length; }                    // surrogate-safe character count
+  function isSigil(s){ return !!SIGIL_RE && gl(s)<=2 && SIGIL_RE.test(s); }
+  function lblFont(fs){ return '600 '+fs+'px Inter, system-ui, sans-serif'; }
+  function lblLS(fs){ return fs>=17 ? 0.012 : 0.022; }              // em — measureText ignores CSS letter-spacing
+  function measW(s,fs){ mctx.font=lblFont(fs);
+    return mctx.measureText(s).width + lblLS(fs)*fs*Math.max(0, gl(s)-1); }
+  // balanced split, not a greedy wrap: minimise the WIDER half
+  function bestSplit(s,fs){
+    var idx=[], i; for (i=1;i<s.length;i++) if (/[\s\-\/·—]/.test(s[i-1])) idx.push(i);
+    if (!idx.length) return null;
+    var best=null, bw=Infinity;
+    idx.forEach(function(k){
+      var a=s.slice(0,k).trim(), b=s.slice(k).trim(); if(!a||!b) return;
+      var w=Math.max(measW(a,fs), measW(b,fs));
+      if (w<bw){ bw=w; best=[a,b,w]; }
+    });
+    return best;
+  }
+  function widthAt(s,fs,lines){
+    if (lines===1) return measW(s,fs);
+    var sp=bestSplit(s,fs); if (sp) return sp[2];
+    return measW(s,fs)*0.53;            // unbreakable ⇒ CSS breaks anywhere: half + a 6% break penalty
+  }
+  function rungFor(s,BOX,floor){
+    for (var c=0;c<LBL_ORDER.length;c++){ var L=LBL_ORDER[c][0], fs=LBL_ORDER[c][1];
+      if (fs<floor) continue;
+      if (widthAt(s,fs,L)<=BOX) return {fs:fs, lines:L}; }
+    return {fs:floor, lines:2};
+  }
+  // PER-LABEL rung with a BOUNDED spread. One size for the whole set makes "Yes / No / Call her back
+  // tonight" render Yes and No at 14px for no reason; unbounded per-label sizes read as a ransom note.
+  // 5px of difference on one dial reads as hierarchy.
+  function fitSet(texts,BOX,floor){
+    var per = texts.map(function(s){
+      if (!s) return {fs:LBL_MAX_FS, lines:1, vote:false};
+      if (isSigil(s)) return {fs:26, lines:1, vote:false, sigil:true};   // a chosen mark, not a shrunken glyph
+      var r = rungFor(s,BOX,floor); r.vote = true; return r;
+    });
+    var votes=[]; per.forEach(function(p){ if (p.vote) votes.push(p.fs); });
+    votes.sort(function(a,b){ return a-b; });
+    var worst = votes.length ? votes[0] : LBL_MAX_FS;
+    var second = votes.length>1 ? votes[1] : worst;
+    var base = Math.min(LBL_MAX_FS, second, worst+LBL_SPREAD);
+    return texts.map(function(s,i){
+      if (!s) return {fs:base, txt:''};
+      if (per[i].sigil) return {fs:26, txt:s};
+      var fs = Math.min(base, per[i].fs);
+      var sp = (per[i].lines===2) ? bestSplit(s,fs) : null;   // the LAST RESORT still splits at the space
+      return {fs:fs, txt: sp ? sp[0]+'\n'+sp[1] : s};
+    });
+  }
+
+  var plateLayer=null, plates=[], plateK=1, plateTrans=null, psig=null, pLastW=0;
+  function angNorm(a){ a%=360; if(a>180)a-=360; if(a<-180)a+=360; return a; }
+  function plateOpacity(d, revealed, isWin){
+    var t = 0.5 + 0.5*Math.cos(d*Math.PI/180);      // 1 at the arrow's spot … 0 at the bottom
+    var rest = 0.42 + 0.58*Math.pow(t,2.2);
+    if (!revealed) return rest;
+    return isWin ? 1 : 0.26;                        // 0.18 measured as "erased"; 0.26 reads as retired
+  }
+  // ---- the motion fade: names blur out at speed and CONDENSE back as the wheel plants ----
+  // Velocity-driven, not state-driven: the ramp occupies the brake's own last ~85ms, so the rest
+  // gradient and .is-top land AT the lock rather than 260ms after the reveal.
+  var pv={a:null,t:0,w:0}, pWatch=0, pWasSpinning=false;
+  function pOmega(W, now){
+    if (pv.a===null){ pv.a=W; pv.t=now; return 0; }
+    var dt = now-pv.t; if (dt<=0) return pv.w;
+    var w = Math.abs(W-pv.a)/dt; pv.a=W; pv.t=now;
+    pv.w = pv.w*0.4 + w*0.6;                        // 1-pole smooth: kills the single-frame spike at the lock
+    return pv.w;
+  }
+  function pOpacity(w){                             // 0.065 deg/ms ≈ 2px/frame at r=110; 0.33 ≈ 10px/frame
+    if (w<=0.065) return 1;
+    if (w>=0.33)  return 0.06;
+    return 1 - 0.94*(w-0.065)/0.265;
+  }
+  function pSettle(){
+    pWatch = 0; if (!plateLayer) return;
+    var op = pOpacity(pOmega(pLastW, performance.now()));
+    plateLayer.style.opacity = op.toFixed(3);
+    if (op<1) pWatch = requestAnimationFrame(pSettle); else paintPlateRest();
+  }
+  function paintPlateRest(){
+    var n=plates.length; if(!n) return;
+    var seg=360/n, revealed=(!busy() && state.winner!=null), i;
+    for (i=0;i<n;i++){
+      var p=plates[i], d=Math.abs(angNorm(pLastW+i*seg));
+      p.t.style.opacity = plateOpacity(d, revealed, i===state.winner).toFixed(3);
+      var top = (n===1) || (d <= seg/2 + 1e-6);     // <=, not <: an exact half-segment landing is reachable
+      if (top!==p.top){ p.top=top; p.t.classList.toggle('is-top', top); }
     }
-    var deg = ((w.mid*180/Math.PI)%360+360)%360;
-    var fs = Math.min(25, Math.max(12, 320/(txt.length+2)));
-    fs = Math.min(fs, (2*Math.PI/n)*R*0.42);
-    ctx.font='600 '+fs+'px Inter, sans-serif'; ctx.textBaseline='middle'; ctx.fillStyle=LABEL_INK;
-    if (deg>90 && deg<270){ ctx.rotate(w.mid+Math.PI); ctx.textAlign='left'; ctx.fillText(txt,-(R*0.9),0); }
-    else { ctx.rotate(w.mid); ctx.textAlign='right'; ctx.fillText(txt,R*0.9,0); }
-    ctx.restore(); ctx.globalAlpha=1;
+  }
+  // THE PER-FRAME DRIVER. Load-bearing: this MUST be driven from mirrorInk, i.e. the same style flush
+  // as the canvas transform, and never as an animation of its own. Coast angular velocity is ~19.8°
+  // per frame, so ONE frame of pipeline desync between a compositor-driven counter-rotation and the
+  // main-thread orbit would rock every word ±20°. Same-flush is the only construction that can't tumble.
+  function syncPlates(W){
+    if (!plateLayer) return;
+    var n=plates.length; if (!n) return;
+    var Weff = (n===1 ? 0 : W);                     // a lone plate is pinned upright under the arrow
+    var tr = canvas.style.transition, i;
+    if (tr !== plateTrans){                         // guarded ⇒ ~3 writes per spin, not per frame
+      plateTrans = tr;
+      var real = !!(tr && tr!=='none');
+      plateLayer.style.transition = real ? tr : '';
+      for (i=0;i<n;i++) plates[i].t.style.transition = real ? (tr+', '+PLATE_OP_TR) : '';
+      if (real) void plateLayer.offsetWidth;        // start the mirrored transition from the CURRENT angle
+    }
+    plateLayer.style.transform = 'translate(-50%,-50%) scale('+plateK+') rotate('+Weff+'deg)';
+    var seg=360/n;
+    for (i=0;i<n;i++) plates[i].t.style.transform = 'translate(-50%,-50%) rotate('+(-(Weff+i*seg))+'deg)';
+    pLastW = Weff;
+    if (state.spinning && !pWasSpinning){ pv.a=null; pv.w=0; }   // fresh velocity estimate per spin
+    pWasSpinning = state.spinning;
+    if (state.spinning){
+      var op = pOpacity(pOmega(Weff, performance.now()));
+      plateLayer.style.opacity = op.toFixed(3);
+      if (op<1 && !pWatch) pWatch = requestAnimationFrame(pSettle);
+      return;                                       // MOVING: transforms + one layer opacity, nothing else
+    }
+    if (!pWatch){ plateLayer.style.opacity='1'; paintPlateRest(); }
+  }
+  function buildPlates(){
+    if (!plateLayer) return;
+    var segs=segments(), n=segs.length;
+    var solo = (n===1);
+    var nsig = segs.map(function(s){return s.text;}).join('')+'#'+n+'#'+plateK.toFixed(4);
+    if (nsig===psig) return; psig=nsig;
+    var fsFloor = Math.max(13, Math.ceil(LBL_FS_MIN_PX/plateK));   // never smaller than 9.5 REAL px on screen
+    var fit = fitSet(segs.map(function(s){ return s.text||''; }), solo?LBL_BOX_W_SOLO:LBL_BOX_W, fsFloor);
+    var seg=360/n, k;
+    if (plates.length!==n){                         // rebuild the DOM only when the COUNT changes —
+      plateLayer.innerHTML=''; plates=[];           // otherwise typing re-promotes six layers per keystroke
+      for (k=0;k<n;k++){
+        var np=document.createElement('div'); np.className='np';
+        np.style.transform='rotate('+(k*seg)+'deg)';
+        var t=document.createElement('span'); t.className='np-t';
+        t.setAttribute('dir','auto');               // mixed Latin/RTL names order wrongly without it
+        np.appendChild(t); plateLayer.appendChild(np);
+        plates.push({np:np, t:t, top:false, txt:null, fs:0});
+      }
+      plateTrans=null;
+    } else {
+      for (k=0;k<n;k++) plates[k].np.style.transform='rotate('+(k*seg)+'deg)';
+    }
+    for (k=0;k<n;k++){
+      var p=plates[k], f=fit[k];
+      if (p.txt!==f.txt){ p.txt=f.txt; p.t.textContent=f.txt; p.t.style.display = f.txt ? '' : 'none'; }
+      if (p.fs!==f.fs){ p.fs=f.fs; p.t.style.fontSize=f.fs+'px'; p.t.style.letterSpacing=lblLS(f.fs)+'em'; }
+      p.t.style.maxWidth = solo ? '180px' : '';     // a pinned plate never orbits ⇒ no swept envelope to respect
+    }
+    syncPlates(rot);
+  }
+  function syncPlateVerdict(){
+    if(!plateLayer) return;
+    plateLayer.style.opacity='1';                   // un-strands the add/remove hide on every canonical resting frame
+    var revealed = (!busy() && state.winner!=null);
+    plateLayer.classList.toggle('is-revealed', revealed);
+    for(var i=0;i<plates.length;i++) plates[i].t.classList.toggle('is-win', revealed && i===state.winner);
+    paintPlateRest();
   }
 
   // ---- shared obsidian glass light rig (fixed in disc-space; caller supplies the clip) ----
@@ -571,6 +778,7 @@
 
   // ---- wheel rendering ---- (the resting frame is always this)
   function draw(){
+    buildPlates(); syncPlateVerdict();     // both self-guard; both must run BEFORE the sig early-out below
     var segs = segments();
     var winner = (!busy() && state.winner!=null) ? state.winner : null;   // verdict withheld while spinning OR revealPending
     var nsig = segs.map(function(s){return s.color+'|'+s.text;}).join(';')+'#w'+(winner==null?'-':winner);
@@ -640,7 +848,7 @@
       });
     }
 
-    wedges.forEach(function(w,k){ if (w.text) drawText(ctx,cx,cy,R,w,n, winner!=null && k!==winner); });
+    // (option names are no longer painted here — they are the horizontal .nameplates ring above)
 
     // 6) thin dark edge seating the painted disc on black; hub (suppressed on the clean empty orb)
     ctx.save(); ctx.beginPath(); ctx.arc(cx,cy,R-1,0,Math.PI*2); ctx.lineWidth=2.5; ctx.strokeStyle='rgba(18,11,5,0.85)'; ctx.stroke(); ctx.restore();
@@ -1572,6 +1780,7 @@
     anim = { kind: isFirst?'first':'add', start: performance.now(),
              dur: isFirst?DUR_FIRST:DUR_POP, oldSegs: (isFirst?[]:oldSegs),
              newSeg: newSeg };
+    if (plateLayer) plateLayer.style.opacity='0';   // names sit out the re-partition (parity: drawTransition never painted text)
     drawTransition(anim, 0);   // paint the first chunk SYNCHRONOUSLY on the click tick — no one-rAF deferral
     kick();
     draftEl.focus();           // parity with Enter-to-add: keep focus in the field for the next choice
@@ -1589,6 +1798,7 @@
     renderControls();
     anim = { kind:'remove', start: performance.now(), dur: DUR_REMOVE,
              oldSegs: oldSegs, removed:i };
+    if (plateLayer) plateLayer.style.opacity='0';   // restored by syncPlateVerdict on the next canonical resting frame
     kick();
   }
 
@@ -1677,6 +1887,21 @@
     ? (coreEl.getBoundingClientRect().top + coreEl.getBoundingClientRect().height/2)
       - (plungeEl.getBoundingClientRect().top + plungeEl.getBoundingClientRect().height/2)
     : 240;   // fallback for the authored 480 disc
+  // ---- nameplate ring wire-up: one fixed 480 coordinate system scaled to the live disc ----
+  plateLayer = document.getElementById('nameplates');
+  var _dw = document.querySelector('.disc-wrap');
+  function measurePlates(){
+    // measure .disc-wrap, NEVER #wheel — the wheel is WAAPI-scaled during orbAbsorb
+    var w = _dw ? _dw.getBoundingClientRect().width : DISC_S, k = (w||DISC_S)/DISC_S;
+    if (Math.abs(k-plateK) < 0.002) return;
+    plateK = k; psig = null; buildPlates();
+  }
+  measurePlates();
+  if (window.ResizeObserver && _dw) new ResizeObserver(measurePlates).observe(_dw);
+  else window.addEventListener('resize', measurePlates);
+  // measureText returns fallback metrics until Inter lands — one-shot refit
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(function(){ psig=null; buildPlates(); }).catch(function(){});
+
   if (orbitArm){
     var _arrowURI = rasterizeArrow();
     orbitArm.style.backgroundImage = 'url('+_arrowURI+')';
