@@ -1,86 +1,379 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Arrow Orbit — Easing Test</title>
+<title>Arrow Orbit — Isolation Test (live geometry)</title>
 <style>
   body{margin:0;min-height:100vh;background:radial-gradient(120% 90% at 50% -10%,#100f0d,#0a0908 55%,#050505);
-    color:#948f87;font:600 12px 'IBM Plex Mono',monospace;display:flex;flex-direction:column;align-items:center;padding:32px 20px}
-  .note{max-width:600px;text-align:center;line-height:1.7;letter-spacing:.05em;margin-bottom:6px;color:#8a857d}
+    color:#948f87;font:600 11px 'IBM Plex Mono',ui-monospace,monospace;
+    display:flex;flex-direction:column;align-items:center;padding:24px 16px 56px}
+  .note{max-width:760px;text-align:center;line-height:1.75;letter-spacing:.04em;color:#8a857d}
   .note b{color:#e8842a}
-  .wheel-area{position:relative;width:520px;max-width:92vw;aspect-ratio:520/620;margin-top:6px}
-  .disc{position:absolute;left:9%;top:9%;width:82%;height:68.8%;border-radius:50%;
-    background:radial-gradient(circle at 50% 45%,#17161b,#0b0b0d 70%);box-shadow:0 16px 26px rgba(0,0,0,.55)}
-  .orbit-arm{position:absolute;left:50%;top:43.4%;width:100%;aspect-ratio:1;
-    transform:translate(-50%,-50%) rotate(0deg);transform-origin:50% 50%;
+  .note .warn{color:#d7d3ca}
+
+  /* ---- LIVE GEOMETRY: identical boxes to fortune-wheel-black.html. The old test used a 96px-wide
+         arrow in a 600 canvas at 1300ms/lap = 277 deg/s. The shipped arrow is 56px in a 760 canvas at
+         439 deg/s. That test was 2x too wide and 0.63x too slow — it could never have shown the
+         defect it was built to find. Every box below is copied from the real file. ---- */
+  .wheel-area{position:relative;width:560px;max-width:96vw;aspect-ratio:560/700;margin:4px 0 -40px}
+  .disc-shadow{position:absolute;left:7.143%;top:9.143%;width:85.714%;height:68.571%;border-radius:50%;
+    z-index:1;pointer-events:none;box-shadow:0 16px 26px rgba(0,0,0,.55),0 4px 8px rgba(0,0,0,.4)}
+  .orb{position:absolute;left:7.143%;top:9.143%;width:85.714%;height:68.571%;border-radius:50%;z-index:2;
+    transform-origin:50% 50%;
+    background:radial-gradient(circle at 45% 28%,#1a1920 0%,#0e0e12 42%,#08080b 72%,#050507 100%)}
+  .band{position:absolute;inset:0;border-radius:50%;pointer-events:none;
+    -webkit-mask:radial-gradient(circle closest-side at 50% 50%,transparent 0 66.3%,#000 68.3% 86.0%,transparent 88.5%);
+            mask:radial-gradient(circle closest-side at 50% 50%,transparent 0 66.3%,#000 68.3% 86.0%,transparent 88.5%);
+    background:
+      radial-gradient(circle closest-side at 50% 50%,transparent 83.3%,rgba(233,241,252,.26) 84.2%,rgba(233,241,252,.09) 84.9%,transparent 85.6%),
+      radial-gradient(circle closest-side at 50% 50%,transparent 68.6%,rgba(226,236,248,.14) 69.4%,transparent 70.4%),
+      linear-gradient(128deg,rgba(226,238,252,.20) 0%,rgba(226,238,252,.055) 26%,rgba(226,238,252,0) 50%),
+      radial-gradient(circle closest-side at 50% 50%,rgba(90,130,180,.10) 0%,rgba(90,130,180,.10) 100%)}
+  .liquid-shell{position:absolute;inset:0;border-radius:50%;pointer-events:none;transform-origin:50% 50%}
+  .liquid{position:absolute;inset:0;border-radius:50%;pointer-events:none;
+    -webkit-mask:radial-gradient(circle closest-side at 50% 50%,transparent 0 69%,#000 71% 84%,transparent 86%);
+            mask:radial-gradient(circle closest-side at 50% 50%,transparent 0 69%,#000 71% 84%,transparent 86%);
+    background:radial-gradient(46% 46% at 72% 26%,rgba(104,168,226,.34) 0%,rgba(104,168,226,0) 70%),
+               radial-gradient(38% 38% at 26% 74%,rgba(104,168,226,.20) 0%,rgba(104,168,226,0) 70%)}
+
+  .orbit-hover{position:absolute;left:50%;top:43.43%;width:135.714%;aspect-ratio:1;
+    transform:translate(-50%,-50%);transform-origin:50% 50%;z-index:3;pointer-events:none;will-change:transform;
+    animation:armHover 4600ms ease-in-out infinite}
+  .orbit-arm{position:absolute;inset:0;width:100%;height:100%;transform:rotate(0deg);transform-origin:50% 50%;
     background-position:center;background-size:100% 100%;background-repeat:no-repeat;
-    z-index:3;pointer-events:none;opacity:0;will-change:transform}
-  .row{margin-top:18px;display:flex;gap:10px;flex-wrap:wrap;justify-content:center;align-items:center}
+    z-index:3;pointer-events:none;opacity:1;will-change:transform}
+  .arm-smear{position:absolute;inset:0;width:100%;height:100%;background-position:center;
+    background-size:100% 100%;background-repeat:no-repeat;pointer-events:none;opacity:0;will-change:opacity}
+  @keyframes armHover{0%{transform:translate(-50%,-50%) translateY(0)}
+    50%{transform:translate(-50%,-50%) translateY(-1.4px)}100%{transform:translate(-50%,-50%) translateY(0)}}
+  .orbit-hover.lockbreathe{animation:none}
+
+  .panel{width:min(880px,100%);display:flex;flex-direction:column;gap:9px}
+  .row{display:flex;gap:7px;flex-wrap:wrap;align-items:center}
+  .lab{color:#6e6b63;letter-spacing:.18em;min-width:74px;text-transform:uppercase}
   button{font:inherit;cursor:pointer;color:#d7d3ca;background:rgba(233,229,220,.05);
-    border:1px solid rgba(233,229,220,.2);border-radius:8px;padding:11px 16px;text-transform:uppercase;letter-spacing:.14em}
+    border:1px solid rgba(233,229,220,.18);border-radius:7px;padding:9px 12px;letter-spacing:.1em;white-space:nowrap}
+  button:hover{border-color:rgba(233,229,220,.4)}
   button.on{color:#171310;background:linear-gradient(180deg,#e7e2d7,#cbc6bb);border-color:transparent}
-  #fps{color:#e8842a;min-width:70px;text-align:right}
-  .lab{color:#6e6b63;letter-spacing:.2em}
+  button.warn.on{background:linear-gradient(180deg,#e8a45a,#cf7f2e)}
+  .readout{margin-top:12px;width:min(880px,100%);border:1px solid rgba(233,229,220,.12);border-radius:8px;
+    padding:12px 14px;line-height:1.9;color:#8a857d;letter-spacing:.05em;background:rgba(233,229,220,.02)}
+  .readout b{color:#d7d3ca;font-weight:600}
+  .readout .hot{color:#e8842a}
+  .readout .good{color:#8fd0a0}
+  #fps{color:#e8842a;min-width:64px;text-align:right}
+  .gate{margin-top:14px;width:min(880px,100%);border:1px solid rgba(233,229,220,.10);border-radius:8px;
+    padding:12px 16px;line-height:1.85;color:#7d786f;letter-spacing:.03em}
+  .gate h4{margin:0 0 6px;color:#948f87;letter-spacing:.22em;text-transform:uppercase;font-size:11px}
+  .gate ol{margin:0;padding-left:18px} .gate li{margin:4px 0} .gate b{color:#c9c4ba}
 </style></head><body>
-  <div class="note">Try each easing. Which reads as a smooth rigid orbit vs. <b>lag/teleport</b>?<br>
-  <b>LINEAR</b> = steady sweep · <b>SMOOTH</b> = gentle ease · <b>WHIP</b> = the old ceremony motion (slows at ~10 o'clock, then snaps to top).<br>
-  Then hit <b>HOG</b> to jam the main thread and see if the smooth ones survive it.</div>
-  <div class="wheel-area"><div class="disc"></div><div class="orbit-arm" id="arm"></div></div>
-  <div class="row">
-    <span class="lab">Easing:</span>
-    <button id="b-linear" class="on">Linear</button>
-    <button id="b-smooth">Smooth</button>
-    <button id="b-whip">Whip (old)</button>
-  </div>
-  <div class="row">
-    <span id="fps">-- fps</span>
-    <button id="hog">Main-thread hog: OFF</button>
-  </div>
+
+<div class="note">
+  <b>Every default below is today's shipped build</b> — 439&deg;/s, no smear, motion A, no reverb, no load.<br>
+  Change one thing at a time. <span class="warn">Start with gate step 1 (the judder sweep) — it decides everything else.</span>
+</div>
+
+<div class="wheel-area">
+  <div class="disc-shadow"></div>
+  <div class="orb" id="orb"><div class="band"></div><div class="liquid-shell" id="lshell"><div class="liquid"></div></div></div>
+  <div class="orbit-hover" id="hover"><div class="orbit-arm" id="arm"><div class="arm-smear" id="smear"></div></div></div>
+</div>
+
+<div class="panel">
+  <div class="row"><span class="lab">1 Cruise</span><span id="r-cruise"></span></div>
+  <div class="row"><span class="lab">2 Smear</span><span id="r-smear"></span></div>
+  <div class="row"><span class="lab">3 Motion</span><span id="r-motion"></span></div>
+  <div class="row"><span class="lab">4 Reverb</span><span id="r-reverb"></span></div>
+  <div class="row"><span class="lab">5 Load</span><span id="r-load"></span></div>
+  <div class="row"><span class="lab">6 Run</span><span id="r-run"></span><span id="fps">-- fps</span></div>
+</div>
+
+<div class="readout" id="readout"></div>
+
+<div class="gate">
+  <h4>Acceptance gate — in order, your eye is the instrument</h4>
+  <ol>
+    <li><b>JUDDER (decides everything).</b> Motion A, loop on. Sweep 277 &rarr; 439 &rarr; 574, once fixating a
+      point on the rim, once tracking the arrow. If 439 shows a picket fence / multiple arrows while 277 is clean,
+      the residual lag is <b>sampling</b>, not easing. Confirm by flipping smear 26&deg; ON at 439 — if the fence
+      disappears, it is proven and the smear is mandatory.</li>
+    <li><b>LAUNCH.</b> B vs A at 1&times; then 0.25&times;. PASS = at least 3 visible frames of growing gap, and the
+      first visible position within one arrow-width of 12 o'clock. FAIL &rarr; raise the launch from 140ms.</li>
+    <li><b>HAMMER.</b> C vs A. PASS = an arrival, not a glide, with no teleport — at 0.25&times; you can count at
+      least 2 decreasing steps. Teleports &rarr; lengthen the hammer; glides &rarr; shorten it. Never both.</li>
+    <li><b>LOAD.</b> D + smear 26 + tuned reverb. Sustained hog: should be indistinguishable. Launch spike: must
+      still depart from rest. Seat spike: the orb dip must land on the stop frame.</li>
+    <li><b>REVERB.</b> Tuned vs C3-ring, watching the top rim. Any rise above the rest line = C3 fails (expected).</li>
+    <li><b>SEAMS.</b> D at 0.25&times;, watch the launch&rarr;cruise and cruise&rarr;hammer joins. Any kink is a
+      slope mismatch in the numbers, not a perf problem.</li>
+  </ol>
+</div>
+
 <script>(function(){
-  var ORBIT_DIR=1, ARM_BASE='translate(-50%,-50%) ', mode='linear';
-  var arm=document.getElementById('arm');
+  "use strict";
+  var arm=document.getElementById('arm'), smearEl=document.getElementById('smear'),
+      orb=document.getElementById('orb'), lshell=document.getElementById('lshell'),
+      hover=document.getElementById('hover');
+
+  /* ============ THE GEM — copied verbatim from fortune-wheel-black.html ============ */
+  var GEM={
+    SIL:[[216,-67],[264,-67],[268,-54],[256,-35],[240,-14],[224,-35],[212,-54]],
+    TAB:[[222,-67],[258,-67],[252,-56],[228,-56]],
+    CR_L:[[216,-67],[222,-67],[228,-56],[212,-54]],
+    CR_R:[[258,-67],[264,-67],[268,-54],[252,-56]],
+    PV_L:[[212,-54],[228,-56],[240,-56],[240,-14],[224,-35]],
+    PV_R:[[240,-56],[252,-56],[268,-54],[256,-35],[240,-14]],
+    FLASH:[[232.5,-30],[240,-38],[240,-22]],
+    GIRD:[[212,-54],[228,-56],[252,-56],[268,-54]],
+    GHOST:[[212,-54],[224,-35],[240,-14],[256,-35],[268,-54]]
+  };
   function rasterizeArrow(){
-    var S=600,OFF=(S-480)/2,ss=2,c=document.createElement('canvas');c.width=c.height=S*ss;
+    var S=760,OFF=(S-480)/2,ss=(window.devicePixelRatio||1)>=1.5?3:2;
+    var c=document.createElement('canvas');c.width=c.height=S*ss;
     var g=c.getContext('2d');g.scale(ss,ss);g.translate(OFF,OFF);
-    function tri(){g.beginPath();g.moveTo(192,-44);g.lineTo(288,-44);g.lineTo(240,52);g.closePath();}
-    var grad=g.createLinearGradient(192,-44,288,52);
-    grad.addColorStop(0,'#eb9a52');grad.addColorStop(0.55,'#d2691e');grad.addColorStop(1,'#a05019');
-    g.lineJoin='round';g.lineCap='round';
-    g.save();g.shadowColor='rgba(0,0,0,0.5)';g.shadowBlur=10;g.shadowOffsetY=8;tri();g.lineWidth=14;g.strokeStyle='#c15f1a';g.stroke();g.restore();
-    tri();g.fillStyle=grad;g.fill();g.lineWidth=14;g.strokeStyle='#c15f1a';tri();g.stroke();
-    g.lineWidth=2.5;g.strokeStyle='rgba(32,15,6,0.8)';tri();g.stroke();return c.toDataURL('image/png');
+    g.lineJoin='miter';g.miterLimit=8;g.lineCap='butt';
+    var SIL=GEM.SIL,TAB=GEM.TAB,CR_L=GEM.CR_L,CR_R=GEM.CR_R,PV_L=GEM.PV_L,PV_R=GEM.PV_R,
+        FLASH=GEM.FLASH,GIRD=GEM.GIRD,PGHOST=GEM.GHOST;
+    function path(p,close,dx,dy){dx=dx||0;dy=dy||0;g.beginPath();g.moveTo(p[0][0]+dx,p[0][1]+dy);
+      for(var i=1;i<p.length;i++)g.lineTo(p[i][0]+dx,p[i][1]+dy);if(close)g.closePath();}
+    function lin(x0,y0,x1,y1,st){var q=g.createLinearGradient(x0,y0,x1,y1);
+      for(var i=0;i<st.length;i++)q.addColorStop(st[i][0],st[i][1]);return q;}
+    function rad(x,y,r,c0,c1){var q=g.createRadialGradient(x,y,0,x,y,r);q.addColorStop(0,c0);q.addColorStop(1,c1);return q;}
+    g.save();g.fillStyle=rad(240,-6,18,'rgba(0,0,0,0.46)','rgba(0,0,0,0)');
+      g.beginPath();g.ellipse(240,-6,18,6.5,0,0,Math.PI*2);g.fill();g.restore();
+    g.save();g.fillStyle='#04070C';
+      g.shadowColor='rgba(0,0,0,0.42)';g.shadowBlur=16;g.shadowOffsetX=4;g.shadowOffsetY=11;
+      path(SIL,true,3.0,3.4);g.fill();
+      g.shadowColor='rgba(0,0,0,0.72)';g.shadowBlur=4;g.shadowOffsetX=2;g.shadowOffsetY=3;
+      path(SIL,true,3.0,3.4);g.fill();
+    g.restore();
+    g.strokeStyle='rgba(126,154,192,0.18)';g.lineWidth=1;path([SIL[1],SIL[2],SIL[3]],false,3.0,3.4);g.stroke();
+    path(SIL,true);g.fillStyle=lin(206,-70,274,-16,[[0,'#1B2B44'],[0.42,'#101B2D'],[1,'#070B12']]);g.fill();
+    path(PV_R,true);g.fillStyle=lin(250,-56,244,-16,[[0,'#0D1626'],[1,'#05080E']]);g.fill();
+    path(PV_L,true);g.fillStyle=lin(213,-52,240,-28,[[0,'#16233A'],[0.62,'#213450'],[1,'#2C4568']]);g.fill();
+    path(TAB,true);g.fillStyle=lin(224,-67,252,-56,[[0,'#111C2E'],[0.5,'#0B1220'],[1,'#070C15']]);g.fill();
+    g.save();path(TAB,true);g.clip();g.globalCompositeOperation='screen';
+      g.fillStyle=rad(230,-64,8.5,'rgba(168,198,236,0.16)','rgba(168,198,236,0)');
+      g.fillRect(210,-70,60,20);g.restore();
+    path(CR_L,true);g.fillStyle=lin(214,-66,228,-55,[[0,'#7099CE'],[0.45,'#3B5A8A'],[1,'#20334D']]);g.fill();
+    path(CR_R,true);g.fillStyle=lin(256,-66,268,-54,[[0,'#243A57'],[1,'#101A2B']]);g.fill();
+    g.save();path(SIL,true);g.clip();
+      g.lineWidth=1.1;g.strokeStyle='rgba(122,168,224,0.15)';path(PGHOST,false,2.6,-3.2);g.stroke();
+      g.beginPath();g.moveTo(242.6,-58.7);g.lineTo(242.6,-17.7);g.stroke();
+      g.strokeStyle='rgba(4,7,12,0.55)';path(PGHOST,false,-1.9,2.4);g.stroke();
+      g.globalCompositeOperation='screen';
+      g.fillStyle=rad(236,-34,20,'rgba(46,80,124,0.42)','rgba(46,80,124,0)');g.fillRect(206,-70,68,60);
+    g.restore();
+    path(FLASH,true);g.fillStyle='rgba(168,198,236,0.52)';g.fill();
+    g.strokeStyle='rgba(220,233,248,0.62)';g.lineWidth=0.8;
+      g.beginPath();g.moveTo(232.5,-30);g.lineTo(240,-38);g.stroke();
+    g.strokeStyle='rgba(206,216,226,0.30)';g.lineWidth=1.2;path(GIRD,false);g.stroke();
+    g.strokeStyle='rgba(4,7,12,0.55)';g.lineWidth=1.0;path(GIRD,false,0,1.3);g.stroke();
+    g.strokeStyle='rgba(220,233,248,0.60)';g.lineWidth=1.3;
+      g.beginPath();g.moveTo(240,-55.5);g.lineTo(240,-14.5);g.stroke();
+    g.strokeStyle='rgba(220,233,248,0.75)';g.lineWidth=0.6;
+      g.beginPath();g.moveTo(240,-55.5);g.lineTo(240,-33);g.stroke();
+    g.lineWidth=2.4;g.strokeStyle='rgba(150,190,242,0.18)';path(SIL,true);g.stroke();
+    g.lineWidth=1.5;g.strokeStyle='rgba(220,233,248,0.85)';path([SIL[6],SIL[0],SIL[1]],false);g.stroke();
+    g.lineWidth=1.1;g.strokeStyle='rgba(168,198,236,0.34)';path([SIL[1],SIL[2]],false);g.stroke();
+    g.lineWidth=1.0;g.strokeStyle='rgba(126,154,192,0.26)';path([SIL[2],SIL[3],SIL[4]],false);g.stroke();
+    g.lineWidth=1.3;g.strokeStyle='rgba(4,7,12,0.90)';path([SIL[4],SIL[5],SIL[6]],false);g.stroke();
+    g.fillStyle=rad(240,-14.6,3,'rgba(220,233,248,0.35)','rgba(220,233,248,0)');
+      g.beginPath();g.arc(240,-14.6,3,0,Math.PI*2);g.fill();
+    g.fillStyle='#FFFFFF';g.beginPath();g.arc(240,-14.6,1.4,0,Math.PI*2);g.fill();
+    return c.toDataURL('image/png');
+  }
+  /* the ARC SMEAR: N ghosts of the arris network only, swept BEHIND a clockwise orbit */
+  function rasterizeArrowSmear(deg){
+    var S=760,OFF=(S-480)/2,ss=2,N=16;
+    var c=document.createElement('canvas');c.width=c.height=S*ss;
+    var g=c.getContext('2d');g.scale(ss,ss);g.translate(OFF,OFF);
+    g.lineJoin='miter';g.miterLimit=8;g.lineCap='butt';
+    var SIL=GEM.SIL,GIRD=GEM.GIRD;
+    function path(p,close){g.beginPath();g.moveTo(p[0][0],p[0][1]);
+      for(var i=1;i<p.length;i++)g.lineTo(p[i][0],p[i][1]);if(close)g.closePath();}
+    for(var i=1;i<=N;i++){
+      var a=-(deg*i/N)*Math.PI/180, f=1-(i-1)/N, al=0.30*f*f;
+      g.save();g.translate(240,240);g.rotate(a);g.translate(-240,-240);
+      g.strokeStyle='rgba(220,233,248,'+al.toFixed(4)+')';g.lineWidth=1.4;path(SIL,true);g.stroke();
+      g.strokeStyle='rgba(220,233,248,'+(al*0.7).toFixed(4)+')';g.lineWidth=1.0;path(GIRD,false);g.stroke();
+      g.strokeStyle='rgba(220,233,248,'+(al*0.85).toFixed(4)+')';g.lineWidth=1.2;
+      g.beginPath();g.moveTo(240,-55.5);g.lineTo(240,-14.5);g.stroke();
+      g.restore();
+    }
+    return c.toDataURL('image/png');
   }
   arm.style.backgroundImage='url('+rasterizeArrow()+')';
-  function lap(){
-    arm.style.transform=ARM_BASE+'rotate(0deg)';arm.style.opacity='1';
-    var kf, opt;
-    if(mode==='linear'){
-      kf=[{transform:ARM_BASE+'rotate(0deg)'},{transform:ARM_BASE+'rotate('+(360*ORBIT_DIR)+'deg)'}];
-      opt={duration:1300, easing:'linear', fill:'forwards'};
-    } else if(mode==='smooth'){
-      kf=[{transform:ARM_BASE+'rotate(0deg)'},{transform:ARM_BASE+'rotate('+(360*ORBIT_DIR)+'deg)'}];
-      opt={duration:1300, easing:'cubic-bezier(.4,0,.2,1)', fill:'forwards'};   // gentle ease-in-out
-    } else { // whip — the old ceremony motion
-      kf=[
-        {transform:ARM_BASE+'rotate(0deg) scale(1)',offset:0,easing:'ease-out'},
-        {transform:ARM_BASE+'rotate(0deg) scale(1.03)',offset:0.068},
-        {transform:ARM_BASE+'rotate(0deg) scale(1)',offset:0.136,easing:'cubic-bezier(0.15,0.15,0.5,0.35)'},
-        {transform:ARM_BASE+'rotate('+(312*ORBIT_DIR)+'deg) scale(1)',offset:0.705,easing:'cubic-bezier(0.9,0.03,0.97,0.20)'},
-        {transform:ARM_BASE+'rotate('+(360*ORBIT_DIR)+'deg) scale(1)',offset:1}
-      ];
-      opt={duration:440, fill:'forwards'};
-    }
-    var a=arm.animate(kf,opt);
-    a.finished.then(function(){arm.style.opacity='0';}).catch(function(){});
+  var smearCache={};
+  function smearURI(d){ if(!smearCache[d]) smearCache[d]=rasterizeArrowSmear(d); return smearCache[d]; }
+
+  /* the gem's true angular footprint, measured off the silhouette (not guessed) */
+  var ARROW_DEG=(function(){var m=0;GEM.SIL.forEach(function(p){
+    var dx=p[0]-240, dy=p[1]-240, a=Math.abs(Math.atan2(dx,-dy)); if(a>m)m=a;}); return 2*m*180/Math.PI;})();
+
+  /* ============ MOTION VARIANTS ============
+     Each declares the angle and time-fraction of its CRUISE segment, so the cruise ladder can
+     solve T for any target deg/s exactly:  T = theta_c / (f_c * omega). */
+  var MOTION={
+    A:{name:'A CURRENT', tc:316.800, fc:0.880000, launch:0, hammer:0.120000, exitV:0,
+       kf:function(){return [
+         {transform:'rotate(0deg)',offset:0,easing:'linear'},
+         {transform:'rotate(316.8deg)',offset:0.88,easing:'cubic-bezier(.2,.2,.5,1)'},
+         {transform:'rotate(360deg)',offset:1}];}},
+    B:{name:'B LAUNCH ONLY', tc:318.702, fc:0.844444, launch:0.155556, hammer:0, exitV:1,
+       kf:function(){return [
+         {transform:'rotate(0deg)',offset:0,easing:'cubic-bezier(.32,0,.60,.42)'},
+         {transform:'rotate(41.298deg)',offset:0.155556,easing:'linear'},
+         {transform:'rotate(360deg)',offset:1}];}},
+    C:{name:'C HAMMER ONLY', tc:345.841, fc:0.946667, launch:0, hammer:0.053333, exitV:0,
+       kf:function(){return [
+         {transform:'rotate(0deg)',offset:0,easing:'linear'},
+         {transform:'rotate(345.841deg)',offset:0.946667,easing:'cubic-bezier(.40,.58,.68,1)'},
+         {transform:'rotate(360deg)',offset:1}];}},
+    D:{name:'D FULL G-LONG', tc:304.543, fc:0.791111, launch:0.155556, hammer:0.053333, exitV:0,
+       kf:function(){return [
+         {transform:'rotate(0deg)',offset:0,easing:'cubic-bezier(.32,0,.60,.42)'},
+         {transform:'rotate(41.298deg)',offset:0.155556,easing:'linear'},
+         {transform:'rotate(345.841deg)',offset:0.946667,easing:'cubic-bezier(.40,.58,.68,1)'},
+         {transform:'rotate(360deg)',offset:1}];}}
+  };
+
+  var S={cruise:439, smear:0, motion:'A', reverb:'off', hog:false, spikeLaunch:false, spikeSeat:false,
+         loop:true, rate:1, breathe:'live'};
+  var CRUISE=[[439,'439 today'],[428,'428 G-LONG'],[471,'471 fallback'],[574,'574 two-lap'],[277,'277 old test']];
+  var SMEARS=[[0,'OFF'],[18,'18&deg;'],[26,'26&deg;'],[34,'34&deg;']];
+
+  function mkRow(host,items,get,set){
+    var el=document.getElementById(host), btns=[];
+    items.forEach(function(it){
+      var b=document.createElement('button'); b.innerHTML=it[1];
+      if(it[2]) b.className='warn';
+      b.addEventListener('click',function(){ set(it[0]); paint(); restart(); });
+      btns.push([b,it[0]]); el.appendChild(b);
+    });
+    return function(){ btns.forEach(function(p){ p[0].classList.toggle('on', get()===p[1]); }); };
   }
-  var loopId=setInterval(lap,1700); lap();
-  function pick(m,btn){mode=m;['b-linear','b-smooth','b-whip'].forEach(function(id){document.getElementById(id).classList.remove('on');});btn.classList.add('on');clearInterval(loopId);loopId=setInterval(lap,1700);lap();}
-  document.getElementById('b-linear').addEventListener('click',function(){pick('linear',this);});
-  document.getElementById('b-smooth').addEventListener('click',function(){pick('smooth',this);});
-  document.getElementById('b-whip').addEventListener('click',function(){pick('whip',this);});
+  var paints=[];
+  paints.push(mkRow('r-cruise',CRUISE,function(){return S.cruise;},function(v){S.cruise=v;}));
+  paints.push(mkRow('r-smear',SMEARS,function(){return S.smear;},function(v){S.smear=v;}));
+  paints.push(mkRow('r-motion',[['A','A CURRENT'],['B','B LAUNCH'],['C','C HAMMER'],['D','D FULL']],
+    function(){return S.motion;},function(v){S.motion=v;}));
+  paints.push(mkRow('r-reverb',[['off','OFF'],['tuned','TUNED THUD'],['c3','C3 RING (bounces)']],
+    function(){return S.reverb;},function(v){S.reverb=v;}));
+  paints.push(mkRow('r-load',[[false,'ALL OFF']],function(){return (!S.hog&&!S.spikeLaunch&&!S.spikeSeat);},
+    function(){S.hog=false;S.spikeLaunch=false;S.spikeSeat=false;setHog();}));
+  (function(){   /* the three load toggles are independent, not a radio group */
+    var el=document.getElementById('r-load');
+    [['hog','SUSTAINED HOG'],['spikeLaunch','LAUNCH SPIKE 34ms'],['spikeSeat','SEAT SPIKE 34ms']].forEach(function(t){
+      var b=document.createElement('button'); b.textContent=t[1]; b.className='warn';
+      b.addEventListener('click',function(){ S[t[0]]=!S[t[0]]; setHog(); paint(); });
+      paints.push(function(){ b.classList.toggle('on', !!S[t[0]]); }); el.appendChild(b);
+    });
+  })();
+  (function(){
+    var el=document.getElementById('r-run');
+    var bl=document.createElement('button'); bl.textContent='LOOP';
+    bl.addEventListener('click',function(){ S.loop=!S.loop; paint(); if(S.loop) restart(); });
+    paints.push(function(){ bl.classList.toggle('on',S.loop); }); el.appendChild(bl);
+    var bo=document.createElement('button'); bo.textContent='ONCE';
+    bo.addEventListener('click',function(){ lap(); }); el.appendChild(bo);
+    [[1,'1x'],[0.25,'0.25x']].forEach(function(r){
+      var b=document.createElement('button'); b.textContent=r[1];
+      b.addEventListener('click',function(){ S.rate=r[0]; paint(); restart(); });
+      paints.push(function(){ b.classList.toggle('on',S.rate===r[0]); }); el.appendChild(b);
+    });
+    var bb=document.createElement('button'); bb.textContent='BREATHE LOCK';
+    bb.addEventListener('click',function(){ S.breathe=(S.breathe==='live'?'lock':'live');
+      hover.classList.toggle('lockbreathe',S.breathe==='lock'); paint(); });
+    paints.push(function(){ bb.classList.toggle('on',S.breathe==='lock'); }); el.appendChild(bb);
+  })();
+
+  function T(){ var m=MOTION[S.motion]; return m.tc/(m.fc*S.cruise)*1000; }
+  function paint(){
+    paints.forEach(function(f){f();});
+    var m=MOTION[S.motion], t=T(), perFrame=S.cruise/60, foot=ARROW_DEG+S.smear;
+    var ratio=perFrame/foot;
+    document.getElementById('readout').innerHTML=
+      '<b>'+m.name+'</b> &middot; lap <b>'+t.toFixed(0)+'ms</b> &middot; cruise <b>'+S.cruise.toFixed(1)+
+      '&deg;/s</b> = <b>'+perFrame.toFixed(3)+'&deg;/frame</b> @60Hz<br>'+
+      'gem footprint <b>'+ARROW_DEG.toFixed(2)+'&deg;</b> + smear '+S.smear+'&deg; = '+foot.toFixed(2)+'&deg; &nbsp;&rarr;&nbsp; '+
+      'step/footprint <b class="'+(ratio>0.5?'hot':'good')+'">'+ratio.toFixed(3)+'</b> '+
+      (ratio>0.5?'(the arrow lands clear of its own last position every frame — this is the picket fence)'
+               :'(consecutive positions overlap — the eye fuses them into one moving object)')+'<br>'+
+      'launch <b>'+(m.launch*t).toFixed(0)+'ms</b> &middot; hammer <b>'+(m.hammer*t).toFixed(0)+'ms</b> &middot; '+
+      'exit velocity <b class="'+(m.exitV?'hot':'good')+'">'+(m.exitV?(S.cruise.toFixed(0)+'&deg;/s — B is a diagnostic, it is MEANT to cut'):'0.000')+'</b><br>'+
+      'reverb <b>'+S.reverb+'</b> &middot; rate '+S.rate+'&times; &middot; breathe '+S.breathe+
+      ' &middot; load: '+((S.hog?'hog ':'')+(S.spikeLaunch?'launch-spike ':'')+(S.spikeSeat?'seat-spike':'')||'none');
+  }
+
+  /* ---- reverb: the orb absorbs the blow (tuned) or rings and rebounds (C3, kept so it can be rejected) ---- */
+  var IMPACT_MS=260;
+  function reverb(){
+    if(S.reverb==='off') return;
+    var N=14, kf=[], kfL=[], i, u, sx, sy, dy, rz;
+    var tuned=(S.reverb==='tuned');
+    var cFrac = tuned?0.075:0.14, dec = tuned?5.2:4.4, sink = tuned?5.0:4.0;
+    for(i=0;i<=N;i++){
+      u=i/N;
+      if(u<=cFrac){ var w=u/cFrac; sy=1-0.028*w; sx=1+0.009*w; dy=sink*w; rz=tuned?0:0.62*w; }
+      else{
+        var v=(u-cFrac)/(1-cFrac), e;
+        if(tuned){ e=Math.exp(-dec*v); rz=0; }
+        else { e=Math.exp(-dec*0.42*v)*Math.cos(7.2*v); rz=0.62*e; }   /* C3 rebounds above the rest line */
+        sy=1-0.028*e; sx=1+0.009*e; dy=sink*e;
+      }
+      kf.push({transform:'translateY('+dy.toFixed(2)+'px) scale('+sx.toFixed(4)+','+sy.toFixed(4)+') rotate('+rz.toFixed(3)+'deg)'});
+    }
+    kf[N]={transform:'translateY(0px) scale(1,1) rotate(0deg)'};
+    orb.animate(kf,{duration:IMPACT_MS,easing:'linear'});
+    /* the ring liquid sloshes BEHIND the blow — single damped sine, starts at exactly 0 */
+    var SL_MS=560,SL_DIP=6.2,SL_ROT=1.35,SL_HZ=4.6,SL_Z=0.28;
+    var w2=2*Math.PI*SL_HZ/1000, lam=w2*SL_Z/Math.sqrt(1-SL_Z*SL_Z), A=SL_DIP/0.6597, Ar=SL_ROT/0.6597, M=18;
+    for(i=0;i<=M;i++){ var t2=i/M*SL_MS, e2=Math.exp(-lam*t2)*Math.sin(w2*t2);
+      kfL.push({transform:'translateY('+(A*e2).toFixed(2)+'px) rotate('+(Ar*e2).toFixed(3)+'deg)'}); }
+    kfL[M]={transform:'translateY(0px) rotate(0deg)'};
+    lshell.animate(kfL,{duration:SL_MS,easing:'linear'});
+  }
+
+  /* ---- the lap ---- */
+  var lapAnim=null, loopTimer=0, seatTimer=0;
+  function block(ms){ var t=performance.now(); while(performance.now()-t<ms){} }
+  function lap(){
+    if(lapAnim){ try{lapAnim.cancel();}catch(e){} }
+    if(seatTimer){ clearTimeout(seatTimer); seatTimer=0; }
+    var t=T(), m=MOTION[S.motion];
+    if(S.smear>0){ smearEl.style.backgroundImage='url('+smearURI(S.smear)+')'; }
+    arm.style.transform='rotate(0deg)';
+    /* LAUNCH SPIKE: 34ms of main-thread block in the SAME task that creates the animation —
+       the single most common real cause of "it doesn't leave to spin correctly". */
+    if(S.spikeLaunch) block(34);
+    lapAnim=arm.animate(m.kf(),{duration:t,easing:'linear',fill:'forwards'});
+    lapAnim.playbackRate=S.rate;
+    if(S.smear>0){
+      var sa=smearEl.animate([
+        {opacity:0,offset:0},{opacity:0.10,offset:0.04},{opacity:0.55,offset:0.1556},
+        {opacity:0.55,offset:0.92},{opacity:0.22,offset:0.96},{opacity:0,offset:0.9778},{opacity:0,offset:1}
+      ],{duration:t,easing:'linear'});
+      sa.playbackRate=S.rate;
+    } else { smearEl.style.opacity='0'; }
+    /* SEAT SPIKE: the same 34ms block timed to land on the stop frame */
+    if(S.spikeSeat) seatTimer=setTimeout(function(){ block(34); }, t/S.rate);
+    lapAnim.finished.then(function(){
+      reverb();
+      if(S.loop) loopTimer=setTimeout(lap, 620);
+    }).catch(function(){});
+  }
+  function restart(){ if(loopTimer){clearTimeout(loopTimer);loopTimer=0;} if(S.loop) lap(); }
+
+  var hogId=0;
+  function setHog(){
+    if(hogId){ clearInterval(hogId); hogId=0; }
+    if(S.hog) hogId=setInterval(function(){ block(12); },16);
+  }
+
   var last=performance.now(),frames=0,fpsEl=document.getElementById('fps');
-  (function tick(now){frames++;if(now-last>=500){fpsEl.textContent=Math.round(frames*1000/(now-last))+' fps';frames=0;last=now;}requestAnimationFrame(tick);})(performance.now());
-  var hogId=0,hb=document.getElementById('hog');
-  hb.addEventListener('click',function(){
-    if(hogId){clearInterval(hogId);hogId=0;hb.textContent='Main-thread hog: OFF';}
-    else{hogId=setInterval(function(){var t=performance.now();while(performance.now()-t<12){}},16);hb.textContent='Main-thread hog: ON';}
-  });
+  (function tick(now){ frames++;
+    if(now-last>=500){ fpsEl.textContent=Math.round(frames*1000/(now-last))+' fps'; frames=0; last=now; }
+    requestAnimationFrame(tick);
+  })(performance.now());
+
+  paint(); lap();
 })();</script></body></html>
