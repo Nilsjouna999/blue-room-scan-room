@@ -659,9 +659,8 @@
     if(reduce){                               // reduced-motion: flat lines at the perches + bottom band, no wobble
       codexEnv=target; ctx.clearRect(0,0,W,H);
       if(maskGrad) drawBand(lines[1], codexEnv, false, '#0a0b0d');   // sole bottom dark focus band
-      var uy=topY*codexEnv, ly=H-(H-botY)*codexEnv; ctx.lineWidth=1;
+      var ly=H-(H-botY)*codexEnv; ctx.lineWidth=1;   // BR-S238: top line removed (builder) — only the bottom rail remains
       ctx.strokeStyle='rgba(255,255,255,'+(STROKE_A*codexEnv).toFixed(3)+')';
-      ctx.beginPath(); ctx.moveTo(0,uy); ctx.lineTo(W,uy); ctx.stroke();
       ctx.beginPath(); ctx.moveTo(0,ly); ctx.lineTo(W,ly); ctx.stroke();
       return;                                 // step-4 fork schedules the shared frame() loop after this returns
     }
@@ -671,9 +670,8 @@
     accT+=dt; var steps=0; while(accT>=STEP && steps<3){ for(var b=0;b<lines.length;b++) integrate(lines[b]); accT-=STEP; steps++; }
     ctx.clearRect(0,0,W,H);
     if(maskGrad) drawBand(lines[1], codexEnv, false, '#0a0b0d');   // BOTTOM dark focus band ONLY — no top band (header stays visible)
-    drawLine(lines[0], t, codexEnv);          // top line under the header
-    drawLine(lines[1], t, codexEnv);          // bottom line at the base
-    // NB: deliberately NO drawBands(), NO gatherBoxes()/emitParticles()/stepParticles()/drawParticles().
+    drawLine(lines[1], t, codexEnv);          // bottom line at the base — BR-S238: top line removed (builder); only the bottom rail + focus band remain
+    // NB: deliberately NO drawBands(), NO gatherBoxes()/emitParticles()/stepParticles()/drawParticles(), NO top drawLine (removed).
   }
 
   function boot(){
