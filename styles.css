@@ -2565,7 +2565,14 @@ body[data-view="room"] .dev { display: none; }
 .about__hx:first-of-type { transform: translateX(clamp(-58px, -5.4vw, -26px)); }   /* "We hold" — leans up-left */
 .about__hx:last-of-type  { transform: translateX(clamp(26px, 5.4vw, 58px)); }      /* "the candle." — settles down-right */
 .about__pivot { justify-self: center; align-self: center; width: clamp(30px, 5vw, 54px); height: 1.6px; transform: rotate(21deg); background: linear-gradient(90deg, transparent, var(--line-strong) 22%, var(--line-strong) 78%, transparent); opacity: .72; border-radius: 1px; }
-.about__lede { font-family: var(--font-display); font-size: clamp(14.5px, 2.2vw, 16.5px); line-height: 1.68; letter-spacing: 0.006em; color: var(--t-primary); max-width: 44ch; margin: 0; opacity: .95; }
+/* BR-S234 — the lede continues the headline's yin-yang descent: split at its two sentences into
+   two staggered breaths — sentence 1 leans left (beneath "We hold"), sentence 2 leans right
+   (beneath "the candle."). Narrower per-block measure + a beat between them de-chunks the old
+   centred slab and paces the "come down slowly" read. */
+.about__lede { display: grid; justify-items: center; row-gap: clamp(15px, 2.6vh, 30px); width: 100%; margin: 0; }
+.about__lede p { font-family: var(--font-display); font-size: clamp(14.5px, 2.2vw, 16.5px); line-height: 1.66; letter-spacing: 0.006em; color: var(--t-primary); max-width: 34ch; margin: 0; opacity: .95; }
+.about__lede-a { transform: translateX(clamp(-46px, -3.8vw, -22px)); }   /* leans left — under "We hold" */
+.about__lede-b { transform: translateX(clamp(22px, 3.8vw, 46px)); }      /* leans right — under "the candle." */
 .about__wick { width: 1px; height: clamp(34px, 8vh, 55px); margin-top: 5px; background: linear-gradient(var(--hair-1), var(--hair-3) 70%, transparent); }
 
 /* the rail + its hairline candle-spine (BR-S206: hair-ladder material; a brighter 46-54% waist, tapered to nothing) */

@@ -35,6 +35,16 @@
   var ON = true; try { ON = localStorage.getItem('u1lines') !== '0'; } catch(e){}
   if(!ON) return;
 
+  // ---- BULGE variant switch (BR-S234) — the box reverse-magnet bulge is SAVED in full but
+  // OFF by default (the builder found the deflection distracting). With BULGE off the lines
+  // keep their ambient flow current + the aperture/dissolve, they just don't deflect at boxes,
+  // so the slit edge stays clean. Opt the bulge back in with ?u1bulge (persists) / off ?u1bulge=0.
+  try {
+    if(/[?&]u1bulge=0\b/i.test(location.search)) localStorage.setItem('u1bulge','0');
+    else if(/[?&]u1bulge\b/i.test(location.search)) localStorage.setItem('u1bulge','1');
+  } catch(e){}
+  var BULGE = false; try { BULGE = localStorage.getItem('u1bulge') === '1'; } catch(e){}
+
   var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   // ---- tunables (identical to the prototype) --------------------------
@@ -344,7 +354,7 @@
     // no-op (0.30*band > REPEL_RANGE), keeping the deeper/longer feel where there is room.
     var range = Math.min(REPEL_RANGE, (LOWER_Y-UPPER_Y)*0.30);
     for(i=0;i<N;i++) tgt[i]=flow(xs[i],t);
-    for(var b=0;b<boxes.length;b++){
+    if(BULGE) for(var b=0;b<boxes.length;b++){   // BR-S234: bulge SAVED but gated — off by default (no box deflection), the ambient flow current above still runs
       var box=boxes[b], gap=Math.abs(baseY-box.cy), effGap=gap-box.hh; if(effGap<0)effGap=0;
       // BR-S230 [item 1, outward-only bulge]: the recoil sign is now the fixed per-line
       // fixedSide (hoisted above), so the box's travel direction no longer matters and the
