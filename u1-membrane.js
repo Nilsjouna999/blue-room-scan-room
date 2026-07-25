@@ -77,7 +77,7 @@
   // into its edge rather than being pinned at a wall. FOLLOW still drives outward arrival, and
   // the sustained-peak-across-overlap means reach isn't time-critical. VMAX unchanged (it caps
   // velocity, not reach; inward velocity is zeroed at the clamp so it can't build a return dip).
-  var STEP=1/60, FOLLOW=0.14, TENSION=0.10, DAMP=0.36, VMAX=52, EDGE_FEATHER=90;
+  var STEP=1/60, FOLLOW=0.12, TENSION=0.13, DAMP=0.36, VMAX=52, EDGE_FEATHER=90;   // BR-S235: FOLLOW 0.14->0.12 floatier drift + TENSION 0.10->0.13 more self-balancing diffusion (see flow() note)
 
   // BR PULSE-2 [taste, sole owner of the draw constants]: quiet the resting
   // membrane from a "HUD underline" toward a "quiet membrane" — every value here
@@ -126,8 +126,16 @@
   // smoothstep's cubic. Used only for the upper line's latch/hold so it eases into
   // presence like the liquid material itself, not a mechanical snap.
   function smootherstep(a,b,x){ if(a===b) return x<a?0:1; var t=(x-a)/(b-a); if(t<0)t=0; else if(t>1)t=1; return t*t*t*(t*(t*6-15)+10); }
-  function flow(x,t){ return 3.0*Math.sin(x*0.013-t*1.6)+1.7*Math.sin(x*0.030+t*1.05+1.3)+1.0*Math.sin(x*0.061-t*2.2+2.1); }
-  function thick(x,v,t){ return 0.9+0.6*(0.5+0.5*Math.sin(x*0.02-t*1.9))+0.05*Math.min(6,Math.abs(v)); }
+  // BR-S235 [motion — "the cat licking her paws" / a weightless aura tending its own field]:
+  // the resting current moves a touch SLOWER (wave speeds ~x0.72) and more WEIGHTLESSLY —
+  // amplitudes quieted, the fast third wave (the fidgety one that "performs") cut most, so the
+  // line stays self-absorbed and subtle rather than stealing the eye. A very slow BREATH
+  // (~55s cycle, +/-12%) makes the field's energy gently DIFFUSE out and RECONSTRUCT — an aura
+  // balancing itself, not a pulse. Paired with a floatier FOLLOW (0.14->0.12) so the line drifts
+  // toward the current languidly, and a touch more TENSION (0.10->0.13) = the neighbour-coupling
+  // DIFFUSION that self-smooths displacement back into balance. Peak drift ~4.4px (was ~5.7).
+  function flow(x,t){ var breath=0.88+0.12*Math.sin(t*0.11); return breath*(2.5*Math.sin(x*0.013-t*1.15)+1.35*Math.sin(x*0.030+t*0.76+1.3)+0.6*Math.sin(x*0.061-t*1.58+2.1)); }
+  function thick(x,v,t){ return 0.9+0.5*(0.5+0.5*Math.sin(x*0.02-t*1.4))+0.05*Math.min(6,Math.abs(v)); }
 
   function ensureCanvas(){
     if(canvas) return;
