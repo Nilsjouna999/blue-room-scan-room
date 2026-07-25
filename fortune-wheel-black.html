@@ -36,7 +36,10 @@
     pointer-events:none; transform-origin:50% 50%;
     background-position:center; background-size:100% 100%; background-repeat:no-repeat;
     will-change:transform;
-    animation:engraveDrift 64s linear infinite;   /* ambient-always: alive at rest */
+    animation:engraveDrift 150s linear infinite;  /* ambient-always: alive at rest. SLOWER because the limb got denser:
+                                                     72 outer ticks at 150s = a tick crosses a fixed point every 2.08s.
+                                                     Below 150s the 5deg scale begins to shimmer — do not speed this up
+                                                     without cutting tick count in the same edit. */
   }
   @keyframes engraveDrift{ to{ transform:rotate(-360deg) } }  /* CCW — armillary contrast vs the CW wheel spin */
   @media (prefers-reduced-motion:reduce){ .engrave-ring{ animation:none } }  /* still visible, static */
@@ -48,7 +51,9 @@
     pointer-events:none; border-radius:50%; transform-origin:50% 50%;
     background-position:center; background-size:100% 100%; background-repeat:no-repeat;
     will-change:transform;
-    animation:ringLiquidDrift 100s linear infinite;   /* CW — opposite the inlay's CCW → visible parallax */
+    animation:ringLiquidDrift 200s linear infinite;   /* CW — opposite the inlay's CCW → visible parallax.
+                                                         150s/200s ⇒ relative revolution every 85.7s: still plainly
+                                                         two bodies over the ~10s a user watches, but slow and cold. */
   }
   @keyframes ringLiquidDrift{ to{ transform:rotate(360deg) } }
   @media (prefers-reduced-motion:reduce){ .ring-liquid{ animation:none } }   /* still visible, static */
@@ -57,22 +62,35 @@
   .engrave-glass{
     position:absolute; inset:0; width:100%; height:100%;
     pointer-events:none; border-radius:50%;
-    /* annulus mask: 158/480≈32.9% inner rail, 202/480≈42.1% outer rail */
-    -webkit-mask:radial-gradient(circle at 50% 50%, transparent 0 32.5%, #000 33.5% 42.1%, transparent 43%);
-            mask:radial-gradient(circle at 50% 50%, transparent 0 32.5%, #000 33.5% 42.1%, transparent 43%);
+    /* `closest-side` is LOAD-BEARING. Without it the ending shape defaults to farthest-corner =
+       240·√2 = 339.41px, so every percentage below was multiplied by 0.7071 and this ENTIRE channel
+       was parked at r≈110–146 — inside the wedge field, never once on the band it belongs to.
+       With closest-side, 100% == 240px == the disc radius ⇒ percent = r/240·100.
+       annulus mask: 66.3%→r159 fade-in · 68.3–86.0% → r164–206 solid · 88.5% → r212 fade-out */
+    -webkit-mask:radial-gradient(circle closest-side at 50% 50%,
+        transparent 0 66.3%, #000 68.3% 86.0%, transparent 88.5%);
+            mask:radial-gradient(circle closest-side at 50% 50%,
+        transparent 0 66.3%, #000 68.3% 86.0%, transparent 88.5%);
     background:
-      /* (a) primary diagonal refraction sheen — brighter, more defined glass streak */
-      linear-gradient(128deg, rgba(233,239,247,0.17) 0%, rgba(226,232,240,0.05) 24%, rgba(226,232,240,0) 48%),
-      /* (b) faint COOL chromatic hint, upper-left rim (refraction split) */
-      linear-gradient(128deg, rgba(150,190,242,0.08) 0%, rgba(150,190,242,0) 16%),
-      /* (c) faint WARM chromatic hint, lower-right rim (the other split) */
-      linear-gradient(308deg, rgba(242,206,168,0.055) 0%, rgba(242,206,168,0) 15%),
-      /* (d) outer-edge bevel highlight — crisper, stronger */
-      radial-gradient(circle at 50% 50%, transparent 40.8%, rgba(233,239,247,0.22) 41.8%, transparent 42.6%),
-      /* (e) secondary inner bevel highlight — adds glass thickness under the sheen */
-      radial-gradient(circle at 50% 50%, transparent 34.6%, rgba(226,232,240,0.11) 35.5%, transparent 36.4%),
-      /* (f) inner-edge depth-shade — deeper recessed channel (reads further under glass) */
-      radial-gradient(circle at 50% 50%, transparent 32.4%, rgba(0,0,0,0.34) 33.6%, transparent 35%);
+      /* 1 — OUTER RAIL bevel (r 200.0/202.1/203.8/205.4) — the instrument's primary lit edge */
+      radial-gradient(circle closest-side at 50% 50%, transparent 83.3%, rgba(233,241,252,0.26) 84.2%, rgba(233,241,252,0.09) 84.9%, transparent 85.6%),
+      /* 2 — INNER RAIL bevel (r 164.6/166.6/168.9) — quieter near lip */
+      radial-gradient(circle closest-side at 50% 50%, transparent 68.6%, rgba(226,236,248,0.14) 69.4%, transparent 70.4%),
+      /* 3 — primary diagonal refraction sheen */
+      linear-gradient(128deg, rgba(226,238,252,0.20) 0%, rgba(226,238,252,0.055) 26%, rgba(226,238,252,0) 50%),
+      /* 4 — cool chromatic split, upper-left (the warm lower-right split is deliberately GONE — warm law) */
+      linear-gradient(128deg, rgba(150,190,242,0.085) 0%, rgba(150,190,242,0) 17%),
+      /* 5 — THE CAUSTIC: light that got through the glass and pooled on the far channel floor,
+             diagonally opposite the specular. Centres at r=184.1 and r=179.9 — mid-band. */
+      radial-gradient(58px 58px   at 74.4% 79.6%, rgba(214,234,255,0.17) 0%, rgba(214,234,255,0) 72%),
+      radial-gradient(112px 112px at 76.5% 76.5%, rgba(214,234,255,0.07) 0%, rgba(214,234,255,0) 80%),
+      /* 6 — inner wall in shadow (r 167.0/169.0/174.0/178.1) — the channel's real depth */
+      radial-gradient(circle closest-side at 50% 50%, transparent 69.6%, rgba(0,0,0,0.42) 70.4%, rgba(0,0,0,0.12) 72.5%, transparent 74.2%),
+      /* 7 — outer wall seat (r 197.0/200.2/202.1) */
+      radial-gradient(circle closest-side at 50% 50%, transparent 82.1%, rgba(0,0,0,0.26) 83.4%, transparent 84.2%),
+      /* 8 — THE UNDER-LIP: the glass rim casting outward onto the wedge field (r 202.6–211.2).
+             This is the single line that makes the band read RAISED rather than printed. */
+      radial-gradient(circle closest-side at 50% 50%, transparent 84.4%, rgba(0,0,0,0.30) 85.4%, rgba(0,0,0,0.10) 86.9%, transparent 88.0%);
   }
 
   /* ---- compass glass: fixed dome cover over the disc, under the pointer; never rotates ---- */
@@ -89,9 +107,13 @@
       radial-gradient(90% 90% at 55% 66%,
           rgba(196,200,208,0.05) 0%,
           rgba(196,200,208,0)    34%),
-      radial-gradient(circle at 50% 50%,
-          rgba(0,0,0,0)    58%,
-          rgba(0,0,0,0.14) 84%,
+      /* closest-side, same root cause as .engrave-glass: with the default farthest-corner this ramp
+         maxed at r=339 while the disc ends at r=240, so the rim seal composited to ≈0.068 instead of
+         the authored 0.34 and the orb was never sealed at its edge. (.glass::before is left alone —
+         its 57/65/73% land at r=193/220/248 and read correctly.) */
+      radial-gradient(circle closest-side at 50% 50%,
+          rgba(0,0,0,0)    82%,
+          rgba(0,0,0,0.14) 92%,
           rgba(0,0,0,0.34) 100%);
     /* bezel rim + dome under-shade as inset shadows (no extra element) */
     box-shadow:
@@ -194,11 +216,10 @@
     pointer-events:none;z-index:2;opacity:0;mix-blend-mode:screen;
     background:radial-gradient(120% 105% at 38% 30%, rgba(224,226,232,0.55) 0%, rgba(224,226,232,0.14) 30%, rgba(224,226,232,0) 56%);}
 
-  /* impact-to-core: a converging shockwave ring (rim → centre) + a core absorb-flash at the hub — compositor-only */
-  .shock{position:absolute;left:7.143%;top:9.143%;width:85.714%;height:68.571%;border-radius:50%;
-    pointer-events:none;z-index:4;opacity:0;transform-origin:50% 50%;mix-blend-mode:screen;
-    border:2px solid rgba(226,232,240,0.9);
-    box-shadow:0 0 12px rgba(226,232,240,0.55), inset 0 0 12px rgba(226,232,240,0.35);}
+  /* impact-to-core: a core absorb-flash at the hub — compositor-only.
+     (The converging shockwave RING that used to live here was `.shock`: a permanently-present full-disc
+      mix-blend-mode:screen element that was never once animated — it created a stacking context in the
+      z=4 stack for nothing. Deleted. The idea is still a good one; it was simply never wired.) */
   .coreflash{position:absolute;left:50%;top:43.43%;width:34%;aspect-ratio:1;transform:translate(-50%,-50%);
     border-radius:50%;pointer-events:none;z-index:4;opacity:0;mix-blend-mode:screen;
     background:radial-gradient(circle, rgba(255,255,255,0.95) 0%, rgba(226,232,240,0.6) 34%, rgba(226,232,240,0) 70%);}
@@ -287,8 +308,7 @@
     <!-- ===== verdict-ceremony overlays (display:none / opacity:0 at rest — no effect on the resting frame) ===== -->
     <!-- B4b vitrify glaze: over the disc, under the pointer; baked brightness-lift + crescent glint, opacity-pulsed -->
     <div class="vitrify" aria-hidden="true"></div>
-    <!-- impact-to-core: converging shockwave ring (rim → centre) + core absorb-flash (hub); opacity/transform-pulsed -->
-    <div class="shock" aria-hidden="true"></div>
+    <!-- impact-to-core: core absorb-flash (hub); opacity/transform-pulsed -->
     <div class="coreflash" aria-hidden="true"></div>
     <!-- the plunge lens: bright energy driving DOWN the 12→centre axis, swallowed inward by the core -->
     <div class="plunge" aria-hidden="true"></div>
@@ -509,20 +529,36 @@
     ictx.setTransform(dpr,0,0,dpr,0,0);
     ictx.clearRect(0,0,DISC_S,DISC_S);
     if (!angs || n<=1) return;                     // seams exist only when >1 wedge
-    var cx=DISC_S/2, cy=DISC_S/2, R=R_WEDGE;
+    var cx=DISC_S/2, cy=DISC_S/2;
     ictx.save();
     // clip to the saturn annulus (a hair beyond the rails) so ink only re-asserts seams where they cross the ring
     ictx.beginPath();
-    ictx.arc(cx,cy,RING_R_OUT+3,0,Math.PI*2,false);
-    ictx.arc(cx,cy,RING_R_IN-3, 0,Math.PI*2,true);
+    ictx.arc(cx,cy,RING_R_OUT+10,0,Math.PI*2,false);   // +10/-10, not +3/-3: room for the feathered ends
+    ictx.arc(cx,cy,RING_R_IN-10, 0,Math.PI*2,true);
     ictx.clip('evenodd');
     angs.forEach(function(a0){
       var dx=Math.cos(a0), dy=Math.sin(a0);
-      ictx.strokeStyle='rgba(0,0,0,0.6)'; ictx.lineWidth=2.5;                    // same dark groove as draw()'s seam
-      ictx.beginPath(); ictx.moveTo(cx,cy); ictx.lineTo(cx+dx*R,cy+dy*R); ictx.stroke();
-      var ox=-dy*1.3, oy=dx*1.3;                                                 // same faint warm sliver
-      ictx.strokeStyle='rgba(210,214,222,0.09)'; ictx.lineWidth=1;
-      ictx.beginPath(); ictx.moveTo(cx+ox,cy+oy); ictx.lineTo(cx+dx*R+ox,cy+dy*R+oy); ictx.stroke();
+      var r0=RING_R_IN-10, r1=RING_R_OUT+10;
+      // 0.45, not 0.6: the wheel canvas ALREADY laid this exact seam at 0.6 underneath. 0.6-over-0.6
+      // composites to 0.84 and the seam visibly FATTENS where it crosses the band. And the stroke is
+      // now a gradient with transparent ends, so it dissolves into the wedge field instead of
+      // hard-cutting at the clip radius and leaving four floating stub-ends per seam.
+      var lg=ictx.createLinearGradient(cx+dx*r0, cy+dy*r0, cx+dx*r1, cy+dy*r1);
+      lg.addColorStop(0.00,'rgba(0,0,0,0)');
+      lg.addColorStop(0.18,'rgba(0,0,0,0.45)');
+      lg.addColorStop(0.82,'rgba(0,0,0,0.45)');
+      lg.addColorStop(1.00,'rgba(0,0,0,0)');
+      ictx.strokeStyle=lg; ictx.lineWidth=2.5;
+      ictx.beginPath(); ictx.moveTo(cx+dx*r0,cy+dy*r0); ictx.lineTo(cx+dx*r1,cy+dy*r1); ictx.stroke();
+      // the CUT EDGE — where the structural seam severs the inlay. Cooled to match the new silver.
+      var ox=-dy*1.3, oy=dx*1.3;
+      var lg2=ictx.createLinearGradient(cx+dx*r0+ox, cy+dy*r0+oy, cx+dx*r1+ox, cy+dy*r1+oy);
+      lg2.addColorStop(0.00,'rgba(212,226,242,0)');
+      lg2.addColorStop(0.22,'rgba(212,226,242,0.11)');
+      lg2.addColorStop(0.78,'rgba(212,226,242,0.11)');
+      lg2.addColorStop(1.00,'rgba(212,226,242,0)');
+      ictx.strokeStyle=lg2; ictx.lineWidth=1;
+      ictx.beginPath(); ictx.moveTo(cx+dx*r0+ox,cy+dy*r0+oy); ictx.lineTo(cx+dx*r1+ox,cy+dy*r1+oy); ictx.stroke();
     });
     ictx.restore();
   }
@@ -564,6 +600,13 @@
     ctx.save();
     ctx.beginPath(); ctx.arc(cx,cy,R,0,Math.PI*2); ctx.clip();
     glassRig(ctx, cx, cy, R);
+    ctx.restore();
+
+    // 2c) shelf + channel floor — the nameplate bed + the groove the band sits in. AFTER glassRig
+    //     (so the dome light doesn't re-lift it) and BEFORE winner-dim/seams (so labels sit on it).
+    ctx.save();
+    ctx.beginPath(); ctx.arc(cx,cy,R,0,Math.PI*2); ctx.clip();
+    ctx.drawImage(ensureShelf(), 0,0, DISC_S, DISC_S);
     ctx.restore();
 
     // 3) winner dim / highlight — the WINNER keeps its full bright colour (no dark tint), losers dim
@@ -699,6 +742,30 @@
     g.fillStyle = vig; g.fillRect(cx-R,cy-R,R*2,R*2);
     return vigCanvas;
   }
+  // ---- shelf + channel floor: ONE rotationally-symmetric ramp, baked once and blitted. It does two
+  //      jobs at once: it lays a dark BED under the horizontal nameplates at r≈85-135 so white text
+  //      reads cleanly even on citrine #8a6a16, and it cuts the GROOVE the saturn band sits in at
+  //      r≈176. Rotationally symmetric ⇒ the wheel's rotation is irrelevant to it. ----
+  var shelfCanvas = null;
+  function ensureShelf(){
+    if (shelfCanvas) return shelfCanvas;
+    shelfCanvas = makeDiscCanvas();
+    var g = shelfCanvas.getContext('2d'), cx = DISC_S/2, cy = DISC_S/2;
+    var s = g.createRadialGradient(cx,cy,40, cx,cy,220);   // offset = (r-40)/180
+    s.addColorStop(0.000,'rgba(2,4,8,0)');      // r= 40
+    s.addColorStop(0.111,'rgba(2,4,8,0.06)');   // r= 60
+    s.addColorStop(0.250,'rgba(2,4,8,0.18)');   // r= 85
+    s.addColorStop(0.389,'rgba(2,4,8,0.22)');   // r=110  ← the label ring
+    s.addColorStop(0.528,'rgba(2,4,8,0.18)');   // r=135
+    s.addColorStop(0.667,'rgba(2,4,8,0.10)');   // r=160  ← lift under the inner rail: keeps it crisp
+    s.addColorStop(0.756,'rgba(2,4,8,0.26)');   // r=176  ← channel floor, deepest
+    s.addColorStop(0.867,'rgba(2,4,8,0.18)');   // r=196
+    s.addColorStop(0.933,'rgba(2,4,8,0.05)');   // r=208
+    s.addColorStop(1.000,'rgba(2,4,8,0)');      // r=220
+    g.fillStyle = s; g.fillRect(0,0,DISC_S,DISC_S);
+    return shelfCanvas;
+  }
+
   // hub, baked once via the existing drawHub (blit source-over)
   function ensureHub(){
     if (hubCanvas) return hubCanvas;
@@ -708,7 +775,9 @@
   }
 
   // ---- engraved inlay ring — baked ONCE to a data-URI, drifts on its own compositor layer (replaces the strobe) ----
-  var RING_R_IN = 158, RING_R_OUT = 202, RING_COL = '206,216,226';  // cool silver-patina
+  // 158→166: a 44px band is a gutter you have to fill with junk; 36px is a precision limb. The 8px
+  // freed goes to the label lane below it. RING_COL cooled to #D2DEEC.
+  var RING_R_IN = 166, RING_R_OUT = 202, RING_COL = '210,222,236';  // cool silver-patina
   function bakeEngraveRing(){
     var ss = 2, S = DISC_S;                       // supersample for crisp non-integer-angle edges
     var c = document.createElement('canvas'); c.width = c.height = S*ss;
@@ -717,57 +786,75 @@
     g.globalCompositeOperation = 'source-over';    // a TRUE solid mark (NOT 'lighter')
     g.lineCap = 'round';
 
-    // ETCHED-IN (tweak B "moving in rails"): every mark is an inlay SET INTO a carved groove —
-    // a dark near-wall shadow offset UP-LEFT + a faint lit far-wall DOWN-RIGHT + the silver inlay centred.
-    // marks(ox,oy, col, aRail,aDot,aMajor,aSigil,aMinor, gleam) paints the WHOLE mark set once at one offset.
-    function marks(ox, oy, col, aRail, aDot, aMajor, aSigil, aMinor, gleam){
-      if (gleam){ g.shadowColor = 'rgba('+RING_COL+',0.39)'; g.shadowBlur = 1.5; }   // baked inlay gleam (tweak A: dimmer)
-      else { g.shadowColor = 'transparent'; g.shadowBlur = 0; }
-      // (1) two continuous rails = the frame / the tracks the ticks ride in
-      g.strokeStyle = 'rgba('+col+','+aRail+')'; g.lineWidth = 1.4;
-      g.beginPath(); g.arc(cx+ox,cy+oy,RING_R_IN, 0,Math.PI*2); g.stroke();
-      g.beginPath(); g.arc(cx+ox,cy+oy,RING_R_OUT,0,Math.PI*2); g.stroke();
-      // (4) fine inner dot-hairline (ancient texture) — 24 dots at r=166
-      g.fillStyle = 'rgba('+col+','+aDot+')';
-      for (var d=0; d<24; d++){
-        var ad = (d/24)*Math.PI*2, dx = cx+ox+Math.cos(ad)*166, dy = cy+oy+Math.sin(ad)*166;
-        g.beginPath(); g.arc(dx,dy,0.9,0,Math.PI*2); g.fill();
+    // ETCHED-IN: every mark is an inlay SET INTO a carved groove — a dark near-wall + a faint lit
+    // far-wall + the silver inlay centred.
+    //
+    // THE EMBOSS IS NOW ROTATION-INVARIANT BY CONSTRUCTION. The old version offset every pass by a
+    // fixed SCREEN vector (-0.7,-0.7), so the engraving's light source rotated with the drifting
+    // bitmap — which is why the ring never quite settled as a solid carved thing. Here each mark is
+    // offset along ITS OWN NORMAL instead: radial for circles and sigils, TANGENTIAL for radial
+    // ticks. A mark set built that way looks identically carved at every angle — not "less
+    // noticeably", but mathematically. All directional light now lives in the static .engrave-glass,
+    // which is where a fixed observer's light belongs.
+    //
+    // marks(sgn, col, A, gleam): sgn -1 = dark near-wall · +1 = lit far-wall · 0 = the silver inlay.
+    var EMB = 0.55;   // groove offset (px, disc-space) — was 0.7; denser marks need a tighter groove
+    var TAU_ = Math.PI*2;
+    function marks(sgn, col, A, gleam){
+      var e = sgn*EMB;
+      if (gleam){ g.shadowColor='rgba('+RING_COL+',0.30)'; g.shadowBlur=1.2; }   // 2x the marks ⇒ dim the gleam
+      else { g.shadowColor='transparent'; g.shadowBlur=0; }
+
+      // (1) RAILS — circles: normal is radial ⇒ offset the radius
+      g.strokeStyle='rgba('+col+','+A.railOut+')'; g.lineWidth=1.6;
+      g.beginPath(); g.arc(cx,cy,RING_R_OUT+e,0,TAU_); g.stroke();
+      g.strokeStyle='rgba('+col+','+A.railIn+')';  g.lineWidth=1.1;
+      g.beginPath(); g.arc(cx,cy,RING_R_IN+e,0,TAU_); g.stroke();
+
+      // (2) OUTER SCALE — 72 @5°: cardinal every 45° (i%9), major every 15° (i%3), else minor.
+      //     Radial ticks ⇒ normal is TANGENTIAL ⇒ offset along t=(-uy,ux).
+      for (var i=0;i<72;i++){
+        var a=(i/72)*TAU_, ux=Math.cos(a), uy=Math.sin(a), tx=-uy*e, ty=ux*e, r0, lw, al;
+        if      (i%9===0){ r0=RING_R_IN; lw=2.0; al=A.card; }   // 8 cardinals, full 36px bridge
+        else if (i%3===0){ r0=187;       lw=1.4; al=A.maj;  }   // 16 majors, 15px
+        else             { r0=195;       lw=1.0; al=A.min;  }   // 48 minors, 7px
+        g.strokeStyle='rgba('+col+','+al+')'; g.lineWidth=lw;
+        g.beginPath();
+        g.moveTo(cx+ux*r0+tx, cy+uy*r0+ty);
+        g.lineTo(cx+ux*RING_R_OUT+tx, cy+uy*RING_R_OUT+ty);
+        g.stroke();
       }
-      // (2)+(3) 24 graduation ticks @15°; every 3rd (the 8 cardinals @45°) promoted to a MAJOR with a lozenge sigil
-      for (var i=0; i<24; i++){
-        var a = (i/24)*Math.PI*2, ux = Math.cos(a), uy = Math.sin(a);
-        if (i % 3 === 0){
-          g.strokeStyle = 'rgba('+col+','+aMajor+')'; g.lineWidth = 2;
-          g.beginPath();
-          g.moveTo(cx+ox+ux*RING_R_IN, cy+oy+uy*RING_R_IN);
-          g.lineTo(cx+ox+ux*RING_R_OUT, cy+oy+uy*RING_R_OUT);
-          g.stroke();
-          // engraved lozenge sigil at mid r=180, half-diagonal 5px
-          var mx = cx+ox+ux*180, my = cy+oy+uy*180, nx = -uy, ny = ux;   // n = tangent
-          g.fillStyle = 'rgba('+col+','+aSigil+')';
-          g.beginPath();
-          g.moveTo(mx+ux*5, my+uy*5);   // outward point
-          g.lineTo(mx+nx*5, my+ny*5);   // tangent point
-          g.lineTo(mx-ux*5, my-uy*5);   // inward point
-          g.lineTo(mx-nx*5, my-ny*5);   // other tangent
-          g.closePath(); g.fill();
-        } else {
-          g.strokeStyle = 'rgba('+col+','+aMinor+')'; g.lineWidth = 1.5;
-          g.beginPath();
-          g.moveTo(cx+ox+ux*190, cy+oy+uy*190);      // short tick r=190→202
-          g.lineTo(cx+ox+ux*RING_R_OUT, cy+oy+uy*RING_R_OUT);
-          g.stroke();
-        }
+      // (3) INNER SCALE — 36 @10°, OFFSET BY 2.5°, growing off the inner rail. Two opposed scales
+      //     facing each other across a clear middle lane = the classic graduated limb. The 2.5°
+      //     offset is the fix for the old 24-dot row, which sat at exactly the tick angles and so
+      //     only smeared the ticks instead of adding texture.
+      g.strokeStyle='rgba('+col+','+A.inner+')'; g.lineWidth=0.9;
+      for (var j=0;j<72;j+=2){
+        var b=((j+0.5)/72)*TAU_, vx=Math.cos(b), vy=Math.sin(b), sx=-vy*e, sy=vx*e;
+        g.beginPath();
+        g.moveTo(cx+vx*RING_R_IN+sx, cy+vy*RING_R_IN+sy);
+        g.lineTo(cx+vx*172+sx,        cy+vy*172+sy);
+        g.stroke();
+      }
+      // (4) SIGILS — 8 lozenges at r=176 (in from 180: they now occupy the middle lane). Filled ⇒ radial normal.
+      g.fillStyle='rgba('+col+','+A.sigil+')';
+      for (var k=0;k<8;k++){
+        var c2=(k/8)*TAU_, wx=Math.cos(c2), wy=Math.sin(c2);
+        var mx=cx+wx*(176+e), my=cy+wy*(176+e), nx=-wy, ny=wx, H=4.5;
+        g.beginPath();
+        g.moveTo(mx+wx*H,my+wy*H); g.lineTo(mx+nx*H,my+ny*H);
+        g.lineTo(mx-wx*H,my-wy*H); g.lineTo(mx-nx*H,my-ny*H);
+        g.closePath(); g.fill();
       }
     }
-
-    var EMB = 0.7;   // groove offset (px, disc-space)
-    // PASS 1 — dark near-wall shadow, offset UP-LEFT: the carved groove each mark sits inside
-    marks(-EMB, -EMB, '6,8,12',        0.50, 0.30, 0.55, 0.50, 0.42, false);
-    // PASS 2 — faint lit far-wall, offset DOWN-RIGHT: catches the upper-left dome light (sells the bevel)
-    marks( EMB*0.7, EMB*0.7, '236,240,247', 0.10, 0.06, 0.12, 0.11, 0.09, false);
-    // PASS 3 — the silver inlay centred in the groove, softened a further ~16% (mellower, still clearly legible), with the baked gleam
-    marks(0, 0, RING_COL,              0.285, 0.19, 0.40, 0.395, 0.33, true);
+    // Brightness ceiling: cardinals 0.36, majors 0.30. Nothing on the DRIFTING limb may out-shine the
+    // fixed gem at 12 o'clock — otherwise a cardinal arriving at the top reads as a second pointer.
+    // PASS 1 — dark near-wall (#04060A)
+    marks(-1, '4,6,10',      {railOut:.46, railIn:.38, card:.52, maj:.46, min:.36, inner:.30, sigil:.48}, false);
+    // PASS 2 — lit far-wall (#E8F2FF)
+    marks(+1, '232,242,255', {railOut:.09, railIn:.07, card:.11, maj:.09, min:.07, inner:.05, sigil:.10}, false);
+    // PASS 3 — the silver inlay (#D2DEEC), centred, with the baked gleam
+    marks( 0, RING_COL,      {railOut:.30, railIn:.22, card:.36, maj:.30, min:.22, inner:.17, sigil:.34}, true);
 
     return c.toDataURL('image/png');
   }
@@ -781,16 +868,56 @@
     g.beginPath();
     g.arc(cx,cy,RING_R_OUT,0,Math.PI*2);
     g.arc(cx,cy,RING_R_IN, 0,Math.PI*2,true); g.clip('evenodd');   // hard-clip to the band
-    // primary pool — soft blue crescent, upper-right of the band
-    var a=g.createRadialGradient(cx+104,cy-149,4, cx+104,cy-149,96);
-    a.addColorStop(0,  'rgba(122,168,224,0.24)');
-    a.addColorStop(.5, 'rgba(114,160,220,0.09)');
-    a.addColorStop(1,  'rgba(114,160,220,0)');
-    g.fillStyle=a; g.fillRect(0,0,S,S);
-    // fainter counter-pool lower-left → gentle two-lobe slosh
-    var b=g.createRadialGradient(cx-158,cy+91,4, cx-158,cy+91,84);
-    b.addColorStop(0,'rgba(96,150,212,0.12)'); b.addColorStop(1,'rgba(96,150,212,0)');
-    g.fillStyle=b; g.fillRect(0,0,S,S);
+
+    // (1) THREE lobes at IRREGULAR angles, all centred at r=190. Two lobes 180° apart read as a
+    //     rendering artefact; three at 80°/124°/156° gaps read as liquid that hasn't settled.
+    function pool(ang,rad,a0,rgb){
+      var px=cx+Math.cos(ang)*190, py=cy+Math.sin(ang)*190;
+      var p=g.createRadialGradient(px,py,3, px,py,rad);
+      p.addColorStop(0,   'rgba('+rgb+','+a0+')');
+      p.addColorStop(0.52,'rgba('+rgb+','+(a0*0.36).toFixed(3)+')');
+      p.addColorStop(1,   'rgba('+rgb+',0)');
+      g.fillStyle=p; g.fillRect(0,0,S,S);
+    }
+    var D2 = Math.PI/180;
+    pool(-58*D2, 104, 0.30, '104,168,226');   // #68A8E2
+    pool(146*D2,  88, 0.19, '104,168,226');
+    pool( 22*D2,  58, 0.12, '104,168,226');
+
+    // (2) OUTER-WALL POOLING. A liquid in a spinning channel piles against the far wall.
+    //     destination-in multiplies alpha by this ramp ⇒ every lobe is reshaped at once.
+    g.globalCompositeOperation='destination-in';
+    var ramp=g.createRadialGradient(cx,cy,RING_R_IN, cx,cy,RING_R_OUT);   // offset=(r-166)/36
+    ramp.addColorStop(0.000,'rgba(0,0,0,0)');     // r=166 — dry at the near wall
+    ramp.addColorStop(0.222,'rgba(0,0,0,0.05)');  // r=174
+    ramp.addColorStop(0.444,'rgba(0,0,0,0.28)');  // r=182
+    ramp.addColorStop(0.611,'rgba(0,0,0,0.62)');  // r=188 ← the surface knee
+    ramp.addColorStop(0.778,'rgba(0,0,0,0.92)');  // r=194
+    ramp.addColorStop(0.917,'rgba(0,0,0,1)');     // r=199
+    ramp.addColorStop(1.000,'rgba(0,0,0,0.88)');  // r=202 — surface-tension relief; keeps the rail visible
+    g.fillStyle=ramp; g.fillRect(0,0,S,S);
+
+    // (3) source-atop ⇒ everything below paints ONLY where liquid exists. This is what turns a tint
+    //     into a body: it acquires a surface and a depth instead of a fade.
+    g.globalCompositeOperation='source-atop';
+
+    // (3a) MENISCUS — the light catching the curved surface, sitting on the density knee
+    g.strokeStyle='rgba(206,232,255,0.50)'; g.lineWidth=1.6;      // #CEE8FF
+    g.beginPath(); g.arc(cx,cy,188,0,Math.PI*2); g.stroke();
+    g.strokeStyle='rgba(206,232,255,0.18)'; g.lineWidth=3.4;
+    g.beginPath(); g.arc(cx,cy,190.5,0,Math.PI*2); g.stroke();
+
+    // (3b) DEPTH TINT — deep water darkens toward the wall it's piled against
+    var dep=g.createRadialGradient(cx,cy,184, cx,cy,RING_R_OUT);
+    dep.addColorStop(0,'rgba(22,52,95,0)'); dep.addColorStop(1,'rgba(22,52,95,0.34)');   // #16345F
+    g.fillStyle=dep; g.fillRect(0,0,S,S);
+
+    // (3c) CAUSTIC SPECKS on the outer wall — 4 tiny bright points; what makes it read WET
+    g.fillStyle='rgba(224,242,255,0.40)';
+    [-71,-44,138,157].forEach(function(d){
+      var a=d*D2, sx=cx+Math.cos(a)*198, sy=cy+Math.sin(a)*198;
+      g.beginPath(); g.arc(sx,sy,1.5,0,Math.PI*2); g.fill();
+    });
     g.restore();
     return c.toDataURL('image/png');
   }
@@ -866,6 +993,7 @@
     }
     ctx.clip(); ctx.drawImage(ensureTexture(), 0,0, DISC_S, DISC_S);
     glassRig(ctx, cx, cy, R_WEDGE);   // same wedge-union clip; disc-space rig (fixed full R while a shrinking wedge crops it)
+    ctx.drawImage(ensureShelf(), 0,0, DISC_S, DISC_S);   // parity with draw() — without this the groove pops out mid add/remove
     ctx.restore();
 
     // 3) seams — dark groove + faint warm sliver (only when >1 wedge)
@@ -1067,7 +1195,6 @@
   var coreR    = fxLayer ? fxLayer.querySelector('.coreR')    : null;
   var coreL    = fxLayer ? fxLayer.querySelector('.coreL')    : null;
   var rills = [filmR, channelR, filmL, channelL, coreR, coreL];
-  var shockEl = document.querySelector('.shock');
   var coreEl  = document.querySelector('.coreflash');
   var plungeEl = document.querySelector('.plunge');
 
@@ -1097,11 +1224,10 @@
   function showFx(el){ if (el) el.style.opacity='1'; }
   function hideFx(el){ if (el) el.style.opacity='0'; }
   function resetFx(){
-    [dropEl, dropA, dropB, splatEl, shockEl, coreEl, plungeEl].forEach(function(el){ if (el) el.style.opacity='0'; });
+    [dropEl, dropA, dropB, splatEl, coreEl, plungeEl].forEach(function(el){ if (el) el.style.opacity='0'; });
     if (dropEl) dropEl.style.transform='';
     if (dropA)  dropA.style.transform='';
     if (dropB)  dropB.style.transform='';
-    if (shockEl) shockEl.style.transform='';
     if (coreEl)  coreEl.style.transform='translate(-50%,-50%)';
     rills.forEach(function(el){ if (el) el.style.strokeDashoffset='1'; });   // re-arm the rivulet strokes undrawn
   }
@@ -1147,7 +1273,6 @@
     if (ptr){ ptr.style.transform=''; ptr.style.willChange=''; ptr.style.opacity=''; ptr.style.transition=''; }
     if (fxLayer)   fxLayer.classList.remove('live');   // display:none hides the drop + splat
     if (vitrifyEl) vitrifyEl.style.opacity='0';
-    if (shockEl)   shockEl.style.opacity='0';
     if (coreEl)    coreEl.style.opacity='0';
     if (plungeEl)  plungeEl.style.opacity='0';
     // defensively zero every bead so an interrupt mid-stream leaves nothing stranded (fx is also display:none)
