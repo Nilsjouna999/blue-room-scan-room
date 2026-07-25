@@ -1101,71 +1101,142 @@ html.js-io .read-item.in .ri-record { transition-delay: .56s; }
 .archive-remove:hover, .archive-remove:focus-visible { color: var(--accent-lit); opacity: 1; background: rgba(201, 138, 94, 0.08); }
 
 /* ============================================================================
-   THE CODEX BALL (F3) — a small resting mark, quiet chrome. REUSABLE COMPONENT:
-   .br-ball is the generic shell (position it via a wrapping context or utility
-   class per room); .br-ball--yellow is the "full codex" skin used here. See
-   QUEUE_SPEC.md for the drop-in contract for other Blue Room rooms.
+   THE CODEX ORBS — "Deep Glass". The two-ball dock: the WHITE full-codex orb with
+   the smaller ORANGE mini-codex orb above it. Identical to the live app's
+   #brCodexDock — one object across the universe.
+
+   PERF CONTRACT: only transform + opacity ever animate. Every shadow and gradient is
+   STATIC. box-shadow is NEVER transitioned (that was the repaint-per-hover-frame lag).
+   RESTRAINT: nothing emitted at rest, max two hover cues, hairline caption not a card,
+   9px gap so the pair reads as ONE object, nothing loops.
    ========================================================================== */
-/* the two-ball dock — orange (mini codex) stacked on the white (full codex), matching the
-   live app's #brCodexDock. */
-.br-dock { position: fixed; right: 18px; bottom: 18px; z-index: 40; display: flex; flex-direction: column; align-items: center; gap: 11px; }
+:root {
+  --orb-in: 120ms; --orb-out: 220ms; --orb-press: 90ms;
+  --orb-e-in: cubic-bezier(.2,.7,.3,1);
+  --orb-e-out: cubic-bezier(.4,0,.6,1);
+}
+
+.br-dock {
+  position: fixed; right: 18px; bottom: 18px; z-index: 40;
+  display: flex; flex-direction: column; align-items: center; gap: 9px;
+}
+
 .br-ball {
-  position: relative; border-radius: 50%; padding: 0; border: none;
-  display: flex; align-items: center; justify-content: center;
+  position: relative; display: block; border-radius: 50%;
+  padding: 0; border: none; background: none;
   text-decoration: none; cursor: pointer;
-  /* settle (hover-out) is a hair slower than approach (hover-in) — a resting object easing
-     back to stillness, not snapping; this is the same asymmetry the deal/land beats use. */
-  transition: transform .3s cubic-bezier(.22, .9, .26, 1), box-shadow .3s ease, opacity .3s ease;
+  -webkit-tap-highlight-color: transparent;
+  transition: opacity var(--orb-out) var(--orb-e-out);   /* for the card-turn recede */
 }
-/* The skin is deliberately pushed OFF the settle/currency gold (--gold-lit #c0a05d): a paler
-   ivory highlight over a desaturated wax/parchment body, clearly lighter and cooler than any
-   price mark. It reads as "a reference lamp left on," never a paid/premium chip. Do NOT reach
-   for the --gold token here — gold is currency-only in this room. */
-.br-ball--yellow {
-  width: 42px; height: 42px;
-  background: radial-gradient(60% 60% at 33% 28%, #fefaf0, #e6d29a 52%, #b39a5f 100%);
-  box-shadow: 0 3px 12px rgba(0,0,0,0.45), 0 0 0 1px rgba(255,246,224,0.16) inset, 0 0 22px rgba(240,224,170,0.28);
+.br-ball--yellow { width: 42px; height: 42px; }
+.br-ball--orange { width: 30px; height: 30px; }
+
+/* the glow — the ONE hover cue. Transparent centre: lights the air, not the ball. */
+.br-ball::before {
+  content: ""; position: absolute; inset: -12px; border-radius: 50%;
+  pointer-events: none; opacity: 0;
+  transition: opacity var(--orb-out) var(--orb-e-out);
 }
-.br-ball--orange {
-  width: 30px; height: 30px;
-  background: radial-gradient(60% 60% at 33% 28%, #ffe0c0, #ec7038 52%, #a2430f 100%);
-  box-shadow: 0 3px 11px rgba(0,0,0,0.44), 0 0 0 1px rgba(255,222,186,0.2) inset, 0 0 18px rgba(232,110,58,0.32);
+.br-ball--yellow::before {
+  background: radial-gradient(closest-side,
+    rgba(246,232,192,0) 0%, rgba(246,232,192,0) 46%,
+    rgba(246,232,192,.26) 64%, rgba(246,232,192,.08) 82%, rgba(246,232,192,0) 100%);
 }
-.br-ball-core { display: block; width: 100%; height: 100%; border-radius: 50%; position: relative; }
-/* the magnetic halo — a soft ring that blooms ONLY on hover/focus (never idle, never a loop);
-   this is what makes the ball feel drawn-to rather than merely brightened. */
-.br-ball-core::after {
-  content: ""; position: absolute; inset: -9px; border-radius: 50%;
-  border: 1px solid rgba(226, 208, 150, 0.3);
-  opacity: 0; transform: scale(0.82);
-  transition: opacity .3s ease, transform .3s cubic-bezier(.22, .9, .26, 1);
-  pointer-events: none;
+.br-ball--orange::before {
+  inset: -10px;
+  background: radial-gradient(closest-side,
+    rgba(238,124,60,0) 0%, rgba(238,124,60,0) 46%,
+    rgba(238,124,60,.28) 64%, rgba(238,124,60,.09) 82%, rgba(238,124,60,0) 100%);
 }
-.br-ball:hover .br-ball-core::after,
-.br-ball:focus-visible .br-ball-core::after { opacity: 1; transform: scale(1); }
-.br-ball--orange .br-ball-core::after { border-color: rgba(244,150,96,0.42); }
-.br-ball:hover, .br-ball:focus-visible { transform: translateY(-2px) scale(1.05); transition-duration: .2s; }
-.br-ball--yellow:hover, .br-ball--yellow:focus-visible { box-shadow: 0 9px 22px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,246,224,0.18) inset, 0 0 28px rgba(240,224,170,0.4); }
-.br-ball--orange:hover, .br-ball--orange:focus-visible { box-shadow: 0 8px 18px rgba(0,0,0,0.48), 0 0 0 1px rgba(255,222,186,0.22) inset, 0 0 24px rgba(232,110,58,0.44); }
-/* the crown beat owns the stage: while a card is actively turning, the ball recedes so nothing
-   warm competes with the flip. Restored on settle. Motion-gated in JS (class only added when
-   motion is allowed), so reduced-motion sitters never see a dim. */
-.room.is-cardturn .br-ball { opacity: 0.38; }
-/* hovering the ball mid-turn still lifts it fully — intent overrides the recede */
-.room.is-cardturn .br-ball:hover,
-.room.is-cardturn .br-ball:focus-visible { opacity: 1; }
-.br-ball:focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }
-/* the press — a brief, tactile give before the link departs; confirms the click landed */
-.br-ball:active { transform: translateY(0) scale(0.96); transition-duration: .09s; }
-/* the label — hidden until hover/focus, so the ball itself stays the only mark at rest */
+
+/* THE SPHERE — static layers, one light (upper-left) */
+.br-ball-core {
+  display: block; width: 100%; height: 100%; position: relative;
+  border-radius: 50%; overflow: hidden;
+  background-repeat: no-repeat;
+  transition: transform var(--orb-out) var(--orb-e-out);
+}
+.br-ball--yellow .br-ball-core {
+  background-image:
+    radial-gradient(86% 86% at 26% 20%,
+      rgba(255,246,220,0) 0%, rgba(255,246,220,0) 64%,
+      rgba(255,242,210,.07) 78%, rgba(255,242,212,.34) 92%, rgba(255,248,226,.56) 100%),
+    radial-gradient(78% 78% at 33% 27%,
+      #faf4e4 0%, #f2e7cb 14%, #e4d2a4 30%, #cfb880 50%,
+      #ae9660 70%, #866f40 88%, #a48a58 100%);
+  box-shadow:
+    inset -2px -3px 8px rgba(44,31,12,.34),
+    inset  3px  3px 7px rgba(255,252,240,.13),
+    0 1px 2px rgba(0,0,0,.62),
+    0 4px 10px rgba(0,0,0,.44),
+    0 10px 22px rgba(0,0,0,.28);
+}
+.br-ball--orange .br-ball-core {
+  background-image:
+    radial-gradient(86% 86% at 26% 20%,
+      rgba(255,200,146,0) 0%, rgba(255,200,146,0) 64%,
+      rgba(255,196,140,.07) 78%, rgba(255,192,134,.32) 92%, rgba(255,209,160,.54) 100%),
+    radial-gradient(78% 78% at 33% 27%,
+      #ffecd4 0%, #ffcb9a 13%, #f59f5b 28%, #eb7832 46%,
+      #c85718 68%, #8a370a 89%, #b0551b 100%);
+  box-shadow:
+    inset -2px -3px 7px rgba(48,17,2,.40),
+    inset  2px  2px 6px rgba(255,236,214,.15),
+    0 1px 2px rgba(0,0,0,.60),
+    0 3px 8px rgba(0,0,0,.42),
+    0 8px 18px rgba(0,0,0,.26);
+}
+/* the catchlight — static gradient, static rotation: free at raster */
+.br-ball-core::before {
+  content: ""; position: absolute; left: 20%; top: 13%; width: 38%; height: 28%;
+  border-radius: 50%; transform: rotate(-18deg); pointer-events: none;
+  background: radial-gradient(closest-side,
+    rgba(255,255,255,.94), rgba(255,255,255,.30) 46%, rgba(255,255,255,0) 74%);
+}
+.br-ball--orange .br-ball-core::before {
+  background: radial-gradient(closest-side,
+    rgba(255,251,246,.90), rgba(255,238,220,.26) 46%, rgba(255,238,220,0) 74%);
+}
+
+/* the label — a hairline caption, not a card */
 .br-ball-tip {
-  position: absolute; right: calc(100% + 12px); top: 50%; transform: translateY(-50%) translateX(4px);
-  white-space: nowrap; padding: 5px 10px; border-radius: 6px;
-  background: #16130f; border: 1px solid var(--line); color: var(--t-primary);
-  font-family: var(--f-mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
-  opacity: 0; pointer-events: none; transition: opacity .18s ease .05s, transform .18s ease .05s;
+  position: absolute; right: calc(100% + 10px); top: 50%;
+  transform: translate3d(5px,-50%,0);
+  white-space: nowrap; padding: 2px 0;
+  background: none; border: none; color: #a29a89;
+  font-family: var(--f-mono); font-size: 9px; letter-spacing: .13em; text-transform: uppercase;
+  opacity: 0; pointer-events: none;
+  transition: opacity var(--orb-out) var(--orb-e-out) 0s,
+              transform var(--orb-out) var(--orb-e-out) 0s;
 }
-.br-ball:hover .br-ball-tip, .br-ball:focus-visible .br-ball-tip { opacity: 1; transform: translateY(-50%) translateX(0); }
+
+/* ---- hover / focus ---- */
+.br-ball:hover .br-ball-core, .br-ball:focus-visible .br-ball-core {
+  transform: translate3d(0,-1px,0) scale(1.04);
+}
+.br-ball:hover::before, .br-ball:focus-visible::before { opacity: 1; }
+.br-ball:hover .br-ball-tip, .br-ball:focus-visible .br-ball-tip {
+  opacity: 1; transform: translate3d(0,-50%,0);
+}
+.br-ball:hover::before, .br-ball:hover .br-ball-core, .br-ball:hover .br-ball-tip,
+.br-ball:focus-visible::before, .br-ball:focus-visible .br-ball-core,
+.br-ball:focus-visible .br-ball-tip {
+  transition-duration: var(--orb-in);
+  transition-timing-function: var(--orb-e-in);
+  transition-delay: 0s;
+}
+.br-ball:active .br-ball-core {
+  transform: translate3d(0,0,0) scale(.96);
+  transition-duration: var(--orb-press);
+  transition-timing-function: cubic-bezier(.3,0,.7,1);
+}
+.br-ball:focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }
+
+/* the crown beat owns the stage: while a card turns, the dock recedes. Restored on settle. */
+.room.is-cardturn .br-ball { opacity: 0.38; }
+.room.is-cardturn .br-ball:hover, .room.is-cardturn .br-ball:focus-visible { opacity: 1; }
+
+@media (hover: none) { .br-ball-tip { display: none; } }
 
 /* ============================================================================
    RESPONSIVE
@@ -1200,7 +1271,7 @@ html.js-io .read-item.in .ri-record { transition-delay: .56s; }
   .leave-mark, .archive-mark { top: 12px; }
   .leave-mark { left: 12px; }
   .archive-mark { right: 12px; }
-  .br-ball { right: 12px; bottom: 12px; width: 38px; height: 38px; }
+  .br-dock { right: 12px; bottom: 12px; }
   .br-ball-tip { display: none; }  /* hover tooltip has no home on touch; aria-label still speaks it */
   /* reserve a bottom safe-gutter so the last close-exits can never wrap UNDER the fixed ball
      (bottom-right, ~50px tall zone) on a narrow phone — the final tap target stays clear. */
@@ -1296,10 +1367,10 @@ html.js-io .read-item.in .ri-record { transition-delay: .56s; }
   .glow, .deck, .slot-label, .reading-head, .reading-matter, .intake-input { transition-duration: .12s; }
 
   /* F1–F3 additions: same no-translate discipline, opacity-only where motion implied position */
-  .btn-keep:hover, .archive-link:hover, .br-ball:hover, .br-ball:focus-visible, .br-ball:active { transform: none; }
-  .br-ball-core::after { transition: opacity .12s ease !important; transform: none !important; }
+  .btn-keep:hover, .archive-link:hover { transform: none; }
+  .br-ball:hover .br-ball-core, .br-ball:focus-visible .br-ball-core, .br-ball:active .br-ball-core { transform: none !important; }
   .archive-veil { transition: opacity .12s ease; }
   .archive-panel { transform: none !important; opacity: 0; transition: opacity .14s ease; }
   .archive-drawer.is-open .archive-panel { opacity: 1; }
-  .br-ball-tip { transition: opacity .12s ease; }
+  .br-ball, .br-ball::before, .br-ball-core, .br-ball-core::before, .br-ball-tip { transition: none !important; }
 }
