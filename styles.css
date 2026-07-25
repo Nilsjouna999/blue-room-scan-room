@@ -3822,6 +3822,19 @@ body[data-devnav="1"] .devnav {
   pointer-events: none; transition: opacity 200ms ease, transform 220ms var(--ease-bloom); }
 #menuView .mini[data-state="open"] .mini__panel { opacity: 1; transform: none; pointer-events: auto; }
 
+/* THE FLIP ZONES. The panel is anchored at its BOTTOM edge, so as results arrive it grows
+   UPWARD — which is how the search field could climb off the top of the page. app.js
+   measures the room above the ball (and re-measures whenever the panel's height changes)
+   and flips these on when the panel can no longer fit: it then opens DOWNWARD, with the
+   ball sitting above its box. Same idea horizontally when the ball is carried to the left
+   edge. Only the anchor + origin change — the open/close motion is identical. */
+#menuView .mini.is-below .mini__panel {
+  bottom: auto; top: calc(100% + 10px);
+  transform-origin: top right; transform: translateY(-6px) scale(.98); }
+#menuView .mini.is-below[data-state="open"] .mini__panel { transform: none; }
+#menuView .mini.is-leftedge .mini__panel { right: auto; left: -4px; transform-origin: bottom left; }
+#menuView .mini.is-leftedge.is-below .mini__panel { transform-origin: top left; }
+
 #menuView .mini__input { width: 100%; box-sizing: border-box; padding: 8px 10px;
   background: #100d09; border: 1px solid #332c25; border-radius: 8px;
   color: #e9e2d5; font-family: var(--font-display); font-size: 13px; outline: none; }
@@ -3846,11 +3859,23 @@ body[data-devnav="1"] .devnav {
   border-top: 1px solid #241f1a; color: var(--cx-gold); font-size: 12px; letter-spacing: .02em; text-decoration: none; }
 #menuView .mini__more:hover { color: #e0b070; }
 
-/* step aside during the reveal fullview + while the full aperture is opening/open/closing */
+/* step aside during the reveal fullview + while the full aperture is opening/open.
+   The mini FADES rather than snapping — it used to be a bare visibility flip with no
+   transition, and because it stayed hidden through the whole `is-codex-closing` reverb it
+   reappeared late and abruptly once that class finally dropped. */
+/* (.mini only — the dock keeps its own opacity+transform transition, declared above.) */
+#menuView .mini {
+  transition: opacity 300ms var(--ease-settle), visibility 0s linear 0s; }
 #menuView.menurev.is-fullview .mini, #menuView.menurev.is-fullview .mini-dock,
-#menuView.is-codex-open .mini, #menuView.is-codex-open .mini-dock,
+#menuView.is-codex-open .mini, #menuView.is-codex-open .mini-dock {
+  opacity: 0; visibility: hidden; pointer-events: none;
+  transition: opacity 180ms ease, visibility 0s linear 180ms; }
+/* CLOSING: it returns WITH the iris collapsing, not after it — a gentle fade that starts
+   early in the close and is settled by the time the seal finishes reverberating. It stays
+   click-through until the close completes so nothing is hit mid-animation. */
 #menuView.is-codex-closing .mini, #menuView.is-codex-closing .mini-dock {
-  opacity: 0; visibility: hidden; pointer-events: none; }
+  opacity: 1; visibility: visible; pointer-events: none;
+  transition: opacity 340ms var(--ease-settle) 90ms, visibility 0s linear 90ms; }
 
 @media (prefers-reduced-motion: reduce) {
   #menuView .mini, #menuView .mini__ball, #menuView .mini__panel, #menuView .mini-dock { transition: none !important; }

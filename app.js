@@ -1883,12 +1883,36 @@ function wireMiniCodex(host) {
     mini.style.willChange = "";
   }
 
+  /* PLACEMENT. The panel hangs from its BOTTOM edge, so as results arrive it grows UPWARD —
+     which is how the search field could climb clean off the top of the page. Decide the
+     anchor from the room actually available around the ball, and re-decide whenever the
+     panel's height changes (results landing) or the ball is carried somewhere new. */
+  const EDGE = 12, GAP = 10;
+  function placePanel() {
+    if (!panelOpen) return;
+    const b = ball.getBoundingClientRect();
+    const h = panel.offsetHeight || 0, w = panel.offsetWidth || 0;
+    const roomAbove = b.top - EDGE, roomBelow = window.innerHeight - b.bottom - EDGE;
+    // stay above by habit; flip below only when above genuinely cannot hold it and below can do better
+    const below = (h + GAP > roomAbove) && (roomBelow > roomAbove);
+    mini.classList.toggle("is-below", below);
+    // the panel is right-aligned to the ball; if that pushes its left edge off-screen, flip it
+    mini.classList.toggle("is-leftedge", (b.right + 4 - w) < EDGE);
+  }
+  let panelRO = null;
+  function watchPanel() {
+    if (panelRO || typeof ResizeObserver !== "function") return;
+    panelRO = new ResizeObserver(function () { placePanel(); });
+    panelRO.observe(panel);
+  }
+
   function openPanel() {
     if (panelOpen) return; panelOpen = true;
     mini.setAttribute("data-state", "open");
     ball.setAttribute("aria-expanded", "true");
     panel.removeAttribute("inert"); panel.removeAttribute("aria-hidden");
     loadIndex();
+    placePanel(); watchPanel();          // decide the anchor before it is painted open
     setTimeout(function () { try { input.focus({ preventScroll: true }); } catch (e) {} }, reduced() ? 0 : 60);
   }
   function closePanel() {
@@ -1921,10 +1945,44 @@ function wireMiniCodex(host) {
   }
 
   // ---- drag (pointer capture on the ball; a sub-threshold move is a tap → toggle panel) ----
+  /* THE THROW. A bead you flick should keep going a little and slide to rest — that carry
+     is most of what makes dragging feel good, and it costs one transform per frame. Bounds
+     are the room itself: the ball can never be dragged or thrown out of the viewport, and
+     meeting an edge kills that axis (a bead against a wall stops; it does not bounce). */
+  let vx = 0, vy = 0, lastT = 0, lastX = 0, lastY = 0, glideId = null;
+  let minX = -1e5, maxX = 1e5, minY = -1e5, maxY = 1e5;
+  function measureBounds() {
+    const r = ball.getBoundingClientRect();
+    const homeL = r.left - ox, homeT = r.top - oy;      // where it sits at offset 0
+    minX = EDGE - homeL;  maxX = window.innerWidth  - EDGE - r.width  - homeL;
+    minY = EDGE - homeT;  maxY = window.innerHeight - EDGE - r.height - homeT;
+  }
+  function clampX(x) { return Math.min(Math.max(x, minX), maxX); }
+  function clampY(y) { return Math.min(Math.max(y, minY), maxY); }
+  function stopGlide() { if (glideId) { cancelAnimationFrame(glideId); glideId = null; } }
+  function glide(done) {
+    const FRICTION = 0.92, STOP = 0.12;
+    function step() {
+      vx *= FRICTION; vy *= FRICTION;
+      if (Math.hypot(vx, vy) < STOP) { glideId = null; done(); return; }
+      const nx = clampX(ox + vx), ny = clampY(oy + vy);
+      if (nx !== ox + vx) vx = 0;
+      if (ny !== oy + vy) vy = 0;
+      ox = nx; oy = ny;
+      mini.style.transform = "translate3d(" + nx + "px," + ny + "px,0)";
+      glideId = requestAnimationFrame(step);
+    }
+    glideId = requestAnimationFrame(step);
+  }
+
   function onDown(e) {
     if (e.button != null && e.button !== 0) return;
+    stopGlide();                                          // catching it mid-throw stops it dead
     pid = e.pointerId; dragging = true; moved = false;
     sx = e.clientX; sy = e.clientY; bx = ox; by = oy;
+    vx = vy = 0; lastT = (window.performance && performance.now()) || Date.now();
+    lastX = e.clientX; lastY = e.clientY;
+    measureBounds();
     mini.classList.remove("is-homing"); mini.classList.add("is-dragging");
     mini.style.willChange = "transform";   // drag-scoped ONLY — cleared on release, never resident
     try { ball.setPointerCapture(pid); } catch (_) {}
@@ -1933,16 +1991,23 @@ function wireMiniCodex(host) {
     if (!dragging) return;
     const dx = e.clientX - sx, dy = e.clientY - sy;
     if (!moved && Math.hypot(dx, dy) > 5) { moved = true; if (panelOpen) closePanel(); }
-    if (moved) dragTo(bx + dx, by + dy);
+    if (!moved) return;
+    const now = (window.performance && performance.now()) || Date.now();
+    const dt = Math.max(1, now - lastT);                  // normalise to px per 60fps frame
+    vx = vx * 0.6 + ((e.clientX - lastX) * 16.7 / dt) * 0.4;
+    vy = vy * 0.6 + ((e.clientY - lastY) * 16.7 / dt) * 0.4;
+    lastT = now; lastX = e.clientX; lastY = e.clientY;
+    dragTo(clampX(bx + dx), clampY(by + dy));
   }
   function onUp(e) {
     if (!dragging) return; dragging = false;
-    endDragTransport();
     mini.classList.remove("is-dragging");
     try { ball.releasePointerCapture(pid); } catch (_) {}
-    if (e.type === "pointercancel") { if (moved) { nearSeal() ? goHome() : dropAway(); } return; }
-    if (!moved) { togglePanel(); return; }               // a tap, not a drag
-    nearSeal() ? goHome() : dropAway();
+    if (!moved) { endDragTransport(); togglePanel(); return; }   // a tap, not a drag
+    const settle = function () { endDragTransport(); nearSeal() ? goHome() : dropAway(); };
+    // a flick carries; a placement does not. Reduced motion never coasts.
+    if (e.type === "pointercancel" || reduced() || Math.hypot(vx, vy) < 1.4) { settle(); return; }
+    glide(settle);
   }
   ball.addEventListener("pointerdown", onDown);
   ball.addEventListener("pointermove", onMove);
@@ -2004,8 +2069,15 @@ function wireMiniCodex(host) {
 
   input.addEventListener("input", function () { clearTimeout(qt); qt = setTimeout(function () { renderResults(input.value); }, 90); });
 
+  // the viewport changing size can invalidate both the anchor choice and the drag bounds
+  const onMiniResize = function () { placePanel(); if (!dragging) measureBounds(); };
+  window.addEventListener("resize", onMiniResize);
+
   _miniTeardown = function () {
     clearTimeout(qt); clearTimeout(homeT);
+    stopGlide(); if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
+    if (panelRO) { try { panelRO.disconnect(); } catch (_) {} panelRO = null; }
+    window.removeEventListener("resize", onMiniResize);
   };
 }
 
