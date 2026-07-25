@@ -265,8 +265,23 @@
     D.closeActions = $("[data-close-actions]");
     D.againBottom = $("[data-again-bottom]");
     D.backRoom = $("[data-back-room]");
+    D.leaveRoom = $("[data-leave-room]");
     D.polite = $("[data-live-polite]");
     D.assertive = $("[data-live-assertive]");
+
+    // F2 — keep/archive
+    D.keepRow = $("[data-keep-row]");
+    D.keep = $("[data-keep]");
+    D.copyLink = $("[data-copy-link]");
+    D.keepFallback = $("[data-keep-fallback]");
+    D.archiveOpen = $("[data-archive-open]");
+    D.archiveCount = $("[data-archive-count]");
+    D.archiveDrawer = $("[data-archive-drawer]");
+    D.archiveVeil = $("[data-archive-veil]");
+    D.archivePanel = $("[data-archive-panel]");
+    D.archiveClose = $("[data-archive-close]");
+    D.archiveEmpty = $("[data-archive-empty]");
+    D.archiveList = $("[data-archive-list]");
   }
 
   /* ---------------------------------------------------------------- mood */
@@ -292,6 +307,189 @@
       if (ms && isFinite(ms)) return new Date(ms);
     } catch (e) {}
     return new Date();
+  }
+
+  /* ---------------------------------------------------------------- archive (F2)
+     Local, fail-safe. Stores just enough (k/q/t) to replay a filed reading exactly, plus
+     when it was kept. Everything else (accession, filed date, title) is re-derived from
+     that triple on render — one source of truth, same as the live ?read= receipt. */
+  var ARCHIVE_KEY = "br_dr_archive";
+  var ARCHIVE_MAX = 60;
+  function archiveRead() {
+    try {
+      var raw = localStorage.getItem(ARCHIVE_KEY);
+      var arr = raw ? JSON.parse(raw) : [];
+      return Array.isArray(arr) ? arr : [];
+    } catch (e) { return []; }
+  }
+  function archiveWrite(arr) {
+    try { localStorage.setItem(ARCHIVE_KEY, JSON.stringify(arr)); return true; }
+    catch (e) { return false; }
+  }
+  function archiveHas(token) {
+    var arr = archiveRead();
+    for (var i = 0; i < arr.length; i++) if (arr[i].t === token) return true;
+    return false;
+  }
+  // Returns true on success, false if storage failed (private mode / quota) — the caller
+  // falls open to the copy-link path so "keeping" never dead-ends into silence.
+  function archiveAdd(key, q, token) {
+    var arr = archiveRead().filter(function (e) { return e.t !== token; });
+    arr.unshift({ k: key, q: q || "", t: token, savedAt: Date.now() });
+    if (arr.length > ARCHIVE_MAX) arr = arr.slice(0, ARCHIVE_MAX);
+    return archiveWrite(arr);
+  }
+  function archiveRemove(token) {
+    var arr = archiveRead().filter(function (e) { return e.t !== token; });
+    return archiveWrite(arr);
+  }
+  function receiptHref(k, q, token) {
+    var payload;
+    try { payload = btoa(unescape(encodeURIComponent(JSON.stringify({ k: k, q: q || "", t: token })))); }
+    catch (e) { return null; }
+    return "?read=" + encodeURIComponent(payload);
+  }
+  function refreshArchiveCount() {
+    if (!D.archiveCount) return;
+    var n = archiveRead().length;
+    if (n > 0) { D.archiveCount.hidden = false; D.archiveCount.textContent = " (" + n + ")"; }
+    else { D.archiveCount.hidden = true; D.archiveCount.textContent = ""; }
+  }
+  function renderArchiveList() {
+    if (!D.archiveList) return;
+    var arr = archiveRead();
+    D.archiveEmpty.hidden = arr.length > 0;
+    D.archiveList.innerHTML = "";
+    for (var i = 0; i < arr.length; i++) {
+      (function (entry) {
+        var sp = SPREADS[entry.k];
+        if (!sp) return;
+        var href = receiptHref(entry.k, entry.q, entry.t);
+        if (!href) return;
+        var d = dateFromToken(entry.t);
+        var seed = makeSeed(entry.k, entry.q, entry.t);
+        var acc = accession(seed);
+        var q = (entry.q || "").trim();
+
+        var li = el("li", "archive-item");
+        var a = document.createElement("a");
+        a.className = "archive-link";
+        a.href = href;
+        a.innerHTML =
+          '<span class="ai-tier">' + esc(sp.title) + '</span>' +
+          (q ? '<span class="ai-q">&ldquo;' + esc(q) + '&rdquo;</span>' : '<span class="ai-q ai-q-none">No question was set down.</span>') +
+          '<span class="ai-meta">' + esc(acc) + ' &middot; filed ' + esc(fmtDate(d)) + '</span>';
+        li.appendChild(a);
+
+        var rm = document.createElement("button");
+        rm.type = "button";
+        rm.className = "archive-remove";
+        rm.setAttribute("aria-label", "Remove this reading from Your readings");
+        rm.textContent = "✕";
+        rm.addEventListener("click", function (ev) {
+          ev.preventDefault();
+          archiveRemove(entry.t);
+          renderArchiveList();
+          refreshArchiveCount();
+          if (STATE.token === entry.t) syncKeepUI();
+        });
+        li.appendChild(rm);
+
+        D.archiveList.appendChild(li);
+      })(arr[i]);
+    }
+  }
+  var archiveWasOpenFocus = null;
+  function openArchive() {
+    if (!D.archiveDrawer) return;
+    renderArchiveList();
+    archiveWasOpenFocus = document.activeElement;
+    D.archiveDrawer.hidden = false;
+    void D.archiveDrawer.offsetWidth;
+    D.archiveDrawer.classList.add("is-open");
+    if (D.archiveClose) D.archiveClose.focus();
+    document.addEventListener("keydown", onArchiveKeydown);
+  }
+  function closeArchive() {
+    if (!D.archiveDrawer) return;
+    D.archiveDrawer.classList.remove("is-open");
+    document.removeEventListener("keydown", onArchiveKeydown);
+    var done = function () { D.archiveDrawer.hidden = true; };
+    if (motionOK) setTimeout(done, 320); else done();   // matches .archive-panel's .32s close transition
+    if (archiveWasOpenFocus && archiveWasOpenFocus.focus) archiveWasOpenFocus.focus();
+  }
+  function onArchiveKeydown(ev) {
+    if (ev.key === "Escape") { closeArchive(); return; }
+    // minimal focus containment — Tab cycles within the panel while open
+    if (ev.key === "Tab" && D.archivePanel) {
+      var focusables = D.archivePanel.querySelectorAll('a[href], button:not([disabled])');
+      if (!focusables.length) return;
+      var first = focusables[0], last = focusables[focusables.length - 1];
+      if (ev.shiftKey && document.activeElement === first) { ev.preventDefault(); last.focus(); }
+      else if (!ev.shiftKey && document.activeElement === last) { ev.preventDefault(); first.focus(); }
+    }
+  }
+
+  // Sets the keep-row to match whatever is (or isn't) archived for the CURRENT reading.
+  var copyResetTimer = null;
+  function syncKeepUI() {
+    if (!D.keepRow) return;
+    var sp = SPREADS[STATE.tierKey];
+    if (!sp || !sp.filed || !STATE.token) { D.keepRow.hidden = true; return; }
+    D.keepRow.hidden = false;
+    D.keepFallback.hidden = true;
+    var kept = archiveHas(STATE.token);
+    D.keep.disabled = kept;
+    D.keep.textContent = kept ? "Kept." : "Keep this reading";
+    D.keep.classList.toggle("is-kept", kept);
+    // The ?read= link is a portable save in its own right (F2), so surface the copy affordance
+    // on ANY filed close — not only after the local Keep commits. Keep/"Kept." stays the
+    // separate local-archive act; the quiet copy link sits beside it either way.
+    D.copyLink.hidden = false;
+    D.copyLink.textContent = "Copy the record’s link";
+  }
+  function copyText(text) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).catch(function () { legacyCopy(text); });
+    } else {
+      legacyCopy(text);
+    }
+  }
+  function legacyCopy(text) {
+    try {
+      var ta = document.createElement("textarea");
+      ta.value = text; ta.setAttribute("readonly", ""); ta.style.position = "fixed"; ta.style.opacity = "0";
+      document.body.appendChild(ta); ta.select(); document.execCommand("copy"); document.body.removeChild(ta);
+    } catch (e) { /* silent — the link is still visible in the address bar */ }
+  }
+  function wireArchive() {
+    if (D.archiveOpen) D.archiveOpen.addEventListener("click", openArchive);
+    if (D.archiveClose) D.archiveClose.addEventListener("click", closeArchive);
+    if (D.archiveVeil) D.archiveVeil.addEventListener("click", closeArchive);
+    if (D.keep) D.keep.addEventListener("click", function () {
+      if (!STATE.token) return;
+      var ok = archiveAdd(STATE.tierKey, STATE.question, STATE.token);
+      refreshArchiveCount();
+      if (ok) {
+        syncKeepUI();
+        announce("Kept.", "polite");
+      } else {
+        D.keep.disabled = true;
+        D.keep.textContent = "Keep this reading";
+        D.keepFallback.hidden = false;
+        D.copyLink.hidden = false;
+        announce("Could not keep it here — the link still opens this reading.", "polite");
+      }
+    });
+    if (D.copyLink) D.copyLink.addEventListener("click", function () {
+      var href = receiptHref(STATE.tierKey, STATE.question, STATE.token);
+      if (!href) return;
+      copyText(location.origin + location.pathname + href);
+      clearTimeout(copyResetTimer);
+      D.copyLink.textContent = "Copied.";
+      announce("Link copied.", "polite");
+      copyResetTimer = setTimeout(function () { D.copyLink.textContent = "Copy the record’s link"; }, 1800);
+    });
   }
 
   /* ---------------------------------------------------------------- accent register (PRESERVED) */
@@ -405,6 +603,11 @@
   }
 
   function chooseTier(key) {
+    // Starting a fresh ceremony must never leave a stale ?read= in the address bar (e.g. when
+    // "New sitting" is reached from a reopened receipt): a mid-ceremony reload would otherwise
+    // reopen the OLD reading, not the fresh one. The next cut rewrites it via writeReceipt().
+    if (history.replaceState) history.replaceState(null, "", location.pathname);
+    D.room.classList.remove("is-cardturn");
     STATE = { phase: "intake", tierKey: key, question: "", token: null, seed: null,
               drawn: [], revealed: 0, replay: false, paidRun: false, done: false };
     var sp = SPREADS[key], st = TIER_STYLE[key], isPull = (key === "pull");
@@ -726,11 +929,13 @@
     D.mocknote.hidden = true;
     D.pretierNav.hidden = true;
 
-    // A reopened receipt still needs a way out — a forward control + the bottom cluster.
+    // A reopened receipt ends on the SAME three-exit close cluster as a freshly finished
+    // reading — mirroring complete(): the bottom block is the sole, legible way out. The
+    // stage-level "again" is retired here too, so there are no twin buttons and no label
+    // collision with the close block's own "New sitting" / "Choose a different reading".
     D.controls.hidden = false;
     D.cut.hidden = true;
-    D.again.hidden = false;
-    D.again.textContent = againLabel(sp);      // was hardcoded "Begin a new sitting" for every tier
+    D.again.hidden = true;
     D.status.hidden = true;
     D.hint.hidden = true;
     D.glow.style.display = "none";
@@ -755,6 +960,7 @@
       flip.style.transition = "none";
       flip.classList.add("is-turned");
       flip.setAttribute("aria-disabled", "true");
+      flip.setAttribute("aria-label", faceUpLabel(i, sp, dd));   // reopened cards are already face-up — the label must say so, not "turn it"
       flip.disabled = true;
       // deliver the label STATICALLY (R1 §5.6)
       var label = $(".slot-label", slots[i]);
@@ -781,6 +987,7 @@
     D.descend.hidden = false;                  // signpost shown for every reopened tier
     showClose(sp);
     if (sp.filed) stampAccession(accession(STATE.seed), d); else D.accession.hidden = true;
+    syncKeepUI();
     D.againBottom.textContent = againLabel(sp);   // was hardcoded "Begin a new sitting"
     D.stage.classList.add("is-launched");
   }
@@ -957,6 +1164,11 @@
     flip.classList.add("is-turned");
     flip.setAttribute("aria-label", faceUpLabel(i, sp, dd));
 
+    // Nothing shares the stage with the crown beat: the codex ball recedes while a card is
+    // actively turning, restored on settle below. Motion-gated (no dim under reduced motion,
+    // where there is no flip to protect) and purely cosmetic — the draw is untouched.
+    if (motionOK) D.room.classList.add("is-cardturn");
+
     // assertive announce fires NOW — a screen reader never waits on visuals
     var read = bindRead(dd.card, dd.reversed);
     var pre = sp.key === "pull" ? "" : sp.positions[i] + ": ";
@@ -967,6 +1179,7 @@
     // then fills its full record below. The turn now speaks where the eye already is.
     var idx = i, delay = motionOK ? 930 : 150;
     setTimeout(function () {
+      D.room.classList.remove("is-cardturn");                                 // card settled — the ball returns
       if (STATE.phase !== "revealing" && STATE.phase !== "complete") return; // reset aborted the beat
       if (STATE.drawn[idx] !== dd) return;                                    // spread rebuilt
       sayAtStage(dd);
@@ -1090,6 +1303,7 @@
     } else {
       D.accession.hidden = true;               // a Glance is not filed — never carry a stale stamp in
     }
+    syncKeepUI();
     announce(closingLine(sp), "assertive");
 
     // The climax points DOWN into the record, never at a reset. The stage-level "again" is
@@ -1150,6 +1364,7 @@
     if (history.replaceState) history.replaceState(null, "", location.pathname);
     STATE = { phase: "tier", tierKey: null, question: "", token: null, seed: null,
               drawn: [], revealed: 0, replay: false, paidRun: false, done: false };
+    D.room.classList.remove("is-cardturn");    // never leave the ball dimmed if a turn was aborted
     D.ceremony.setAttribute("hidden", "");
     D.tiers.removeAttribute("hidden");
     D.spread.innerHTML = "";
@@ -1206,6 +1421,9 @@
     });
     D.backRoom.addEventListener("click", resetToTiers);
     D.backTier.addEventListener("click", resetToTiers);
+    // D.leaveRoom is a plain <a href="../index.html"> — no JS needed, it just navigates.
+
+    wireArchive();
 
     D.descendBtn.addEventListener("click", function () {
       // begin the descent at the head of the record — the question echo, then "THE READING" —
@@ -1248,6 +1466,7 @@
     }
     wire();
     refreshDoorCopy();
+    refreshArchiveCount();
     tryReopen();   // ?read= replays cold, skips gate + ceremony
   }
 

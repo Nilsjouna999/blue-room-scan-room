@@ -25,6 +25,21 @@
          Reuses the freed corner where the card-finish chooser used to sit (D1). -->
     <a class="leave-mark" data-leave href="../index.html" aria-label="Leave the room">Blue Room</a>
 
+    <!-- Persistent quiet counterpart, top-right — the local archive of filed readings.
+         Present in every state (matches leave-mark's always-there discipline); the drawer
+         it opens is empty-safe, so there is nothing to hide when nothing is kept yet. -->
+    <button type="button" class="archive-mark" data-archive-open aria-haspopup="dialog" aria-controls="archive-panel">
+      Your readings<span class="archive-count" data-archive-count hidden></span>
+    </button>
+
+    <!-- F3 — reusable Codex-access ball (component contract in QUEUE_SPEC.md). Quiet, always
+         present, bottom-right; opens the Codex's tarot guide in place. -->
+    <a class="br-ball br-ball--yellow" data-codex-ball href="../codex.html#tarot-guide"
+       aria-label="Open the Codex — how to read the cards, and what each one means">
+      <span class="br-ball-core" aria-hidden="true"></span>
+      <span class="br-ball-tip" aria-hidden="true">The Codex</span>
+    </a>
+
     <header class="masthead">
       <p class="kicker">THE DRAWING ROOM</p>
       <p class="subline" data-subline>A reading, kept exactly as it is drawn.</p>
@@ -124,12 +139,41 @@
         <p class="close-note" data-closenote></p>
         <p class="close-confidential" data-confidential hidden></p>
         <div class="accession" data-accession hidden></div>
+
+        <!-- F2 — keep/archive. Filed tiers only (a Glance is never filed, so this stays hidden
+             for it); the receipt link IS the ?read= address already sitting in the location bar. -->
+        <div class="keep-row" data-keep-row hidden>
+          <button type="button" class="btn-keep" data-keep>Keep this reading</button>
+          <button type="button" class="link-quiet" data-copy-link hidden>Copy the record&rsquo;s link</button>
+          <p class="keep-fallback" data-keep-fallback hidden>Not kept here — but the link below still opens it.</p>
+        </div>
+
+        <!-- F1 — three legible exits: start again (same tier) / choose another reading (tier
+             select) / leave the room entirely (Blue Room home). Never twin buttons to one screen. -->
         <div class="close-actions" data-close-actions>
           <button type="button" class="btn btn-ghost" data-again-bottom></button>
-          <button type="button" class="link-quiet" data-back-room>Back to the room</button>
+          <div class="close-exits">
+            <button type="button" class="link-quiet" data-back-room>Choose a different reading</button>
+            <a class="link-quiet link-leave" data-leave-room href="../index.html">Leave to Blue Room</a>
+          </div>
         </div>
       </div>
     </section>
+
+    <!-- F2 — the local archive drawer. A quiet index of readings kept from this browser;
+         each entry reopens its own ?read= receipt exactly as filed. -->
+    <div class="archive-drawer" data-archive-drawer hidden>
+      <div class="archive-veil" data-archive-veil></div>
+      <aside class="archive-panel" id="archive-panel" role="dialog" aria-modal="true" aria-labelledby="archive-title" data-archive-panel>
+        <div class="archive-head">
+          <p class="archive-title" id="archive-title">Your Readings</p>
+          <button type="button" class="archive-close" data-archive-close aria-label="Close">&#10005;</button>
+        </div>
+        <p class="archive-lede">Kept locally, in this browser — a private index of what&rsquo;s been filed. Each one reopens exactly as it was drawn.</p>
+        <p class="archive-empty" data-archive-empty>Nothing kept yet. A Sitting or a Deep Read can be kept from its close.</p>
+        <ul class="archive-list" data-archive-list></ul>
+      </aside>
+    </div>
 
     <!-- ============ SCREEN-READER LIVE REGIONS ============ -->
     <div class="sr-only" aria-live="polite" data-live-polite></div>
