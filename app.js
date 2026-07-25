@@ -1857,6 +1857,32 @@ function wireMiniCodex(host) {
 
   function setOffset(x, y) { ox = x; oy = y; mini.style.setProperty("--mx", x + "px"); mini.style.setProperty("--my", y + "px"); }
 
+  /* DRAG TRANSPORT (the "pingy" fix). --mx/--my are perfect for the resting/homing state,
+     but a custom property cannot ride the compositor fast path: every write invalidates
+     style and forces a recalc before the transform lands, so the ball trails the pointer
+     by a frame. While a drag is live we bypass the variables and write the composited
+     transform straight onto the node, coalesced to ONE write per frame (a high-rate mouse
+     fires pointermove several times per frame; only the last position matters).
+     On release we hand the position back to --mx/--my so `.is-homing` can transition it. */
+  let rafId = null, pendX = 0, pendY = 0, pending = false;
+  function dragTo(x, y) {
+    ox = x; oy = y; pendX = x; pendY = y; pending = true;
+    if (rafId) return;
+    rafId = requestAnimationFrame(function () {
+      rafId = null;
+      if (!pending) return;
+      pending = false;
+      mini.style.transform = "translate3d(" + pendX + "px," + pendY + "px,0)";
+    });
+  }
+  function endDragTransport() {
+    if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
+    pending = false;
+    setOffset(ox, oy);            // variables first...
+    mini.style.transform = "";    // ...then release the inline transform, so CSS resumes
+    mini.style.willChange = "";
+  }
+
   function openPanel() {
     if (panelOpen) return; panelOpen = true;
     mini.setAttribute("data-state", "open");
@@ -1900,16 +1926,18 @@ function wireMiniCodex(host) {
     pid = e.pointerId; dragging = true; moved = false;
     sx = e.clientX; sy = e.clientY; bx = ox; by = oy;
     mini.classList.remove("is-homing"); mini.classList.add("is-dragging");
+    mini.style.willChange = "transform";   // drag-scoped ONLY — cleared on release, never resident
     try { ball.setPointerCapture(pid); } catch (_) {}
   }
   function onMove(e) {
     if (!dragging) return;
     const dx = e.clientX - sx, dy = e.clientY - sy;
     if (!moved && Math.hypot(dx, dy) > 5) { moved = true; if (panelOpen) closePanel(); }
-    if (moved) setOffset(bx + dx, by + dy);
+    if (moved) dragTo(bx + dx, by + dy);
   }
   function onUp(e) {
     if (!dragging) return; dragging = false;
+    endDragTransport();
     mini.classList.remove("is-dragging");
     try { ball.releasePointerCapture(pid); } catch (_) {}
     if (e.type === "pointercancel") { if (moved) { nearSeal() ? goHome() : dropAway(); } return; }

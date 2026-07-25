@@ -3570,7 +3570,24 @@ body[data-devnav="1"] .devnav {
   transition: opacity var(--orb-out) var(--orb-e-out); }
 #menuView .seed__glyph { grid-area: 1 / 1; font-family: var(--font-display); line-height: 1; color: #2a1e0c; transition: opacity 220ms ease; }
 #menuView .seed__open  { font-size: 15px; opacity: 0; }
-#menuView .seed__close { font-size: 17px; opacity: 0; font-weight: 300; }
+/* THE CLOSE MARK — two drawn hairlines, not a set ✕ glyph. At 42px a Cormorant ✕ reads
+   thin, off-weight and optically off-centre on a bright pearl; two bars are exact, crisp
+   at any DPI, and can carry their own turn-in. It arrives by ROTATING into true (a mark
+   being struck), not by fading up — transform + opacity only. */
+#menuView .seed__close {
+  position: relative; font-size: 0;      /* the unicode char stays for a11y/no-CSS fallback */
+  width: 15px; height: 15px;
+  opacity: 0; transform: rotate(-65deg);
+  transition: opacity 200ms ease, transform 340ms var(--ease-bloom);
+}
+#menuView .seed__close::before,
+#menuView .seed__close::after {
+  content: ""; position: absolute; left: 50%; top: 50%;
+  width: 15px; height: 1.6px; border-radius: 1.5px;
+  background: #241a0a;
+}
+#menuView .seed__close::before { transform: translate(-50%,-50%) rotate(45deg); }
+#menuView .seed__close::after  { transform: translate(-50%,-50%) rotate(-45deg); }
 /* lift only — the glyph is real text, so no scale (it would composite-stretch the ◆) */
 #menuView .seed:hover, #menuView .seed:focus-visible { transform: translate3d(0,-1px,0); outline: none;
   transition-duration: var(--orb-in); transition-timing-function: var(--orb-e-in); }
@@ -3614,7 +3631,7 @@ body[data-devnav="1"] .devnav {
 /* OPEN — seal charge→swallow→re-form as ✕; aperture slow-burn leap to land; ink frontier; ember; sheen */
 #menuView.is-codex-open .seed { animation: seedToClose 660ms var(--ease-bloom); }
 #menuView.is-codex-open .seed__open  { opacity: 0; transition-delay: 150ms; }
-#menuView.is-codex-open .seed__close { opacity: .82; transition-delay: 400ms; }
+#menuView.is-codex-open .seed__close { opacity: 1; transform: rotate(0deg); transition-delay: 340ms; }
 #menuView.is-codex-open .bloom { clip-path: circle(var(--r, 1400px) at var(--cx) var(--cy));
   transition: clip-path var(--edge-dur) var(--ease-edge) 90ms; }
 #menuView.is-codex-open .bloom__ink, #menuView.is-codex-closing .bloom__ink { will-change: transform, opacity; }
@@ -3758,8 +3775,23 @@ body[data-devnav="1"] .devnav {
   opacity: 1; transition-duration: var(--orb-in); transition-timing-function: var(--orb-e-in); }
 #menuView .mini__ball:active { transform: translate3d(0,0,0) scale(.96); transition-duration: var(--orb-press); }
 #menuView .mini__ball:focus-visible { outline: 2px solid rgba(233,229,220,.55); outline-offset: 3px; }
-#menuView .mini.is-dragging .mini__ball { cursor: grabbing; transform: translate3d(0,0,0) scale(1.08); }
-#menuView .mini.is-dragging .mini__ball::before { opacity: 1; }
+/* HELD. A solid object does not inflate when you pick it up — it leaves the surface.
+   The old scale(1.08), easing over 220ms while you were already moving, is what read as
+   "heavy". Now: no scale, no transition (a held thing tracks the pointer 1:1, it never
+   eases), and a deeper drop so it reads as LIFTED rather than swollen. The shadow swap is
+   instant and un-transitioned — one repaint on grab, nothing per frame. */
+#menuView .mini.is-dragging .mini__ball {
+  cursor: grabbing;
+  transform: none;
+  transition: none;
+  box-shadow:
+    inset -2px -3px 7px rgba(48,17,2,.40),
+    inset  2px  2px 6px rgba(255,236,214,.15),
+    0 2px 3px rgba(0,0,0,.50),
+    0 10px 20px rgba(0,0,0,.50),
+    0 18px 34px rgba(0,0,0,.34);
+}
+#menuView .mini.is-dragging .mini__ball::before { opacity: 1; transition: none; }
 #menuView .mini__glyph { display: none; }   /* plain sphere, matching the full-codex ball */
 @media (prefers-reduced-motion: reduce) {
   #menuView .mini__ball, #menuView .mini__ball::before { transition: none !important; }
