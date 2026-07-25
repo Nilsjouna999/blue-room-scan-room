@@ -1159,17 +1159,19 @@ const ZONE_LABELS = { menu: "ARCHIVE · LOBBY", room: "ARCHIVE · SAMPLE CARD", 
 function syncCodexBall() {
   const MISSING = { arcane: 1, "arcana-reading": 1, "drawing-room": 1, ceremony: 1, settings: 1, vault: 1 };
   const show = state.view === "dev" && !!MISSING[state.dev];
-  let ball = document.getElementById("brCodexBall");
-  if (!ball) {
-    ball = document.createElement("a");
-    ball.id = "brCodexBall";
-    ball.className = "br-ball br-ball--yellow";
-    ball.href = "codex.html";
-    ball.setAttribute("aria-label", "Open the Codex — the archive of meanings");
-    ball.innerHTML = '<span class="br-ball-core" aria-hidden="true"></span><span class="br-ball-tip" aria-hidden="true">The Codex</span>';
-    document.body.appendChild(ball);
+  let dock = document.getElementById("brCodexDock");
+  if (!dock) {
+    dock = document.createElement("div");
+    dock.id = "brCodexDock";
+    // the two-ball pair — orange (mini codex) stacked on top of the white (full codex)
+    dock.innerHTML =
+      '<a class="br-ball br-ball--orange" href="codex.html" aria-label="Search the Codex">' +
+        '<span class="br-ball-core" aria-hidden="true"></span><span class="br-ball-tip" aria-hidden="true">Search</span></a>' +
+      '<a class="br-ball br-ball--yellow" href="codex.html" aria-label="Open the Codex — the archive of meanings">' +
+        '<span class="br-ball-core" aria-hidden="true"></span><span class="br-ball-tip" aria-hidden="true">The Codex</span></a>';
+    document.body.appendChild(dock);
   }
-  ball.style.display = show ? "" : "none";
+  dock.style.display = show ? "" : "none";
 }
 
 function applyView() {
