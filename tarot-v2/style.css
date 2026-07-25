@@ -445,10 +445,11 @@ html.js-anim .door:nth-child(3) { animation-delay: .50s; }
   opacity: 0; /* withheld — height reserved, no jump on delivery */
 }
 .slot-label .sub {
-  font-family: var(--f-mono); font-weight: 500; font-size: 10.5px;
-  letter-spacing: 0.14em; color: var(--t-ghost);
+  font-family: var(--f-mono); font-weight: 600; font-size: 11px;
+  letter-spacing: 0.1em; color: var(--t-body);
   opacity: 0;
 }
+.slot-label[title] { cursor: help; }
 .label-wait {
   position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
   width: 16px; height: 1px; background: var(--line); opacity: 0.6;
@@ -539,6 +540,13 @@ html.js-anim .door:nth-child(3) { animation-delay: .50s; }
   letter-spacing: 0.16em; text-transform: uppercase; color: var(--card-sub);
 }
 .card-rev .face-orient { color: var(--card-accent); }
+/* the reversed gloss, printed under "Reversed" on the card face itself — disarms the single
+   scariest word in the ceremony at first sight; its own line, un-capsed, so it fits the smallest
+   card without crowding the name above it */
+.fo-gloss {
+  display: block; margin-top: 3px; text-transform: none; letter-spacing: 0.02em;
+  font-weight: 400; font-size: 8px; font-style: italic; color: var(--card-sub);
+}
 
 /* ============================================================================
    CONTROLS + NAV
@@ -589,6 +597,38 @@ html.js-anim .door:nth-child(3) { animation-delay: .50s; }
   transition: opacity .6s ease, transform .6s cubic-bezier(.2, .8, .26, 1);
 }
 .stage-say.is-said { opacity: 1; transform: none; }
+
+/* ---------- THE SPREAD KEY — the reading's intent, stated at the table the instant the cards
+   land face-down: the arc named as one movement, then each polarity pair coupled with a copper
+   ↔ (the boundary between seats made literal). Static, full-opacity — no scroll-gate, no
+   IntersectionObserver, no keyframes; present identically in the js-io and reduced-motion paths. */
+.spread-key {
+  margin: var(--sp-4) auto 0; max-width: 54ch; text-align: center;
+  display: flex; flex-direction: column; align-items: center; gap: var(--sp-2);
+}
+.sk-eyebrow {
+  margin: 0;
+  font-family: var(--f-mono); font-weight: 600; font-size: 11px;
+  letter-spacing: 0.18em; text-transform: uppercase; color: var(--t-meta);
+}
+.sk-legend {
+  margin: 0; max-width: 46ch;
+  font-family: var(--f-display); font-style: italic; font-weight: 500;
+  font-size: clamp(15px, 2vw, 17px); line-height: 1.5; color: var(--t-body);
+}
+.sk-axes {
+  display: flex; flex-wrap: wrap; justify-content: center; gap: var(--sp-1) var(--sp-3);
+}
+.sk-axis { display: inline-flex; flex-direction: column; align-items: center; gap: 2px; }
+.sk-pair {
+  font-family: var(--f-mono); font-weight: 600; font-size: 11px;
+  letter-spacing: 0.14em; text-transform: uppercase; color: var(--t-primary);
+}
+.sk-pair .x { color: var(--card-accent); padding: 0 .3em; }  /* the ↔ = copper, the polarity boundary made literal; never --gold */
+.sk-meta {
+  font-family: var(--f-mono); font-weight: 500; font-size: 10px;
+  letter-spacing: 0.08em; color: var(--t-meta);
+}
 
 /* ---------- DESCEND CUE — the ONE signpost down, now the primary post-turn act
    (a present, labelled pill; the sole ambient loop is a small chevron nudge) ---------- */
@@ -651,7 +691,41 @@ html.js-anim .door:nth-child(3) { animation-delay: .50s; }
 }
 .rh-sub {
   margin: var(--sp-2) 0 0;
-  font-family: var(--f-display); font-style: italic; font-size: 17px; color: var(--t-ghost);
+  font-family: var(--f-display); font-style: italic; font-size: 17px; color: var(--t-body);
+}
+
+/* "How to read this" — the essentials, collapsed by default (progressive disclosure); the
+   intent of the spread is already visible per-card, this is the process that ties it together */
+.how-to-read {
+  margin: var(--sp-3) auto 0; max-width: 52ch; text-align: left;
+}
+.how-to-read summary {
+  cursor: pointer; text-align: center; list-style: none;
+  font-family: var(--f-mono); font-weight: 600; font-size: 11px;
+  letter-spacing: 0.16em; text-transform: uppercase; color: var(--t-meta);
+  transition: color .2s ease;
+}
+.how-to-read summary:hover, .how-to-read summary:focus-visible { color: var(--t-primary); }
+.how-to-read summary::-webkit-details-marker { display: none; }
+.how-to-read summary::after { content: " \25BE"; font-size: 9px; vertical-align: 1px; }
+.how-to-read[open] summary::after { content: " \25B4"; }
+.how-to-read p {
+  margin: var(--sp-3) 0 0;
+  font-family: var(--f-display); font-style: normal; font-weight: 500;
+  font-size: 15px; line-height: 1.65; color: var(--t-body);
+}
+/* the one quiet path onward — from the on-page essentials to the Codex's full guide */
+.how-to-read .how-to-more {
+  margin-top: var(--sp-3); font-family: var(--f-mono); font-weight: 400;
+  font-size: 11px; letter-spacing: 0.08em; font-style: normal;
+}
+.how-to-read .how-to-more a {
+  color: var(--t-meta); text-decoration: none;
+  border-bottom: 1px solid rgba(201, 138, 94, 0.35); padding-bottom: 1px;
+  transition: color .2s ease, border-color .2s ease;
+}
+.how-to-read .how-to-more a:hover, .how-to-read .how-to-more a:focus-visible {
+  color: var(--accent-lit); border-bottom-color: var(--accent-lit);
 }
 
 /* Connective bridge — position-structural, full-width, between adjacent cards */
@@ -702,8 +776,23 @@ html.js-anim .door:nth-child(3) { animation-delay: .50s; }
 .ri-body { min-width: 0; }
 .ri-index { margin: 0 0 6px; font: 400 10px var(--f-mono); letter-spacing: 0.18em; color: var(--t-ghost); }
 .ri-eyebrow { margin: 0 0 10px; font: 600 11px var(--f-mono); letter-spacing: 0.2em; line-height: 1.5; }
-.ri-eyebrow .pos { text-transform: uppercase; color: var(--t-meta); }
-.ri-eyebrow .sub { color: var(--t-ghost); }
+.ri-eyebrow .pos { text-transform: uppercase; color: var(--accent-lit); }
+.ri-eyebrow .sub { color: var(--t-body); }
+
+/* the position's role — a marginal note in the room's own prose voice, naming what the slot
+   IS and its polarity counterweight; sits between the eyebrow and the name so the intent
+   of the position reads before the card's own answer does */
+.ri-role {
+  margin: 0 0 16px; padding-left: 14px; max-width: 46ch;
+  border-left: 2px solid rgba(201, 138, 94, 0.4);
+  font: italic 500 15px/1.5 var(--f-display); color: var(--t-primary);
+}
+/* the plain-language meaning of a reversal — lifted off the visibility floor (--t-meta, not the
+   faint --t-ghost) so the one line that says what "reversed" MEANS is actually readable at a glance */
+.ri-orient-gloss {
+  margin-left: 8px; font: 500 10.5px var(--f-mono); letter-spacing: 0.06em;
+  text-transform: none; color: var(--t-meta);
+}
 .ri-name {
   margin: 0 0 16px;
   font: 600 clamp(26px, 3.6vw, 34px) var(--f-display); line-height: 1.08; color: var(--t-display);
@@ -754,12 +843,14 @@ html.js-anim .door:nth-child(3) { animation-delay: .50s; }
 html.js-io .read-item .ri-card,
 html.js-io .read-item .ri-index,
 html.js-io .read-item .ri-eyebrow,
+html.js-io .read-item .ri-role,
 html.js-io .read-item .ri-name,
 html.js-io .read-item .ri-lead,
 html.js-io .read-item .ri-record { opacity: 0; transform: translateY(14px); }
 html.js-io .read-item.in .ri-card,
 html.js-io .read-item.in .ri-index,
 html.js-io .read-item.in .ri-eyebrow,
+html.js-io .read-item.in .ri-role,
 html.js-io .read-item.in .ri-name,
 html.js-io .read-item.in .ri-lead,
 html.js-io .read-item.in .ri-record {
@@ -769,6 +860,7 @@ html.js-io .read-item.in .ri-record {
 html.js-io .read-item.in .ri-card { transition-delay: 0s; }
 html.js-io .read-item.in .ri-index { transition-delay: .12s; }
 html.js-io .read-item.in .ri-eyebrow { transition-delay: .16s; }
+html.js-io .read-item.in .ri-role { transition-delay: .20s; }
 html.js-io .read-item.in .ri-name { transition-delay: .24s; }
 html.js-io .read-item.in .ri-lead { transition-delay: .40s; }
 html.js-io .read-item.in .ri-record { transition-delay: .56s; }
@@ -892,6 +984,7 @@ html.js-io .read-item.in .ri-record { transition-delay: .56s; }
   .read-item .ri-card { --read-card-w: clamp(150px, 44vw, 190px); justify-self: center; }
   .read-item .ri-body { max-width: 42ch; text-align: left; }
   .read-item .ri-eyebrow, .read-item .ri-index { text-align: center; }
+  .read-item .ri-role { margin-left: auto; margin-right: auto; text-align: left; }
   .ri-name { justify-content: center; }
   .ri-lead { max-width: 40ch; }
   .ri-record { max-width: 42ch; }

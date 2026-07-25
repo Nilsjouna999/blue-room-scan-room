@@ -103,11 +103,79 @@
                positions: [null], notes: [null] },
     sitting: { key: "sitting", title: "A Sitting",    n: 3, paid: false, price: "$1.99", filed: true,
                positions: ["The Ground", "The Crossing", "The Turn"],
-               notes: ["what the matter rests on", "what stands against it", "where it tends, left as it stands"] },
+               notes: ["what the matter rests on", "what stands against it", "where it tends, left as it stands"],
+               explain: [
+                 "The base it already stands on — what’s settled or given, under the question itself. Its counterweight is the Crossing.",
+                 "What stands against it — the friction or opposition the Ground has to bear. Its counterweight is the Ground.",
+                 "Where it tends, left exactly as it stands — the close of the arc, not a verdict."
+               ] },
     deep:    { key: "deep",    title: "The Deep Read", n: 5, paid: true,  price: "$2.99", filed: true,
                positions: ["The Ground", "The Crossing", "The Root", "The Crown", "The Turn"],
-               notes: ["what it rests on", "what stands against it", "what it grew from", "what it reaches for", "where it tends"] }
+               notes: ["what it rests on", "what stands against it", "what it grew from", "what it reaches for", "where it tends"],
+               explain: [
+                 "The base it already stands on — what’s settled or given, under the question itself. Its counterweight is the Crossing.",
+                 "What stands against it — the friction or opposition the Ground has to bear. Its counterweight is the Ground.",
+                 "What it grew from — the origin underneath both, older than either. Its counterweight is the Crown.",
+                 "What it reaches for — the aim pulling from above, the shape it’s growing toward. Its counterweight is the Root.",
+                 "Where it tends, left exactly as it stands — the close of the arc, not a verdict."
+               ] }
   };
+
+  // R7/COPY §10 — the on-page teaching block (reading-head disclosure). One paragraph per
+  // filed tier: reads the spread as a single movement (polarity pairs → close), names the angle
+  // to watch (agreement vs disagreement), and states plainly what a reversed card means.
+  var HOWTO = {
+    sitting: "Read the three in the order they fell — Ground, then Crossing, then Turn — as one line, " +
+      "not three separate answers. Ground and Crossing are a pair: what the matter already stands on, weighed " +
+      "against what opposes it. Neither wins — the tension between them is the real subject. The Turn is " +
+      "where that tension is heading if nothing moves: a likely drift, not a sentence. Reversed doesn’t mean " +
+      "opposite — it’s the same meaning turned inward: blocked, delayed, or not yet outward.",
+    deep: "Read the five in the order they fell, as one movement in two pairs and a close. Ground and Crossing " +
+      "are the first pair — what the matter already stands on, weighed against what opposes it. Root and " +
+      "Crown are the second — what it grew from, reaching toward what it’s aiming at. The Turn closes " +
+      "the arc: where all four are tending, left exactly as they stand. Notice where the cards agree and where " +
+      "they pull apart — agreement confirms, disagreement marks the real work. Reversed doesn’t mean " +
+      "opposite — it’s the same meaning turned inward: blocked, delayed, or not yet outward."
+  };
+  var ORIENT_GLOSS = { rev: "inward, not yet" };
+
+  // The tier-specific arc line — on the reading head (rh-sub): the bare movement, in fall order.
+  // The seats' MEANINGS + polarity live in the Spread Key (with its ↔ axes) above; the head just
+  // names the sequence to walk, so the triad gloss isn't restated a fourth time. Pull has no head.
+  var ARC = {
+    sitting: "Read in the order it fell — ground, crossing, turn.",
+    deep: "Read in the order it fell — ground, crossing, root, crown, turn."
+  };
+
+  // THE SPREAD KEY — the one always-visible frame at the table (revealed once the cards land
+  // face-down, before any turn): names the whole arc, and couples each polarity pair with a
+  // copper ↔ so the boundary between the seats is literal, not only prose. Turn is the sum of
+  // the pairs, not a pair itself — it carries no axis row.
+  var SK_LEGEND = {
+    sitting: "Three seats, one arc — what it rests on, what stands against it, and where it tends.",
+    deep: "Five seats, one arc — what it rests on and what stands against it, what it grew from " +
+      "and what it reaches for, and where it all tends."
+  };
+  var SK_AXES = {
+    sitting: [["Ground", "Crossing", "support · resistance"]],
+    deep: [["Ground", "Crossing", "support · resistance"], ["Root", "Crown", "origin · reach"]]
+  };
+  function renderSpreadKey(sp) {
+    if (!D.spreadKey) return;
+    if (!sp || sp.key === "pull") { D.spreadKey.hidden = true; D.spreadKey.innerHTML = ""; return; }
+    var axes = SK_AXES[sp.key] || [];
+    D.spreadKey.innerHTML =
+      '<p class="sk-eyebrow">THE SHAPE OF IT</p>' +
+      '<p class="sk-legend">' + esc(SK_LEGEND[sp.key] || "") + '</p>' +
+      '<div class="sk-axes">' +
+        axes.map(function (a) {
+          return '<span class="sk-axis">' +
+                   '<span class="sk-pair">' + esc(a[0]) + '<span class="x">&#8596;</span>' + esc(a[1]) + '</span>' +
+                   '<span class="sk-meta">' + esc(a[2]) + '</span>' +
+                 '</span>';
+        }).join("") +
+      '</div>';
+  }
   var TIER_STYLE = {
     pull:    { w: "clamp(184px,42vw,216px)", ar: "150 / 238" },
     sitting: { w: "clamp(120px,26vw,150px)", ar: "150 / 238" },
@@ -174,6 +242,7 @@
     D.mocknote = $("[data-mocknote]");
     D.subline = $("[data-subline]");
     D.stage = $("[data-stage]");
+    D.spreadKey = $("[data-spread-key]");
     D.glow = $("[data-glow]");
     D.deck = $("[data-deck]");
     D.spread = $("[data-spread]");
@@ -268,7 +337,9 @@
       '</div>' +
       '<div class="face-name' + longName + '">' + esc(card.name) + '</div>' +
       '<div class="face-div"></div>' +
-      '<div class="face-orient">' + (rev ? "Reversed" : "Upright") + '</div>' +
+      '<div class="face-orient">' +
+        (rev ? 'Reversed<span class="fo-gloss">inward, not yet</span>' : "Upright") +
+      '</div>' +
       '<span class="tick tl"></span><span class="tick br"></span>';
   }
   function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
@@ -375,6 +446,8 @@
     renderDeck();
     renderSkeleton(sp);
     renderReadingSkeleton(sp, false);
+    renderSpreadKey(sp);                       // built now, revealed only once the cards land
+    if (D.spreadKey) D.spreadKey.hidden = true;
 
     D.reopen.hidden = true;
     D.closingBlock.hidden = true;
@@ -430,7 +503,16 @@
       D.reading.appendChild(matter);
 
       var head = el("div", "reading-head");
-      head.innerHTML = '<h2 class="rh-eyebrow">THE READING</h2><p class="rh-sub">Read in the order it fell.</p>';
+      var howto = HOWTO[sp.key];
+      // The process lesson is open on a live reading (the sitter explicitly wants to learn how
+      // to read it) and collapsed on a reopened receipt (coldOpen), where the calm recap is the
+      // point. The foot of it carries the one quiet path to the Codex's full guide.
+      head.innerHTML = '<h2 class="rh-eyebrow">THE READING</h2><p class="rh-sub">' +
+        esc(ARC[sp.key] || "Read in the order it fell.") + '</p>' +
+        (howto ? '<details class="how-to-read"' + (coldOpen ? '' : ' open') + '>' +
+          '<summary>How to read this</summary><p>' + esc(howto) + '</p>' +
+          '<p class="how-to-more"><a href="../codex.html#tarot-guide">The full guide lives in the Codex &rarr;</a></p>' +
+        '</details>' : '');
       D.reading.appendChild(head);
     }
 
@@ -456,9 +538,12 @@
       var body = el("div", "ri-body");
       var html = "";
       if (!isPull) {
-        html += '<p class="ri-index">' + roman(i + 1) + ' &middot; ' + esc(String(sp.positions[i]).toUpperCase()) + '</p>';
+        // numeral only — marks the order it fell; the position NAME follows in the copper eyebrow
+        // on the very next line, so we don't print it twice in a row.
+        html += '<p class="ri-index">' + roman(i + 1) + '</p>';
         html += '<p class="ri-eyebrow" id="rh-' + i + '"><span class="pos">' + esc(sp.positions[i]) + '</span>' +
                 ' &middot; <span class="sub">' + esc(sp.notes[i]) + '</span></p>';
+        if (sp.explain && sp.explain[i]) html += '<p class="ri-role">' + esc(sp.explain[i]) + '</p>';
       }
       html += '<h3 class="ri-name" id="rn-' + i + '"><span class="nm">&mdash;</span></h3>';
       html += '<div class="ri-read-wrap" data-read-wrap><p class="ri-lead ri-ghost">Awaiting the turn.</p></div>';
@@ -660,6 +745,8 @@
 
     renderSkeleton(sp);
     renderReadingSkeleton(sp, true);   // coldOpen: never observe (no scroll dependence)
+    renderSpreadKey(sp);               // a reopened receipt shows the same frame
+    if (D.spreadKey) D.spreadKey.hidden = (sp.key === "pull");
 
     var slots = D.spread.querySelectorAll(".slot");
     for (var i = 0; i < sp.n; i++) {
@@ -675,6 +762,7 @@
         var pe = $(".pos", label), se = $(".sub", label);
         if (pe) pe.textContent = sp.positions[i];
         if (se) se.textContent = sp.notes[i];
+        if (sp.explain && sp.explain[i]) label.title = sp.explain[i];
         label.classList.add("is-answered", "no-anim");
       }
       $(".card-travel", slots[i]).classList.add("is-mounted");
@@ -815,6 +903,10 @@
   function enterDealt() {
     STATE.phase = "dealt";
     D.status.hidden = true;
+    D.cutnote.hidden = true;                   // the cut-note is a PRE-cut instruction — stale now the deal has landed
+    // the spread's intent, present the whole time the sitter turns cards (the "immediately
+    // see what it's directed at" beat); pull has no seats, so no key.
+    if (STATE.tierKey !== "pull" && D.spreadKey) D.spreadKey.hidden = false;
     announce("Awaiting the turn.", "polite");
     if (STATE.tierKey !== "pull") { D.hint.hidden = false; D.hint.textContent = turnHint(); }
     var first = $(".flip", D.spread);
@@ -856,6 +948,7 @@
       var posEl = $(".pos", label), subEl = $(".sub", label);
       if (posEl) posEl.textContent = sp.positions[i];
       if (subEl) subEl.textContent = sp.notes[i];
+      if (sp.explain && sp.explain[i]) label.title = sp.explain[i];
       label.classList.add("is-answered");
     }
     var bp = $(".back-prompt", slot);
@@ -921,8 +1014,9 @@
     var nameEl = $(".ri-name", item);
     if (nameEl) {
       var orient = dd.reversed ? "Reversed" : "Upright";
+      var gloss = dd.reversed ? '<span class="ri-orient-gloss">' + ORIENT_GLOSS.rev + '</span>' : '';
       nameEl.innerHTML = '<span class="nm">' + esc(dd.card.name) + '</span>' +
-                         '<span class="ri-orient' + (dd.reversed ? " is-rev" : "") + '">' + orient + '</span>';
+                         '<span class="ri-orient' + (dd.reversed ? " is-rev" : "") + '">' + orient + '</span>' + gloss;
     }
 
     var wrap = $("[data-read-wrap]", item);
@@ -964,7 +1058,7 @@
       base = "Ground, crossing, turn — what it rests on, what stands against it, where it leans if nothing changes.";
       ret = "That is what the sitting returns to it.";
     } else {
-      base = "Ground and root beneath it, crossing and crown against and above it, and the turn where it leans if nothing changes.";
+      base = "Ground against crossing, root against crown — what holds it, what opposes it, what it grew from, what it reaches for — and the turn, where it leans if nothing changes.";
       ret = "That is what the read returns to it.";
     }
     s.innerHTML = esc(base) + (hasQ ? '<br><span class="syn-return">' + esc(ret) + '</span>' : "");
@@ -1014,10 +1108,13 @@
     if (sp.key === "sitting") return "The sitting is filed.";
     return "The read is filed, in full.";
   }
+  // The close is the reading's quietest, most personal beat — a bare filing fact, no arc-recap.
+  // The synthesis already restated the arc at the foot of the reading; the close leaves the
+  // "filed / kept for you" lines room to land un-narrated, instead of printing the triad twice.
   function closeNote(sp) {
     if (sp.key === "pull") return "No question was set down, so nothing here repeats.";
-    if (sp.key === "sitting") return "Three cards, read in the order they were asked to answer: what the matter rests on, what stands against it, where it tends, left as it stands.";
-    return "Five cards, read in full: what it rests on, what stands against it, what it grew from, what it reaches for, and where it tends.";
+    if (sp.key === "sitting") return "Three cards, kept in the order they fell.";
+    return "Five cards, kept in full.";
   }
   function againLabel(sp) {
     if (sp.key === "pull") return "Another glance";
@@ -1084,6 +1181,7 @@
     D.again.hidden = true;
     D.status.hidden = true;
     D.hint.hidden = true;
+    if (D.spreadKey) D.spreadKey.hidden = true;
     clearSay();
 
     setMood("tier");

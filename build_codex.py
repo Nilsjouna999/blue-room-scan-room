@@ -8,7 +8,8 @@ def disp(sysname):
     if 'western' in s or ('zodiac' in s and 'sun' in s): return ('western', 'The Western Zodiac', 'the twelve sun signs')
     if 'chinese' in s: return ('chinese', 'The Chinese Zodiac & Five Elements', 'twelve animals, five elements')
     if 'numerolog' in s: return ('numerology', 'Numerology', 'the core & master numbers')
-    if 'tarot' in s or 'arcana' in s: return ('tarot', 'The Major Arcana', 'the twenty-two')
+    if 'minor' in s and 'arcana' in s: return ('tarot-minor', 'The Minor Arcana', 'the fifty-six')
+    if 'tarot' in s or 'arcana' in s: return ('tarot-major', 'The Major Arcana', 'the twenty-two')
     if 'rune' in s or 'futhark' in s: return ('runes', 'The Elder Futhark', 'the twenty-four runes')
     if 'trigram' in s: return ('trigrams', 'The Eight Trigrams', 'the building blocks')
     if 'ching' in s or 'hexagram' in s: return ('iching', 'The I Ching', 'the sixty-four hexagrams')
@@ -20,6 +21,30 @@ def esc(x): return html.escape(str(x if x is not None else ''))
 secs = []
 navs = []
 for w in data:
+    if w.get('kind') == 'guide':
+        # title from the JSON source (single source of truth); sub is the short mono eyebrow,
+        # the fuller "essentials, at length…" line rides below as the italic systemNote.
+        sid = 'tarot-guide'
+        title = w.get('system') or 'Reading the Tarot'
+        sub = 'how a spread is built, and how to read one'
+        navs.append(f'<a href="#{sid}">{esc(title)}</a>')
+        g = w.get('guide', {})
+        gsecs = []
+        for gs in g.get('sections', []):
+            gsecs.append(
+                f'<div class="g-sec" id="{esc(gs.get("id",""))}">'
+                + f'<h3 class="g-head">{esc(gs.get("heading",""))}</h3>'
+                + gs.get('body', '')  # authored HTML, trusted source
+                + '</div>')
+        note = esc(w.get('systemNote', ''))
+        secs.append(
+            f'<section class="sys guide" id="{sid}">'
+            + f'<div class="sys-head"><h2 class="sys-title">{esc(title)}</h2><span class="sys-sub">{esc(sub)}</span></div>'
+            + (f'<p class="sys-note">{note}</p>' if note else '')
+            + (f'<p class="g-intro">{g.get("intro","")}</p>' if g.get('intro') else '')
+            + f'<div class="g-body">{"".join(gsecs)}</div>'
+            + '</section>')
+        continue
     sid, title, sub = disp(w.get('system', ''))
     navs.append(f'<a href="#{sid}">{esc(title)}</a>')
     cards = []
@@ -101,10 +126,32 @@ footer{text-align:center;color:var(--faint);font-family:"SFMono-Regular",ui-mono
 .dict-def{font-size:13.5px;color:var(--ink-2);line-height:1.55;margin:0 0 5px}
 .dict-status{font-style:italic;color:var(--dim);font-size:13px}
 .dict-src{font-family:"SFMono-Regular",ui-monospace,Consolas,monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);margin-top:12px}
+.guide .g-intro{font-style:italic;font-size:16px;color:var(--ink-2);max-width:720px;margin:16px 0 34px;line-height:1.72}
+.guide .g-body{display:flex;flex-direction:column;gap:34px;max-width:760px}
+.guide .g-sec{border-top:1px solid var(--hair-2);padding-top:22px}
+.guide .g-head{font-size:19px;font-weight:600;color:var(--gold);margin:0 0 12px;letter-spacing:.005em}
+.guide .g-sec p{font-size:14.5px;color:var(--ink-2);line-height:1.72;margin:0 0 12px}
+.guide .g-sec p:last-child{margin-bottom:0}
+.guide .g-sec strong{color:var(--ink);font-weight:600}
+.guide .g-sec em{color:var(--ink-2)}
+.suit-grid,.pos-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;margin:16px 0 18px}
+.suit,.pos{background:linear-gradient(180deg,rgba(255,255,255,.012),rgba(0,0,0,.12)),var(--card);border:1px solid var(--hair);border-radius:9px;padding:15px 17px}
+.suit-name,.pos-name{display:block;font-size:16px;font-weight:600;color:var(--ink)}
+.suit-el,.pos-role{display:block;font-family:"SFMono-Regular",ui-monospace,Consolas,monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold-dim);margin:3px 0 10px}
+.suit p,.pos p{font-size:13px;color:var(--ink-2);line-height:1.6;margin:0}
+.pos-grid{grid-template-columns:repeat(auto-fill,minmax(260px,1fr))}
+.process-list{margin:16px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:14px}
+.process-list li{font-size:14.5px;color:var(--ink-2);line-height:1.7;padding-left:20px;position:relative}
+.process-list li::before{content:"\\2022";position:absolute;left:0;color:var(--gold-dim)}
+.process-list strong{color:var(--ink);font-weight:600}
+.walk-draw{margin:18px 0;padding:15px 19px;border:1px solid var(--hair);border-radius:9px;background:linear-gradient(180deg,rgba(255,255,255,.014),rgba(0,0,0,.14)),var(--card);display:flex;flex-direction:column;gap:9px}
+.walk-draw p{margin:0;font-size:15px;color:var(--ink);line-height:1.4}
+.walk-seat{display:inline-block;min-width:118px;font-family:"SFMono-Regular",ui-monospace,Consolas,monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold-dim)}
+.walk-read strong{color:var(--ink);font-weight:600}
 """
 JS = """
 const q=document.getElementById('q');const cards=[...document.querySelectorAll('.card')];const syss=[...document.querySelectorAll('.sys')];const nr=document.getElementById('nr');
-q.addEventListener('input',()=>{const v=q.value.trim().toLowerCase();let any=false;cards.forEach(c=>{const hit=!v||c.dataset.search.includes(v);c.style.display=hit?'':'none';if(hit)any=true;});syss.forEach(s=>{const vis=[...s.querySelectorAll('.card')].some(c=>c.style.display!=='none');s.style.display=vis?'':'none';});nr.style.display=any?'none':'block';});
+q.addEventListener('input',()=>{const v=q.value.trim().toLowerCase();let any=false;cards.forEach(c=>{const hit=!v||c.dataset.search.includes(v);c.style.display=hit?'':'none';if(hit)any=true;});syss.forEach(s=>{if(s.classList.contains('guide')){s.style.display=v?'none':'';return;}const vis=[...s.querySelectorAll('.card')].some(c=>c.style.display!=='none');s.style.display=vis?'':'none';});nr.style.display=any?'none':'block';});
 /* the English dictionary — a second search, far right; looks up definitions via the free Dictionary API */
 const dq=document.getElementById('dq');const dout=document.getElementById('dict-out');
 function de(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
