@@ -1945,11 +1945,20 @@ function wireMiniCodex(host) {
   }
 
   // ---- drag (pointer capture on the ball; a sub-threshold move is a tap → toggle panel) ----
-  /* THE THROW. A bead you flick should keep going a little and slide to rest — that carry
-     is most of what makes dragging feel good, and it costs one transform per frame. Bounds
-     are the room itself: the ball can never be dragged or thrown out of the viewport, and
-     meeting an edge kills that axis (a bead against a wall stops; it does not bounce). */
-  let vx = 0, vy = 0, lastT = 0, lastX = 0, lastY = 0, glideId = null;
+  /* THE CARRY. One gesture serves two intents, and the engine must not blur them:
+       · PLACEMENT — the real job. Let go and it stays exactly there. Zero drift, always.
+       · A CHUCK — the bit of play. It floats on a little and settles.
+     So the float is gated behind a real flick (ordinary dragging never coasts), and its
+     distance is HARD-CAPPED — however hard you throw it, it levitates MAX_CARRY px and no
+     further. It is never a throw across the room, and it can never carry the ball somewhere
+     you have to go fetch it from.
+     The float is handed to the compositor as ONE css transition: no per-frame JS, no
+     physics loop, no accumulating error — the target is computed once and is exact. */
+  const FLICK_MIN = 6;      // px/frame — under this it is a placement, not a chuck
+  const CARRY_K   = 3.2;    // how much of the flick becomes float
+  const MAX_CARRY = 26;     // px — the ceiling. A levitation, not a throw.
+  const COAST_MS  = 300;
+  let vx = 0, vy = 0, lastT = 0, lastX = 0, lastY = 0, coastT = null;
   let minX = -1e5, maxX = 1e5, minY = -1e5, maxY = 1e5;
   function measureBounds() {
     const r = ball.getBoundingClientRect();
@@ -1959,25 +1968,25 @@ function wireMiniCodex(host) {
   }
   function clampX(x) { return Math.min(Math.max(x, minX), maxX); }
   function clampY(y) { return Math.min(Math.max(y, minY), maxY); }
-  function stopGlide() { if (glideId) { cancelAnimationFrame(glideId); glideId = null; } }
-  function glide(done) {
-    const FRICTION = 0.92, STOP = 0.12;
-    function step() {
-      vx *= FRICTION; vy *= FRICTION;
-      if (Math.hypot(vx, vy) < STOP) { glideId = null; done(); return; }
-      const nx = clampX(ox + vx), ny = clampY(oy + vy);
-      if (nx !== ox + vx) vx = 0;
-      if (ny !== oy + vy) vy = 0;
-      ox = nx; oy = ny;
-      mini.style.transform = "translate3d(" + nx + "px," + ny + "px,0)";
-      glideId = requestAnimationFrame(step);
-    }
-    glideId = requestAnimationFrame(step);
+  /* where it visually is this instant — mid-float included, so catching it stops it dead
+     exactly under your finger rather than snapping to where it was headed. */
+  function currentTranslate() {
+    const m = window.getComputedStyle(mini).transform;
+    if (!m || m === "none") return [ox, oy];
+    const p = m.slice(m.indexOf("(") + 1, -1).split(",").map(parseFloat);
+    return p.length >= 6 && isFinite(p[4]) && isFinite(p[5]) ? [p[4], p[5]] : [ox, oy];
+  }
+  function stopCoast() {
+    if (!coastT) return;
+    clearTimeout(coastT); coastT = null;
+    const c = currentTranslate();
+    mini.classList.remove("is-coasting");
+    setOffset(clampX(c[0]), clampY(c[1]));
   }
 
   function onDown(e) {
     if (e.button != null && e.button !== 0) return;
-    stopGlide();                                          // catching it mid-throw stops it dead
+    stopCoast();                                          // catching it mid-float stops it dead
     pid = e.pointerId; dragging = true; moved = false;
     sx = e.clientX; sy = e.clientY; bx = ox; by = oy;
     vx = vy = 0; lastT = (window.performance && performance.now()) || Date.now();
@@ -2004,10 +2013,21 @@ function wireMiniCodex(host) {
     mini.classList.remove("is-dragging");
     try { ball.releasePointerCapture(pid); } catch (_) {}
     if (!moved) { endDragTransport(); togglePanel(); return; }   // a tap, not a drag
-    const settle = function () { endDragTransport(); nearSeal() ? goHome() : dropAway(); };
-    // a flick carries; a placement does not. Reduced motion never coasts.
-    if (e.type === "pointercancel" || reduced() || Math.hypot(vx, vy) < 1.4) { settle(); return; }
-    glide(settle);
+    endDragTransport();                                          // it is now exactly where released
+    const settle = function () { nearSeal() ? goHome() : dropAway(); };
+    const speed = Math.hypot(vx, vy);
+    // A placement — the common case, and the one that must be exact — ends here, untouched.
+    if (e.type === "pointercancel" || reduced() || speed < FLICK_MIN) { settle(); return; }
+    // A chuck: one bounded float, computed once, run by the compositor.
+    const k = Math.min(CARRY_K * speed, MAX_CARRY) / speed;
+    const tx = clampX(ox + vx * k), ty = clampY(oy + vy * k);
+    if (Math.abs(tx - ox) < 1 && Math.abs(ty - oy) < 1) { settle(); return; }   // an edge ate it
+    void mini.offsetWidth;                                       // flush, so the transition has a start value
+    mini.classList.add("is-coasting");
+    setOffset(tx, ty);
+    coastT = setTimeout(function () {
+      coastT = null; mini.classList.remove("is-coasting"); settle();
+    }, COAST_MS + 20);
   }
   ball.addEventListener("pointerdown", onDown);
   ball.addEventListener("pointermove", onMove);
@@ -2075,7 +2095,8 @@ function wireMiniCodex(host) {
 
   _miniTeardown = function () {
     clearTimeout(qt); clearTimeout(homeT);
-    stopGlide(); if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
+    if (coastT) { clearTimeout(coastT); coastT = null; }
+    if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
     if (panelRO) { try { panelRO.disconnect(); } catch (_) {} panelRO = null; }
     window.removeEventListener("resize", onMiniResize);
   };
