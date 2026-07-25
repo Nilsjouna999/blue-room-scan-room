@@ -1407,6 +1407,7 @@ function renderReliquaryTeaser() {
     +   '<a class="menu__reliq-door" href="?dev=arcane">See a reading — free to look &rarr;</a>'
     + '</div>'
     + '<p class="menu__reliq-foot">Sealed · held in conservation · Blue Room Archive</p>'
+    + reliqPreviewToggle(false)
     + '</div>';
 }
 function renderReliquaryOpen() {
@@ -1421,9 +1422,35 @@ function renderReliquaryOpen() {
     +   '<a class="menu__reliq-door menu__reliq-door--enter" href="?dev=profile">Open the Reliquary &rarr;</a>'
     + '</div>'
     + '<p class="menu__reliq-foot">Filed &amp; sealed · Blue Room Archive</p>'
+    + reliqPreviewToggle(true)
+    + '</div>';
+}
+/* BR-S230 — a visible dev/preview toggle on M3, so the builder can SEE both account
+   states without the ?devnav rail: "No account" re-renders the sealed teaser in place;
+   "The profile" sets the mock holdings flag and opens the real ?dev=profile route (never
+   mounted here — the gate stays a pure static string). Pre-launch affordance; gate behind
+   ?devnav or remove before launch. Reuses hasHoldings()/br_holdings. */
+function reliqPreviewToggle(held) {
+  return '<div class="menu__reliq-preview" role="group" aria-label="Preview: account state">'
+    + '<span class="menu__reliq-preview-tag" aria-hidden="true">&#9670; Preview as</span>'
+    + '<button type="button" class="menu__reliq-previewbtn' + (held ? '' : ' is-on') + '" data-reliq-state="none"' + (held ? '' : ' aria-current="true"') + '>No account</button>'
+    + '<span class="menu__reliq-preview-sep" aria-hidden="true">·</span>'
+    + '<button type="button" class="menu__reliq-previewbtn' + (held ? ' is-on' : '') + '" data-reliq-state="profile"' + (held ? ' aria-current="true"' : '') + '>The profile &rarr;</button>'
     + '</div>';
 }
 function renderReliquary(held) { return held ? renderReliquaryOpen() : renderReliquaryTeaser(); }
+/* delegated click for the M3 preview toggle — module-level named handler so it never
+   stacks across menu remounts (bound once via remove+add in mountMenu). */
+function onReliqPreviewClick(e) {
+  var b = e.target.closest("[data-reliq-state]");
+  if (!b) return;
+  e.preventDefault();
+  var st = b.getAttribute("data-reliq-state");
+  try { st === "profile" ? localStorage.setItem("br_holdings", "1") : localStorage.removeItem("br_holdings"); } catch (_) {}
+  if (st === "profile") { location.href = "?dev=profile"; return; }
+  var cur = e.currentTarget.querySelector(".menu__reliq");   // re-render M3 in place — stays on slide 3
+  if (cur) cur.outerHTML = renderReliquary(false);
+}
 
 /* BR-S205: the fixed-leaf Codex aperture — appended unconditionally as trailing #menuView
    children (siblings of .menu__track, NEVER inside it). The seal is a real <a href> so the
@@ -1550,6 +1577,8 @@ function mountMenu() {
   wireMenuAbout(host);   // BR-S203: the About surface scroll-reveal
   wireMenuCodex(host);   // BR-S205: the bottom-right Codex aperture (seal → in-page codex.html)
   wireMiniCodex(host);   // BR-S226: the orange mini-codex ball (drag + in-room search)
+  host.removeEventListener("click", onReliqPreviewClick);   // BR-S230: M3 preview state toggle — single-bind across remounts
+  host.addEventListener("click", onReliqPreviewClick);
 }
 
 /* BR-S203 — the About "Procession" scroll-reveal. Base state is VISIBLE (freeze-safe, the
