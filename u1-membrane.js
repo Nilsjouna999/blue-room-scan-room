@@ -115,6 +115,27 @@
   var W=0, H=0, DPR=1, UPPER_Y=0, LOWER_Y=0, MID_Y=0;
   var lines=[], particles=[], PMAX=260, last=0, accT=0;
   var upperEnv=0, lowerEnv=0;     // BR PULSE-2: split per-line presence — upper=quintic latch/hold, lower=content-anchored fade. Written each frame by aboutEnvelope(); zero per-frame alloc.
+  // BR-S237 [codex reading frame]: additive-only state for the codex-mode FORK. The About path
+  // never reads any of these, so the normal membrane+aperture is byte-for-byte unchanged when the
+  // codex is closed. EMPTY = shared empty boxes array for pure-flow codex frames (zero per-frame
+  // alloc; an empty boxes[] no-ops computeTarget's bulge loop). wasCodex = codex-mode flag.
+  // codexEnv = the codex frame's own 0..1 ease (the iris). CODEX_HEADER_FALLBACK = px-from-top
+  // perch for the top line when the live sticky-header can't be read.
+  var EMPTY=[];
+  var wasCodex=false, codexEnv=0;
+  var CODEX_HEADER_FALLBACK=96;
+  // BR-S237 [refine, header-tracking smoothing — MOTION risk-2 + TASTE risk-2 consensus]: a
+  // persistent, lerp'd top-line perch so the line GLIDES to the measured sticky-header instead of
+  // snapping (absorbs the iframe-load 96->real jump AND sticky sub-pixel flicker during momentum
+  // scroll). Snapped on the first codex frame (no slide from 0) + in reduced-motion. CODEX_HEADER_GAP
+  // = px of breathing room BELOW the header bottom so the top line doesn't sit flush on the
+  // stickybar's own 1px hairline border (TASTE risk-1, the "doubled rule / HUD underline").
+  var codexTopY=0, CODEX_HEADER_GAP=8;
+  // BR-S237 [refine, About re-entry ease — MOTION risk-1]: 0..1 scalar that IRISES the About
+  // membrane back in on the codex-close -> About handoff (mirrors codexEnv's iris) so the About
+  // lines fade in instead of hard-popping at full env the frame the codex frame lets go. Defaults
+  // to 1: when the codex never opened this is a no-op and the About path is byte-for-byte unchanged.
+  var reentry=1;
   var touched = [];               // plates we've written inline styles onto
   var wasVisible = false;
   var aboutEl = null;             // last-found #about (set by aboutEnvelope)
@@ -500,11 +521,70 @@
   function stepParticles(){ for(var i=particles.length-1;i>=0;i--){ var p=particles[i]; p.x+=p.vx; p.y+=p.vy; p.vx*=0.99; p.a-=0.012; if(p.a<=0)particles.splice(i,1); } }
   function drawParticles(){ ctx.fillStyle='#fff'; for(var i=0;i<particles.length;i++){ var p=particles[i], e=p.up?upperEnv:lowerEnv; ctx.globalAlpha=(p.a<0?0:p.a)*0.7*e; ctx.beginPath(); ctx.arc(p.x,p.y,p.s,0,6.28318); ctx.fill(); } ctx.globalAlpha=1; }
 
+  // BR-S237 [codex reading frame — detection, SAFETY GUARD #1, never throws]: pure classList read
+  // on the PARENT #menuView (the same document this canvas lives in). Returns true while the codex
+  // aperture is up (open OR the ~840ms closing ease, app.js), false on any non-menu view (Desk /
+  // reading rooms), which is the desk-safety guarantee. Node is re-read each frame (never cached) —
+  // #menuView is re-created on remounts and a stale ref would break detection.
+  function codexOpen(){
+    var host=document.getElementById('menuView');
+    if(!host) return false;
+    var cl=host.classList;
+    return cl.contains('is-codex-open')||cl.contains('is-codex-closing');
+  }
+  // BR-S237 [codex reading frame — header measurement, SAFETY GUARD #2, never throws / never parks
+  // off-screen]: walk parent #menuView -> #codexBloom .bloom__frame (the codex iframe) ->
+  // contentDocument -> .stickybar (position:sticky;top:0 inside codex.html) -> rect.bottom. The
+  // iframe fills the viewport (inset:0 in a fixed .bloom), so the in-iframe rect.bottom is already
+  // viewport-relative — no offset math. The WHOLE body is ONE try/catch because contentDocument is
+  // null/about:blank while the lazy data-src iframe warms, .stickybar is absent pre-paint, and
+  // access can defensively throw mid-navigation. Sanity clamp 0<b<0.5H rejects NaN/0/collapsed
+  // pre-layout reads that would otherwise snap the top line to y=0 or mid-screen. Fixed fallback
+  // (96px) makes the frame usable on the very first open and unbreakable during navigation.
+  function codexHeaderY(){
+    try{
+      var host=document.getElementById('menuView');
+      var fr=host&&host.querySelector('#codexBloom .bloom__frame');
+      var doc=fr&&(fr.contentDocument||(fr.contentWindow&&fr.contentWindow.document));
+      var bar=doc&&doc.querySelector('.stickybar');
+      // BR-S237 [refine, MOTION risk-2]: CLAMP the returned value (Math.min(b,H*0.45)) rather than
+      // REJECTING any b>=0.5H and snapping to the fixed fallback. This lets the top line track the
+      // header continuously on every viewport (incl. short/landscape where the masthead pushes the
+      // header past mid-screen at scroll-top) while still preserving the topY<MID_Y(0.5H)
+      // classification guarantee. The 96px fallback is now reserved for genuinely bad reads only
+      // (b<=0 / NaN / null contentDocument / missing header).
+      if(bar){ var b=bar.getBoundingClientRect().bottom; if(b>0 && isFinite(b)) return Math.min(b, H*0.45); }
+    }catch(e){}
+    return CODEX_HEADER_FALLBACK;
+  }
+
   function frame(now){
     if(!canvas){ requestAnimationFrame(frame); return; }
     if(window.innerWidth!==W || window.innerHeight!==H) resize();
 
+    // BR-S237 — CODEX READING FRAME fork (decoupled from #about; renders every time the codex
+    // aperture is up). Placement is load-bearing: AFTER resize() (needs valid W/H + rebuilt
+    // maskGrad) and BEFORE aboutEnvelope()/ensureAboutLayout()/the vis gate, so when codex is open
+    // the entire About body never executes, and when codex is NOT open the fork is a pure no-op and
+    // the About path runs identically to before this edit.
+    var mv=document.getElementById('menuView');
+    if(codexOpen()){ frameCodex(now, mv); requestAnimationFrame(frame); return; }
+    if(wasCodex){                             // codex just closed -> restore the About path cleanly
+      refreshBaselines();                     // lines[].baseY back to H*frac (MID_Y/UPPER_Y/LOWER_Y never touched)
+      for(var cr=0;cr<lines.length;cr++){ lines[cr].y.fill(0); lines[cr].v.fill(0); }
+      ctx.clearRect(0,0,W,H); codexEnv=0; wasCodex=false; wasVisible=false; last=now; accT=0;
+      reentry=0;                              // BR-S237: arm the About re-entry iris (ramps back to 1 over ~10 frames below)
+    }
+
     var vis = aboutEnvelope();                // sets upperEnv/lowerEnv; returns their max as the visibility gate
+    // BR-S237 [refine, About re-entry ease — MOTION risk-1]: after a codex-close, iris the About
+    // membrane back in by scaling the LINE/BAND env (upperEnv/lowerEnv) by a 0..1 ramp — the same
+    // coverage-lerp that drives drawLine/drawBand, so the lines slide in from the frame edges and
+    // fade up together (a mirror of codexEnv's iris) instead of snapping on at full env in one
+    // frame. Applied AFTER vis so the visibility GATE below still keys off true presence (a scaled
+    // env must not spuriously trip the vis<=0.001 clear). reentry==1 => exact byte-for-byte About
+    // path when the codex never opened. Reduced-motion snaps (no fade) to match the static ethos.
+    if(reentry<1){ if(reduce){ reentry=1; } else { reentry+=(1-reentry)*0.12; if(reentry>0.999)reentry=1; upperEnv*=reentry; lowerEnv*=reentry; } }
     ensureAboutLayout(aboutEl);               // flag-scoped row/intro/close breathing, as soon as U1 mounts
     var l;
 
@@ -546,6 +626,54 @@
     drawLine(lines[1], t, lowerEnv);          // lower (LOWER_FRAC): content-anchored fade (last-plate exit)
     emitParticles(boxes); stepParticles(); drawParticles();
     requestAnimationFrame(frame);
+  }
+
+  // BR-S237 — THE CODEX READING FRAME. A self-contained renderer, forked out of frame() while the
+  // codex aperture is up. Freeze-safe fixed-dt, GPU-safe 2D, pure S235 weightless flow (BULGE off /
+  // empty boxes), the SOLE bottom dark focus band (NO top band — the codex sticky header must stay
+  // visible), and NO plate/particle mutation (those write onto the hidden #about DOM). The two
+  // per-lattice baseY fields are TEMPORARILY overridden here (baseY is a derived field, not an About
+  // constant); refreshBaselines() on codex-close restores them byte-for-byte. MID_Y stays 0.5H — it
+  // stays strictly between the ~96px header perch and the 0.955H base, so integrate()/computeTarget
+  // classify top vs bottom correctly with zero MID_Y mutation. codexEnv is the SOLE presence scalar
+  // (upperEnv/lowerEnv are NEVER read here — aboutEnvelope() is skipped so they hold stale values).
+  function frameCodex(now, mv){
+    if(!wasCodex){                            // codex ENTRY: release any About plate the prior frame dimmed, start from a flat calm line
+      clearTouched(); particles.length=0;
+      for(var q=0;q<lines.length;q++){ lines[q].y.fill(0); lines[q].v.fill(0); }
+      last=now; accT=0; codexEnv=0; wasCodex=true; wasVisible=false;
+      codexTopY=0;                            // BR-S237: force a fresh snap to the first measured header this open (no glide from a stale prior value)
+    }
+    // TEMPORARY lattice override (About constants untouched; restored via refreshBaselines on exit).
+    // BR-S237 [refine]: perch the top line a small GAP below the header bottom (TASTE risk-1: keeps
+    // it off the stickybar's own 1px hairline), clamp to H*0.48 so topY stays strictly < MID_Y(0.5H)
+    // on ANY viewport (preserves the top<MID_Y<bottom classification the integrate()/computeTarget
+    // sign branches rely on — see MID_Y note above), then GLIDE codexTopY toward it (MOTION+TASTE:
+    // absorbs the load-in snap + sub-pixel sticky flicker). Reduced-motion + first frame snap.
+    var hdrTarget=codexHeaderY()+CODEX_HEADER_GAP; if(hdrTarget>H*0.48) hdrTarget=H*0.48;
+    if(reduce || codexTopY<=0) codexTopY=hdrTarget; else codexTopY+=(hdrTarget-codexTopY)*0.18;
+    var topY=codexTopY;                       // lerp'd sticky-header perch (gap'd + clamped; fallback 96+gap)
+    var botY=H*0.955;                         // near the base
+    lines[0].baseY=topY; lines[1].baseY=botY; // MID_Y stays 0.5H, still between them -> top/bottom classify correctly
+    var closing=mv && mv.classList.contains('is-codex-closing'); var target=closing?0:1;
+    if(reduce){                               // reduced-motion: flat lines at the perches + bottom band, no wobble
+      codexEnv=target; ctx.clearRect(0,0,W,H);
+      if(maskGrad) drawBand(lines[1], codexEnv, false, '#0a0b0d');   // sole bottom dark focus band
+      var uy=topY*codexEnv, ly=H-(H-botY)*codexEnv; ctx.lineWidth=1;
+      ctx.strokeStyle='rgba(255,255,255,'+(STROKE_A*codexEnv).toFixed(3)+')';
+      ctx.beginPath(); ctx.moveTo(0,uy); ctx.lineTo(W,uy); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(0,ly); ctx.lineTo(W,ly); ctx.stroke();
+      return;                                 // step-4 fork schedules the shared frame() loop after this returns
+    }
+    codexEnv += (target-codexEnv)*0.12; if(codexEnv>0.999)codexEnv=1; else if(codexEnv<0.001)codexEnv=0;
+    var t=now/1000, dt=(now-last)/1000; if(dt<0||dt>0.05)dt=STEP; last=now;
+    for(var a=0;a<lines.length;a++) computeTarget(lines[a], EMPTY, t);   // EMPTY -> pure flow() current (BULGE off / loop no-ops)
+    accT+=dt; var steps=0; while(accT>=STEP && steps<3){ for(var b=0;b<lines.length;b++) integrate(lines[b]); accT-=STEP; steps++; }
+    ctx.clearRect(0,0,W,H);
+    if(maskGrad) drawBand(lines[1], codexEnv, false, '#0a0b0d');   // BOTTOM dark focus band ONLY — no top band (header stays visible)
+    drawLine(lines[0], t, codexEnv);          // top line under the header
+    drawLine(lines[1], t, codexEnv);          // bottom line at the base
+    // NB: deliberately NO drawBands(), NO gatherBoxes()/emitParticles()/stepParticles()/drawParticles().
   }
 
   function boot(){
