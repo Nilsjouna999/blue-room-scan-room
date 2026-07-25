@@ -26,15 +26,31 @@
   /* static drop-shadow sibling — box-shadow on a circle == the old disc drop-shadow, but never re-rasters per frame */
   .disc-shadow{position:absolute;left:7.143%;top:9.143%;width:85.714%;height:68.571%;border-radius:50%;z-index:1;pointer-events:none;box-shadow:0 16px 26px rgba(0,0,0,.55),0 4px 8px rgba(0,0,0,.4)}
   #wheel{display:block;width:100%;height:100%;border-radius:50%;transform-origin:50% 50%}
-  /* ---- wagon-wheel strobe overlay: rides #wheel's rotation, fades before the landing; under .glass ---- */
-  .strobe{
+  /* engraved inlay ring — its OWN slow entity; a baked bitmap that drifts on the compositor, never rides #wheel */
+  .engrave-ring{
     position:absolute; inset:0; width:100%; height:100%;
-    border-radius:50%;
-    pointer-events:none;
-    transform-origin:50% 50%;
-    transition:none;          /* rAF owns the transform, same as #wheel */
-    opacity:0;                /* invisible at rest; only a live spin lifts it */
-    /* will-change set imperatively for the spin window only (never a permanent GPU layer) */
+    pointer-events:none; transform-origin:50% 50%;
+    background-position:center; background-size:100% 100%; background-repeat:no-repeat;
+    will-change:transform;
+    animation:engraveDrift 64s linear infinite;   /* ambient-always: alive at rest */
+  }
+  @keyframes engraveDrift{ to{ transform:rotate(-360deg) } }  /* CCW — armillary contrast vs the CW wheel spin */
+  @media (prefers-reduced-motion:reduce){ .engrave-ring{ animation:none } }  /* still visible, static */
+
+  /* the fixed glass channel the inlay is suspended under — never rotates, zero animation */
+  .engrave-glass{
+    position:absolute; inset:0; width:100%; height:100%;
+    pointer-events:none; border-radius:50%;
+    /* annulus mask: 158/480≈32.9% inner rail, 202/480≈42.1% outer rail */
+    -webkit-mask:radial-gradient(circle at 50% 50%, transparent 0 32.5%, #000 33.5% 42.1%, transparent 43%);
+            mask:radial-gradient(circle at 50% 50%, transparent 0 32.5%, #000 33.5% 42.1%, transparent 43%);
+    background:
+      /* fixed diagonal refraction sheen across the band */
+      linear-gradient(128deg, rgba(226,232,240,0.10) 0%, rgba(226,232,240,0) 40%),
+      /* outer-edge bevel highlight */
+      radial-gradient(circle at 50% 50%, transparent 41%, rgba(226,232,240,0.14) 42%, transparent 43%),
+      /* inner-edge depth-shade */
+      radial-gradient(circle at 50% 50%, transparent 32.5%, rgba(0,0,0,0.22) 33.5%, transparent 34.5%);
   }
 
   /* ---- compass glass: fixed dome cover over the disc, under the pointer; never rotates ---- */
@@ -186,6 +202,7 @@
   /* transform-box:view-box makes WAAPI px == viewBox units (load-bearing); drop authored around local (0,0) */
   .fx .drop,.fx .dropA,.fx .dropB{transform-box:view-box;transform-origin:0 0;opacity:0}
   .fx .splat{opacity:0}
+  .fx .filmR,.fx .channelR,.fx .filmL,.fx .channelL{ opacity:1; }  /* the dashoffset gates visibility, not opacity */
 </style>
 </head>
 <body>
@@ -220,7 +237,11 @@
     </svg>
 
     <div class="disc-shadow" aria-hidden="true"></div>
-    <div class="disc-wrap"><canvas id="wheel" width="480" height="480" role="img" aria-label="Verdict wheel"></canvas><canvas id="strobe" class="strobe" width="480" height="480" aria-hidden="true"></canvas></div>
+    <div class="disc-wrap">
+      <canvas id="wheel" width="480" height="480" role="img" aria-label="Verdict wheel"></canvas>
+      <div class="engrave-ring"  aria-hidden="true"></div>
+      <div class="engrave-glass" aria-hidden="true"></div>
+    </div>
 
     <!-- fixed compass glass: over the disc, under the pointer; never rotates -->
     <div class="glass" aria-hidden="true"></div>
@@ -251,6 +272,19 @@
     <span class="ring"  aria-hidden="true"></span>
     <!-- B6-B8 milk-drop FX overlay; viewBox matches wheel-area aspect ⇒ every coordinate auto-scales on mobile -->
     <svg class="fx" viewBox="0 0 560 700" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <!-- rivulet gradient: leading (lowest) edge brightest = wet head, no per-frame work -->
+      <defs>
+        <linearGradient id="rillGrad" gradientUnits="userSpaceOnUse" x1="0" y1="67" x2="0" y2="541">
+          <stop offset="0"   stop-color="#FFFFFF" stop-opacity="0.55"/>
+          <stop offset="0.7" stop-color="#FFFFFF" stop-opacity="0.90"/>
+          <stop offset="1"   stop-color="#FFFFFF" stop-opacity="1"/>
+        </linearGradient>
+      </defs>
+      <!-- RIGHT side: sweep 1 (bulges right). LEFT side: sweep 0 (bulges left). VERIFY on device; swap 1<->0 if mirrored. -->
+      <path class="filmR"    d="M280,67 A237,237 0 0 1 280,541" fill="none" stroke="#FFFFFF"        stroke-opacity="0.30" stroke-width="5.5" stroke-linecap="round" pathLength="1" stroke-dasharray="1 1" stroke-dashoffset="1"/>
+      <path class="channelR" d="M280,67 A237,237 0 0 1 280,541" fill="none" stroke="url(#rillGrad)"                       stroke-width="2.4" stroke-linecap="round" pathLength="1" stroke-dasharray="1 1" stroke-dashoffset="1"/>
+      <path class="filmL"    d="M280,67 A237,237 0 0 0 280,541" fill="none" stroke="#FFFFFF"        stroke-opacity="0.30" stroke-width="5.5" stroke-linecap="round" pathLength="1" stroke-dasharray="1 1" stroke-dashoffset="1"/>
+      <path class="channelL" d="M280,67 A237,237 0 0 0 280,541" fill="none" stroke="url(#rillGrad)"                       stroke-width="2.4" stroke-linecap="round" pathLength="1" stroke-dasharray="1 1" stroke-dashoffset="1"/>
       <!-- twin stream beads: born together on the top rim (deposited by the arrow), split down the left/right arcs, meet at the bottom -->
       <g class="dropA"><circle cx="0" cy="0" r="7" fill="#FFFFFF"/><ellipse cx="-2" cy="-2.3" rx="1.6" ry="2.2" fill="#FFFFFF"/></g>
       <g class="dropB"><circle cx="0" cy="0" r="7" fill="#FFFFFF"/><ellipse cx="-2" cy="-2.3" rx="1.6" ry="2.2" fill="#FFFFFF"/></g>
@@ -314,21 +348,6 @@
   var DRAW       = 'normal';                                  // 'quick' | 'normal' | 'long'
   var DRAW_MS    = { quick:2600, normal:SPIN_MS, long:4400 }; // 'normal' === current SPIN_MS
   var DRAW_TURNS = { quick:[6,3], normal:[8,4], long:[12,5] };// [base, randSpan]; 'normal' === 8+floor(rand*4)
-
-  // ---- wagon-wheel strobe layer (additive, rides main θ, dissolves before landing) ----
-  var STROBE_MARKS         = 36;      // CONFIRM 36 — multiple of 6, marks register on the 6 wedge seams; T=10°
-  var STROBE_R_IN          = 176;     // was 188 — pulled inward off the heaviest vignette
-  var STROBE_R_OUT         = 214;     // was 216 — band = 38px thick
-  var STROBE_STAVE_ALPHA   = 0.52;    // was 0.20 — additive over obsidian ≈ clear mid-grey engraving
-  var STROBE_ORN_ALPHA     = 0.42;    // was 0.13 — node + serifs + barb
-  var STROBE_RAIL_ALPHA    = 0.30;    // was 0.10 — visible band rails (fallback 0.24 if an outer seam shows)
-  var STROBE_BLOOM         = 3;       // was 2.5 (design proposed 4; critique dials to 3 to keep it "engraved", not "gaudy gear")
-  var STROBE_COLOR         = '200,214,224';   // UNCHANGED cool silver-patina — never warm-tint
-  var STROBE_LINE_W        = 1.6;     // was 1.4
-  var STROBE_LAYER_OPACITY = 1.0;     // unchanged
-  var STROBE_FADE_IN_P     = 0.05;    // envelope UNCHANGED
-  var STROBE_FADE_OUT_START_P = 0.78; // UNCHANGED
-  var STROBE_FADE_END_P    = 0.88;    // UNCHANGED (< FREE_END 0.90 → landing uncontested)
 
   // ---- state ---- (unchanged functional model + ceremony reveal-deferral fields)
   var state = { options: [], draft: '', preview: null, spinning: false, result: null, winner: null, revealPending: false };
@@ -539,13 +558,17 @@
   var VANISH_FRAC = 0.24;// was 0.28 — beat A ≈ 125ms; trim comes out of the dissolve, reflow keeps ~395ms
   var OVERSHOOT = 0.11;  // was 0.15 — softer back-out; survivors glide closed, still alive not floaty
 
-  // BLOCKY POP — held waypoints for the re-partition scalar s, jump-cut (never tweened between).
-  // The hold-then-snap rhythm is the stop-motion "chunk"; 1.18 = the overshoot slam past full, then a
-  // damped step-bounce (0.90 -> 1.03 -> 1.0) settles it. addLayout keeps the disc tiling 360 at every s.
-  // FRAME 0 IS A VISIBLE CHUNK (0.26), not a leading 0 — a 0 held s=0 (zero-width new wedge) for the
-  // first ~51ms, a pixel-identical dead frame that read as "add lag". The wedge now pops on the click tick.
-  var POP_STEPS = [0.26, 0.52, 0.86, 1.18, 0.90, 1.03, 1.0];
-  function popS(p){ return POP_STEPS[Math.min(POP_STEPS.length-1, Math.floor(p*POP_STEPS.length))]; }
+  // SMOOTH POP — one continuous eased-back scalar for the re-partition (was 7 held jump-cut waypoints).
+  // Front-loaded grow from a visible click-tick chunk (POP_BASE, no dead first frame) to a tiny gentle
+  // overshoot, then eases home to exactly 1. easeOutBack shape: fast rise, small bounce, settle.
+  var POP_BASE = 0.30, POP_C1 = 1.4, POP_C3 = POP_C1 + 1;   // C1 tunes overshoot; ~1.4 => peak s ≈ 1.05
+  function popS(p){
+    if (p <= 0) return POP_BASE;      // synchronous click-tick paint shows a real chunk, never s=0
+    if (p >= 1) return 1;             // exact final share; loop finalizes to draw() at p>=1 anyway
+    var u = p - 1;                    // easeOutBack(p) = 1 + C3*u^3 + C1*u^2
+    var eb = 1 + POP_C3*u*u*u + POP_C1*u*u;
+    return POP_BASE + (1 - POP_BASE) * eb;
+  }
   // back-out settle — the shared "gravity into place" curve (overshoot then damp); SMOOTH by design (the remove reflow)
   function settle(p,s){ var u=p-1; return 1+(s+1)*u*u*u+s*u*u; }
   // smooth vanish — eased S radius collapse + a quadratic alpha dissolve (the removed wedge fades as it shrinks)
@@ -621,67 +644,54 @@
     return hubCanvas;
   }
 
-  // ---- wagon-wheel strobe overlay: ghost-silver spokes baked once, ridden by θ, faded by opacity ----
-  var strobeCanvas = null, strobe = document.getElementById('strobe');
-  function ensureStrobe(){
-    if (strobeCanvas) return strobeCanvas;
-    strobeCanvas = strobe;                    // draw straight onto the live overlay (baked once)
-    strobe.width  = DISC_S*dpr;
-    strobe.height = DISC_S*dpr;
-    var c = strobe.getContext('2d');
-    c.setTransform(dpr,0,0,dpr,0,0);
-    c.clearRect(0,0,DISC_S,DISC_S);
-    var cx=DISC_S/2, cy=DISC_S/2;
-    c.globalCompositeOperation = 'lighter';       // additive ghost light — never a dark line on obsidian
-    c.lineCap = 'round';
-    c.shadowColor = 'rgba('+STROBE_COLOR+',0.5)';
-    c.shadowBlur  = STROBE_BLOOM;
-
-    // (2) 36 IDENTICAL engraved glyphs — the strobe carrier + the relic detail
-    for (var i=0;i<STROBE_MARKS;i++){
-      var a = (-90 + i*(360/STROBE_MARKS)) * Math.PI/180;
-      c.save();
-      c.translate(cx,cy);
-      c.rotate(a + Math.PI/2);                       // stave along local +Y, pointing outward
-      // 1) STAVE — the wagon-wheel spoke; bright zone CENTERED (lands where vignette is lighter)
-      var g = c.createLinearGradient(0,179, 0,211);
-      g.addColorStop(0.00,'rgba('+STROBE_COLOR+',0)');
-      g.addColorStop(0.50,'rgba('+STROBE_COLOR+','+STROBE_STAVE_ALPHA+')');
-      g.addColorStop(1.00,'rgba('+STROBE_COLOR+',0)');
-      c.strokeStyle=g; c.lineWidth=STROBE_LINE_W; c.lineCap='round';
-      c.beginPath(); c.moveTo(0,179); c.lineTo(0,211); c.stroke();
-      // 2) SERIFS — inner + outer rune stave-caps (also thicken the band ends)
-      c.strokeStyle='rgba('+STROBE_COLOR+','+STROBE_ORN_ALPHA+')'; c.lineWidth=1.4;
-      c.beginPath(); c.moveTo(-4,180); c.lineTo(4,180); c.stroke();
-      c.beginPath(); c.moveTo(-4,210); c.lineTo(4,210); c.stroke();
-      // 3) LOZENGE NODE at mid — a bold engraved bead (replaces the invisible r2.2 open ring)
-      c.fillStyle='rgba('+STROBE_COLOR+','+STROBE_ORN_ALPHA+')';
-      c.beginPath(); c.moveTo(0,191); c.lineTo(2.6,195); c.lineTo(0,199); c.lineTo(-2.6,195); c.closePath(); c.fill();
-      // 4) OUTWARD BARB (ratchet tooth) — small V; reinforces the wheel. FIRST TO CUT if it reads "gear" not "relic".
-      c.strokeStyle='rgba('+STROBE_COLOR+',0.36)'; c.lineWidth=1.3;
-      c.beginPath(); c.moveTo(0,211); c.lineTo(3.5,216); c.stroke();
-      c.beginPath(); c.moveTo(0,211); c.lineTo(-3.5,216); c.stroke();
-      c.restore();
+  // ---- engraved inlay ring — baked ONCE to a data-URI, drifts on its own compositor layer (replaces the strobe) ----
+  var RING_R_IN = 158, RING_R_OUT = 202, RING_COL = '206,216,226';  // cool silver-patina
+  function bakeEngraveRing(){
+    var ss = 2, S = DISC_S;                       // supersample for crisp non-integer-angle edges
+    var c = document.createElement('canvas'); c.width = c.height = S*ss;
+    var g = c.getContext('2d'); g.scale(ss,ss);
+    var cx = S/2, cy = S/2;                        // 240,240
+    g.globalCompositeOperation = 'source-over';    // a TRUE solid mark (NOT 'lighter')
+    g.lineCap = 'round';
+    g.shadowColor = 'rgba('+RING_COL+',0.5)'; g.shadowBlur = 1.5;   // baked inlay gleam
+    // (1) two continuous rails = the frame
+    g.strokeStyle = 'rgba('+RING_COL+',0.44)'; g.lineWidth = 1.4;
+    g.beginPath(); g.arc(cx,cy,RING_R_IN, 0,Math.PI*2); g.stroke();
+    g.beginPath(); g.arc(cx,cy,RING_R_OUT,0,Math.PI*2); g.stroke();
+    // (4) fine inner dot-hairline (ancient texture) — 24 dots at r=166
+    g.fillStyle = 'rgba('+RING_COL+',0.30)';
+    for (var d=0; d<24; d++){
+      var ad = (d/24)*Math.PI*2, dx = cx+Math.cos(ad)*166, dy = cy+Math.sin(ad)*166;
+      g.beginPath(); g.arc(dx,dy,0.9,0,Math.PI*2); g.fill();
     }
-    // STATIC RAILS — two full-circle arcs = the band frame; rotation-invariant ⇒ they DO NOT strobe
-    c.shadowBlur = 2;
-    c.strokeStyle = 'rgba('+STROBE_COLOR+','+STROBE_RAIL_ALPHA+')';
-    c.lineWidth = 1.6;
-    c.beginPath(); c.arc(cx,cy,STROBE_R_IN, 0,Math.PI*2); c.stroke();
-    c.beginPath(); c.arc(cx,cy,STROBE_R_OUT,0,Math.PI*2); c.stroke();
-
-    c.globalCompositeOperation = 'source-over';
-    return strobeCanvas;
-  }
-  // opacity envelope keyed to spin progress p — gone before FREE_END(0.90) so the landing is uncontested
-  function strobeOpacity(p){
-    if (p<=0 || p>=STROBE_FADE_END_P) return 0;
-    var env;
-    if      (p < STROBE_FADE_IN_P)        env = p / STROBE_FADE_IN_P;                 // ramp in
-    else if (p < STROBE_FADE_OUT_START_P) env = 1;                                    // hold through coast
-    else { var q=(p-STROBE_FADE_OUT_START_P)/(STROBE_FADE_END_P-STROBE_FADE_OUT_START_P);
-           env = 1 - q*q*(3-2*q); }                                                   // smoothstep out
-    return STROBE_LAYER_OPACITY * env;
+    // (2)+(3) 24 graduation ticks @15°; every 3rd (the 8 cardinals @45°) promoted to a MAJOR with a lozenge sigil
+    for (var i=0; i<24; i++){
+      var a = (i/24)*Math.PI*2, ux = Math.cos(a), uy = Math.sin(a);
+      var major = (i % 3 === 0);
+      if (major){
+        g.strokeStyle = 'rgba('+RING_COL+',0.62)'; g.lineWidth = 2;
+        g.beginPath();
+        g.moveTo(cx+ux*RING_R_IN, cy+uy*RING_R_IN);
+        g.lineTo(cx+ux*RING_R_OUT, cy+uy*RING_R_OUT);
+        g.stroke();
+        // engraved lozenge sigil at mid r=180, half-diagonal 5px
+        var mx = cx+ux*180, my = cy+uy*180, nx = -uy, ny = ux;   // n = tangent
+        g.fillStyle = 'rgba('+RING_COL+',0.60)';
+        g.beginPath();
+        g.moveTo(mx+ux*5, my+uy*5);   // outward point
+        g.lineTo(mx+nx*5, my+ny*5);   // tangent point
+        g.lineTo(mx-ux*5, my-uy*5);   // inward point
+        g.lineTo(mx-nx*5, my-ny*5);   // other tangent
+        g.closePath(); g.fill();
+      } else {
+        g.strokeStyle = 'rgba('+RING_COL+',0.50)'; g.lineWidth = 1.5;
+        g.beginPath();
+        g.moveTo(cx+ux*190, cy+uy*190);      // short tick r=190→202
+        g.lineTo(cx+ux*RING_R_OUT, cy+uy*RING_R_OUT);
+        g.stroke();
+      }
+    }
+    return c.toDataURL('image/png');
   }
 
   // ---- per-frame layout builders (angles in DEGREES; each entry: {color,a0,a1,r,full?}) ----
@@ -804,8 +814,7 @@
   function finalizeTransition(){
     abortCeremony();                                    // single interrupt choke point — silently kills any in-flight ceremony
     if (rafId){ cancelAnimationFrame(rafId); rafId=0; }
-    if (spinRAF){ cancelAnimationFrame(spinRAF); spinRAF=0; canvas.style.willChange=''; strobe.style.willChange=''; state.spinning=false; }
-    strobe.style.opacity='0';
+    if (spinRAF){ cancelAnimationFrame(spinRAF); spinRAF=0; canvas.style.willChange=''; state.spinning=false; }
     if (anim){ anim=null; sig=null; draw(); }
   }
 
@@ -868,24 +877,20 @@
       canvas.style.transition='transform 0.6s cubic-bezier(0.2,0.8,0.2,1)';
       void canvas.offsetWidth;
       canvas.style.transform='rotate('+rot+'deg)';
-      strobe.style.opacity='0'; strobe.style.transform='rotate('+rot+'deg)';   // no strobe on the reduced-motion path
       var rmT=setTimeout(function(){ if(state.revealPending===false && state.result===null){ state.revealPending=true; resolveWinnerSilently(); commitReveal(); } }, 800);   // watchdog: a dropped transitionend must not strand on "Deciding…"
       canvas.addEventListener('transitionend', function(){ clearTimeout(rmT); state.revealPending=true; resolveWinnerSilently(); commitReveal(); }, {once:true});
       return;
     }
 
     canvas.style.transition='none';                     // rAF owns the transform
-    canvas.style.willChange='transform'; strobe.style.willChange='transform';
+    canvas.style.willChange='transform';
     var dist=rot-start, t0=performance.now();
     (function frame(now){
       var p=(now-t0)/DRAW_MS[DRAW]; if (p>1) p=1;
       canvas.style.transform='rotate('+(start + spinEase(p)*dist + spinDetent(p))+'deg)';
-      strobe.style.transform = canvas.style.transform;   // strobe rides the identical θ
-      strobe.style.opacity   = strobeOpacity(p);         // opacity on its own p-keyed schedule
       if (p<1){ spinRAF=requestAnimationFrame(frame); }
       else { spinRAF=0; canvas.style.transform='rotate('+rot+'deg)';   // exact lock onto rot (unchanged)
-             strobe.style.transform='rotate('+rot+'deg)'; strobe.style.opacity='0';
-             canvas.style.willChange=''; strobe.style.willChange='';
+             canvas.style.willChange='';
              state.revealPending = true;
              var isDefault = resolveWinnerSilently();                  // winner decided NOW, silently
              if (isDefault || prefersReduced() || !ceremonyOn){ commitReveal(); }   // empty orb / ceremony off: instant reveal, no theatre
@@ -941,6 +946,11 @@
   var splatEl = fxLayer ? fxLayer.querySelector('.splat') : null;
   var dropA   = fxLayer ? fxLayer.querySelector('.dropA') : null;
   var dropB   = fxLayer ? fxLayer.querySelector('.dropB') : null;
+  var filmR    = fxLayer ? fxLayer.querySelector('.filmR')    : null;
+  var channelR = fxLayer ? fxLayer.querySelector('.channelR') : null;
+  var filmL    = fxLayer ? fxLayer.querySelector('.filmL')    : null;
+  var channelL = fxLayer ? fxLayer.querySelector('.channelL') : null;
+  var rills = [filmR, channelR, filmL, channelL];
   var shockEl = document.querySelector('.shock');
   var coreEl  = document.querySelector('.coreflash');
 
@@ -976,6 +986,7 @@
     if (dropB)  dropB.style.transform='';
     if (shockEl) shockEl.style.transform='';
     if (coreEl)  coreEl.style.transform='translate(-50%,-50%)';
+    rills.forEach(function(el){ if (el) el.style.strokeDashoffset='1'; });   // re-arm the rivulet strokes undrawn
   }
 
   function armCeremony(arc, onDone){          // arc = 'full' | 'lean'
@@ -1023,6 +1034,7 @@
     if (coreEl)    coreEl.style.opacity='0';
     // defensively zero every bead so an interrupt mid-stream leaves nothing stranded (fx is also display:none)
     [dropEl, dropA, dropB, splatEl].forEach(function(el){ if (el) el.style.opacity='0'; });
+    rills.forEach(function(el){ if (el){ el.style.strokeDashoffset='1'; } });   // re-arm rivulet strokes undrawn for the next spin
     canvas.style.transform = 'rotate('+rot+'deg)';     // byte-identical to the lock — nothing drifts
     if (reveal) commitReveal(); else state.revealPending = false;
   }
@@ -1153,6 +1165,16 @@
       {transform:'translate(280px,540px) scale(1,1)',    offset:0.887},
       {transform:'translate(280px,540px) scale(1.3,0.7)',offset:1.000}
     ],{duration:ARCPOOL, easing:'linear', fill:'forwards'}));
+    // draw the rivulet head-first, glued to the bead's own keyframe offsets (do = 1 - arcFraction)
+    var rillKf = [
+      {strokeDashoffset:1, offset:0.000},{strokeDashoffset:0.90, offset:0.016},
+      {strokeDashoffset:0.80, offset:0.053},{strokeDashoffset:0.70, offset:0.108},
+      {strokeDashoffset:0.60, offset:0.178},{strokeDashoffset:0.50, offset:0.263},
+      {strokeDashoffset:0.40, offset:0.363},{strokeDashoffset:0.30, offset:0.475},
+      {strokeDashoffset:0.20, offset:0.600},{strokeDashoffset:0.10, offset:0.738},
+      {strokeDashoffset:0,    offset:0.887},{strokeDashoffset:0,    offset:1.000}
+    ];
+    rills.forEach(function(el){ if (el) reg(el.animate(rillKf, {duration:ARCPOOL, easing:'linear', fill:'forwards'})); });
     // MEET+MERGE handoff — REGISTERED timer (cancel-safe via ceremony.timers). Same-frame coincident-white swap.
     ct(function(){
       hideFx(dropA); hideFx(dropB);
@@ -1213,7 +1235,6 @@
     if (state.spinning) return;
     finalizeTransition();
     rot = 0; canvas.style.transition='none'; canvas.style.transform='rotate(0deg)';
-    strobe.style.transition='none'; strobe.style.transform='rotate(0deg)'; strobe.style.opacity='0';
     spunSinceEdit = 0;                                       // option-set cleared → next spin is a FULL arc
     state.options=[]; state.draft=''; state.preview=null; state.result=null; state.winner=null; state.revealPending=false;
     document.getElementById('draft').value='';
@@ -1234,6 +1255,7 @@
       if (justRevealed && revealPaint){                    // the milk paints the verdict — cream rises to fill the letters
         v.style.setProperty('--paint-ms', (revealLean?300:520)+'ms');
         v.classList.add('paint');
+        v.addEventListener('animationend', function(){ v.classList.remove('paint'); }, {once:true});   // revert to solid #FFFFFF + full halo (not a faded clip)
       }
     } else if (state.options.length < 2) r.innerHTML = '<span class="spin">Add two or more options</span>';
     else r.innerHTML = '';
@@ -1281,7 +1303,12 @@
   });
   syncCeremonyToggle();   // reflect persisted state onto the toggle at load
 
-  ensureStrobe();   // bake the ghost-spoke overlay once at init (invisible until a spin lifts its opacity)
+  var _ringEl = document.querySelector('.engrave-ring');
+  if (_ringEl){
+    var _ringURI = bakeEngraveRing();
+    _ringEl.style.backgroundImage = 'url('+_ringURI+')';
+    var _ri = new Image(); _ri.src = _ringURI; if (_ri.decode) _ri.decode().catch(function(){});  // GPU-ready, no first-frame flash
+  }
   if (orbitArm){
     var _arrowURI = rasterizeArrow();
     orbitArm.style.backgroundImage = 'url('+_arrowURI+')';
