@@ -137,7 +137,9 @@
   }
   @media (prefers-reduced-motion: reduce){ .glass::before{ opacity:0.32; } }
 
-  .pointer{display:none}   /* retired — the rasterized bitmap arrow is now the sole, permanently-visible pointer */
+  .pointer{display:none}   /* retired — the rasterized bitmap arrow is now the sole, permanently-visible pointer.
+                              DO NOT RESURRECT: this SVG and #ptrGrad are the old warm-orange pointer. Warm is now
+                              rationed to the brass hub + the brand mark; the perimeter belongs to the cold gem. */
 
   /* OUTER — owns the magnetic radial breathe; NEVER rotates. Centred on the disc centre (280,304). */
   .orbit-hover{
@@ -147,7 +149,11 @@
     transform:translate(-50%,-50%);
     transform-origin:50% 50%;
     z-index:3; pointer-events:none; will-change:transform;
-    animation:armHover 3400ms ease-in-out infinite;
+    animation:armHover 4600ms ease-in-out infinite;   /* slower + shallower than the old 3400ms/-2.3px:
+                                                         a ton of corundum does not bob. Amplitude down,
+                                                         period up = mass. (Taste, not a lag fix — the
+                                                         breathe was measured at 0.035px/frame and is
+                                                         provably not the source of the arrow's lag.) */
   }
   /* INNER — fills the outer, so its centre IS the disc centre ⇒ rotate() orbits about the disc centre by containment.
      A FROZEN bitmap on a block div = own GPU layer, composited transform, immune to main-thread jank.
@@ -160,7 +166,7 @@
   }
   @keyframes armHover{                     /* at 12 o'clock, screen-Y === radial ⇒ pure in/out breathe, no sway, no rotation */
     0%   { transform:translate(-50%,-50%) translateY(0) }
-    50%  { transform:translate(-50%,-50%) translateY(-2.3px) }
+    50%  { transform:translate(-50%,-50%) translateY(-1.4px) }
     100% { transform:translate(-50%,-50%) translateY(0) }
   }
   @media (prefers-reduced-motion:reduce){ .orbit-hover{ animation:none } }   /* static arrow, fixed gap */
@@ -1198,22 +1204,119 @@
   var coreEl  = document.querySelector('.coreflash');
   var plungeEl = document.querySelector('.plunge');
 
+  // ============ THE STONE: a blue-black CORUNDUM, shield cut ============
+  // Mohs 9, second-hardest natural mineral, SG 4.0 — the honest "weighs tons / hardest thing"
+  // claim without pretending to be diamond. Its darkest grade reads BLACK and only confesses
+  // blue in its speculars and in its depths, so the colour lives in the highlights and never in
+  // the fill: restraint enforced by the material rather than by discipline. It contrasts the
+  // obsidian orb by FINISH, not hue — obsidian is volcanic glass with a broad soft dome sheen;
+  // corundum is crystalline, plane-broken, mirror-flat, hard-edged. Same darkness family,
+  // different material class: a harder thing about to strike a softer thing. That IS the hammer
+  // story, told in substance.
+  //
+  // THE INVERSION THAT SELLS IT: the TABLE is the DARKEST broad plane, not the brightest. Looking
+  // down through a dark stone's table returns the black room. A bright table is what makes a drawn
+  // gem look like a drawn logo; a dark one is what makes it look like a stone.
+  //
+  // Facet geometry, disc-space (same translated frame as the old triangle). The CULET is FROZEN at
+  // (240,-14): DROP_TOP / the liquid's contact frame are authored against it. Top edge held at
+  // y=-67 so the 760 canvas margin and header clearance are unchanged; the stone gains mass
+  // laterally only (52→56 wide). Widest point sits 24.5% down = top-heavy = a hammer head.
+  var ARROW_TIP_R = 254;    // culet radius from the disc centre — the liquid's source frame reads this
+  var GEM = {
+    SIL:   [[216,-67],[264,-67],[268,-54],[256,-35],[240,-14],[224,-35],[212,-54]],
+    TAB:   [[222,-67],[258,-67],[252,-56],[228,-56]],
+    CR_L:  [[216,-67],[222,-67],[228,-56],[212,-54]],
+    CR_R:  [[258,-67],[264,-67],[268,-54],[252,-56]],
+    PV_L:  [[212,-54],[228,-56],[240,-56],[240,-14],[224,-35]],
+    PV_R:  [[240,-56],[252,-56],[268,-54],[256,-35],[240,-14]],
+    FLASH: [[232.5,-30],[240,-38],[240,-22]],
+    GIRD:  [[212,-54],[228,-56],[252,-56],[268,-54]],
+    GHOST: [[212,-54],[224,-35],[240,-14],[256,-35],[268,-54]]
+  };
+
   // rasterize the arrow ONCE to a PNG data-URI: a frozen bitmap on a permanently-promoted block layer
   function rasterizeArrow(){
-    var S=760, OFF=(S-480)/2 /*=140*/, ss=3;                // bigger canvas fits the outward-shifted base; tip → r=254 (outside the rim)
+    var S=760, OFF=(S-480)/2 /*=140*/;                      // canvas contract UNCHANGED — orbit maths depend on it
+    var ss = (window.devicePixelRatio||1) >= 1.5 ? 3 : 2;   // the diagonal arrises want the oversample where it shows
     var c=document.createElement('canvas'); c.width=c.height=S*ss;
     var g=c.getContext('2d'); g.scale(ss,ss); g.translate(OFF,OFF);   // 480-space, centre still (240,240)
-    // compact hover pointer: tip at r=254 (20px gap outside the rim), base r~307 so it clears the header
-    function tri(){ g.beginPath(); g.moveTo(214,-67); g.lineTo(266,-67); g.lineTo(240,-14); g.closePath(); }
-    var grad=g.createLinearGradient(214,-67,266,-14);
-    grad.addColorStop(0,'#eb9a52'); grad.addColorStop(0.55,'#d2691e'); grad.addColorStop(1,'#a05019');
-    g.lineJoin='round'; g.lineCap='round';
-    g.save(); g.shadowColor='rgba(0,0,0,0.5)'; g.shadowBlur=8; g.shadowOffsetY=6;
-      tri(); g.lineWidth=9; g.strokeStyle='#c15f1a'; g.stroke();           // soft round body + cast shadow
+    g.lineJoin='miter'; g.miterLimit=8; g.lineCap='butt';   // HARD arrises. The old round join+cap inflated the
+                                                            // shape ~4.5px a side and rounded every corner —
+                                                            // roundness reads ductile, a preserved arris reads hard.
+    var SIL=GEM.SIL, TAB=GEM.TAB, CR_L=GEM.CR_L, CR_R=GEM.CR_R,
+        PV_L=GEM.PV_L, PV_R=GEM.PV_R, FLASH=GEM.FLASH, GIRD=GEM.GIRD, PGHOST=GEM.GHOST;
+    function path(p,close,dx,dy){ dx=dx||0; dy=dy||0; g.beginPath(); g.moveTo(p[0][0]+dx,p[0][1]+dy);
+      for(var i=1;i<p.length;i++) g.lineTo(p[i][0]+dx,p[i][1]+dy); if(close) g.closePath(); }
+    function lin(x0,y0,x1,y1,st){ var q=g.createLinearGradient(x0,y0,x1,y1);
+      for(var i=0;i<st.length;i++) q.addColorStop(st[i][0],st[i][1]); return q; }
+    function rad(x,y,r,c0,c1){ var q=g.createRadialGradient(x,y,0,x,y,r); q.addColorStop(0,c0); q.addColorStop(1,c1); return q; }
+
+    // (1) RIM SMUDGE — the pool of dark the hovering mass presses onto the glass below it
+    g.save(); g.fillStyle=rad(240,-6,18,'rgba(0,0,0,0.46)','rgba(0,0,0,0)');
+      g.beginPath(); g.ellipse(240,-6,18,6.5,0,0,Math.PI*2); g.fill(); g.restore();
+    // (2) SIDE WALL (+3.0,+3.4) — real thickness. Filled twice to hang two shadow tiers off the UNION
+    //     shape, both keyed to the world's upper-left light (the old shadow had offsetX 0 = a sticker).
+    g.save(); g.fillStyle='#04070C';
+      g.shadowColor='rgba(0,0,0,0.42)'; g.shadowBlur=16; g.shadowOffsetX=4; g.shadowOffsetY=11;
+      path(SIL,true,3.0,3.4); g.fill();
+      g.shadowColor='rgba(0,0,0,0.72)'; g.shadowBlur=4;  g.shadowOffsetX=2; g.shadowOffsetY=3;
+      path(SIL,true,3.0,3.4); g.fill();
     g.restore();
-    tri(); g.fillStyle=grad; g.fill();                                     // orange body (matches #ptrGrad)
-    g.lineWidth=9; g.strokeStyle='#c15f1a'; tri(); g.stroke();             // matte-orange rounded edge
-    g.lineWidth=2; g.strokeStyle='rgba(32,15,6,0.8)'; tri(); g.stroke();   // crisp dark definition edge
+    g.strokeStyle='rgba(126,154,192,0.18)'; g.lineWidth=1;          // the wall is polished too, not a blob
+      path([SIL[1],SIL[2],SIL[3]],false,3.0,3.4); g.stroke();
+    // (3) BODY UNDERPAINT — so no transparent hairline can survive between facets
+    path(SIL,true); g.fillStyle=lin(206,-70,274,-16,[[0,'#1B2B44'],[0.42,'#101B2D'],[1,'#070B12']]); g.fill();
+    // (4) PAVILIONS — shadow side first
+    path(PV_R,true); g.fillStyle=lin(250,-56,244,-16,[[0,'#0D1626'],[1,'#05080E']]); g.fill();
+    path(PV_L,true); g.fillStyle=lin(213,-52,240,-28,[[0,'#16233A'],[0.62,'#213450'],[1,'#2C4568']]); g.fill();
+    // (5) TABLE — the DARK window, + one sky reflection in its upper-left corner
+    path(TAB,true); g.fillStyle=lin(224,-67,252,-56,[[0,'#111C2E'],[0.5,'#0B1220'],[1,'#070C15']]); g.fill();
+    g.save(); path(TAB,true); g.clip(); g.globalCompositeOperation='screen';
+      g.fillStyle=rad(230,-64,8.5,'rgba(168,198,236,0.16)','rgba(168,198,236,0)');
+      g.fillRect(210,-70,60,20); g.restore();
+    // (6) CROWN BEVELS — CR_L is the ONE bright broad plane in the object
+    path(CR_L,true); g.fillStyle=lin(214,-66,228,-55,[[0,'#7099CE'],[0.45,'#3B5A8A'],[1,'#20334D']]); g.fill();
+    path(CR_R,true); g.fillStyle=lin(256,-66,268,-54,[[0,'#243A57'],[1,'#101A2B']]); g.fill();
+    // (7) SUB-SURFACE — in a real cut stone you see the BACK facets through the front, MISREGISTERED
+    //     because they are on the other side of the body. That offset is what separates "a shape with
+    //     facet lines on it" from "a volume you are looking into".
+    g.save(); path(SIL,true); g.clip();
+      g.lineWidth=1.1; g.strokeStyle='rgba(122,168,224,0.15)'; path(PGHOST,false, 2.6,-3.2); g.stroke();
+      g.beginPath(); g.moveTo(242.6,-58.7); g.lineTo(242.6,-17.7); g.stroke();            // ghost keel
+      g.strokeStyle='rgba(4,7,12,0.55)';   path(PGHOST,false,-1.9, 2.4); g.stroke();      // the ghost's own shadow
+      g.globalCompositeOperation='screen';
+      g.fillStyle=rad(236,-34,20,'rgba(46,80,124,0.42)','rgba(46,80,124,0)'); g.fillRect(206,-70,68,60);
+    g.restore();
+    // (8) THE ONE INTERNAL GLINT — gems flash sparsely; two refractions in the whole stone, not five
+    path(FLASH,true); g.fillStyle='rgba(168,198,236,0.52)'; g.fill();
+    g.strokeStyle='rgba(220,233,248,0.62)'; g.lineWidth=0.8;
+      g.beginPath(); g.moveTo(232.5,-30); g.lineTo(240,-38); g.stroke();
+    // (9) GIRDLE — the frosted band + its under-shade: the instant "this is a CUT stone" signal
+    g.strokeStyle='rgba(206,216,226,0.30)'; g.lineWidth=1.2; path(GIRD,false); g.stroke();
+    g.strokeStyle='rgba(4,7,12,0.55)';      g.lineWidth=1.0; path(GIRD,false,0,1.3); g.stroke();
+    // (10) KEEL — the brightest line in the stone, and its one cold glint
+    g.strokeStyle='rgba(220,233,248,0.60)'; g.lineWidth=1.3;
+      g.beginPath(); g.moveTo(240,-55.5); g.lineTo(240,-14.5); g.stroke();
+    g.strokeStyle='rgba(220,233,248,0.75)'; g.lineWidth=0.6;
+      g.beginPath(); g.moveTo(240,-55.5); g.lineTo(240,-33); g.stroke();
+    // (11) COLD SEPARATION HAIRLINE — the sky catching the polished edge; keeps a near-black stone
+    //      legible against a near-black room WITHOUT a warm or dark outline. Runs BEFORE the arrises
+    //      so they paint over it and the occluded lower-left contour stays truly black.
+    //      THIS IS THE VISIBILITY KNOB: 0.18 → 0.26 if the stone reads as a hole. Never a glow.
+    g.lineWidth=2.4; g.strokeStyle='rgba(150,190,242,0.18)'; path(SIL,true); g.stroke();
+    // (12) ARRISES — key side hard, off-key side cold-weak, occluded side black. A polished arris is
+    //      a mirror LINE, not a glow: no blur, ever. (The old rgba(32,15,6,0.8) "definition edge" is
+    //      deliberately not reproduced — against this room a dark outline only feathers warm and
+    //      thins the shape. A gem on a dark ground is defined by its BRIGHT edge.)
+    g.lineWidth=1.5; g.strokeStyle='rgba(220,233,248,0.85)'; path([SIL[6],SIL[0],SIL[1]],false); g.stroke();
+    g.lineWidth=1.1; g.strokeStyle='rgba(168,198,236,0.34)'; path([SIL[1],SIL[2]],false); g.stroke();
+    g.lineWidth=1.0; g.strokeStyle='rgba(126,154,192,0.26)'; path([SIL[2],SIL[3],SIL[4]],false); g.stroke();
+    g.lineWidth=1.3; g.strokeStyle='rgba(4,7,12,0.90)';      path([SIL[4],SIL[5],SIL[6]],false); g.stroke();
+    // (13) CULET — the sharpest point gets the sharpest light, and it is where the liquid is born
+    g.fillStyle=rad(240,-14.6,3,'rgba(220,233,248,0.35)','rgba(220,233,248,0)');
+      g.beginPath(); g.arc(240,-14.6,3,0,Math.PI*2); g.fill();
+    g.fillStyle='#FFFFFF'; g.beginPath(); g.arc(240,-14.6,1.4,0,Math.PI*2); g.fill();   // ONE white point on the stone
     return c.toDataURL('image/png');
   }
 
