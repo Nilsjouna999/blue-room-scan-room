@@ -198,6 +198,18 @@
     background-position:center; background-size:100% 100%; background-repeat:no-repeat;
     z-index:3; pointer-events:none; opacity:1; will-change:transform;   /* VISIBLE AT REST — this bitmap is the pointer */
   }
+  /* THE ARC SMEAR — the anti-judder layer, and the real fix for "ever slightly laggy".
+     At 439°/s the gem advances 7.317° per frame against its own 10.88° footprint: every frame it
+     lands almost clear of where it was, so the eye sees a picket fence of separate arrows rather
+     than one moving object. No easing curve can fix that — it is a SAMPLING problem. A baked trail
+     of the stone's arris network extends the persistence footprint to ~37°, which drops step/footprint
+     from 0.672 to ~0.196: consecutive positions overlap and fuse. Opacity-only, on the arm's own
+     layer, so it costs one composited property and cannot desync from the arrow it belongs to. */
+  .arm-smear{
+    position:absolute; inset:0; width:100%; height:100%;
+    background-position:center; background-size:100% 100%; background-repeat:no-repeat;
+    pointer-events:none; opacity:0; will-change:opacity;
+  }
   @keyframes armHover{                     /* at 12 o'clock, screen-Y === radial ⇒ pure in/out breathe, no sway, no rotation */
     0%   { transform:translate(-50%,-50%) translateY(0) }
     50%  { transform:translate(-50%,-50%) translateY(-1.4px) }
@@ -277,8 +289,16 @@
     background:radial-gradient(circle,#fff 0%,rgba(255,244,224,.9) 28%,transparent 70%)}
   .ring{width:20px;height:20px;border-radius:50%;border:1px solid rgba(226,232,240,.9)}
 
+  /* static wrappers for the hammer. .engrave-ring and .ring-liquid own infinite CSS transform
+     animations, so WAAPI-animating THEM would suspend the drift for 260ms and snap it back —
+     wrap, never fight. No will-change at rest: these are inert divs, promoted imperatively in
+     armCeremony and de-promoted in endCeremony, so the resting frame keeps its existing 2 layers. */
+  .ring-body,.ring-liquid-shell{position:absolute;inset:0;width:100%;height:100%;
+    pointer-events:none;transform-origin:50% 50%}
+
   /* B6-B8 milk-drop overlay */
-  .fx{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:4;display:none}
+  .fx{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:4;display:none;
+    transform-origin:50% 43.43%}   /* the disc centre — so the film rides the orb's squash, not the page box */
   .fx.live{display:block}
   /* transform-box:view-box makes WAAPI px == viewBox units (load-bearing); drop authored around local (0,0) */
   .fx .drop,.fx .dropA,.fx .dropB{transform-box:view-box;transform-origin:0 0;opacity:0}
@@ -320,8 +340,12 @@
     <div class="disc-shadow" aria-hidden="true"></div>
     <div class="disc-wrap">
       <canvas id="wheel" width="480" height="480" role="img" aria-label="Verdict wheel"></canvas>
-      <div class="engrave-ring"  aria-hidden="true"></div>
-      <div class="ring-liquid"   aria-hidden="true"></div>
+      <!-- the instrument is the SAME BODY as the orb: these static wrappers take the hammer so the
+           ring cannot visibly detach from the orb at the exact climax frame -->
+      <div class="ring-body" aria-hidden="true">
+        <div class="engrave-ring"></div>
+        <div class="ring-liquid-shell"><div class="ring-liquid"></div></div>
+      </div>
       <!-- structural-ink overlay: the wheel's black seams, re-asserted OVER the drifting saturn band -->
       <canvas id="wheelInk" width="480" height="480" aria-hidden="true"></canvas>
       <div class="engrave-glass" aria-hidden="true"></div>
@@ -345,7 +369,7 @@
     </svg>
 
     <!-- rigid string-orbit arm: outer = magnetic breathe (translate only, never rotates); inner = frozen bitmap + lap rotate -->
-    <div class="orbit-hover" aria-hidden="true"><div class="orbit-arm"></div></div>
+    <div class="orbit-hover" aria-hidden="true"><div class="orbit-arm"><div class="arm-smear"></div></div></div>
 
     <!-- ===== verdict-ceremony overlays (display:none / opacity:0 at rest — no effect on the resting frame) ===== -->
     <!-- B4b vitrify glaze: over the disc, under the pointer; baked brightness-lift + crescent glint, opacity-pulsed -->
@@ -736,8 +760,14 @@
   //      angs = seam start-angles in RADIANS (disc-space); n<=1 => no seams (single wedge / empty orb) => clear.
   //      The ink layer carries the wheel's rotation via a mirrored CSS transform, so drawing in disc-space here
   //      keeps every seam locked to its #wheel twin regardless of spin. Additive: never touches the winner render. ----
+  var inkSig = null;   // memo: the seam set only changes when the wedge angles do — see below
   function drawInkSeams(angs, n){
     if (!ictx) return;
+    // The seat frame is the busiest frame in the page. This raster used to re-run on every draw()
+    // even when the seams were identical; the signature check halves that frame's texture upload.
+    var isig = n+'|'+(angs?angs.join(','):'-');
+    if (isig===inkSig && inkCanvas.width===DISC_S*dpr) return;
+    inkSig = isig;
     if (inkCanvas.width !== DISC_S*dpr){ inkCanvas.width=DISC_S*dpr; inkCanvas.height=DISC_S*dpr; }
     ictx.setTransform(dpr,0,0,dpr,0,0);
     ictx.clearRect(0,0,DISC_S,DISC_S);
@@ -1340,7 +1370,10 @@
       mirrorInk(canvas.style.transform);                // ink layer rides the exact same per-frame angle
       if (p<1){ spinRAF=requestAnimationFrame(frame); }
       else { spinRAF=0; canvas.style.transform='rotate('+rot+'deg)';   // exact lock onto rot (unchanged)
-             canvas.style.willChange=''; mirrorInk('rotate('+rot+'deg)'); if (inkCanvas){ inkCanvas.style.willChange=''; }
+             // the two willChange teardowns that used to sit HERE now run in endCeremony: clearing them
+             // on the lock frame de-promoted two layers and then re-promoted them ~900ms later at the
+             // seat — two layer churns on the two frames that can least afford them.
+             mirrorInk('rotate('+rot+'deg)');
              state.revealPending = true;
              var isDefault = resolveWinnerSilently();                  // winner decided NOW, silently
              if (isDefault || prefersReduced() || !ceremonyOn){ commitReveal(); }   // empty orb / ceremony off: instant reveal, no theatre
@@ -1367,23 +1400,28 @@
   function syncCeremonyToggle(){ var b=document.getElementById('ceremonyToggle'); if(!b) return;
     b.setAttribute('aria-checked', ceremonyOn?'true':'false');
     b.textContent = ceremonyOn ? 'Ceremony · On' : 'Ceremony · Off'; }
-  var CEREMONY_MAX_FULL   = 2400;    // watchdog — force-fires endCeremony(true) if a callback is throttled/dropped (bumped for the ~820ms linear lap)
+  var CEREMONY_MAX_FULL   = 2500;    // watchdog — force-fires endCeremony(true) if a callback is throttled/dropped
   var CEREMONY_MAX_LEAN   = 1200;
-  // ---- lap = ONE STEADY LINEAR orbit (the confirmed lag/teleport fix) ----
-  // rotate(0deg)→rotate(360deg), easing:'linear'. NO whip, NO velocity dip, NO ease-in, NO charge, NO deceleration.
-  // The arrow reaches the top at FULL speed and the animation simply ENDS — that abrupt stop IS the impact.
-  var LAP_MS         = 820;          // tunable lap duration (first 88% constant angular velocity; last 12% seats to rest)
-  var SETTLE_FRAC = 0.12;                          // last 12% carries the seat; first 88% untouched
-  var SETTLE_EASE = 'cubic-bezier(.2,.2,.5,1)';    // entry slope y1/x1 = 1 = cruise (no jerk); exit slope 0 (firm plant, v=0)
+  // ---- THE LAP: g-force launch · linear cruise · kinetic-hammer stop ("G-LONG") ----
+  //   T_A = 140ms launch · T_B = 712ms cruise · T_C = 48ms hammer.  ω = 0.4277286 deg/ms.
+  //   θ_A = 41.298 · θ_B = 304.543 · θ_C = 14.159  ⇒  Σ = 360.000 exactly.
+  //   Velocity is CONTINUOUS at both seams (|Δv| < 1e-7 deg/ms) and EXACTLY ZERO at both ends, so
+  //   acceleration is discontinuous at precisely two instants — the yank and the strike — and
+  //   nowhere else. The hammer crushes 4.5x more deceleration into its 48ms than the launch spends
+  //   accelerating, which is what makes a zero-exit-velocity stop still read as a blow rather than
+  //   a glide; the energy then leaves the arrow and enters the ORB (see orbAbsorb).
+  //   Cruise is 7.129 deg/frame @60Hz — BETTER sampled than the old 820ms lap's 7.317.
+  var LAP_MS         = 900;
+  var SMEAR_DEG      = 26;           // arc-smear sweep; 18 / 26 / 34 are the sanctioned choices
   var ORBIT_DIR      = 1;            // 1 = clockwise
   var TICK_SPARK_MS  = 80;
   var TICK_RING_MS   = 120;
   var VITRIFY_MS     = 160;          // B4b glaze opacity pulse, peak 0.6
   // ---- impact-to-the-core (DIRECTIONAL CHAIN: strike → lens plunges the axis → core swallows inward → orb squashes/sinks, over-damped, no bounce) ----
-  var IMPACT_SCALE_Y = 0.976;        // top flattens under the blow (anisotropic squash → circle to ellipse)
-  var IMPACT_SCALE_X = 1.007;        // slight lateral bulge
-  var IMPACT_SINK    = 4;            // px the whole orb dips under the strike
-  var IMPACT_MS      = 260;          // orb squash-and-sink duration
+  var IMPACT_SCALE_Y = 0.972;        // top flattens under the blow (anisotropic squash → circle to ellipse)
+  var IMPACT_SCALE_X = 1.009;        // slight lateral bulge
+  var IMPACT_SINK    = 5.0;          // px the whole orb dips under the strike
+  var IMPACT_MS      = 260;          // orb squash-and-sink duration — do NOT walk this into the liquid window
   var PLUNGE_MS      = 170;          // the bright lens travelling 12 o'clock → core
   var CORE_DELAY     = 120;          // the core swallows inward as the lens lands
   var CORE_MS        = 200;          // core pinch-to-zero duration
@@ -1393,6 +1431,11 @@
   var wheelArea  = document.querySelector('.wheel-area');
   var ptr        = document.querySelector('.pointer');
   var orbitArm   = document.querySelector('.orbit-arm');
+  var armSmear   = document.querySelector('.arm-smear');
+  var ringBody   = document.querySelector('.ring-body');
+  var liquidShell= document.querySelector('.ring-liquid-shell');
+  var glassBand  = document.querySelector('.engrave-glass');
+  var shadowEl   = document.querySelector('.disc-shadow');
   var fxLayer    = document.querySelector('.fx');
   var vitrifyEl  = document.querySelector('.vitrify');
   var sparkEl    = document.querySelector('.spark');
@@ -1528,8 +1571,33 @@
     return c.toDataURL('image/png');
   }
 
+  // ---- THE ARC SMEAR bake: N ghosts of the stone's ARRIS NETWORK ONLY, swept BEHIND a clockwise
+  //      orbit. Lines, not fills, and no white tip glint — a trail, not a second arrow. Quadratic
+  //      alpha falloff so the head stays the object and the tail is only persistence. ss=2: the
+  //      trail peaks at 0.55 for well under a second and sub-pixel softness there is invisible. ----
+  function rasterizeArrowSmear(){
+    var S=760, OFF=(S-480)/2, ss=2, N=16;
+    var c=document.createElement('canvas'); c.width=c.height=S*ss;
+    var g=c.getContext('2d'); g.scale(ss,ss); g.translate(OFF,OFF);
+    g.lineJoin='miter'; g.miterLimit=8; g.lineCap='butt';
+    var SIL=GEM.SIL, GIRD=GEM.GIRD;
+    function path(p,close){ g.beginPath(); g.moveTo(p[0][0],p[0][1]);
+      for(var i=1;i<p.length;i++) g.lineTo(p[i][0],p[i][1]); if(close) g.closePath(); }
+    for (var i=1;i<=N;i++){
+      var a=-(SMEAR_DEG*i/N)*Math.PI/180, f=1-(i-1)/N, al=0.30*f*f;
+      g.save(); g.translate(240,240); g.rotate(a); g.translate(-240,-240);
+      g.strokeStyle='rgba(220,233,248,'+al.toFixed(4)+')'; g.lineWidth=1.4; path(SIL,true); g.stroke();
+      g.strokeStyle='rgba(220,233,248,'+(al*0.7).toFixed(4)+')'; g.lineWidth=1.0; path(GIRD,false); g.stroke();
+      g.strokeStyle='rgba(220,233,248,'+(al*0.85).toFixed(4)+')'; g.lineWidth=1.2;
+      g.beginPath(); g.moveTo(240,-55.5); g.lineTo(240,-14.5); g.stroke();
+      g.restore();
+    }
+    return c.toDataURL('image/png');
+  }
+
   // ---- the controller (single owner of all beats + all teardown) ----
   var ceremony = { active:false, raf:0, timers:[], anims:[], watchdog:0 };
+  var lapAnim = null;   // the live orbit animation — held so a tap-skip can FINISH it instead of cancelling it
   function ct(fn, delay){ ceremony.timers.push(setTimeout(fn, delay)); }   // registered timer
   function reg(a){ ceremony.anims.push(a); return a; }                     // registered WAAPI anim
   function showFx(el){ if (el) el.style.opacity='1'; }
@@ -1552,6 +1620,12 @@
     document.addEventListener('visibilitychange', ceremonyVis);
     wheelArea.addEventListener('click', ceremonySkip);
 
+    // promote the static wrappers now — the full branch gets ~900ms of lead, the lean branch a task
+    // boundary. They carry no will-change at rest, so this costs nothing until a spin is under way.
+    if (ringBody)    ringBody.style.willChange='transform';
+    if (liquidShell) liquidShell.style.willChange='transform';
+    if (glassBand)   glassBand.style.willChange='transform';
+
     resetFx();
     if (fxLayer) fxLayer.classList.add('live');
 
@@ -1563,10 +1637,10 @@
       ct(function(){ endCeremony(true); },                    1050);   // normal end = reveal BACKSTOP (idempotent; no-op once impact revealed)
     } else {                                  // first spin of a set: steady LINEAR lap; the SEAT (impact) reveals
       arrowLap(function(){ tickFlash(); impactToCore(); vitrify(); if(onDone) onDone(); }); // SEAT=IMPACT: winner lights + verdict prints SOLID
-      ct(beadBirth,                                            860);   // ~40ms after the ~820ms lap: beads deposited by the just-landed arrow
-      ct(function(){ beadStream(false); },                     950);   // split → down both edges → merge at bottom
-      ct(function(){ dripImpact(false); },                    1630);   // 950 + FALL_FULL(680): the drip KISSES the already-shown verdict
-      ct(function(){ endCeremony(true); },                    1960);   // normal end = reveal BACKSTOP (idempotent; no-op once impact revealed)
+      ct(beadBirth,                                            940);   // ~40ms after the 900ms lap: beads deposited by the just-landed arrow
+      ct(function(){ beadStream(false); },                    1030);   // split → down both edges → merge at bottom
+      ct(function(){ dripImpact(false); },                    1710);   // 1030 + FALL_FULL(680): the drip lands on the verdict
+      ct(function(){ endCeremony(true); },                    2040);   // normal end = reveal BACKSTOP (idempotent; no-op once impact revealed)
     }
   }
 
@@ -1575,12 +1649,25 @@
     ceremony.active = false;
     if (ceremony.raf){ cancelAnimationFrame(ceremony.raf); ceremony.raf = 0; }
     ceremony.timers.forEach(clearTimeout); ceremony.timers.length = 0;
-    ceremony.anims.forEach(function(a){ try{ a.cancel(); }catch(e){} }); ceremony.anims.length = 0;
+    // THE LAP IS FINISHED, NOT CANCELLED. Cancelling it mid-orbit reverts the arm to its pre-animation
+    // inline transform and the arrow TELEPORTS home from wherever it was; finishing jumps it to
+    // rotate(360deg), which is visually identical to the rest angle, so a tap-skip lands instead of
+    // snapping. (ceremony.active is already false above, so the finished-handler's reveal cannot fire.)
+    if (lapAnim){ try{ lapAnim.finish(); }catch(e){} }
+    ceremony.anims.forEach(function(a){ if (a!==lapAnim){ try{ a.cancel(); }catch(e){} } });
+    ceremony.anims.length = 0; lapAnim = null;
     clearTimeout(ceremony.watchdog);
     document.removeEventListener('visibilitychange', ceremonyVis);
     wheelArea.removeEventListener('click', ceremonySkip);
     // hard-reset every decorative overlay to rest:
     if (orbitArm){ orbitArm.style.transform='rotate(0deg)'; }   // arrow stays VISIBLE (it is the pointer); revert inner to the rest angle
+    if (armSmear){ armSmear.style.opacity='0'; }
+    if (ringBody){    ringBody.style.transform='';    ringBody.style.willChange=''; }
+    if (liquidShell){ liquidShell.style.transform=''; liquidShell.style.willChange=''; }
+    if (glassBand){   glassBand.style.transform='';   glassBand.style.willChange=''; }
+    if (shadowEl)   shadowEl.style.transform='';
+    if (plateLayer) plateLayer.style.transform='';   // syncPlates rewrites it on the mirrorInk below
+    canvas.style.willChange='';                      // moved OFF the spin's lock frame — see spin()
     if (ptr){ ptr.style.transform=''; ptr.style.willChange=''; ptr.style.opacity=''; ptr.style.transition=''; }
     if (fxLayer)   fxLayer.classList.remove('live');   // display:none hides the drop + splat
     if (vitrifyEl) vitrifyEl.style.opacity='0';
@@ -1597,22 +1684,33 @@
   function ceremonyVis(){ if (document.hidden) endCeremony(true); }
   function ceremonySkip(){ endCeremony(true); }
 
-  // ---- LINEAR arrow lap — ONE steady constant-speed sweep 0→360 on the INNER arm; the abrupt STOP at the top IS the impact ----
-  // The magnetic breathe lives on the OUTER (.orbit-hover) and never rotates, so this rotate() never shares a transform with it.
+  // ---- THE LAP: G-FORCE LAUNCH → LINEAR CRUISE → KINETIC-HAMMER STOP ----
+  // The magnetic breathe lives on the OUTER (.orbit-hover) and never rotates, so this rotate() never
+  // shares a transform with it. Three welded segments, C1-continuous at every joint (see the constants
+  // block for the derivation): the arrow is TORN out of rest, sweeps one clean lap, and is stopped dead
+  // in ~3 frames. It arrives at exactly zero velocity — the impact is sold by the crushed deceleration
+  // and by the ORB taking the energy, never by a hard cut, which is what reads as teleport.
   function arrowLap(onImpact){
     if (!orbitArm){ if (onImpact) onImpact(); return; }
     orbitArm.style.transform = 'rotate(0deg)';
-    var full   = 360 * ORBIT_DIR;
-    var splitO = 1 - SETTLE_FRAC;                   // 0.88
-    var splitA = full * splitO;                     // 316.8deg = exactly where pure-linear already sits at t=0.88
-    var lap = reg(orbitArm.animate([
-      { transform:'rotate(0deg)',          offset:0.00,   easing:'linear'    },   // 0→88%: the loved cruise, unchanged
-      { transform:'rotate('+splitA+'deg)', offset:splitO, easing:SETTLE_EASE },   // 88→100%: firm precise seat to rest
-      { transform:'rotate('+full+'deg)',   offset:1.00 }
+    lapAnim = reg(orbitArm.animate([
+      { transform:'rotate(0deg)',       offset:0.000000, easing:'cubic-bezier(.32,0,.60,.42)' },  // v(0)=0 EXACT
+      { transform:'rotate(41.298deg)',  offset:0.155556, easing:'linear'                      },  // launch → cruise, |Δv|<1e-7
+      { transform:'rotate(345.841deg)', offset:0.946667, easing:'cubic-bezier(.40,.58,.68,1)' },  // the 48ms hammer
+      { transform:'rotate(360deg)',     offset:1.000000 }
     ], { duration: LAP_MS, easing:'linear', fill:'forwards' }));
-    lap.finished.then(function(){
+    smearRun();                                      // same task ⇒ same startTime; no sync surface at all
+    lapAnim.finished.then(function(){
       if (ceremony.active && onImpact) onImpact();   // fires at the SEATED frame (v=0), still at t=LAP_MS
     }).catch(function(){});
+  }
+  // The trail dies at t≈880 — 20ms before the seat — so the last frames are the naked stone slamming home.
+  function smearRun(){
+    if (!armSmear) return;
+    reg(armSmear.animate([
+      {opacity:0,offset:0.0000},{opacity:0.10,offset:0.0400},{opacity:0.55,offset:0.1556},
+      {opacity:0.55,offset:0.9200},{opacity:0.22,offset:0.9600},{opacity:0,offset:0.9778},{opacity:0,offset:1.0}
+    ], {duration:LAP_MS, easing:'linear'}));         // fill defaults to 'none' ⇒ reverts to the CSS rest 0
   }
 
   // ---- B3b tick flash (light, not motion) ----
@@ -1636,19 +1734,55 @@
   // over-damped e^-decay home — a felt, COLD, contained blow with NO rebound.
   // scale/translateY are PREPENDED (left of rotate(rot)) so the locked rotation stays byte-identical.
   function orbAbsorb(){
-    var N=14, kf=[], cFrac=0.14;
+    // cFrac 0.075 = a 19.5ms compression, barely over one frame: a STRIKE, not a squeeze.
+    // e^-5.2 is dead by ~200ms. Monotone decay, no rebound term anywhere — a cold contained blow.
+    var N=14, kf=[], kfR=[], kfShadow=[], cFrac=0.075, OPT={duration:IMPACT_MS, easing:'linear'};
     for(var i=0;i<=N;i++){ var u=i/N, sx, sy, dy;
       if(u<=cFrac){ var w=u/cFrac; sy=1-(1-IMPACT_SCALE_Y)*w; sx=1+(IMPACT_SCALE_X-1)*w; dy=IMPACT_SINK*w; }
-      else{ var v=(u-cFrac)/(1-cFrac), e=Math.exp(-4.4*v); sy=1-(1-IMPACT_SCALE_Y)*e; sx=1+(IMPACT_SCALE_X-1)*e; dy=IMPACT_SINK*e; }
-      kf.push({transform:'translateY('+dy.toFixed(2)+'px) scale('+sx.toFixed(4)+','+sy.toFixed(4)+') rotate('+rot+'deg)'});
+      else{ var v=(u-cFrac)/(1-cFrac), e=Math.exp(-5.2*v); sy=1-(1-IMPACT_SCALE_Y)*e; sx=1+(IMPACT_SCALE_X-1)*e; dy=IMPACT_SINK*e; }
+      var body='translateY('+dy.toFixed(2)+'px) scale('+sx.toFixed(4)+','+sy.toFixed(4)+')';
+      kf.push({transform: body+' rotate('+rot+'deg)'});     // the wheel carries its locked rotation
+      kfR.push({transform: body});                          // the ring/glass/film never did
+      kfShadow.push({transform:'translateY('+(dy*0.45).toFixed(2)+'px) scale('+(1+0.010*(dy/IMPACT_SINK)).toFixed(4)+')'});
     }
-    kf[N] = {transform:'translateY(0px) scale(1,1) rotate('+rot+'deg)'};
-    var a = reg(canvas.animate(kf, {duration:IMPACT_MS, easing:'linear'}));  // fill:none → reverts to inline rotate(rot)
+    kf[N]       = {transform:'translateY(0px) scale(1,1) rotate('+rot+'deg)'};
+    kfR[N]      = {transform:'translateY(0px) scale(1,1)'};
+    kfShadow[N] = {transform:'translateY(0px) scale(1)'};
+    var a = reg(canvas.animate(kf, OPT));                                    // fill:none → reverts to inline rotate(rot)
     a.onfinish = function(){ canvas.style.transform='rotate('+rot+'deg)'; };
     if (inkCanvas){                                                          // the over-ring seams squash in lockstep
-      var ai = reg(inkCanvas.animate(kf, {duration:IMPACT_MS, easing:'linear'}));
+      var ai = reg(inkCanvas.animate(kf, OPT));
       ai.onfinish = function(){ mirrorInk('rotate('+rot+'deg)'); };
     }
+    // EVERYTHING THE ORB IS MADE OF RIDES THE SAME FRAME. If any one of these stays rigid it visibly
+    // detaches at the exact climax — which is the moment the whole ceremony is built around.
+    if (ringBody)  reg(ringBody.animate(kfR, OPT));                          // astrolabe + liquid, as one body
+    if (glassBand) reg(glassBand.animate(kfR, OPT));                         // the glass channel over them
+    if (fxLayer)   reg(fxLayer.animate(kfR, OPT));                           // the white film clings to the sinking glass
+    if (shadowEl)  reg(shadowEl.animate(kfShadow, OPT));                     // the cast shadow compresses toward it
+    if (plateLayer){                                                         // the names squash with the wheel they name
+      var pre='translate(-50%,-50%) scale('+plateK+') ', post=' rotate('+(plates.length===1?0:rot)+'deg)';
+      reg(plateLayer.animate(kfR.map(function(k){ return {transform: pre+k.transform+post}; }), OPT));
+    }
+    ringSlosh();
+  }
+
+  // THE LIQUID LAGS THE BLOW. Only the WRAPPER moves, so .ring-liquid's own drift is never suspended.
+  // A single damped sine starting at exactly ZERO: the nonzero initial VELOCITY is the impulse — the
+  // container stops and the liquid keeps going, which is the physically right story and lands on the
+  // liquid rather than on the arrow. Peak −6.2px at 44.5ms, naturally lagging the orb's 19.5ms
+  // compression; residual at 560ms is 0.055px and the last keyframe pins it to exact rest.
+  var SL_MS=560, SL_DIP=6.2, SL_ROT=1.35, SL_HZ=4.6, SL_Z=0.28;
+  function ringSlosh(){
+    if (!liquidShell) return;
+    var w=2*Math.PI*SL_HZ/1000,                 // 0.0289027 rad/ms
+        lam=w*SL_Z/Math.sqrt(1-SL_Z*SL_Z),      // 0.0084295 /ms
+        A=SL_DIP/0.6597, Ar=SL_ROT/0.6597, N=18, kf=[];
+    for (var i=0;i<=N;i++){ var t=i/N*SL_MS, e=Math.exp(-lam*t)*Math.sin(w*t);
+      kf.push({transform:'translateY('+(A*e).toFixed(2)+'px) rotate('+(Ar*e).toFixed(3)+'deg)'}); }
+    kf[N]={transform:'translateY(0px) rotate(0deg)'};
+    var a=reg(liquidShell.animate(kf,{duration:SL_MS, easing:'linear'}));
+    a.onfinish=function(){ liquidShell.style.transform=''; };   // if it sloshes the wrong way, negate SL_ROT
   }
 
   // THE PLUNGE LENS: flares just inside the top rim (the strike), accelerates DOWN the 12→centre axis,
@@ -1906,6 +2040,11 @@
     var _arrowURI = rasterizeArrow();
     orbitArm.style.backgroundImage = 'url('+_arrowURI+')';
     var _im=new Image(); _im.src=_arrowURI; if(_im.decode) _im.decode().catch(function(){}); // GPU-ready, kills first-frame flash
+  }
+  if (armSmear){
+    var _smearURI = rasterizeArrowSmear();
+    armSmear.style.backgroundImage = 'url('+_smearURI+')';
+    var _si=new Image(); _si.src=_smearURI; if(_si.decode) _si.decode().catch(function(){});  // warmed like the gem
   }
   render();
 })();
