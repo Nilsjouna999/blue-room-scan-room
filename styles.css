@@ -3543,15 +3543,15 @@ body[data-devnav="1"] .devnav {
      The seal has no inner core span and its ::after is the iris ring, so the catchlight
      rides as a positioned background instead of a rotated pseudo-element. */
   background-image:
-    radial-gradient(closest-side, rgba(255,255,255,.94), rgba(255,255,255,.30) 46%, rgba(255,255,255,0) 74%),
+    radial-gradient(closest-side, rgba(255,255,255,.80), rgba(255,255,255,.22) 52%, rgba(255,255,255,0) 78%),
     radial-gradient(86% 86% at 26% 20%,
       rgba(255,246,220,0) 0%, rgba(255,246,220,0) 64%,
       rgba(255,242,210,.07) 78%, rgba(255,242,212,.34) 92%, rgba(255,248,226,.56) 100%),
     radial-gradient(78% 78% at 33% 27%,
       #faf4e4 0%, #f2e7cb 14%, #e4d2a4 30%, #cfb880 50%,
       #ae9660 70%, #866f40 88%, #a48a58 100%);
-  background-size: 38% 28%, auto, auto;
-  background-position: 20% 13%, 0 0, 0 0;
+  background-size: 19% 13%, auto, auto;
+  background-position: 24% 11%, 0 0, 0 0;
   background-repeat: no-repeat;
   box-shadow:
     inset -2px -3px 8px rgba(44,31,12,.34),
@@ -3725,15 +3725,15 @@ body[data-devnav="1"] .devnav {
   border-radius: 50%; cursor: grab; border: none; color: var(--mini-ink);
   /* "Deep Glass" sphere — catchlight / crescent rim / body, all STATIC */
   background-image:
-    radial-gradient(closest-side, rgba(255,251,246,.90), rgba(255,238,220,.26) 46%, rgba(255,238,220,0) 74%),
+    radial-gradient(closest-side, rgba(255,251,246,.78), rgba(255,238,220,.20) 52%, rgba(255,238,220,0) 78%),
     radial-gradient(86% 86% at 26% 20%,
       rgba(255,200,146,0) 0%, rgba(255,200,146,0) 64%,
       rgba(255,196,140,.07) 78%, rgba(255,192,134,.32) 92%, rgba(255,209,160,.54) 100%),
     radial-gradient(78% 78% at 33% 27%,
       #ffecd4 0%, #ffcb9a 13%, #f59f5b 28%, #eb7832 46%,
       #c85718 68%, #8a370a 89%, #b0551b 100%);
-  background-size: 38% 28%, auto, auto;
-  background-position: 20% 13%, 0 0, 0 0;
+  background-size: 19% 13%, auto, auto;
+  background-position: 24% 11%, 0 0, 0 0;
   background-repeat: no-repeat;
   box-shadow:
     inset -2px -3px 7px rgba(48,17,2,.40),
@@ -3838,6 +3838,7 @@ body[data-devnav="1"] .devnav {
    hairline caption not a card, 9px gap so the pair reads as ONE object, nothing loops.
    ========================================================================== */
 :root {
+  color-scheme: dark;        /* belt-and-braces with the <meta>: never let auto-dark re-invert */
   --orb-in: 120ms;                        /* hover-in — answers on the next frame */
   --orb-out: 220ms;                       /* settle */
   --orb-press: 90ms;
@@ -3921,10 +3922,10 @@ body[data-devnav="1"] .devnav {
 /* the catchlight — static transform, static gradient: free at raster.
    No filter: blur() — it mushes at 14px and costs a render surface. */
 .br-ball-core::before {
-  content: ""; position: absolute; left: 20%; top: 13%; width: 38%; height: 28%;
+  content: ""; position: absolute; left: 24%; top: 11%; width: 19%; height: 13%;
   border-radius: 50%; transform: rotate(-18deg); pointer-events: none;
   background: radial-gradient(closest-side,
-    rgba(255,255,255,.94), rgba(255,255,255,.30) 46%, rgba(255,255,255,0) 74%);
+    rgba(255,255,255,.80), rgba(255,255,255,.22) 52%, rgba(255,255,255,0) 78%);
 }
 .br-ball--orange .br-ball-core::before {
   background: radial-gradient(closest-side,

@@ -1188,14 +1188,14 @@ html.js-io .read-item.in .ri-record { transition-delay: .56s; }
 }
 /* the catchlight — static gradient, static rotation: free at raster */
 .br-ball-core::before {
-  content: ""; position: absolute; left: 20%; top: 13%; width: 38%; height: 28%;
+  content: ""; position: absolute; left: 24%; top: 11%; width: 19%; height: 13%;
   border-radius: 50%; transform: rotate(-18deg); pointer-events: none;
   background: radial-gradient(closest-side,
-    rgba(255,255,255,.94), rgba(255,255,255,.30) 46%, rgba(255,255,255,0) 74%);
+    rgba(255,255,255,.80), rgba(255,255,255,.22) 52%, rgba(255,255,255,0) 78%);
 }
 .br-ball--orange .br-ball-core::before {
   background: radial-gradient(closest-side,
-    rgba(255,251,246,.90), rgba(255,238,220,.26) 46%, rgba(255,238,220,0) 74%);
+    rgba(255,251,246,.78), rgba(255,238,220,.20) 52%, rgba(255,238,220,0) 78%);
 }
 
 /* the label — a hairline caption, not a card */
