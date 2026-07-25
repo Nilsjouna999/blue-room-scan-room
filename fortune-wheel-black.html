@@ -305,8 +305,8 @@
     pointer-events:none;transform-origin:50% 50%}
 
   /* B6-B8 milk-drop overlay */
-  .fx{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:4;display:none;
-    transform-origin:50% 43.43%}   /* the disc centre — so the film rides the orb's squash, not the page box */
+  .fx{position:absolute;left:0;top:0;width:100%;height:122.857%;pointer-events:none;z-index:4;display:none;
+    transform-origin:50% 35.349%}  /* 304/860 = the disc centre — so the film rides the orb's squash, not the page box */
   .fx.live{display:block}
   /* transform-box:view-box makes WAAPI px == viewBox units (load-bearing); every sprite is authored
      around local (0,0) and placed by its own translate — never by an attribute */
@@ -391,7 +391,14 @@
     <span class="spark" aria-hidden="true"></span>
     <span class="ring"  aria-hidden="true"></span>
     <!-- B6-B8 milk-drop FX overlay; viewBox matches wheel-area aspect ⇒ every coordinate auto-scales on mobile -->
-    <svg class="fx" viewBox="0 0 560 700" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <!-- THE FX BOX EXTENDS BELOW THE WHEEL. It has to: the verdict word lives in .result, which sits
+         OUTSIDE .wheel-area, so a 560x700 canvas clipped the falling drop at y=700 — it visibly tore
+         apart on its way down and the splat landed entirely outside the viewport. 560x860 keeps the
+         SAME 1 unit == 1 wheel-area px mapping (height 122.857% of 700 == 860), so every coordinate
+         authored above is untouched; there is simply canvas below the orb now.
+         NOTE: overflow:visible is deliberately NOT used — geometry outside an SVG's viewBox is this
+         repo's known per-frame overflow-rect landmine. The viewBox is enlarged instead. -->
+    <svg class="fx" viewBox="0 0 560 860" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
       <!-- THE KEY TRICK: a userSpaceOnUse radialGradient CONCENTRIC WITH THE ARC paints the stroke's
            CROSS-SECTION. One stroke then carries a meniscus profile — a wet body, a bright lip at the
            limb, a feather inboard — with no filter and no extra elements. ZERO <filter> in this layer:
@@ -504,13 +511,16 @@
 (function(){
   "use strict";
   // ---- config ----
-  var MAX = 6;
+  var MAX = 8;
   var DISC_S = 480;          // canvas logical size (css px)
   var R_OUTER = 234;         // outer edge reference
   var R_WEDGE = R_OUTER - 2; // wedges fill to the edge — no frame, a hair of dark rim
   var HUB_R = 30;            // center axle-cap radius
-  // deep jewel set — obsidian · citrine gold · carnelian · garnet · deep teal glass · emerald (ADD ORDER, black first)
-  var JEWEL = ['#0b0b0d','#8a6a16','#8f4212','#6e1020','#0e5150','#10502e'];
+  // deep jewel set — obsidian · citrine gold · carnelian · garnet · deep teal glass · emerald ·
+  // sapphire · amethyst (ADD ORDER, black first). The last two complete the circle of hues so eight
+  // wedges never repeat a colour: the set now runs neutral → gold → orange → red → teal → green →
+  // blue → violet, and no two neighbours share a family, including across the 8→1 wrap.
+  var JEWEL = ['#0b0b0d','#8a6a16','#8f4212','#6e1020','#0e5150','#10502e','#153a66','#43204f'];
   // the single white token — dark ink is invisible on deep jewel/black. Now lives in .np-t{color}.
   var GRAIN = 0.04;          // glass wants ~no tooth; a whisper only to dither the gradients; 0 = dead-flat
 
@@ -631,13 +641,28 @@
   //   3.6 characters. So the names take the lane just inside the ring, and the
   //   silver band becomes the FRAME around them.
   // ======================================================================
-  var LBL_R = 110;              // orbital radius of each plate centre (mirrored in .np-t's rest transform)
+  // THE LABEL LANE SCALES WITH THE WEDGE COUNT. Two things bind it: the SEAM (a plate must not cross
+  // into its neighbour's wedge) and, from 7 wedges up, the TOP CHORD (the wedge is simply narrower
+  // than the plate at that radius). Ship the law, not a constant:
+  //     R     = RING_R_IN / (1 + sin(180/n))          the radius where those two are balanced
+  //     seam  = (R·sin(180/n) − 3) / 0.476            0.476 = the wash contour / box-width ratio
+  //     chord = 2·(R − 21)·tan(180/n)                 21 = a two-line plate's half-height
+  // n ≤ 6 keeps the measured 110/106/96 (those numbers were tuned against real failing names and
+  // beat the formula slightly); n = 7 and 8 take min(seam, chord) with a 6px safety trim.
+  var LBL_R = 110;              // orbital radius of each plate centre — recomputed per wedge count
+  function lblGeom(n){
+    if (n<=1) return {R:110, maxW:180, box:168};        // a pinned plate never orbits: no swept envelope
+    if (n<=6) return {R:110, maxW:106, box:96};
+    var half=Math.PI/n, R=RING_R_IN/(1+Math.sin(half));
+    var seam=(R*Math.sin(half)-3)/0.476, chord=2*(R-17)*Math.tan(half);
+    var maxW=Math.floor(Math.min(seam,chord))-6;
+    return {R:Math.round(R), maxW:maxW, box:maxW-10};   // −10 = the 5px horizontal padding, both sides
+  }
   var LBL_MAX_FS = 21, LBL_SPREAD = 5, LBL_FS_MIN_PX = 9.5;
-  var LBL_BOX_W = 96, LBL_BOX_W_SOLO = 168;    // content widths (box-sizing:border-box is global)
   // Preference ladder: never drop below 18px merely to avoid a second line; below 18 prefer fewer
   // lines at the same size. Two lines are legal only while 2·fs·1.14 + 4 <= 45  ⇒  fs <= 18.
   var LBL_ORDER = [[1,21],[1,20],[1,19],[1,18],[2,18],[1,17],[2,17],[1,16],[2,16],
-                   [1,15],[2,15],[1,14],[2,14],[1,13],[2,13]];
+                   [1,15],[2,15],[1,14],[2,14],[1,13],[2,13],[1,12],[2,12],[1,11],[2,11]];
   var PLATE_OP_TR = 'opacity 260ms cubic-bezier(.2,.7,.2,1)';
   var mctx = document.createElement('canvas').getContext('2d');   // dedicated measurer, never touches wctx
   var SIGIL_RE = null;   // built defensively: \p{...} is a SyntaxError on older engines, and a literal would kill the file
@@ -666,6 +691,23 @@
     var sp=bestSplit(s,fs); if (sp) return sp[2];
     return measW(s,fs)*0.53;            // unbreakable ⇒ CSS breaks anywhere: half + a 6% break penalty
   }
+  // At 7–8 wedges the box gets narrow enough that a long name can beat every rung. Left to CSS,
+  // overflow-wrap:anywhere snaps it mid-word — "Absolutel / y…" — which reads as a bug. Drop whole
+  // trailing WORDS instead until the remainder fits, and mark the cut. A clean "Absolutely not…"
+  // beats a broken word every time; the full name is always intact in the options list below.
+  function fitOrTrim(s,fs,BOX){
+    var sp = bestSplit(s,fs);
+    if (sp && sp[2] <= BOX) return sp[0]+'\n'+sp[1];
+    if (measW(s,fs) <= BOX) return s;
+    var w = s.split(/\s+/);
+    while (w.length > 1){
+      w.pop();
+      var t = w.join(' ')+'…', s2 = bestSplit(t,fs);
+      if (s2 && s2[2] <= BOX) return s2[0]+'\n'+s2[1];
+      if (measW(t,fs) <= BOX) return t;
+    }
+    return s;                                  // one unbreakable word: CSS + line-clamp handle it
+  }
   function rungFor(s,BOX,floor){
     for (var c=0;c<LBL_ORDER.length;c++){ var L=LBL_ORDER[c][0], fs=LBL_ORDER[c][1];
       if (fs<floor) continue;
@@ -690,8 +732,7 @@
       if (!s) return {fs:base, txt:''};
       if (per[i].sigil) return {fs:26, txt:s};
       var fs = Math.min(base, per[i].fs);
-      var sp = (per[i].lines===2) ? bestSplit(s,fs) : null;   // the LAST RESORT still splits at the space
-      return {fs:fs, txt: sp ? sp[0]+'\n'+sp[1] : s};
+      return {fs:fs, txt: fitOrTrim(s,fs,BOX)};   // the LAST RESORT still breaks at a word boundary
     });
   }
 
@@ -769,11 +810,14 @@
   function buildPlates(){
     if (!plateLayer) return;
     var segs=segments(), n=segs.length;
-    var solo = (n===1);
+    var geom = lblGeom(n); LBL_R = geom.R;
     var nsig = segs.map(function(s){return s.text;}).join('')+'#'+n+'#'+plateK.toFixed(4);
     if (nsig===psig) return; psig=nsig;
-    var fsFloor = Math.max(13, Math.ceil(LBL_FS_MIN_PX/plateK));   // never smaller than 9.5 REAL px on screen
-    var fit = fitSet(segs.map(function(s){ return s.text||''; }), solo?LBL_BOX_W_SOLO:LBL_BOX_W, fsFloor);
+    // never smaller than 9.5 REAL px on screen. 7–8 wedges get 2 more rungs: at that width a single
+    // 10-letter word cannot fit at 13px, and the bounded spread means only the offending label takes
+    // the smaller size — its neighbours stay where they are.
+    var fsFloor = Math.max(n>=7?11:13, Math.ceil(LBL_FS_MIN_PX/plateK));
+    var fit = fitSet(segs.map(function(s){ return s.text||''; }), geom.box, fsFloor);
     var k;
     if (plates.length!==n){                         // rebuild the DOM only when the COUNT changes —
       plateLayer.innerHTML=''; plates=[];           // otherwise typing re-promotes six layers per keystroke
@@ -789,7 +833,7 @@
       var p=plates[k], f=fit[k];
       if (p.txt!==f.txt){ p.txt=f.txt; p.t.textContent=f.txt; p.t.style.display = f.txt ? '' : 'none'; }
       if (p.fs!==f.fs){ p.fs=f.fs; p.t.style.fontSize=f.fs+'px'; p.t.style.letterSpacing=lblLS(f.fs)+'em'; }
-      p.t.style.maxWidth = solo ? '180px' : '';     // a pinned plate never orbits ⇒ no swept envelope to respect
+      p.t.style.maxWidth = geom.maxW+'px';
     }
     plateLayer.style.transform = 'translate(-50%,-50%) scale('+plateK+')';   // the layer only ever SCALES
     syncPlates(rot);
@@ -1925,8 +1969,11 @@
     var r = v.getBoundingClientRect(), wa = wheelArea.getBoundingClientRect();
     if (!r.width || !wa.width || !wa.height) return;
     var px = r.width/2, py = r.height*0.42;                  // the strike point inside the word's own box
+    // wa.height is the 700-unit wheel box; the fx canvas is 860 tall in those same units, so the
+    // word (which sits BELOW the wheel) maps straight in. Clamped so an unusually tall layout makes
+    // the drop land a little high rather than fall off the bottom of the canvas.
     LAND.x = (r.left + px - wa.left)/wa.width*560;
-    LAND.y = (r.top  + py - wa.top )/wa.height*700;
+    LAND.y = Math.min(848, (r.top + py - wa.top)/wa.height*700);
     LAND.dx = LAND.x-280; LAND.dy = LAND.y-684;
     if (splatEl)   splatEl.style.transform  ='translate('+LAND.dx.toFixed(1)+'px,'+LAND.dy.toFixed(1)+'px)';
     if (wetmarkEl) wetmarkEl.style.transform='translate('+LAND.dx.toFixed(1)+'px,'+LAND.dy.toFixed(1)+'px)';
