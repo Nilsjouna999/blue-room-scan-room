@@ -8,7 +8,7 @@
        (spine + gold top-rule + folder-tab heading), clearly contained.
 
    Static design surface — mock data, no backend, no payment. Commerce lives in
-   the Arcana Room, not here: the hub is DOORS to every room (Main Menu, Arcana
+   the Arcana Reading, not here: the hub is DOORS to every room (Main Menu, Arcana
    Room, Codex, Vault) + free "Open this reading" portals. No hub-side price,
    modal, or violet remains.
 
@@ -125,14 +125,13 @@
       '<stop offset="0" stop-color="#dcc38b"/><stop offset=".45" stop-color="#ab8646"/><stop offset="1" stop-color="#563914"/></radialGradient>' +
     '</svg>';
 
-  /* the identity name's treatment — WHITE letters with a black "oil / ink" edge that
-     ripples and bounces ever so slightly around the glyphs. Animated turbulence displaces
-     the RIM only (dilated-alpha minus alpha), so the letters themselves stay crisp/readable. */
+  /* the identity name's treatment — WHITE letters with a black "oil / ink" edge around the
+     glyphs. Static turbulence displaces the RIM only (dilated-alpha minus alpha), so the
+     letters stay crisp/readable. BR-S234: the ripple <animate> was dropped — a fixed
+     baseFrequency keeps the ink-edge distortion at zero continuous re-raster cost. */
   var OIL_DEFS = '<svg class="pf-defs" width="0" height="0" aria-hidden="true" focusable="false"><defs>' +
     '<filter id="pfOil" x="-16%" y="-45%" width="132%" height="190%" color-interpolation-filters="sRGB">' +
-      '<feTurbulence type="fractalNoise" baseFrequency="0.015 0.021" numOctaves="2" seed="8" result="noise">' +
-        '<animate attributeName="baseFrequency" dur="7s" values="0.015 0.021;0.023 0.014;0.015 0.021" repeatCount="indefinite" calcMode="spline" keySplines="0.45 0 0.55 1;0.45 0 0.55 1"/>' +
-      '</feTurbulence>' +
+      '<feTurbulence type="fractalNoise" baseFrequency="0.019 0.018" numOctaves="2" seed="8" result="noise"/>' +
       '<feMorphology in="SourceAlpha" operator="dilate" radius="1.5" result="fat"/>' +
       '<feComposite in="fat" in2="SourceAlpha" operator="out" result="rim"/>' +
       '<feDisplacementMap in="rim" in2="noise" scale="4.5" xChannelSelector="R" yChannelSelector="G" result="rimMoved"/>' +
@@ -174,7 +173,7 @@
       : '';
 
     // the Crown — the reading button; "Open this reading" IS the full arcana result page.
-    // No profile-side redraw: to get a new reading, draw one from the Arcana Room.
+    // No profile-side redraw: to get a new reading, draw one from the Arcana Reading.
     var crown;
     // the crown as a single-object museum display: its own centered band, lit,
     // enlarged, with the caption BELOW it and nothing crowding either side.
@@ -294,7 +293,7 @@
   // not repeated here.) Commerce is not shown on the hub — price lives in the room.
   function roomsHTML() {
     var rooms = [
-      ["arcane", "The Arcana Room", "Where a new reading is drawn"],
+      ["arcane", "The Arcana Reading", "Where a new reading is drawn"],
       ["drawing-room", "The Drawing Room", "Where cards are cut and filed"],
       ["reading", "The Reading", "Your draw, laid out in full"],
       ["codex", "The Codex", "The archive of meanings"]
@@ -374,7 +373,7 @@
         var d = el.getAttribute("data-door");
         if (d === "menu") { if (inApp()) location.href = location.pathname; else note(root, "Returns to the main menu. (Inert in preview.)"); }
         else if (d === "codex") { if (inApp()) location.href = "codex.html"; else note(root, "Opens the Codex. (Inert in preview.)"); }
-        else if (d === "arcane") toInput("", "Opens the Arcana Room. (Inert in preview.)");
+        else if (d === "arcane") toInput("", "Opens the Arcana Reading. (Inert in preview.)");
         else if (d === "drawing-room") { if (inApp()) location.href = "?dev=drawing-room"; else note(root, "Opens the Drawing Room — the tarot room. (Inert in preview.)"); }
         else if (d === "ceremony") { if (inApp()) location.href = "?dev=ceremony"; else note(root, "Opens the Ceremony — the arcana forge. (Inert in preview.)"); }
         else if (d === "reading") { if (inApp()) location.href = "?dev=arcana-reading"; else note(root, "Opens your reading, laid out. (Inert in preview.)"); }
@@ -404,13 +403,13 @@
         return;
       }
 
-      // every draw/redraw routes to the Arcana Room, carrying intent; commerce lives there
+      // every draw/redraw routes to the Arcana Reading, carrying intent; commerce lives there
       if (el.hasAttribute("data-draw")) {
         ev.preventDefault();
         var who = el.getAttribute("data-draw"), intent = el.getAttribute("data-intent"), rel = el.getAttribute("data-rel");
         var params = "for=" + (who === "other" ? "other" : "self") + (intent ? "&intent=" + intent : "") + (rel ? "&subject=" + encodeURIComponent(rel) : "");
         var msg = intent === "redraw"
-          ? "This would open the Arcana Room to add a richer reading — the redraw confirm and price live there. (Inert in preview.)"
+          ? "This would open the Arcana Reading to add a richer reading — the redraw confirm and price live there. (Inert in preview.)"
           : (who === "other" ? "This would open the input room to read for someone. (Inert in preview.)"
                              : "This would open the input room to draw a new reading. (Inert in preview.)");
         toInput(params, msg);
