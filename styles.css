@@ -3680,17 +3680,24 @@ body[data-devnav="1"] .devnav {
 #menuView .mini.is-dragging { transition: none; }
 #menuView .mini.is-homing { transition: transform 440ms cubic-bezier(0.2,0.7,0.2,1); }
 
+/* The mini-codex ball — the ORANGE twin of the full-codex (white) ball: SAME design,
+   smaller (30px vs 42px), orange. Was a flat glyph-marked chip; now the matched sphere
+   (radial body + hover halo + lift, plain — no glyph). The .mini drag + #codexMiniBall
+   search-panel wiring is unchanged; only the skin is restyled. */
 #menuView .mini__ball { position: absolute; inset: 0; width: 30px; height: 30px; padding: 0;
-  border-radius: 50%; cursor: grab; display: grid; place-items: center;
-  background: radial-gradient(circle at 50% 34%, #f4794a 0%, var(--mini-orange) 56%, var(--mini-orange-dim) 100%);
-  border: 1px solid rgba(244,122,74,.55); color: var(--mini-ink);
-  box-shadow: 0 2px 8px rgba(0,0,0,.42), inset 0 1px 0 rgba(255,214,186,.4);
-  transition: transform 180ms var(--ease-settle), box-shadow 220ms ease; }
+  border-radius: 50%; cursor: grab; border: none; color: var(--mini-ink);
+  background: radial-gradient(62% 62% at 34% 30%, #ffd7b0, #e06c3c 56%, #9a3f16 100%);
+  box-shadow: 0 2px 9px rgba(0,0,0,.42), 0 0 0 1px rgba(40,16,6,.4) inset, 0 0 14px rgba(224,108,60,.16);
+  transition: transform .3s cubic-bezier(.22,.9,.26,1), box-shadow .3s ease; }
+#menuView .mini__ball::after { content: ""; position: absolute; inset: -7px; border-radius: 50%;
+  border: 1px solid rgba(240,140,90,.34); opacity: 0; transform: scale(.82);
+  transition: opacity .3s ease, transform .3s cubic-bezier(.22,.9,.26,1); pointer-events: none; }
 #menuView .mini__ball:hover, #menuView .mini__ball:focus-visible {
-  transform: scale(1.06); outline: none;
-  box-shadow: 0 3px 12px rgba(0,0,0,.44), inset 0 1px 0 rgba(255,214,186,.44), 0 0 11px 1px rgba(224,88,42,.45); }
-#menuView .mini.is-dragging .mini__ball { cursor: grabbing; transform: scale(1.08); }
-#menuView .mini__glyph { font-size: 11px; line-height: 1; font-family: var(--font-display); opacity: .82; }
+  transform: translateY(-2px) scale(1.04); outline: none;
+  box-shadow: 0 7px 18px rgba(0,0,0,.45), 0 0 0 1px rgba(40,16,6,.4) inset, 0 0 18px rgba(224,108,60,.3); }
+#menuView .mini__ball:hover::after, #menuView .mini__ball:focus-visible::after { opacity: 1; transform: scale(1); }
+#menuView .mini.is-dragging .mini__ball { cursor: grabbing; transform: translateY(0) scale(1.08); }
+#menuView .mini__glyph { display: none; }   /* plain sphere, matching the full-codex ball */
 
 /* the ghost home-dock — where the ball belongs; shown only once the ball is dragged away */
 #menuView .mini-dock { position: fixed;
