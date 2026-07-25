@@ -1462,6 +1462,16 @@ function onReliqPreviewClick(e) {
   var cur = e.currentTarget.querySelector(".menu__reliq");   // re-render M3 in place — stays on slide 3
   if (cur) cur.outerHTML = renderReliquary(false);
 }
+/* BR-S233 — annex nav (data-annex-go/back) as ONE delegated listener on host, bound
+   once in mountMenu. Survives in-place DOM swaps (e.g. the M3 preview toggle's outerHTML
+   re-render) that per-element listeners did NOT — a freshly-rendered back/forward control
+   keeps working without any re-wire. */
+function onMenuAnnexClick(e) {
+  var el = e.target.closest("[data-annex-go],[data-annex-back]");
+  if (!el) return;
+  var host = e.currentTarget;
+  menuSlideTo(_menuIndex(host) + (el.hasAttribute("data-annex-go") ? 1 : -1), {});
+}
 
 /* BR-S205: the fixed-leaf Codex aperture — appended unconditionally as trailing #menuView
    children (siblings of .menu__track, NEVER inside it). The seal is a real <a href> so the
@@ -1590,6 +1600,8 @@ function mountMenu() {
   wireMiniCodex(host);   // BR-S226: the orange mini-codex ball (drag + in-room search)
   host.removeEventListener("click", onReliqPreviewClick);   // BR-S230: M3 preview state toggle — single-bind across remounts
   host.addEventListener("click", onReliqPreviewClick);
+  host.removeEventListener("click", onMenuAnnexClick);      // BR-S233: annex nav delegated (survives DOM swaps like the M3 toggle re-render)
+  host.addEventListener("click", onMenuAnnexClick);
 }
 
 /* BR-S203 — the About "Procession" scroll-reveal. Base state is VISIBLE (freeze-safe, the
@@ -2097,8 +2109,8 @@ function wireMenuAnnex(host) {                                      // KEEP the 
   document.removeEventListener("keydown", menuEsc);                 // defensive on remount (menuSlideTo owns arm/disarm)
   window.removeEventListener("popstate", menuPopstate);            // remove-then-add: no stacking
   window.addEventListener("popstate", menuPopstate);
-  host.querySelectorAll("[data-annex-go]").forEach(el => el.addEventListener("click", () => menuSlideTo(_menuIndex(host) + 1, {})));
-  host.querySelectorAll("[data-annex-back]").forEach(el => el.addEventListener("click", () => menuSlideTo(_menuIndex(host) - 1, {})));
+  // BR-S233: annex-go/-back clicks are handled by the delegated onMenuAnnexClick (bound
+  // once on host in mountMenu) — survives in-place DOM swaps that per-element binding did not.
   const seedIdx = _hashIndex();
   if (seedIdx > 0) menuSlideTo(seedIdx, { seed: true });            // deep-link: paint composed, no slide
   else MENU_PANELS.forEach(p => { if (p.cls) host.classList.remove(p.cls); });   // stale-state reset on remount
@@ -3762,7 +3774,12 @@ document.addEventListener("keydown", (e) => {
   /* room shortcuts (1/2/F/H/M) only fire inside the room. On the front
      door Enter opens the room; on a draft Escape returns to the menu. */
   if (state.view !== "room") {
-    if (state.view === "menu" && e.key === "Enter" && !_cxOpen) { state.view = "room"; applyView(); window.scrollTo(0, 0); }   // BR-S205: don't rip to room while the Codex is open
+    if (state.view === "menu" && e.key === "Enter" && !_cxOpen) {   // BR-S205: not while the Codex is open
+      // BR-S233: only the DESK slide's Enter opens the room — on the M2/M3 ribbon slides let
+      // the focused control handle Enter (don't yank keyboard users into the scan room).
+      const mv = document.getElementById("menuView");
+      if (!mv || _menuIndex(mv) === 0) { state.view = "room"; applyView(); window.scrollTo(0, 0); }
+    }
     else if (state.view === "draft" && e.key === "Escape") {
       /* Escape steps back one level: gate → intake, intake → menu */
       if (state.draftGate) { state.draftGate = false; document.getElementById("draftView").innerHTML = renderDraft(); }
