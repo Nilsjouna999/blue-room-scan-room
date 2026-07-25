@@ -3749,3 +3749,51 @@ body[data-devnav="1"] .devnav {
   #menuView .mini, #menuView .mini__ball, #menuView .mini__panel, #menuView .mini-dock { transition: none !important; }
 }
 
+
+/* ============================================================================
+   THE CODEX BALL — the yellow "full codex" ball, present in the rooms that
+   otherwise lack codex access. SAME design + size as the tarot room's ball
+   (universe-consistent). A body-level fixed anchor; app.js#syncCodexBall toggles
+   it per view. Off currency-gold on purpose (gold is price-only): a paler
+   ivory/wax "reference lamp left on", never a paid chip. #brCodexBall id is
+   distinct so it never collides with the menu's #codexSeed / #codexMiniBall.
+   ========================================================================== */
+#brCodexBall.br-ball {
+  position: fixed; right: 18px; bottom: 18px; z-index: 40;
+  width: 42px; height: 42px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  text-decoration: none; cursor: pointer;
+  transition: transform .3s cubic-bezier(.22,.9,.26,1), box-shadow .3s ease, opacity .3s ease;
+}
+#brCodexBall.br-ball--yellow {
+  background: radial-gradient(62% 62% at 34% 30%, #f6eccf, #d9c48d 56%, #a89058 100%);
+  box-shadow: 0 2px 10px rgba(0,0,0,0.4), 0 0 0 1px rgba(20,14,8,0.35) inset, 0 0 16px rgba(226,208,150,0.15);
+}
+#brCodexBall .br-ball-core { display: block; width: 100%; height: 100%; border-radius: 50%; position: relative; }
+#brCodexBall .br-ball-core::after {
+  content: ""; position: absolute; inset: -9px; border-radius: 50%;
+  border: 1px solid rgba(226,208,150,0.3);
+  opacity: 0; transform: scale(0.82);
+  transition: opacity .3s ease, transform .3s cubic-bezier(.22,.9,.26,1);
+  pointer-events: none;
+}
+#brCodexBall.br-ball:hover .br-ball-core::after,
+#brCodexBall.br-ball:focus-visible .br-ball-core::after { opacity: 1; transform: scale(1); }
+#brCodexBall.br-ball:hover, #brCodexBall.br-ball:focus-visible {
+  transform: translateY(-2px) scale(1.04);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.45), 0 0 0 1px rgba(20,14,8,0.35) inset, 0 0 20px rgba(226,208,150,0.26);
+  transition-duration: .2s;
+}
+#brCodexBall.br-ball:focus-visible { outline: 2px solid rgba(233,229,220,0.55); outline-offset: 3px; }
+#brCodexBall.br-ball:active { transform: translateY(0) scale(0.96); transition-duration: .09s; }
+#brCodexBall .br-ball-tip {
+  position: absolute; right: calc(100% + 12px); top: 50%; transform: translateY(-50%) translateX(4px);
+  white-space: nowrap; padding: 5px 10px; border-radius: 6px;
+  background: #16130f; border: 1px solid rgba(233,229,220,0.12); color: #d7d3ca;
+  font-family: "IBM Plex Mono", monospace; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
+  opacity: 0; pointer-events: none; transition: opacity .18s ease .05s, transform .18s ease .05s;
+}
+#brCodexBall.br-ball:hover .br-ball-tip, #brCodexBall.br-ball:focus-visible .br-ball-tip { opacity: 1; transform: translateY(-50%) translateX(0); }
+@media (prefers-reduced-motion: reduce) {
+  #brCodexBall.br-ball, #brCodexBall .br-ball-core::after, #brCodexBall .br-ball-tip { transition: none; }
+}

@@ -1150,8 +1150,31 @@ function renderDossier(src, treatment) {
    The topbar only renders in the room view, so "ARCHIVE · SCAN ROOM" is what shows;
    the others are set for correctness if the topbar ever surfaces in another view. */
 const ZONE_LABELS = { menu: "ARCHIVE · LOBBY", room: "ARCHIVE · SAMPLE CARD", draft: "ARCHIVE · LOCAL DRAFT", dev: "ARCHIVE · DEV" };
+/* THE CODEX BALL — the yellow "full codex" ball, placed in the rooms that otherwise
+   lack codex access (arcane / arcana-reading / drawing-room / ceremony / settings /
+   vault). ONE body-level fixed anchor, SAME design + size as the tarot room's ball
+   (universe-consistent), toggled per view here. The menu keeps its Aperture seal +
+   orange mini-codex; the Profile keeps its door. Distinct #brCodexBall id so it never
+   collides with the menu's #codexSeed / #codexMiniBall bindings. */
+function syncCodexBall() {
+  const MISSING = { arcane: 1, "arcana-reading": 1, "drawing-room": 1, ceremony: 1, settings: 1, vault: 1 };
+  const show = state.view === "dev" && !!MISSING[state.dev];
+  let ball = document.getElementById("brCodexBall");
+  if (!ball) {
+    ball = document.createElement("a");
+    ball.id = "brCodexBall";
+    ball.className = "br-ball br-ball--yellow";
+    ball.href = "codex.html";
+    ball.setAttribute("aria-label", "Open the Codex — the archive of meanings");
+    ball.innerHTML = '<span class="br-ball-core" aria-hidden="true"></span><span class="br-ball-tip" aria-hidden="true">The Codex</span>';
+    document.body.appendChild(ball);
+  }
+  ball.style.display = show ? "" : "none";
+}
+
 function applyView() {
   document.body.dataset.view = state.view;
+  syncCodexBall();   // the codex ball follows the rooms that lack their own codex access
   if (state.view !== "room") { _surfaceRafs.forEach((id) => cancelAnimationFrame(id)); _surfaceRafs = []; }   // BR-S234: stop the surface-record canvas loops on any route away from the room (they only render there)
   const zl = document.getElementById("zoneLabel");
   if (!zl) return;
