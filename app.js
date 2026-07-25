@@ -1152,6 +1152,7 @@ function renderDossier(src, treatment) {
 const ZONE_LABELS = { menu: "ARCHIVE · LOBBY", room: "ARCHIVE · SAMPLE CARD", draft: "ARCHIVE · LOCAL DRAFT", dev: "ARCHIVE · DEV" };
 function applyView() {
   document.body.dataset.view = state.view;
+  if (state.view !== "room") { _surfaceRafs.forEach((id) => cancelAnimationFrame(id)); _surfaceRafs = []; }   // BR-S234: stop the surface-record canvas loops on any route away from the room (they only render there)
   const zl = document.getElementById("zoneLabel");
   if (!zl) return;
   if (state.view === "room") {
@@ -2046,8 +2047,8 @@ function menuEsc(e) {
 function menuHistory(target, cur, opts) {
   if (opts.seed) { _menuPushed = 0; return; }
   if (opts.viaHistory) {                                // popstate already moved the URL — adjust our push-count directionally
-    if (target < cur) _menuPushed = Math.max(0, _menuPushed - 1);
-    else if (target > cur) _menuPushed++;
+    if (target < cur) _menuPushed = Math.max(0, _menuPushed - (cur - target));   // BR-S234: correct by the real index delta (each synthetic push = one panel step), not a fixed ±1
+    else if (target > cur) _menuPushed += (target - cur);
     return;
   }
   const url = MENU_PANELS[target].hash || (location.pathname + location.search);

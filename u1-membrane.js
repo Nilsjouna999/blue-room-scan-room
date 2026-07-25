@@ -590,7 +590,7 @@
 
     if(vis<=0.001){                           // neither line has presence — go dark, restore plates
       if(wasVisible){ ctx.clearRect(0,0,W,H); clearTouched(); particles.length=0; wasVisible=false; }
-      requestAnimationFrame(frame); return;
+      setTimeout(function(){ requestAnimationFrame(frame); }, 120); return;   // BR-S234: idle re-check at ~8Hz (not 60fps) while the membrane is off-screen — cuts the per-frame getBoundingClientRect polling on the Desk landing; wakes within ~120ms on scroll-in
     }
     if(!wasVisible){                          // 0->1 re-entry: settle from a flat, calm line (no stale wobble/velocity/latch)
       for(l=0;l<lines.length;l++){ lines[l].y.fill(0); lines[l].v.fill(0); }  // BR-S231: side removed (fixed-sign recoil has no latch); still zero y/v so a mid-band box on wake settles from a flat, calm line
