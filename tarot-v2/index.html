@@ -32,13 +32,18 @@
       Your readings<span class="archive-count" data-archive-count hidden></span>
     </button>
 
-    <!-- F3 — reusable Codex-access ball (component contract in QUEUE_SPEC.md). Quiet, always
-         present, bottom-right; opens the Codex's tarot guide in place. -->
-    <a class="br-ball br-ball--yellow" data-codex-ball href="../codex.html#tarot-guide"
-       aria-label="Open the Codex — how to read the cards, and what each one means">
-      <span class="br-ball-core" aria-hidden="true"></span>
-      <span class="br-ball-tip" aria-hidden="true">The Codex</span>
-    </a>
+    <!-- F3 — the two-ball Codex dock (matching the universe): white full-codex + orange mini. -->
+    <div class="br-dock">
+      <a class="br-ball br-ball--orange" href="../codex.html" aria-label="Search the Codex">
+        <span class="br-ball-core" aria-hidden="true"></span>
+        <span class="br-ball-tip" aria-hidden="true">Search</span>
+      </a>
+      <a class="br-ball br-ball--yellow" data-codex-ball href="../codex.html#tarot-guide"
+         aria-label="Open the Codex — how to read the cards, and what each one means">
+        <span class="br-ball-core" aria-hidden="true"></span>
+        <span class="br-ball-tip" aria-hidden="true">The Codex</span>
+      </a>
+    </div>
 
     <header class="masthead">
       <p class="kicker">THE DRAWING ROOM</p>
