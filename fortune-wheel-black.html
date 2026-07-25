@@ -26,6 +26,10 @@
   /* static drop-shadow sibling — box-shadow on a circle == the old disc drop-shadow, but never re-rasters per frame */
   .disc-shadow{position:absolute;left:7.143%;top:9.143%;width:85.714%;height:68.571%;border-radius:50%;z-index:1;pointer-events:none;box-shadow:0 16px 26px rgba(0,0,0,.55),0 4px 8px rgba(0,0,0,.4)}
   #wheel{display:block;width:100%;height:100%;border-radius:50%;transform-origin:50% 50%}
+  /* structural-ink overlay: a copy of the wheel's BLACK radial seams, clipped to the saturn band, that
+     rides ABOVE the drifting inlay ring so the dark lines cross OVER it (ring reads embedded, not floating).
+     Same transform as #wheel (mirrored in JS) → seams stay locked to the wheel while the ring drifts under them. */
+  #wheelInk{position:absolute;inset:0;width:100%;height:100%;border-radius:50%;transform-origin:50% 50%;pointer-events:none}
   /* engraved inlay ring — its OWN slow entity; a baked bitmap that drifts on the compositor, never rides #wheel */
   .engrave-ring{
     position:absolute; inset:0; width:100%; height:100%;
@@ -182,17 +186,8 @@
   /* ===== verdict-ceremony overlays ===== */
   /* reveal-tick swatch beside the result name */
   .result .rsw{width:14px;height:14px;border-radius:4px;margin-right:12px;box-shadow:0 0 0 1px rgba(255,206,132,0.5), inset 0 0 0 1px rgba(0,0,0,0.3)}
-  /* the verdict painted into being: milk rises to fill the letterforms bottom→up */
-  .result .v.paint{
-    color:transparent; -webkit-text-fill-color:transparent;
-    -webkit-background-clip:text; background-clip:text;
-    background-image:linear-gradient(to top,#FFFFFF 0%,#FFFFFF 84%,#FFFFFF 100%);
-    background-repeat:no-repeat; background-position:left bottom;
-    background-size:100% 0%;
-    animation:paintRise var(--paint-ms,520ms) cubic-bezier(.35,.9,.25,1) forwards;
-  }
-  @keyframes paintRise{ from{background-size:100% 0%} to{background-size:100% 112%} } /* 112% overfills caps/ascenders */
-  @media (prefers-reduced-motion:reduce){ .result .v.paint{ animation:none; background-size:100% 112%; } }
+  /* verdict is now shown SOLID #FFFFFF the instant the arrow seats (see commitReveal @ impact) — the old
+     paint-from-invisible (paintRise) mechanic is retired; the base .result .v carries the solid-white + glow. */
 
   /* B4b vitrify glaze — geometry of .glass; baked brightness lift + upper-left crescent glint; opacity-pulsed only */
   .vitrify{position:absolute;left:7.143%;top:9.143%;width:85.714%;height:68.571%;border-radius:50%;
@@ -226,7 +221,7 @@
   .fx.live{display:block}
   /* transform-box:view-box makes WAAPI px == viewBox units (load-bearing); drop authored around local (0,0) */
   .fx .drop,.fx .dropA,.fx .dropB{transform-box:view-box;transform-origin:0 0;opacity:0}
-  .fx .splat{opacity:0}
+  .fx .splat{opacity:0;transform-box:view-box;transform-origin:280px 684px}   /* ripple scales about the drip point ON the verdict */
   .fx .filmR,.fx .channelR,.fx .filmL,.fx .channelL,.fx .coreR,.fx .coreL{ opacity:1; }  /* the dashoffset gates visibility, not opacity */
 </style>
 </head>
@@ -266,6 +261,8 @@
       <canvas id="wheel" width="480" height="480" role="img" aria-label="Verdict wheel"></canvas>
       <div class="engrave-ring"  aria-hidden="true"></div>
       <div class="ring-liquid"   aria-hidden="true"></div>
+      <!-- structural-ink overlay: the wheel's black seams, re-asserted OVER the drifting saturn band -->
+      <canvas id="wheelInk" width="480" height="480" aria-hidden="true"></canvas>
       <div class="engrave-glass" aria-hidden="true"></div>
     </div>
 
@@ -383,14 +380,17 @@
   // ---- state ---- (unchanged functional model + ceremony reveal-deferral fields)
   var state = { options: [], draft: '', preview: null, spinning: false, result: null, winner: null, revealPending: false };
   var rot = 0, sig = null;
-  var justRevealed = false;      // one-shot: the name's arrive-animation flag (consumed synchronously by renderControls)
+  var justRevealed = false;      // one-shot: the name's arrive flag (set/cleared inside commitReveal; kept for interrupt symmetry)
   var spunSinceEdit = 0;         // arc auto-decay: 0 => FULL arc on the first spin of a set, else LEAN (reset by add/remove/reset)
-  var revealPaint=false, revealLean=false;   // one-shot: live only during a NATURAL ceremony reveal tick (gates the milk-paint)
   function busy(){ return state.spinning || state.revealPending; }
 
   var canvas = document.getElementById('wheel');
   var dpr = Math.min(window.devicePixelRatio || 1, 2);
   var wctx = canvas.getContext('2d');   // shared 2d ctx (same object draw() gets)
+  // structural-ink overlay canvas (the black seams re-asserted OVER the drifting saturn band)
+  var inkCanvas = document.getElementById('wheelInk');
+  var ictx = inkCanvas ? inkCanvas.getContext('2d') : null;
+  function mirrorInk(t){ if (inkCanvas) inkCanvas.style.transform = t; }   // keep the ink layer locked to #wheel's transform
 
   // ---- deterministic RNG (stable texture per redraw) ----
   function hash(str){ var h=7; for(var i=0;i<str.length;i++) h=(Math.imul(h,31)+str.charCodeAt(i))|0; return h>>>0; }
@@ -498,6 +498,35 @@
     ctx.restore();
   }
 
+  // ---- structural-ink pass: redraw ONLY the black radial seams, clipped to the saturn band, onto #wheelInk.
+  //      #wheelInk sits ABOVE the drifting inlay ring, so these dark lines cross OVER it (ring reads embedded).
+  //      angs = seam start-angles in RADIANS (disc-space); n<=1 => no seams (single wedge / empty orb) => clear.
+  //      The ink layer carries the wheel's rotation via a mirrored CSS transform, so drawing in disc-space here
+  //      keeps every seam locked to its #wheel twin regardless of spin. Additive: never touches the winner render. ----
+  function drawInkSeams(angs, n){
+    if (!ictx) return;
+    if (inkCanvas.width !== DISC_S*dpr){ inkCanvas.width=DISC_S*dpr; inkCanvas.height=DISC_S*dpr; }
+    ictx.setTransform(dpr,0,0,dpr,0,0);
+    ictx.clearRect(0,0,DISC_S,DISC_S);
+    if (!angs || n<=1) return;                     // seams exist only when >1 wedge
+    var cx=DISC_S/2, cy=DISC_S/2, R=R_WEDGE;
+    ictx.save();
+    // clip to the saturn annulus (a hair beyond the rails) so ink only re-asserts seams where they cross the ring
+    ictx.beginPath();
+    ictx.arc(cx,cy,RING_R_OUT+3,0,Math.PI*2,false);
+    ictx.arc(cx,cy,RING_R_IN-3, 0,Math.PI*2,true);
+    ictx.clip('evenodd');
+    angs.forEach(function(a0){
+      var dx=Math.cos(a0), dy=Math.sin(a0);
+      ictx.strokeStyle='rgba(0,0,0,0.6)'; ictx.lineWidth=2.5;                    // same dark groove as draw()'s seam
+      ictx.beginPath(); ictx.moveTo(cx,cy); ictx.lineTo(cx+dx*R,cy+dy*R); ictx.stroke();
+      var ox=-dy*1.3, oy=dx*1.3;                                                 // same faint warm sliver
+      ictx.strokeStyle='rgba(210,214,222,0.09)'; ictx.lineWidth=1;
+      ictx.beginPath(); ictx.moveTo(cx+ox,cy+oy); ictx.lineTo(cx+dx*R+ox,cy+dy*R+oy); ictx.stroke();
+    });
+    ictx.restore();
+  }
+
   // ---- wheel rendering ---- (the resting frame is always this)
   function draw(){
     var segs = segments();
@@ -574,6 +603,9 @@
     }
     var isEmptyOrb = (n===1 && !segs[0].text);
     if (!isEmptyOrb) ctx.drawImage(ensureHub(),0,0,DISC_S,DISC_S);   // brass axle-cap once wedges exist; clean sphere when empty
+
+    // structural-ink: re-assert the black seams OVER the drifting saturn band (cleared when n<=1)
+    drawInkSeams(wedges.map(function(w){ return w.a0; }), n);
   }
 
   // ======================================================================
@@ -734,8 +766,8 @@
     marks(-EMB, -EMB, '6,8,12',        0.50, 0.30, 0.55, 0.50, 0.42, false);
     // PASS 2 — faint lit far-wall, offset DOWN-RIGHT: catches the upper-left dome light (sells the bevel)
     marks( EMB*0.7, EMB*0.7, '236,240,247', 0.10, 0.06, 0.12, 0.11, 0.09, false);
-    // PASS 3 — the silver inlay centred in the groove, ~22% dimmer than before (tweak A), with the baked gleam
-    marks(0, 0, RING_COL,              0.34, 0.23, 0.48, 0.47, 0.39, true);
+    // PASS 3 — the silver inlay centred in the groove, softened a further ~16% (mellower, still clearly legible), with the baked gleam
+    marks(0, 0, RING_COL,              0.285, 0.19, 0.40, 0.395, 0.33, true);
 
     return c.toDataURL('image/png');
   }
@@ -864,6 +896,9 @@
 
     // 5) hub
     ctx.drawImage(ensureHub(),0,0,DISC_S,DISC_S);
+
+    // structural-ink: mirror the transition's seams onto the over-ring layer (degrees→radians; clears when <=1 wedge)
+    drawInkSeams(layout.map(function(w){ return w.a0*D2R; }), layout.length);
   }
 
   // ---- rAF controller: runs ONLY while a transition is alive ----
@@ -922,7 +957,8 @@
     state.winner = isDefault ? null : idx;
     return isDefault;
   }
-  // idempotent — the single disclosure tick; wheel light-up + name paint share ONE render() call ⇒ auto-synced
+  // idempotent — the single disclosure tick; wheel light-up + SOLID name print share ONE render() call ⇒ auto-synced.
+  // Now fired at the arrow-SEAT (impact) frame (see armCeremony), not at the drip. Stays interrupt-safe via revealPending.
   function commitReveal(){
     if (!state.revealPending) return;
     state.revealPending = false;
@@ -944,8 +980,9 @@
 
     if (reduce){                                        // short, no coast/detent
       canvas.style.transition='transform 0.6s cubic-bezier(0.2,0.8,0.2,1)';
+      if (inkCanvas){ inkCanvas.style.transition=canvas.style.transition; }
       void canvas.offsetWidth;
-      canvas.style.transform='rotate('+rot+'deg)';
+      canvas.style.transform='rotate('+rot+'deg)'; mirrorInk('rotate('+rot+'deg)');
       var rmT=setTimeout(function(){ if(state.revealPending===false && state.result===null){ state.revealPending=true; resolveWinnerSilently(); commitReveal(); } }, 800);   // watchdog: a dropped transitionend must not strand on "Deciding…"
       canvas.addEventListener('transitionend', function(){ clearTimeout(rmT); state.revealPending=true; resolveWinnerSilently(); commitReveal(); }, {once:true});
       return;
@@ -953,27 +990,29 @@
 
     canvas.style.transition='none';                     // rAF owns the transform
     canvas.style.willChange='transform';
+    if (inkCanvas){ inkCanvas.style.transition='none'; inkCanvas.style.willChange='transform'; }
     var dist=rot-start, t0=performance.now();
     (function frame(now){
       var p=(now-t0)/DRAW_MS[DRAW]; if (p>1) p=1;
       canvas.style.transform='rotate('+(start + spinEase(p)*dist + spinDetent(p))+'deg)';
+      mirrorInk(canvas.style.transform);                // ink layer rides the exact same per-frame angle
       if (p<1){ spinRAF=requestAnimationFrame(frame); }
       else { spinRAF=0; canvas.style.transform='rotate('+rot+'deg)';   // exact lock onto rot (unchanged)
-             canvas.style.willChange='';
+             canvas.style.willChange=''; mirrorInk('rotate('+rot+'deg)'); if (inkCanvas){ inkCanvas.style.willChange=''; }
              state.revealPending = true;
              var isDefault = resolveWinnerSilently();                  // winner decided NOW, silently
              if (isDefault || prefersReduced() || !ceremonyOn){ commitReveal(); }   // empty orb / ceremony off: instant reveal, no theatre
              else { renderControls();                                  // result row blanks; wheel stays neutral
-                    armCeremony(arc, commitReveal); } }                // theatre begins; reveals at the splat frame
+                    armCeremony(arc, commitReveal); } }                // theatre begins; reveals at the ARROW-SEAT (impact) frame
     })(performance.now());
   }
 
   // ======================================================================
   // ============  THE VERDICT CEREMONY  (100% additive, post-settle)  =====
-  //   The wheel stops but the verdict is withheld: the arrow laps + magnet-
-  //   snaps, the disc shudders once and vitrifies, a held breath, then a
-  //   milk-bead births at the 6 o'clock rim, falls, and SPLATS — and on that
-  //   crown-snap frame commitReveal() paints the verdict everywhere at once.
+  //   The wheel stops, the arrow laps and SEATS at the top — and on that seat
+  //   (impact) frame commitReveal() lights the winner + prints the verdict SOLID.
+  //   The milk-bead then births at the top rim, splits down both edges, and
+  //   SPLATS onto the already-visible verdict as a finishing kiss (no reveal).
   //   Zero per-frame canvas work; all motion is WAAPI on pre-placed overlays.
   // ======================================================================
 
@@ -1079,18 +1118,18 @@
     resetFx();
     if (fxLayer) fxLayer.classList.add('live');
 
-    if (lean){                                // repeat spins: no orbit lap; arrow already at top → impact + beads fire immediately
-      ct(function(){ tickFlash(); impactToCore(); vitrify(); },  0);   // impact absorbed to the core at once
+    if (lean){                                // repeat spins: no orbit lap; arrow already at top → reveal + beads fire immediately
+      ct(function(){ tickFlash(); impactToCore(); vitrify(); if(onDone) onDone(); },  0);   // IMPACT: winner lights + verdict prints SOLID
       ct(beadBirth,                                            120);   // twin beads born from the arrow at the top rim
       ct(function(){ beadStream(true); },                      210);   // split → down both edges → merge at bottom
-      ct(function(){ dripImpact(true, onDone); },              730);   // 210 + FALL_LEAN(520)
-      ct(function(){ endCeremony(false); },                   1050);
-    } else {                                  // first spin of a set: steady LINEAR lap, then impact-to-core
-      arrowLap(function(){ tickFlash(); impactToCore(); vitrify(); }); // seal on the true 360=top arrival, at FULL speed
+      ct(function(){ dripImpact(true); },                      730);   // 210 + FALL_LEAN(520): the drip KISSES the already-shown verdict
+      ct(function(){ endCeremony(true); },                    1050);   // normal end = reveal BACKSTOP (idempotent; no-op once impact revealed)
+    } else {                                  // first spin of a set: steady LINEAR lap; the SEAT (impact) reveals
+      arrowLap(function(){ tickFlash(); impactToCore(); vitrify(); if(onDone) onDone(); }); // SEAT=IMPACT: winner lights + verdict prints SOLID
       ct(beadBirth,                                            860);   // ~40ms after the ~820ms lap: beads deposited by the just-landed arrow
       ct(function(){ beadStream(false); },                     950);   // split → down both edges → merge at bottom
-      ct(function(){ dripImpact(false, onDone); },            1630);   // 950 + FALL_FULL(680)
-      ct(function(){ endCeremony(false); },                   1960);
+      ct(function(){ dripImpact(false); },                    1630);   // 950 + FALL_FULL(680): the drip KISSES the already-shown verdict
+      ct(function(){ endCeremony(true); },                    1960);   // normal end = reveal BACKSTOP (idempotent; no-op once impact revealed)
     }
   }
 
@@ -1115,6 +1154,7 @@
     [dropEl, dropA, dropB, splatEl].forEach(function(el){ if (el) el.style.opacity='0'; });
     rills.forEach(function(el){ if (el){ el.style.strokeDashoffset='1'; } });   // re-arm rivulet strokes undrawn for the next spin
     canvas.style.transform = 'rotate('+rot+'deg)';     // byte-identical to the lock — nothing drifts
+    if (inkCanvas){ inkCanvas.style.transition='none'; inkCanvas.style.willChange=''; } mirrorInk('rotate('+rot+'deg)');
     if (reveal) commitReveal(); else state.revealPending = false;
   }
   function abortCeremony(){ endCeremony(false); }
@@ -1169,6 +1209,10 @@
     kf[N] = {transform:'translateY(0px) scale(1,1) rotate('+rot+'deg)'};
     var a = reg(canvas.animate(kf, {duration:IMPACT_MS, easing:'linear'}));  // fill:none → reverts to inline rotate(rot)
     a.onfinish = function(){ canvas.style.transform='rotate('+rot+'deg)'; };
+    if (inkCanvas){                                                          // the over-ring seams squash in lockstep
+      var ai = reg(inkCanvas.animate(kf, {duration:IMPACT_MS, easing:'linear'}));
+      ai.onfinish = function(){ mirrorInk('rotate('+rot+'deg)'); };
+    }
   }
 
   // THE PLUNGE LENS: flares just inside the top rim (the strike), accelerates DOWN the 12→centre axis,
@@ -1271,12 +1315,16 @@
       ],{duration:DRIP, easing:'linear', fill:'forwards'}));
     }, ARCPOOL);
   }
-  function dripImpact(lean, onDone){   // lands ON the text → drip + PAINT the white verdict, one frame
+  function dripImpact(lean){   // the drip KISSES the already-visible white verdict — a finishing splat/ripple, NO reveal
     hideFx(dropEl);
     showFx(splatEl);
-    reg(splatEl.animate([{opacity:1},{opacity:1,offset:0.12},{opacity:0}],
-        {duration:220, easing:'ease-out', fill:'forwards'}));
-    if (onDone){ revealPaint=true; revealLean=lean; onDone(); revealPaint=false; }   // paintRise wells the white fill up the letters NOW
+    // ripple blooms ON the word (origin 280,684 = where the thread lands) then fades — a finishing flourish, not a creator
+    reg(splatEl.animate([
+      {opacity:0, transform:'scale(0.5)'},
+      {opacity:1, transform:'scale(0.92)', offset:0.22},
+      {opacity:1, transform:'scale(1.0)',  offset:0.45},
+      {opacity:0, transform:'scale(1.28)'}
+    ], {duration:300, easing:'ease-out', fill:'forwards'}));
   }
 
   function addOption(){
@@ -1320,6 +1368,7 @@
     if (state.spinning) return;
     finalizeTransition();
     rot = 0; canvas.style.transition='none'; canvas.style.transform='rotate(0deg)';
+    if (inkCanvas){ inkCanvas.style.transition='none'; } mirrorInk('rotate(0deg)');
     spunSinceEdit = 0;                                       // option-set cleared → next spin is a FULL arc
     state.options=[]; state.draft=''; state.preview=null; state.result=null; state.winner=null; state.revealPending=false;
     document.getElementById('draft').value='';
@@ -1336,12 +1385,7 @@
       r.innerHTML = '<span class="k">Verdict</span><span class="rsw"></span><span class="v"></span>';
       if (wc) r.querySelector('.rsw').style.background = wc;
       var v = r.querySelector('.v');
-      v.textContent = state.result;
-      if (justRevealed && revealPaint){                    // the milk paints the verdict — cream rises to fill the letters
-        v.style.setProperty('--paint-ms', (revealLean?300:520)+'ms');
-        v.classList.add('paint');
-        v.addEventListener('animationend', function(){ v.classList.remove('paint'); }, {once:true});   // revert to solid #FFFFFF + full halo (not a faded clip)
-      }
+      v.textContent = state.result;                        // solid #FFFFFF + glow, printed the instant the arrow seats (no paint-up)
     } else if (state.options.length < 2) r.innerHTML = '<span class="spin">Add two or more options</span>';
     else r.innerHTML = '';
     document.getElementById('count').textContent = state.options.length + '/' + MAX;
