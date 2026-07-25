@@ -37,6 +37,18 @@
   @keyframes engraveDrift{ to{ transform:rotate(-360deg) } }  /* CCW — armillary contrast vs the CW wheel spin */
   @media (prefers-reduced-motion:reduce){ .engrave-ring{ animation:none } }  /* still visible, static */
 
+  /* faint blue liquid suspended in the band — a baked bitmap drifting on its OWN compositor layer,
+     opposite the inlay's CCW so the two never lock → reads as independent liquid ("second saturn") */
+  .ring-liquid{
+    position:absolute; inset:0; width:100%; height:100%;
+    pointer-events:none; border-radius:50%; transform-origin:50% 50%;
+    background-position:center; background-size:100% 100%; background-repeat:no-repeat;
+    will-change:transform;
+    animation:ringLiquidDrift 100s linear infinite;   /* CW — opposite the inlay's CCW → visible parallax */
+  }
+  @keyframes ringLiquidDrift{ to{ transform:rotate(360deg) } }
+  @media (prefers-reduced-motion:reduce){ .ring-liquid{ animation:none } }   /* still visible, static */
+
   /* the fixed glass channel the inlay is suspended under — never rotates, zero animation */
   .engrave-glass{
     position:absolute; inset:0; width:100%; height:100%;
@@ -45,12 +57,18 @@
     -webkit-mask:radial-gradient(circle at 50% 50%, transparent 0 32.5%, #000 33.5% 42.1%, transparent 43%);
             mask:radial-gradient(circle at 50% 50%, transparent 0 32.5%, #000 33.5% 42.1%, transparent 43%);
     background:
-      /* fixed diagonal refraction sheen across the band */
-      linear-gradient(128deg, rgba(226,232,240,0.10) 0%, rgba(226,232,240,0) 40%),
-      /* outer-edge bevel highlight */
-      radial-gradient(circle at 50% 50%, transparent 41%, rgba(226,232,240,0.14) 42%, transparent 43%),
-      /* inner-edge depth-shade */
-      radial-gradient(circle at 50% 50%, transparent 32.5%, rgba(0,0,0,0.22) 33.5%, transparent 34.5%);
+      /* (a) primary diagonal refraction sheen — brighter, more defined glass streak */
+      linear-gradient(128deg, rgba(233,239,247,0.17) 0%, rgba(226,232,240,0.05) 24%, rgba(226,232,240,0) 48%),
+      /* (b) faint COOL chromatic hint, upper-left rim (refraction split) */
+      linear-gradient(128deg, rgba(150,190,242,0.08) 0%, rgba(150,190,242,0) 16%),
+      /* (c) faint WARM chromatic hint, lower-right rim (the other split) */
+      linear-gradient(308deg, rgba(242,206,168,0.055) 0%, rgba(242,206,168,0) 15%),
+      /* (d) outer-edge bevel highlight — crisper, stronger */
+      radial-gradient(circle at 50% 50%, transparent 40.8%, rgba(233,239,247,0.22) 41.8%, transparent 42.6%),
+      /* (e) secondary inner bevel highlight — adds glass thickness under the sheen */
+      radial-gradient(circle at 50% 50%, transparent 34.6%, rgba(226,232,240,0.11) 35.5%, transparent 36.4%),
+      /* (f) inner-edge depth-shade — deeper recessed channel (reads further under glass) */
+      radial-gradient(circle at 50% 50%, transparent 32.4%, rgba(0,0,0,0.34) 33.6%, transparent 35%);
   }
 
   /* ---- compass glass: fixed dome cover over the disc, under the pointer; never rotates ---- */
@@ -189,6 +207,13 @@
   .coreflash{position:absolute;left:50%;top:43.43%;width:34%;aspect-ratio:1;transform:translate(-50%,-50%);
     border-radius:50%;pointer-events:none;z-index:4;opacity:0;mix-blend-mode:screen;
     background:radial-gradient(circle, rgba(255,255,255,0.95) 0%, rgba(226,232,240,0.6) 34%, rgba(226,232,240,0) 70%);}
+  /* the plunge lens — the visible energy travelling top→core: a bright lens plunging DOWN the 12 o'clock→centre axis */
+  .plunge{position:absolute;left:50%;top:9.143%;width:44%;height:9%;
+    transform:translate(-50%,-50%);transform-origin:50% 50%;border-radius:50%;
+    pointer-events:none;z-index:4;opacity:0;mix-blend-mode:screen;
+    will-change:transform,opacity;
+    background:radial-gradient(62% 100% at 50% 50%,
+      rgba(226,232,240,0.95) 0%, rgba(226,232,240,0.34) 46%, rgba(226,232,240,0) 76%);}
 
   /* B3b tick flash — light at the 12 o'clock rim; NOT inside .glass (its mask/blur would mute the blend) */
   .spark,.ring{position:absolute;left:50%;top:9.143%;transform:translate(-50%,-50%);pointer-events:none;z-index:4;opacity:0}
@@ -202,7 +227,7 @@
   /* transform-box:view-box makes WAAPI px == viewBox units (load-bearing); drop authored around local (0,0) */
   .fx .drop,.fx .dropA,.fx .dropB{transform-box:view-box;transform-origin:0 0;opacity:0}
   .fx .splat{opacity:0}
-  .fx .filmR,.fx .channelR,.fx .filmL,.fx .channelL{ opacity:1; }  /* the dashoffset gates visibility, not opacity */
+  .fx .filmR,.fx .channelR,.fx .filmL,.fx .channelL,.fx .coreR,.fx .coreL{ opacity:1; }  /* the dashoffset gates visibility, not opacity */
 </style>
 </head>
 <body>
@@ -240,6 +265,7 @@
     <div class="disc-wrap">
       <canvas id="wheel" width="480" height="480" role="img" aria-label="Verdict wheel"></canvas>
       <div class="engrave-ring"  aria-hidden="true"></div>
+      <div class="ring-liquid"   aria-hidden="true"></div>
       <div class="engrave-glass" aria-hidden="true"></div>
     </div>
 
@@ -267,6 +293,8 @@
     <!-- impact-to-core: converging shockwave ring (rim → centre) + core absorb-flash (hub); opacity/transform-pulsed -->
     <div class="shock" aria-hidden="true"></div>
     <div class="coreflash" aria-hidden="true"></div>
+    <!-- the plunge lens: bright energy driving DOWN the 12→centre axis, swallowed inward by the core -->
+    <div class="plunge" aria-hidden="true"></div>
     <!-- B3b tick flash: a sharp point of light + one hairline ring at the 12 o'clock rim -->
     <span class="spark" aria-hidden="true"></span>
     <span class="ring"  aria-hidden="true"></span>
@@ -275,30 +303,33 @@
       <!-- rivulet gradient: leading (lowest) edge brightest = wet head, no per-frame work -->
       <defs>
         <linearGradient id="rillGrad" gradientUnits="userSpaceOnUse" x1="0" y1="67" x2="0" y2="541">
-          <stop offset="0"   stop-color="#FFFFFF" stop-opacity="0.55"/>
-          <stop offset="0.7" stop-color="#FFFFFF" stop-opacity="0.90"/>
-          <stop offset="1"   stop-color="#FFFFFF" stop-opacity="1"/>
+          <stop offset="0"    stop-color="#FFFFFF" stop-opacity="0.26"/>
+          <stop offset="0.55" stop-color="#FFFFFF" stop-opacity="0.62"/>
+          <stop offset="0.85" stop-color="#FFFFFF" stop-opacity="0.92"/>
+          <stop offset="1"    stop-color="#FFFFFF" stop-opacity="1.0"/>
         </linearGradient>
       </defs>
       <!-- RIGHT side: sweep 1 (bulges right). LEFT side: sweep 0 (bulges left). VERIFY on device; swap 1<->0 if mirrored. -->
-      <path class="filmR"    d="M280,67 A237,237 0 0 1 280,541" fill="none" stroke="#FFFFFF"        stroke-opacity="0.30" stroke-width="5.5" stroke-linecap="round" pathLength="1" stroke-dasharray="1 1" stroke-dashoffset="1"/>
-      <path class="channelR" d="M280,67 A237,237 0 0 1 280,541" fill="none" stroke="url(#rillGrad)"                       stroke-width="2.4" stroke-linecap="round" pathLength="1" stroke-dasharray="1 1" stroke-dashoffset="1"/>
-      <path class="filmL"    d="M280,67 A237,237 0 0 0 280,541" fill="none" stroke="#FFFFFF"        stroke-opacity="0.30" stroke-width="5.5" stroke-linecap="round" pathLength="1" stroke-dasharray="1 1" stroke-dashoffset="1"/>
-      <path class="channelL" d="M280,67 A237,237 0 0 0 280,541" fill="none" stroke="url(#rillGrad)"                       stroke-width="2.4" stroke-linecap="round" pathLength="1" stroke-dasharray="1 1" stroke-dashoffset="1"/>
+      <path class="filmR"    d="M280,67 A237,237 0 0 1 280,541" fill="none" stroke="#FFFFFF"        stroke-opacity="0.13" stroke-width="3.0" stroke-linecap="round" pathLength="1" stroke-dasharray="1 1" stroke-dashoffset="1"/>
+      <path class="channelR" d="M280,67 A237,237 0 0 1 280,541" fill="none" stroke="url(#rillGrad)"                       stroke-width="1.3" stroke-linecap="round" pathLength="1" stroke-dasharray="1 1" stroke-dashoffset="1"/>
+      <path class="coreR"    d="M280,67 A237,237 0 0 1 280,541" fill="none" stroke="#FFFFFF" stroke-opacity="0.92" stroke-width="0.6" stroke-linecap="round" pathLength="1" stroke-dasharray="1 1" stroke-dashoffset="1"/>
+      <path class="filmL"    d="M280,67 A237,237 0 0 0 280,541" fill="none" stroke="#FFFFFF"        stroke-opacity="0.13" stroke-width="3.0" stroke-linecap="round" pathLength="1" stroke-dasharray="1 1" stroke-dashoffset="1"/>
+      <path class="channelL" d="M280,67 A237,237 0 0 0 280,541" fill="none" stroke="url(#rillGrad)"                       stroke-width="1.3" stroke-linecap="round" pathLength="1" stroke-dasharray="1 1" stroke-dashoffset="1"/>
+      <path class="coreL"    d="M280,67 A237,237 0 0 0 280,541" fill="none" stroke="#FFFFFF" stroke-opacity="0.92" stroke-width="0.6" stroke-linecap="round" pathLength="1" stroke-dasharray="1 1" stroke-dashoffset="1"/>
       <!-- twin stream beads: born together on the top rim (deposited by the arrow), split down the left/right arcs, meet at the bottom -->
-      <g class="dropA"><circle cx="0" cy="0" r="7" fill="#FFFFFF"/><ellipse cx="-2" cy="-2.3" rx="1.6" ry="2.2" fill="#FFFFFF"/></g>
-      <g class="dropB"><circle cx="0" cy="0" r="7" fill="#FFFFFF"/><ellipse cx="-2" cy="-2.3" rx="1.6" ry="2.2" fill="#FFFFFF"/></g>
+      <g class="dropA"><ellipse cx="0" cy="0" rx="3.0" ry="4.4" fill="#FFFFFF"/></g>
+      <g class="dropB"><ellipse cx="0" cy="0" rx="3.0" ry="4.4" fill="#FFFFFF"/></g>
       <!-- the merged drip bead: short soft trailing tail (plain white, static, low-opacity) + head + one static cel highlight -->
       <g class="drop">
-        <path class="tail" d="M-3.5,0 C-2,-14 -1,-24 0,-30 C1,-24 2,-14 3.5,0 Z" fill="#FFFFFF" opacity="0.35"/>
-        <circle class="bead" cx="0" cy="0" r="9" fill="#FFFFFF"/>
-        <ellipse class="hl" cx="-2.6" cy="-3" rx="2" ry="2.8" fill="#FFFFFF"/>
+        <path class="tail" d="M-2.0,0 C-2,-14 -1,-24 0,-30 C1,-24 2,-14 2.0,0 Z" fill="#FFFFFF" opacity="0.35"/>
+        <circle class="bead" cx="0" cy="0" r="5" fill="#FFFFFF"/>
+        <ellipse class="hl" cx="-2.6" cy="-3" rx="1.2" ry="1.8" fill="#FFFFFF"/>
       </g>
       <!-- the drip: compact splat at the text + 2 micro-flecks (held ~2 frames, then fade) -->
       <g class="splat">
-        <ellipse cx="280" cy="684" rx="16" ry="4" fill="#FFFFFF"/>
-        <circle cx="267" cy="681" r="2.2" fill="#FFFFFF"/>
-        <circle cx="294" cy="682" r="1.8" fill="#FFFFFF"/>
+        <ellipse cx="280" cy="684" rx="9" ry="2.6" fill="#FFFFFF"/>
+        <circle cx="267" cy="681" r="1.4" fill="#FFFFFF"/>
+        <circle cx="294" cy="682" r="1.2" fill="#FFFFFF"/>
       </g>
     </svg>
   </div>
@@ -653,44 +684,82 @@
     var cx = S/2, cy = S/2;                        // 240,240
     g.globalCompositeOperation = 'source-over';    // a TRUE solid mark (NOT 'lighter')
     g.lineCap = 'round';
-    g.shadowColor = 'rgba('+RING_COL+',0.5)'; g.shadowBlur = 1.5;   // baked inlay gleam
-    // (1) two continuous rails = the frame
-    g.strokeStyle = 'rgba('+RING_COL+',0.44)'; g.lineWidth = 1.4;
-    g.beginPath(); g.arc(cx,cy,RING_R_IN, 0,Math.PI*2); g.stroke();
-    g.beginPath(); g.arc(cx,cy,RING_R_OUT,0,Math.PI*2); g.stroke();
-    // (4) fine inner dot-hairline (ancient texture) — 24 dots at r=166
-    g.fillStyle = 'rgba('+RING_COL+',0.30)';
-    for (var d=0; d<24; d++){
-      var ad = (d/24)*Math.PI*2, dx = cx+Math.cos(ad)*166, dy = cy+Math.sin(ad)*166;
-      g.beginPath(); g.arc(dx,dy,0.9,0,Math.PI*2); g.fill();
-    }
-    // (2)+(3) 24 graduation ticks @15°; every 3rd (the 8 cardinals @45°) promoted to a MAJOR with a lozenge sigil
-    for (var i=0; i<24; i++){
-      var a = (i/24)*Math.PI*2, ux = Math.cos(a), uy = Math.sin(a);
-      var major = (i % 3 === 0);
-      if (major){
-        g.strokeStyle = 'rgba('+RING_COL+',0.62)'; g.lineWidth = 2;
-        g.beginPath();
-        g.moveTo(cx+ux*RING_R_IN, cy+uy*RING_R_IN);
-        g.lineTo(cx+ux*RING_R_OUT, cy+uy*RING_R_OUT);
-        g.stroke();
-        // engraved lozenge sigil at mid r=180, half-diagonal 5px
-        var mx = cx+ux*180, my = cy+uy*180, nx = -uy, ny = ux;   // n = tangent
-        g.fillStyle = 'rgba('+RING_COL+',0.60)';
-        g.beginPath();
-        g.moveTo(mx+ux*5, my+uy*5);   // outward point
-        g.lineTo(mx+nx*5, my+ny*5);   // tangent point
-        g.lineTo(mx-ux*5, my-uy*5);   // inward point
-        g.lineTo(mx-nx*5, my-ny*5);   // other tangent
-        g.closePath(); g.fill();
-      } else {
-        g.strokeStyle = 'rgba('+RING_COL+',0.50)'; g.lineWidth = 1.5;
-        g.beginPath();
-        g.moveTo(cx+ux*190, cy+uy*190);      // short tick r=190→202
-        g.lineTo(cx+ux*RING_R_OUT, cy+uy*RING_R_OUT);
-        g.stroke();
+
+    // ETCHED-IN (tweak B "moving in rails"): every mark is an inlay SET INTO a carved groove —
+    // a dark near-wall shadow offset UP-LEFT + a faint lit far-wall DOWN-RIGHT + the silver inlay centred.
+    // marks(ox,oy, col, aRail,aDot,aMajor,aSigil,aMinor, gleam) paints the WHOLE mark set once at one offset.
+    function marks(ox, oy, col, aRail, aDot, aMajor, aSigil, aMinor, gleam){
+      if (gleam){ g.shadowColor = 'rgba('+RING_COL+',0.39)'; g.shadowBlur = 1.5; }   // baked inlay gleam (tweak A: dimmer)
+      else { g.shadowColor = 'transparent'; g.shadowBlur = 0; }
+      // (1) two continuous rails = the frame / the tracks the ticks ride in
+      g.strokeStyle = 'rgba('+col+','+aRail+')'; g.lineWidth = 1.4;
+      g.beginPath(); g.arc(cx+ox,cy+oy,RING_R_IN, 0,Math.PI*2); g.stroke();
+      g.beginPath(); g.arc(cx+ox,cy+oy,RING_R_OUT,0,Math.PI*2); g.stroke();
+      // (4) fine inner dot-hairline (ancient texture) — 24 dots at r=166
+      g.fillStyle = 'rgba('+col+','+aDot+')';
+      for (var d=0; d<24; d++){
+        var ad = (d/24)*Math.PI*2, dx = cx+ox+Math.cos(ad)*166, dy = cy+oy+Math.sin(ad)*166;
+        g.beginPath(); g.arc(dx,dy,0.9,0,Math.PI*2); g.fill();
+      }
+      // (2)+(3) 24 graduation ticks @15°; every 3rd (the 8 cardinals @45°) promoted to a MAJOR with a lozenge sigil
+      for (var i=0; i<24; i++){
+        var a = (i/24)*Math.PI*2, ux = Math.cos(a), uy = Math.sin(a);
+        if (i % 3 === 0){
+          g.strokeStyle = 'rgba('+col+','+aMajor+')'; g.lineWidth = 2;
+          g.beginPath();
+          g.moveTo(cx+ox+ux*RING_R_IN, cy+oy+uy*RING_R_IN);
+          g.lineTo(cx+ox+ux*RING_R_OUT, cy+oy+uy*RING_R_OUT);
+          g.stroke();
+          // engraved lozenge sigil at mid r=180, half-diagonal 5px
+          var mx = cx+ox+ux*180, my = cy+oy+uy*180, nx = -uy, ny = ux;   // n = tangent
+          g.fillStyle = 'rgba('+col+','+aSigil+')';
+          g.beginPath();
+          g.moveTo(mx+ux*5, my+uy*5);   // outward point
+          g.lineTo(mx+nx*5, my+ny*5);   // tangent point
+          g.lineTo(mx-ux*5, my-uy*5);   // inward point
+          g.lineTo(mx-nx*5, my-ny*5);   // other tangent
+          g.closePath(); g.fill();
+        } else {
+          g.strokeStyle = 'rgba('+col+','+aMinor+')'; g.lineWidth = 1.5;
+          g.beginPath();
+          g.moveTo(cx+ox+ux*190, cy+oy+uy*190);      // short tick r=190→202
+          g.lineTo(cx+ox+ux*RING_R_OUT, cy+oy+uy*RING_R_OUT);
+          g.stroke();
+        }
       }
     }
+
+    var EMB = 0.7;   // groove offset (px, disc-space)
+    // PASS 1 — dark near-wall shadow, offset UP-LEFT: the carved groove each mark sits inside
+    marks(-EMB, -EMB, '6,8,12',        0.50, 0.30, 0.55, 0.50, 0.42, false);
+    // PASS 2 — faint lit far-wall, offset DOWN-RIGHT: catches the upper-left dome light (sells the bevel)
+    marks( EMB*0.7, EMB*0.7, '236,240,247', 0.10, 0.06, 0.12, 0.11, 0.09, false);
+    // PASS 3 — the silver inlay centred in the groove, ~22% dimmer than before (tweak A), with the baked gleam
+    marks(0, 0, RING_COL,              0.34, 0.23, 0.48, 0.47, 0.39, true);
+
+    return c.toDataURL('image/png');
+  }
+
+  // ---- faint blue liquid suspended in the astrolabe band ("second saturn") — baked ONCE, drifts on its own layer ----
+  function bakeRingLiquid(){
+    var ss=2, S=DISC_S;
+    var c=document.createElement('canvas'); c.width=c.height=S*ss;
+    var g=c.getContext('2d'); g.scale(ss,ss); var cx=S/2, cy=S/2;
+    g.save();
+    g.beginPath();
+    g.arc(cx,cy,RING_R_OUT,0,Math.PI*2);
+    g.arc(cx,cy,RING_R_IN, 0,Math.PI*2,true); g.clip('evenodd');   // hard-clip to the band
+    // primary pool — soft blue crescent, upper-right of the band
+    var a=g.createRadialGradient(cx+104,cy-149,4, cx+104,cy-149,96);
+    a.addColorStop(0,  'rgba(122,168,224,0.24)');
+    a.addColorStop(.5, 'rgba(114,160,220,0.09)');
+    a.addColorStop(1,  'rgba(114,160,220,0)');
+    g.fillStyle=a; g.fillRect(0,0,S,S);
+    // fainter counter-pool lower-left → gentle two-lobe slosh
+    var b=g.createRadialGradient(cx-158,cy+91,4, cx-158,cy+91,84);
+    b.addColorStop(0,'rgba(96,150,212,0.12)'); b.addColorStop(1,'rgba(96,150,212,0)');
+    g.fillStyle=b; g.fillRect(0,0,S,S);
+    g.restore();
     return c.toDataURL('image/png');
   }
 
@@ -922,16 +991,22 @@
   // ---- lap = ONE STEADY LINEAR orbit (the confirmed lag/teleport fix) ----
   // rotate(0deg)→rotate(360deg), easing:'linear'. NO whip, NO velocity dip, NO ease-in, NO charge, NO deceleration.
   // The arrow reaches the top at FULL speed and the animation simply ENDS — that abrupt stop IS the impact.
-  var LAP_MS         = 820;          // tunable lap duration (constant angular velocity throughout)
+  var LAP_MS         = 820;          // tunable lap duration (first 88% constant angular velocity; last 12% seats to rest)
+  var SETTLE_FRAC = 0.12;                          // last 12% carries the seat; first 88% untouched
+  var SETTLE_EASE = 'cubic-bezier(.2,.2,.5,1)';    // entry slope y1/x1 = 1 = cruise (no jerk); exit slope 0 (firm plant, v=0)
   var ORBIT_DIR      = 1;            // 1 = clockwise
   var TICK_SPARK_MS  = 80;
   var TICK_RING_MS   = 120;
   var VITRIFY_MS     = 160;          // B4b glaze opacity pulse, peak 0.6
-  // ---- impact-to-the-core (replaces the old reverb + the refine spec's magnetCatch) ----
-  var IMPACT_MS      = 220;          // orb compression-absorb duration
-  var IMPACT_SCALE   = 0.965;        // compression depth: 1 → 0.965 → 1, over-damped, NO overshoot (it ABSORBS)
-  var SHOCK_MS       = 260;          // converging shockwave ring: rim → core, fading
-  var COREFLASH_MS   = 180;          // core absorb-flash at the hub
+  // ---- impact-to-the-core (DIRECTIONAL CHAIN: strike → lens plunges the axis → core swallows inward → orb squashes/sinks, over-damped, no bounce) ----
+  var IMPACT_SCALE_Y = 0.976;        // top flattens under the blow (anisotropic squash → circle to ellipse)
+  var IMPACT_SCALE_X = 1.007;        // slight lateral bulge
+  var IMPACT_SINK    = 4;            // px the whole orb dips under the strike
+  var IMPACT_MS      = 260;          // orb squash-and-sink duration
+  var PLUNGE_MS      = 170;          // the bright lens travelling 12 o'clock → core
+  var CORE_DELAY     = 120;          // the core swallows inward as the lens lands
+  var CORE_MS        = 200;          // core pinch-to-zero duration
+  // PLUNGE_DIST is MEASURED from the live top-rim→hub gap in the wire-up block (do NOT hardcode px — breaks on mobile)
 
   // ---- element refs ----
   var wheelArea  = document.querySelector('.wheel-area');
@@ -950,9 +1025,12 @@
   var channelR = fxLayer ? fxLayer.querySelector('.channelR') : null;
   var filmL    = fxLayer ? fxLayer.querySelector('.filmL')    : null;
   var channelL = fxLayer ? fxLayer.querySelector('.channelL') : null;
-  var rills = [filmR, channelR, filmL, channelL];
+  var coreR    = fxLayer ? fxLayer.querySelector('.coreR')    : null;
+  var coreL    = fxLayer ? fxLayer.querySelector('.coreL')    : null;
+  var rills = [filmR, channelR, filmL, channelL, coreR, coreL];
   var shockEl = document.querySelector('.shock');
   var coreEl  = document.querySelector('.coreflash');
+  var plungeEl = document.querySelector('.plunge');
 
   // rasterize the arrow ONCE to a PNG data-URI: a frozen bitmap on a permanently-promoted block layer
   function rasterizeArrow(){
@@ -980,7 +1058,7 @@
   function showFx(el){ if (el) el.style.opacity='1'; }
   function hideFx(el){ if (el) el.style.opacity='0'; }
   function resetFx(){
-    [dropEl, dropA, dropB, splatEl, shockEl, coreEl].forEach(function(el){ if (el) el.style.opacity='0'; });
+    [dropEl, dropA, dropB, splatEl, shockEl, coreEl, plungeEl].forEach(function(el){ if (el) el.style.opacity='0'; });
     if (dropEl) dropEl.style.transform='';
     if (dropA)  dropA.style.transform='';
     if (dropB)  dropB.style.transform='';
@@ -1032,6 +1110,7 @@
     if (vitrifyEl) vitrifyEl.style.opacity='0';
     if (shockEl)   shockEl.style.opacity='0';
     if (coreEl)    coreEl.style.opacity='0';
+    if (plungeEl)  plungeEl.style.opacity='0';
     // defensively zero every bead so an interrupt mid-stream leaves nothing stranded (fx is also display:none)
     [dropEl, dropA, dropB, splatEl].forEach(function(el){ if (el) el.style.opacity='0'; });
     rills.forEach(function(el){ if (el){ el.style.strokeDashoffset='1'; } });   // re-arm rivulet strokes undrawn for the next spin
@@ -1047,13 +1126,17 @@
   function arrowLap(onImpact){
     if (!orbitArm){ if (onImpact) onImpact(); return; }
     orbitArm.style.transform = 'rotate(0deg)';
+    var full   = 360 * ORBIT_DIR;
+    var splitO = 1 - SETTLE_FRAC;                   // 0.88
+    var splitA = full * splitO;                     // 316.8deg = exactly where pure-linear already sits at t=0.88
     var lap = reg(orbitArm.animate([
-      { transform:'rotate(0deg)' },
-      { transform:'rotate('+(360*ORBIT_DIR)+'deg)' }
-    ], { duration: LAP_MS, easing:'linear', fill:'forwards' }));       // constant angular velocity — no whip, no dip, no ease
+      { transform:'rotate(0deg)',          offset:0.00,   easing:'linear'    },   // 0→88%: the loved cruise, unchanged
+      { transform:'rotate('+splitA+'deg)', offset:splitO, easing:SETTLE_EASE },   // 88→100%: firm precise seat to rest
+      { transform:'rotate('+full+'deg)',   offset:1.00 }
+    ], { duration: LAP_MS, easing:'linear', fill:'forwards' }));
     lap.finished.then(function(){
-      if (ceremony.active && onImpact) onImpact();                     // impact fires on the true 360=top arrival, at FULL speed
-    }).catch(function(){ /* cancelled by endCeremony */ });
+      if (ceremony.active && onImpact) onImpact();   // fires at the SEATED frame (v=0), still at t=LAP_MS
+    }).catch(function(){});
   }
 
   // ---- B3b tick flash (light, not motion) ----
@@ -1069,42 +1152,44 @@
       {duration:TICK_RING_MS, easing:'ease-out'}));
   }
 
-  // ---- IMPACT-TO-THE-CORE: the orb takes the massive energy IN and contains it (never rebounds) ----
-  function impactToCore(){ orbAbsorb(); shockToCore(); coreFlash(); }
+  // ---- IMPACT-TO-THE-CORE: a legible DIRECTIONAL CHAIN — orb squashes/sinks under the strike, a bright lens
+  //      PLUNGES down the 12→centre axis, and the core swallows it INWARD (sequenced: strike → travel → absorb) ----
+  function impactToCore(){ orbAbsorb(); plunge(); ct(coreFlash, CORE_DELAY); }
 
-  // ORB COMPRESSION-ABSORB on #wheel: 1 → IMPACT_SCALE fast, then over-damped e^-decay back to 1 (NO bounce/overshoot).
-  // scale is PREPENDED (left of rotate(rot)) so the locked rotation stays byte-identical.
+  // ORB SQUASH-AND-SINK on #wheel: anisotropic compression (circle→ellipse) + a small downward dip, then
+  // over-damped e^-decay home — a felt, COLD, contained blow with NO rebound.
+  // scale/translateY are PREPENDED (left of rotate(rot)) so the locked rotation stays byte-identical.
   function orbAbsorb(){
-    var min=IMPACT_SCALE, N=12, kf=[], cFrac=0.16;
-    for (var i=0;i<=N;i++){
-      var u=i/N, sc;
-      if (u<=cFrac) sc = 1-(1-min)*(u/cFrac);                              // quick compress into the impact
-      else { var v=(u-cFrac)/(1-cFrac); sc = 1-(1-min)*Math.exp(-4.4*v); } // monotonic absorb back toward 1 (over-damped)
-      kf.push({ transform:'scale('+sc.toFixed(4)+') rotate('+rot+'deg)' });
+    var N=14, kf=[], cFrac=0.14;
+    for(var i=0;i<=N;i++){ var u=i/N, sx, sy, dy;
+      if(u<=cFrac){ var w=u/cFrac; sy=1-(1-IMPACT_SCALE_Y)*w; sx=1+(IMPACT_SCALE_X-1)*w; dy=IMPACT_SINK*w; }
+      else{ var v=(u-cFrac)/(1-cFrac), e=Math.exp(-4.4*v); sy=1-(1-IMPACT_SCALE_Y)*e; sx=1+(IMPACT_SCALE_X-1)*e; dy=IMPACT_SINK*e; }
+      kf.push({transform:'translateY('+dy.toFixed(2)+'px) scale('+sx.toFixed(4)+','+sy.toFixed(4)+') rotate('+rot+'deg)'});
     }
-    kf[N] = { transform:'scale(1) rotate('+rot+'deg)' };                   // land exactly at rest scale
+    kf[N] = {transform:'translateY(0px) scale(1,1) rotate('+rot+'deg)'};
     var a = reg(canvas.animate(kf, {duration:IMPACT_MS, easing:'linear'}));  // fill:none → reverts to inline rotate(rot)
     a.onfinish = function(){ canvas.style.transform='rotate('+rot+'deg)'; };
   }
 
-  // CONVERGING SHOCKWAVE: a bright cool-white ring born at the RIM, contracting to the centre while fading — energy to the core.
-  function shockToCore(){
-    if (!shockEl) return;
-    reg(shockEl.animate([
-      { opacity:0.0, transform:'scale(1.00)', offset:0.00, easing:'cubic-bezier(.35,.6,.2,1)' },
-      { opacity:0.9, transform:'scale(0.80)', offset:0.16 },
-      { opacity:0.0, transform:'scale(0.00)', offset:1.00 }
-    ], {duration:SHOCK_MS}));
+  // THE PLUNGE LENS: flares just inside the top rim (the strike), accelerates DOWN the 12→centre axis,
+  // narrows to a thread and vanishes exactly at the hub = the core swallowing the energy inward.
+  function plunge(){
+    if(!plungeEl) return;
+    reg(plungeEl.animate([
+      {transform:'translate(-50%,-50%) translateY(0px) scale(1,1)',                        opacity:0.0, offset:0.00, easing:'cubic-bezier(.2,.7,.4,1)'},
+      {transform:'translate(-50%,-50%) translateY('+(PLUNGE_DIST*0.083)+'px) scale(1,1)',  opacity:0.95, offset:0.14},
+      {transform:'translate(-50%,-50%) translateY('+PLUNGE_DIST+'px) scale(0.34,0.5)',     opacity:0.0, offset:1.00, easing:'cubic-bezier(.4,0,.7,.5)'}
+    ],{duration:PLUNGE_MS, easing:'linear'}));
   }
 
-  // CORE FLASH: a brief radial glow at the hub — the core absorbing the impact in.
+  // CORE FLASH: the hub swallowing the plunge INWARD — blooms then pinches to scale 0 (energy eaten, not radiated).
   function coreFlash(){
-    if (!coreEl) return;
+    if(!coreEl) return;
     reg(coreEl.animate([
-      { opacity:0,   transform:'translate(-50%,-50%) scale(0.6)' },
-      { opacity:0.8, transform:'translate(-50%,-50%) scale(1.0)', offset:0.4 },
-      { opacity:0,   transform:'translate(-50%,-50%) scale(1.15)' }
-    ], {duration:COREFLASH_MS, easing:'ease-out'}));
+      {opacity:0,    transform:'translate(-50%,-50%) scale(0.45)'},
+      {opacity:0.95, transform:'translate(-50%,-50%) scale(1.02)', offset:0.32},
+      {opacity:0,    transform:'translate(-50%,-50%) scale(0.0)'}
+    ],{duration:CORE_MS, easing:'cubic-bezier(.3,.7,.3,1)'}));
   }
 
   // ---- B4b vitrify (opacity-only glaze pulse; filter animation banned) ----
@@ -1137,33 +1222,33 @@
     var ARCPOOL = TOTAL - DRIP;               // 405 | 530  (arc + short pool)
     // RIGHT arc (dropA): equal 18° steps on R=236 about (280,304); last keyframe = pool (flatten in place). Time front-loaded (gravity).
     reg(dropA.animate([
-      {transform:'translate(280px,64px)  scale(1,1)',    offset:0.000, easing:'linear'},
-      {transform:'translate(353px,80px)  scale(1,1)',    offset:0.016},
-      {transform:'translate(419px,113px) scale(1,1)',    offset:0.053},
-      {transform:'translate(471px,165px) scale(1,1)',    offset:0.108},
-      {transform:'translate(504px,231px) scale(1,1)',    offset:0.178},
-      {transform:'translate(516px,304px) scale(1,1)',    offset:0.263},   // equator right (r=236)
-      {transform:'translate(504px,377px) scale(1,1)',    offset:0.363},
-      {transform:'translate(471px,443px) scale(1,1)',    offset:0.475},
-      {transform:'translate(419px,495px) scale(1,1)',    offset:0.600},
-      {transform:'translate(353px,529px) scale(1,1)',    offset:0.738},
-      {transform:'translate(280px,540px) scale(1,1)',    offset:0.887},   // bottom meet
-      {transform:'translate(280px,540px) scale(1.3,0.7)',offset:1.000}    // POOL: beads coincide + flatten
+      {transform:'translate(280px,64px)  scale(1,1)',        offset:0.000, easing:'linear'},
+      {transform:'translate(353px,80px)  scale(0.997,1.005)',offset:0.016},
+      {transform:'translate(419px,113px) scale(0.989,1.018)',offset:0.053},
+      {transform:'translate(471px,165px) scale(0.978,1.037)',offset:0.108},
+      {transform:'translate(504px,231px) scale(0.964,1.060)',offset:0.178},
+      {transform:'translate(516px,304px) scale(0.947,1.089)',offset:0.263},   // equator right (r=236)
+      {transform:'translate(504px,377px) scale(0.926,1.123)',offset:0.363},
+      {transform:'translate(471px,443px) scale(0.904,1.161)',offset:0.475},
+      {transform:'translate(419px,495px) scale(0.878,1.203)',offset:0.600},
+      {transform:'translate(353px,529px) scale(0.850,1.250)',offset:0.738},
+      {transform:'translate(280px,540px) scale(0.82,1.30)',  offset:0.887},   // bottom meet — head thinned+stretched (accelerating water)
+      {transform:'translate(280px,540px) scale(1.3,0.7)',    offset:1.000}    // POOL: beads coincide + flatten
     ],{duration:ARCPOOL, easing:'linear', fill:'forwards'}));
     // LEFT arc (dropB): x-mirror (560 − x), identical y + offsets
     reg(dropB.animate([
-      {transform:'translate(280px,64px)  scale(1,1)',    offset:0.000, easing:'linear'},
-      {transform:'translate(207px,80px)  scale(1,1)',    offset:0.016},
-      {transform:'translate(141px,113px) scale(1,1)',    offset:0.053},
-      {transform:'translate(89px,165px)  scale(1,1)',    offset:0.108},
-      {transform:'translate(56px,231px)  scale(1,1)',    offset:0.178},
-      {transform:'translate(44px,304px)  scale(1,1)',    offset:0.263},   // equator left
-      {transform:'translate(56px,377px)  scale(1,1)',    offset:0.363},
-      {transform:'translate(89px,443px)  scale(1,1)',    offset:0.475},
-      {transform:'translate(141px,495px) scale(1,1)',    offset:0.600},
-      {transform:'translate(207px,529px) scale(1,1)',    offset:0.738},
-      {transform:'translate(280px,540px) scale(1,1)',    offset:0.887},
-      {transform:'translate(280px,540px) scale(1.3,0.7)',offset:1.000}
+      {transform:'translate(280px,64px)  scale(1,1)',        offset:0.000, easing:'linear'},
+      {transform:'translate(207px,80px)  scale(0.997,1.005)',offset:0.016},
+      {transform:'translate(141px,113px) scale(0.989,1.018)',offset:0.053},
+      {transform:'translate(89px,165px)  scale(0.978,1.037)',offset:0.108},
+      {transform:'translate(56px,231px)  scale(0.964,1.060)',offset:0.178},
+      {transform:'translate(44px,304px)  scale(0.947,1.089)',offset:0.263},   // equator left
+      {transform:'translate(56px,377px)  scale(0.926,1.123)',offset:0.363},
+      {transform:'translate(89px,443px)  scale(0.904,1.161)',offset:0.475},
+      {transform:'translate(141px,495px) scale(0.878,1.203)',offset:0.600},
+      {transform:'translate(207px,529px) scale(0.850,1.250)',offset:0.738},
+      {transform:'translate(280px,540px) scale(0.82,1.30)',  offset:0.887},
+      {transform:'translate(280px,540px) scale(1.3,0.7)',    offset:1.000}
     ],{duration:ARCPOOL, easing:'linear', fill:'forwards'}));
     // draw the rivulet head-first, glued to the bead's own keyframe offsets (do = 1 - arcFraction)
     var rillKf = [
@@ -1309,6 +1394,17 @@
     _ringEl.style.backgroundImage = 'url('+_ringURI+')';
     var _ri = new Image(); _ri.src = _ringURI; if (_ri.decode) _ri.decode().catch(function(){});  // GPU-ready, no first-frame flash
   }
+  var _liqEl = document.querySelector('.ring-liquid');
+  if (_liqEl){
+    var _lU = bakeRingLiquid();
+    _liqEl.style.backgroundImage = 'url('+_lU+')';
+    var _li = new Image(); _li.src = _lU; if (_li.decode) _li.decode().catch(function(){});   // GPU-ready, no first-frame flash
+  }
+  // measure the top-rim→hub gap ONCE (responsive; scales with the disc) so the plunge lens lands on the hub at any width
+  var PLUNGE_DIST = (plungeEl && coreEl)
+    ? (coreEl.getBoundingClientRect().top + coreEl.getBoundingClientRect().height/2)
+      - (plungeEl.getBoundingClientRect().top + plungeEl.getBoundingClientRect().height/2)
+    : 240;   // fallback for the authored 480 disc
   if (orbitArm){
     var _arrowURI = rasterizeArrow();
     orbitArm.style.backgroundImage = 'url('+_arrowURI+')';
