@@ -2640,7 +2640,8 @@ body[data-view="room"] .dev { display: none; }
 .about__foot { margin: 0; text-align: center; font-family: var(--font-mono); font-size: 8.5px; letter-spacing: 0.28em; text-transform: uppercase; color: var(--faint); }
 
 /* scroll-reveal — base VISIBLE (freeze-safe); .is-motion arms the hidden state; the PLATE rises to its stationary ghost ordinal; LATCH (stays lit — "the light stays on") */
-.about.is-motion .about__nugget .about__plate { opacity: 0; transform: translateY(20px); transition: opacity 720ms cubic-bezier(.16, .84, .29, 1), transform 720ms cubic-bezier(.16, .84, .29, 1); will-change: opacity, transform; }
+.about.is-motion .about__nugget .about__plate { opacity: 0; transform: translateY(20px); transition: opacity 720ms cubic-bezier(.16, .84, .29, 1), transform 720ms cubic-bezier(.16, .84, .29, 1); }
+.about.is-motion .about__nugget:not(.is-lit) .about__plate { will-change: opacity, transform; }   /* BR-S234: drop the compositor promotion once a plate latches lit */
 .about.is-motion .about__nugget.is-lit .about__plate { opacity: 1; transform: none; }
 @media (prefers-reduced-motion: reduce) { .about.is-motion .about__nugget .about__plate { opacity: 1; transform: none; transition: none; } }
 

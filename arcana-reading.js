@@ -24,7 +24,7 @@
   var KWC=JSON.parse(document.getElementById("kwcolor").textContent);
   // authored keyword-colour lexicon: each perk tinted by its semantic family
   function keysHTML(kws){return kws&&kws.length?'<ul class="keys">'+kws.map(function(k){return '<li style="color:'+(KWC[String(k).toLowerCase()]||"#9c9790")+'">'+esc(k)+'</li>'}).join("")+'</ul>':""}
-  function esc(s){return String(s==null?"":s).replace(/[&<>]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;"}[c]})}
+  function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
   function hash(s){var h=2166136261,i;for(i=0;i<s.length;i++){h^=s.charCodeAt(i);h=(h*16777619)>>>0}return h>>>0}
   function pick(l,s){return l&&l.length?l[hash(s)%l.length]:null}
   function deac(s){return String(s).normalize("NFD").replace(/[̀-ͯ]/g,"")}
@@ -567,7 +567,7 @@
        consults this lock — the URL is the receipt and reopening must never gate; the lock
        guards only the desk's drawing act, on this device. Real enforcement is backend, later. */
     var standing=concordStanding(sa,sb);
-    if(standing){var w=document.querySelector("[data-cc-sealwrap]");if(w)w.innerHTML='<p class="cc-onfile">The answer is on file.</p><p class="prose" style="font-style:italic">One bond is drawn per pair. The concord stands.</p><a class="cc-standlink" href="'+standing+'">The standing concord &rarr;</a>';return;}
+    if(standing){var w=document.querySelector("[data-cc-sealwrap]");if(w)w.innerHTML='<p class="cc-onfile">The answer is on file.</p><p class="prose" style="font-style:italic">One bond is drawn per pair. The concord stands.</p><a class="cc-standlink" href="'+esc(standing)+'">The standing concord &rarr;</a>';return;}
     var btn=document.querySelector("[data-cc-seal]");
     sealBeat(btn,"Settled",function(){try{localStorage.setItem(pairKey(sa,sb),concordURL(sa,sb));}catch(e){}location.hash=concordURL(sa,sb);});
   }

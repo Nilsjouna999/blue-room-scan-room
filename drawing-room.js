@@ -289,7 +289,7 @@
       fetch("codex-data.json?v=208").then(function (r) { return r.text(); }).then(function (txt) {
         var codex = JSON.parse(txt);
         DECK = codex.filter(function (s) { return /tarot|minor arcana/i.test(String(s.system || "")); }).reduce(function (a, s) { return a.concat(s.entries || []); }, []);
-        if (!reopen()) showLanding();
+        if (!reopen()) { var _pull = param("pull"); showLanding(); if (_pull) pull(); }   // BR-S234: honor the M2 "Draw a card — free" door (&pull=1) — land already-drawn (capture before showLanding strips the param)
       }).catch(function () { var st = host.querySelector("[data-dr-stage]"); if (st) st.innerHTML = '<p class="dr-loading">The deck could not be reached. (Standalone preview.)</p>'; });
     }
   };
