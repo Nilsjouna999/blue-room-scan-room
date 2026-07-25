@@ -1312,78 +1312,89 @@ function renderAbout() {
    the rooms' OWN art: the reading's crown (arcana-build/gen_body.js CROWN_SVG) and the
    Drawing Room's engraved plates (drawing-room.js backSVG/faceSVG), gradients copied
    verbatim under unique ids (#mwGold/#mwInk) so the views can co-exist. */
+/* BR-S231 — M2 "THE DRAW": the Reading Rooms rebuilt as the Desk's mirror twin.
+   Silver develops (M1); gold draws (M2). Copies M1's .menu__inner grid recipe so
+   parity is inherited; reuses the existing door / msample / codex idioms. The hero
+   is one standing card (the XVII Star) that turns to gold once on arrival. Source
+   order is head → ctrl → stage so keyboard/AT reach the primary act before the
+   monument; grid-areas restore the visual placement. Pure static string (the front
+   door never mounts anything). Colour law: #mwGold is the ONE hero metal; the lone
+   violet in the room is the word "kept". */
 function renderWall() {
-  const backPlate =
-    '<rect x="7" y="7" width="106" height="176" rx="7" fill="none" stroke="url(#mwInk)" stroke-width="1"/>'
-    + '<rect x="13" y="13" width="94" height="164" rx="5" fill="none" stroke="url(#mwInk)" stroke-width=".5" opacity=".6"/>'
-    + '<g stroke="url(#mwInk)" stroke-width=".6" fill="none" opacity=".7"><path d="M60 42 L86 95 L60 148 L34 95 Z"/><path d="M60 64 L74 95 L60 126 L46 95 Z"/><circle cx="60" cy="95" r="4.5"/></g>';
-  const facePlate =
-    '<rect x="6" y="6" width="108" height="178" rx="7" fill="none" stroke="url(#mwGold)" stroke-width="1.1"/>'
-    + '<rect x="11" y="11" width="98" height="168" rx="5" fill="none" stroke="url(#mwInk)" stroke-width=".5" opacity=".7"/>'
-    + '<text x="60" y="30" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9" letter-spacing="2.5" fill="url(#mwGold)">XVII</text>'
-    + '<g stroke="url(#mwGold)" fill="none"><circle cx="60" cy="98" r="31" stroke-width=".8" opacity=".5"/><circle cx="60" cy="98" r="23" stroke-width=".6" opacity=".35"/>'
-    + '<path d="M60 69 L64.6 86.9 L80.5 77.5 L71.1 93.4 L89 98 L71.1 102.6 L80.5 118.5 L64.6 109.1 L60 127 L55.4 109.1 L39.5 118.5 L48.9 102.6 L31 98 L48.9 93.4 L39.5 77.5 L55.4 86.9 Z" stroke-width=".9" opacity=".8"/><circle cx="60" cy="98" r="3.2" fill="url(#mwGold)" stroke="none"/></g>';
   return '<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>'
     + '<linearGradient id="mwGold" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#c8ad70"/><stop offset=".55" stop-color="#a2864a"/><stop offset="1" stop-color="#5f471f"/></linearGradient>'
     + '<linearGradient id="mwInk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9c9790"/><stop offset="1" stop-color="#6f6b64"/></linearGradient>'
     + '</defs></svg>'
-    + '<div class="menu__wall">'
+    + '<div class="menu__draw">'
     + '<button type="button" class="menu__wall-back" data-annex-back>&larr; Back to the desk</button>'
-    + '<header class="menu__wall-head">'
+    // HEAD — the same front-door grammar as M1
+    + '<header class="menu__draw-head">'
     + '<p class="menu__wall-eyebrow"><span class="menu__wall-eyemark" aria-hidden="true">◆</span> BLUE ROOM</p>'
-    + '<h2 class="menu__wall-title" tabindex="-1">The Reading Rooms</h2>'
-    + '<p class="menu__wall-thesis">Not every card is developed. Some are drawn.</p>'
+    + '<h2 class="menu__draw-title" tabindex="-1">The Reading Rooms</h2>'
+    + '<p class="menu__draw-thesis">Not every card is developed. Some are drawn.</p>'
     + '<p class="menu__wall-trust">Asked the same, they answer the same.</p>'
     + '</header>'
-    + '<div class="menu__wall-plaques">'
-    + '<article class="menu__plaque menu__plaque--arcane">'
-    + '<p class="menu__plaque-kicker">Room I · By Birth</p>'
-    + '<h3 class="menu__plaque-name">The Arcana Reading</h3>'
-    + '<span class="menu__plaque-rule" aria-hidden="true"></span>'
-    + '<div class="menu__plaque-spec">'
-    + '<svg class="menu__spec-crown" viewBox="0 0 120 90" aria-hidden="true"><path d="M16 64 L26 28 L45 50 L60 18 L75 50 L94 28 L104 64" fill="none" stroke="url(#mwInk)" stroke-width="4" opacity=".28" stroke-linejoin="round"/><path d="M16 64 L26 28 L45 50 L60 18 L75 50 L94 28 L104 64" fill="none" stroke="url(#mwGold)" stroke-width="1.7" stroke-linejoin="round"/><path d="M15 64 H105" stroke="url(#mwGold)" stroke-width="2"/><path d="M19 71 H101" stroke="url(#mwGold)" stroke-width="1" opacity=".45"/><circle cx="26" cy="28" r="3.1" fill="url(#mwGold)"/><circle cx="60" cy="18" r="3.8" fill="url(#mwGold)"/><circle cx="94" cy="28" r="3.1" fill="url(#mwGold)"/><circle cx="42" cy="67.5" r="2.1" fill="url(#mwGold)" opacity=".7"/><circle cx="60" cy="67.5" r="2.5" fill="url(#mwGold)"/><circle cx="78" cy="67.5" r="2.1" fill="url(#mwGold)" opacity=".7"/></svg>'
-    + '<p class="menu__spec-name">Six marks. One name.</p>'
-    + '<p class="menu__spec-spine">Sun Sign · Year Animal · Life Path · Rune · Trigram · Hexagram</p>'
+    // CTRL — one loud act under the gold cut-line, then a steep ladder (source-first for a11y)
+    + '<div class="menu__draw-ctrl">'
+    + '<span class="menu__draw-cutline" aria-hidden="true"></span>'
+    + '<p class="msample__seal">The deck is already cut to you. One card is free to turn.</p>'
+    + '<div class="menu__draw-doors">'
+    + '<a class="menu__door menu__door--add menu__door--pull" href="?dev=drawing-room&pull=1">'
+    + '<span class="menu__door-kicker">The Pull · By the Draw</span>'
+    + '<span class="menu__door-name">Draw a card — free</span>'
+    + '<span class="menu__door-desc">One card, cut to your question. Free — and yours to keep.</span>'
+    + '</a>'
+    + '<div class="menu__door menu__door--sample menu__door--birth">'
+    + '<a class="menu__draw-hit" href="?dev=arcane" aria-label="The Arcana Reading"></a>'
+    + '<span class="menu__door-kicker"><svg class="menu__draw-crown" viewBox="0 0 120 90" aria-hidden="true"><path d="M16 64 L26 28 L45 50 L60 18 L75 50 L94 28 L104 64" fill="none" stroke="url(#mwGold)" stroke-width="4" stroke-linejoin="round"/><path d="M15 64 H105" stroke="url(#mwGold)" stroke-width="3"/><circle cx="60" cy="18" r="5" fill="url(#mwGold)"/></svg> By Birth · Given, not drawn</span>'
+    + '<span class="menu__door-name">The Arcana Reading</span>'
+    + '<span class="menu__door-desc">Six marks. One name. The deeper reading — given at birth, read here.</span>'
+    + '<span class="menu__draw-spine">Sun Sign · Year Animal · Life Path · Rune · Trigram · Hexagram</span>'
+    + '<a class="menu__draw-aside" href="?dev=arcana-reading#/concord">Or two names, one bond — a Concord &rarr;</a>'
     + '</div>'
-    + '<p class="menu__plaque-expl">The marks are given, not chosen — the Codex holds their meanings; the crown is their sum.</p>'
-    + '<div class="menu__plaque-ledger">'
-    + '<p class="menu__ledger-row"><span class="menu__ledger-name">Asks for</span><span class="menu__ledger-val">a name · a birth date · a birthplace</span></p>'
-    + '<p class="menu__ledger-row"><span class="menu__ledger-name">Returns</span><span class="menu__ledger-val">a crowned name · a record for every mark</span></p>'
     + '</div>'
-    // BR-S197: the Concord door — By Birth only (two Arcane Readings + the bond), so it lives INSIDE
-    // Room I, above the door (sits where Plaque B's credo sits — keeps the two doors level). No price here.
-    + '<a class="menu__plaque-aside" href="?dev=arcana-reading#/concord">Or two names, one bond — a Concord &rarr;</a>'
-    + '<a class="menu__plaque-door" href="?dev=arcane" aria-label="Enter the Arcana Reading">Enter the room &rarr;</a>'
-    + '</article>'
-    + '<article class="menu__plaque menu__plaque--drawing">'
-    + '<p class="menu__plaque-kicker">Room II · By the Draw</p>'
-    + '<h3 class="menu__plaque-name">Tarot Divination</h3>'
-    + '<span class="menu__plaque-rule" aria-hidden="true"></span>'
-    + '<div class="menu__plaque-spec">'
-    + '<svg class="menu__spec-fan" viewBox="0 0 260 216" aria-hidden="true">'
-    + '<g transform="translate(18 24) rotate(-10 60 175)" opacity=".72">' + backPlate + '</g>'
-    + '<g transform="translate(122 24) rotate(10 60 175)" opacity=".72">' + backPlate + '</g>'
-    + '<g transform="translate(70 12)">' + facePlate + '</g>'
-    + '</svg>'
-    + '<p class="menu__spec-name">Seventy-eight cards. One question.</p>'
-    + '</div>'
-    + '<p class="menu__plaque-expl">The deck is cut to the question laid down. What falls is read, stamped, and filed.</p>'
-    + '<div class="menu__plaque-ledger">'
-    + '<p class="menu__ledger-row"><span class="menu__ledger-name">The Pull</span><span class="menu__ledger-val">one card</span></p>'
-    + '<p class="menu__ledger-row"><span class="menu__ledger-name">A Sitting</span><span class="menu__ledger-val">three cards</span></p>'
-    + '<p class="menu__ledger-row"><span class="menu__ledger-name">The Deep Read</span><span class="menu__ledger-val">five cards</span></p>'
-    + '</div>'
-    + '<p class="menu__plaque-credo">Drawn once. Not reissued.</p>'
-    + '<a class="menu__plaque-door" href="?dev=drawing-room" aria-label="Enter the Drawing Room">Enter the room &rarr;</a>'
-    + '</article>'
-    + '</div>'
-    + '<div class="menu__wall-rail">'
-    + '<button type="button" class="menu__codex menu__codex--reliq" data-annex-go><span class="menu__codex__mark" aria-hidden="true">◆</span> The Reliquary <span class="menu__codex__arr" aria-hidden="true">→</span></button>'
-    + '<a class="menu__codex" href="codex.html" data-codex-open><span class="menu__codex__mark" aria-hidden="true">◆</span> The Codex <span class="menu__codex__arr" aria-hidden="true">→</span></a>'
+    + '<a class="menu__draw-tiers" href="?dev=drawing-room">Deeper draws — A Sitting · three, free · The Deep Read · five, <em class="menu__draw-kept">kept</em> &rarr;</a>'
+    + '<div class="menu__draw-rail">'
+    + '<button type="button" class="menu__codex menu__codex--reliq" data-annex-go><span class="menu__codex__mark" aria-hidden="true">◆</span> The Reliquary — what you draw is kept <span class="menu__codex__arr" aria-hidden="true">→</span></button>'
     + '<a class="menu__codex" href="?dev=settings"><span class="menu__codex__mark" aria-hidden="true">◆</span> Settings <span class="menu__codex__arr" aria-hidden="true">→</span></a>'
     + '</div>'
-    + '<p class="menu__wall-foot">One archive · every door kept.</p>'
+    + '<p class="menu__draw-foot"><span class="menu__draw-cuttick" aria-hidden="true"></span> One archive · every door kept. <span class="menu__draw-credo">Drawn once. Not reissued.</span></p>'
+    + '</div>'
+    // STAGE — the standing monument: the XVII Star, turned in gold
+    + '<section class="menu__draw-stage">'
+    + '<div class="msample__cap"><span class="msample__label">Sample Draw</span><span class="msample__type">XVII · The Star</span></div>'
+    + '<p class="menu__draw-herosub">Seventy-eight cards. One question.</p>'
+    + '<div class="m2hero" data-m2-hero>'
+    + '<svg class="m2hero__back" viewBox="0 0 120 190" aria-hidden="true" preserveAspectRatio="xMidYMid meet"><rect x="7" y="7" width="106" height="176" rx="7" fill="none" stroke="url(#mwInk)" stroke-width="1"/><rect x="13" y="13" width="94" height="164" rx="5" fill="none" stroke="url(#mwInk)" stroke-width=".5" opacity=".6"/><g stroke="url(#mwInk)" stroke-width=".6" fill="none" opacity=".7"><path d="M60 42 L86 95 L60 148 L34 95 Z"/><path d="M60 64 L74 95 L60 126 L46 95 Z"/><circle cx="60" cy="95" r="4.5"/></g></svg>'
+    + '<svg class="m2hero__face" viewBox="0 0 120 190" role="img" aria-label="XVII — The Star" preserveAspectRatio="xMidYMid meet"><rect x="6" y="6" width="108" height="178" rx="7" fill="none" stroke="url(#mwGold)" stroke-width="1.1"/><rect x="11" y="11" width="98" height="168" rx="5" fill="none" stroke="url(#mwInk)" stroke-width=".5" opacity=".7"/><text x="60" y="30" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9" letter-spacing="2.5" fill="url(#mwGold)">XVII</text><g stroke="url(#mwGold)" fill="none"><circle cx="60" cy="98" r="31" stroke-width=".8" opacity=".5"/><circle cx="60" cy="98" r="23" stroke-width=".6" opacity=".35"/><path d="M60 69 L64.6 86.9 L80.5 77.5 L71.1 93.4 L89 98 L71.1 102.6 L80.5 118.5 L64.6 109.1 L60 127 L55.4 109.1 L39.5 118.5 L48.9 102.6 L31 98 L48.9 93.4 L39.5 77.5 L55.4 86.9 Z" stroke-width=".9" opacity=".8"/><circle class="m2pip-glow" cx="60" cy="98" r="6.5" fill="url(#mwGold)" stroke="none"/><circle cx="60" cy="98" r="3.2" fill="url(#mwGold)" stroke="none"/></g></svg>'
+    + '</div>'
+    + '<a class="menu__draw-placard" href="codex.html" data-codex-open><span class="menu__draw-placard-mark" aria-hidden="true">✦</span>The Codex — where every mark is defined &rarr;</a>'
+    + '</section>'
+    + '<span class="menu__draw-wm" aria-hidden="true"><svg viewBox="0 0 120 190" preserveAspectRatio="xMidYMid meet"><g stroke="url(#mwInk)" fill="none"><circle cx="60" cy="98" r="31" stroke-width=".8"/><circle cx="60" cy="98" r="23" stroke-width=".6"/><path d="M60 69 L64.6 86.9 L80.5 77.5 L71.1 93.4 L89 98 L71.1 102.6 L80.5 118.5 L64.6 109.1 L60 127 L55.4 109.1 L39.5 118.5 L48.9 102.6 L31 98 L48.9 93.4 L39.5 77.5 L55.4 86.9 Z" stroke-width=".9"/></g></svg></span>'
     + '</div>';
+}
+/* BR-S231 — the monument's one-shot "turn to gold": played ONCE per session, on the
+   first ARRIVAL at the wall (fired from menuSlideTo). Module-level flag so it never
+   re-fires on remount/return. The hero's BASE css is the settled face-up state, so if
+   the turn never plays (reduced motion, deep-link) the gold Star still shows — the card
+   is never stuck back-showing. */
+let M2_TURN_PLAYED = false;
+function wireM2Turn(host) {
+  if (M2_TURN_PLAYED) return;
+  const hero = host.querySelector("[data-m2-hero]");
+  if (!hero) return;
+  M2_TURN_PLAYED = true;
+  const reduced = window.BRMotion ? window.BRMotion.prefersReduced()
+    : !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+  if (reduced) return;                                   // base css already shows the settled gold face
+  const face = hero.querySelector(".m2hero__face"), back = hero.querySelector(".m2hero__back");
+  if (face) face.style.willChange = "transform, opacity, clip-path";
+  if (back) back.style.willChange = "opacity";
+  hero.classList.add("m2hero--turn");
+  if (face) face.addEventListener("animationend", function () {
+    face.style.willChange = ""; if (back) back.style.willChange = "";
+    hero.classList.remove("m2hero--turn");             // animation done; the base settled state holds
+  }, { once: true });
 }
 
 /* BR-S204 — the Reliquary threshold (menu slide 3). A GATED conservation niche:
@@ -1969,7 +1980,7 @@ function wireMenuReveal(host) {
    never stack across remounts. */
 const MENU_PANELS = [
   { cls: null,           sel: ".menu__panel--desk",      hash: "",           focus: ".menu__panel--desk .menu__go-btn" },
-  { cls: "is-wall",      sel: ".menu__panel--wall",      hash: "#rooms",     focus: ".menu__wall-title" },
+  { cls: "is-wall",      sel: ".menu__panel--wall",      hash: "#rooms",     focus: ".menu__draw-title" },
   { cls: "is-reliquary", sel: ".menu__panel--reliquary", hash: "#reliquary", focus: ".menu__reliq-title" },
 ];
 let _menuPushed = 0;     // COUNT of synthetic history entries we pushed (never assign the index)
@@ -2062,6 +2073,7 @@ function menuSlideTo(target, opts = {}) {
   if (target > 0) {                                                 // arriving ANY non-desk panel (forward OR back): focus its title now
     const el = host.querySelector(MENU_PANELS[target].focus);
     if (el) el.focus({ preventScroll: true });
+    if (MENU_PANELS[target].cls === "is-wall") wireM2Turn(host);    // BR-S231: play the monument's turn on arrival (once)
     menuSettle(track, panels, target);
   } else {                                                          // returning to the desk: settle, then focus the rooms arrow/pill
     menuSettle(track, panels, 0, () => {
