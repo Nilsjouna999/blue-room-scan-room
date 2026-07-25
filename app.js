@@ -2142,6 +2142,73 @@ function wireMenuAnnex(host) {                                      // KEEP the 
   else MENU_PANELS.forEach(p => { if (p.cls) host.classList.remove(p.cls); });   // stale-state reset on remount
 }
 
+/* BR-S243 — KEYBOARD NAVIGATION (the first, easiest pass).
+   ← / →  step the horizontal panels: Desk ⇄ The Reading Rooms ⇄ The Reliquary.
+   ↓ / ↑  walk the DESK's vertical depth as CHECKPOINTS — the desk itself, the
+          About intro, then each of the five plates in turn, then the close. One
+          press = one stop, so the page always settles ON a box, never between two.
+   Esc already steps a panel back (menuEsc) and Enter already opens the room; this
+   only adds the two axes that had no key. Guards, in order: menu view only, no
+   modifier (so browser shortcuts survive), never while the Codex aperture or
+   fullview owns the screen, never while typing, and never inside the mini-codex
+   (it owns its own keys). Stops are measured LIVE on each press — the plates
+   reveal on scroll and the rail's row-gap is viewport-relative, so a cached
+   table would drift. */
+function _navBlocked(t) {
+  if (!t) return false;
+  if (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.tagName === "SELECT" || t.isContentEditable) return true;
+  return !!(t.closest && t.closest("#codexMini"));
+}
+function _navStops() {
+  const host = document.getElementById("menuView");
+  const ys = [0];                                                   // the desk, at rest
+  const about = host && host.querySelector("#about");
+  if (about) {
+    const seat = (el) => {
+      if (!el) return;
+      const r = el.getBoundingClientRect(), vh = window.innerHeight;
+      const top = r.top + window.scrollY;
+      // seat the box in the middle of the viewport when it fits; otherwise park its head just below the top edge
+      ys.push(Math.round(r.height < vh - 96 ? top - (vh - r.height) / 2 : top - 48));
+    };
+    seat(about.querySelector(".about__intro"));
+    [].forEach.call(about.querySelectorAll(".about__nugget"), (n) => seat(n.querySelector(".about__plate") || n));
+    seat(about.querySelector(".about__close"));
+  }
+  const floor = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+  return ys.map((y) => Math.min(Math.max(0, y), floor))             // clamp into the real scroll range…
+           .filter((y, i, a) => i === 0 || y > a[i - 1] + 8);       // …then drop any stop the clamp collapsed onto its neighbour
+}
+function _navStep(dir) {
+  const stops = _navStops();
+  if (stops.length < 2) return false;
+  const at = window.scrollY, slack = 24;                            // slack absorbs smooth-scroll overshoot + fractional DPR
+  const next = dir > 0 ? stops.find((y) => y > at + slack)
+                       : stops.slice().reverse().find((y) => y < at - slack);
+  if (next == null) return false;
+  const reduce = window.BRMotion ? window.BRMotion.prefersReduced() : window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  try { window.scrollTo({ top: next, behavior: reduce ? "auto" : "smooth" }); }
+  catch (e) { window.scrollTo(0, next); }                           // older engines: no options object
+  return true;
+}
+document.addEventListener("keydown", function (e) {
+  if (state.view !== "menu") return;
+  if (e.ctrlKey || e.metaKey || e.altKey || e.shiftKey) return;
+  if (_cxOpen || _navBlocked(e.target)) return;
+  const host = document.getElementById("menuView");
+  if (!host || host.classList.contains("is-fullview")) return;
+  const k = e.key;
+  if (k === "ArrowRight" || k === "ArrowLeft") {
+    const to = _menuIndex(host) + (k === "ArrowRight" ? 1 : -1);
+    if (to < 0 || to >= MENU_PANELS.length) return;                 // at either end: let the key fall through untouched
+    e.preventDefault();
+    menuSlideTo(to, {});
+  } else if (k === "ArrowDown" || k === "ArrowUp") {
+    if (_menuIndex(host) !== 0) return;                             // the vertical depth hangs off the desk only
+    if (_navStep(k === "ArrowDown" ? 1 : -1)) e.preventDefault();   // no stop left → the browser keeps its normal scroll
+  }
+});
+
 /* DEV NAV rail markup (dev-only; mounted only when DEVNAV). State navigation
    only — no product copy, no file picker, no draft. Buttons reuse the existing
    state setters via one delegated [data-devnav="kind:val"] handler below. */
