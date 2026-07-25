@@ -1954,11 +1954,12 @@ function wireMiniCodex(host) {
      you have to go fetch it from.
      The float is handed to the compositor as ONE css transition: no per-frame JS, no
      physics loop, no accumulating error — the target is computed once and is exact. */
-  const FLICK_MIN = 6;      // px/frame — under this it is a placement, not a chuck
-  const CARRY_K   = 3.2;    // how much of the flick becomes float
-  const MAX_CARRY = 26;     // px — the ceiling. A levitation, not a throw.
-  const COAST_MS  = 300;
-  let vx = 0, vy = 0, lastT = 0, lastX = 0, lastY = 0, coastT = null;
+  const FLICK_MIN = 2.5;    // px/frame — under this it is a placement, not a chuck
+  const CARRY_K   = 8;      // how much of the flick becomes float
+  const MAX_CARRY = 130;    // px — the ceiling. Felt, but still a levitation, not a fling.
+  const COAST_MS  = 520;
+  const VEL_WINDOW = 90;    // ms — velocity is read over a window, never off one sample
+  let samples = [], coastT = null;
   let minX = -1e5, maxX = 1e5, minY = -1e5, maxY = 1e5;
   function measureBounds() {
     const r = ball.getBoundingClientRect();
@@ -1983,14 +1984,32 @@ function wireMiniCodex(host) {
     mini.classList.remove("is-coasting");
     setOffset(clampX(c[0]), clampY(c[1]));
   }
+  /* Velocity is read over a WINDOW, not from the last event. Pointer streams routinely end
+     with a stale or zero-delta sample right before pointerup (and rates vary wildly between
+     devices), which read one-at-a-time collapses the flick to nothing — the throw then never
+     fires at all. Comparing the newest sample against the oldest one still inside the window
+     is stable across a 60Hz trackpad and a 1000Hz mouse alike. */
+  function now() { return (window.performance && performance.now()) || Date.now(); }
+  function pushSample(x, y) {
+    const t = now();
+    samples.push({ t: t, x: x, y: y });
+    while (samples.length > 2 && t - samples[0].t > VEL_WINDOW) samples.shift();
+  }
+  function releaseVelocity() {                    // px per 60fps frame
+    if (samples.length < 2) return [0, 0];
+    const b = samples[samples.length - 1], a = samples[0];
+    const dt = b.t - a.t;
+    if (dt <= 0) return [0, 0];
+    if (now() - b.t > 120) return [0, 0];         // they paused before letting go → a placement
+    return [(b.x - a.x) * 16.7 / dt, (b.y - a.y) * 16.7 / dt];
+  }
 
   function onDown(e) {
     if (e.button != null && e.button !== 0) return;
     stopCoast();                                          // catching it mid-float stops it dead
     pid = e.pointerId; dragging = true; moved = false;
     sx = e.clientX; sy = e.clientY; bx = ox; by = oy;
-    vx = vy = 0; lastT = (window.performance && performance.now()) || Date.now();
-    lastX = e.clientX; lastY = e.clientY;
+    samples = []; pushSample(e.clientX, e.clientY);
     measureBounds();
     mini.classList.remove("is-homing"); mini.classList.add("is-dragging");
     mini.style.willChange = "transform";   // drag-scoped ONLY — cleared on release, never resident
@@ -2001,11 +2020,7 @@ function wireMiniCodex(host) {
     const dx = e.clientX - sx, dy = e.clientY - sy;
     if (!moved && Math.hypot(dx, dy) > 5) { moved = true; if (panelOpen) closePanel(); }
     if (!moved) return;
-    const now = (window.performance && performance.now()) || Date.now();
-    const dt = Math.max(1, now - lastT);                  // normalise to px per 60fps frame
-    vx = vx * 0.6 + ((e.clientX - lastX) * 16.7 / dt) * 0.4;
-    vy = vy * 0.6 + ((e.clientY - lastY) * 16.7 / dt) * 0.4;
-    lastT = now; lastX = e.clientX; lastY = e.clientY;
+    pushSample(e.clientX, e.clientY);
     dragTo(clampX(bx + dx), clampY(by + dy));
   }
   function onUp(e) {
@@ -2015,15 +2030,19 @@ function wireMiniCodex(host) {
     if (!moved) { endDragTransport(); togglePanel(); return; }   // a tap, not a drag
     endDragTransport();                                          // it is now exactly where released
     const settle = function () { nearSeal() ? goHome() : dropAway(); };
-    const speed = Math.hypot(vx, vy);
+    const v = releaseVelocity(), vX = v[0], vY = v[1];
+    const speed = Math.hypot(vX, vY);
     // A placement — the common case, and the one that must be exact — ends here, untouched.
     if (e.type === "pointercancel" || reduced() || speed < FLICK_MIN) { settle(); return; }
     // A chuck: one bounded float, computed once, run by the compositor.
     const k = Math.min(CARRY_K * speed, MAX_CARRY) / speed;
-    const tx = clampX(ox + vx * k), ty = clampY(oy + vy * k);
+    const tx = clampX(ox + vX * k), ty = clampY(oy + vY * k);
     if (Math.abs(tx - ox) < 1 && Math.abs(ty - oy) < 1) { settle(); return; }   // an edge ate it
-    void mini.offsetWidth;                                       // flush, so the transition has a start value
+    /* Arm the transition FIRST, then flush, then change the value — so the start value is
+       computed with `transform` already transitionable. Flushing before the class is added
+       can let both land in one recalc, and the float silently never runs. */
     mini.classList.add("is-coasting");
+    void mini.offsetWidth;
     setOffset(tx, ty);
     coastT = setTimeout(function () {
       coastT = null; mini.classList.remove("is-coasting"); settle();

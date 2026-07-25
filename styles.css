@@ -3735,7 +3735,7 @@ body[data-devnav="1"] .devnav {
 #menuView .mini.is-homing { transition: transform 440ms cubic-bezier(0.2,0.7,0.2,1); }
 /* the float after a chuck — one compositor transition, no physics loop. Strongly
    decelerating so it reads as levitating to a stop, not sliding. */
-#menuView .mini.is-coasting { transition: transform 300ms cubic-bezier(.12,.82,.24,1); }
+#menuView .mini.is-coasting { transition: transform 520ms cubic-bezier(.10,.85,.22,1); }
 
 /* The mini-codex ball — the ORANGE twin of the full-codex (white) ball: SAME design,
    smaller (30px vs 42px), orange. Was a flat glyph-marked chip; now the matched sphere
