@@ -2599,6 +2599,16 @@ body[data-view="room"] .dev { display: none; }
 .about__rule { width: 44px; height: 1px; background: linear-gradient(90deg, transparent, var(--hair-1) 20%, var(--hair-1) 80%, transparent); }
 .about__line { font-family: var(--font-display); font-size: clamp(16px, 2.3vw, 18.5px); line-height: 1.5; color: var(--t-primary); text-align: center; max-width: 31ch; margin: 0; }
 .about__micro { font-family: var(--font-mono); font-size: 8.5px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--t-meta); margin: 0; }
+
+/* BR-S236 — hovering a box lifts its TEXT slightly brighter so the one you're reading pulls into
+   focus and is easier to read. Colour-only on the text (safe in both plain + engraved-relic modes),
+   with a whisper of plate lift as the focus cue. Scoped to LIT nuggets — the unlit "not yet lit"
+   one stays dim on purpose. Eased so it's a soft settle, never a flash. */
+.about__name, .about__line { transition: color 240ms ease; }
+.about__nugget:not(.about__nugget--unlit) .about__plate { transition: border-color 240ms ease, box-shadow 240ms ease; }
+.about__nugget:not(.about__nugget--unlit) .about__plate:hover { border-color: var(--line-strong); box-shadow: inset 0 1px 0 rgba(233,229,220,.06), 0 6px 22px rgba(0,0,0,.26); }
+.about__nugget:not(.about__nugget--unlit) .about__plate:hover .about__line { color: #f1ede6; }
+.about__nugget:not(.about__nugget--unlit) .about__plate:hover .about__name { color: #f7f4ee; }
 .about__door { margin-top: 8px; display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 12px 20px; border: 1px solid var(--hair-1); border-radius: 8px; background: linear-gradient(180deg, rgba(233,229,220,.015), transparent 70%); cursor: pointer; font-family: var(--font-ui); font-size: 11.5px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--t-display); text-decoration: none; transition: border-color 200ms cubic-bezier(.2,.7,.2,1), color 200ms cubic-bezier(.2,.7,.2,1), background 200ms cubic-bezier(.2,.7,.2,1), box-shadow 200ms cubic-bezier(.2,.7,.2,1), transform 160ms cubic-bezier(.2,.7,.2,1); }
 .about__door:hover, .about__door:focus-visible { transform: translateY(-1.5px); outline: none; }
 .about__door:active { transform: translateY(-.5px); transition-duration: 80ms; }
