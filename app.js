@@ -1289,6 +1289,7 @@ function aboutNugget(o) {
   return '<li class="about__nugget' + (o.cls ? ' ' + o.cls : '') + '" data-side="' + o.side + '" data-nug="' + o.key + '">'
     + '<span class="about__ord" aria-hidden="true">' + o.ord + '</span>'
     + '<div class="about__plate">'
+    +   '<span class="about__frame" aria-hidden="true"></span>'   /* BR-S251: the photographed frame, hover-only (u1-plates.css) */
     +   '<span class="about__emblem" aria-hidden="true">' + AB_EMBLEMS[o.key] + '</span>'
     +   '<p class="about__name">' + o.name + '</p>'
     +   '<span class="about__rule" aria-hidden="true"></span>'
@@ -1542,13 +1543,20 @@ function renderMenu(reveal) {
         <p class="menu__trust">Image-as-artifact scan — it reads frame, gesture and signal, never the person.</p>
       </header>
 
+      <!-- BR-S250: the caption comes AFTER the card. It used to be the topmost ink
+           on the whole page — 8.5px of the card's own furniture sitting 78px above
+           the wordmark — so Blue Room's entrance opened by naming the specimen
+           instead of the room. Moved in SOURCE ORDER, not with CSS `order` or
+           column-reverse: a caption read before its object is wrong for a screen
+           reader too, and column-reverse was measured to make the CARD the topmost
+           ink at y138, which is strictly worse than the problem it names. -->
       <section class="menu__stage${reveal ? " menu__stage--reveal" : ""}">
+        ${reveal ? `<p class="menurev__note">◆ Example · Showcase</p>` : ""}
+        ${reveal ? '<div class="menurev__mount"></div>' : `<div class="msample__card">${renderCard(s, "free")}</div>`}
         <div class="msample__cap">
           <span class="msample__label">Sample Scan</span>
           <span class="msample__type">SRC-01 · Archive</span>
         </div>
-        ${reveal ? `<p class="menurev__note">◆ Example · Showcase</p>` : ""}
-        ${reveal ? '<div class="menurev__mount"></div>' : `<div class="msample__card">${renderCard(s, "free")}</div>`}
       </section>
 
       <div class="menu__controls">
@@ -2028,6 +2036,10 @@ function wireMiniCodex(host) {
     if (dt < 8) return [0, 0];                          // too short to be a measurement
     return [(b.x - a.x) * 1000 / dt, (b.y - a.y) * 1000 / dt];
   }
+  /* the coast clock. (Regression guard: this was deleted with the block it used to live in,
+     and startCoast calls it — a ReferenceError thrown out of onUp left .is-carry stuck on
+     and the inline transform unreleased, which read as the orb simply not working.) */
+  function now() { return (window.performance && performance.now()) || Date.now(); }
   function stopCoast() { if (coastRaf) { cancelAnimationFrame(coastRaf); coastRaf = null; } }
 
   function startCoast(vx, vy, settle) {
