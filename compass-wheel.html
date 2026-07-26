@@ -46,17 +46,24 @@
 
   /* faint blue liquid suspended in the band — a baked bitmap drifting on its OWN compositor layer,
      opposite the inlay's CCW so the two never lock → reads as independent liquid ("second saturn") */
-  .ring-liquid{
+  /* KEPLERIAN SHEAR — the change that moves the ring from "a texture that rotates" to "a body made of
+     orbiting things". One rigid bitmap cannot shear: every streak in it keeps its neighbours forever, so
+     only the ~4.7% of the ink that is angularly distinguishable can be seen to move at all. Split at
+     r=184 — mid-plateau, where the profile has no feature, so the split itself is invisible — and let the
+     two annuli run at different periods. The inner one is FASTER, which is the real direction: for a real
+     ring the inner edge orbits 1.294x the outer. Streaks that start aligned separate by 11.7px at the
+     boundary in ten seconds, and the Cassini gap stops being a painted stripe and becomes the division
+     between two bodies. Nothing else in the file changes: same shell, same shiver, same clip. */
+  .ring-liquid, .ring-liquid-b{
     position:absolute; inset:0; width:100%; height:100%;
-    pointer-events:none; border-radius:50%; transform-origin:50% 50%;
+    pointer-events:none; transform-origin:50% 50%;
     background-position:center; background-size:100% 100%; background-repeat:no-repeat;
     will-change:transform;
-    animation:ringLiquidDrift 200s linear infinite;   /* CW — opposite the inlay's CCW → visible parallax.
-                                                         150s/200s ⇒ relative revolution every 85.7s: still plainly
-                                                         two bodies over the ~10s a user watches, but slow and cold. */
   }
+  .ring-liquid  { animation:ringLiquidDrift 176s linear infinite }   /* inner annulus, r 166-184: faster */
+  .ring-liquid-b{ animation:ringLiquidDrift 214s linear infinite }   /* outer annulus, r 184-202: slower */
   @keyframes ringLiquidDrift{ to{ transform:rotate(360deg) } }
-  @media (prefers-reduced-motion:reduce){ .ring-liquid{ animation:none } }   /* still visible, static */
+  @media (prefers-reduced-motion:reduce){ .ring-liquid,.ring-liquid-b{ animation:none } }
 
   /* the fixed glass channel the inlay is suspended under — never rotates, zero animation */
   .engrave-glass{
@@ -308,6 +315,11 @@
      NO LETTERS: a drifting bitmap cannot keep N/E/S/W upright, and counter-rotating them is exactly
      the tumble trap. Which says the right thing anyway - a rose with no fixed north is a compass
      that cannot answer, and the needle is the only thing here that ever becomes true. */
+  /* the compass is PART OF THE ORB, not painted on it. Without this wrapper the whole assembly
+     stayed rigid while the orb sank 5px under the hammer, and the disagreement is worst at r=0 —
+     on the 11px pivot, the most-stared-at point on the dial. Same construction as .ring-body. */
+  .compass-body{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;
+    z-index:4;transform-origin:50% 50%}
   .compass-rose{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:3;
     background-position:center;background-size:100% 100%;background-repeat:no-repeat;
     will-change:transform;animation:roseDrift 260s linear infinite}
@@ -328,7 +340,8 @@
   .needle{position:absolute;inset:0;width:100%;height:100%;
     background-position:center;background-size:100% 100%;background-repeat:no-repeat}
   /* the last warm point on the instrument - the brass hub is gone, so the ration survives as one jewel */
-  .pivot{position:absolute;left:50%;top:50%;width:11px;height:11px;margin:-5.5px 0 0 -5.5px;
+  /* 2.292% of the 480 disc = 11px at full size, and it stays proportional to the boss it caps */
+  .pivot{position:absolute;left:50%;top:50%;width:2.292%;aspect-ratio:1;margin:-1.146% 0 0 -1.146%;
     border-radius:50%;pointer-events:none;z-index:5;
     background:radial-gradient(circle at 38% 34%, #f0ad66 0%, #d2691e 52%, #7d3a12 100%);
     box-shadow:0 0 0 1px rgba(20,10,4,.8), 0 1px 3px rgba(0,0,0,.6)}
@@ -389,15 +402,17 @@
            ring cannot visibly detach from the orb at the exact climax frame -->
       <div class="ring-body" aria-hidden="true">
         <div class="engrave-ring"></div>
-        <div class="ring-liquid-shell"><div class="ring-liquid"></div></div>
+        <div class="ring-liquid-shell"><div class="ring-liquid"></div><div class="ring-liquid-b"></div></div>
       </div>
       <!-- structural-ink overlay: the wheel's black seams, re-asserted OVER the drifting saturn band -->
       <canvas id="wheelInk" width="480" height="480" aria-hidden="true"></canvas>
       <div class="engrave-glass" aria-hidden="true"></div>
       <!-- the compass: a spare rose, a needle on the ring's beat, and one warm pivot -->
-      <div class="compass-rose" aria-hidden="true"></div>
-      <div class="needle-layer" id="needleLayer" aria-hidden="true"><div class="needle"></div></div>
-      <div class="pivot" aria-hidden="true"></div>
+      <div class="compass-body" aria-hidden="true">
+        <div class="compass-rose"></div>
+        <div class="needle-layer" id="needleLayer"><div class="needle"></div></div>
+        <div class="pivot"></div>
+      </div>
       <!-- the nameplate ring: horizontal option names, orbiting without rotating, framed by the band -->
       <div class="nameplates" id="nameplates" aria-hidden="true"></div>
     </div>
@@ -530,13 +545,13 @@
     </svg>
   </div>
 
-  <div class="result" id="result"></div>
+  <div class="result" id="result" role="status" aria-live="polite"></div>
 
   <div class="controls">
     <div class="inrow">
       <div class="field">
-        <input id="draft" maxlength="24" placeholder="Name a choice…">
-        <span class="count" id="count">0/6</span>
+        <input id="draft" maxlength="24" placeholder="Name a choice…" aria-label="Name a choice">
+        <span class="count" id="count">0/8</span>
       </div>
       <button class="add" id="add">Add</button>
     </div>
@@ -702,7 +717,9 @@
   var LBL_MAX_FS = 21, LBL_SPREAD = 5, LBL_FS_MIN_PX = 9.5;
   // Preference ladder: never drop below 18px merely to avoid a second line; below 18 prefer fewer
   // lines at the same size. Two lines are legal only while 2·fs·1.14 + 4 <= 45  ⇒  fs <= 18.
-  var LBL_ORDER = [[1,21],[1,20],[1,19],[1,18],[2,18],[1,17],[2,17],[1,16],[2,16],
+  // [2,18] and [2,17] are gone: a two-line plate at those sizes reaches r=87.5 inward, and the
+  // needle's tip is at r=94. They were the only rungs that fouled it.
+  var LBL_ORDER = [[1,21],[1,20],[1,19],[1,18],[1,17],[1,16],[2,16],
                    [1,15],[2,15],[1,14],[2,14],[1,13],[2,13],[1,12],[2,12],[1,11],[2,11]];
   var PLATE_OP_TR = 'opacity 260ms cubic-bezier(.2,.7,.2,1)';
   var mctx = document.createElement('canvas').getContext('2d');   // dedicated measurer, never touches wctx
@@ -1230,16 +1247,9 @@
         g.lineTo(cx+vx*172+sx,        cy+vy*172+sy);
         g.stroke();
       }
-      // (4) SIGILS — 8 lozenges at r=176 (in from 180: they now occupy the middle lane). Filled ⇒ radial normal.
-      g.fillStyle='rgba('+col+','+A.sigil+')';
-      for (var k=0;k<8;k++){
-        var c2=(k/8)*TAU_, wx=Math.cos(c2), wy=Math.sin(c2);
-        var mx=cx+wx*(176+e), my=cy+wy*(176+e), nx=-wy, ny=wx, H=4.5;
-        g.beginPath();
-        g.moveTo(mx+wx*H,my+wy*H); g.lineTo(mx+nx*H,my+ny*H);
-        g.lineTo(mx-wx*H,my-wy*H); g.lineTo(mx-nx*H,my-ny*H);
-        g.closePath(); g.fill();
-      }
+      // (4) SIGILS — DELETED. They sat at r=176 with zero angular offset from the 8 cardinals,
+      //     which put them exactly on top of the ring's brightest feature (its 176.4 edge) and
+      //     bisected it eight times. The middle lane belongs to the ring.
     }
     // Brightness ceiling: cardinals 0.36, majors 0.30. Nothing on the DRIFTING limb may out-shine the
     // fixed gem at 12 o'clock — otherwise a cardinal arriving at the top reads as a second pointer.
@@ -1253,45 +1263,54 @@
     return c.toDataURL('image/png');
   }
 
-  // ---- THE RING SYSTEM IN THE CHANNEL — baked ONCE, drifts on its own layer ----
-  // What used to sit here was LIQUID: two soft lobes pooled against the outer wall. It read as a
-  // tint. This is a ring SYSTEM instead — the thing the band was always reaching to be. The
-  // difference is that a ring is MADE OF THINGS: it has real annular bands with a Cassini division
-  // between them, two hard bright lines where it ends, and hundreds of particle streaks whose
-  // angular density clumps. The clumping is the load-bearing part: an even wash rotating looks
-  // static, a clumped one visibly ORBITS, so the 200s drift finally reads as a body in motion.
-  // It sits in the channel's middle lane so it never fights the engraved graduation around it.
-  function bakeRingLiquid(){
+  // ---- THE RING SYSTEM IN THE CHANNEL — baked ONCE PER ANNULUS, each drifting at its own rate ----
+  // What used to sit here was LIQUID: two soft lobes pooled against the outer wall. It read as a tint.
+  // This is a ring SYSTEM — real annular bands with a Cassini division between them, a hard bright edge
+  // where each band ends, and particle streaks whose angular density clumps. The clumping is what makes
+  // the drift legible: an even wash rotating looks static, a clumped one visibly ORBITS.
+  //
+  // The profile's breakpoints are sampled EXACTLY. Twenty-seven even samples across a 36px band land
+  // every 1.385px and hit none of prof()'s three discontinuities, which quietly shrank the authored 4.0px
+  // Cassini gap to 2.77px and rounded both peaks off. Stops are now placed on the breakpoints themselves,
+  // doubled where the profile jumps — the same lesson the .engrave-glass mask already learned.
+  function ringProf(r){
+    if (r<168||r>200) return 0;
+    if (r<172) return 0.30*(r-168)/4;
+    if (r<176) return 0;                        // the Cassini division
+    if (r<192) return 1;
+    if (r<194) return 0.12;
+    return 0.40*(200-r)/6;
+  }
+  // rLo..rHi = this annulus only. Everything outside it is left transparent, so the two layers compose
+  // to exactly the ring that used to be one bitmap.
+  function bakeRingLiquid(rLo, rHi){
     var ss=2, S=DISC_S, TAU=Math.PI*2;
     var c=document.createElement('canvas'); c.width=c.height=S*ss;
     var g=c.getContext('2d'); g.scale(ss,ss); var cx=S/2, cy=S/2;
-    // the radial profile inside the 36px channel: faint inner · GAP · the dense main band ·
-    // thin gap · faint outer. The gaps are what stop it reading as a painted stripe.
-    function prof(r){
-      if (r<168||r>200) return 0;
-      if (r<172) return 0.30*(r-168)/4;
-      if (r<176) return 0;                        // the Cassini division
-      if (r<192) return 1;
-      if (r<194) return 0.12;
-      return 0.40*(200-r)/6;
-    }
     g.save();
     g.beginPath();
-    g.arc(cx,cy,RING_R_OUT,0,TAU);
-    g.arc(cx,cy,RING_R_IN, 0,TAU,true); g.clip('evenodd');   // hard-clip to the band
+    g.arc(cx,cy,rHi,0,TAU);
+    g.arc(cx,cy,rLo,0,TAU,true); g.clip('evenodd');
 
-    // (1) the smooth body of the ring
-    var grad=g.createRadialGradient(cx,cy,RING_R_IN, cx,cy,RING_R_OUT);
-    for (var q=0;q<=26;q++){
-      var rr=RING_R_IN+(RING_R_OUT-RING_R_IN)*q/26;
-      // 0.18, not 0.34: over BLACK a smooth blue body reads as delicate, but over citrine and garnet
-      // the same alpha reads as a grey veil and it swallows the engraving underneath. The particles
-      // and the two edge lines carry the ring; the body only tints the space between them.
-      grad.addColorStop(q/26,'rgba(104,168,226,'+(0.18*prof(rr)).toFixed(4)+')');
+    // (1) the smooth body. 0.18, not 0.34: over BLACK a smooth blue body reads as delicate, but over
+    //     citrine and garnet the same alpha is a grey veil that swallows the engraving underneath.
+    //     The body only tints between the edges; the grain carries the ring.
+    var span=rHi-rLo;
+    var grad=g.createRadialGradient(cx,cy,rLo, cx,cy,rHi);
+    var BRK=[166,168,171.999,172,175.999,176,184,191.999,192,193.999,194,200,202];
+    var seen={};
+    for (var b=0;b<BRK.length;b++){
+      var rr=BRK[b];
+      if (rr<rLo || rr>rHi) continue;
+      var off=(rr-rLo)/span; if (off<0) off=0; if (off>1) off=1;
+      var key=off.toFixed(6); if (seen[key]===undefined) seen[key]=0; else { off=Math.min(1,off+1e-6); }
+      seen[key]=1;
+      grad.addColorStop(off,'rgba(104,168,226,'+(0.18*ringProf(rr)).toFixed(4)+')');
     }
     g.fillStyle=grad; g.fillRect(0,0,S,S);
 
-    // (2) the particles — three broad density nodes so the drift is legible
+    // (2) the particles — three broad density nodes so the drift is legible. Each annulus gets only the
+    //     streaks that fall inside it, so the total across both layers is unchanged.
     var rnd=rng(0x5A7C21);
     function dens(a){ return 0.55 + 0.45*Math.pow(0.5+0.5*Math.sin(3*a+1.1),1.6); }
     var placed=0, guard=0;
@@ -1299,21 +1318,29 @@
       guard++;
       var a=rnd()*TAU;
       if (rnd()>dens(a)) continue;
-      var r=168+32*rnd(), pr=prof(r);
+      var r=168+32*rnd(), pr=ringProf(r);
       if (pr<=0 || rnd()>pr) continue;
       placed++;
       var len=(0.5+rnd()*2.0)*Math.PI/180;                 // a short arc: a streak, not a dot
-      var al=(0.09+rnd()*0.30)*pr;      // the grain does the work now, so it gets the strength
-      g.strokeStyle = (rnd()<0.14) ? 'rgba(198,226,255,'+(al*1.5).toFixed(3)+')'
-                                   : 'rgba(104,168,226,'+al.toFixed(3)+')';
-      g.lineWidth=0.5+rnd()*1.2;
+      var al=(0.09+rnd()*0.30)*pr;
+      var bright=(rnd()<0.14), lw=0.5+rnd()*1.2;
+      if (r<rLo || r>=rHi) continue;                       // drawn by the OTHER annulus
+      g.strokeStyle = bright ? 'rgba(198,226,255,'+(al*1.5).toFixed(3)+')'
+                             : 'rgba(104,168,226,'+al.toFixed(3)+')';
+      g.lineWidth=lw;
       g.beginPath(); g.arc(cx,cy,r,a,a+len); g.stroke();
     }
-    // (3) the two bright edges: a ring's sharpest feature is where it ENDS
-    g.strokeStyle='rgba(186,218,252,0.28)'; g.lineWidth=1.0;
-    g.beginPath(); g.arc(cx,cy,176.4,0,TAU); g.stroke();
-    g.strokeStyle='rgba(186,218,252,0.16)'; g.lineWidth=0.9;
-    g.beginPath(); g.arc(cx,cy,191.6,0,TAU); g.stroke();
+    // (3) the edge where THIS band ends — a ring's sharpest feature, and now one per body. Lifted above
+    //     the drifting-mark ceiling: that ceiling exists so no mark out-shines the fixed gem at 12
+    //     o'clock, but a concentric circle cannot read as a pointer at any brightness.
+    if (176.4>=rLo && 176.4<rHi){
+      g.strokeStyle='rgba(186,218,252,0.40)'; g.lineWidth=1.0;
+      g.beginPath(); g.arc(cx,cy,176.4,0,TAU); g.stroke();
+    }
+    if (191.6>=rLo && 191.6<rHi){
+      g.strokeStyle='rgba(186,218,252,0.24)'; g.lineWidth=0.9;
+      g.beginPath(); g.arc(cx,cy,191.6,0,TAU); g.stroke();
+    }
     g.restore();
     return c.toDataURL('image/png');
   }
@@ -1327,7 +1354,7 @@
     var c=document.createElement('canvas'); c.width=c.height=S*ss;
     var g=c.getContext('2d'); g.scale(ss,ss);
     g.lineJoin='miter'; g.miterLimit=8; g.lineCap='butt';
-    var R0=34, R1=88;
+    var R0=20, R1=88;   // was 34: the brass hub used to fill this; now the rays close it
     // A FILLED shape must not use the offset emboss the thin strokes use: at a 0.55px offset the dark
     // pass covers almost the whole kite and the ray just reads as a smudge. A kite embosses ITSELF —
     // one half lit, one half in shadow, meeting on the spine — so it gets a single pass, a hair of
@@ -1385,12 +1412,13 @@
       g.beginPath(); g.moveTo(cx,ty); g.lineTo(cx-W,sy); g.lineTo(cx,cy);
       g.lineTo(cx+W,sy); g.closePath(); g.stroke();
     }
-    lobe(-1,'rgba(14,20,32,1)','rgba(8,12,20,1)','rgba(120,150,190,0.20)');   // south first
+    lobe(-1,'rgba(14,20,32,1)','rgba(8,12,20,1)','rgba(120,150,190,0.34)');   // south first; edge lifted
+                                                                             // off the obsidian behind it
     var nl=g.createLinearGradient(cx-W,cy-L,cx,cy); nl.addColorStop(0,'#8FB4E2'); nl.addColorStop(1,'#33506F');
     var nr=g.createLinearGradient(cx,cy-L,cx+W,cy);  nr.addColorStop(0,'#3C5C82'); nr.addColorStop(1,'#182B41');
     lobe(1, nl, nr, 'rgba(198,222,252,0.55)');
     g.strokeStyle='rgba(226,240,255,0.72)'; g.lineWidth=0.8;                  // the spine
-    g.beginPath(); g.moveTo(cx,cy-L+1); g.lineTo(cx,cy+L*0.42); g.stroke();
+    g.beginPath(); g.moveTo(cx,cy-L+1); g.lineTo(cx,cy+L*0.90); g.stroke();   // the spine runs the whole needle
     var bg=g.createRadialGradient(cx-3,cy-4,1, cx,cy,13);                     // the boss it turns on
     bg.addColorStop(0,'#5D7A9E'); bg.addColorStop(0.55,'#24374F'); bg.addColorStop(1,'#0B1220');
     g.fillStyle=bg; g.beginPath(); g.arc(cx,cy,13,0,Math.PI*2); g.fill();
@@ -1656,7 +1684,7 @@
   var IMPACT_MS      = 260;          // orb squash-and-sink duration — do NOT walk this into the liquid window
   var PLUNGE_MS      = 170;          // the bright lens travelling 12 o'clock → core
   var CORE_DELAY     = 120;          // the core swallows inward as the lens lands
-  var CORE_MS        = 200;          // core pinch-to-zero duration
+  var CORE_MS        = 140;   // was 200: it outlived the needle's release and buried it in the flash          // core pinch-to-zero duration
   // PLUNGE_DIST is MEASURED from the live top-rim→hub gap in the wire-up block (do NOT hardcode px — breaks on mobile)
 
   // ---- element refs ----
@@ -1668,6 +1696,7 @@
   var liquidShell= document.querySelector('.ring-liquid-shell');
   var glassBand  = document.querySelector('.engrave-glass');
   var shadowEl   = document.querySelector('.disc-shadow');
+  var compassBody= document.querySelector('.compass-body');
   var fxLayer    = document.querySelector('.fx');
   var vitrifyEl  = document.querySelector('.vitrify');
   var sparkEl    = document.querySelector('.spark');
@@ -1870,6 +1899,7 @@
     if (ringBody)    ringBody.style.willChange='transform';
     if (liquidShell) liquidShell.style.willChange='transform';
     if (glassBand)   glassBand.style.willChange='transform';
+    if (compassBody) compassBody.style.willChange='transform';
 
     resetFx();
     if (fxLayer) fxLayer.classList.add('live');
@@ -1878,10 +1908,10 @@
     // it schedules everything else RELATIVE TO THIS INSTANT — so the whole coating stays glued to the
     // strike no matter what LAP_MS becomes.
     if (lean){                                // repeat spins: no orbit lap; the arrow is already at the top
-      ct(function(){ tickFlash(); impactToCore(); vitrify(); if(onDone) onDone(); liquid(true); needleFind(); },  0);
+      ct(function(){ tickFlash(); impactToCore(); vitrify(); if(onDone) onDone(); liquid(true); },  0);
       ct(function(){ endCeremony(true); }, LIQ.lean.total + 40);          // = 1091 < CEREMONY_MAX_LEAN 1200
     } else {                                  // first spin of a set: the lap runs and the SEAT reveals
-      arrowLap(function(){ tickFlash(); impactToCore(); vitrify(); if(onDone) onDone(); liquid(false); needleFind(); });
+      arrowLap(function(){ tickFlash(); impactToCore(); vitrify(); if(onDone) onDone(); liquid(false); });
       ct(function(){ endCeremony(true); }, LAP_MS + LIQ.full.total + 40); // = 2360 < CEREMONY_MAX_FULL 2500
     }
   }
@@ -1907,8 +1937,11 @@
     if (ringBody){    ringBody.style.transform='';    ringBody.style.willChange=''; }
     if (liquidShell){ liquidShell.style.transform=''; liquidShell.style.willChange=''; }
     if (glassBand){   glassBand.style.transform='';   glassBand.style.willChange=''; }
+    if (compassBody){ compassBody.style.transform=''; compassBody.style.willChange=''; }
     if (shadowEl)   shadowEl.style.transform='';
-    if (plateLayer) plateLayer.style.transform='';   // syncPlates rewrites it on the mirrorInk below
+    // NOT plateLayer: the only writer of its transform is buildPlates (behind the psig early-out),
+    // so blanking it here dropped the layer back to the CSS scale(1) and left the names 1/plateK
+    // oversize on every viewport under 600px, permanently, after every completed spin.
     canvas.style.willChange='';                      // moved OFF the spin's lock frame — see spin()
     if (ptr){ ptr.style.transform=''; ptr.style.willChange=''; ptr.style.opacity=''; ptr.style.transition=''; }
     if (fxLayer)   fxLayer.classList.remove('live');   // display:none hides the drop + splat
@@ -1978,17 +2011,19 @@
   function orbAbsorb(){
     // cFrac 0.075 = a 19.5ms compression, barely over one frame: a STRIKE, not a squeeze.
     // e^-5.2 is dead by ~200ms. Monotone decay, no rebound term anywhere — a cold contained blow.
-    var N=14, kf=[], kfR=[], kfShadow=[], cFrac=0.075, OPT={duration:IMPACT_MS, easing:'linear'};
+    var N=14, kf=[], kfR=[], kfP=[], kfShadow=[], cFrac=0.075, OPT={duration:IMPACT_MS, easing:'linear'};
     for(var i=0;i<=N;i++){ var u=i/N, sx, sy, dy;
       if(u<=cFrac){ var w=u/cFrac; sy=1-(1-IMPACT_SCALE_Y)*w; sx=1+(IMPACT_SCALE_X-1)*w; dy=IMPACT_SINK*w; }
       else{ var v=(u-cFrac)/(1-cFrac), e=Math.exp(-5.2*v); sy=1-(1-IMPACT_SCALE_Y)*e; sx=1+(IMPACT_SCALE_X-1)*e; dy=IMPACT_SINK*e; }
       var body='translateY('+dy.toFixed(2)+'px) scale('+sx.toFixed(4)+','+sy.toFixed(4)+')';
+      kfP.push({transform:'translateY('+(dy/plateK).toFixed(2)+'px) scale('+sx.toFixed(4)+','+sy.toFixed(4)+')'});
       kf.push({transform: body+' rotate('+rot+'deg)'});     // the wheel carries its locked rotation
       kfR.push({transform: body});                          // the ring/glass/film never did
       kfShadow.push({transform:'translateY('+(dy*0.45).toFixed(2)+'px) scale('+(1+0.010*(dy/IMPACT_SINK)).toFixed(4)+')'});
     }
     kf[N]       = {transform:'translateY(0px) scale(1,1) rotate('+rot+'deg)'};
     kfR[N]      = {transform:'translateY(0px) scale(1,1)'};
+    kfP[N]      = {transform:'translateY(0px) scale(1,1)'};
     kfShadow[N] = {transform:'translateY(0px) scale(1)'};
     var a = reg(canvas.animate(kf, OPT));                                    // fill:none → reverts to inline rotate(rot)
     a.onfinish = function(){ canvas.style.transform='rotate('+rot+'deg)'; };
@@ -2001,30 +2036,68 @@
     if (ringBody)  reg(ringBody.animate(kfR, OPT));                          // astrolabe + liquid, as one body
     if (glassBand) reg(glassBand.animate(kfR, OPT));                         // the glass channel over them
     if (fxLayer)   reg(fxLayer.animate(kfR, OPT));                           // the white film clings to the sinking glass
+    if (compassBody) reg(compassBody.animate(kfR, OPT));                     // rose + needle + pivot sink WITH the orb
     if (shadowEl)  reg(shadowEl.animate(kfShadow, OPT));                     // the cast shadow compresses toward it
     if (plateLayer){                                                         // the names squash with the wheel they name
+      // the dip sits INSIDE scale(plateK), so a raw dy would sink the names by dy*plateK and they
+      // would drift off the orb at every width but 1. Pre-divide so the screen displacement matches.
       var pre='translate(-50%,-50%) scale('+plateK+') ';
-      reg(plateLayer.animate(kfR.map(function(k){ return {transform: pre+k.transform}; }), OPT));
+      reg(plateLayer.animate(kfP.map(function(k){ return {transform: pre+k.transform}; }), OPT));
     }
     ringSlosh();
   }
 
-  // ---- THE NEEDLE FINDS NORTH. It leans on the ring's beat while nothing is decided; on the blow it
-  //      is released and settles, ringing past centre and back. This is the ONE place a damped
-  //      overshoot is correct - the hammer bans rebound because a struck orb must not bounce, but a
-  //      needle that arrived without ringing would not be a needle. ----
+  // ---- THE NEEDLE. It leans on the ring's beat while nothing is decided; the plunge releases it, and
+  //      it settles onto north exactly as the drop lands on the word. This is the ONE place a damped
+  //      overshoot is correct — the hammer bans rebound because a struck orb must not bounce, but a
+  //      needle that arrived without ringing would not be a needle.
+  //
+  //      The three joints that used to be uncut, and how each is cut now:
+  //      (1) RELEASE. A damped cosine has initial velocity -A*lambda, which has nothing to do with how
+  //          fast the needle was actually travelling — so the settle began with a velocity STEP. The
+  //          free response is now written in full, A*cos + B*sin with B derived from the measured
+  //          release velocity, so the needle is RELEASED rather than pushed.
+  //      (2) LANDING. 900ms was 1.575 cycles — the animation ended mid-swing and the final keyframe
+  //          pinned it, which is a dead stop dressed as a settle. NEEDLE_MS is now 3*pi/omega exactly,
+  //          where the free response's own velocity is zero, so the pin has nothing left to do.
+  //      (3) WAKE. Removing .found used to hand straight back to a CSS lean that could be 22deg away —
+  //          a one-frame teleport. The lean now resumes at the next moment the ring's beat puts it at
+  //          exactly 0deg, so it rejoins from where it already is. It holds north until the instrument
+  //          comes back for it.
   var needleLayer = document.getElementById('needleLayer');
-  var needleFound = false;
-  var NEEDLE_BEAT_S = 18.75;                 // 150s ring / 8 cardinals - mirrored in the CSS duration
+  var needleFound = false, needleWakeT = 0;
+  var NEEDLE_BEAT_S = 18.75;                 // 150s ring / 8 cardinals — mirrored in the CSS duration
+  var NEEDLE_HZ = 1.75, NEEDLE_Z = 0.42;     // Z 0.42: residual 0.287deg = under half a pixel at the tip
+  var NEEDLE_W  = 2*Math.PI*NEEDLE_HZ/1000;                          // rad/ms
+  var NEEDLE_LAM= NEEDLE_W*NEEDLE_Z/Math.sqrt(1-NEEDLE_Z*NEEDLE_Z);  // 1/ms
+  var NEEDLE_MS = Math.round(3*Math.PI/NEEDLE_W);                    // 857ms — an exact velocity zero
+  var NEEDLE_KICK = 3.6;                     // deg of extra swing the blow imparts (see ringSlosh)
+
+  // the ring's OWN clock, not the document's. The CSS animations start after six synchronous bakes,
+  // so timeOrigin was wrong by however long those took — and that error was permanent.
+  function ringPhaseS(){
+    var el = document.querySelector('.engrave-ring');
+    try {
+      var a = el && el.getAnimations ? el.getAnimations()[0] : null;
+      if (a && a.currentTime != null) return (a.currentTime/1000) % NEEDLE_BEAT_S;
+    } catch(e){}
+    return (performance.now()/1000) % NEEDLE_BEAT_S;
+  }
   function needleWake(){                     // a new question: nothing is decided again
     if (!needleLayer || !needleFound) return;
     needleFound = false;
-    needleLayer.style.transform = '';
-    // re-enter the ring's beat IN PHASE. Both animations started at load, so the ring's phase is just
-    // the elapsed time modulo the beat; a negative delay of that much puts the needle back in step
-    // instead of restarting its pendulum wherever the last spin happened to leave it.
-    needleLayer.style.animationDelay = '-' + ((performance.now()/1000) % NEEDLE_BEAT_S).toFixed(3) + 's';
-    needleLayer.classList.remove('found');
+    if (needleWakeT){ clearTimeout(needleWakeT); needleWakeT = 0; }
+    // the lean passes through exactly 0deg at 25% and 75% of its cycle. Rejoin at the NEXT of those,
+    // so the needle steps back into the beat from the angle it is already holding — no jump, no drift.
+    var q = ringPhaseS()/NEEDLE_BEAT_S;
+    var next = (q < 0.25) ? 0.25 : (q < 0.75 ? 0.75 : 1.25);
+    needleWakeT = setTimeout(function(){
+      needleWakeT = 0;
+      if (needleFound) return;               // a new verdict landed while we were waiting
+      needleLayer.style.transform = '';
+      needleLayer.style.animationDelay = '-' + ((next % 1)*NEEDLE_BEAT_S).toFixed(3) + 's';
+      needleLayer.classList.remove('found');
+    }, (next - q)*NEEDLE_BEAT_S*1000);
   }
   function needleAngleNow(){                 // read the live angle out of the lean's own matrix
     if (!needleLayer) return 0;
@@ -2034,22 +2107,43 @@
     var a = Math.atan2(parseFloat(v[1]), parseFloat(v[0]))*180/Math.PI;
     return isFinite(a) ? a : 0;
   }
-  var NEEDLE_MS=900, NEEDLE_HZ=1.75, NEEDLE_Z=0.30;
+  // measure how fast the needle is travelling at the instant of release, by seeking its own animation
+  // back 20ms and reading it. Synchronous and exact — sampling across two rAF ticks would have cost a
+  // frame at the one moment in the whole ceremony that cannot afford one.
+  function needleVelNow(a0){
+    if (!needleLayer || !needleLayer.getAnimations) return 0;
+    try {
+      var an = needleLayer.getAnimations()[0];
+      if (!an || an.currentTime == null) return 0;
+      var ct = an.currentTime;
+      if (ct < 20) return 0;
+      an.currentTime = ct - 20;
+      var prev = needleAngleNow();
+      an.currentTime = ct;
+      return (a0 - prev)/20;                 // deg/ms
+    } catch(e){ return 0; }
+  }
   function needleFind(){
     if (!needleLayer) return;
-    var from = needleAngleNow();
+    var A  = needleAngleNow();
+    var v0 = needleVelNow(A);
     needleFound = true;
+    if (needleWakeT){ clearTimeout(needleWakeT); needleWakeT = 0; }
     needleLayer.classList.add('found');      // stop the lean at exactly where it had got to
-    needleLayer.style.transform = 'rotate('+from.toFixed(3)+'deg)';
-    var w=2*Math.PI*NEEDLE_HZ/1000, lam=w*NEEDLE_Z/Math.sqrt(1-NEEDLE_Z*NEEDLE_Z), N=24, kf=[];
+    needleLayer.style.transform = 'rotate('+A.toFixed(3)+'deg)';
+    // theta(t) = e^(-lam t) [ A cos(w t) + B sin(w t) ],  B = (v0 + lam*A)/w + the blow's impulse.
+    // With B derived from v0 the join is velocity-continuous; the kick is the hammer arriving through
+    // the needle's own pivot, the same way ringSlosh gives the ring the impulse rather than a position.
+    var B = (v0 + NEEDLE_LAM*A)/NEEDLE_W + ORBIT_DIR*NEEDLE_KICK;
+    var N = 30, kf = [];
     for (var i=0;i<=N;i++){
-      var t=i/N*NEEDLE_MS, e=Math.exp(-lam*t)*Math.cos(w*t);
-      kf.push({transform:'rotate('+(from*e).toFixed(3)+'deg)'});
+      var t = i/N*NEEDLE_MS, e = Math.exp(-NEEDLE_LAM*t);
+      kf.push({transform:'rotate('+(e*(A*Math.cos(NEEDLE_W*t) + B*Math.sin(NEEDLE_W*t))).toFixed(3)+'deg)'});
     }
-    kf[N]={transform:'rotate(0deg)'};        // value AND slope at rest: it stops, it does not cut
-    var a=reg(needleLayer.animate(kf,{duration:NEEDLE_MS, easing:'linear', fill:'forwards'}));
-    a.onfinish=function(){ needleLayer.style.transform='rotate(0deg)'; };
-    a.oncancel=function(){ needleLayer.style.transform='rotate(0deg)'; };   // an interrupt still lands north
+    kf[N] = {transform:'rotate(0deg)'};      // at 3pi/w the curve's own velocity is already zero
+    var a = reg(needleLayer.animate(kf,{duration:NEEDLE_MS, easing:'linear', fill:'forwards'}));
+    a.onfinish = function(){ needleLayer.style.transform='rotate(0deg)'; };
+    a.oncancel = function(){ needleLayer.style.transform='rotate(0deg)'; };   // an interrupt still lands north
   }
 
   // THE LIQUID LAGS THE BLOW. Only the WRAPPER moves, so .ring-liquid's own drift is never suspended.
@@ -2057,15 +2151,20 @@
   // container stops and the liquid keeps going, which is the physically right story and lands on the
   // liquid rather than on the arrow. Peak −6.2px at 44.5ms, naturally lagging the orb's 19.5ms
   // compression; residual at 560ms is 0.055px and the last keyframe pins it to exact rest.
-  var SL_MS=560, SL_DIP=3.4, SL_ROT=0.80, SL_HZ=4.6, SL_Z=0.28;   // a RING shivers; water sloshed
+  // A ring in a circular groove has ONE degree of freedom: it can slip round, it cannot move sideways.
+  // The translate made it 3.4px eccentric to its own stationary rails at the exact frame the file's own
+  // law forbids anything detaching from the orb — so only the rotation survives. N is 36, not 18: at 18
+  // the 4.6Hz curve got 7 samples per cycle and the peak fell between two of them, so the shiver never
+  // reached the amplitude it was authored for and plateaued instead of turning.
+  var SL_MS=560, SL_ROT=0.80, SL_HZ=4.6, SL_Z=0.28;
   function ringSlosh(){
     if (!liquidShell) return;
     var w=2*Math.PI*SL_HZ/1000,                 // 0.0289027 rad/ms
         lam=w*SL_Z/Math.sqrt(1-SL_Z*SL_Z),      // 0.0084295 /ms
-        A=SL_DIP/0.6597, Ar=SL_ROT/0.6597, N=18, kf=[];
+        Ar=SL_ROT/0.6597, N=36, kf=[];
     for (var i=0;i<=N;i++){ var t=i/N*SL_MS, e=Math.exp(-lam*t)*Math.sin(w*t);
-      kf.push({transform:'translateY('+(A*e).toFixed(2)+'px) rotate('+(Ar*e).toFixed(3)+'deg)'}); }
-    kf[N]={transform:'translateY(0px) rotate(0deg)'};
+      kf.push({transform:'rotate('+(Ar*e).toFixed(3)+'deg)'}); }
+    kf[N]={transform:'rotate(0deg)'};
     var a=reg(liquidShell.animate(kf,{duration:SL_MS, easing:'linear'}));
     a.onfinish=function(){ liquidShell.style.transform=''; };   // if it sloshes the wrong way, negate SL_ROT
   }
@@ -2195,6 +2294,10 @@
   function liquid(lean){
     var L = lean ? LIQ.lean : LIQ.full;
     armVerdictPaint();
+    // ONE CAUSAL CHAIN: the plunge drives into the core, the needle is released as it arrives, and its
+    // ring ends on the exact frame the drop lands and the word turns white. The needle used to answer
+    // 170ms early and stop 115ms off the drop, which read as two unrelated events.
+    ct(needleFind, Math.max(CORE_DELAY, L.drip + L.dripMs - NEEDLE_MS));
     ct(function(){ wellSwell(L); }, L.well);
     ct(function(){ runHeads(L); }, L.run);
     ct(function(){ drainAll(L); }, L.drain);
@@ -2266,7 +2369,7 @@
     // SPEED, because it is being handed to an impact, not brought to rest.
     var Y0=540, D=LAND.y-556, X=function(f){ return (280+LAND.dx*f).toFixed(1); };
     showFx(dropEl);
-    var d = reg(dropEl.animate([
+    var d = dropAnim = reg(dropEl.animate([
       {transform:'translate(280px,'+Y0+'px) scale(0.62,0.55)',                     opacity:0, offset:0.00, easing:'cubic-bezier(.25,.55,.35,1)'},
       {transform:'translate(280px,547px) scale(0.86,1.02)',                        opacity:1, offset:0.13, easing:'cubic-bezier(.42,0,.72,.45)'},
       {transform:'translate(280px,556px) scale(0.80,1.20)',                        opacity:1, offset:0.26, easing:'cubic-bezier(.36,0,.78,.42)'},  // SNAP — detaches
@@ -2276,7 +2379,11 @@
     ], {duration:L.dripMs, easing:'linear', fill:'forwards'}));
     d.finished.then(function(){ if (ceremony.active) dripImpact(L); }).catch(function(){});
   }
+  var dropAnim = null;
   function dripImpact(L){        // the drop lands ON the word and the white floods out of the strike point
+    // CANCEL before hiding: the fall runs fill:forwards, and a forwards fill outranks an inline
+    // style, so hideFx alone left the drop sitting on the word until teardown popped it out.
+    if (dropAnim){ try{ dropAnim.cancel(); }catch(e){} dropAnim=null; }
     hideFx(dropEl);
     paintVerdict(Math.round(L.splatMs*0.72));
     if (splatEl){
@@ -2324,7 +2431,7 @@
     state.options.push({ text:t.slice(0,24), color:col.color, hue:col.hue });
     state.draft=''; state.preview=null; state.result=null; state.winner=null;
     document.getElementById('draft').value='';
-    if (prefersReduced()){ sig=null; render(); return; }    // snap — no pop, no rAF
+    if (prefersReduced()){ sig=null; render(); draftEl.focus(); return; }   // snap — no pop, no rAF (focus parity)
     renderControls();                                       // list/buttons update now; the canvas is owned by rAF
     var newSeg = { color: col.color, text: t.slice(0,24) };
     anim = { kind: isFirst?'first':'add', start: performance.now(),
@@ -2365,6 +2472,12 @@
 
   // ---- view sync ----  (draw() is suppressed while a transition owns the canvas)
   function renderControls(){
+    // the instant-reveal branch of spin() (empty orb / reduced motion / ceremony off) never reaches
+    // endCeremony, so nothing was releasing the two canvases it promoted. This is the one place that
+    // is guaranteed to run afterwards on every path, and it is not on any hot loop.
+    if (!state.spinning && !state.revealPending && !ceremony.active && canvas.style.willChange){
+      canvas.style.willChange=''; if (inkCanvas) inkCanvas.style.willChange='';
+    }
     var r = document.getElementById('result');
     if (state.spinning){           r.innerHTML = '';        // status carried by the disabled button; the verdict slot stays withheld
                                    needleWake(); }          // a new question: the needle loses north again
@@ -2407,8 +2520,8 @@
       if (state.draft.trim() && !state.preview) state.preview = paletteColor(state.options.length);
       if (!state.draft.trim()) state.preview = null;
     }
-    state.result=null; state.winner=null;
-    sig=null; render();
+    if (!busy() && !ceremony.active){ state.result=null; state.winner=null; }   // typing mid-ceremony
+    sig=null; render();                                    // must not blank a verdict still being delivered
   });
   draftEl.addEventListener('keydown', function(e){ if (e.key==='Enter'){ e.preventDefault(); addOption(); } });
   document.getElementById('add').addEventListener('click', addOption);
@@ -2440,17 +2553,26 @@
     _ndlEl.style.backgroundImage = 'url('+_ndlURI+')';
     var _nI=new Image(); _nI.src=_ndlURI; if(_nI.decode) _nI.decode().catch(function(){});
   }
-  var _liqEl = document.querySelector('.ring-liquid');
-  if (_liqEl){
-    var _lU = bakeRingLiquid();
-    _liqEl.style.backgroundImage = 'url('+_lU+')';
-    var _li = new Image(); _li.src = _lU; if (_li.decode) _li.decode().catch(function(){});   // GPU-ready, no first-frame flash
+  var _liqA = document.querySelector('.ring-liquid');
+  var _liqB = document.querySelector('.ring-liquid-b');
+  if (_liqA){
+    var _uA = bakeRingLiquid(RING_R_IN, 184);            // the inner, faster body
+    _liqA.style.backgroundImage = 'url('+_uA+')';
+    var _iA = new Image(); _iA.src = _uA; if (_iA.decode) _iA.decode().catch(function(){});
   }
-  // measure the top-rim→hub gap ONCE (responsive; scales with the disc) so the plunge lens lands on the hub at any width
-  var PLUNGE_DIST = (plungeEl && coreEl)
-    ? (coreEl.getBoundingClientRect().top + coreEl.getBoundingClientRect().height/2)
-      - (plungeEl.getBoundingClientRect().top + plungeEl.getBoundingClientRect().height/2)
-    : 240;   // fallback for the authored 480 disc
+  if (_liqB){
+    var _uB = bakeRingLiquid(184, RING_R_OUT);           // the outer, slower body
+    _liqB.style.backgroundImage = 'url('+_uB+')';
+    var _iB = new Image(); _iB.src = _uB; if (_iB.decode) _iB.decode().catch(function(){});
+  }
+  // the top-rim→hub gap. RE-measured on resize, not once: measured once, the plunge lens kept aiming at
+  // where the hub used to be after any width change. measurePlates already owns a ResizeObserver.
+  var PLUNGE_DIST = 240;   // fallback for the authored 480 disc
+  function measurePlunge(){
+    if (!plungeEl || !coreEl) return;
+    var a=coreEl.getBoundingClientRect(), b=plungeEl.getBoundingClientRect();
+    PLUNGE_DIST = (a.top + a.height/2) - (b.top + b.height/2);
+  }
   // ---- nameplate ring wire-up: one fixed 480 coordinate system scaled to the live disc ----
   plateLayer = document.getElementById('nameplates');
   var _dw = document.querySelector('.disc-wrap');
@@ -2458,8 +2580,9 @@
     // measure .disc-wrap, NEVER #wheel — the wheel is WAAPI-scaled during orbAbsorb
     var w = _dw ? _dw.getBoundingClientRect().width : DISC_S, k = (w||DISC_S)/DISC_S;
     if (Math.abs(k-plateK) < 0.002) return;
-    plateK = k; psig = null; buildPlates();
+    plateK = k; psig = null; buildPlates(); measurePlunge();
   }
+  measurePlunge();
   measurePlates();
   if (window.ResizeObserver && _dw) new ResizeObserver(measurePlates).observe(_dw);
   else window.addEventListener('resize', measurePlates);
