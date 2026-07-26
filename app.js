@@ -2518,9 +2518,13 @@ function _navStep(dir) {
   const next = dir > 0 ? stops.find((y) => y > at + slack)
                        : stops.slice().reverse().find((y) => y < at - slack);
   if (next == null) return false;
-  const reduce = window.BRMotion ? window.BRMotion.prefersReduced() : window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  try { window.scrollTo({ top: next, behavior: reduce ? "auto" : "smooth" }); }
-  catch (e) { window.scrollTo(0, next); }                           // older engines: no options object
+  /* BR-S264: the keys now ride the SAME owned glide as the scroll boundary, so ↓/↑
+     and a wheel push feel identical and there is one curve to tune. Native
+     `behavior:'smooth'` is gone from here for the reason given at _u1GlideTo: its
+     duration scales with distance, has no dial, and ends on the slow tail that
+     read as lag. _u1GlideTo handles reduced-motion itself (it lands, not travels)
+     and falls back to an instant jump if it declines the move. */
+  if (!_u1GlideTo(next)) window.scrollTo(0, next);
   return true;
 }
 document.addEventListener("keydown", function (e) {
@@ -2560,12 +2564,76 @@ document.addEventListener("keydown", function (e) {
    if a flick comes to rest inside the dead zone between the two rooms, the page
    finishes the journey for it. Same destination, gentler instrument, no hijack.
 
-   INTERRUPTIBLE BY CONSTRUCTION. The guard releases on any upward intent, on any
-   keypress, and on a hard timeout, so a glide can never trap the page. Reduced
-   motion jumps instead of gliding (native `behavior` handles it inside _navStep).  */
+   INTERRUPTIBLE BY CONSTRUCTION. The move only ever gets the ONE gesture that
+   started it — see the wheel handler.
+
+   ── BR-S264 — three fixes, all reported from a real trackpad ──────────────────
+   1. THE UP-TRAP (a real bug, and the bad kind: it took the page away from you).
+      The settle corrector only knew "am I in the dead zone", not "which way was
+      the user going" — so scrolling UP out of U1 crossed the dead zone and got
+      yanked back DOWN to the seat. Now every correction is DIRECTIONAL: we track
+      the sign of travel and a correction may only ever continue the way you were
+      already going. Going up can never pull you down, by construction.
+   2. THE LAG. Native `behavior:'smooth'` scales its duration with distance and has
+      no dial — over this 934px hop it runs long and finishes on a slow tail, which
+      is exactly what reads as "laggy". Replaced with an owned rAF glide: a fixed
+      ~420ms budget and an ease-OUT curve (fast departure, firm arrival, no crawl),
+      terminating hard inside 0.5px instead of asymptoting. One number to tune.
+   3. THE POLISH. The boundary now works BOTH ways: down from the Desk glides to
+      U1, up from the U1 seat glides back to the Desk. A snap that only fires one
+      direction reads as a glitch; one that mirrors reads as a threshold. */
 let _u1Gliding = false, _u1GlideT = null, _u1SettleT = null;
+let _u1RAF = null, _u1LastY = 0, _u1Dir = 0;
+const U1_GLIDE_MS = 420;                     // the one dial for feel. 300 = brisk, 420 = shipped, 600 = stately
 function _u1Seat() { const s = _navStops(); return s.length > 1 ? s[1] : null; }
-function _u1Release() { _u1Gliding = false; if (_u1GlideT) { clearTimeout(_u1GlideT); _u1GlideT = null; } }
+function _u1Reduced() {
+  return window.BRMotion ? window.BRMotion.prefersReduced()
+                         : !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+}
+function _u1Release() {
+  _u1Gliding = false;
+  if (_u1GlideT) { clearTimeout(_u1GlideT); _u1GlideT = null; }
+  if (_u1RAF) { cancelAnimationFrame(_u1RAF); _u1RAF = null; }
+}
+/* One clock, and NOT written as `performance.now() || Date.now()`. That idiom looks
+   safe and is a trap: performance.now() legitimately returns 0 on the very first
+   frame after navigation, 0 is falsy, so the fallback fires and mixes a
+   navigation-relative origin with a Unix epoch one — t goes hugely negative and the
+   glide never moves. Caught by a test that stubbed the clock to 0. */
+function _u1Now() {
+  return (window.performance && typeof performance.now === "function") ? performance.now() : Date.now();
+}
+/* THE GLIDE — owned, so its duration and curve are ours rather than the engine's.
+   easeOutCubic: 1-(1-t)^3. Leaves immediately (so the move registers as a response
+   to your gesture) and seats without hanging (the tail is what felt slow).
+   Cancels itself the moment anything else moves the page, so it can never fight
+   the user or the browser's own scrolling. */
+function _u1GlideTo(target) {
+  const from = window.scrollY;
+  const dist = target - from;
+  if (Math.abs(dist) < 2) return false;
+  if (_u1Reduced()) { window.scrollTo(0, target); return true; }      // no motion: land, don't travel
+  _u1Gliding = true;
+  const t0 = _u1Now();
+  let expect = from;                                                  // where WE put the page last frame
+  const step = function () {
+    _u1RAF = null;
+    if (!_u1Gliding) return;
+    // if the page moved and it wasn't us, the user (or the browser) took over — yield
+    if (Math.abs(window.scrollY - expect) > 2) { _u1Release(); return; }
+    const t = Math.max(0, Math.min(1, (_u1Now() - t0) / U1_GLIDE_MS));
+    const e = 1 - Math.pow(1 - t, 3);
+    const y = Math.round(from + dist * e);
+    window.scrollTo(0, y);
+    expect = window.scrollY;
+    _u1LastY = expect;                                                // keep the scroll listener from reading our own motion as intent
+    if (t >= 1 || Math.abs(target - expect) < 0.5) { window.scrollTo(0, target); _u1LastY = window.scrollY; _u1Release(); return; }
+    _u1RAF = requestAnimationFrame(step);
+  };
+  _u1RAF = requestAnimationFrame(step);
+  _u1GlideT = setTimeout(_u1Release, U1_GLIDE_MS + 400);              // backstop; rAF is throttled in background tabs
+  return true;
+}
 /* true only when the desk is genuinely the thing on screen and nothing else owns input */
 function _u1CanGlide(target) {
   if (state.view !== "menu" || _cxOpen || _navBlocked(target)) return false;
@@ -2574,15 +2642,7 @@ function _u1CanGlide(target) {
   if (_menuIndex(host) !== 0) return false;                          // desk only — M2/M3 are horizontal, they have no depth
   return true;
 }
-function _u1GlideDown() {
-  const seat = _u1Seat();
-  if (seat == null || window.scrollY >= seat - 24) return false;      // already at or past U1 — nothing to do
-  _u1Gliding = true;
-  if (!_navStep(1)) { _u1Release(); return false; }                  // reuse the keyboard's own stepper + curve
-  _u1GlideT = setTimeout(_u1Release, 1200);                          // backstop: never stay armed if scrollend never fires
-  return true;
-}
-/* WHEEL — one deliberate downward push while parked on the desk. */
+/* WHEEL — one deliberate push at either edge of the boundary. */
 window.addEventListener("wheel", function (e) {
   /* MID-GLIDE, ANY DIRECTION: hand control straight back. The gesture is NOT
      swallowed — it falls through to the browser untouched and the guard releases,
@@ -2591,22 +2651,34 @@ window.addEventListener("wheel", function (e) {
      scroll-jacking: the move only ever gets the ONE gesture that started it. */
   if (_u1Gliding) { _u1Release(); return; }
   if (e.ctrlKey || e.metaKey || e.altKey || e.shiftKey) return;       // pinch-zoom and browser gestures stay the browser's
-  if (e.deltaY <= 6) return;                                         // downward, and past a jitter floor
+  if (Math.abs(e.deltaY) <= 6) return;                                // past a jitter floor
   if (!_u1CanGlide(e.target)) return;
   const seat = _u1Seat();
-  if (seat == null || window.scrollY > 8) return;                     // ONLY from the desk at rest; one scroll in, we are done
-  if (_u1GlideDown()) e.preventDefault();
+  if (seat == null) return;
+  const y = window.scrollY;
+  if (e.deltaY > 0) {
+    if (y > 8) return;                                                // DOWN: only from the desk at rest
+    if (_u1GlideTo(seat)) e.preventDefault();
+  } else {
+    if (y < seat - 8 || y > seat + 8) return;                         // UP: only from the U1 seat itself, so About never gets grabbed
+    if (_u1GlideTo(0)) e.preventDefault();
+  }
 }, { passive: false });
-/* TOUCH / anything else — no interception, just finish a flick that died in between. */
+/* TOUCH / anything else — never intercepted. A flick that dies in the gap gets
+   finished, but ONLY onward in the direction it was already travelling. */
 window.addEventListener("scroll", function () {
-  if (_u1Gliding) return;
+  const y = window.scrollY;
+  if (_u1Gliding) { _u1LastY = y; return; }                           // our own motion is not user intent
+  if (y !== _u1LastY) { _u1Dir = y > _u1LastY ? 1 : -1; _u1LastY = y; }
   if (_u1SettleT) clearTimeout(_u1SettleT);
   _u1SettleT = setTimeout(function () {
     if (_u1Gliding || !_u1CanGlide(document.activeElement)) return;
     const seat = _u1Seat();
     if (seat == null) return;
-    const y = window.scrollY;
-    if (y > 24 && y < seat - 40) _u1GlideDown();                     // came to rest in the dead zone → complete the descent
+    const at = window.scrollY;
+    if (at <= 24 || at >= seat - 40) return;                          // outside the gap: nothing to finish
+    if (_u1Dir > 0) _u1GlideTo(seat);                                 // was heading down → complete the descent
+    else if (_u1Dir < 0) _u1GlideTo(0);                               // was heading up → let them leave, back to the desk
   }, 180);
 }, { passive: true });
 document.addEventListener("keydown", _u1Release, true);               // any key hands control straight back
