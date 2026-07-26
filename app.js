@@ -1165,9 +1165,9 @@ function syncCodexBall() {
     dock.id = "brCodexDock";
     // the two-ball pair — orange (mini codex) stacked on top of the white (full codex)
     dock.innerHTML =
-      '<a class="br-ball br-ball--orange" href="codex.html" aria-label="Search the Codex">' +
+      '<a class="br-ball br-ball--orange" href="codex.html?v=237" aria-label="Search the Codex">' +
         '<span class="br-ball-core" aria-hidden="true"></span><span class="br-ball-tip" aria-hidden="true">Search</span></a>' +
-      '<a class="br-ball br-ball--yellow" href="codex.html" aria-label="Open the Codex — the archive of meanings">' +
+      '<a class="br-ball br-ball--yellow" href="codex.html?v=237" aria-label="Open the Codex — the archive of meanings">' +
         '<span class="br-ball-core" aria-hidden="true"></span><span class="br-ball-tip" aria-hidden="true">The Codex</span></a>';
     document.body.appendChild(dock);
   }
@@ -1332,7 +1332,7 @@ function renderAbout() {
        so three lines is the plaque's real ceiling. */
     { key: 'codex', ord: 'I', side: 'left', cls: 'is-free', name: 'The Codex',
       line: '166 entries across eight systems. Every card, sign, rune and hexagram the rooms read from.', micro: 'Free · no account',
-      door: '<a class="about__door" href="codex.html">Open the Codex &rarr;</a>' },
+      door: '<a class="about__door" href="codex.html?v=237">Open the Codex &rarr;</a>' },
     { key: 'tarot', ord: 'II', side: 'right', cls: '', name: 'Tarot Divination',
       line: 'Three cards for a Sitting, five for the Deep Read, cut from the full 78 and filed where each fell.', micro: 'First sitting free · to $2.99',
       door: '<a class="about__door" href="?dev=drawing-room">Cut the deck &rarr;</a>' },
@@ -1446,7 +1446,7 @@ function renderWall() {
     + '<svg class="m2hero__back" viewBox="0 0 120 190" aria-hidden="true" preserveAspectRatio="xMidYMid meet"><rect x="7" y="7" width="106" height="176" rx="7" fill="none" stroke="url(#mwInk)" stroke-width="1"/><rect x="13" y="13" width="94" height="164" rx="5" fill="none" stroke="url(#mwInk)" stroke-width=".5" opacity=".6"/><g stroke="url(#mwInk)" stroke-width=".6" fill="none" opacity=".7"><path d="M60 42 L86 95 L60 148 L34 95 Z"/><path d="M60 64 L74 95 L60 126 L46 95 Z"/><circle cx="60" cy="95" r="4.5"/></g></svg>'
     + '<svg class="m2hero__face" viewBox="0 0 120 190" role="img" aria-label="XVII — The Star" preserveAspectRatio="xMidYMid meet"><rect x="6" y="6" width="108" height="178" rx="7" fill="none" stroke="url(#mwGold)" stroke-width="1.1"/><rect x="11" y="11" width="98" height="168" rx="5" fill="none" stroke="url(#mwInk)" stroke-width=".5" opacity=".7"/><text x="60" y="30" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9" letter-spacing="2.5" fill="url(#mwGold)">XVII</text><g stroke="url(#mwGold)" fill="none"><circle cx="60" cy="98" r="31" stroke-width=".8" opacity=".5"/><circle cx="60" cy="98" r="23" stroke-width=".6" opacity=".35"/><path d="M60 69 L64.6 86.9 L80.5 77.5 L71.1 93.4 L89 98 L71.1 102.6 L80.5 118.5 L64.6 109.1 L60 127 L55.4 109.1 L39.5 118.5 L48.9 102.6 L31 98 L48.9 93.4 L39.5 77.5 L55.4 86.9 Z" stroke-width=".9" opacity=".8"/><circle class="m2pip-glow" cx="60" cy="98" r="6.5" fill="url(#mwGold)" stroke="none"/><circle cx="60" cy="98" r="3.2" fill="url(#mwGold)" stroke="none"/></g></svg>'
     + '</div>'
-    + '<a class="menu__draw-placard" href="codex.html" data-codex-open><span class="menu__draw-placard-mark" aria-hidden="true">✦</span>The Codex — where every mark is defined &rarr;</a>'
+    + '<a class="menu__draw-placard" href="codex.html?v=237" data-codex-open><span class="menu__draw-placard-mark" aria-hidden="true">✦</span>The Codex — where every mark is defined &rarr;</a>'
     + '</section>'
     + '<span class="menu__draw-wm" aria-hidden="true"><svg viewBox="0 0 120 190" preserveAspectRatio="xMidYMid meet"><g stroke="url(#mwInk)" fill="none"><circle cx="60" cy="98" r="31" stroke-width=".8"/><circle cx="60" cy="98" r="23" stroke-width=".6"/><path d="M60 69 L64.6 86.9 L80.5 77.5 L71.1 93.4 L89 98 L71.1 102.6 L80.5 118.5 L64.6 109.1 L60 127 L55.4 109.1 L39.5 118.5 L48.9 102.6 L31 98 L48.9 93.4 L39.5 77.5 L55.4 86.9 Z" stroke-width=".9"/></g></svg></span>'
     + '</div>';
@@ -1553,15 +1553,18 @@ function onMenuAnnexClick(e) {
 
 /* BR-S205: the fixed-leaf Codex aperture — appended unconditionally as trailing #menuView
    children (siblings of .menu__track, NEVER inside it). The seal is a real <a href> so the
-   front door survives any JS failure; the bloom is born CLOSED (inert+aria-hidden) + painted. */
+   front door survives any JS failure; the bloom is born CLOSED (inert+aria-hidden) + painted.
+   Every codex.html reference in this file carries ?v=237 — the Codex v2 rebuild replaced the
+   whole document, and a returning visitor holding the cached old one would otherwise read a
+   page that no longer exists. Bump all of them together or none. */
 const CX_LEAVES =
-  '<a class="seed" id="codexSeed" href="codex.html" role="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="codexBloom" aria-label="Open the Codex">'
+  '<a class="seed" id="codexSeed" href="codex.html?v=237" role="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="codexBloom" aria-label="Open the Codex">'
   + '<span class="seed__glyph seed__open" aria-hidden="true">&#9670;</span>'
   + '<span class="seed__glyph seed__close" aria-hidden="true">&#10005;</span>'
   + '</a>'
   + '<div class="bloom" id="codexBloom" role="dialog" aria-modal="true" aria-label="The Codex" inert aria-hidden="true">'
   + '<div class="bloom__backfill"></div>'
-  + '<iframe class="bloom__frame" data-src="codex.html" title="The Codex" tabindex="-1"></iframe>'
+  + '<iframe class="bloom__frame" data-src="codex.html?v=237" title="The Codex" tabindex="-1"></iframe>'
   + '<div class="bloom__sheen" aria-hidden="true"></div>'
   + '</div>'
   + '<div class="bloom__ink" aria-hidden="true"></div>'
@@ -1578,7 +1581,7 @@ const MINI_LEAVES =
   + '<div class="mini__panel" role="dialog" aria-label="Mini Codex — search" inert aria-hidden="true">'
   + '<input class="mini__input" type="search" autocomplete="off" spellcheck="false" placeholder="Search the Codex…" aria-label="Search the Codex" />'
   + '<div class="mini__results" aria-live="polite"></div>'
-  + '<a class="mini__more" href="codex.html" data-codex-open>Open the full Codex &#8594;</a>'
+  + '<a class="mini__more" href="codex.html?v=237" data-codex-open>Open the full Codex &#8594;</a>'
   + '</div></div>';
 
 function renderMenu(reveal) {
@@ -1641,7 +1644,7 @@ function renderMenu(reveal) {
         </div>
 
         <div class="menu__portals">
-          <a class="menu__codex" href="codex.html" data-codex-open><span class="menu__codex__mark" aria-hidden="true">◆</span> The Codex <span class="menu__codex__arr" aria-hidden="true">→</span></a>
+          <a class="menu__codex" href="codex.html?v=237" data-codex-open><span class="menu__codex__mark" aria-hidden="true">◆</span> The Codex <span class="menu__codex__arr" aria-hidden="true">→</span></a>
           <a class="menu__codex" href="?dev=settings"><span class="menu__codex__mark" aria-hidden="true">◆</span> Settings <span class="menu__codex__arr" aria-hidden="true">→</span></a>
           <button type="button" class="menu__codex menu__codex--rooms" data-annex-go><span class="menu__codex__mark" aria-hidden="true">◆</span> The Reading Rooms <span class="menu__codex__arr" aria-hidden="true">→</span></button>
         </div>
@@ -1754,10 +1757,20 @@ function wireMenuCodex(host) {
   if (!seed || !bloom || !frame) return;                   // the seal's href still opens codex.html
 
   let loaded = false, isOpen = false, busy = false, bgInert = [];
-  let wcT = null, homeT = null, closeT = null, busyT = null, focusT = null;
+  let pendingOpen = false;                 // M4.3: a click landed before the frame did — open the moment it lands
+  let cxPushed = false, cxUnwind = false;  // M4.2: our one history entry, and the pop that consumes it
+  let wcT = null, homeT = null, closeT = null, busyT = null, focusT = null, coldT = null;
   const ok = (function () { try { return window.CSS && CSS.supports("clip-path", "circle(0px)"); } catch (e) { return false; } })();
   const reduced = function () { return window.BRMotion ? window.BRMotion.prefersReduced() : (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches); };
-  const canBloom = function () { return loaded && ok; };
+  /* M4.3: `ok` is a CAPABILITY (clip-path support — static for the session); `loaded` is a
+     RACE (the lazy iframe, usually resolved within a second of first paint). The old
+     canBloom() folded the two together, so a seal click in that first second fell through
+     to the anchor's href and navigated the whole app away — the same control behaving two
+     different ways by timing alone. They are now read separately: only !ok is a door. */
+  function warmFrame() {
+    const src = frame.getAttribute("data-src");
+    if (src && !frame.getAttribute("src")) frame.setAttribute("src", src);
+  }
 
   function geometry() {
     const r = seed.getBoundingClientRect();
@@ -1769,15 +1782,27 @@ function wireMenuCodex(host) {
     host.style.setProperty("--r", rc + "px");
   }
 
-  /* inert every #menuView child EXCEPT the seal + the bloom; record only what WE inerted so
-     the ribbon's own panel-inert (nested in .menu__track) is never cleared on close. */
+  /* inert every #menuView child EXCEPT the seal + the bloom. Only DIRECT children are ever
+     touched, so the ribbon's own panel-inert (which lives nested inside .menu__track) is
+     never cleared on close — that, not the tracking gate, is what protects it.
+
+     M4.1 — THE INERT STRANDING. The tracking used to be gated on the element not already
+     carrying inert, and that stranded the entire menu on ordinary click timing:
+     open → close (schedules bg(false) at +480ms) → open (clearTimeout kills that pending
+     bg(false) before it un-inerts anything, then calls bg(true) — which finds every child
+     STILL inert, so the guard is false for all of them and bgInert ends up EMPTY) → close
+     (forEach over an empty array). Nav ribbon, About, prev/next and the mini codex all dead
+     until reload, no console error, no visual cue. The list is now rebuilt in FULL every
+     time the veil goes on; only the attribute WRITE is gated. Whichever close fires last
+     therefore clears inert from everything that has it, however the toggles interleave. */
   function bg(on) {
     if (on) {
       bgInert = [];
       for (let i = 0; i < host.children.length; i++) {
         const el = host.children[i];
         if (el === seed || el === bloom) continue;
-        if (!el.hasAttribute("inert")) { el.setAttribute("inert", ""); bgInert.push(el); }
+        bgInert.push(el);                                               // track ALWAYS — the last close must win
+        if (!el.hasAttribute("inert")) el.setAttribute("inert", "");    // write only what isn't already written
       }
     } else { bgInert.forEach(function (el) { el.removeAttribute("inert"); }); bgInert = []; }
   }
@@ -1792,10 +1817,34 @@ function wireMenuCodex(host) {
 
   function onEsc(e) { if (e.key === "Escape") { e.preventDefault(); e.stopImmediatePropagation(); close(); } }
 
+  /* M4.2 — BACK BELONGS TO THE APERTURE. With the codex open, the browser's Back button
+     used to leave Blue Room entirely: one press out of the room, the aperture and the site,
+     landing on whatever preceded us. The app's own slides have taken a history entry since
+     BR-S204 (menuHistory(), ~2409) — that discipline was simply never extended here.
+     The aperture now takes ONE entry on open and consumes it with one history.back() on
+     close, the same unwind menuHistory() does. The URL is deliberately unchanged
+     (location.href), so menuPopstate() reads the same hash and no-ops; only this handler
+     reacts. It is bound for the whole mount, not per-open, so a traversal that lands
+     mid-toggle can never arrive to find no listener. */
+  function onCxPop() {
+    if (cxUnwind) { cxUnwind = false; return; }      // this pop is our own back() eating our own entry
+    if (isOpen) { cxPushed = false; close(true); }   // Back closes the aperture — the entry is already spent
+  }
+
   function open() {
     if (isOpen) return;
-    if (!canBloom()) { location.href = "codex.html"; return; }   // load-gate / unsupported → real full-page codex
+    if (!ok) { location.href = "codex.html?v=237"; return; }           // no clip-path: the seal is a real door
+    if (!loaded) {                                              // M4.3: cold click — wait for the frame, don't navigate
+      warmFrame(); pendingOpen = true;
+      clearTimeout(coldT);                                      // ...but a frame that never arrives must not leave a dead control:
+      coldT = setTimeout(function () {                          // after 6s the seal becomes the real door again, as it always was
+        if (pendingOpen && !loaded) { pendingOpen = false; location.href = "codex.html?v=237"; }
+      }, 6000);
+      return;
+    }
+    clearTimeout(coldT); pendingOpen = false;
     isOpen = true; _cxOpen = true;
+    if (!cxPushed) { try { history.pushState({ br_codex: 1 }, "", location.href); cxPushed = true; } catch (e) {} }
     clearTimeout(homeT); clearTimeout(closeT);
     geometry();
     bloom.removeAttribute("inert"); bloom.removeAttribute("aria-hidden");
@@ -1815,9 +1864,13 @@ function wireMenuCodex(host) {
     wcT = setTimeout(function () { bloom.style.willChange = ""; }, reduced() ? 60 : 1000);
   }
 
-  function close() {
+  /* fromPop === true when a popstate already consumed our entry (Back); anything else —
+     the seal, Escape, the codex's own back link — has to consume it itself. */
+  function close(fromPop) {
     if (!isOpen) return;
     isOpen = false; _cxOpen = false;
+    pendingOpen = false;
+    if (cxPushed && !fromPop) { cxPushed = false; cxUnwind = true; try { history.back(); } catch (e) { cxUnwind = false; } }
     clearTimeout(wcT); clearTimeout(focusT);
     document.removeEventListener("keydown", onEsc, true);
     seed.setAttribute("aria-expanded", "false");
@@ -1841,31 +1894,36 @@ function wireMenuCodex(host) {
   function toggle() {
     if (busy) return;
     busy = true; clearTimeout(busyT); busyT = setTimeout(function () { busy = false; }, 160);
-    isOpen ? close() : open();
+    if (isOpen) close();
+    else if (pendingOpen) { pendingOpen = false; clearTimeout(coldT); }   // a second cold click withdraws the waiting open
+    else open();
   }
 
-  /* the seal: an <a href> that becomes an aperture when it can, a door when it can't */
+  /* the seal: an <a href> that becomes an aperture when it can, a door when it can't.
+     Only !ok — no clip-path circle in this engine — lets the anchor navigate. */
   seed.addEventListener("click", function (e) {
-    if (!canBloom()) return;              // let the anchor navigate to codex.html (front-door fallback)
+    if (!ok) return;                      // let the anchor navigate to codex.html (front-door fallback)
     e.preventDefault(); toggle();
   });
   seed.addEventListener("keydown", function (e) {
     if (e.key === "Enter") { e.stopPropagation(); }        // shield the global menu Enter→room; the anchor's activation fires the click
     else if (e.key === " " || e.key === "Spacebar") {      // anchors don't activate on Space natively
       e.stopPropagation(); e.preventDefault();
-      if (canBloom()) toggle(); else location.href = "codex.html";
+      if (ok) toggle(); else location.href = "codex.html?v=237";
     }
   });
 
-  /* the in-flow "The Codex →" pills (desk + wall) — open-only triggers, shielded + href-fallback */
+  /* the in-flow "The Codex →" pills (desk + wall) — open-only triggers, shielded + href-fallback.
+     They call open() directly: it is idempotent, and toggle() would let a second click
+     withdraw a cold-click open they were never meant to be able to cancel. */
   host.querySelectorAll("[data-codex-open]").forEach(function (el) {
-    el.addEventListener("click", function (e) { if (!canBloom()) return; e.preventDefault(); if (!isOpen) toggle(); });
+    el.addEventListener("click", function (e) { if (!ok) return; e.preventDefault(); open(); });
     el.addEventListener("keydown", function (e) {
       if (e.key === "Enter") { e.stopPropagation(); }        // shield the global menu Enter→room; the anchor's activation fires the click
       else if (e.key === " " || e.key === "Spacebar") {      // anchors don't activate on Space natively
         e.stopPropagation(); e.preventDefault();
-        if (!canBloom()) { location.href = "codex.html"; return; }
-        if (!isOpen) toggle();
+        if (!ok) { location.href = "codex.html?v=237"; return; }
+        open();
       }
     });
   });
@@ -1890,18 +1948,22 @@ function wireMenuCodex(host) {
         if (!d._cxEscBound) { d._cxEscBound = true; d.addEventListener("keydown", function (ev) { if (ev.key === "Escape") { ev.preventDefault(); close(); } }); }
       }
     } catch (e) {}
+    clearTimeout(coldT);
+    if (pendingOpen) { pendingOpen = false; open(); }   // M4.3: the cold click that waited for us
   }
   frame.addEventListener("load", onFrameLoad);
   if (ok && !frame.getAttribute("src")) {
-    const src = frame.getAttribute("data-src");
-    const warm = function () { if (src && !frame.getAttribute("src")) frame.setAttribute("src", src); };
-    (window.requestIdleCallback || function (cb) { return setTimeout(cb, 200); })(warm);
+    (window.requestIdleCallback || function (cb) { return setTimeout(cb, 200); })(warmFrame);
   }
+
+  window.addEventListener("popstate", onCxPop);        // M4.2 — torn down below, never stacked
 
   _cxTeardown = function () {
     try { document.removeEventListener("keydown", onEsc, true); } catch (e) {}
+    try { window.removeEventListener("popstate", onCxPop); } catch (e) {}
     if (_cxResize) { try { window.removeEventListener("resize", _cxResize); } catch (e) {} _cxResize = null; }
-    clearTimeout(wcT); clearTimeout(homeT); clearTimeout(closeT); clearTimeout(busyT); clearTimeout(focusT);
+    clearTimeout(wcT); clearTimeout(homeT); clearTimeout(closeT); clearTimeout(busyT); clearTimeout(focusT); clearTimeout(coldT);
+    pendingOpen = false;
     _cxOpen = false;
   };
 }
