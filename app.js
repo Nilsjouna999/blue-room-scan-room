@@ -1544,7 +1544,7 @@ const MINI_LEAVES =
   + '</div></div>';
 
 function renderMenu(reveal) {
-  const s = m1Source();                       // BR-S256: SRC-03 · Shore Dispatch
+  const s = m1Source();                       // BR-S259: SRC-03 · Shore Dispatch
   const srcCode = m1SrcCode(s);
   const held = hasHoldings();
   return `
@@ -1610,7 +1610,7 @@ function renderMenu(reveal) {
 
         <p class="menu__foot">One sample · ${srcCode} · ${s && s.short ? s.short : "Sample"}.</p>
 
-        <!-- BR-S256: DEV AFFORDANCE, not a product control. Flips the desk between
+        <!-- BR-S259: DEV AFFORDANCE, not a product control. Flips the desk between
              the original layout (A) and the BR-S254 rank reversal (B) with no
              reload, so the two can be judged by eye. Remove once chosen. -->
         <div class="menu__ab" role="group" aria-label="M1 layout variant (dev)">
@@ -1662,9 +1662,9 @@ function mountMenu() {
   host.addEventListener("click", onReliqPreviewClick);
   host.removeEventListener("click", onMenuAnnexClick);      // BR-S233: annex nav delegated (survives DOM swaps like the M3 toggle re-render)
   host.addEventListener("click", onMenuAnnexClick);
-  host.removeEventListener("click", onM1VariantClick);      // BR-S256: M1 A/B layout toggle — same single-bind discipline
+  host.removeEventListener("click", onM1VariantClick);      // BR-S259: M1 A/B layout toggle — same single-bind discipline
   host.addEventListener("click", onM1VariantClick);
-  m1ApplyVariant(host, m1Variant());                        // BR-S256: restore the chosen variant before first paint of the desk
+  m1ApplyVariant(host, m1Variant());                        // BR-S259: restore the chosen variant before first paint of the desk
 }
 
 /* BR-S203 — the About "Procession" scroll-reveal. Base state is VISIBLE (freeze-safe, the
@@ -2232,7 +2232,7 @@ function wireMenuReveal(host) {
   }
   const rev = window.BRReveal.mount(mountEl, {
     menustage: true,
-    src: m1Source(),                     // BR-S256: SRC-03 · Shore Dispatch (same source as the fallback card)
+    src: m1Source(),                     // BR-S259: SRC-03 · Shore Dispatch (same source as the fallback card)
     // BR-S156: enter fullview with the vault hand-off CLOSED; release it only once the
     // developed reading has fully drawn (onReadSettled), so the arrow never precedes the read.
     onFullview: function () { host.classList.add("is-fullview"); host.classList.remove("is-vaultready"); document.addEventListener("keydown", _escBack, true); },
@@ -2269,7 +2269,7 @@ let _menuSettle = null;
 
 function hasHoldings() { try { return localStorage.getItem("br_holdings") === "1"; } catch (e) { return false; } }
 
-/* ── BR-S256: M1's sample source, in ONE place ────────────────────────────────
+/* ── BR-S259: M1's sample source, in ONE place ────────────────────────────────
    The desk shows SRC-03 "Shore Dispatch". Two separate mount paths render it —
    wireMenuReveal() via BRReveal, and renderMenu()'s no-JS .msample__card
    fallback — plus the caption and the foot line quote its number and name. All
@@ -2284,7 +2284,7 @@ function m1Source() {
 /* "SRC-03" — zero-padded from the source's own `no`, never typed by hand */
 function m1SrcCode(s) { return "SRC-" + String((s && s.no) || 1).padStart(2, "0"); }
 
-/* ── BR-S256: the M1 A/B layout toggle ───────────────────────────────────────
+/* ── BR-S259: the M1 A/B layout toggle ───────────────────────────────────────
    Two variants of the desk, switchable live so the builder can judge them side
    by side instead of from a screenshot:
      B (default) — BR-S254: the left column leads, the card is seated under glass

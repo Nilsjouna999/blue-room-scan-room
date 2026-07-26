@@ -2596,14 +2596,29 @@ body[data-view="room"] .dev { display: none; }
 .menu__portals .menu__codex { margin-top: 0; align-self: auto; }
 
 /* ═════════════════════════════════════════════════════════════════════════════
-   BR-S256 — THE M1 A/B LAYOUT TOGGLE  (dev affordance; remove once chosen)
+   BR-S259 — THE M1 A/B LAYOUT TOGGLE  (dev affordance; remove once chosen)
    Borrows the M3 preview-toggle idiom verbatim (.menu__reliq-previewbtn) so it
    reads as the same species of control and needs no new visual vocabulary.
    ═════════════════════════════════════════════════════════════════════════════ */
+/* OUT OF FLOW, ON PURPOSE — and this is the load-bearing part of the whole
+   control. First pass put it in .menu__controls as a normal flow child: it added
+   31px to the column, which pushed .menu__inner to 909px and drove the card's
+   bottom to y946 in a 900px viewport — breaking the BR-S083 invariant that the
+   whole decision fits one 1600x900 screen with no scroll, in BOTH variants.
+   An A/B control that changes the layout it is measuring is a broken instrument.
+   Fixed to the bottom-left corner (the one corner not already claimed — the
+   About cue owns bottom-centre, the codex orbs bottom-right), so toggling
+   changes the desk and nothing else. */
 .menu__ab {
-  display: inline-flex; align-items: center; gap: 7px; margin-top: 12px;
+  position: fixed; left: 20px; bottom: 18px; z-index: 61;
+  display: inline-flex; align-items: center; gap: 7px;
   font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase;
 }
+/* steps aside for the showcase and for the codex aperture, exactly as the orbs and
+   the About cue already do */
+#menuView.menurev.is-fullview .menu__ab,
+#menuView.is-codex-open .menu__ab,
+#menuView.is-codex-closing .menu__ab { opacity: 0; visibility: hidden; pointer-events: none; }
 .menu__ab-tag { color: var(--faint); }
 .menu__ab-sep { color: var(--line-strong); }
 .menu__ab-btn {

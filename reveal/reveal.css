@@ -248,7 +248,24 @@
   box-shadow: 0 44px 90px rgba(0, 0, 0, 0.62), 0 10px 28px rgba(0, 0, 0, 0.5);
   position: relative;
 }
+/* BR-S259 BUGFIX — the raw plate's image must not SIZE the card.
+   This img was in flow with `height: 100%` inside an auto-height parent, so the
+   100% resolved to auto and the image's INTRINSIC aspect drove the layout. All
+   three .rv-layer siblings share one grid cell (grid-area 1/1), so whichever is
+   tallest sizes the track — and a PORTRAIT source made this layer the tallest:
+   SRC-03 is 1868x4000, so at the 430px frame width it demanded
+   430 x (4000/1868) = 921px, x zoom .92 = 847px of track against a 662px card.
+   That inflated .reveal-stage--menustage 662 -> 847, .menu__inner 693 -> 909, and
+   pushed the desk past the 900px fold — visible as the sample caption landing
+   below the viewport. It never showed with SRC-01 (1630x1024 landscape → 270px,
+   comfortably under the card) which is why it sat here undetected.
+   Taking the img out of flow fixes it at the root: the rendered box is identical
+   (inset 0 + cover == 100%/100% + cover), it simply stops contributing intrinsic
+   size. .rv-photoplate is already position:relative, so this needs nothing else.
+   NOT scoped to M1 — any portrait source would break ?dev=staged-reveal and the
+   fullview takeover in exactly the same way. */
 .rv-photoplate img {
+  position: absolute; inset: 0;
   width: 100%; height: 100%;
   object-fit: cover;
   display: block;
@@ -1322,24 +1339,39 @@
    .is-finalizing — none of those may be watched through tint.
    ===================================================================== */
 
-/* --- 3a · THE PRINT CEILING — give the blown window a top it cannot print past.
+/* --- 3a · THE PRINT CEILING — a top the highlights cannot print past.
    `darken` is a per-channel min, so it can only ever pull values DOWN; it
-   provably cannot murk a shadow. The gradient's centre knee sits at L*50 over
-   the face and the raised hand (they pass untouched) and burns down to L*18 at
-   the rim, which is where the window is.
+   provably cannot murk a shadow, and it never touches the photo's own pixels.
    .photo has isolation:isolate (styles.css:461) so the blend is contained inside
    the photo and cannot reach the plate, and overflow:hidden + radius 5px clip the
-   pseudo for free. .photo::after is unclaimed repo-wide. */
+   pseudo for free. .photo::after is unclaimed repo-wide.
+
+   BR-S259 — RETUNED AND DELIBERATELY SOURCE-AGNOSTIC. The first version was
+   hand-fitted to SRC-01's one blown car window (an off-centre radial at 38%/48%).
+   When the desk moved to SRC-03 "Shore Dispatch" that fit was simply wrong:
+   measured on the live crop, SRC-03 is bright at BOTH x-edges with a dark subject
+   in the middle (column means left→right 141,121,119,74,55,59,59,128,150,142) and
+   **18.8%** of it sits above Y190 versus SRC-01's 3.5% — a broadly bright frame,
+   not a localised hot spot.
+   So this is now a SYMMETRIC centre-out ceiling: permissive over the middle where
+   a subject sits, firm at the edges and corners where sky, water and pale ground
+   collect. It is not fitted to any one photograph, which also settles a real
+   objection raised against the per-photo approach — a user's own photo will
+   eventually land in this slot and there is no data.js row to carry a tuning for
+   it. The ceiling is a property of the SLOT, not of the sample.
+   MEASURED on SRC-03, simulated then rendered: mean Y 105→91, p99 217→158,
+   max 237→170, pixels above Y190 18.8%→0.0, while the subject band only moves
+   65→62 and the face region 54→48. It costs the flanks, not the person. */
 .menurev:not(.is-fullview) .reveal-stage--menustage
   .card[data-treatment="free"] .photo::after {
   content: "";
   position: absolute; inset: 0;
   z-index: 2; pointer-events: none;
-  background: radial-gradient(126% 118% at 38% 48%,
-      #8d8779   0%,
-      #7b7567  48%,
-      #5e5849  78%,
-      #3b362d 100%);
+  background: radial-gradient(78% 92% at 50% 50%,
+      #8f897c   0%,   /* the knee — Y~137, well above any subject; passes them through */
+      #837d71  45%,
+      #6a6459  72%,
+      #514c43 100%);  /* the rim — Y~76; this is where sky and pale ground get capped */
   mix-blend-mode: darken;
   opacity: 0.66;
 }
@@ -1354,10 +1386,12 @@
 .menurev:not(.is-fullview) .reveal-stage--menustage .card[data-treatment="free"] .photo__hairline {
   z-index: 3;
 }
-/* OPACITY FLOOR AND CEILING: 0.62–0.68. At 0.82 the window collapses to a flat
-   pale slab — no horizon, no water, no ridge — and the card's own signal note
-   promises "Out the side glass, the fjord." Deleting what the copy promises fails
-   the product, not just the picture. */
+/* OPACITY FLOOR AND CEILING: 0.62–0.68. Above ~0.72 the bright flanks collapse
+   into flat pale slabs — the fjord loses its horizon, water and ridgeline, and the
+   gravel shore loses its texture. Both sources name that scenery in their own copy
+   (SRC-03's provenance is "Shore-side field record, overcast session, fjord
+   locale"), so flattening it deletes what the card claims to show. The rule holds
+   whatever photo is in the slot: cap the highlights, never erase the scene. */
 
 /* --- 3b · THE PANE — one sheet of the room's own black, weighted to the window,
    with a single raking sheen.
@@ -1490,6 +1524,35 @@
    .reveal-stage--menustage and no .rv-cardframe — so it keeps today's floating
    shadow AND gets no glass. That is deliberate: a seated card with no pane would
    be a third, incoherent state. The fallback stays exactly as it shipped. */
+
+/* ═════════════════════════════════════════════════════════════════════════════
+   BR-S259 — VARIANT A, THE CARD SIDE  (see styles.css for the left-column side)
+   Restores the card exactly as it shipped before BR-S254: floating, unglassed,
+   the photograph untreated. These live HERE rather than in styles.css because
+   the rules they undo are in this file, and this file loads second — same-file
+   ordering plus ID+class specificity means no !important.
+   ═════════════════════════════════════════════════════════════════════════════ */
+/* the 44px float comes back */
+#menuView.is-m1a .reveal-stage--menustage .card[data-treatment="free"] {
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.55), 0 44px 90px rgba(0, 0, 0, 0.62), 0 10px 28px rgba(0, 0, 0, 0.5);
+}
+#menuView.is-m1a .reveal-stage--menustage .rv-photoplate {
+  box-shadow: 0 44px 90px rgba(0, 0, 0, 0.62), 0 10px 28px rgba(0, 0, 0, 0.5);
+}
+/* the glass and the print ceiling are simply not built. `content: none` on a
+   pseudo-element removes it from the box tree entirely — nothing paints, nothing
+   composites, so variant A carries no cost from machinery it does not use. */
+#menuView.is-m1a .reveal-stage--menustage .rv-cardframe::after { content: none; }
+#menuView.is-m1a .reveal-stage--menustage .card[data-treatment="free"] .photo::after { content: none; }
+/* the photograph's hard bright edge returns, and the three chips drop back to the
+   z-index they had before the ceiling forced them up */
+#menuView.is-m1a .reveal-stage--menustage .card[data-treatment="free"] .photo__hairline {
+  border-color: rgba(255, 255, 255, 0.08);
+  box-shadow: none;
+}
+#menuView.is-m1a .reveal-stage--menustage .card[data-treatment="free"] .photo__meta,
+#menuView.is-m1a .reveal-stage--menustage .card[data-treatment="free"] .photo__tag,
+#menuView.is-m1a .reveal-stage--menustage .card[data-treatment="free"] .photo__hairline { z-index: 2; }
 
 /* FULLVIEW takeover (see-deeper → halo): the stage cell promotes to a fixed
    full-bleed layer; the menu chrome steps aside. */

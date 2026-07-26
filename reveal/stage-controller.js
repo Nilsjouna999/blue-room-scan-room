@@ -27,7 +27,10 @@
     // SOURCES is a top-level `const` in data.js (a global LEXICAL binding,
     // not a window property) — reach it by the bare name, typeof-guarded.
     var allSrc = (typeof SOURCES !== "undefined" && SOURCES) || window.SOURCES || [];
-    var src = allSrc[0];
+    /* BR-S259: the host may name its own sample (M1's desk shows SRC-03 "Shore
+       Dispatch"). Everything else — ?dev=staged-reveal, the embedded slot, the
+       fullview takeover — still defaults to SOURCES[0], so no other route moves. */
+    var src = opts.src || allSrc[0];
     if (!src) {
       root.innerHTML = '<p style="color:#948f87;font-family:sans-serif;padding:48px;text-align:center">SOURCES not loaded — open this page through the normal app.</p>';
       return;
