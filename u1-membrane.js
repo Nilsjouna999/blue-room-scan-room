@@ -123,6 +123,12 @@
   var maskGrad=null;   // BR-S232 [aperture]: cached viewport-space vertical bg-match gradient for the occluding bands; rebuilt in resize() (keys off H)
   var W=0, H=0, DPR=1, UPPER_Y=0, LOWER_Y=0, MID_Y=0;
   var lines=[], particles=[], PMAX=260, last=0, accT=0;
+  // TEMPORARY — the top membrane line is off. upperEnv is the SOLE gate for everything upper: the
+  // white lip (drawLine), its occluding band (drawBands), its particles and its share of the plate
+  // dimming. Zeroing it removes all four at once and leaves the lower line byte-for-byte untouched.
+  // Flip to true to bring the top line back; nothing else needs changing.
+  var TOP_LINE = false;
+
   var upperEnv=0, lowerEnv=0;     // BR PULSE-2: split per-line presence — upper=quintic latch/hold, lower=content-anchored fade. Written each frame by aboutEnvelope(); zero per-frame alloc.
   // BR-S237 [codex reading frame]: additive-only state for the codex-mode FORK. The About path
   // never reads any of these, so the normal membrane+aperture is byte-for-byte unchanged when the
@@ -605,6 +611,7 @@
     // env must not spuriously trip the vis<=0.001 clear). reentry==1 => exact byte-for-byte About
     // path when the codex never opened. Reduced-motion snaps (no fade) to match the static ethos.
     if(reentry<1){ if(reduce){ reentry=1; } else { reentry+=(1-reentry)*0.12; if(reentry>0.999)reentry=1; upperEnv*=reentry; lowerEnv*=reentry; } }
+    if(!TOP_LINE) upperEnv = 0;               // the top membrane, off — see TOP_LINE at the top of this file
     ensureAboutLayout(aboutEl);               // flag-scoped row/intro/close breathing, as soon as U1 mounts
     var l;
 
