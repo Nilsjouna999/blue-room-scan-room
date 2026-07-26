@@ -3731,11 +3731,11 @@ body[data-devnav="1"] .devnav {
   bottom: calc(clamp(118px,19vh,150px) + 54px);   /* sits ABOVE the seal, ~10px clear — no overlap */
   width: 30px; height: 30px; z-index: 62; touch-action: none;
   transform: translate3d(var(--mx,0px), var(--my,0px), 0); }
-#menuView .mini.is-dragging { transition: none; }
+/* .is-dragging means "the pointer is down"; .is-carry means "the object is airborne" — and
+   the second must OUTLIVE the pointer, or the release frame drops the compositor layer and
+   re-promotes it, and the :hover bloom fires while the orb is flying out from under you. */
+#menuView .mini.is-carry { transition: none; will-change: transform; }
 #menuView .mini.is-homing { transition: transform 440ms cubic-bezier(0.2,0.7,0.2,1); }
-/* the float after a chuck — one compositor transition, no physics loop. Strongly
-   decelerating so it reads as levitating to a stop, not sliding. */
-#menuView .mini.is-coasting { transition: transform 520ms cubic-bezier(.10,.85,.22,1); }
 
 /* The mini-codex ball — the ORANGE twin of the full-codex (white) ball: SAME design,
    smaller (30px vs 42px), orange. Was a flat glyph-marked chip; now the matched sphere
@@ -3783,8 +3783,8 @@ body[data-devnav="1"] .devnav {
    "heavy". Now: no scale, no transition (a held thing tracks the pointer 1:1, it never
    eases), and a deeper drop so it reads as LIFTED rather than swollen. The shadow swap is
    instant and un-transitioned — one repaint on grab, nothing per frame. */
-#menuView .mini.is-dragging .mini__ball {
-  cursor: grabbing;
+#menuView .mini.is-dragging .mini__ball { cursor: grabbing; }
+#menuView .mini.is-carry .mini__ball {
   transform: none;
   transition: none;
   box-shadow:
@@ -3794,7 +3794,7 @@ body[data-devnav="1"] .devnav {
     0 10px 20px rgba(0,0,0,.50),
     0 18px 34px rgba(0,0,0,.34);
 }
-#menuView .mini.is-dragging .mini__ball::before { opacity: 1; transition: none; }
+#menuView .mini.is-carry .mini__ball::before { opacity: 1; transition: none; }
 #menuView .mini__glyph { display: none; }   /* plain sphere, matching the full-codex ball */
 @media (prefers-reduced-motion: reduce) {
   #menuView .mini__ball, #menuView .mini__ball::before { transition: none !important; }

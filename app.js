@@ -1875,12 +1875,17 @@ function wireMiniCodex(host) {
       mini.style.transform = "translate3d(" + pendX + "px," + pendY + "px,0)";
     });
   }
-  function endDragTransport() {
+  /* THE HANDOFF. Both the placement path and the end of a carry come through here, and the
+     ORDER is load-bearing: the variables take the value, then the inline transform is released
+     (no visual change, because they now agree), then .is-carry drops. One task => one style
+     recalc, no forced layout, no flash — and since .is-carry carries `transition:none`,
+     releasing the transform cannot start one even in principle. */
+  function land() {
     if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
     pending = false;
-    setOffset(ox, oy);            // variables first...
-    mini.style.transform = "";    // ...then release the inline transform, so CSS resumes
-    mini.style.willChange = "";
+    setOffset(ox, oy);
+    mini.style.transform = "";
+    mini.classList.remove("is-carry");
   }
 
   /* PLACEMENT. The panel hangs from its BOTTOM edge, so as results arrive it grows UPWARD —
@@ -1936,117 +1941,155 @@ function wireMiniCodex(host) {
     dock.classList.add("is-shown");
   }
 
-  /* distance from the ball's centre to the seal's centre — the recall gravity well */
-  function nearSeal() {
+  /* the recall gravity well — would an orb sitting at offset (px,py) be in the seal's domain?
+     Taking a position lets the release PREDICT its landing, so a chuck aimed at the seal goes
+     straight to the one 440ms recall instead of coasting and then homing (~840ms of motion). */
+  function nearSealAt(px, py) {
     const seed = host.querySelector("#codexSeed");
-    const b = ball.getBoundingClientRect(), s = seed && seed.getBoundingClientRect();
+    const s = seed && seed.getBoundingClientRect();
     if (!s) return false;
-    return Math.hypot((b.left + b.width / 2) - (s.left + s.width / 2), (b.top + b.height / 2) - (s.top + s.height / 2)) < 78;   // the seal's "near domain" — drop anywhere close and it finds its spot
+    const b = ball.getBoundingClientRect();
+    const cx = (b.left + b.width / 2) - ox + px, cy = (b.top + b.height / 2) - oy + py;
+    return Math.hypot(cx - (s.left + s.width / 2), cy - (s.top + s.height / 2)) < 78;
+  }
+  function nearSeal() { return nearSealAt(ox, oy); }
+
+  /* the ONE place a forced layout is still worth it: catching the orb mid-RECALL. That glide is
+     a css transition, so its live position exists nowhere in JS — unlike the carry, whose loop
+     variables already ARE the painted position. Once per grab, never per frame. */
+  function readTranslate() {
+    const m = window.getComputedStyle(mini).transform;
+    if (!m || m === "none") return [ox, oy];
+    const q = m.slice(m.indexOf("(") + 1, -1).split(",").map(parseFloat);
+    return q.length >= 6 && isFinite(q[4]) && isFinite(q[5]) ? [q[4], q[5]] : [ox, oy];
+  }
+  /* Grabbing the orb mid-recall used to TELEPORT it: goHome() sets the offset to (0,0) at once
+     while the 440ms glide is still visually in flight, so ox/oy already held the destination and
+     onDown's `bx = ox` snapped the orb to the dock under the finger — and measureBounds() then
+     derived its bounds from that mid-animation rect. Freeze it where it actually is instead. */
+  function stopHoming() {
+    if (!mini.classList.contains("is-homing")) return;
+    const c = readTranslate();
+    clearTimeout(homeT);
+    mini.classList.remove("is-homing");
+    setOffset(c[0], c[1]);          // already inside bounds: it is between a valid point and home
   }
 
   // ---- drag (pointer capture on the ball; a sub-threshold move is a tap → toggle panel) ----
-  /* THE CARRY. One gesture serves two intents, and the engine must not blur them:
-       · PLACEMENT — the real job. Let go and it stays exactly there. Zero drift, always.
-       · A CHUCK — the bit of play. It floats on a little and settles.
-     So the float is gated behind a real flick (ordinary dragging never coasts), and its
-     distance is HARD-CAPPED — however hard you throw it, it levitates MAX_CARRY px and no
-     further. It is never a throw across the room, and it can never carry the ball somewhere
-     you have to go fetch it from.
-     The float is handed to the compositor as ONE css transition: no per-frame JS, no
-     physics loop, no accumulating error — the target is computed once and is exact. */
-  const FLICK_MIN = 2.5;    // px/frame — under this it is a placement, not a chuck
-  const CARRY_K   = 8;      // how much of the flick becomes float
-  const MAX_CARRY = 130;    // px — the ceiling. Felt, but still a levitation, not a fling.
-  const COAST_MS  = 520;
-  const VEL_WINDOW = 90;    // ms — velocity is read over a window, never off one sample
-  let samples = [], coastT = null;
+  /* THE CARRY — velocity-continuous exponential decay.
+     The old release was a fixed-duration css transition (520ms, cubic-bezier(.10,.85,.22,1))
+     handed a pre-computed target. That bezier's initial slope is .85/.10 = 8.5, so the orb left
+     the finger at ~2.18x the speed the hand was actually moving — THAT was the "pingy" — and the
+     same curve then spent its last ~200ms crawling under half a pixel a frame, with a
+     setTimeout holding the gesture open past even that — THAT was the "laggy". One wrong curve,
+     both ends of it. A prespecified bezier cannot start at a given velocity; this can:
+
+       tau = min(TAU, MAX_CARRY / |v0|)     the ceiling, applied to TAU and never to A
+       A   = v0 * tau                        =>  x'(0) === v0, exactly, by construction
+       x(t)= x0 + A * (1 - e^(-t/tau))
+       D   = tau * ln(|v0| / END_SPEED)      duration EMERGES from the throw
+
+     Capping by shrinking tau rather than clamping A is the load-bearing part: clamping the
+     amplitude would make x'(0) < v0 and reintroduce a discontinuity — a brake instead of a ping.
+     A harder throw therefore decays faster and finishes SOONER, which is what bounded should
+     feel like. It ends on SPEED, not on distance, which is what kills the sub-pixel tail. */
+  const FLICK_MIN  = 150;    // px/s — the placement gate (identical to the old 2.5 px/frame)
+  const TAU        = 0.120;  // s    — the one dial. Heavier: raise. Snappier: lower.
+  const MAX_CARRY  = 130;    // px   — unchanged ceiling
+  const END_SPEED  = 40;     // px/s — 0.67 px/frame: below the threshold of visible motion
+  const MAX_MS     = 450;    // ms   — a guard, not a dial (real max duration is 396ms)
+  const VEL_WINDOW = 90;     // ms   — long enough that hand tremor cannot read as a flick
+  const PAUSE_MS   = 120;    // ms   — stopped before letting go => a placement
+  let samples = [], lastMoveT = 0, coastRaf = null;
   let minX = -1e5, maxX = 1e5, minY = -1e5, maxY = 1e5;
+
   function measureBounds() {
     const r = ball.getBoundingClientRect();
-    const homeL = r.left - ox, homeT = r.top - oy;      // where it sits at offset 0
+    const homeL = r.left - ox, homeTop = r.top - oy;    // where it sits at offset 0
     minX = EDGE - homeL;  maxX = window.innerWidth  - EDGE - r.width  - homeL;
-    minY = EDGE - homeT;  maxY = window.innerHeight - EDGE - r.height - homeT;
+    minY = EDGE - homeTop; maxY = window.innerHeight - EDGE - r.height - homeTop;
   }
   function clampX(x) { return Math.min(Math.max(x, minX), maxX); }
   function clampY(y) { return Math.min(Math.max(y, minY), maxY); }
-  /* where it visually is this instant — mid-float included, so catching it stops it dead
-     exactly under your finger rather than snapping to where it was headed. */
-  function currentTranslate() {
-    const m = window.getComputedStyle(mini).transform;
-    if (!m || m === "none") return [ox, oy];
-    const p = m.slice(m.indexOf("(") + 1, -1).split(",").map(parseFloat);
-    return p.length >= 6 && isFinite(p[4]) && isFinite(p[5]) ? [p[4], p[5]] : [ox, oy];
-  }
-  function stopCoast() {
-    if (!coastT) return;
-    clearTimeout(coastT); coastT = null;
-    const c = currentTranslate();
-    mini.classList.remove("is-coasting");
-    setOffset(clampX(c[0]), clampY(c[1]));
-  }
-  /* Velocity is read over a WINDOW, not from the last event. Pointer streams routinely end
-     with a stale or zero-delta sample right before pointerup (and rates vary wildly between
-     devices), which read one-at-a-time collapses the flick to nothing — the throw then never
-     fires at all. Comparing the newest sample against the oldest one still inside the window
-     is stable across a 60Hz trackpad and a 1000Hz mouse alike. */
-  function now() { return (window.performance && performance.now()) || Date.now(); }
-  function pushSample(x, y) {
-    const t = now();
+
+  /* Samples are stamped with event.timeStamp, not performance.now(): Chrome deliberately holds
+     pointermove until BeginMainFrame, so the handler clock is systematically late and jittery.
+     They record the ORB's clamped position, not the pointer's — against a wall the pointer keeps
+     travelling while the orb does not, and sampling the pointer there would launch the coast in a
+     direction the orb was never moving, breaking the very continuity this design is built on. */
+  function pushSample(x, y, t) {
     samples.push({ t: t, x: x, y: y });
-    while (samples.length > 2 && t - samples[0].t > VEL_WINDOW) samples.shift();
+    // keep one sample OUTSIDE the window so the measured span is >= VEL_WINDOW
+    while (samples.length > 2 && t - samples[1].t > VEL_WINDOW) samples.shift();
   }
-  function releaseVelocity() {                    // px per 60fps frame
+  function releaseVelocity() {                          // px/s
     if (samples.length < 2) return [0, 0];
-    const b = samples[samples.length - 1], a = samples[0];
-    const dt = b.t - a.t;
-    if (dt <= 0) return [0, 0];
-    if (now() - b.t > 120) return [0, 0];         // they paused before letting go → a placement
-    return [(b.x - a.x) * 16.7 / dt, (b.y - a.y) * 16.7 / dt];
+    const b = samples[samples.length - 1], a = samples[0], dt = b.t - a.t;
+    if (dt < 8) return [0, 0];                          // too short to be a measurement
+    return [(b.x - a.x) * 1000 / dt, (b.y - a.y) * 1000 / dt];
+  }
+  function stopCoast() { if (coastRaf) { cancelAnimationFrame(coastRaf); coastRaf = null; } }
+
+  function startCoast(vx, vy, settle) {
+    const sp = Math.hypot(vx, vy);
+    if (!isFinite(sp) || sp < FLICK_MIN) { land(); settle(); return; }   // guard the INPUT: NaN
+    const tau = Math.min(TAU, MAX_CARRY / sp);          // the ceiling, by shrinking tau
+    const ax = vx * tau, ay = vy * tau;                 // => opens at exactly v0
+    if (Math.hypot(ax, ay) < 1) { land(); settle(); return; }
+    const dur = Math.min(tau * Math.log(sp / END_SPEED), MAX_MS / 1000);
+    const x0 = ox, y0 = oy, t0 = now();
+    (function step() {
+      const t = (now() - t0) / 1000;
+      const p = 1 - Math.exp(-t / tau);
+      const ux = x0 + ax * p, uy = y0 + ay * p;
+      const cx = clampX(ux), cy = clampY(uy);
+      ox = cx; oy = cy;                                 // the loop's own state IS the painted
+      mini.style.transform = "translate3d(" + cx + "px," + cy + "px,0)";   // position: catching is exact
+      const pinX = (cx !== ux) || Math.abs(ax) < 0.5;   // it slides TO the wall and stops there
+      const pinY = (cy !== uy) || Math.abs(ay) < 0.5;
+      if (t >= dur || (pinX && pinY)) { coastRaf = null; land(); settle(); return; }
+      coastRaf = requestAnimationFrame(step);
+    })();
   }
 
   function onDown(e) {
     if (e.button != null && e.button !== 0) return;
-    stopCoast();                                          // catching it mid-float stops it dead
+    if (dragging) return;                               // one finger owns the orb
+    stopCoast(); stopHoming();                          // catch it mid-flight or mid-recall
     pid = e.pointerId; dragging = true; moved = false;
     sx = e.clientX; sy = e.clientY; bx = ox; by = oy;
-    samples = []; pushSample(e.clientX, e.clientY);
+    samples = []; lastMoveT = e.timeStamp;
+    pushSample(ox, oy, e.timeStamp);
     measureBounds();
-    mini.classList.remove("is-homing"); mini.classList.add("is-dragging");
-    mini.style.willChange = "transform";   // drag-scoped ONLY — cleared on release, never resident
+    mini.classList.remove("is-homing");
+    mini.classList.add("is-dragging"); mini.classList.add("is-carry");
     try { ball.setPointerCapture(pid); } catch (_) {}
   }
   function onMove(e) {
-    if (!dragging) return;
+    if (!dragging || e.pointerId !== pid) return;
     const dx = e.clientX - sx, dy = e.clientY - sy;
     if (!moved && Math.hypot(dx, dy) > 5) { moved = true; if (panelOpen) closePanel(); }
     if (!moved) return;
-    pushSample(e.clientX, e.clientY);
-    dragTo(clampX(bx + dx), clampY(by + dy));
+    const nx = clampX(bx + dx), ny = clampY(by + dy);
+    lastMoveT = e.timeStamp;
+    pushSample(nx, ny, e.timeStamp);
+    dragTo(nx, ny);
   }
   function onUp(e) {
-    if (!dragging) return; dragging = false;
+    if (!dragging || (e.pointerId != null && e.pointerId !== pid)) return;
+    dragging = false;
     mini.classList.remove("is-dragging");
     try { ball.releasePointerCapture(pid); } catch (_) {}
-    if (!moved) { endDragTransport(); togglePanel(); return; }   // a tap, not a drag
-    endDragTransport();                                          // it is now exactly where released
+    if (!moved) { land(); togglePanel(); return; }                        // a tap, not a drag
     const settle = function () { nearSeal() ? goHome() : dropAway(); };
-    const v = releaseVelocity(), vX = v[0], vY = v[1];
-    const speed = Math.hypot(vX, vY);
-    // A placement — the common case, and the one that must be exact — ends here, untouched.
-    if (e.type === "pointercancel" || reduced() || speed < FLICK_MIN) { settle(); return; }
-    // A chuck: one bounded float, computed once, run by the compositor.
-    const k = Math.min(CARRY_K * speed, MAX_CARRY) / speed;
-    const tx = clampX(ox + vX * k), ty = clampY(oy + vY * k);
-    if (Math.abs(tx - ox) < 1 && Math.abs(ty - oy) < 1) { settle(); return; }   // an edge ate it
-    /* Arm the transition FIRST, then flush, then change the value — so the start value is
-       computed with `transform` already transitionable. Flushing before the class is added
-       can let both land in one recalc, and the float silently never runs. */
-    mini.classList.add("is-coasting");
-    void mini.offsetWidth;
-    setOffset(tx, ty);
-    coastT = setTimeout(function () {
-      coastT = null; mini.classList.remove("is-coasting"); settle();
-    }, COAST_MS + 20);
+    if (e.type === "pointercancel" || reduced()) { land(); settle(); return; }
+    if (e.timeStamp - lastMoveT > PAUSE_MS) { land(); settle(); return; } // paused => placement
+    pushSample(clampX(bx + e.clientX - sx), clampY(by + e.clientY - sy), e.timeStamp);
+    const v = releaseVelocity();
+    if (Math.hypot(v[0], v[1]) < FLICK_MIN) { land(); settle(); return; } // placement, exact
+    // a chuck that would land in the seal's domain goes straight to the one recall
+    if (nearSealAt(clampX(ox + v[0] * TAU), clampY(oy + v[1] * TAU))) { land(); goHome(); return; }
+    startCoast(v[0], v[1], settle);                     // .is-carry stays on through the flight
   }
   ball.addEventListener("pointerdown", onDown);
   ball.addEventListener("pointermove", onMove);
@@ -2114,7 +2157,7 @@ function wireMiniCodex(host) {
 
   _miniTeardown = function () {
     clearTimeout(qt); clearTimeout(homeT);
-    if (coastT) { clearTimeout(coastT); coastT = null; }
+    stopCoast();
     if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
     if (panelRO) { try { panelRO.disconnect(); } catch (_) {} panelRO = null; }
     window.removeEventListener("resize", onMiniResize);
