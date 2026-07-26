@@ -51,7 +51,16 @@
 /* the ink is declared ONLY where masking exists — without the guard an engine
    with no mask support paints a flat slab across the whole plate */
 @supports ((-webkit-mask-image: linear-gradient(#000,#000)) or (mask-image: linear-gradient(#000,#000))) {
-  .about__plate::after { background: rgba(233,229,220,.092); }
+  /* BR-S258 — alpha .092 -> .200. The first value was tuned to the contrast
+     floor and landed under the perceptual one: on the live relic stone it
+     moved the plate's MEAN luminance by 1.33 levels out of 255, with half the
+     mask sitting at exactly zero, so most of the plate was bit-identical to
+     no texture at all and the builder could not see it. .200 lifts the mean
+     2.89 levels and takes a peak mark from L36 to L55, which reads as material
+     rather than as a rumour. Contrast is still guaranteed by construction —
+     the mask clamps the attainable background at a*233 + (1-a)*base regardless
+     of the photograph — and every crop stays above WCAG AA at this value. */
+  .about__plate::after { background: rgba(233,229,220,.200); }
 }
 
 /* the five windows — the only thing that differs between plates */

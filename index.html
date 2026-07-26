@@ -14,7 +14,7 @@
     href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap"
     rel="stylesheet"
   />
-  <link rel="stylesheet" href="styles.css?v=234" /><!-- version param busts stale caches on live — bump the whole ?v=234 epoch set together (232: BR-S254 M1 rank reversal, CSS. 233: BR-S256 M1 A/B toggle + SRC-03 sample — app.js and reveal/stage-controller.js changed too, so the JS needed busting as well) -->
+  <link rel="stylesheet" href="styles.css?v=234" /><!-- version param busts stale caches on live — bump the whole epoch set together. 232: BR-S254 M1 rank reversal (CSS). 233–234: BR-S256 M1 A/B toggle + the SRC-03 sample — app.js and reveal/stage-controller.js changed too, so the JS needed busting as well as the CSS. -->
 
   <link rel="stylesheet" href="reveal/reveal.css?v=234" />
   <link rel="stylesheet" href="arcane.css?v=234" />
@@ -26,7 +26,8 @@
   <!-- BR-S251: the U1 plates — the photographed sheet as a stencil, plus the
        hover frame and the U1 type corrections. Loads LAST so it overrides the
        .about__ block in styles.css; kept separate so it is one rollback. -->
-  <link rel="stylesheet" href="u1-plates.css?v=234b" />
+  <link rel="stylesheet" href="u1-plates.css?v=234c" /><!-- 234c: BR-S258 raises the sheet alpha .092 -> .200 -->
+
 </head>
 <body data-treatment="free" data-view="menu">
   <!-- DEV NAV — dev-only state jumper. Hidden by default; revealed ONLY when the
