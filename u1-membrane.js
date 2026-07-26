@@ -96,8 +96,17 @@
   // BAND (LOWER_Y-UPPER_Y) so a later UPPER_FRAC/LOWER_FRAC retune auto-rescales
   // them — never a bare pixel count. Floor + ceiling clamps keep the ease graceful
   // on a very short section and from ballooning back into a slow fade on a tall one.
-  var U_ESTAB=0.26, U_ESTAB_MIN=90, U_ESTAB_MAX=260;   // establish ramp length (+px floor/ceiling)
-  var U_LEAD=0.13;   // BR PULSE-3 [timing, upper]: finish establish a beat earlier so the upper line reads SOLID across the whole intro-reading window (measured upper at section-top=237: 0.69->0.96) — the user's "ensure the top line is clearly present at About-top." Still genuinely 0 through the whole M1->U1 descent (establish begins only at section-top~=377), so the killed descent-ghost stays killed.
+  var U_ESTAB=0.145, U_ESTAB_MIN=90, U_ESTAB_MAX=260;   // establish ramp length (+px floor/ceiling). BR-S261: 0.26 -> 0.145 (~120px at 900H) so the line reaches solid a short beat after it starts, now that it starts later.
+  /* BR-S261 — U_LEAD IS GONE, and that is the fix. It used to push the establish
+     window EARLIER by 0.13*band (~108px), which combined with the old 215px ramp
+     meant the upper line began inking when the section top was still 359px BELOW
+     the viewport top — measured on the live desk at scrollY 575 of a 934px M1.
+     At that moment the top ~575px of the screen is still the Desk, and the line
+     draws at 0.04H (y=36) — i.e. squarely over M1. The old note here claimed
+     "genuinely 0 through the whole M1->U1 descent (establish begins only at
+     section-top~=377)"; the arithmetic says section-top 359 and the screen says
+     the same, so that claim was simply wrong. See aboutEnvelope() for the rule
+     that replaced it. */
   var U_REL=0.22,   U_REL_MIN=90,   U_REL_MAX=260;      // release ramp length (+px floor/ceiling)
   // BR PULSE-2 [lower, content-anchored exit]: release window for the lower line,
   // as a fraction of the band, once the last plate's bottom clears the upper perch.
@@ -271,9 +280,20 @@
     // UPPER — latch SOLID on a graceful quintic ease, HOLD through the whole section,
     // release late (keyed to the section BOTTOM so the seal + trailing spacer stay
     // framed until the very end).
+    // BR-S261 — THE RULE: the upper line never inks while the Desk is behind it.
+    // It draws at UPPER_Y (0.04H), so the only honest trigger is the section's top
+    // reaching UPPER_Y itself — at that instant About owns every pixel from the
+    // line downward, and not one frame earlier. Establish then runs DOWNWARD from
+    // there (edge0 = UPPER_Y, edge1 = UPPER_Y - estabSpan), so the ramp happens
+    // entirely after the room has started rather than during the descent into it.
+    // Was: smootherstep(UPPER_Y + lead + estabSpan, UPPER_Y + lead, r.top), which
+    // began 359px early and reached solid while M1's tail still sat under the line.
+    // Trade-off, stated honestly: the earlier "clearly present AT About-top" ask is
+    // relaxed — at section-top 0 this reads ~0.7 rather than ~0.96, going solid
+    // ~120px further down. That is the cost of never ghosting over the Desk, and
+    // the ghost is the bug the builder actually reported.
     var estabSpan = clampNum(band*U_ESTAB, U_ESTAB_MIN, U_ESTAB_MAX);
-    var lead      = band*U_LEAD;
-    var establish = smootherstep(UPPER_Y + lead + estabSpan, UPPER_Y + lead, r.top);
+    var establish = smootherstep(UPPER_Y, UPPER_Y - estabSpan, r.top);
     var relSpan   = clampNum(band*U_REL, U_REL_MIN, U_REL_MAX);
     var hold      = smootherstep(UPPER_Y, UPPER_Y + relSpan, r.bottom);
     upperEnv = establish * hold;
