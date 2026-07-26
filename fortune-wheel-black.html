@@ -297,6 +297,41 @@
     background:radial-gradient(circle,#fff 0%,rgba(255,244,224,.9) 28%,transparent 70%)}
   .ring{width:20px;height:20px;border-radius:50%;border:1px solid rgba(226,232,240,.9)}
 
+  /* ---- SATURN: the liquid leaves the channel and becomes a ring system ----
+     A concentric graduated annulus can only ever read as an INSTRUMENT — evenly ticked, readable,
+     lying flat on the face. A ring system reads as a BODY: tilted, passing in front of the sphere on
+     the near side and behind it on the far side. The band was reaching for both and landing as the
+     first. So they split: the engraving keeps the instrument, and the liquid becomes the ring.
+     Construction: the TILT (squash + axis) lives on the parent and the DRIFT on the child, so the
+     spin happens in the ring's own plane and is then projected — which is what makes it orbit rather
+     than wobble. Two copies, one under the orb and one over it (masked to its near half), give the
+     crossing; the orb's own opaque body does the occluding, so there is no per-frame clipping. */
+  .saturn{position:absolute;left:50%;top:43.43%;width:114.286%;aspect-ratio:1;
+    transform:translate(-50%,-50%) rotate(-9deg) scaleY(0.30);
+    pointer-events:none;display:none}
+  .saturn-spin{position:absolute;inset:0;border-radius:50%;
+    background-position:center;background-size:100% 100%;background-repeat:no-repeat;
+    will-change:transform;animation:saturnDrift 200s linear infinite}
+  @keyframes saturnDrift{ from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+  @media (prefers-reduced-motion:reduce){ .saturn-spin{animation:none} }
+  .saturn-far{z-index:1}                                  /* under the disc: the orb occludes the far arc */
+  /* the near half is TRANSLUCENT: you are looking through a ring of particles at the sphere behind
+     it, so the wedge colours and the names must survive underneath. Full strength stays on the far
+     layer, where the side lobes sit against black and need every bit of it. */
+  .saturn-near{z-index:2;opacity:0.55;                     /* over the disc, masked to the NEAR half only */
+    -webkit-mask:linear-gradient(to bottom, transparent 0 49.6%, #000 50.4% 100%);
+            mask:linear-gradient(to bottom, transparent 0 49.6%, #000 50.4% 100%)}
+  /* the shadow the ring throws onto the sphere — clipped to the orb, so it can only fall ON it */
+  .ring-cast{position:absolute;inset:0;border-radius:50%;overflow:hidden;pointer-events:none;
+    z-index:3;display:none}
+  .ring-cast::before{content:'';position:absolute;left:50%;top:50%;width:106%;aspect-ratio:1;
+    transform:translate(-50%,-42%) rotate(-9deg) scaleY(0.30);
+    background:radial-gradient(closest-side, transparent 0 72%, rgba(0,0,0,0.20) 83%,
+      rgba(0,0,0,0.13) 92%, rgba(0,0,0,0) 100%)}
+  .wheel-area.saturn-on .saturn,
+  .wheel-area.saturn-on .ring-cast{display:block}
+  .wheel-area.saturn-on .ring-liquid{display:none}         /* the liquid is out there now, not in the band */
+
   /* static wrappers for the hammer. .engrave-ring and .ring-liquid own infinite CSS transform
      animations, so WAAPI-animating THEM would suspend the drift for 260ms and snap it back —
      wrap, never fight. No will-change at rest: these are inert divs, promoted imperatively in
@@ -347,6 +382,10 @@
     </svg>
 
     <div class="disc-shadow" aria-hidden="true"></div>
+    <!-- SATURN, the FAR half: painted UNDER the orb, so the orb's own body occludes the arc that
+         passes behind it. Only the two side lobes and the far edge survive — which is exactly what
+         "behind the planet" looks like. -->
+    <div class="saturn saturn-far" aria-hidden="true"><div class="saturn-spin"></div></div>
     <div class="disc-wrap">
       <canvas id="wheel" width="480" height="480" role="img" aria-label="Verdict wheel"></canvas>
       <!-- the instrument is the SAME BODY as the orb: these static wrappers take the hammer so the
@@ -358,12 +397,19 @@
       <!-- structural-ink overlay: the wheel's black seams, re-asserted OVER the drifting saturn band -->
       <canvas id="wheelInk" width="480" height="480" aria-hidden="true"></canvas>
       <div class="engrave-glass" aria-hidden="true"></div>
+      <!-- the shadow the ring throws onto the sphere it orbits — the single line that seats it -->
+      <div class="ring-cast" aria-hidden="true"></div>
       <!-- the nameplate ring: horizontal option names, orbiting without rotating, framed by the band -->
       <div class="nameplates" id="nameplates" aria-hidden="true"></div>
     </div>
 
     <!-- fixed compass glass: over the disc, under the pointer; never rotates -->
     <div class="glass" aria-hidden="true"></div>
+
+    <!-- SATURN, the NEAR half: painted OVER everything on the disc, masked to the lower half so it
+         only shows where the ring is in front of the orb. The two halves meet exactly at the ellipse's
+         extremes — the same bitmap on both sides of the seam, so the join is invisible. -->
+    <div class="saturn saturn-near" aria-hidden="true"><div class="saturn-spin"></div></div>
 
     <!-- the pointer — fixed, mounted above, does not rotate -->
     <svg class="pointer" viewBox="0 0 560 200" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -503,6 +549,7 @@
     <div class="metarow">
       <button class="reset" id="reset">↺ Reset</button>
       <button class="reset" id="ceremonyToggle" type="button" role="switch" aria-checked="true">Ceremony · On</button>
+      <button class="reset" id="saturnToggle" type="button" role="switch" aria-checked="true">Ring · Saturn</button>
     </div>
     <div class="opts" id="optsWrap" hidden><h4 id="optsHead">Options</h4><div id="opts"></div></div>
   </div>
@@ -1273,6 +1320,63 @@
     return c.toDataURL('image/png');
   }
 
+  // ---- SATURN: the ring system, baked ONCE. A ring is not a stripe — it is MADE OF THINGS, so this
+  //      is a smooth band profile with real gaps (the Cassini structure) plus ~900 particle streaks
+  //      whose angular density clumps. The clumps are what make the drift legible: an even wash
+  //      rotating looks static, a clumped one visibly orbits. ----
+  function bakeSaturnRing(){
+    var ss=1.5, S=640, cx=S/2, cy=S/2;   // a soft particulate body — 1.5x is plenty, and it halves the data URI
+    var c=document.createElement('canvas'); c.width=c.height=S*ss;
+    var g=c.getContext('2d'); g.scale(ss,ss);
+    var R_IN=218, R_OUT=268;
+    // radial profile: faint inner band · GAP · the dense main band · thin gap · faint outer band
+    function prof(r){
+      if (r<218||r>268) return 0;
+      if (r<231) return 0.34*(r-218)/13;
+      if (r<237) return 0;                       // the Cassini division
+      if (r<257) return 1;
+      if (r<260) return 0.10;
+      return 0.42*(268-r)/8;
+    }
+    // (1) the smooth body of the ring
+    var grad=g.createRadialGradient(cx,cy,R_IN, cx,cy,R_OUT);
+    for (var s=0;s<=25;s++){
+      var rr=R_IN+(R_OUT-R_IN)*s/25;
+      grad.addColorStop(s/25, 'rgba(104,168,226,'+(0.30*prof(rr)).toFixed(4)+')');
+    }
+    g.save();
+    g.beginPath(); g.arc(cx,cy,R_OUT,0,Math.PI*2); g.arc(cx,cy,R_IN,0,Math.PI*2,true); g.clip('evenodd');
+    g.fillStyle=grad; g.fillRect(0,0,S,S);
+
+    // (2) the particles. Angular density clumps at 3 broad nodes so the orbit is readable.
+    var rnd=rng(0x5A7C21), TAU=Math.PI*2;
+    function dens(a){ return 0.55 + 0.45*Math.pow(0.5+0.5*Math.sin(3*a+1.1),1.6); }
+    var placed=0, guard=0;
+    while (placed<700 && guard<9000){
+      guard++;
+      var a=rnd()*TAU;
+      if (rnd()>dens(a)) continue;
+      var r=R_IN+(R_OUT-R_IN)*rnd();
+      var p=prof(r);
+      if (p<=0 || rnd()>p) continue;
+      placed++;
+      var len=(0.4+rnd()*1.6)*Math.PI/180;          // a short arc: a streak, not a dot
+      var al=(0.05+rnd()*0.22)*p;
+      var warmish=rnd()<0.14;                        // a few brighter grains catch the light
+      g.strokeStyle= warmish ? 'rgba(198,226,255,'+(al*1.5).toFixed(3)+')'
+                             : 'rgba(104,168,226,'+al.toFixed(3)+')';
+      g.lineWidth=0.5+rnd()*1.3;
+      g.beginPath(); g.arc(cx,cy,r,a,a+len); g.stroke();
+    }
+    // (3) two bright edge lines: a ring's sharpest feature is where it ENDS
+    g.strokeStyle='rgba(186,218,252,0.26)'; g.lineWidth=1.1;
+    g.beginPath(); g.arc(cx,cy,256.6,0,TAU); g.stroke();
+    g.strokeStyle='rgba(186,218,252,0.14)'; g.lineWidth=0.9;
+    g.beginPath(); g.arc(cx,cy,237.4,0,TAU); g.stroke();
+    g.restore();
+    return c.toDataURL('image/png');
+  }
+
   // ---- per-frame layout builders (angles in DEGREES; each entry: {color,a0,a1,r,full?}) ----
   // ADD: one scalar s drives the whole re-partition — always tiles 360 (gap-free), overshoot = the pop
   function addLayout(oldSegs, newSeg, s){
@@ -1507,6 +1611,16 @@
   function syncCeremonyToggle(){ var b=document.getElementById('ceremonyToggle'); if(!b) return;
     b.setAttribute('aria-checked', ceremonyOn?'true':'false');
     b.textContent = ceremonyOn ? 'Ceremony · On' : 'Ceremony · Off'; }
+  // ---- ring mode toggle (persisted): the new SATURN ring system vs the original in-channel band ----
+  var SATURN_KEY='brWheelSaturn';
+  var saturnOn=(function(){ try{ return localStorage.getItem(SATURN_KEY)!=='off'; }catch(e){ return true; } })();
+  function setSaturnOn(on){ saturnOn=on; try{ localStorage.setItem(SATURN_KEY,on?'on':'off'); }catch(e){} syncSaturnToggle(); }
+  function syncSaturnToggle(){
+    if (wheelArea) wheelArea.classList.toggle('saturn-on', saturnOn);
+    var b=document.getElementById('saturnToggle'); if(!b) return;
+    b.setAttribute('aria-checked', saturnOn?'true':'false');
+    b.textContent = saturnOn ? 'Ring · Saturn' : 'Ring · Band';
+  }
   var CEREMONY_MAX_FULL   = 2500;    // watchdog — force-fires endCeremony(true) if a callback is throttled/dropped
   var CEREMONY_MAX_LEAN   = 1200;
   // ---- THE LAP: g-force launch · linear cruise · kinetic-hammer stop ("G-LONG") ----
@@ -2251,6 +2365,16 @@
     if (!ceremonyOn && ceremony.active) endCeremony(true);   // collapse an in-flight ritual straight to the verdict
   });
   syncCeremonyToggle();   // reflect persisted state onto the toggle at load
+  var saturnToggle=document.getElementById('saturnToggle');
+  if (saturnToggle) saturnToggle.addEventListener('click', function(){ setSaturnOn(!saturnOn); });
+  syncSaturnToggle();
+
+  var _satSpins = document.querySelectorAll('.saturn-spin');
+  if (_satSpins.length){
+    var _satURI = bakeSaturnRing();
+    for (var _s=0; _s<_satSpins.length; _s++) _satSpins[_s].style.backgroundImage = 'url('+_satURI+')';
+    var _sI=new Image(); _sI.src=_satURI; if(_sI.decode) _sI.decode().catch(function(){});   // GPU-ready
+  }
 
   var _ringEl = document.querySelector('.engrave-ring');
   if (_ringEl){
