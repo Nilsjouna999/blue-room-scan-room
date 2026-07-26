@@ -2470,7 +2470,19 @@ function _navStops() {
       // seat the box in the middle of the viewport when it fits; otherwise park its head just below the top edge
       ys.push(Math.round(r.height < vh - 96 ? top - (vh - r.height) / 2 : top - 48));
     };
-    seat(about.querySelector(".about__intro"));
+    /* BR-S262 — THE ARRIVAL. The first About stop used to CENTRE .about__intro,
+       which landed at scrollY 798 on a 900px viewport — and measured there, 136px
+       of the Desk is still on screen (the card's lower edge, the About cue, the
+       Reading Rooms arrow) while the membrane's upper line is still absent, since
+       BR-S261 correctly refuses to ink over the Desk. So the "arrival" showed a
+       strip of the room you just left and no frame: an almost-arrival.
+       Seating the SECTION TOP at the viewport top instead lands at 934, where the
+       Desk is entirely gone, the whole intro is composed (eyebrow, both headline
+       lines, both paragraphs) and the lower line is already framing the plate
+       below. Verified by render at 798 / 934 / 1000; 1000 clips the headline.
+       This is deliberately ONE definition shared by the ↓ key and the BR-S262
+       scroll glide — two seats for the same arrival would drift apart. */
+    ys.push(Math.round(about.getBoundingClientRect().top + window.scrollY));
     [].forEach.call(about.querySelectorAll(".about__nugget"), (n) => seat(n.querySelector(".about__plate") || n));
     seat(about.querySelector(".about__close"));
   }
@@ -2507,6 +2519,76 @@ document.addEventListener("keydown", function (e) {
     if (_navStep(k === "ArrowDown" ? 1 : -1)) e.preventDefault();   // no stop left → the browser keeps its normal scroll
   }
 });
+
+/* ── BR-S262 — THE DESCENT. One gesture down from the Desk and the page GLIDES to
+   the U1 seat instead of stranding you between two rooms. ────────────────────────
+   The stop is not a new number: it is _navStops()[1], the exact seat the ↓ key
+   already lands on. So the mouse now does what the keyboard always did, and there
+   is one definition of "the U1 area" rather than two that can drift.
+
+   SCOPE IS THE WHOLE SAFETY STORY. This owns exactly ONE boundary — the Desk, and
+   only while the page is still parked on it. Past the seat every gesture is the
+   browser's again, so the ~3500px of About reading is never touched. That was a
+   deliberate choice over snapping every checkpoint: a reading surface that fights
+   a trackpad is worse than one that lands imprecisely.
+
+   WHEEL vs TOUCH, and why they differ. Wheel is INTERCEPTED (preventDefault on a
+   non-passive listener) because that is the only way to convert one gesture into a
+   designed move. Touch is NOT intercepted — preventDefault on touchmove is the most
+   fragile thing you can do to a phone, so touch instead gets a SETTLE correction:
+   if a flick comes to rest inside the dead zone between the two rooms, the page
+   finishes the journey for it. Same destination, gentler instrument, no hijack.
+
+   INTERRUPTIBLE BY CONSTRUCTION. The guard releases on any upward intent, on any
+   keypress, and on a hard timeout, so a glide can never trap the page. Reduced
+   motion jumps instead of gliding (native `behavior` handles it inside _navStep).  */
+let _u1Gliding = false, _u1GlideT = null, _u1SettleT = null;
+function _u1Seat() { const s = _navStops(); return s.length > 1 ? s[1] : null; }
+function _u1Release() { _u1Gliding = false; if (_u1GlideT) { clearTimeout(_u1GlideT); _u1GlideT = null; } }
+/* true only when the desk is genuinely the thing on screen and nothing else owns input */
+function _u1CanGlide(target) {
+  if (state.view !== "menu" || _cxOpen || _navBlocked(target)) return false;
+  const host = document.getElementById("menuView");
+  if (!host || host.classList.contains("is-fullview")) return false;
+  if (_menuIndex(host) !== 0) return false;                          // desk only — M2/M3 are horizontal, they have no depth
+  return true;
+}
+function _u1GlideDown() {
+  const seat = _u1Seat();
+  if (seat == null || window.scrollY >= seat - 24) return false;      // already at or past U1 — nothing to do
+  _u1Gliding = true;
+  if (!_navStep(1)) { _u1Release(); return false; }                  // reuse the keyboard's own stepper + curve
+  _u1GlideT = setTimeout(_u1Release, 1200);                          // backstop: never stay armed if scrollend never fires
+  return true;
+}
+/* WHEEL — one deliberate downward push while parked on the desk. */
+window.addEventListener("wheel", function (e) {
+  /* MID-GLIDE, ANY DIRECTION: hand control straight back. The gesture is NOT
+     swallowed — it falls through to the browser untouched and the guard releases,
+     so a second push while the page is still travelling simply takes over instead
+     of fighting the glide. This is the difference between a designed move and
+     scroll-jacking: the move only ever gets the ONE gesture that started it. */
+  if (_u1Gliding) { _u1Release(); return; }
+  if (e.ctrlKey || e.metaKey || e.altKey || e.shiftKey) return;       // pinch-zoom and browser gestures stay the browser's
+  if (e.deltaY <= 6) return;                                         // downward, and past a jitter floor
+  if (!_u1CanGlide(e.target)) return;
+  const seat = _u1Seat();
+  if (seat == null || window.scrollY > 8) return;                     // ONLY from the desk at rest; one scroll in, we are done
+  if (_u1GlideDown()) e.preventDefault();
+}, { passive: false });
+/* TOUCH / anything else — no interception, just finish a flick that died in between. */
+window.addEventListener("scroll", function () {
+  if (_u1Gliding) return;
+  if (_u1SettleT) clearTimeout(_u1SettleT);
+  _u1SettleT = setTimeout(function () {
+    if (_u1Gliding || !_u1CanGlide(document.activeElement)) return;
+    const seat = _u1Seat();
+    if (seat == null) return;
+    const y = window.scrollY;
+    if (y > 24 && y < seat - 40) _u1GlideDown();                     // came to rest in the dead zone → complete the descent
+  }, 180);
+}, { passive: true });
+document.addEventListener("keydown", _u1Release, true);               // any key hands control straight back
 
 /* DEV NAV rail markup (dev-only; mounted only when DEVNAV). State navigation
    only — no product copy, no file picker, no draft. Buttons reuse the existing
