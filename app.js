@@ -1544,7 +1544,8 @@ const MINI_LEAVES =
   + '</div></div>';
 
 function renderMenu(reveal) {
-  const s = SOURCES[0];
+  const s = m1Source();                       // BR-S256: SRC-03 · Shore Dispatch
+  const srcCode = m1SrcCode(s);
   const held = hasHoldings();
   return `
     <div class="menu__track">
@@ -1570,7 +1571,7 @@ function renderMenu(reveal) {
         ${reveal ? '<div class="menurev__mount"></div>' : `<div class="msample__card">${renderCard(s, "free")}</div>`}
         <div class="msample__cap">
           <span class="msample__label">Sample Scan</span>
-          <span class="msample__type">SRC-01 · Archive</span>
+          <span class="msample__type">${srcCode} · Archive</span>
         </div>
       </section>
 
@@ -1580,7 +1581,7 @@ function renderMenu(reveal) {
 
         <!-- BR-S090 door truth: exactly two honest doors. PRIMARY = Add Your Photo (the real
              beginning → local-draft intake; no card is promised, the engine is offline).
-             SECONDARY = View Sample Card (the SRC-01 sample, explicitly not the user's photo).
+             SECONDARY = View Sample Card (the sample source, explicitly not the user's photo).
              Develop is intentionally NOT a menu door — it is an in-card action that only exists
              after a real Free card, which needs the (unbuilt) scan engine. -->
         <div class="menu__doors">
@@ -1592,7 +1593,7 @@ function renderMenu(reveal) {
           <button type="button" class="menu__door menu__door--sample" data-view-to="room">
             <span class="menu__door-kicker">Sample</span>
             <span class="menu__door-name">View sample card</span>
-            <span class="menu__door-desc">See a finished developed card — SRC-01. A sample, not your photo.</span>
+            <span class="menu__door-desc">See a finished developed card — ${srcCode}. A sample, not your photo.</span>
           </button>
         </div>
 
@@ -1607,7 +1608,17 @@ function renderMenu(reveal) {
           <button type="button" class="menu__codex menu__codex--rooms" data-annex-go><span class="menu__codex__mark" aria-hidden="true">◆</span> The Reading Rooms <span class="menu__codex__arr" aria-hidden="true">→</span></button>
         </div>
 
-        <p class="menu__foot">One sample · SRC-01 · Driver.</p>
+        <p class="menu__foot">One sample · ${srcCode} · ${s && s.short ? s.short : "Sample"}.</p>
+
+        <!-- BR-S256: DEV AFFORDANCE, not a product control. Flips the desk between
+             the original layout (A) and the BR-S254 rank reversal (B) with no
+             reload, so the two can be judged by eye. Remove once chosen. -->
+        <div class="menu__ab" role="group" aria-label="M1 layout variant (dev)">
+          <span class="menu__ab-tag">M1 layout</span>
+          <button type="button" class="menu__ab-btn" data-m1-variant="a">A · original</button>
+          <span class="menu__ab-sep" aria-hidden="true">/</span>
+          <button type="button" class="menu__ab-btn" data-m1-variant="b">B · under glass</button>
+        </div>
       </div>
     </div>
     ${ANNEX_GO}
@@ -1651,6 +1662,9 @@ function mountMenu() {
   host.addEventListener("click", onReliqPreviewClick);
   host.removeEventListener("click", onMenuAnnexClick);      // BR-S233: annex nav delegated (survives DOM swaps like the M3 toggle re-render)
   host.addEventListener("click", onMenuAnnexClick);
+  host.removeEventListener("click", onM1VariantClick);      // BR-S256: M1 A/B layout toggle — same single-bind discipline
+  host.addEventListener("click", onM1VariantClick);
+  m1ApplyVariant(host, m1Variant());                        // BR-S256: restore the chosen variant before first paint of the desk
 }
 
 /* BR-S203 — the About "Procession" scroll-reveal. Base state is VISIBLE (freeze-safe, the
@@ -1999,28 +2013,27 @@ function wireMiniCodex(host) {
   }
 
   // ---- drag (pointer capture on the ball; a sub-threshold move is a tap → toggle panel) ----
-  /* THE CARRY — velocity-continuous exponential decay.
-     The old release was a fixed-duration css transition (520ms, cubic-bezier(.10,.85,.22,1))
-     handed a pre-computed target. That bezier's initial slope is .85/.10 = 8.5, so the orb left
-     the finger at ~2.18x the speed the hand was actually moving — THAT was the "pingy" — and the
-     same curve then spent its last ~200ms crawling under half a pixel a frame, with a
-     setTimeout holding the gesture open past even that — THAT was the "laggy". One wrong curve,
-     both ends of it. A prespecified bezier cannot start at a given velocity; this can:
-
-       tau = min(TAU, MAX_CARRY / |v0|)     the ceiling, applied to TAU and never to A
-       A   = v0 * tau                        =>  x'(0) === v0, exactly, by construction
-       x(t)= x0 + A * (1 - e^(-t/tau))
-       D   = tau * ln(|v0| / END_SPEED)      duration EMERGES from the throw
-
-     Capping by shrinking tau rather than clamping A is the load-bearing part: clamping the
-     amplitude would make x'(0) < v0 and reintroduce a discontinuity — a brake instead of a ping.
-     A harder throw therefore decays faster and finishes SOONER, which is what bounded should
-     feel like. It ends on SPEED, not on distance, which is what kills the sub-pixel tail. */
-  const FLICK_MIN  = 150;    // px/s — the placement gate (identical to the old 2.5 px/frame)
-  const TAU        = 0.120;  // s    — the one dial. Heavier: raise. Snappier: lower.
-  const MAX_CARRY  = 130;    // px   — unchanged ceiling
-  const END_SPEED  = 40;     // px/s — 0.67 px/frame: below the threshold of visible motion
-  const MAX_MS     = 450;    // ms   — a guard, not a dial (real max duration is 396ms)
+  /* THE CARRY — a buoyant flight, then a set-down.
+     History, because both wrong answers are instructive:
+       1. A fixed-duration css transition (520ms, cubic-bezier(.10,.85,.22,1)) handed a
+          pre-computed target. Its initial slope is .85/.10 = 8.5, so the orb left the finger at
+          ~2.18x hand speed (the "pingy"), then spent its last ~200ms crawling sub-pixel with a
+          setTimeout holding the gesture open past even that (the "laggy"). One wrong curve.
+       2. Velocity-continuous EXPONENTIAL decay fixed the launch — x'(0) === v0 exactly — but
+          exponential sheds speed fastest at t=0 (only 19% of release speed left by halfway),
+          which reads as heavy and immediately damped: the opposite of weightless.
+     So the profile is now polynomial in velocity, which floats and then sets:
+          v(t) = v0 * (1 - u^SHAPE),  u = t/D
+       v(0) = v0 exactly  -> still no ping, the launch matches the hand.
+       v(D) = 0  exactly  -> arrives at rest at a known instant: no asymptote, no crawl. The
+                             set-down is a real event, which is what "solidifying" needs.
+       88% of release speed still remains at halfway (vs 19%), then it falls off a cliff — the
+       buoyant middle and the sleek landing are the same equation, not two tuned phases.
+     The ceiling is applied by SHORTENING the float, never by scaling the launch. */
+  const FLICK_MIN  = 150;    // px/s — the placement gate. Do not touch: it guards placement.
+  const SHAPE      = 3;      // the buoyancy exponent. Higher = floats flatter, sets down harder.
+  const FLOAT_MS   = 750;    // ms   — how long a gentle flick stays aloft
+  const MAX_CARRY  = 190;    // px   — the ceiling, imposed by shortening the float, never the launch
   const VEL_WINDOW = 90;     // ms   — long enough that hand tremor cannot read as a flick
   const PAUSE_MS   = 120;    // ms   — stopped before letting go => a placement
   let samples = [], lastMoveT = 0, coastRaf = null;
@@ -2055,26 +2068,44 @@ function wireMiniCodex(host) {
      and startCoast calls it — a ReferenceError thrown out of onUp left .is-carry stuck on
      and the inline transform unreleased, which read as the orb simply not working.) */
   function now() { return (window.performance && performance.now()) || Date.now(); }
+
+  /* THE FLIGHT PLAN. v(t) = v0*(1 - u^SHAPE) where u = t/D, integrated to
+       travelled(u) = v0*D*(u - u^(SHAPE+1)/(SHAPE+1))       distance = v0*D*SHAPE/(SHAPE+1)
+     Two properties make this the right shape for "buoyant, then solidifying":
+       v(0) = v0 EXACTLY  -> it leaves the hand at hand speed, so there is still no ping.
+       v(D) = 0  EXACTLY  -> it arrives at rest at a known instant. No asymptote, no crawl,
+                             no residual: the set-down is a real event, which is what reads
+                             as "solidifying on its landing spot".
+     Exponential decay (what this replaces) sheds speed FASTEST at t=0 — 19% of release speed
+     left by halfway — which is the opposite of weightless. This holds 88% at halfway and then
+     falls off a cliff, so it floats for a good bit and then sets. The ceiling is applied by
+     SHORTENING the float, never by scaling the launch: scaling it would re-introduce the ping. */
+  function carryPlan(vx, vy) {
+    const sp = Math.hypot(vx, vy);
+    if (!isFinite(sp) || sp < FLICK_MIN) return null;
+    const K = SHAPE / (SHAPE + 1);
+    let D = FLOAT_MS / 1000;
+    if (sp * D * K > MAX_CARRY) D = MAX_CARRY / (sp * K);   // cap by time, not by speed
+    const dist = sp * D * K;
+    return dist < 1 ? null : { ux: vx / sp, uy: vy / sp, sp: sp, D: D, dist: dist };
+  }
   function stopCoast() { if (coastRaf) { cancelAnimationFrame(coastRaf); coastRaf = null; } }
 
   function startCoast(vx, vy, settle) {
-    const sp = Math.hypot(vx, vy);
-    if (!isFinite(sp) || sp < FLICK_MIN) { land(); settle(); return; }   // guard the INPUT: NaN
-    const tau = Math.min(TAU, MAX_CARRY / sp);          // the ceiling, by shrinking tau
-    const ax = vx * tau, ay = vy * tau;                 // => opens at exactly v0
-    if (Math.hypot(ax, ay) < 1) { land(); settle(); return; }
-    const dur = Math.min(tau * Math.log(sp / END_SPEED), MAX_MS / 1000);
-    const x0 = ox, y0 = oy, t0 = now();
+    const pl = carryPlan(vx, vy);
+    if (!pl) { land(); settle(); return; }
+    const x0 = ox, y0 = oy, t0 = now(), pow = Math.pow;
     (function step() {
-      const t = (now() - t0) / 1000;
-      const p = 1 - Math.exp(-t / tau);
-      const ux = x0 + ax * p, uy = y0 + ay * p;
-      const cx = clampX(ux), cy = clampY(uy);
-      ox = cx; oy = cy;                                 // the loop's own state IS the painted
-      mini.style.transform = "translate3d(" + cx + "px," + cy + "px,0)";   // position: catching is exact
-      const pinX = (cx !== ux) || Math.abs(ax) < 0.5;   // it slides TO the wall and stops there
-      const pinY = (cy !== uy) || Math.abs(ay) < 0.5;
-      if (t >= dur || (pinX && pinY)) { coastRaf = null; land(); settle(); return; }
+      let u = (now() - t0) / 1000 / pl.D;
+      if (u > 1) u = 1;
+      const travelled = pl.sp * pl.D * (u - pow(u, SHAPE + 1) / (SHAPE + 1));
+      const px = x0 + pl.ux * travelled, py = y0 + pl.uy * travelled;
+      const cx = clampX(px), cy = clampY(py);
+      ox = cx; oy = cy;                                  // the loop's state IS the painted position
+      mini.style.transform = "translate3d(" + cx + "px," + cy + "px,0)";
+      const pinX = (cx !== px) || Math.abs(pl.ux) < 0.01;
+      const pinY = (cy !== py) || Math.abs(pl.uy) < 0.01;
+      if (u >= 1 || (pinX && pinY)) { coastRaf = null; land(); settle(); return; }
       coastRaf = requestAnimationFrame(step);
     })();
   }
@@ -2115,7 +2146,8 @@ function wireMiniCodex(host) {
     const v = releaseVelocity();
     if (Math.hypot(v[0], v[1]) < FLICK_MIN) { land(); settle(); return; } // placement, exact
     // a chuck that would land in the seal's domain goes straight to the one recall
-    if (nearSealAt(clampX(ox + v[0] * TAU), clampY(oy + v[1] * TAU))) { land(); goHome(); return; }
+    const plan = carryPlan(v[0], v[1]);
+    if (plan && nearSealAt(clampX(ox + plan.ux * plan.dist), clampY(oy + plan.uy * plan.dist))) { land(); goHome(); return; }
     startCoast(v[0], v[1], settle);                     // .is-carry stays on through the flight
   }
   ball.addEventListener("pointerdown", onDown);
@@ -2200,6 +2232,7 @@ function wireMenuReveal(host) {
   }
   const rev = window.BRReveal.mount(mountEl, {
     menustage: true,
+    src: m1Source(),                     // BR-S256: SRC-03 · Shore Dispatch (same source as the fallback card)
     // BR-S156: enter fullview with the vault hand-off CLOSED; release it only once the
     // developed reading has fully drawn (onReadSettled), so the arrow never precedes the read.
     onFullview: function () { host.classList.add("is-fullview"); host.classList.remove("is-vaultready"); document.addEventListener("keydown", _escBack, true); },
@@ -2235,6 +2268,57 @@ let _menuPushed = 0;     // COUNT of synthetic history entries we pushed (never 
 let _menuSettle = null;
 
 function hasHoldings() { try { return localStorage.getItem("br_holdings") === "1"; } catch (e) { return false; } }
+
+/* ── BR-S256: M1's sample source, in ONE place ────────────────────────────────
+   The desk shows SRC-03 "Shore Dispatch". Two separate mount paths render it —
+   wireMenuReveal() via BRReveal, and renderMenu()'s no-JS .msample__card
+   fallback — plus the caption and the foot line quote its number and name. All
+   four read from here, so they cannot drift apart the way a hardcoded
+   "SRC-01 · Archive" string did. Falls back to SOURCES[0] if the index is ever
+   out of range. */
+const M1_SRC_INDEX = 2;
+function m1Source() {
+  const all = (typeof SOURCES !== "undefined" && SOURCES) || [];
+  return all[M1_SRC_INDEX] || all[0] || null;
+}
+/* "SRC-03" — zero-padded from the source's own `no`, never typed by hand */
+function m1SrcCode(s) { return "SRC-" + String((s && s.no) || 1).padStart(2, "0"); }
+
+/* ── BR-S256: the M1 A/B layout toggle ───────────────────────────────────────
+   Two variants of the desk, switchable live so the builder can judge them side
+   by side instead of from a screenshot:
+     B (default) — BR-S254: the left column leads, the card is seated under glass
+     A           — the original desk, exactly as it shipped before BR-S254
+   The whole difference is CSS. `A` is expressed as one class on #menuView
+   (.is-m1a) that restores every original value — the overrides live next to the
+   BR-S254 rules they undo, in styles.css and reveal/reveal.css, at ID+class
+   specificity so no !important is needed. Because it is pure CSS, flipping the
+   toggle needs NO re-render and NO reload: the page changes under you, which is
+   the only way an A/B on feel is worth anything.
+   Fails to B on a thrown/absent localStorage — the shipped design is the default,
+   never the fallback. This control is a DEV AFFORDANCE on a live page at the
+   builder's request; remove it once the variant is chosen. */
+const M1_VARIANT_KEY = "br_m1_variant";
+function m1Variant() {
+  try { return localStorage.getItem(M1_VARIANT_KEY) === "a" ? "a" : "b"; } catch (e) { return "b"; }
+}
+function m1ApplyVariant(host, v) {
+  if (!host) return;
+  host.classList.toggle("is-m1a", v === "a");
+  host.querySelectorAll("[data-m1-variant]").forEach(function (b) {
+    const on = b.getAttribute("data-m1-variant") === v;
+    b.classList.toggle("is-on", on);
+    if (on) b.setAttribute("aria-current", "true"); else b.removeAttribute("aria-current");
+  });
+}
+function onM1VariantClick(e) {
+  const b = e.target.closest("[data-m1-variant]");
+  if (!b) return;
+  e.preventDefault();
+  const v = b.getAttribute("data-m1-variant") === "a" ? "a" : "b";
+  try { v === "a" ? localStorage.setItem(M1_VARIANT_KEY, "a") : localStorage.removeItem(M1_VARIANT_KEY); } catch (_) {}
+  m1ApplyVariant(e.currentTarget, v);
+}
 
 function _menuEls() {
   const host = document.getElementById("menuView");
