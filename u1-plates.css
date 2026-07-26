@@ -1,0 +1,148 @@
+/* ============================================================================
+   U1 PLATES — the photographed sheet (BR-S251)
+
+   Loaded AFTER styles.css, so every rule here is a deliberate override of the
+   .about__ block in styles.css (~2554-2668). Kept in its own file on purpose:
+   the plate material, the hover frame and the type corrections are one change
+   with one rollback, and styles.css is being edited in parallel elsewhere.
+
+   THE MATERIAL. The builder's own photograph (assets/plate-stock.png) is not
+   composited — it is a STENCIL. Its luminance is the alpha of a mask, and the
+   CSS paints the archive's own light through it. Alpha 0 issues zero paint, so
+   the plate stock survives byte for byte. That single move removes the colour
+   risk, the blend/stacking risk and the whole legibility problem at once:
+   under a mask the brightest the background can ever get is
+   a*233 + (1-a)*base, INDEPENDENT of the photograph, so contrast is guaranteed
+   by construction at every crop and every breakpoint. Worst measured pixel
+   4.734:1 — no text scrim needed, and none is here.
+
+   Five 288x208 windows, all ten pairs disjoint, so no two plates can share a
+   crack. Baked by build_plate_sheets.py: flat-field (the sheet has a 3.68x
+   left-to-right illumination ramp that would otherwise rake a wash across a
+   plate) then levels p70->p99.5 at gamma .5, so the mid-band fibre survives
+   instead of quantising away and leaving a countable starfield.
+
+   No live filter, no blend mode on the sheet, no fixed height, no new DOM node
+   for the material. assets/plate-stock.png is a BUILD INPUT and is never served.
+============================================================================ */
+
+/* NOTE — the plate's BACKGROUND is deliberately not touched here.
+   On the live page u1-membrane.js dresses the plate as an engraved relic
+   (`#about.u1lines .about__nugget:not(--unlit) .about__plate`, BR-S230/S231:
+   a #16140f->#100e0b stone with a carved inset bevel) at ID specificity. An
+   earlier draft of this file tried to sink the stock a level to compensate for
+   the texture's lift; it lost to that rule, and on the plain path it resolved
+   the shorthand's colour layer to transparent — the plate went see-through.
+   Both problems vanish by not competing: the stencil is ADDITIVE-by-alpha and
+   lands on whichever background wins. At alpha .092 it lifts the mean by about
+   5 levels, which is the whole point of it being visible. */
+
+/* THE SHEET. z-index:-1 seats it above the plate's own background and below
+   the platemark and every glyph; .about__plate's z-index:1 stops it escaping. */
+.about__plate::after {
+  content: ""; position: absolute; inset: 0; z-index: -1;
+  border-radius: inherit; pointer-events: none;
+  opacity: .848; transition: opacity 260ms ease;
+  -webkit-mask-image: var(--sheet);   mask-image: var(--sheet);
+  -webkit-mask-size: cover;           mask-size: cover;
+  -webkit-mask-position: center;      mask-position: center;
+  -webkit-mask-repeat: no-repeat;     mask-repeat: no-repeat;
+}
+/* the ink is declared ONLY where masking exists — without the guard an engine
+   with no mask support paints a flat slab across the whole plate */
+@supports ((-webkit-mask-image: linear-gradient(#000,#000)) or (mask-image: linear-gradient(#000,#000))) {
+  .about__plate::after { background: rgba(233,229,220,.092); }
+}
+
+/* the five windows — the only thing that differs between plates */
+.about__nugget[data-nug="codex"]  { --sheet: url("assets/sheet-01.png"); }
+.about__nugget[data-nug="tarot"]  { --sheet: url("assets/sheet-02.png"); }
+.about__nugget[data-nug="arcana"] { --sheet: url("assets/sheet-03.png"); }
+.about__nugget[data-nug="mint"]   { --sheet: url("assets/sheet-04.png"); }
+.about__nugget[data-nug="unlit"]  { --sheet: url("assets/sheet-05.png"); }
+
+/* the sheet nothing has happened to yet — that window is genuinely the
+   quietest patch on the photograph, so the material says it without a rule */
+.about__nugget--unlit .about__plate::after { opacity: 0; }
+
+/* ---------------------------------------------------------------------------
+   THE HOVER FRAME — at rest the plate wears its own hairline edge and the 7px
+   platemark. On hover those fade out and the PHOTOGRAPHED frame fades in, so
+   the edge of the plate becomes the edge of the sheet. One crossfade, three
+   properties, all compositor-cheap: nothing re-rasterises.
+
+   Nine-sliced, never stretched: the frame is portrait 604x958 and the plate is
+   landscape, so fitting one to the other would be a 2.59:1 anisotropic squash
+   that halves the horizontal bar weight. The asset is written LA (white +
+   the photograph's luminance as alpha), so it needs no blend mode — over the
+   dark plate it simply IS the frame arriving. Slices are 105/95 because the
+   shipped file is half size; border widths track them (105/17=6.2, 95/15=6.3)
+   so every corner blowout stays square.
+--------------------------------------------------------------------------- */
+.about__frame {
+  position: absolute; inset: 0; z-index: 2; pointer-events: none;
+  border-style: solid; border-width: 17px 15px; border-color: transparent;
+  border-image-source: url("assets/plate-frame.png");
+  border-image-slice: 105 95 105 95;
+  border-image-repeat: stretch;
+  opacity: 0; transition: opacity 300ms ease;
+}
+.about__plate { transition: border-color 300ms ease; }
+.about__plate::before { transition: opacity 300ms ease; }
+
+/* hover OR keyboard focus — a keyboard user gets the same answer as a mouse.
+   Every selector below carries the #about id, because the live relic-stone
+   rules injected by u1-membrane.js are themselves id-scoped
+   (`#about.u1lines .about__nugget...`); without the id the plate keeps its own
+   edge and the two borders fight during the crossfade. */
+#about .about__nugget:not(.about__nugget--unlit) .about__plate:hover .about__frame,
+#about .about__nugget:not(.about__nugget--unlit) .about__plate:focus-within .about__frame { opacity: .82; }
+#about .about__nugget:not(.about__nugget--unlit) .about__plate:hover,
+#about .about__nugget:not(.about__nugget--unlit) .about__plate:focus-within { border-color: transparent; }
+#about .about__nugget:not(.about__nugget--unlit) .about__plate:hover::before,
+#about .about__nugget:not(.about__nugget--unlit) .about__plate:focus-within::before { opacity: 0; }
+
+/* styles.css:2609 lifts the border to --line-strong on hover and the relic
+   rule carries a carved inset bevel; the photographed frame IS the hover state
+   now, so both stand down or three edges argue at once */
+#about .about__nugget:not(.about__nugget--unlit) .about__plate:hover,
+#about .about__nugget:not(.about__nugget--unlit) .about__plate:focus-within {
+  box-shadow: inset 0 1px 0 rgba(233,229,220,.06);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .about__frame, .about__plate, .about__plate::before, .about__plate::after { transition: none; }
+}
+/* no hover on touch: the frame would latch on after a tap and never leave */
+@media (hover: none) {
+  .about__nugget .about__plate:hover .about__frame { opacity: 0; }
+  .about__nugget .about__plate:hover { border-color: var(--hair-1); }
+  .about__nugget .about__plate:hover::before { opacity: 1; }
+}
+
+/* ---------------------------------------------------------------------------
+   TYPE — the corrections the audit found, scoped to U1.
+--------------------------------------------------------------------------- */
+
+/* carries the price and was the smallest text on the page: cap height 5.93px,
+   stems sub-pixel. 10px/500 at --t-body takes contrast 5.96 -> 8.55:1 */
+.about__micro { font-size: 10px; font-weight: 500; letter-spacing: .24em; line-height: 1.4; color: var(--t-body); }
+.about__name  { font-size: 14px; }        /* step against the door: 1.13x -> 1.22x */
+.about__line  { line-height: 1.38; }      /* 3.95x x-height is ~45% too loose at 38 CPL */
+.about__door  { letter-spacing: .16em; }
+
+/* three WCAG AA failures, all from --faint #6e6b63 on near-black (3.60-3.70:1) */
+.about__eyebrow, .about__foot { color: var(--t-meta); }
+.about__nugget--unlit .about__line, .about__nugget--unlit .about__micro { color: var(--t-meta); }
+
+/* THE GHOST ORDINAL was 74% occluded by an opaque plate and rendering at
+   1.29:1 — invisible, for nine lines of CSS. The alternating layout already
+   opens a ~360px gutter opposite every plate; put the numeral there. Below
+   700px the gutter is gone, so the numeral goes with it. */
+.about__nugget[data-side="left"]   .about__ord { left: auto; right: clamp(8px, 4vw, 56px); }
+.about__nugget[data-side="right"]  .about__ord { right: auto; left: clamp(8px, 4vw, 56px); }
+.about__nugget[data-side="center"] .about__ord { left: auto; right: clamp(8px, 3vw, 24px); transform: none; }
+.about__ord { color: rgba(233,229,220,.16); }
+.about__nugget.is-free .about__ord { color: rgba(200,173,112,.16); }
+.about__nugget.is-paid .about__ord { color: rgba(139,123,255,.15); }
+@media (max-width: 699px) { .about__ord { display: none; } }

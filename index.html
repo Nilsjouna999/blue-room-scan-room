@@ -22,6 +22,11 @@
   <link rel="stylesheet" href="settings.css?v=231" /><!-- BR-S208: Settings + boring page -->
 
   <link rel="stylesheet" href="ceremony.css?v=231" />
+
+  <!-- BR-S251: the U1 plates — the photographed sheet as a stencil, plus the
+       hover frame and the U1 type corrections. Loads LAST so it overrides the
+       .about__ block in styles.css; kept separate so it is one rollback. -->
+  <link rel="stylesheet" href="u1-plates.css?v=231b" />
 </head>
 <body data-treatment="free" data-view="menu">
   <!-- DEV NAV — dev-only state jumper. Hidden by default; revealed ONLY when the
@@ -123,7 +128,8 @@
   <!-- The Ceremony (BR-S163) — the forge ceremony on ?dev=ceremony; the builder's
        exact art kept pixel-perfect + brought to life. window.BRCeremony. -->
   <script src="ceremony.js?v=231"></script>
-  <script src="app.js?v=231"></script>
+  <script src="app.js?v=231b"></script><!-- BR-S251: U1 copy pass + the frame node; suffixed rather than bumping the shared epoch, which a parallel session owns -->
+
   <!-- U1 membrane-lines (2026-07-24) — LIVE by default (BR-S228). Runs the U1
        effect on the real #about surface. Kill-switch preserved: ?u1lines=0
        (persists an off preference); ?u1lines re-enables. Builder has further

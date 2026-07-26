@@ -1300,20 +1300,33 @@ function aboutNugget(o) {
 }
 function renderAbout() {
   const N = [
+    /* BR-S251 — the copy pass. A 14-specialist read found the tone was never the
+       problem: the most ornate plate (V) read cleanly for every cold reader,
+       because it was the only one not hiding a number behind a poetic word.
+       So the voice stays and the FACTS arrive. Two live errors are fixed here:
+       the old Tarot line claimed "what falls is read and filed", which is false
+       for the Pull (a showcase, not filed), and "six systems" miscounted — a
+       hexagram IS two trigrams, so it is six MARKS from five traditions.
+       The micro slot now has ONE job on all five plates: the terms stamp,
+       cost first. No two doors share a CTA, and each names the first act —
+       the Birth Reading's states its INPUT, which is how the plate answers
+       "does this want my photo?" without spending a word on the negative.
+       Lines are held under ~110 chars: 31ch of Cormorant buys ~38 characters,
+       so three lines is the plaque's real ceiling. */
     { key: 'codex', ord: 'I', side: 'left', cls: 'is-free', name: 'The Codex',
-      line: 'The whole archive of meanings — every card, sign, and rune — yours to search.', micro: 'Free · always open',
+      line: '166 entries across eight systems. Every card, sign, rune and hexagram the rooms read from.', micro: 'Free · no account',
       door: '<a class="about__door" href="codex.html">Open the Codex &rarr;</a>' },
     { key: 'tarot', ord: 'II', side: 'right', cls: '', name: 'Tarot Divination',
-      line: 'Cut the full deck to a question — the Pull, a Sitting, or the Deep Read — and what falls is read and filed.', micro: 'Drawn once · not reissued.',
-      door: '<a class="about__door" href="?dev=drawing-room">Enter the room &rarr;</a>' },
-    { key: 'arcana', ord: 'III', side: 'left', cls: 'is-paid', name: 'The Arcana Reading',
-      line: 'A person, read by birth through six systems into a crowned name — a record kept for every reading.', micro: 'By birth · or a Concord of two',
-      door: '<a class="about__door" href="?dev=arcane">Enter the room &rarr;</a>' },
-    { key: 'mint', ord: 'IV', side: 'right', cls: 'is-free', name: 'Card Mint',
-      line: 'Bring a photo — it is already a card. The room only develops it.', micro: 'The Free Pull · the Halo Mint',
+      line: 'Three cards for a Sitting, five for the Deep Read, cut from the full 78 and filed where each fell.', micro: 'First sitting free · to $2.99',
+      door: '<a class="about__door" href="?dev=drawing-room">Cut the deck &rarr;</a>' },
+    { key: 'arcana', ord: 'III', side: 'left', cls: 'is-paid', name: 'The Birth Reading',
+      line: 'Six marks from a name and birth date: astrology, numerology, runes, the I Ching, each with a record.', micro: '$4.99 · $7.99 for two',
+      door: '<a class="about__door" href="?dev=arcane">Give a name and date &rarr;</a>' },
+    { key: 'mint', ord: 'IV', side: 'right', cls: 'is-free', name: 'The Card Mint',
+      line: 'One card from one photograph. The room develops what is already in it, then keeps it a page.', micro: 'Free · or the paid Halo Mint',
       door: '<button type="button" class="about__door" data-view-to="room">See a card develop &rarr;</button>' },
     { key: 'unlit', ord: 'V', side: 'center', cls: 'about__nugget--unlit', name: 'The Unlit Room',
-      line: 'Something is taking shape here — still too dim to name. The candle has not reached it yet.', micro: 'Not yet lit',
+      line: 'A fifth room, unbuilt. Nothing to read here yet; the candle has not reached this end of the hall.', micro: 'Not yet open · no date',
       door: '' }
   ];
   return '<section id="about" class="about" aria-label="About Blue Room">'
@@ -1546,8 +1559,10 @@ function renderMenu(reveal) {
       <!-- BR-S250: the caption comes AFTER the card. It used to be the topmost ink
            on the whole page — 8.5px of the card's own furniture sitting 78px above
            the wordmark — so Blue Room's entrance opened by naming the specimen
-           instead of the room. Moved in SOURCE ORDER, not with CSS `order` or
-           column-reverse: a caption read before its object is wrong for a screen
+           instead of the room. Moved in SOURCE ORDER, not with the CSS order
+           property or column-reverse (and note: no backticks in this comment — it
+           lives inside a template literal, so one would terminate the string):
+           a caption read before its object is wrong for a screen
            reader too, and column-reverse was measured to make the CARD the topmost
            ink at y138, which is strictly worse than the problem it names. -->
       <section class="menu__stage${reveal ? " menu__stage--reveal" : ""}">
