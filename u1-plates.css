@@ -155,3 +155,311 @@
 .about__nugget.is-free .about__ord { color: rgba(200,173,112,.16); }
 .about__nugget.is-paid .about__ord { color: rgba(139,123,255,.15); }
 @media (max-width: 699px) { .about__ord { display: none; } }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   BR-S261 · PART A — THE U1 HEADER: THE VITRINE LABEL
+
+   A museum tombstone label for the archive: accession stamp, title, one-line
+   identification, technical line, sill. Flush left on ONE datum, and that datum
+   is the rail's own left edge — so the header's left edge and plate I's border
+   are the same x. Replaces the ±58px stagger, the 21deg pivot (measured 1.40:1,
+   126 lit pixels — not a glyph) and the two centred ledes.
+
+   SPECIFICITY IS LOAD-BEARING HERE. u1-membrane.js appends its <style> to
+   <head> at RUNTIME, so it is LATER in document order and cannot be beaten on
+   order. It owns `#about.u1lines .about__intro{margin-bottom:…}` = (1,2,0).
+   `#about header.about__intro.about__intro` = (1,2,1) beats it on the third
+   column and — unlike a .u1lines-scoped selector — still applies when the
+   membrane is off. Do not "simplify" it.
+
+   THERE IS NO --gold TOKEN. Every gold on this surface is the literal #c8ad70.
+   var(--gold) would render as an invalid declaration and silently drop the
+   free legend to grey, which is the one thing that line exists to prevent.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ONE number governs the corridor: it is the intro's bottom margin AND the
+   spine's negative top, so the candle can never detach from the sill. */
+#about { --u1-corridor: clamp(80px, 12.7vh, 126px); }
+
+/* THE CASE — the rail's own box, so label and collection share a left datum
+   and a centre. gap:0 because every interval is an explicit margin below; the
+   shipped 21px grid gap made all four interior breaks peers (ink 29/37/39/35). */
+#about header.about__intro.about__intro {
+  width: min(760px, 100%);
+  margin: 0 auto var(--u1-corridor);
+  display: grid; justify-items: stretch;
+  text-align: left; gap: 0;
+}
+
+/* 1 — THE ACCESSION STAMP. Flush left, so tracked caps carry no optical-centring
+   error and must NOT get the negative right margin the centred elements need. */
+#about .about__eyebrow {
+  margin: 0; font-size: 9.5px; line-height: 1; letter-spacing: .3em;
+  font-weight: 500; color: var(--t-meta);
+}
+#about .about__eyemark { color: var(--t-meta); }
+
+/* 2 — THE TITLE. Two lines, broken in markup, both flush to the datum so the
+   return sweep has a left margin to return to. The shipped headline started its
+   second half 51.6px LEFT of where the first ended and 67.42px below it —
+   1.466× its own declared line-height. This sets at the type's own rhythm. */
+#about .about__headline {
+  display: block; justify-items: start; margin: 5px 0 0;
+  font-family: var(--font-display); font-weight: 600;
+  font-size: clamp(31px, 5.4vw, 44px);
+  line-height: 1.08; letter-spacing: -.012em; color: var(--t-display);
+}
+/* (1,1,0) beats styles.css's :first-of-type/:last-of-type (0,1,1) and its ±7vw
+   @media pair — no !important anywhere. */
+#about .about__hx { display: block; justify-self: start; white-space: normal; transform: none; }
+
+/* Deleted from the DOM too; these two guards only cover a cache skew where old
+   markup meets new CSS. The FOOTER's wick is outside .about__intro and stays. */
+#about .about__pivot { display: none; }
+#about .about__intro > .about__wick { display: none; }
+
+/* 3 — THE IDENTIFICATION: the surface's thesis, which must OUTRANK a plate's
+   LINE. It previously lost on every axis (12% smaller, 7% dimmer, un-engraved,
+   2.23% apart in measure). Four discriminators now: 23px vs 18.5 (1.243×,
+   clears the 1.2 modular minimum), ~395px measure vs 274 (+44%), ranged left vs
+   centred, weight 500 vs 400.
+   MEASURE IN em, NOT ch — `ch` is the advance of "0", which differs between
+   Cormorant 400 and 500 and would move the engineered rag under the builder. */
+#about .about__lede { display: block; justify-items: start; width: 100%; margin: 36px 0 0; }
+#about .about__ident {
+  font-family: var(--font-display); font-weight: 500;
+  font-size: clamp(17.5px, 2.9vw, 23px); line-height: 1.52; letter-spacing: .004em;
+  color: var(--t-primary); opacity: 1;
+  max-width: 17.2em; margin: 0; justify-self: start; text-wrap: pretty;
+}
+
+/* 4 — THE TECHNICAL LINE: the census, and the colour law's KEY. Gold and violet
+   are taught HERE, above plate I, so every law-coloured mark down the rail is
+   already decoded when the reader reaches it. Three counts that sum to the
+   first (3+1+1=5) rather than four numbers to reconcile. Flex, so a narrow
+   viewport can only ever break BETWEEN facts, never inside one. */
+#about .about__spec {
+  display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 .82em;
+  width: 100%; margin: 31px 0 0;
+  font-family: var(--font-mono); font-size: 11px; font-weight: 500;
+  letter-spacing: .18em; line-height: 1.5; text-transform: uppercase;
+  color: var(--t-meta);
+}
+#about .about__spec-d    { color: var(--t-meta); opacity: .5; }
+#about .about__spec-free { color: #c8ad70; }
+#about .about__spec-paid { color: var(--violet); }
+
+/* 5 — THE SILL: the lip of the case, and the whole handoff. The header's only
+   full-rail-width object, so it terminates on BOTH axes the rail alternates
+   between — hard left at plate I's border, hard right at plate II's right edge,
+   where `I – V` names the ghost ordinals before the first one appears. */
+#about .about__sill {
+  position: relative; display: grid; grid-template-columns: 1fr auto;
+  align-items: center; column-gap: 14px; width: 100%; margin: 20px 0 0;
+}
+#about .about__sill-line {
+  display: block; height: 1px; width: 100%;
+  background: color-mix(in srgb, var(--t-meta) 66%, transparent);
+}
+#about .about__sill-span {
+  font-family: var(--font-mono); font-size: 9.5px; font-weight: 500;
+  letter-spacing: .28em; text-transform: uppercase; color: var(--t-meta);
+  line-height: 1; margin-right: -.28em;
+}
+/* THE REGISTRATION TICK. 1.5px and offset .75, not 1px and .5: a 1px vertical
+   hairline on a fractional axis antialiases across two device pixels and can
+   never reach its declared alpha — the same failure that made the pivot
+   invisible. On the WRAPPER, so it lands on the rail's centre, not the line's. */
+#about .about__sill::after {
+  content: ""; position: absolute; left: calc(50% - .75px); top: 50%;
+  width: 1.5px; height: 16px; pointer-events: none;
+  background: color-mix(in srgb, var(--t-meta) 66%, transparent);
+}
+
+/* 6 — THE HANDOFF. (a) run the candle-spine UP to the sill so the label's rule
+   and the rail's line form one T, instead of the header stopping and a hairline
+   appearing out of nowhere 268px later. (b) the shipped gradient's first stop
+   was transparent→hair-3 at 6%, and 6% of a ~3900px rail is ~234px — the
+   spine's head sat at or below 1.08:1 exactly where the handoff happens. It now
+   LEAVES THE SILL LIT and only decays once it is inside plate I. Absolute px,
+   not %, because the corridor is ~3% of the rail. The waist and the terminal
+   die-out are kept: a flat lit line down the whole rail is a wash by another
+   name, and the die-out is what plate V's copy already claims. */
+#about .about__rail::before {
+  top: calc(-1 * var(--u1-corridor));
+  background: linear-gradient(
+    color-mix(in srgb, var(--t-meta) 62%, transparent) 0px,
+    color-mix(in srgb, var(--t-meta) 44%, transparent) 96px,
+    var(--hair-1) 190px,
+    var(--hair-1) 52%,
+    var(--hair-3) 92%,
+    transparent 100%);
+}
+
+@media (max-width: 559px) {
+  #about { --u1-corridor: clamp(64px, 10vh, 100px); }
+  #about .about__headline { margin-top: 4px; }
+  #about .about__lede  { margin-top: 28px; }
+  #about .about__ident { max-width: 19.5em; }
+  #about .about__spec  { font-size: 10px; letter-spacing: .14em; gap: 0 .7em; margin-top: 26px; }
+  #about .about__sill  { margin-top: 19px; column-gap: 10px; }
+  #about .about__sill-span { font-size: 9px; letter-spacing: .2em; margin-right: -.2em; }
+  #about .about__rail::before { background: linear-gradient(
+    color-mix(in srgb, var(--t-meta) 62%, transparent) 0px,
+    color-mix(in srgb, var(--t-meta) 44%, transparent) 72px,
+    var(--hair-1) 150px, var(--hair-1) 52%, var(--hair-3) 92%, transparent 100%); }
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   BR-S261 · PART B — THE PLATE POLISH
+   Same specificity trap: u1-membrane.js's injected <style> is LATER in document
+   order and owns `#about.u1lines .about__rule` (1,2,0) and
+   `#about.u1lines .about__nugget:not(--unlit) .about__plate` (1,4,0). Every
+   rule below either out-specifies it or deliberately works around it.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ① the door: one instrument, four times. Measured border contrast was
+   Codex 3.52 · Mint 3.88 · BIRTH 2.96 ✗ · TAROT 1.67 ✗ — and the failure
+   correlated with the law, so it read as a demotion of the paid room. Free is
+   the hero in COLOUR, never in WEIGHT. Widths also spread 1.40× (186/166/232/216). */
+#about .about__door {
+  /* 236, not the spec's 232: measured, "Give a name and date →" sets to 234.1px
+     of content, so at 232 that one door grew past its peers and the set spread
+     2.1px. 236 clears the longest label and all four render identical. */
+  min-width: 236px; max-width: 100%;
+  padding: 12px 20px 12px calc(20px + .16em);   /* L − R = the trailing letter-space, exactly */
+  border-radius: 4px;
+  background: linear-gradient(180deg, rgba(233,229,220,.055), rgba(0,0,0,.34));
+  box-shadow: inset 0 1px 0 rgba(233,229,220,.07), inset 0 -1px 0 rgba(0,0,0,.5);
+  color: var(--t-body);                          /* rank: the NAME leads, the door follows */
+}
+#about .about__nugget:not(.is-free):not(.is-paid) .about__door { border-color: rgba(233,229,220,.42); }
+#about .about__nugget:not(.is-free):not(.is-paid) .about__door:hover,
+#about .about__nugget:not(.is-free):not(.is-paid) .about__door:focus-visible { color: var(--t-display); }
+#about .about__nugget.is-paid .about__door { border-color: color-mix(in srgb, var(--violet) 58%, var(--line-strong)); }
+
+/* ② the rule carries the law. u1-membrane.js paints .about__rule the same warm
+   [101,80,52] on ALL FIVE plates under a selector with no law scope — which
+   puts GOLD, the free mark, 8px under "THE BIRTH READING" and ~130px above
+   $4.99, in the exact place a reader decides whether this costs money. On the
+   unlit plate it is worse: gold on the one plate with nothing to sell. */
+#about .about__nugget.is-free .about__rule {
+  background: linear-gradient(90deg,transparent,rgba(200,173,112,.46) 30%,rgba(200,173,112,.46) 70%,transparent); }
+#about .about__nugget.is-paid .about__rule {
+  background: linear-gradient(90deg,transparent,rgba(139,123,255,.48) 30%,rgba(139,123,255,.48) 70%,transparent); }
+#about .about__nugget:not(.is-free):not(.is-paid) .about__rule {
+  background: linear-gradient(90deg,transparent,rgba(233,229,220,.17) 30%,rgba(233,229,220,.17) 70%,transparent); }
+
+/* ③ the spacing map: three blocks, not six items. gap:13px between six children
+   measured 27/14/22/23/20 optical — four interior gaps inside a 15% band, which
+   the eye cannot group, so the PRICE read as a fourth line of the paragraph.
+   Largest bind 16 vs smallest separation 27 = 1.69×, past the Gestalt threshold.
+   Folds in the tracked-caps optical centring and plate 400→380 (so the plate's
+   inner edge lands ON the spine — tangent, instead of burying it 20px inside). */
+#about .about__plate {
+  gap: 0;
+  padding: 30px 26px 28px;
+  width: min(380px, 100%);
+}
+#about .about__name  { margin-top: 22px; margin-right: -.16em; }   /* A → B separation */
+#about .about__rule  { margin-top: 8px;  }                          /* bind */
+#about .about__line  { margin-top: 8px;  }                          /* bind */
+#about .about__micro { margin-top: 19px; margin-right: -.24em; }   /* B → C separation */
+#about .about__door  { margin-top: 5px;  }                          /* bind */
+#about .about__foot  { margin-right: -.28em; }
+
+@media (max-width: 559px) {
+  #about .about__plate { padding: 24px 20px 24px; }
+  #about .about__name  { margin-top: 18px; }
+  #about .about__rule  { margin-top: 7px; }
+  #about .about__line  { margin-top: 7px; }
+  #about .about__micro { margin-top: 16px; }
+  #about .about__door  { margin-top: 4px; }
+}
+
+/* ④ unlit = the same stone, unlit. Three faults fixed: a blurred WORD reads as
+   a rendering failure (readers blame their screen); the documented gold
+   floor-glow has been DEAD since BR-S251, because styles.css and u1-plates.css
+   are two features fighting over one ::after at equal specificity and this file
+   loads last; and the membrane's stone is :not(--unlit)-scoped, so plate V was
+   a different rock rather than the same rock in shadow. The glow moves to the
+   ELEMENT background, which frees the ::after to carry the stencil. */
+#about .about__nugget--unlit .about__plate {
+  background:
+    radial-gradient(120% 78% at 50% 122%, rgba(200,173,112,.06), transparent 60%),
+    radial-gradient(130% 90% at 50% -12%, rgba(233,229,220,.026), transparent 55%),
+    linear-gradient(180deg,#131210 0%,#0d0c0a 100%);
+  box-shadow: inset 0 1px 0 rgba(233,229,220,.055),
+              inset 0 -1px 0 rgba(0,0,0,.5),
+              inset 0 0 26px rgba(0,0,0,.34);
+}
+#about .about__nugget--unlit .about__plate::after { opacity: .46; background: rgba(233,229,220,.200); }
+#about .about__nugget--unlit .about__name   { filter: none; opacity: 1; color: var(--t-meta); }
+#about .about__nugget--unlit .about__emblem { filter: blur(3.5px); opacity: .34; }
+
+/* ⑤ the ghost ordinal is pinned to its PLATE, not to the page edge. `top:-.34em`
+   was a stale cap-height correction from when the numeral sat behind the plate;
+   measured, numeral III's centre was 139px above plate III's. The gutter spread
+   61/166/204/239/266px — 4.4× — and [data-side=center] used a different clamp
+   again. −53% not −50%: Roman numerals have no descenders, so the geometric
+   centre sits low. These out-specify the BR-S253 rules above, which are now dead. */
+#about .about__ord { top: 50%; }
+#about .about__nugget[data-side="left"]   .about__ord { right: auto; left:  calc(min(380px,100%) + 44px); transform: translateY(-53%); }
+#about .about__nugget[data-side="right"]  .about__ord { left: auto;  right: calc(min(380px,100%) + 44px); transform: translateY(-53%); }
+#about .about__nugget[data-side="center"] .about__ord { right: auto; left:  calc(50% + 234px);            transform: translateY(-53%); }
+
+/* ⑥ the stone IS the door. Hovering a 380×~314 plate lifts its border and
+   recolours ~65% of its ink, and then only a 232px button answers a click —
+   an affordance lie, five times over. .about__door is not positioned, so
+   inset:0 resolves against .about__plate. Still exactly one focusable element
+   per plate; the unlit plate has no door and is untouched.
+   TRADEOFF TAKEN KNOWINGLY: text selection inside a plate is blocked. */
+#about .about__nugget:not(.about__nugget--unlit) .about__plate { cursor: pointer; }
+#about .about__door::after { content:""; position:absolute; inset:0; z-index:3; }
+
+/* ⑦ the emblem, honest. A 40-unit viewBox at 48px shipped every stroke at
+   1.44/0.90 against the documented 1.2/0.75 contract. And the old shadow was
+   arithmetically invisible: blur 16 → σ≈8, peak 1.44/(8√2π) = 7.2%, ×.5 =
+   0.66 of 255 levels — measured, the rows under emblem III were BRIGHTER at
+   centre than at edge. "The lift is on the emblem" bought a raster layer and
+   no lift. σ≈1.5 gives a real contact shadow, and the law is declared here
+   before a word is read. */
+#about .about__emblem-svg { width: 40px; height: 40px; }
+#about .about__emblem { filter: drop-shadow(0 2px 3px rgba(0,0,0,.55)); opacity: .76; }
+#about .about__nugget.is-free .about__emblem {
+  color:#c8ad70;
+  filter: drop-shadow(0 2px 3px rgba(0,0,0,.55)) drop-shadow(0 0 7px rgba(200,173,112,.20));
+  opacity:.92; }
+#about .about__nugget.is-paid .about__emblem {
+  color:var(--violet);
+  filter: drop-shadow(0 2px 3px rgba(0,0,0,.55)) drop-shadow(0 0 7px rgba(139,123,255,.22));
+  opacity:.92; }
+
+/* ⑧ equalise the stencil PEAKS, not the means. The flat-field bake worked —
+   means span 0.8 of a level across I–IV, which nobody will ever see. But the
+   eye fixates the TAIL, and plate II carries 16× plate III's bright-mark area,
+   plate I 4.7× (a vertical crack running down through its body-copy column).
+   III and IV are the reference character; scale I and II onto their p99.9. */
+@supports ((-webkit-mask-image: linear-gradient(#000,#000)) or (mask-image: linear-gradient(#000,#000))) {
+  #about .about__nugget[data-nug="codex"] .about__plate::after { background: rgba(233,229,220,.182); }
+  #about .about__nugget[data-nug="tarot"] .about__plate::after { background: rgba(233,229,220,.168); }
+}
+
+/* ⑨ the paid micro carries the price and was the dimmest law text on the
+   surface. color-mix(… --violet 65%, --t-meta) mixes toward GREY, costing
+   luminance without buying legibility: 6.35:1 against gold's 8.74 and neutral's
+   8.49. Mix toward LIGHT instead — lands ~8.45:1, level with gold. */
+#about .about__nugget.is-paid .about__micro { color: color-mix(in srgb, var(--violet) 62%, #e9e5dc); }
+
+/* ⑩ the platemark stops being a second rim. Three edges were on the books
+   (border, membrane bevel, 7px platemark) and the first two are one edge in the
+   material. It was also geometrically wrong: outer r10 at inset 0 needs inner
+   r3 at inset 7, but it shipped r6 — an 18% corner bulge. Not deleted, because
+   the hover crossfade trades on it. Inverted into a carve, and concentric: 10−6=4. */
+#about .about__plate::before {
+  inset: 6px;
+  border-radius: 4px;
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,.40);
+}

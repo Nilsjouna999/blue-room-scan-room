@@ -1332,12 +1332,33 @@ function renderAbout() {
   return '<section id="about" class="about" aria-label="About Blue Room">'
     + '<header class="about__intro">'
     +   '<p class="about__eyebrow"><span class="about__eyemark" aria-hidden="true">◆</span> BLUE ROOM</p>'
-    +   '<h2 class="about__headline" aria-label="We hold the candle."><span class="about__hx" aria-hidden="true">We&nbsp;hold</span><span class="about__pivot" aria-hidden="true"></span><span class="about__hx" aria-hidden="true">the&nbsp;candle.</span></h2>'
+    /* BR-S261 — THE VITRINE LABEL. The header is now a museum tombstone label
+       for the whole archive: accession stamp, title, one-line identification,
+       technical line, sill. Everything is flush left on ONE datum, and that
+       datum is the rail's own left edge, so the header's left edge and plate I's
+       border are the same x.
+       "We hold the candle." is gone: it was atmosphere with no referent, and it
+       was split across two halves staggered ±58px with a 21deg hairline between
+       them that measured 1.40:1 — not a glyph, and invisible in practice.
+       The second lede is gone too: 24% of the header's light, zero product
+       facts, and it asserted knowledge of the reader's own ignorance.
+       The spec line teaches the COLOUR LAW above plate I, so every gold and
+       violet mark down the rail is already decoded when the reader meets it. It
+       is written sentence-case and uppercased in CSS, so a screen reader says
+       words rather than spelling initials. */
+    +   '<h2 class="about__headline" aria-label="Everything read here is yours to keep.">'
+    +     '<span class="about__hx" aria-hidden="true">Everything read here</span>'
+    +     '<span class="about__hx" aria-hidden="true">is yours to keep.</span></h2>'
     +   '<div class="about__lede">'
-    +     '<p class="about__lede-a">Blue Room draws the readings and develops the cards, then keeps every one on a shelf that is yours to find and stand before.</p>'
-    +     '<p class="about__lede-b">Come down slowly; the light stays on while you read your way into what you did not know was here.</p>'
+    +     '<p class="about__ident">The archive draws tarot and birth readings, develops a card from a photograph, and&nbsp;files&nbsp;each one on a page of its own.</p>'
     +   '</div>'
-    +   '<span class="about__wick" aria-hidden="true"></span>'
+    +   '<p class="about__spec">'
+    +     '<span>Five rooms</span><span class="about__spec-d" aria-hidden="true">·</span>'
+    +     '<span class="about__spec-free">Three free to enter</span><span class="about__spec-d" aria-hidden="true">·</span>'
+    +     '<span class="about__spec-paid">One paid</span><span class="about__spec-d" aria-hidden="true">·</span>'
+    +     '<span>One unlit</span></p>'
+    +   '<span class="about__sill" aria-hidden="true">'
+    +     '<span class="about__sill-line"></span><span class="about__sill-span">I &ndash; V</span></span>'
     + '</header>'
     + '<ol class="about__rail">' + N.map(aboutNugget).join('') + '</ol>'
     + '<footer class="about__close">'
