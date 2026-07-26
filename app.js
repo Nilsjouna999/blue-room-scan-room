@@ -1556,7 +1556,7 @@ function renderMenu(reveal) {
         <p class="menu__trust">Image-as-artifact scan — it reads frame, gesture and signal, never the person.</p>
       </header>
 
-      <!-- BR-S250: the caption comes AFTER the card. It used to be the topmost ink
+      <!-- BR-S254: the caption comes AFTER the card. It used to be the topmost ink
            on the whole page — 8.5px of the card's own furniture sitting 78px above
            the wordmark — so Blue Room's entrance opened by naming the specimen
            instead of the room. Moved in SOURCE ORDER, not with the CSS order

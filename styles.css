@@ -2393,11 +2393,20 @@ body[data-view="room"] .dev { display: none; }
   flex-direction: column;   /* BR-S203: the desk stage (100vh) then the About surface below it */
 }
 /* Archive Desk (BR-S083): the entrance is a horizontal CONTROL DESK — brand +
-   controls on the LEFT, the real Free card as the dominant artifact on the RIGHT.
+   controls on the LEFT, the real Free card as the artifact on the RIGHT.
    Side-by-side replaces the centered stack's height SUM with the MAX, so the full
    decision fits one 1600x900 viewport with NO scroll AND the card grows. This is
-   NOT a SaaS funnel: the card is the largest object (~60/40 mass), the doors are
-   quiet shadowless ledger entries (no fill/accent/CTA), the eye lands on the card. */
+   NOT a SaaS funnel: the doors are quiet shadowless ledger entries (no
+   fill/accent/CTA).
+   BR-S254 RANK REVERSAL — this block used to read "the card is the largest object
+   (~60/40 mass), the eye lands on the card." That is no longer the intent. Canon
+   is "the card is the crown, not the kingdom" (GOLDEN_NUGGETS #3) and the desk
+   was under-executing it: the card BRACKETED the column, starting 53px above its
+   first ink and ending 81px below it, and in a two-object composition the
+   bracketing object reads as the frame and the bracketed one as its contents.
+   The left column now leads and the card is the second read. Measured cause of
+   the old inversion was NOT the card's board — board and column both sit at
+   L*8.28 — it was geometry plus one blown highlight inside the photograph. */
 .menu__inner {
   width: min(1180px, 92vw);
   display: grid;
@@ -2407,24 +2416,85 @@ body[data-view="room"] .dev { display: none; }
     "head stage"
     "ctrl stage"
     ".    stage";
-  grid-template-rows: 1fr auto auto 1fr;
+  /* BR-S254: the leading 1fr let the column float to the vertical middle while
+     the taller card overhung it at both ends. A fixed 10.5px top row pins the
+     masthead's cap-line level with the card's top edge (within 0.6px measured)
+     and lifts the whole block to ~23px above the viewport centre — the standard
+     optical overshoot. The trailing 1fr still absorbs the remainder. */
+  grid-template-rows: 10.5px auto auto 1fr;
   column-gap: 72px;
   row-gap: 14px;
   align-items: start;
   text-align: left;
 }
 .menu__head { grid-area: head; display: grid; gap: 9px; justify-items: start; }
-.menu__stage { grid-area: stage; align-self: center; display: flex; flex-direction: column; align-items: center; gap: 14px; }
+/* BR-S254: the caption now renders BELOW the card (app.js renderMenu). The stage is
+   centred in its cell, so moving 17px of caption + 14px of gap from above the card
+   to below it slides the card UP by half of that — and the padding-top puts the
+   card's optical centre back where it was. Measured after: the card's centre lands
+   on the left column's centre, and the topmost ink on the page becomes .menu__brand.
+   This also REPLACES a separate fix somebody could reach for: the card's centre used
+   to sit ~15px below the column's, and that entire offset WAS the caption plus its
+   gap living inside the centred stage. Do not also add a -15px nudge. */
+.menu__stage { grid-area: stage; align-self: center; display: flex; flex-direction: column; align-items: center; gap: 14px; padding-top: 31px; }
 .menu__controls { grid-area: ctrl; display: flex; flex-direction: column; gap: 14px; }
-.menu__rule { width: 100%; height: 1px; background: var(--line-faint); margin: 2px 0; }
+/* BR-S254: the rule used to sit dead-centre in its own gap (20px above, 21px
+   below) — a hairline that bisects the void it lives in separates nothing and
+   reads as an artifact. Pushed down so it becomes the header rule of the block
+   beneath it and the masthead gets a terminal silence. Kept at --line-faint:
+   deleting it was measured and the column reads WEAKER without it. */
+.menu__rule { width: 100%; height: 1px; background: var(--line-faint); margin: 10px 0 0; }
 .menu__brand {
   display: flex; align-items: center; gap: 12px;
   font-weight: 600; font-size: 30px; letter-spacing: 0.34em;
   color: var(--t-display);
 }
 .menu__mark { color: var(--silver-dim); font-size: 17px; }
-.menu__thesis { font-family: var(--font-display); font-size: 19px; line-height: 1.4; color: var(--t-primary); }
-.menu__trust { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em; line-height: 1.5; color: var(--t-body); }
+/* BR-S254 — HANG THE ORNAMENT. Eleven of the column's twelve ink runs start on
+   x210; the wordmark's first LETTER started on x249, because the ◆ is nominally
+   holding the spine but at 17px is far too small to hold a margin against a 30px
+   nameplate — so the headline read as indented and the body as hanging out left.
+   text-indent does NOT work here: .menu__brand is a flex row and the text run is
+   an anonymous flex item. A negative margin on the mark is the mechanism.
+   The offset is the mark's own box (25.2px, its letter-spacing included) plus the
+   flex gap (12px) = 37.2px. Both are fixed px, so the value does NOT track the
+   brand's font-size. Measured after: the "B" lands on x202.7 against the body
+   spine's x202.5 — flush within a quarter pixel. (-39px overshot to x200.7.)
+   Gated at 1300px because the hang needs 37px of page margin to live in, and
+   because below that breakpoint the brand drops to 23px/0.26em, which changes the
+   mark's box width. Under the gate it renders flush, exactly as it does today. */
+@media (min-width: 1300px) { .menu__mark { margin-left: -37.2px; } }
+/* BR-S254 — THE THESIS TAKES ITS RANK. This sentence carries the whole page and
+   it was ranking THIRD inside its own column: the primary door's name beat it on
+   cap height, brightness, weight AND tracking. It also broke mid-clause, severing
+   the subject from its verb ("The room / develops it.") across a 293px line and
+   an 84px stub. 24px/600/--t-display makes it the second thing read; Cormorant
+   600 is already loaded, so the weight is more ink at no new cost.
+   max-width 12.25em: the clean-break window is a property of the STRING, not of
+   the size, so it is constant in em and must be written in em. Measured live at
+   600/24px Cormorant Garamond: "Every photo is already a card." = 274.91px and
+   "…card. The" = 315.45px, so the window is 274.9–315.5px = 11.455–13.144em.
+   12.25em (294px) is dead centre with ±6.9% slack, and every trial from 11.6em to
+   13em gave the same clean [274.9 / 202.7] couplet — one sentence per line.
+   Do NOT hard-code px here: 232px is the window's centre at the OLD 19px size and
+   at 24px it falls BELOW the window, forcing a 3-line break with a 19px one-word
+   orphan. Do NOT substitute text-wrap:balance either — measured, it splits
+   "a / card" and buries the sentence period mid-line. If the COPY changes,
+   re-probe the two widths above; if only the SIZE changes, the em holds. */
+.menu__thesis {
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 1.32;
+  max-width: 12.25em;
+  color: var(--t-display);
+}
+/* BR-S254: max-width 320. At the inherited 360 the first line rendered 359.05px —
+   0.95px of slack, i.e. one glyph of cross-engine metric variance from re-wrapping
+   into a different shape on Safari than on Chrome. It also broke a three-item list
+   after item two ("frame, gesture / and signal"). At 320 it breaks on the comma
+   after "frame," and the bistability is gone. */
+.menu__trust { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em; line-height: 1.5; color: var(--t-body); max-width: 320px; }
 /* Menu sample (BR-S079): the actual reduced Free card floats as the menu hero —
    the room's payoff shown at the entrance ("every photo is already a card"), not
    a flat photo tile. The card flexes to the wrapper via width: min(--card-w,100%);
@@ -2444,9 +2514,31 @@ body[data-view="room"] .dev { display: none; }
    room card's exact proportions (a width-only squeeze distorts the fixed chrome).
    zoom collapses the layout box cleanly; the free card is static (no motion). */
 .msample__card { --card-w: 430px; width: 430px; zoom: 0.92; margin: 0; }
-.msample__seal { font-family: var(--font-mono); font-size: 11.5px; letter-spacing: 0.08em; line-height: 1.6; color: var(--t-body); max-width: 340px; }
+/* BR-S254: one tier down, and a measure that breaks cleanly. This is a caption for
+   the object on the RIGHT, filed on the left in the SAME value and the SAME typeface
+   as the trust line — a safety claim about the scan — so the two read as one
+   paragraph interrupted by a hairline. --t-meta turns them into claim, then
+   annotation. 232px replaces the magic 340: measured, it gives a balanced
+   [203.3 / 219.0] couplet and stops stranding the article "a" at a line end.
+   (This 232 is NOT the thesis's measure — different string, face and size. The two
+   numbers happen to coincide; nothing depends on it.) */
+.msample__seal { font-family: var(--font-mono); font-size: 11.5px; letter-spacing: 0.08em; line-height: 1.6; color: var(--t-meta); max-width: 232px; }
 
-.menu__actions { display: grid; justify-items: start; gap: 12px; margin-top: 2px; }
+/* BR-S254 — ABSORB THE EMPTY BAND. doors→pills was 48px, the LARGEST gap in the
+   column by 27px, sitting where no boundary of that size belongs. 28px of it was
+   this wrapper's own cost: with no draft staged .menu__actions holds nothing but a
+   0-width .pickmsg reserving a line for the aria-live status. The reservation is
+   correct (it stops the layout jumping when a message appears) — it just should not
+   buy its own band. Now the status line reads as belonging to the doors it reports
+   on, and the silence below it is deliberate rather than accidental.
+   THE ARITHMETIC, because it is easy to get backwards (I did, first pass — 14 here
+   plus 16 on .menu__portals made the gap 70px, worse than the 48 it was meant to
+   fix). .menu__controls has gap:14, so doors→portals =
+     14 (gap) + this margin + 12 (.pickmsg min-height) + 14 (gap) + portals margin
+   Original: 14 + 2 + 12 + 14 + 4 = 46 measured 48. Now: 14 + 0 + 12 + 14 + 4 = 44,
+   and the 12px reserved status line sits INSIDE the silence instead of adding to
+   it. If either margin changes, re-run this sum. */
+.menu__actions { display: grid; justify-items: start; gap: 12px; margin-top: 0; }
 .menu__enter {
   font-family: var(--font-ui); font-size: 13px; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase;
   color: var(--t-display); padding: 13px 30px; cursor: pointer;
@@ -2483,16 +2575,24 @@ body[data-view="room"] .dev { display: none; }
 .menu__door--sample { border: 1px dashed rgba(233, 229, 220, 0.34); }
 .menu__door--sample:hover { border-color: var(--silver-dim); }
 .menu__door--sample .menu__door-name { font-size: 12.5px; color: var(--silver-dim); }
-.pickmsg { font-family: var(--font-mono); font-size: 9.5px; letter-spacing: 0.06em; color: var(--moss-bright); min-height: 12px; margin-top: 2px; }
-.menu__foot { font-family: var(--font-mono); font-size: 8.5px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--faint); margin-top: auto; }
+.pickmsg { font-family: var(--font-mono); font-size: 9.5px; letter-spacing: 0.06em; color: var(--moss-bright); min-height: 12px; margin-top: 0; }   /* BR-S254: the reserved line keeps its height, loses its extra offset */
+/* BR-S254: margin-top was `auto` — dead code. .menu__controls is a content-sized
+   flex column, so there is never free space for auto to consume and it resolved to
+   0 every time. Stating 14px makes the file honest about what actually renders. */
+.menu__foot { font-family: var(--font-mono); font-size: 8.5px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--faint); margin-top: 14px; }
 /* BR-S155: quiet pill link from the front door to the Codex reference page */
 .menu__codex { align-self: start; display: inline-flex; align-items: center; gap: 8px; margin-top: 4px; padding: 8px 16px; font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--t-meta); text-decoration: none; border: 1px solid var(--line); border-radius: 999px; transition: color 160ms ease, border-color 160ms ease; }
 .menu__codex:hover { color: var(--t-display); border-color: var(--t-meta); }
-.menu__codex__mark { color: var(--violet); }
+/* BR-S254 — SEND THE ACCENT HOME. Violet is the paid/kept register (this file says
+   so in three separate places: "the one violet in the room"). It was being spent on
+   free navigation pills at the bottom of the free page — accent as paint, not as
+   currency. It was also the only chroma in the left column competing with the
+   photograph, sitting where it did the least good. */
+.menu__codex__mark { color: var(--t-meta); }
 .menu__codex__arr { color: var(--t-ghost); transition: color 160ms ease, transform 160ms ease; }
 .menu__codex:hover .menu__codex__arr { color: var(--t-meta); transform: translateX(2px); }
 /* BR-S158 — two quiet portals (The Codex · The Arcane Reading) sit as a row under the doors */
-.menu__portals { display: flex; gap: 10px; flex-wrap: wrap; align-self: start; margin-top: 4px; }
+.menu__portals { display: flex; gap: 10px; flex-wrap: wrap; align-self: start; margin-top: 4px; }   /* BR-S254: unchanged — the doors→portals sum is balanced on .menu__actions instead */
 .menu__portals .menu__codex { margin-top: 0; align-self: auto; }
 
 /* Archive Desk narrow fallback (BR-S083): below the desk threshold, restore the
@@ -2533,6 +2633,47 @@ body[data-view="room"] .dev { display: none; }
 .menu.is-reliquary .menu__track { transform: translateX(-200%); }   /* BR-S204: slide 3 (source-ordered AFTER is-wall so it wins if both ever coexist) */
 .menu__panel { flex: 0 0 100%; min-width: 0; min-height: 100vh; padding: 34px 24px; position: relative; display: flex; align-items: center; justify-content: center; }
 .menu__panel.is-offstage { visibility: hidden; height: 0; min-height: 0; overflow: hidden; }
+
+/* BR-S254 — THE LIGHT LEANS LEFT. The room had no light asymmetry: the body's
+   radial is centred at 50% -10%, which leaves the left column and the card at
+   almost identical falloff (measured 0.83 vs 0.82), yet only the card behaved like
+   a lit object. This gives the desk one light source and aims it where the reading
+   starts.
+   WHY THIS AND NOT DARKENING THE CARD: the field is rgb(16,15,12) — sixteen sRGB
+   levels above black and two hundred and thirty-nine below white. Every darkening
+   idea on this page is fighting over ~6% of the tonal range; adding light has the
+   rest of it. Measured: +7 levels on the column, +1.4 at the card's left edge
+   (invisible). It is also the only lever here that ADDS rather than subtracts, so
+   it costs the card nothing at all.
+   24% of 1600 = x384 = the column's exact ink centre. 47% (not 40%) so the DOORS
+   are lit too — they are the weakest ink in the column and the only pressable
+   things in it.
+   Panel-scoped, NOT on body: M2 and M3 keep their own field, and the pool slides
+   away with the desk. position:absolute keeps it out of the panel's flex flow. */
+.menu__panel--desk::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(38% 62% at 24% 47%,
+    rgba(233, 229, 220, 0.055)  0%,
+    rgba(233, 229, 220, 0.022) 45%,
+    rgba(233, 229, 220, 0)     76%);
+}
+/* the narrow fallback re-centres the desk into one column, so the light follows it */
+@media (max-width: 1199px) {
+  .menu__panel--desk::before {
+    background: radial-gradient(54% 46% at 50% 46%,
+      rgba(233, 229, 220, 0.05)  0%,
+      rgba(233, 229, 220, 0.02) 45%,
+      rgba(233, 229, 220, 0)    76%);
+  }
+}
+/* Ceiling on the hot stop is 0.08 — past that it stops reading as "this is where
+   the light is" and starts reading as a smudge behind the text. If the falloff
+   bands on an 8-bit panel the fix is a static noise layer underneath, never a
+   filter (animated feTurbulence is a known Blue Room landmine). */
   /* off-stage panel contributes zero height → no phantom scrollbar on short desks */
 @media (prefers-reduced-motion: reduce) { .menu__track { transition: none; } }
 
@@ -3882,6 +4023,53 @@ body[data-devnav="1"] .devnav {
 
 @media (prefers-reduced-motion: reduce) {
   #menuView .mini, #menuView .mini__ball, #menuView .mini__panel, #menuView .mini-dock { transition: none !important; }
+}
+
+/* BR-S254 — CALM THE ORBS AT REST. The finding nobody was looking for: on M1 the
+   FIRST fixation is not the card, it is these two spheres. Measured — cream orb
+   L*62.96, chroma 55.54, peak L*95.54 against a field of L*3.17; saliency peak
+   1.000 vs the photograph's 0.551; 27x more attention-dense per pixel than the
+   whole left column; and blurred, 61% brighter than the word BLUE ROOM. They hold
+   the only pure-255 pixels outside the photograph and they are the only lit 3D
+   objects on a flat matte page. No amount of card work outranks that, and every
+   card treatment made them relatively louder — so calming the card without calming
+   these would have handed the page to the orbs instead of to the left column.
+   NOTHING IS REMOVED — this is the resting state only, and the whole object returns
+   at full strength on hover, on keyboard focus, while being dragged, and whenever
+   the codex is open (where the cream orb IS the close button and must be legible).
+   The threshold is sharp: at opacity .55 they still won the first fixation, so the
+   brightness/saturate pair is doing the real work, not the opacity.
+   THE TRANSITION IS REPRODUCED, NOT EXTENDED. Both base rules declare
+   `transition: transform var(--orb-out) var(--orb-e-out)` with an explicit "box-shadow
+   NEVER transitions" note. A shorthand here would clobber that and kill the hover
+   lift, so transform is restated alongside filter and opacity — and box-shadow is
+   still absent, deliberately.
+   RISK, CHECKED: `filter` creates a stacking context on a z-index:60 element. The
+   bloom overlay is a SIBLING at z-index 200 (and the seal is promoted to 210 while
+   open), not a descendant, so the codex iris is unaffected — verified by opening it.
+   If this ever does disturb the bloom, drop the filter and use opacity: .42 alone,
+   which was also measured to move the first fixation off them. */
+#menuView .seed,
+#menuView .mini__ball {
+  opacity: 0.78;
+  filter: brightness(0.62) saturate(0.5);
+  transition: transform var(--orb-out) var(--orb-e-out),
+              opacity   var(--orb-out) var(--orb-e-out),
+              filter    var(--orb-out) var(--orb-e-out);
+}
+#menuView .seed:hover, #menuView .seed:focus-visible,
+#menuView .mini__ball:hover, #menuView .mini__ball:focus-visible,
+#menuView .mini.is-dragging .mini__ball,
+#menuView .mini.is-carry .mini__ball,
+#menuView.is-codex-open .seed,
+#menuView.is-codex-closing .seed {
+  opacity: 1;
+  filter: none;
+  transition-duration: var(--orb-in);
+  transition-timing-function: var(--orb-e-in);
+}
+@media (prefers-reduced-motion: reduce) {
+  #menuView .seed, #menuView .mini__ball { transition: none !important; }
 }
 
 

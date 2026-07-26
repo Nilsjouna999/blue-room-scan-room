@@ -263,6 +263,24 @@
 .rv-layer--free { z-index: 2; }
 .rv-layer--halo { z-index: 3; clip-path: inset(-60px); }  /* -60px keeps the halo glow visible; the develop wipe animates within this */
 
+/* BR-S254 — the idle that isn't. CardFrame builds a FULL shiny card in the halo
+   layer and parks it at opacity:0 until the develop runs (card-frame.js:34).
+   opacity:0 does NOT stop a CSS animation, so on the entrance page two infinite
+   loops have been running behind an invisible layer since load:
+     halo-breathe 5s   (styles.css:1096) on .card__halo — which also carries
+                        filter: blur(6px), so every tick repaints a blurred layer
+     twinkle 2.8s      (styles.css:1109) on .card__sparkles — 7 radial gradients
+   NOT holo-spin: `.rv-layer > .card { animation: none }` (line 235 above) already
+   kills the edge conic in every reveal route — equal specificity, and reveal.css
+   loads after styles.css, so it wins. Verified on the live page: the shiny card
+   computes animation-name "none" while its two children ran at iter=Infinity.
+   Re-arms itself — the layer gains .is-shown the instant the develop starts, so
+   the breathe now begins from frame 0 WITH the ceremony instead of mid-cycle. */
+.rv-layer--halo:not(.is-shown) .card[data-treatment="shiny"] .card__halo,
+.rv-layer--halo:not(.is-shown) .card[data-treatment="shiny"] .card__sparkles {
+  animation: none;
+}
+
 /* BR-S143: kill the develop SEAM (free card taller than halo). In the narrow
    reveal card (~396px) the mint-strip's serial is squeezed between the state
    pill and the right cluster, and the FREE state pill ("FREE PULL EDITION") is
@@ -1270,6 +1288,208 @@
 /* the menu seam is only ~24px, so the read clears a left lane: the arrow nestles in it,
    pointing INTO the read, instead of landing on top of the first module. */
 .reveal-stage--menustage.is-reading .rv-read { padding-left: 52px; }
+
+/* =====================================================================
+   BR-S254 — THE ENTRANCE CARD GOES UNDER GLASS (M1 resting state only)
+   ---------------------------------------------------------------------
+   THE MEASURED PROBLEM. The card was NOT brighter than the left column: the
+   card's chrome and the column both sit at L*8.28, and the card's whole bottom
+   half (title, signal note, FRAME READING, mint strip, serial) is LESS visually
+   dense than the column — 1.56x vs 1.79x. What shouted was ~20,800px of blown
+   side glass out the passenger window: 1.4% of the page carrying 16.35% of its
+   light when blurred, at 11.3x the page average, with the page's blurred peak
+   sitting inside it at 3.5x the brightest thing on the left.
+   WHY WE DO NOT DARKEN THE BOARD. Measured counter-test: multiplying the card's
+   plate by 0.5 buys 2% of hierarchy and makes the photograph's LOCAL pop 310%
+   worse, because a darker plate sits BEHIND the picture and raises its contrast
+   against its own surround. Treating the frame amplifies the disease.
+   WHY GLASS IS THE RIGHT INSTRUMENT. source-over compositing is an affine
+   contraction toward the pane's colour: out = C*a + in*(1-a). A pane is therefore
+   SELF-TARGETING — it takes proportionally from whatever is brightest. Measured on
+   the real pixels, a pane graded onto the photograph costs it 7.0x what it costs
+   the card's chrome. The pane physically CANNOT strip the card's craft, because
+   the craft is dark and glass only taxes light. That is doctrine ("strong-without
+   is not remove") satisfied by physics rather than by discipline.
+   NOTHING IS REMOVED. The board gradient, the paper-fibre feTurbulence, the
+   top light-lip, the vignette, the corner ticks, the deboss, the grain/tone/scrim
+   layers and the photograph's own pixels are all untouched and all at full
+   strength. The glass lifts to 40% on hover or keyboard focus.
+   SCOPING. .reveal-stage--menustage is emitted only by stage-controller.js:39 when
+   opts.menustage, from app.js (live M1) and ?dev=menu-reveal. M2, the vault, the
+   drawing room and the standalone reveal never carry it. The three state guards
+   are load-bearing, not defensive: the SAME node is promoted into the see-deeper
+   takeover (line 1300 below) and carries .is-reading / .is-developing /
+   .is-finalizing — none of those may be watched through tint.
+   ===================================================================== */
+
+/* --- 3a · THE PRINT CEILING — give the blown window a top it cannot print past.
+   `darken` is a per-channel min, so it can only ever pull values DOWN; it
+   provably cannot murk a shadow. The gradient's centre knee sits at L*50 over
+   the face and the raised hand (they pass untouched) and burns down to L*18 at
+   the rim, which is where the window is.
+   .photo has isolation:isolate (styles.css:461) so the blend is contained inside
+   the photo and cannot reach the plate, and overflow:hidden + radius 5px clip the
+   pseudo for free. .photo::after is unclaimed repo-wide. */
+.menurev:not(.is-fullview) .reveal-stage--menustage
+  .card[data-treatment="free"] .photo::after {
+  content: "";
+  position: absolute; inset: 0;
+  z-index: 2; pointer-events: none;
+  background: radial-gradient(126% 118% at 38% 48%,
+      #8d8779   0%,
+      #7b7567  48%,
+      #5e5849  78%,
+      #3b362d 100%);
+  mix-blend-mode: darken;
+  opacity: 0.66;
+}
+/* MANDATORY COMPANION, not a nicety. .photo__meta (styles.css:567) and
+   .photo__tag (styles.css:584) are ALREADY z-index:2, and ::after is last in tree
+   order, so at equal z the ceiling paints OVER them — that is "BR-SCN 01 · 4:5",
+   "REC 2026-06-18" and the CANDID / DRV chip, all of which are live legible text.
+   .photo__hairline is z-auto and would also fall under the ceiling, which would
+   eat half of 3c below. */
+.menurev:not(.is-fullview) .reveal-stage--menustage .card[data-treatment="free"] .photo__meta,
+.menurev:not(.is-fullview) .reveal-stage--menustage .card[data-treatment="free"] .photo__tag,
+.menurev:not(.is-fullview) .reveal-stage--menustage .card[data-treatment="free"] .photo__hairline {
+  z-index: 3;
+}
+/* OPACITY FLOOR AND CEILING: 0.62–0.68. At 0.82 the window collapses to a flat
+   pale slab — no horizon, no water, no ridge — and the card's own signal note
+   promises "Out the side glass, the fjord." Deleting what the copy promises fails
+   the product, not just the picture. */
+
+/* --- 3b · THE PANE — one sheet of the room's own black, weighted to the window,
+   with a single raking sheen.
+   .rv-cardframe is display:grid with .rv-layer at grid-area 1/1 (lines 226-234),
+   so grid-area:1/1 gives the pseudo pixel-exact registration with the card with
+   zero positioning. margin:1px keeps it INSIDE the card's own 1px bezel ring, so
+   the border gradient and the top light-lip survive at full strength.
+   THE SHEEN IS NOT DECORATION — it is what converts "the card got dimmer" (the
+   failure mode) into "the card is under glass" (preciousness). Tint takes the
+   attention; the sheen hands back the object. Ship both or neither.
+   104deg deliberately CROSSES the plate's own upper-left gleam
+   (styles.css:829, radial at 28% 18%); a specular running WITH it fuses and just
+   reads as "the gradient got weird".
+   THE PANE IS WARM ON PURPOSE — rgba(16,15,12) is --ink-900, the room's own black.
+   A cold "museum glass" slate drags the card's warm graphite hue off-axis and
+   lifts the field enough to draw a visible rectangle on the page.
+   NO mix-blend-mode and NO backdrop-filter anywhere here: on a backdrop this dark
+   source-over and screen differ by under 1 part in 255, and source-over avoids the
+   WebKit blend/backdrop-inside-zoom class of bug entirely — which matters, because
+   .rv-cardframe carries BOTH zoom:0.92 AND isolation:isolate, under a
+   .rv-stagemain that is transformed with will-change. */
+.menurev:not(.is-fullview)
+  .reveal-stage--menustage:not(.is-reading)
+  .rv-cardframe:not(.is-developing):not(.is-developing-photo):not(.is-finalizing)::after {
+  content: "";
+  grid-area: 1 / 1;
+  z-index: 4;
+  pointer-events: none;
+  margin: 1px;
+  border-radius: calc(var(--card-radius, 12px) - 1px);
+  background:
+    /* the raking sheen — painted on top (first layer in a background list wins) */
+    linear-gradient(104deg,
+      transparent               26%,
+      rgba(233, 229, 220, 0.026) 41%,
+      rgba(233, 229, 220, 0.055) 45%,
+      rgba(233, 229, 220, 0.020) 52%,
+      transparent               70%),
+    /* THE PANE, shaped to the card's ACTUAL bands — measured on the live card, not
+       estimated. As a fraction of card height:
+         4.0– 5.8%  .card__house — "◆ BLUE ROOM ARCHIVE" / "ARCHIVE EDITION"
+         7.3–46.4%  the photograph  <-- the only band that needs taxing
+        46.4–100%   title, archline, signal note, FRAME READING, mint strip, serial
+       First pass ramped from .14 at 0% to .42 at 9%, which put ~.30 alpha across
+       the nameplate at 5% — visibly dimming the card's own name, which is the
+       "makes it look broken rather than quieter" failure mode. The ramp now stays
+       flat and low until 6%, climbs inside the photo's own top edge, and is spent
+       by the time the title block starts. */
+    linear-gradient(180deg,
+      rgba(16, 15, 12, 0.05)   0%,
+      rgba(16, 15, 12, 0.06)   6%,    /* the nameplate keeps its light */
+      rgba(16, 15, 12, 0.40)  10%,
+      rgba(16, 15, 12, 0.44)  28%,    /* the photograph */
+      rgba(16, 15, 12, 0.40)  43%,
+      rgba(16, 15, 12, 0.14)  49%,    /* spent by the title block */
+      rgba(16, 15, 12, 0.05)  62%,
+      rgba(16, 15, 12, 0.03)  78%,
+      rgba(16, 15, 12, 0.02) 100%);   /* reading rows, mint strip, serial: ~untouched */
+  transition: opacity 260ms var(--rv-ease);
+}
+/* MANDATORY. .card computes corner-shape:bevel on this build (styles.css:421-424,
+   @supports-gated). A round pane over a bevelled card shows four bright mismatched
+   corner slivers — a visible defect, not a subtlety. */
+@supports (corner-shape: bevel) {
+  .menurev:not(.is-fullview)
+    .reveal-stage--menustage:not(.is-reading)
+    .rv-cardframe:not(.is-developing):not(.is-developing-photo):not(.is-finalizing)::after { corner-shape: bevel; }
+}
+/* the glass clears when you lean in — opacity only, so compositor-only */
+.menurev:not(.is-fullview) .reveal-stage--menustage .rv-cardframe:hover::after,
+.menurev:not(.is-fullview) .reveal-stage--menustage .rv-cardframe:focus-within::after { opacity: 0.40; }
+@media (prefers-reduced-motion: reduce) {
+  .menurev:not(.is-fullview) .reveal-stage--menustage .rv-cardframe::after { transition: none; }
+}
+/* SHEEN BUDGET (chrome baseline L*8.45): .030 is a whisper and may not register as
+   glass at all; .045 safe; .055 SHIPPED — reads as glass, invisible as an object;
+   .080 assertive; .110 FAILS, the streak becomes its own magnet. Hard cap .07.
+   Check the 1.4%-wide core at devicePixelRatio 2 — a gradient core that thin is
+   exactly the sort of thing that band-steps on a 2x panel. */
+
+/* --- 3c · DISSOLVE THE RECTANGLE — the photograph stops being a lit window cut
+   through the board and becomes an emulsion coated onto it. This is the literal
+   answer to "engrave it deeper or inside the surface", taken from the photo side.
+   Hosted on .photo__hairline, which already exists at inset:0 / radius 5 /
+   pointer-events:none and carries NO box-shadow (styles.css:553-558) — so this
+   ADDS and the border is TUNED, never deleted.
+   rgba(16,15,12) is the measured board tone immediately around the picture, so the
+   edge dissolves into the card rather than into an invented dark.
+   Best risk profile in the set: pure inset box-shadow. No mask, no blend, no
+   filter, no new compositing layer, no repaint cost, photo pixels untouched.
+   HARD DEPENDENCY: ships with 3a's z-index:3 companion above, or the print
+   ceiling paints over this and mutes it. */
+.menurev:not(.is-fullview) .reveal-stage--menustage
+  .card[data-treatment="free"] .photo__hairline {
+  border-color: rgba(233, 229, 220, 0.035);
+  box-shadow:
+    inset 0 0  0 1px rgba(16, 15, 12, 0.50),
+    inset 0 0 14px 5px rgba(16, 15, 12, 0.52),
+    inset 0 0 26px 2px rgba(16, 15, 12, 0.30);
+}
+
+/* --- BR-S254 · SEAT IT — the card sits down on the wall instead of hovering.
+   The old free-treatment shadow (styles.css:822) was
+     0 2px 0 .55, 0 44px 90px .62, 0 10px 28px .5
+   and a 44px-offset / 90px-blur term is literally the CSS for "this object is
+   floating 44px above the page". That is the one thing in the whole audit you can
+   see directly rather than measure. The contact line (0 2px 0) is KEPT — it is what
+   says the card is resting ON something rather than printed INTO it.
+   FLOOR ~24px of throw: below that it stops reading as seated and starts reading as
+   a sticker, which crosses from "quieter" into "worse".
+   NO lateral offset. Commit 2 puts the room's light BESIDE the card (x384), not
+   above it, so a directional shadow here would be decoration justified by a theory
+   rather than by the light actually in the room.
+   .rv-photoplate (line ~248) duplicates the OLD shadow value literally rather than
+   by reference, so it is mirrored here — otherwise a re-run develop ceremony
+   flashes the original float for a frame mid-morph. */
+.menurev:not(.is-fullview) .reveal-stage--menustage .card[data-treatment="free"] {
+  box-shadow:
+    0 2px  0    rgba(0, 0, 0, 0.55),
+    0 28px 62px rgba(0, 0, 0, 0.58),
+    0 7px  18px rgba(0, 0, 0, 0.46);
+}
+.menurev:not(.is-fullview) .reveal-stage--menustage .rv-photoplate {
+  box-shadow:
+    0 28px 62px rgba(0, 0, 0, 0.58),
+    0 7px  18px rgba(0, 0, 0, 0.46);
+}
+/* NOTE ON THE NO-JS FALLBACK: when reveal is unavailable app.js mounts
+   .msample__card instead of .menurev__mount, and that node has no
+   .reveal-stage--menustage and no .rv-cardframe — so it keeps today's floating
+   shadow AND gets no glass. That is deliberate: a seated card with no pane would
+   be a third, incoherent state. The fallback stays exactly as it shipped. */
 
 /* FULLVIEW takeover (see-deeper → halo): the stage cell promotes to a fixed
    full-bleed layer; the menu chrome steps aside. */
