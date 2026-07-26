@@ -2427,6 +2427,51 @@ body[data-view="room"] .dev { display: none; }
   align-items: start;
   text-align: left;
 }
+/* ═════════════════════════════════════════════════════════════════════════════
+   BR-S260 — THE GUTTER LINE. One hairline standing between the reading side and
+   the card. It does the job neither block can do for itself: it gives the left
+   column a right-hand wall to end against, and it stops the card from reading as
+   though it were floating in the same open field as the text.
+   WHERE. Measured on the SETTLED desk (this matters — read it before .rv-stagemain's
+   820ms translateX has landed and the card looks 27px further left than it ends up):
+   the text column ends at x562 and the card begins at x811, a 248px gutter whose
+   visual midpoint is x686 — 124px past the 360px text track.
+   It sits on the MIDPOINT on purpose: a boundary that belongs to neither side.
+   (The grid's own 72px gap midpoint would be x598 — structurally exact but only
+   36px off the text, which reads as the text's own margin rule rather than a
+   division between two things.)
+   WHY IT FADES. Hard terminals would make it a graphic bar and give the eye two
+   new corners to catch on. Fading to zero at both ends means it has no beginning
+   and no end — it reads as depth, a seam in the room, not as drawn furniture.
+   WHY 1px AND WHY THIS ALPHA. The horizontal .menu__rule sits at --line-faint
+   (0.07) and was measured effectively invisible over a 360px run; a 690px
+   vertical run needs more to read at all, but anything past ~0.16 at the crest
+   turns it into a divider that competes. 0.13 is the measured floor at which it
+   reads as intentional. Tunable via --gut for probing.
+   DESK ONLY. Below 1200px the desk collapses to one centred column, so there is
+   nothing to divide and the line would cut through the stack.
+   ═════════════════════════════════════════════════════════════════════════════ */
+/* --gut lives on .menu__inner, not on the pseudo-element, so the weight is one
+   inheritable dial that can be probed live without touching the gradient. */
+.menu__inner { position: relative; --gut: 0.13; }   /* position: containing block for the line; does NOT affect the fullview's position:fixed (only transform/filter/perspective would) */
+@media (min-width: 1200px) {
+  .menu__panel--desk .menu__inner::after {
+    content: "";
+    position: absolute;
+    top: 0; bottom: 0;
+    left: calc(360px + 124px);         /* 360px text track + half the settled 248px gutter */
+    width: 1px;
+    pointer-events: none;
+    background: linear-gradient(180deg,
+      rgba(233, 229, 220, 0)                    0%,
+      rgba(233, 229, 220, calc(var(--gut) * 0.18))  9%,
+      rgba(233, 229, 220, var(--gut))          34%,
+      rgba(233, 229, 220, var(--gut))          66%,
+      rgba(233, 229, 220, calc(var(--gut) * 0.18)) 91%,
+      rgba(233, 229, 220, 0)                  100%);
+  }
+}
+
 .menu__head { grid-area: head; display: grid; gap: 9px; justify-items: start; }
 /* BR-S254: the caption now renders BELOW the card (app.js renderMenu). The stage is
    centred in its cell, so moving 17px of caption + 14px of gap from above the card

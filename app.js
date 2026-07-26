@@ -2298,9 +2298,14 @@ function m1SrcCode(s) { return "SRC-" + String((s && s.no) || 1).padStart(2, "0"
    Fails to B on a thrown/absent localStorage — the shipped design is the default,
    never the fallback. This control is a DEV AFFORDANCE on a live page at the
    builder's request; remove it once the variant is chosen. */
+/* BR-S260 — THE VERDICT: A WINS. After building B and comparing both live, the
+   builder chose the ORIGINAL desk. So A is now the default and the canonical
+   layout; B is kept behind the toggle because it is measured, reversible, and
+   parts of it may still be wanted — but it is no longer what the room ships.
+   Storage semantics inverted with the default: absent => A, "b" => B. */
 const M1_VARIANT_KEY = "br_m1_variant";
 function m1Variant() {
-  try { return localStorage.getItem(M1_VARIANT_KEY) === "a" ? "a" : "b"; } catch (e) { return "b"; }
+  try { return localStorage.getItem(M1_VARIANT_KEY) === "b" ? "b" : "a"; } catch (e) { return "a"; }
 }
 function m1ApplyVariant(host, v) {
   if (!host) return;
@@ -2315,8 +2320,8 @@ function onM1VariantClick(e) {
   const b = e.target.closest("[data-m1-variant]");
   if (!b) return;
   e.preventDefault();
-  const v = b.getAttribute("data-m1-variant") === "a" ? "a" : "b";
-  try { v === "a" ? localStorage.setItem(M1_VARIANT_KEY, "a") : localStorage.removeItem(M1_VARIANT_KEY); } catch (_) {}
+  const v = b.getAttribute("data-m1-variant") === "b" ? "b" : "a";
+  try { v === "b" ? localStorage.setItem(M1_VARIANT_KEY, "b") : localStorage.removeItem(M1_VARIANT_KEY); } catch (_) {}   /* BR-S260: A is the default now, so A stores nothing */
   m1ApplyVariant(e.currentTarget, v);
 }
 
