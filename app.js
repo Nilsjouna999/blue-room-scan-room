@@ -1174,8 +1174,25 @@ function syncCodexBall() {
   dock.style.display = show ? "" : "none";
 }
 
+/* BR-S266 — ONE PLACE THAT KEEPS THE ADDRESS BAR HONEST.
+   The URL is this app's boot truth (`?dev=` is parsed at load to decide what mounts),
+   so any disagreement between the URL and what is on screen comes back as a "random"
+   route on the next refresh, back, or same-document link. BR-S265 fixed that for one
+   click handler; this is the same fix at the level where it cannot be missed. */
+function _devUrlStrip() {
+  try {
+    const u = new URL(location.href);
+    if (!u.searchParams.has("dev")) return false;
+    u.searchParams.delete("dev");
+    history.replaceState(null, "", u.pathname + (u.search || "") + u.hash);
+    return true;
+  } catch (_) { return false; }   // older engines: the view still switches, the URL just lags
+}
 function applyView() {
   document.body.dataset.view = state.view;
+  /* If we are NOT on a dev route, the URL must not claim we are — whatever path got us
+     here (in-app back, the brand mark, a panel slide, a keyboard step). */
+  if (state.view !== "dev" && state.dev) { state.dev = null; _devUrlStrip(); }
   syncCodexBall();   // the codex ball follows the rooms that lack their own codex access
   if (state.view !== "room") { _surfaceRafs.forEach((id) => cancelAnimationFrame(id)); _surfaceRafs = []; }   // BR-S234: stop the surface-record canvas loops on any route away from the room (they only render there)
   const zl = document.getElementById("zoneLabel");
@@ -4189,14 +4206,7 @@ document.addEventListener("click", (e) => {
      should not leave an entry behind that a refresh can resurrect.
      Long-standing — this handler has been URL-blind since it was written; it only
      became visible once the Vault got a real entry point. */
-  if (state.dev) {
-    state.dev = null;
-    try {
-      const u = new URL(location.href);
-      u.searchParams.delete("dev");
-      history.replaceState(null, "", u.pathname + (u.search || "") + (to === "menu" ? "" : u.hash));
-    } catch (_) { /* older engines: the view still switches, the URL just lags */ }
-  }
+  if (state.dev) { state.dev = null; _devUrlStrip(); }   // BR-S266: one shared helper, so this can't drift from applyView's copy
   applyView();
   window.scrollTo(0, 0);
 });
@@ -4486,4 +4496,18 @@ document.addEventListener("keydown", function (e) {
   else { document.body.dataset.devnav = "1"; if (el) { el.innerHTML = renderDevnav(); el.removeAttribute("hidden"); } }
 });
 if (state.view === "dev") mountDev();
+/* BR-S266 — THE VAULT IS A DESTINATION, NOT A STATE. The reported bug was "hard refresh
+   still gives me the vault page no matter what page I'm in", and BR-S265 did not fix it:
+   that fix only cleaned the URL when you CLICKED an in-app exit, and a refresh never
+   clicks anything. So a tab whose URL still read ?dev=vault kept resurrecting the Vault
+   forever, and because M1↔M2↔M3 move on hashes and U1 is a scroll, the URL never changed
+   as you moved around — hence "no matter what page I'm in".
+   The Vault is reached by the see-deeper hand-off, i.e. it is somewhere you are SENT, not
+   a page you sit in. So the param is consumed on arrival: the route still mounts for this
+   visit, but the address bar goes clean immediately, and a refresh returns to the desk.
+   Kept STICKY when the dev rail is on (?devnav=1 / the backtick toggle, persisted), so
+   iterating on the Vault with refreshes still works — that is the escape hatch.
+   Deliberately vault-only: settings / profile / drawing-room / arcane are places you work
+   in and SHOULD survive a refresh. */
+if (state.dev === "vault" && !DEVNAV) _devUrlStrip();
 render();
