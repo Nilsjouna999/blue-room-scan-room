@@ -2584,7 +2584,44 @@ document.addEventListener("keydown", function (e) {
       direction reads as a glitch; one that mirrors reads as a threshold. */
 let _u1Gliding = false, _u1GlideT = null, _u1SettleT = null;
 let _u1RAF = null, _u1LastY = 0, _u1Dir = 0;
-const U1_GLIDE_MS = 420;                     // the one dial for feel. 300 = brisk, 420 = shipped, 600 = stately
+/* BR-S265 — THE LANDING, SOFTENED. 420ms of easeOutCubic was reported as "solid, but
+   too definite" — the builder wants a fuller, softer, more welcoming arrival without
+   losing the sense that the page committed to the move.
+   So the descent now borrows the house's own slide curve: .menu__track moves the
+   horizontal panels with `640ms cubic-bezier(.22,.61,.25,1)` (styles.css), a curve
+   already tuned to this builder's taste. Matching both the duration and the easing
+   makes the vertical descent read as the SIBLING of the horizontal panel slide rather
+   than a second, unrelated motion — which is the real reason it now feels fuller.
+   Versus easeOutCubic at 420ms: it leaves a touch more gently (55% of the distance in
+   the first third rather than 68%), travels visibly longer, and its tail eases in over
+   ~200ms instead of ~120ms, so it settles rather than stops. */
+const U1_GLIDE_MS = 640;                     // == .menu__track's panel slide. 420 read as clipped; 800 starts to drag
+const U1_EASE = [0.22, 0.61, 0.25, 1];       // == .menu__track's cubic-bezier
+/* Cubic-bezier evaluated the way CSS does it: solve x(t)=progress for t, then read
+   y(t). Newton first (fast, 4 passes is plenty for a 1D monotonic curve), bisection as
+   the fallback for the flat regions where Newton's derivative vanishes. */
+function _u1Ease(p) {
+  const [x1, y1, x2, y2] = U1_EASE;
+  if (p <= 0) return 0;
+  if (p >= 1) return 1;
+  const cx = (t) => 3 * t * (1 - t) * (1 - t) * x1 + 3 * t * t * (1 - t) * x2 + t * t * t;
+  const cy = (t) => 3 * t * (1 - t) * (1 - t) * y1 + 3 * t * t * (1 - t) * y2 + t * t * t;
+  const dx = (t) => 3 * (1 - t) * (1 - t) * x1 + 6 * t * (1 - t) * (x2 - x1) + 3 * t * t * (1 - x2);
+  let t = p;
+  for (let i = 0; i < 4; i++) {
+    const d = dx(t);
+    if (Math.abs(d) < 1e-6) break;
+    const nt = t - (cx(t) - p) / d;
+    if (nt < 0 || nt > 1) break;
+    t = nt;
+  }
+  if (Math.abs(cx(t) - p) > 1e-4) {          // Newton wandered — bisect instead
+    let lo = 0, hi = 1;
+    t = p;
+    for (let i = 0; i < 24; i++) { const v = cx(t); if (Math.abs(v - p) < 1e-5) break; if (v < p) lo = t; else hi = t; t = (lo + hi) / 2; }
+  }
+  return cy(t);
+}
 function _u1Seat() { const s = _navStops(); return s.length > 1 ? s[1] : null; }
 function _u1Reduced() {
   return window.BRMotion ? window.BRMotion.prefersReduced()
@@ -2604,8 +2641,8 @@ function _u1Now() {
   return (window.performance && typeof performance.now === "function") ? performance.now() : Date.now();
 }
 /* THE GLIDE — owned, so its duration and curve are ours rather than the engine's.
-   easeOutCubic: 1-(1-t)^3. Leaves immediately (so the move registers as a response
-   to your gesture) and seats without hanging (the tail is what felt slow).
+   Curve + duration are the house panel-slide's (see U1_GLIDE_MS above), so the
+   descent is the vertical twin of the horizontal slide.
    Cancels itself the moment anything else moves the page, so it can never fight
    the user or the browser's own scrolling. */
 function _u1GlideTo(target) {
@@ -2622,7 +2659,7 @@ function _u1GlideTo(target) {
     // if the page moved and it wasn't us, the user (or the browser) took over — yield
     if (Math.abs(window.scrollY - expect) > 2) { _u1Release(); return; }
     const t = Math.max(0, Math.min(1, (_u1Now() - t0) / U1_GLIDE_MS));
-    const e = 1 - Math.pow(1 - t, 3);
+    const e = _u1Ease(t);
     const y = Math.round(from + dist * e);
     window.scrollTo(0, y);
     expect = window.scrollY;
@@ -3244,10 +3281,19 @@ function renderProtoCards() {
    touched, the back button reuses the menu nav (data-view-to="menu").
 ============================================================ */
 
+/* BR-S265 — THE FEATURED MINT FOLLOWS M1. The Vault is reached by the see-deeper
+   hand-off ("To the Vault"), so the first thing in it should be the card you just
+   developed. It was pinned to SOURCES[0] "Checkpoint Wave" while the desk moved to
+   SRC-03 "Shore Dispatch" in BR-S259 — so you developed one card and were handed a
+   different one, which is the "wrong card" as reported. Label, serial and thumb are
+   now DERIVED from the same source, so they cannot drift again the next time the
+   desk's sample changes. */
 const VAULT_MINTS = [
-  { key: "drv", label: "Checkpoint Wave", id: "BR-001-DRV-0001", state: "HALO MINT · DEVELOPED",
+  { key: "m1", label: (m1Source().card && m1Source().card.title) || "Sample Scan",
+    id: (m1Source().card && m1Source().card.serial) || m1SrcCode(m1Source()) + "-0001",
+    state: "HALO MINT · DEVELOPED",
     filed: "APR 26, 2025 · 14:22", sealLine: "Sealed · Recorded",
-    src: SOURCES[0], thumb: SOURCES[0].file },
+    src: m1Source(), thumb: m1Source().file },
   { key: "lnd", label: "Road Morning", id: "BR-001-LND-0022", state: "HALO MINT · DEVELOPED",
     filed: "MAR 12, 2025 · 07:41", sealLine: "Sealed · Recorded",
     src: { no: 22, file: "assets/source-02.jpg",
@@ -4129,6 +4175,28 @@ document.addEventListener("click", (e) => {
     document.getElementById("draftView").innerHTML = renderDraft();
   }
   state.view = to;
+  /* BR-S265 — THE URL HAS TO COME WITH US. This handler moved the VIEW and left the
+     address bar untouched, so leaving a ?dev= route (the Vault especially, which the
+     see-deeper hand-off reaches by a real navigation) showed the menu while the URL
+     still read ?dev=vault. Everything downstream re-reads that URL, so the route came
+     back on its own:
+       · REFRESH  — boot re-parses ?dev=vault and mounts the Vault instead of the desk
+       · BACK     — the stale entry is still in history, so it pops the Vault open
+       · LINKS    — any hash-only or same-document link kept ?dev=vault alive
+     All three are the same bug wearing three faces, and none of it was random.
+     Clearing state.dev and rewriting the entry with replaceState makes the URL agree
+     with what is on screen. replaceState, not pushState, on purpose: leaving a route
+     should not leave an entry behind that a refresh can resurrect.
+     Long-standing — this handler has been URL-blind since it was written; it only
+     became visible once the Vault got a real entry point. */
+  if (state.dev) {
+    state.dev = null;
+    try {
+      const u = new URL(location.href);
+      u.searchParams.delete("dev");
+      history.replaceState(null, "", u.pathname + (u.search || "") + (to === "menu" ? "" : u.hash));
+    } catch (_) { /* older engines: the view still switches, the URL just lags */ }
+  }
   applyView();
   window.scrollTo(0, 0);
 });

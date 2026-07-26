@@ -373,8 +373,26 @@
 }
 @media (prefers-reduced-motion: no-preference) { .pf-vaultstage::before { animation: pfBreath 12s ease-in-out infinite; } }
 
-.pf-vaultcard { position: relative; width: fit-content; max-width: min(340px, 86vw); margin: 0 auto; }
-.pf-vaultcard__inner { position: relative; z-index: 1; }
+/* BR-S265 — SCALE THE CARD, DO NOT SQUEEZE IT.
+   This was `max-width: min(340px, 86vw)` on a card that declares `--card-w: 500px`
+   (the room-crown tier). A max-width only narrows the BOX: every fixed-px piece of
+   chrome inside keeps its 500px-crown size, so the card rendered 340 wide while its
+   title stayed 32px and .card__plate kept 26px of padding — measured live. The card
+   read wrong-proportioned rather than smaller, which is the "wrong dimension" as
+   reported.
+   styles.css already states the rule this broke, on .msample__card: "Render the card
+   at a known-good natural width, then scale the whole artifact down proportionally
+   with zoom so it keeps the room card's exact proportions (a width-only squeeze
+   distorts the fixed chrome)." So: same instrument here. 500 x 0.68 = 340 rendered,
+   identical footprint to before, correct proportions inside it.
+   zoom (not transform:scale) deliberately — it collapses the layout box, so the
+   surrounding composition and the gold vitrine brackets still measure the real
+   rendered size and need no compensation. */
+.pf-vaultcard { position: relative; width: fit-content; max-width: 100%; margin: 0 auto; }
+.pf-vaultcard__inner { position: relative; z-index: 1; width: 500px; zoom: 0.68; }
+/* narrow: keep the same proportions, just less of them (86vw at 500px natural) */
+@media (max-width: 620px) { .pf-vaultcard__inner { zoom: 0.52; } }
+@media (max-width: 420px) { .pf-vaultcard__inner { zoom: 0.44; } }
 /* faint gold vitrine brackets — the one retained museum motif */
 .pf-vcrop { position: absolute; width: 14px; height: 14px; border: 1px solid var(--pf-line-cut); z-index: 2; pointer-events: none; }
 .pf-vcrop--tl { top: -9px; left: -9px; border-right: 0; border-bottom: 0; }
