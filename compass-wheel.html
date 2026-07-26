@@ -1,0 +1,2591 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Compass Wheel (prototype) — Blue Room</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600&family=IBM+Plex+Mono:wght@500;600&family=Inter:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-room: radial-gradient(120% 90% at 50% -10%, #100f0d 0%, #0a0908 55%, #050505 100%);
+    --t-display:#e9e5dc; --t-primary:#d7d3ca; --t-meta:#948f87; --t-ghost:#6e6b63;
+    --line:rgba(233,229,220,0.12);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;min-height:100vh;background:var(--bg-room);color:var(--t-primary);
+    font-family:Inter,system-ui,sans-serif;display:flex;flex-direction:column;align-items:center;padding:40px 20px 64px}
+  .brand{display:flex;align-items:center;gap:12px;margin-bottom:8px}
+  .brand .mark{font:700 20px 'Cormorant Garamond',serif;color:#e8842a;line-height:1}
+  .brand .label{font:600 12px 'IBM Plex Mono',monospace;letter-spacing:.3em;color:var(--t-meta);text-transform:uppercase}
+
+  /* ---- wheel assembly ---- */
+  .wheel-area{position:relative;width:560px;max-width:100%;aspect-ratio:560/700;margin-top:30px}
+  .disc-wrap{position:absolute;left:7.143%;top:9.143%;width:85.714%;height:68.571%;z-index:2;}
+  /* static drop-shadow sibling — box-shadow on a circle == the old disc drop-shadow, but never re-rasters per frame */
+  .disc-shadow{position:absolute;left:7.143%;top:9.143%;width:85.714%;height:68.571%;border-radius:50%;z-index:1;pointer-events:none;box-shadow:0 16px 26px rgba(0,0,0,.55),0 4px 8px rgba(0,0,0,.4)}
+  #wheel{display:block;width:100%;height:100%;border-radius:50%;transform-origin:50% 50%}
+  /* structural-ink overlay: a copy of the wheel's BLACK radial seams, clipped to the saturn band, that
+     rides ABOVE the drifting inlay ring so the dark lines cross OVER it (ring reads embedded, not floating).
+     Same transform as #wheel (mirrored in JS) → seams stay locked to the wheel while the ring drifts under them. */
+  #wheelInk{position:absolute;inset:0;width:100%;height:100%;border-radius:50%;transform-origin:50% 50%;pointer-events:none}
+  /* engraved inlay ring — its OWN slow entity; a baked bitmap that drifts on the compositor, never rides #wheel */
+  .engrave-ring{
+    position:absolute; inset:0; width:100%; height:100%;
+    pointer-events:none; transform-origin:50% 50%;
+    background-position:center; background-size:100% 100%; background-repeat:no-repeat;
+    will-change:transform;
+    animation:engraveDrift 150s linear infinite;  /* ambient-always: alive at rest. SLOWER because the limb got denser:
+                                                     72 outer ticks at 150s = a tick crosses a fixed point every 2.08s.
+                                                     Below 150s the 5deg scale begins to shimmer — do not speed this up
+                                                     without cutting tick count in the same edit. */
+  }
+  @keyframes engraveDrift{ to{ transform:rotate(-360deg) } }  /* CCW — armillary contrast vs the CW wheel spin */
+  @media (prefers-reduced-motion:reduce){ .engrave-ring{ animation:none } }  /* still visible, static */
+
+  /* faint blue liquid suspended in the band — a baked bitmap drifting on its OWN compositor layer,
+     opposite the inlay's CCW so the two never lock → reads as independent liquid ("second saturn") */
+  .ring-liquid{
+    position:absolute; inset:0; width:100%; height:100%;
+    pointer-events:none; border-radius:50%; transform-origin:50% 50%;
+    background-position:center; background-size:100% 100%; background-repeat:no-repeat;
+    will-change:transform;
+    animation:ringLiquidDrift 200s linear infinite;   /* CW — opposite the inlay's CCW → visible parallax.
+                                                         150s/200s ⇒ relative revolution every 85.7s: still plainly
+                                                         two bodies over the ~10s a user watches, but slow and cold. */
+  }
+  @keyframes ringLiquidDrift{ to{ transform:rotate(360deg) } }
+  @media (prefers-reduced-motion:reduce){ .ring-liquid{ animation:none } }   /* still visible, static */
+
+  /* the fixed glass channel the inlay is suspended under — never rotates, zero animation */
+  .engrave-glass{
+    position:absolute; inset:0; width:100%; height:100%;
+    pointer-events:none; border-radius:50%;
+    /* `closest-side` is LOAD-BEARING. Without it the ending shape defaults to farthest-corner =
+       240·√2 = 339.41px, so every percentage below was multiplied by 0.7071 and this ENTIRE channel
+       was parked at r≈110–146 — inside the wedge field, never once on the band it belongs to.
+       With closest-side, 100% == 240px == the disc radius ⇒ percent = r/240·100.
+       annulus mask: 66.3%→r159 fade-in · 68.3–86.0% → r164–206 solid · 88.5% → r212 fade-out */
+    -webkit-mask:radial-gradient(circle closest-side at 50% 50%,
+        transparent 0 66.3%, #000 68.3% 86.0%, transparent 88.5%);
+            mask:radial-gradient(circle closest-side at 50% 50%,
+        transparent 0 66.3%, #000 68.3% 86.0%, transparent 88.5%);
+    background:
+      /* 1 — OUTER RAIL bevel (r 200.0/202.1/203.8/205.4) — the instrument's primary lit edge */
+      radial-gradient(circle closest-side at 50% 50%, transparent 83.3%, rgba(233,241,252,0.26) 84.2%, rgba(233,241,252,0.09) 84.9%, transparent 85.6%),
+      /* 2 — INNER RAIL bevel (r 164.6/166.6/168.9) — quieter near lip */
+      radial-gradient(circle closest-side at 50% 50%, transparent 68.6%, rgba(226,236,248,0.14) 69.4%, transparent 70.4%),
+      /* 3 — primary diagonal refraction sheen */
+      linear-gradient(128deg, rgba(226,238,252,0.20) 0%, rgba(226,238,252,0.055) 26%, rgba(226,238,252,0) 50%),
+      /* 4 — cool chromatic split, upper-left (the warm lower-right split is deliberately GONE — warm law) */
+      linear-gradient(128deg, rgba(150,190,242,0.085) 0%, rgba(150,190,242,0) 17%),
+      /* 5 — THE CAUSTIC: light that got through the glass and pooled on the far channel floor,
+             diagonally opposite the specular. Centres at r=184.1 and r=179.9 — mid-band. */
+      radial-gradient(58px 58px   at 74.4% 79.6%, rgba(214,234,255,0.17) 0%, rgba(214,234,255,0) 72%),
+      radial-gradient(112px 112px at 76.5% 76.5%, rgba(214,234,255,0.07) 0%, rgba(214,234,255,0) 80%),
+      /* 6 — inner wall in shadow (r 167.0/169.0/174.0/178.1) — the channel's real depth */
+      radial-gradient(circle closest-side at 50% 50%, transparent 69.6%, rgba(0,0,0,0.42) 70.4%, rgba(0,0,0,0.12) 72.5%, transparent 74.2%),
+      /* 7 — outer wall seat (r 197.0/200.2/202.1) */
+      radial-gradient(circle closest-side at 50% 50%, transparent 82.1%, rgba(0,0,0,0.26) 83.4%, transparent 84.2%),
+      /* 8 — THE UNDER-LIP: the glass rim casting outward onto the wedge field (r 202.6–211.2).
+             This is the single line that makes the band read RAISED rather than printed. */
+      radial-gradient(circle closest-side at 50% 50%, transparent 84.4%, rgba(0,0,0,0.30) 85.4%, rgba(0,0,0,0.10) 86.9%, transparent 88.0%);
+  }
+
+  /* ---- THE NAMEPLATE RING: every option is a level, horizontal name riding just inside the band ----
+     NOTHING IN THIS SYSTEM ROTATES. Each name is PLACED on the circle by a pure translate:
+       x = LBL_R·sin(W + i·segDeg),  y = −LBL_R·cos(W + i·segDeg)
+     so it revolves without rotating, and there is no rotation anywhere that would have to be
+     cancelled by an equal and opposite one. That matters: the obvious construction — rotate the
+     layer, counter-rotate each word — is exact ONLY while both halves are written in the same style
+     flush, and it degrades into a ±W tumble the moment anything (a CSS transition, a dropped frame,
+     a compositor promotion) applies one half without the other. Placement can't tumble because there
+     is nothing to cancel. It also removes the upside-down branch, the left/right alignment test and
+     the reading-direction question entirely: the 6 o'clock name is as upright as the 12 o'clock one.
+     LBL_R = 110. Envelope [59.5, 160.5] clears the ring's inner rail at 166 by 5.5 and the hub halo
+     at 54 by 5.5. */
+  .nameplates{position:absolute;left:50%;top:50%;width:480px;height:480px;
+    transform-origin:50% 50%;transform:translate(-50%,-50%) scale(1);
+    pointer-events:none;z-index:5;will-change:transform}
+  .np-t{position:absolute;left:50%;top:50%;max-width:106px;padding:2px 5px;
+    display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;
+    white-space:pre-line;overflow-wrap:anywhere;text-align:center;
+    font-family:Inter,system-ui,sans-serif;font-weight:600;line-height:1.14;
+    color:#FFFFFF;-webkit-font-smoothing:antialiased;
+    /* the wash is a SHADOW THE WORD CASTS on the glass, not a sticker: the 68%/68% radii make the
+       ellipse follow the box's own aspect, so alpha reaches 0 at the edge midpoints and is already 0
+       at the corners — no rectangle can ever read. The 0 0 3px shadow layer covers the glyph corners
+       that fall outside the ellipse (they do sit on bare jewel at 2 lines). */
+    background:radial-gradient(68% 68% at 50% 50%, rgba(4,5,9,0.26) 0%, rgba(4,5,9,0.15) 44%, rgba(4,5,9,0) 74%);
+    text-shadow:0 1px 2px rgba(0,0,0,0.62), 0 0 3px rgba(0,0,0,0.70), 0 0 7px rgba(0,0,0,0.45);
+    transform-origin:50% 50%;transform:translate(-50%,-50%) translate(0px,-110px);
+    transition:opacity 260ms cubic-bezier(.2,.7,.2,1);will-change:transform}
+  /* the winner's bloom is the same species as .result .v's glow — the eye links wheel→word.
+     REVEAL ONLY: at rest the top name is brightest by opacity alone, never by light. */
+  .nameplates.is-revealed .np-t.is-win{text-shadow:0 1px 2px rgba(0,0,0,.62),0 0 3px rgba(0,0,0,.70),
+    0 0 7px rgba(0,0,0,.45),0 0 9px rgba(255,255,255,0.18)}
+  @media (prefers-reduced-motion:reduce){ .np-t{transition:none} }
+  @media (max-width:560px){ body{padding-left:8px;padding-right:8px} }   /* buys back ~7.5% of type size at 360px */
+
+  /* ---- compass glass: fixed dome cover over the disc, under the pointer; never rotates ---- */
+  .glass{
+    position:absolute; left:7.143%; top:9.143%;
+    width:85.714%; height:68.571%;
+    z-index:2; border-radius:50%; pointer-events:none;
+    /* (a) broad dome sheen upper-left · (b) soft fill lower-right · (c) edge vignette (center stays clear) */
+    background:
+      radial-gradient(120% 105% at 45% 28%,
+          rgba(222,220,216,0.13) 0%,
+          rgba(222,220,216,0.04) 17%,
+          rgba(222,220,216,0)    40%),
+      radial-gradient(90% 90% at 55% 66%,
+          rgba(196,200,208,0.05) 0%,
+          rgba(196,200,208,0)    34%),
+      /* closest-side, same root cause as .engrave-glass: with the default farthest-corner this ramp
+         maxed at r=339 while the disc ends at r=240, so the rim seal composited to ≈0.068 instead of
+         the authored 0.34 and the orb was never sealed at its edge. (.glass::before is left alone —
+         its 57/65/73% land at r=193/220/248 and read correctly.) */
+      radial-gradient(circle closest-side at 50% 50%,
+          rgba(0,0,0,0)    82%,
+          rgba(0,0,0,0.14) 92%,
+          rgba(0,0,0,0.34) 100%);
+    /* bezel rim + dome under-shade as inset shadows (no extra element) */
+    box-shadow:
+      inset 0 0 0 1px rgba(255,255,255,0.05),
+      inset 0 2px 5px  rgba(255,255,255,0.05),
+      inset 0 -12px 24px rgba(0,0,0,0.30),
+      inset 0 0 0 2px  rgba(6,6,10,0.40);
+  }
+  /* the signature curved reflection arc — a soft crescent glare hugging the upper-left interior rim */
+  .glass::before{
+    content:""; position:absolute; inset:0; border-radius:50%;
+    background:
+      radial-gradient(circle at 50% 50%,
+          rgba(255,255,255,0) 0 57%,
+          rgba(224,226,232,0.22) 65%,
+          rgba(255,255,255,0) 73%);
+    -webkit-mask-image:linear-gradient(138deg, #000 4%, rgba(0,0,0,0) 46%);
+            mask-image:linear-gradient(138deg, #000 4%, rgba(0,0,0,0) 46%);
+    filter:blur(2px);
+    opacity:0.46;   /* the canvas rim/dome carry the specular now — this is a thin real-glass coat only */
+  }
+  @media (prefers-reduced-motion: reduce){ .glass::before{ opacity:0.32; } }
+
+  .pointer{display:none}   /* retired — the rasterized bitmap arrow is now the sole, permanently-visible pointer.
+                              DO NOT RESURRECT: this SVG and #ptrGrad are the old warm-orange pointer. Warm is now
+                              rationed to the brass hub + the brand mark; the perimeter belongs to the cold gem. */
+
+  /* OUTER — owns the magnetic radial breathe; NEVER rotates. Centred on the disc centre (280,304). */
+  .orbit-hover{
+    position:absolute;
+    left:50%; top:43.43%;                  /* disc centre y = 43.43% × 700 = 304 */
+    width:135.714%; aspect-ratio:1;        /* 760 / 560 = 135.714% ⇒ 760px square */
+    transform:translate(-50%,-50%);
+    transform-origin:50% 50%;
+    z-index:3; pointer-events:none; will-change:transform;
+    animation:armHover 4600ms ease-in-out infinite;   /* slower + shallower than the old 3400ms/-2.3px:
+                                                         a ton of corundum does not bob. Amplitude down,
+                                                         period up = mass. (Taste, not a lag fix — the
+                                                         breathe was measured at 0.035px/frame and is
+                                                         provably not the source of the arrow's lag.) */
+  }
+  /* INNER — fills the outer, so its centre IS the disc centre ⇒ rotate() orbits about the disc centre by containment.
+     A FROZEN bitmap on a block div = own GPU layer, composited transform, immune to main-thread jank.
+     NEVER set willChange:'auto' inline anywhere — de-promotes + reintroduces same-tick promotion jank. */
+  .orbit-arm{
+    position:absolute; inset:0; width:100%; height:100%;
+    transform:rotate(0deg); transform-origin:50% 50%;
+    background-position:center; background-size:100% 100%; background-repeat:no-repeat;
+    z-index:3; pointer-events:none; opacity:1; will-change:transform;   /* VISIBLE AT REST — this bitmap is the pointer */
+  }
+  /* THE ARC SMEAR — the anti-judder layer, and the real fix for "ever slightly laggy".
+     At 439°/s the gem advances 7.317° per frame against its own 10.88° footprint: every frame it
+     lands almost clear of where it was, so the eye sees a picket fence of separate arrows rather
+     than one moving object. No easing curve can fix that — it is a SAMPLING problem. A baked trail
+     of the stone's arris network extends the persistence footprint to ~37°, which drops step/footprint
+     from 0.672 to ~0.196: consecutive positions overlap and fuse. Opacity-only, on the arm's own
+     layer, so it costs one composited property and cannot desync from the arrow it belongs to. */
+  .arm-smear{
+    position:absolute; inset:0; width:100%; height:100%;
+    background-position:center; background-size:100% 100%; background-repeat:no-repeat;
+    pointer-events:none; opacity:0; will-change:opacity;
+  }
+  @keyframes armHover{                     /* at 12 o'clock, screen-Y === radial ⇒ pure in/out breathe, no sway, no rotation */
+    0%   { transform:translate(-50%,-50%) translateY(0) }
+    50%  { transform:translate(-50%,-50%) translateY(-1.4px) }
+    100% { transform:translate(-50%,-50%) translateY(0) }
+  }
+  @media (prefers-reduced-motion:reduce){ .orbit-hover{ animation:none } }   /* static arrow, fixed gap */
+
+  /* the verdict is a KICKER OVER A WORD, not a row — so the word sits dead centre under the orb and
+     the drop can fall straight down onto it. (In the old single-line row the label and swatch pushed
+     the word ~63px right of the fall line, and a drop cannot drift sideways and still read as falling.) */
+  .result{min-height:56px;height:auto;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:7px;max-width:100%;padding:0 16px;margin:-16px 0 16px}
+  .result .k{font:600 11px 'IBM Plex Mono',monospace;letter-spacing:.28em;color:var(--t-ghost);text-transform:uppercase}
+  .result .line{position:relative;display:flex;align-items:center;justify-content:center;max-width:100%}
+  .result .v{font:600 clamp(22px,6.4vw,32px) 'Cormorant Garamond',serif;color:#FFFFFF;line-height:1.05;max-width:92vw;overflow-wrap:anywhere;text-align:center;
+    text-shadow:0 0 1px rgba(255,255,255,.85), 0 0 10px rgba(255,255,255,.22), 0 2px 6px rgba(0,0,0,.5)}   /* solid bright white, not a faded thin serif */
+  .result .spin{background:none;padding:0;border-radius:0;box-shadow:none;border:0;font:600 12px 'IBM Plex Mono',monospace;letter-spacing:.3em;color:var(--t-ghost);text-transform:uppercase}
+
+  .controls{display:flex;flex-direction:column;gap:16px;width:min(560px,100%)}
+  .inrow{display:flex;gap:12px;align-items:stretch}
+  .field{flex:1;display:flex;align-items:center;gap:10px;padding:0 14px;border:1px solid var(--line);border-radius:8px;background:rgba(233,229,220,.045)}
+  .field input{flex:1;min-width:0;background:transparent;border:none;outline:none;color:var(--t-display);font:500 16px Inter;padding:14px 0}
+  .field input::placeholder{color:var(--t-ghost);opacity:1}
+  .field .count{font:600 11px 'IBM Plex Mono',monospace;letter-spacing:.12em;color:var(--t-ghost);white-space:nowrap}
+  button{font-family:inherit;cursor:pointer}
+  button:disabled{cursor:default}
+  .add{border:1px solid rgba(233,229,220,.2);border-radius:8px;padding:0 26px;min-height:44px;color:var(--t-primary);
+    font:600 12px 'IBM Plex Mono',monospace;letter-spacing:.2em;text-transform:uppercase;background:rgba(233,229,220,.045);transition:all .16s cubic-bezier(.2,.7,.2,1)}
+  .add:not(:disabled):hover{color:var(--t-display);border-color:rgba(233,229,220,.38);background:rgba(233,229,220,.08)}
+  .spin{border:none;border-radius:12px;padding:20px;color:#171310;font:700 17px Inter;letter-spacing:.26em;text-transform:uppercase;
+    background:linear-gradient(180deg,#e7e2d7,#cbc6bb);box-shadow:0 10px 26px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.5);
+    transition:transform .16s cubic-bezier(.2,.7,.2,1), box-shadow .16s ease}
+  .spin:not(:disabled):hover{transform:translateY(-2px);box-shadow:0 16px 32px rgba(0,0,0,.46), inset 0 1px 0 rgba(255,255,255,.6)}
+  .spin:not(:disabled):active{transform:translateY(0)}
+  .reset{align-self:center;border:none;background:transparent;color:var(--t-meta);font:600 11px 'IBM Plex Mono',monospace;
+    letter-spacing:.24em;text-transform:uppercase;padding:4px 10px;min-height:44px;display:inline-flex;align-items:center;justify-content:center;transition:color .15s ease}
+  .reset:not(:disabled):hover{color:var(--t-display)}
+  .metarow{display:flex;gap:22px;justify-content:center;align-items:center;flex-wrap:wrap}
+  #ceremonyToggle[aria-checked="false"]{color:var(--t-ghost)}
+  .add:focus-visible,.spin:focus-visible,.reset:focus-visible,.opt .x:focus-visible{outline:2px solid rgba(233,229,220,.6);outline-offset:2px}
+  .field:focus-within{border-color:rgba(233,229,220,.45);box-shadow:0 0 0 3px rgba(233,229,220,.08)}
+  button:disabled{opacity:.4}
+  .opts{display:flex;flex-direction:column;gap:8px;margin-top:2px}
+  .opts h4{margin:0 0 2px;padding:0 2px;font:600 11px 'IBM Plex Mono',monospace;letter-spacing:.24em;text-transform:uppercase;color:var(--t-ghost)}
+  .opt{display:flex;align-items:center;gap:12px;padding:10px 12px;border:1px solid var(--line);border-radius:6px;background:rgba(233,229,220,.04)}
+  .opt .x{position:relative;flex:none;width:26px;height:26px;border-radius:50%;border:1px solid rgba(233,229,220,.18);background:rgba(233,229,220,.05);
+    color:var(--t-meta);font:400 16px Inter;line-height:1;display:flex;align-items:center;justify-content:center;padding:0;transition:all .15s ease}
+  .opt .x::before{content:'';position:absolute;inset:-9px}   /* expands the hit zone to ~44px with no visual change */
+  .opt .x:hover{border-color:rgba(233,229,220,.4);color:var(--t-display);background:rgba(233,229,220,.09)}
+  .opt .sw{flex:none;width:14px;height:14px;border-radius:4px;box-shadow:0 0 0 1px rgba(233,229,220,.18)}
+  .opt .tx{flex:1;min-width:0;font:500 15px Inter;color:var(--t-primary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+  /* ===== verdict-ceremony overlays ===== */
+  /* reveal-tick swatch beside the result name */
+  /* absolutely placed so it cannot shift the word off the fall line */
+  .result .rsw{position:absolute;right:calc(100% + 12px);top:50%;transform:translateY(-50%);
+    width:14px;height:14px;border-radius:4px;box-shadow:0 0 0 1px rgba(255,206,132,0.5), inset 0 0 0 1px rgba(0,0,0,0.3)}
+  /* verdict is now shown SOLID #FFFFFF the instant the arrow seats (see commitReveal @ impact) — the old
+     paint-from-invisible (paintRise) mechanic is retired; the base .result .v carries the solid-white + glow. */
+
+  /* B4b vitrify glaze — geometry of .glass; baked brightness lift + upper-left crescent glint; opacity-pulsed only */
+  .vitrify{position:absolute;left:7.143%;top:9.143%;width:85.714%;height:68.571%;border-radius:50%;
+    pointer-events:none;z-index:2;opacity:0;mix-blend-mode:screen;
+    background:radial-gradient(120% 105% at 38% 30%, rgba(224,226,232,0.55) 0%, rgba(224,226,232,0.14) 30%, rgba(224,226,232,0) 56%);}
+
+  /* impact-to-core: a core absorb-flash at the hub — compositor-only.
+     (The converging shockwave RING that used to live here was `.shock`: a permanently-present full-disc
+      mix-blend-mode:screen element that was never once animated — it created a stacking context in the
+      z=4 stack for nothing. Deleted. The idea is still a good one; it was simply never wired.) */
+  .coreflash{position:absolute;left:50%;top:43.43%;width:34%;aspect-ratio:1;transform:translate(-50%,-50%);
+    border-radius:50%;pointer-events:none;z-index:4;opacity:0;mix-blend-mode:screen;
+    background:radial-gradient(circle, rgba(255,255,255,0.95) 0%, rgba(226,232,240,0.6) 34%, rgba(226,232,240,0) 70%);}
+  /* the plunge lens — the visible energy travelling top→core: a bright lens plunging DOWN the 12 o'clock→centre axis */
+  .plunge{position:absolute;left:50%;top:9.143%;width:44%;height:9%;
+    transform:translate(-50%,-50%);transform-origin:50% 50%;border-radius:50%;
+    pointer-events:none;z-index:4;opacity:0;mix-blend-mode:screen;
+    will-change:transform,opacity;
+    background:radial-gradient(62% 100% at 50% 50%,
+      rgba(226,232,240,0.95) 0%, rgba(226,232,240,0.34) 46%, rgba(226,232,240,0) 76%);}
+
+  /* B3b tick flash — light at the 12 o'clock rim; NOT inside .glass (its mask/blur would mute the blend) */
+  .spark,.ring{position:absolute;left:50%;top:9.143%;transform:translate(-50%,-50%);pointer-events:none;z-index:4;opacity:0}
+  .spark{width:12px;height:12px;border-radius:50%;mix-blend-mode:screen;
+    background:radial-gradient(circle,#fff 0%,rgba(255,244,224,.9) 28%,transparent 70%)}
+  .ring{width:20px;height:20px;border-radius:50%;border:1px solid rgba(226,232,240,.9)}
+
+  /* ---- THE COMPASS: a drifting rose and a needle that hunts ----
+     Same mechanism as the saturn band, one level in: baked once to a bitmap, its own compositor
+     layer, its own slow drift counter to the astrolabe's. It lives in the one empty annulus on the
+     whole dial (r 34–90, between the hub and the nameplates), which is where a rose belongs anyway.
+     NO LETTERS, deliberately: a drifting bitmap cannot keep N/E/S/W upright, and counter-rotating
+     them is exactly the tumble trap. Rays only — which says the right thing, because a rose with no
+     fixed north is a compass that cannot answer, which is why you are asking a wheel. */
+  .compass-rose{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:3;
+    background-position:center;background-size:100% 100%;background-repeat:no-repeat;
+    will-change:transform;animation:roseDrift 260s linear infinite}
+  @keyframes roseDrift{ to{ transform:rotate(360deg) } }   /* CW — against the astrolabe's CCW */
+  @media (prefers-reduced-motion:reduce){ .compass-rose{ animation:none } }
+
+  /* the needle wanders while nothing is decided, then finds north the instant the verdict lands.
+     A damped overshoot is BANNED for the hammer (a struck orb must not bounce) but it is REQUIRED
+     here — settling past and back is the signature of the instrument. */
+  .needle-layer{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:4;
+    transform-origin:50% 50%;will-change:transform;animation:needleWander 26s ease-in-out infinite}
+  .needle-layer.found{animation:none}
+  @keyframes needleWander{
+    0%{transform:rotate(-13deg)} 27%{transform:rotate(19deg)}
+    55%{transform:rotate(-7deg)} 78%{transform:rotate(11deg)} 100%{transform:rotate(-13deg)} }
+  @media (prefers-reduced-motion:reduce){ .needle-layer{ animation:none } }
+  .needle{position:absolute;inset:0;width:100%;height:100%;
+    background-position:center;background-size:100% 100%;background-repeat:no-repeat}
+  /* the last warm point on the instrument — the brass hub is gone, so the ration survives as one jewel */
+  .pivot{position:absolute;left:50%;top:50%;width:11px;height:11px;margin:-5.5px 0 0 -5.5px;
+    border-radius:50%;pointer-events:none;z-index:5;
+    background:radial-gradient(circle at 38% 34%, #f0ad66 0%, #d2691e 52%, #7d3a12 100%);
+    box-shadow:0 0 0 1px rgba(20,10,4,.8), 0 1px 3px rgba(0,0,0,.6)}
+
+  /* ---- SATURN: the liquid leaves the channel and becomes a ring system ----
+     A concentric graduated annulus can only ever read as an INSTRUMENT — evenly ticked, readable,
+     lying flat on the face. A ring system reads as a BODY: tilted, passing in front of the sphere on
+     the near side and behind it on the far side. The band was reaching for both and landing as the
+     first. So they split: the engraving keeps the instrument, and the liquid becomes the ring.
+     Construction: the TILT (squash + axis) lives on the parent and the DRIFT on the child, so the
+     spin happens in the ring's own plane and is then projected — which is what makes it orbit rather
+     than wobble. Two copies, one under the orb and one over it (masked to its near half), give the
+     crossing; the orb's own opaque body does the occluding, so there is no per-frame clipping. */
+  .saturn{position:absolute;left:50%;top:43.43%;width:114.286%;aspect-ratio:1;
+    transform:translate(-50%,-50%) rotate(-9deg) scaleY(0.30);
+    pointer-events:none;display:none}
+  .saturn-spin{position:absolute;inset:0;border-radius:50%;
+    background-position:center;background-size:100% 100%;background-repeat:no-repeat;
+    will-change:transform;animation:saturnDrift 200s linear infinite}
+  @keyframes saturnDrift{ from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+  @media (prefers-reduced-motion:reduce){ .saturn-spin{animation:none} }
+  .saturn-far{z-index:1}                                  /* under the disc: the orb occludes the far arc */
+  /* the near half is TRANSLUCENT: you are looking through a ring of particles at the sphere behind
+     it, so the wedge colours and the names must survive underneath. Full strength stays on the far
+     layer, where the side lobes sit against black and need every bit of it. */
+  .saturn-near{z-index:2;opacity:0.55;                     /* over the disc, masked to the NEAR half only */
+    -webkit-mask:linear-gradient(to bottom, transparent 0 49.6%, #000 50.4% 100%);
+            mask:linear-gradient(to bottom, transparent 0 49.6%, #000 50.4% 100%)}
+  /* the shadow the ring throws onto the sphere — clipped to the orb, so it can only fall ON it */
+  .ring-cast{position:absolute;inset:0;border-radius:50%;overflow:hidden;pointer-events:none;
+    z-index:3;display:none}
+  .ring-cast::before{content:'';position:absolute;left:50%;top:50%;width:106%;aspect-ratio:1;
+    transform:translate(-50%,-42%) rotate(-9deg) scaleY(0.30);
+    background:radial-gradient(closest-side, transparent 0 72%, rgba(0,0,0,0.20) 83%,
+      rgba(0,0,0,0.13) 92%, rgba(0,0,0,0) 100%)}
+  .wheel-area.saturn-on .saturn,
+  .wheel-area.saturn-on .ring-cast{display:block}
+  .wheel-area.saturn-on .ring-liquid{display:none}         /* the liquid is out there now, not in the band */
+
+  /* static wrappers for the hammer. .engrave-ring and .ring-liquid own infinite CSS transform
+     animations, so WAAPI-animating THEM would suspend the drift for 260ms and snap it back —
+     wrap, never fight. No will-change at rest: these are inert divs, promoted imperatively in
+     armCeremony and de-promoted in endCeremony, so the resting frame keeps its existing 2 layers. */
+  .ring-body,.ring-liquid-shell{position:absolute;inset:0;width:100%;height:100%;
+    pointer-events:none;transform-origin:50% 50%}
+
+  /* B6-B8 milk-drop overlay */
+  .fx{position:absolute;left:0;top:0;width:100%;height:122.857%;pointer-events:none;z-index:4;display:none;
+    transform-origin:50% 35.349%}  /* 304/860 = the disc centre — so the film rides the orb's squash, not the page box */
+  .fx.live{display:block}
+  /* transform-box:view-box makes WAAPI px == viewBox units (load-bearing); every sprite is authored
+     around local (0,0) and placed by its own translate — never by an attribute */
+  .fx .well,.fx .headR,.fx .headL,.fx .pool,.fx .teat,.fx .drop{transform-box:view-box;transform-origin:0 0;opacity:0}
+  .fx .splat,.fx .wetmark{opacity:0;transform-box:view-box;transform-origin:280px 684px}   /* the ripple scales about the drip point ON the word */
+  .fx .coatR,.fx .coatL,.fx .chanR,.fx .chanL,.fx .coreR,.fx .coreL,.fx .wet,.fx .wellStain{opacity:0}
+</style>
+</head>
+<body>
+  <div class="brand"><span class="mark">◆</span><span class="label">Spin Room · Compass Wheel</span></div>
+
+  <div class="wheel-area">
+    <!-- shared defs (filters + gradients reused by the pointer SVG) -->
+    <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+      <defs>
+        <linearGradient id="ptrGrad" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#eb9a52"/>
+          <stop offset="0.55" stop-color="#d2691e"/>
+          <stop offset="1" stop-color="#a05019"/>
+        </linearGradient>
+        <filter id="grain" color-interpolation-filters="sRGB" x="-20%" y="-20%" width="140%" height="140%">
+          <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="24" result="t"/>
+          <feColorMatrix in="t" type="matrix"
+            values="0 0 0 0 0
+                    0 0 0 0 0
+                    0 0 0 0 0
+                    0.33 0.33 0.33 0 0" result="g"/>
+          <feComponentTransfer in="g" result="g2">
+            <feFuncA type="gamma" amplitude="1" exponent="3.4" offset="0"/>
+          </feComponentTransfer>
+          <feComposite in="g2" in2="SourceGraphic" operator="in" result="grain"/>
+          <feBlend in="SourceGraphic" in2="grain" mode="multiply"/>
+        </filter>
+        <filter id="blur8" x="-60%" y="-200%" width="220%" height="500%">
+          <feGaussianBlur stdDeviation="9"/>
+        </filter>
+      </defs>
+    </svg>
+
+    <div class="disc-shadow" aria-hidden="true"></div>
+    <!-- SATURN, the FAR half: painted UNDER the orb, so the orb's own body occludes the arc that
+         passes behind it. Only the two side lobes and the far edge survive — which is exactly what
+         "behind the planet" looks like. -->
+    <div class="saturn saturn-far" aria-hidden="true"><div class="saturn-spin"></div></div>
+    <div class="disc-wrap">
+      <canvas id="wheel" width="480" height="480" role="img" aria-label="Verdict wheel"></canvas>
+      <!-- the instrument is the SAME BODY as the orb: these static wrappers take the hammer so the
+           ring cannot visibly detach from the orb at the exact climax frame -->
+      <div class="ring-body" aria-hidden="true">
+        <div class="engrave-ring"></div>
+        <div class="ring-liquid-shell"><div class="ring-liquid"></div></div>
+      </div>
+      <!-- structural-ink overlay: the wheel's black seams, re-asserted OVER the drifting saturn band -->
+      <canvas id="wheelInk" width="480" height="480" aria-hidden="true"></canvas>
+      <div class="engrave-glass" aria-hidden="true"></div>
+      <!-- the shadow the ring throws onto the sphere it orbits — the single line that seats it -->
+      <div class="ring-cast" aria-hidden="true"></div>
+      <!-- the compass: a drifting rose, a hunting needle, and one warm pivot -->
+      <div class="compass-rose" aria-hidden="true"></div>
+      <div class="needle-layer" id="needleLayer" aria-hidden="true"><div class="needle"></div></div>
+      <div class="pivot" aria-hidden="true"></div>
+      <!-- the nameplate ring: horizontal option names, orbiting without rotating, framed by the band -->
+      <div class="nameplates" id="nameplates" aria-hidden="true"></div>
+    </div>
+
+    <!-- fixed compass glass: over the disc, under the pointer; never rotates -->
+    <div class="glass" aria-hidden="true"></div>
+
+    <!-- SATURN, the NEAR half: painted OVER everything on the disc, masked to the lower half so it
+         only shows where the ring is in front of the orb. The two halves meet exactly at the ellipse's
+         extremes — the same bitmap on both sides of the seam, so the join is invisible. -->
+    <div class="saturn saturn-near" aria-hidden="true"><div class="saturn-spin"></div></div>
+
+    <!-- the pointer — fixed, mounted above, does not rotate -->
+    <svg class="pointer" viewBox="0 0 560 200" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <!-- soft cast shadow -->
+      <path d="M238,26 L334,26 L286,124 Z" fill="rgba(30,14,5,0.5)" filter="url(#blur8)"/>
+      <!-- chunky rounded matte-orange body (thick round stroke = soft corners), light grain -->
+      <path d="M234,20 L330,20 L282,116 Z" fill="url(#ptrGrad)" filter="url(#grain)"
+            stroke="#c15f1a" stroke-width="14" stroke-linejoin="round" stroke-linecap="round"/>
+      <!-- crisp dark edge for definition; no glare patch -->
+      <path d="M234,20 L330,20 L282,116 Z" fill="none"
+            stroke="rgba(32,15,6,0.8)" stroke-width="2.5" stroke-linejoin="round"/>
+    </svg>
+
+    <!-- rigid string-orbit arm: outer = magnetic breathe (translate only, never rotates); inner = frozen bitmap + lap rotate -->
+    <div class="orbit-hover" aria-hidden="true"><div class="orbit-arm"><div class="arm-smear"></div></div></div>
+
+    <!-- ===== verdict-ceremony overlays (display:none / opacity:0 at rest — no effect on the resting frame) ===== -->
+    <!-- B4b vitrify glaze: over the disc, under the pointer; baked brightness-lift + crescent glint, opacity-pulsed -->
+    <div class="vitrify" aria-hidden="true"></div>
+    <!-- impact-to-core: core absorb-flash (hub); opacity/transform-pulsed -->
+    <div class="coreflash" aria-hidden="true"></div>
+    <!-- the plunge lens: bright energy driving DOWN the 12→centre axis, swallowed inward by the core -->
+    <div class="plunge" aria-hidden="true"></div>
+    <!-- B3b tick flash: a sharp point of light + one hairline ring at the 12 o'clock rim -->
+    <span class="spark" aria-hidden="true"></span>
+    <span class="ring"  aria-hidden="true"></span>
+    <!-- B6-B8 milk-drop FX overlay; viewBox matches wheel-area aspect ⇒ every coordinate auto-scales on mobile -->
+    <!-- THE FX BOX EXTENDS BELOW THE WHEEL. It has to: the verdict word lives in .result, which sits
+         OUTSIDE .wheel-area, so a 560x700 canvas clipped the falling drop at y=700 — it visibly tore
+         apart on its way down and the splat landed entirely outside the viewport. 560x860 keeps the
+         SAME 1 unit == 1 wheel-area px mapping (height 122.857% of 700 == 860), so every coordinate
+         authored above is untouched; there is simply canvas below the orb now.
+         NOTE: overflow:visible is deliberately NOT used — geometry outside an SVG's viewBox is this
+         repo's known per-frame overflow-rect landmine. The viewBox is enlarged instead. -->
+    <svg class="fx" viewBox="0 0 560 860" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <!-- THE KEY TRICK: a userSpaceOnUse radialGradient CONCENTRIC WITH THE ARC paints the stroke's
+           CROSS-SECTION. One stroke then carries a meniscus profile — a wet body, a bright lip at the
+           limb, a feather inboard — with no filter and no extra elements. ZERO <filter> in this layer:
+           the cross-gradients ARE the blur. -->
+      <defs>
+        <radialGradient id="coatCross" gradientUnits="userSpaceOnUse" cx="280" cy="304" r="243">
+          <stop offset="0"      stop-color="#FFFFFF" stop-opacity="0"/>
+          <stop offset="0.9424" stop-color="#FFFFFF" stop-opacity="0"/>      <!-- r=229 inner feather -->
+          <stop offset="0.9630" stop-color="#DCE8F8" stop-opacity="0.10"/>   <!-- r=234 -->
+          <stop offset="0.9753" stop-color="#FFFFFF" stop-opacity="0.30"/>   <!-- r=237 wet body -->
+          <stop offset="0.9877" stop-color="#FFFFFF" stop-opacity="0.40"/>   <!-- r=240 meniscus lip AT the limb -->
+          <stop offset="0.9959" stop-color="#E8F0FC" stop-opacity="0.16"/>   <!-- r=242 -->
+          <stop offset="1"      stop-color="#CFE0F2" stop-opacity="0"/></radialGradient>
+        <radialGradient id="chanCross" gradientUnits="userSpaceOnUse" cx="280" cy="304" r="240">
+          <stop offset="0"      stop-color="#FFFFFF" stop-opacity="0"/>
+          <stop offset="0.9729" stop-color="#FFFFFF" stop-opacity="0"/>
+          <stop offset="0.9813" stop-color="#FFFFFF" stop-opacity="0.55"/>
+          <stop offset="0.9875" stop-color="#FFFFFF" stop-opacity="0.92"/>
+          <stop offset="0.9938" stop-color="#FFFFFF" stop-opacity="0.48"/>
+          <stop offset="1"      stop-color="#EAF2FF" stop-opacity="0"/></radialGradient>
+        <radialGradient id="wetCross" gradientUnits="userSpaceOnUse" cx="280" cy="304" r="254">
+          <stop offset="0"      stop-color="#FFFFFF" stop-opacity="0"/>
+          <stop offset="0.8622" stop-color="#FFFFFF" stop-opacity="0"/>      <!-- r=219 -->
+          <stop offset="0.9134" stop-color="#DCE8F8" stop-opacity="0.28"/>   <!-- r=232 -->
+          <stop offset="0.9370" stop-color="#FFFFFF" stop-opacity="0.72"/>   <!-- r=238 -->
+          <stop offset="0.9528" stop-color="#FFFFFF" stop-opacity="0.55"/>   <!-- r=242 -->
+          <stop offset="0.9764" stop-color="#CFE0F2" stop-opacity="0.14"/>   <!-- r=248 -->
+          <stop offset="1"      stop-color="#CFE0F2" stop-opacity="0"/></radialGradient>
+        <radialGradient id="headFill" cx="0.42" cy="0.34" r="0.78">
+          <stop offset="0" stop-color="#FFFFFF" stop-opacity="1"/><stop offset="0.55" stop-color="#FFFFFF" stop-opacity="0.98"/>
+          <stop offset="0.86" stop-color="#EAF1FC" stop-opacity="0.72"/><stop offset="1" stop-color="#CFE0F2" stop-opacity="0"/></radialGradient>
+        <radialGradient id="wellFill" cx="0.5" cy="0.34" r="0.72">
+          <stop offset="0" stop-color="#FFFFFF" stop-opacity="1"/><stop offset="0.46" stop-color="#FFFFFF" stop-opacity="0.92"/>
+          <stop offset="0.80" stop-color="#F2F6FF" stop-opacity="0.55"/><stop offset="1" stop-color="#DDE7F5" stop-opacity="0"/></radialGradient>
+        <linearGradient id="wakeFade" gradientUnits="userSpaceOnUse" x1="0" y1="2" x2="0" y2="-34">
+          <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.62"/><stop offset="0.34" stop-color="#FFFFFF" stop-opacity="0.30"/>
+          <stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/></linearGradient>
+        <linearGradient id="tailFade" gradientUnits="userSpaceOnUse" x1="0" y1="4" x2="0" y2="-34">
+          <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.55"/><stop offset="0.42" stop-color="#FFFFFF" stop-opacity="0.24"/>
+          <stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/></linearGradient>
+        <radialGradient id="poolFill" cx="0.5" cy="0.38" r="0.74">
+          <stop offset="0" stop-color="#FFFFFF" stop-opacity="1"/><stop offset="0.50" stop-color="#FFFFFF" stop-opacity="0.95"/>
+          <stop offset="0.85" stop-color="#EAF1FC" stop-opacity="0.60"/><stop offset="1" stop-color="#CFE0F2" stop-opacity="0"/></radialGradient>
+        <radialGradient id="wetmarkFill" cx="0.5" cy="0.5" r="0.5">
+          <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.30"/><stop offset="0.5" stop-color="#FFFFFF" stop-opacity="0.14"/>
+          <stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/></radialGradient>
+      </defs>
+      <!-- the whole orb goes faintly WET while the film runs — light on glass, not paint -->
+      <circle class="wet" cx="280" cy="304" r="236" fill="none" stroke="url(#wetCross)" stroke-width="34" opacity="0"/>
+      <!-- the COATING: a broad clinging film behind a narrower channel behind a brilliant core. Together
+           they read as a widening head with a thinning tail and a wet sheen left on the glass.
+           RIGHT = sweep 1 (bulges right), LEFT = sweep 0. Both run well (280,68) → pool (280,540). -->
+      <path class="coatL" d="M280,68 A236,236 0 0 0 280,540" fill="none" stroke="url(#coatCross)" stroke-width="9"   stroke-linecap="round" pathLength="1" stroke-dasharray="1 1.60"   stroke-dashoffset="1.00"/>
+      <path class="coatR" d="M280,68 A236,236 0 0 1 280,540" fill="none" stroke="url(#coatCross)" stroke-width="9"   stroke-linecap="round" pathLength="1" stroke-dasharray="1 1.60"   stroke-dashoffset="1.00"/>
+      <path class="chanL" d="M280,68 A236,236 0 0 0 280,540" fill="none" stroke="url(#chanCross)" stroke-width="4.6" stroke-linecap="round" pathLength="1" stroke-dasharray="0.30 1.40" stroke-dashoffset="2.00"/>
+      <path class="chanR" d="M280,68 A236,236 0 0 1 280,540" fill="none" stroke="url(#chanCross)" stroke-width="4.6" stroke-linecap="round" pathLength="1" stroke-dasharray="0.30 1.40" stroke-dashoffset="2.00"/>
+      <path class="coreL" d="M280,68 A236,236 0 0 0 280,540" fill="none" stroke="#FFFFFF" stroke-opacity="0.90" stroke-width="2.4" stroke-linecap="round" pathLength="1" stroke-dasharray="0.10 1.40" stroke-dashoffset="1.60"/>
+      <path class="coreR" d="M280,68 A236,236 0 0 1 280,540" fill="none" stroke="#FFFFFF" stroke-opacity="0.90" stroke-width="2.4" stroke-linecap="round" pathLength="1" stroke-dasharray="0.10 1.40" stroke-dashoffset="1.60"/>
+      <!-- THE SOURCE, made legible: the glass sweats at the strike point and the meniscus rises until it
+           TOUCHES the gem's culet, then breaks. That contact frame is the causal beat the viewer reads. -->
+      <ellipse class="wellStain" cx="280" cy="70" rx="34" ry="7" fill="url(#wetmarkFill)" opacity="0"/>
+      <g class="well">
+        <path d="M-26,4 C-26,-6.5 -13,-12 0,-12 C13,-12 26,-6.5 26,4 C26,7.5 13,9 0,9 C-13,9 -26,7.5 -26,4 Z" fill="url(#wellFill)"/>
+        <path d="M-9,-6 C-9,-13 -4.5,-17.5 0,-19 C4.5,-17.5 9,-13 9,-6 C9,-1.5 4.5,0.5 0,0.5 C-4.5,0.5 -9,-1.5 -9,-6 Z" fill="#FFFFFF" opacity="0.9"/>
+        <ellipse cx="-6.5" cy="-6" rx="2.6" ry="3.4" fill="#FFFFFF" opacity="0.55"/></g>
+      <!-- the two heads that drag the film down the meridians -->
+      <g class="headL">
+        <path class="wake" d="M-5.2,0 C-5.6,-9 -4.2,-19 -1.9,-30 C-0.9,-34 0.9,-34 1.9,-30 C4.2,-19 5.6,-9 5.2,0 Z" fill="url(#wakeFade)"/>
+        <path d="M0,8.6 C-4.6,8.6 -7.4,5.2 -7.4,1.2 C-7.4,-3.2 -4.2,-6.4 0,-6.4 C4.2,-6.4 7.4,-3.2 7.4,1.2 C7.4,5.2 4.6,8.6 0,8.6 Z" fill="url(#headFill)"/>
+        <ellipse cx="-2.4" cy="-1.8" rx="1.5" ry="2.1" fill="#FFFFFF" opacity="0.85"/></g>
+      <g class="headR">
+        <path class="wake" d="M-5.2,0 C-5.6,-9 -4.2,-19 -1.9,-30 C-0.9,-34 0.9,-34 1.9,-30 C4.2,-19 5.6,-9 5.2,0 Z" fill="url(#wakeFade)"/>
+        <path d="M0,8.6 C-4.6,8.6 -7.4,5.2 -7.4,1.2 C-7.4,-3.2 -4.2,-6.4 0,-6.4 C4.2,-6.4 7.4,-3.2 7.4,1.2 C7.4,5.2 4.6,8.6 0,8.6 Z" fill="url(#headFill)"/>
+        <ellipse cx="-2.4" cy="-1.8" rx="1.5" ry="2.1" fill="#FFFFFF" opacity="0.85"/></g>
+      <!-- they meet and pool at the bottom pole, a thread necks down, and one drop snaps off -->
+      <g class="pool"><path d="M-19,0 C-19,-6.2 -10.5,-9.4 0,-9.4 C10.5,-9.4 19,-6.2 19,0 C19,5.4 10.5,8.2 0,8.2 C-10.5,8.2 -19,5.4 -19,0 Z" fill="url(#poolFill)"/>
+        <ellipse cx="-5.5" cy="-3.4" rx="3.2" ry="2.0" fill="#FFFFFF" opacity="0.6"/></g>
+      <path class="teat" d="M-3.4,0 C-3.4,6 -1.8,13 0,17 C1.8,13 3.4,6 3.4,0 Z" fill="url(#tailFade)"/>
+      <g class="drop">
+        <path d="M-2.6,2 C-3.0,-10 -1.6,-22 0,-34 C1.6,-22 3.0,-10 2.6,2 Z" fill="url(#tailFade)"/>
+        <path d="M0,9.2 C-5.0,9.2 -8.0,5.6 -8.0,1.2 C-8.0,-3.6 -4.6,-7.0 0,-7.0 C4.6,-7.0 8.0,-3.6 8.0,1.2 C8.0,5.6 5.0,9.2 0,9.2 Z" fill="url(#headFill)"/>
+        <ellipse cx="-2.7" cy="-2.2" rx="1.7" ry="2.3" fill="#FFFFFF" opacity="0.85"/></g>
+      <!-- the landing, on the word itself: a splat crown, then the word drinks the drop -->
+      <ellipse class="wetmark" cx="280" cy="684" rx="30" ry="9" fill="url(#wetmarkFill)" opacity="0"/>
+      <g class="splat"><ellipse cx="280" cy="684" rx="11" ry="3.0" fill="url(#poolFill)"/>
+        <circle cx="264" cy="680" r="1.6" fill="#FFFFFF"/><circle cx="296" cy="681" r="1.4" fill="#FFFFFF"/>
+        <circle cx="272" cy="689" r="1.1" fill="#FFFFFF"/><circle cx="291" cy="690" r="1.0" fill="#FFFFFF"/></g>
+    </svg>
+  </div>
+
+  <div class="result" id="result"></div>
+
+  <div class="controls">
+    <div class="inrow">
+      <div class="field">
+        <input id="draft" maxlength="24" placeholder="Name a choice…">
+        <span class="count" id="count">0/6</span>
+      </div>
+      <button class="add" id="add">Add</button>
+    </div>
+    <button class="spin" id="spin">Spin</button>
+    <div class="metarow">
+      <button class="reset" id="reset">↺ Reset</button>
+      <button class="reset" id="ceremonyToggle" type="button" role="switch" aria-checked="true">Ceremony · On</button>
+      <button class="reset" id="saturnToggle" type="button" role="switch" aria-checked="true">Ring · Saturn</button>
+    </div>
+    <div class="opts" id="optsWrap" hidden><h4 id="optsHead">Options</h4><div id="opts"></div></div>
+  </div>
+
+<script>
+(function(){
+  "use strict";
+  // ---- config ----
+  var MAX = 8;
+  var DISC_S = 480;          // canvas logical size (css px)
+  var R_OUTER = 234;         // outer edge reference
+  var R_WEDGE = R_OUTER - 2; // wedges fill to the edge — no frame, a hair of dark rim
+  var HUB_R = 30;            // center axle-cap radius
+  // deep jewel set — obsidian · citrine gold · carnelian · garnet · deep teal glass · emerald ·
+  // sapphire · amethyst (ADD ORDER, black first). The last two complete the circle of hues so eight
+  // wedges never repeat a colour: the set now runs neutral → gold → orange → red → teal → green →
+  // blue → violet, and no two neighbours share a family, including across the 8→1 wrap.
+  var JEWEL = ['#0b0b0d','#8a6a16','#8f4212','#6e1020','#0e5150','#10502e','#153a66','#43204f'];
+  // the single white token — dark ink is invisible on deep jewel/black. Now lives in .np-t{color}.
+  var GRAIN = 0.04;          // glass wants ~no tooth; a whisper only to dither the gradients; 0 = dead-flat
+
+  // ---- spin feel (rAF free-coast + crisp precise-landing settle) ----
+  // The feel is the coast/brake SPLIT, not the length: ~90% near-constant free coast
+  // ("could spin all day"), then a short ~10% decisive brake that DROPS it into place.
+  var SPIN_MS    = 3200;   // total spin time — long enough that the fast coast reads "all day", not a crawl
+  var FREE_END   = 0.90;   // pA — near-constant coast ends / landing brake begins (last ~10% ≈ 320ms = the drop)
+  var FREE_DIST  = 0.95;   // fL — distance covered by end of coast (brake covers only ~5% → a tad, precise)
+  var DROOP      = 0.05;   // k  — gentle coast velocity sag so it reads as a real coasting wheel (0 = dead-flat)
+  var DETENT_DEG = 1.6;    // tiny compass-needle settle at the very instant of landing (0 = pure crisp stop)
+
+  // ---- draw-length selector (swaps only ms + turn-count fed to the UNCHANGED normalized curve) ----
+  var DRAW       = 'normal';                                  // 'quick' | 'normal' | 'long'
+  var DRAW_MS    = { quick:2600, normal:SPIN_MS, long:4400 }; // 'normal' === current SPIN_MS
+  var DRAW_TURNS = { quick:[6,3], normal:[8,4], long:[12,5] };// [base, randSpan]; 'normal' === 8+floor(rand*4)
+
+  // ---- state ---- (unchanged functional model + ceremony reveal-deferral fields)
+  var state = { options: [], draft: '', preview: null, spinning: false, result: null, winner: null, revealPending: false };
+  var rot = 0, sig = null;
+  var justRevealed = false;      // one-shot: the name's arrive flag (set/cleared inside commitReveal; kept for interrupt symmetry)
+  var spunSinceEdit = 0;         // arc auto-decay: 0 => FULL arc on the first spin of a set, else LEAN (reset by add/remove/reset)
+  function busy(){ return state.spinning || state.revealPending; }
+
+  var canvas = document.getElementById('wheel');
+  var dpr = Math.min(window.devicePixelRatio || 1, 2);
+  var wctx = canvas.getContext('2d');   // shared 2d ctx (same object draw() gets)
+  // structural-ink overlay canvas (the black seams re-asserted OVER the drifting saturn band)
+  var inkCanvas = document.getElementById('wheelInk');
+  var ictx = inkCanvas ? inkCanvas.getContext('2d') : null;
+  // keep the ink layer locked to #wheel's transform. mirrorInk is already THE "the wheel's angle just
+  // changed" broadcast — every call site passes exactly 'rotate(<deg>deg)' — so the nameplates hang off
+  // it too and inherit the sacred curve's frame timing for free. Nothing else needs to know a spin exists.
+  function mirrorInk(t){
+    if (inkCanvas) inkCanvas.style.transform = t;
+    if (plateLayer){ var a=parseFloat(t.slice(7)); syncPlates(isFinite(a)?a:0); }
+  }
+
+  // ---- deterministic RNG (stable texture per redraw) ----
+  function hash(str){ var h=7; for(var i=0;i<str.length;i++) h=(Math.imul(h,31)+str.charCodeAt(i))|0; return h>>>0; }
+  function rng(seed){ var s=seed>>>0; return function(){ s=(s+0x6D2B79F5)|0; var t=Math.imul(s^(s>>>15),1|s); t=(t+Math.imul(t^(t>>>7),61|t))^t; return ((t^(t>>>14))>>>0)/4294967296; }; }
+
+  // wedge colour is fixed by the slot it will occupy (add order) — deterministic, no random hue
+  function paletteColor(i){ return { hue: i, color: JEWEL[i % JEWEL.length] }; }
+
+  function segments(){
+    if (state.options.length) return state.options.map(function(o){ return {color:o.color, text:o.text}; });
+    var d = (state.draft||'').trim();
+    if (d && state.preview) return [{ color: state.preview.color, text: Array.from(d).slice(0,18).join('') }];   // surrogate-safe
+    return [{ color: JEWEL[0], text: '' }];   // empty state = the single obsidian orb (n=1)
+  }
+
+  // ================= clean matte-paint texture (a whisper of even tooth) =================
+  // one shared, position-seeded pass — a sparse BALANCED neutral fleck field (half faint-white,
+  // half faint-black) so it reads as one continuous matte surface with zero net darkening and no brown.
+
+  function clipAnnulus(ctx,cx,cy,rIn,rOut){
+    ctx.beginPath();
+    ctx.arc(cx,cy,rOut,0,Math.PI*2,false);
+    if (rIn>0.5) ctx.arc(cx,cy,rIn,0,Math.PI*2,true);
+    ctx.closePath();
+    ctx.clip();
+  }
+  function drawChipPoly(ctx,x,y,sz,rnd){
+    var verts=3+Math.floor(rnd()*3);
+    ctx.beginPath();
+    for (var i=0;i<verts;i++){
+      var a=(i/verts)*Math.PI*2+rnd()*0.6;
+      var rr=sz*(0.5+rnd()*0.9);
+      var px=x+Math.cos(a)*rr, py=y+Math.sin(a)*rr;
+      if (i===0) ctx.moveTo(px,py); else ctx.lineTo(px,py);
+    }
+    ctx.closePath(); ctx.fill();
+  }
+  // rIn/rOut define an annulus (rIn=0 -> a full disc). seed is a FIXED constant so the field is stable.
+  function weather(ctx,cx,cy,rIn,rOut,seed,o){
+    o = o || {};
+    if (GRAIN<=0) return;                    // dead-flat option
+    var rnd = rng(seed);
+    ctx.save();
+    clipAnnulus(ctx,cx,cy,rIn,rOut);
+    var span = rOut-rIn;
+    var flecks = Math.round(span*GRAIN);     // ~32 total — a whisper (was ~300 dark specks)
+    for (var f=0; f<flecks; f++){
+      var ang = rnd()*Math.PI*2, rad = rIn+span*rnd();
+      var x = cx+Math.cos(ang)*rad, y = cy+Math.sin(ang)*rad, sz = 0.5+rnd()*0.7;
+      // BALANCED neutral: half faint-white, half faint-black -> no net darkening, no brown
+      ctx.fillStyle = rnd()<0.5 ? 'rgba(255,255,255,0.035)' : 'rgba(0,0,0,0.035)';
+      drawChipPoly(ctx,x,y,sz,rnd);
+    }
+    ctx.restore();
+  }
+
+  function drawHub(ctx,cx,cy,r){
+    var halo = ctx.createRadialGradient(cx,cy,r*0.6,cx,cy,r*1.8);
+    halo.addColorStop(0,'rgba(0,0,0,0.35)'); halo.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.fillStyle=halo; ctx.beginPath(); ctx.arc(cx,cy,r*1.8,0,Math.PI*2); ctx.fill();
+
+    ctx.save(); ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.clip();
+    var g = ctx.createRadialGradient(cx-r*0.3,cy-r*0.35,r*0.1,cx,cy,r*1.15);
+    g.addColorStop(0,'#eda058'); g.addColorStop(0.5,'#d2691e'); g.addColorStop(1,'#93481a');
+    ctx.fillStyle=g; ctx.fillRect(cx-r,cy-r,r*2,r*2);
+    ctx.restore();
+    weather(ctx,cx,cy,0,r,0x4B03C7,{});
+    ctx.beginPath(); ctx.arc(cx,cy,r-1,0,Math.PI*2);
+    ctx.lineWidth=2; ctx.strokeStyle='rgba(32,15,6,0.75)'; ctx.stroke();
+  }
+
+  // ======================================================================
+  // ============  THE NAMEPLATE RING  (replaces canvas drawText)  =========
+  //   Option names are horizontal DOM plates orbiting a lane just inside the
+  //   silver band. They are NOT painted on the wheel: glyphs rasterise upright
+  //   at every angle, which canvas-baked rotated text can never do.
+  //
+  //   HONEST NOTE ON THE BRIEF: horizontal text cannot live IN the astrolabe
+  //   band. A level word orbiting at the band's radius sweeps a ring twice its
+  //   own diagonal wide; to fit inside the 36px channel a name could be about
+  //   3.6 characters. So the names take the lane just inside the ring, and the
+  //   silver band becomes the FRAME around them.
+  // ======================================================================
+  // THE LABEL LANE SCALES WITH THE WEDGE COUNT. Two things bind it: the SEAM (a plate must not cross
+  // into its neighbour's wedge) and, from 7 wedges up, the TOP CHORD (the wedge is simply narrower
+  // than the plate at that radius). Ship the law, not a constant:
+  //     R     = RING_R_IN / (1 + sin(180/n))          the radius where those two are balanced
+  //     seam  = (R·sin(180/n) − 3) / 0.476            0.476 = the wash contour / box-width ratio
+  //     chord = 2·(R − 21)·tan(180/n)                 21 = a two-line plate's half-height
+  // n ≤ 6 keeps the measured 110/106/96 (those numbers were tuned against real failing names and
+  // beat the formula slightly); n = 7 and 8 take min(seam, chord) with a 6px safety trim.
+  var LBL_R = 110;              // orbital radius of each plate centre — recomputed per wedge count
+  function lblGeom(n){
+    if (n<=1) return {R:110, maxW:180, box:168};        // a pinned plate never orbits: no swept envelope
+    if (n<=6) return {R:110, maxW:106, box:96};
+    var half=Math.PI/n, R=RING_R_IN/(1+Math.sin(half));
+    var seam=(R*Math.sin(half)-3)/0.476, chord=2*(R-17)*Math.tan(half);
+    var maxW=Math.floor(Math.min(seam,chord))-6;
+    return {R:Math.round(R), maxW:maxW, box:maxW-10};   // −10 = the 5px horizontal padding, both sides
+  }
+  var LBL_MAX_FS = 21, LBL_SPREAD = 5, LBL_FS_MIN_PX = 9.5;
+  // Preference ladder: never drop below 18px merely to avoid a second line; below 18 prefer fewer
+  // lines at the same size. Two lines are legal only while 2·fs·1.14 + 4 <= 45  ⇒  fs <= 18.
+  var LBL_ORDER = [[1,21],[1,20],[1,19],[1,18],[2,18],[1,17],[2,17],[1,16],[2,16],
+                   [1,15],[2,15],[1,14],[2,14],[1,13],[2,13],[1,12],[2,12],[1,11],[2,11]];
+  var PLATE_OP_TR = 'opacity 260ms cubic-bezier(.2,.7,.2,1)';
+  var mctx = document.createElement('canvas').getContext('2d');   // dedicated measurer, never touches wctx
+  var SIGIL_RE = null;   // built defensively: \p{...} is a SyntaxError on older engines, and a literal would kill the file
+  try { SIGIL_RE = new RegExp('^\\p{Extended_Pictographic}+$','u'); } catch(e){ SIGIL_RE = null; }
+
+  function gl(s){ return Array.from(s).length; }                    // surrogate-safe character count
+  function isSigil(s){ return !!SIGIL_RE && gl(s)<=2 && SIGIL_RE.test(s); }
+  function lblFont(fs){ return '600 '+fs+'px Inter, system-ui, sans-serif'; }
+  function lblLS(fs){ return fs>=17 ? 0.012 : 0.022; }              // em — measureText ignores CSS letter-spacing
+  function measW(s,fs){ mctx.font=lblFont(fs);
+    return mctx.measureText(s).width + lblLS(fs)*fs*Math.max(0, gl(s)-1); }
+  // balanced split, not a greedy wrap: minimise the WIDER half
+  function bestSplit(s,fs){
+    var idx=[], i; for (i=1;i<s.length;i++) if (/[\s\-\/·—]/.test(s[i-1])) idx.push(i);
+    if (!idx.length) return null;
+    var best=null, bw=Infinity;
+    idx.forEach(function(k){
+      var a=s.slice(0,k).trim(), b=s.slice(k).trim(); if(!a||!b) return;
+      var w=Math.max(measW(a,fs), measW(b,fs));
+      if (w<bw){ bw=w; best=[a,b,w]; }
+    });
+    return best;
+  }
+  function widthAt(s,fs,lines){
+    if (lines===1) return measW(s,fs);
+    var sp=bestSplit(s,fs); if (sp) return sp[2];
+    return measW(s,fs)*0.53;            // unbreakable ⇒ CSS breaks anywhere: half + a 6% break penalty
+  }
+  // At 7–8 wedges the box gets narrow enough that a long name can beat every rung. Left to CSS,
+  // overflow-wrap:anywhere snaps it mid-word — "Absolutel / y…" — which reads as a bug. Drop whole
+  // trailing WORDS instead until the remainder fits, and mark the cut. A clean "Absolutely not…"
+  // beats a broken word every time; the full name is always intact in the options list below.
+  function fitOrTrim(s,fs,BOX){
+    var sp = bestSplit(s,fs);
+    if (sp && sp[2] <= BOX) return sp[0]+'\n'+sp[1];
+    if (measW(s,fs) <= BOX) return s;
+    var w = s.split(/\s+/);
+    while (w.length > 1){
+      w.pop();
+      var t = w.join(' ')+'…', s2 = bestSplit(t,fs);
+      if (s2 && s2[2] <= BOX) return s2[0]+'\n'+s2[1];
+      if (measW(t,fs) <= BOX) return t;
+    }
+    return s;                                  // one unbreakable word: CSS + line-clamp handle it
+  }
+  function rungFor(s,BOX,floor){
+    for (var c=0;c<LBL_ORDER.length;c++){ var L=LBL_ORDER[c][0], fs=LBL_ORDER[c][1];
+      if (fs<floor) continue;
+      if (widthAt(s,fs,L)<=BOX) return {fs:fs, lines:L}; }
+    return {fs:floor, lines:2};
+  }
+  // PER-LABEL rung with a BOUNDED spread. One size for the whole set makes "Yes / No / Call her back
+  // tonight" render Yes and No at 14px for no reason; unbounded per-label sizes read as a ransom note.
+  // 5px of difference on one dial reads as hierarchy.
+  function fitSet(texts,BOX,floor){
+    var per = texts.map(function(s){
+      if (!s) return {fs:LBL_MAX_FS, lines:1, vote:false};
+      if (isSigil(s)) return {fs:26, lines:1, vote:false, sigil:true};   // a chosen mark, not a shrunken glyph
+      var r = rungFor(s,BOX,floor); r.vote = true; return r;
+    });
+    var votes=[]; per.forEach(function(p){ if (p.vote) votes.push(p.fs); });
+    votes.sort(function(a,b){ return a-b; });
+    var worst = votes.length ? votes[0] : LBL_MAX_FS;
+    var second = votes.length>1 ? votes[1] : worst;
+    var base = Math.min(LBL_MAX_FS, second, worst+LBL_SPREAD);
+    return texts.map(function(s,i){
+      if (!s) return {fs:base, txt:''};
+      if (per[i].sigil) return {fs:26, txt:s};
+      var fs = Math.min(base, per[i].fs);
+      return {fs:fs, txt: fitOrTrim(s,fs,BOX)};   // the LAST RESORT still breaks at a word boundary
+    });
+  }
+
+  var plateLayer=null, plates=[], plateK=1, plateTrans=null, psig=null, pLastW=0;
+  function angNorm(a){ a%=360; if(a>180)a-=360; if(a<-180)a+=360; return a; }
+  function plateOpacity(d, revealed, isWin){
+    var t = 0.5 + 0.5*Math.cos(d*Math.PI/180);      // 1 at the arrow's spot … 0 at the bottom
+    var rest = 0.42 + 0.58*Math.pow(t,2.2);
+    if (!revealed) return rest;
+    return isWin ? 1 : 0.26;                        // 0.18 measured as "erased"; 0.26 reads as retired
+  }
+  // ---- the motion fade: names blur out at speed and CONDENSE back as the wheel plants ----
+  // Velocity-driven, not state-driven: the ramp occupies the brake's own last ~85ms, so the rest
+  // gradient and .is-top land AT the lock rather than 260ms after the reveal.
+  var pv={a:null,t:0,w:0}, pWatch=0, pWasSpinning=false;
+  function pOmega(W, now){
+    if (pv.a===null){ pv.a=W; pv.t=now; return 0; }
+    var dt = now-pv.t; if (dt<=0) return pv.w;
+    var w = Math.abs(W-pv.a)/dt; pv.a=W; pv.t=now;
+    pv.w = pv.w*0.4 + w*0.6;                        // 1-pole smooth: kills the single-frame spike at the lock
+    return pv.w;
+  }
+  function pOpacity(w){                             // 0.065 deg/ms ≈ 2px/frame at r=110; 0.33 ≈ 10px/frame
+    if (w<=0.065) return 1;
+    if (w>=0.33)  return 0.06;
+    return 1 - 0.94*(w-0.065)/0.265;
+  }
+  function pSettle(){
+    pWatch = 0; if (!plateLayer) return;
+    var op = pOpacity(pOmega(pLastW, performance.now()));
+    plateLayer.style.opacity = op.toFixed(3);
+    if (op<1) pWatch = requestAnimationFrame(pSettle); else paintPlateRest();
+  }
+  function paintPlateRest(){
+    var n=plates.length; if(!n) return;
+    var seg=360/n, revealed=(!busy() && state.winner!=null), i;
+    for (i=0;i<n;i++){
+      var p=plates[i], d=Math.abs(angNorm(pLastW+i*seg));
+      p.t.style.opacity = plateOpacity(d, revealed, i===state.winner).toFixed(3);
+      var top = (n===1) || (d <= seg/2 + 1e-6);     // <=, not <: an exact half-segment landing is reachable
+      if (top!==p.top){ p.top=top; p.t.classList.toggle('is-top', top); }
+    }
+  }
+  // THE PER-FRAME DRIVER. Driven from mirrorInk — the same style flush as the canvas transform — so
+  // the names advance on the identical frame as the wedges they sit on. n translate writes, no layout,
+  // no paint, no measureText, and (by construction, see the CSS note) nothing that can tumble.
+  function syncPlates(W){
+    if (!plateLayer) return;
+    var n=plates.length; if (!n) return;
+    var Weff = (n===1 ? 0 : W);                     // a lone plate is pinned under the arrow
+    var tr = canvas.style.transition, i;
+    if (tr !== plateTrans){                         // guarded ⇒ ~3 writes per spin, not per frame
+      plateTrans = tr;
+      var real = !!(tr && tr!=='none');
+      for (i=0;i<n;i++) plates[i].t.style.transition = real ? (tr+', '+PLATE_OP_TR) : '';
+      if (real) void plateLayer.offsetWidth;        // start the mirrored transition from the CURRENT place
+    }
+    var seg=360/n, RAD=Math.PI/180;
+    for (i=0;i<n;i++){
+      var a=(Weff+i*seg)*RAD;
+      plates[i].t.style.transform = 'translate(-50%,-50%) translate('+
+        (LBL_R*Math.sin(a)).toFixed(2)+'px,'+(-LBL_R*Math.cos(a)).toFixed(2)+'px)';
+    }
+    pLastW = Weff;
+    if (state.spinning && !pWasSpinning){ pv.a=null; pv.w=0; }   // fresh velocity estimate per spin
+    pWasSpinning = state.spinning;
+    if (state.spinning){
+      var op = pOpacity(pOmega(Weff, performance.now()));
+      plateLayer.style.opacity = op.toFixed(3);
+      if (op<1 && !pWatch) pWatch = requestAnimationFrame(pSettle);
+      return;                                       // MOVING: transforms + one layer opacity, nothing else
+    }
+    if (!pWatch){ plateLayer.style.opacity='1'; paintPlateRest(); }
+  }
+  function buildPlates(){
+    if (!plateLayer) return;
+    var segs=segments(), n=segs.length;
+    var geom = lblGeom(n); LBL_R = geom.R;
+    var nsig = segs.map(function(s){return s.text;}).join('')+'#'+n+'#'+plateK.toFixed(4);
+    if (nsig===psig) return; psig=nsig;
+    // never smaller than 9.5 REAL px on screen. 7–8 wedges get 2 more rungs: at that width a single
+    // 10-letter word cannot fit at 13px, and the bounded spread means only the offending label takes
+    // the smaller size — its neighbours stay where they are.
+    var fsFloor = Math.max(n>=7?11:13, Math.ceil(LBL_FS_MIN_PX/plateK));
+    var fit = fitSet(segs.map(function(s){ return s.text||''; }), geom.box, fsFloor);
+    var k;
+    if (plates.length!==n){                         // rebuild the DOM only when the COUNT changes —
+      plateLayer.innerHTML=''; plates=[];           // otherwise typing re-promotes six layers per keystroke
+      for (k=0;k<n;k++){
+        var t=document.createElement('span'); t.className='np-t';
+        t.setAttribute('dir','auto');               // mixed Latin/RTL names order wrongly without it
+        plateLayer.appendChild(t);
+        plates.push({t:t, top:false, txt:null, fs:0});
+      }
+      plateTrans=null;
+    }
+    for (k=0;k<n;k++){
+      var p=plates[k], f=fit[k];
+      if (p.txt!==f.txt){ p.txt=f.txt; p.t.textContent=f.txt; p.t.style.display = f.txt ? '' : 'none'; }
+      if (p.fs!==f.fs){ p.fs=f.fs; p.t.style.fontSize=f.fs+'px'; p.t.style.letterSpacing=lblLS(f.fs)+'em'; }
+      p.t.style.maxWidth = geom.maxW+'px';
+    }
+    plateLayer.style.transform = 'translate(-50%,-50%) scale('+plateK+')';   // the layer only ever SCALES
+    syncPlates(rot);
+  }
+  function syncPlateVerdict(){
+    if(!plateLayer) return;
+    plateLayer.style.opacity='1';                   // un-strands the add/remove hide on every canonical resting frame
+    var revealed = (!busy() && state.winner!=null);
+    plateLayer.classList.toggle('is-revealed', revealed);
+    for(var i=0;i<plates.length;i++) plates[i].t.classList.toggle('is-win', revealed && i===state.winner);
+    paintPlateRest();
+  }
+
+  // ---- shared obsidian glass light rig (fixed in disc-space; caller supplies the clip) ----
+  // screen-composited light lifts each jewel base a fixed amount (never blows to white, hue kept);
+  // computed disc-space + only CLIPPED per wedge -> six hues share one dome/rim = one lacquered sphere.
+  // PERF BAKE: dome+belly+rim are pre-rendered once (ensureGloss, screen-blit) and the vignette once
+  // (ensureVig, source-over blit). Geometry is fixed at R_WEDGE / cx=cy=DISC_S/2, so both call sites
+  // (draw + drawTransition, both pass R_WEDGE) reproduce the live geometry exactly; passed cx/cy/R unused.
+  function glassRig(ctx, cx, cy, R){
+    ctx.save();
+    ctx.globalCompositeOperation = 'screen';
+    ctx.drawImage(ensureGloss(), 0,0, DISC_S, DISC_S);
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.drawImage(ensureVig(), 0,0, DISC_S, DISC_S);
+    ctx.restore();
+  }
+
+  // ---- structural-ink pass: redraw ONLY the black radial seams, clipped to the saturn band, onto #wheelInk.
+  //      #wheelInk sits ABOVE the drifting inlay ring, so these dark lines cross OVER it (ring reads embedded).
+  //      angs = seam start-angles in RADIANS (disc-space); n<=1 => no seams (single wedge / empty orb) => clear.
+  //      The ink layer carries the wheel's rotation via a mirrored CSS transform, so drawing in disc-space here
+  //      keeps every seam locked to its #wheel twin regardless of spin. Additive: never touches the winner render. ----
+  var inkSig = null;   // memo: the seam set only changes when the wedge angles do — see below
+  function drawInkSeams(angs, n){
+    if (!ictx) return;
+    // The seat frame is the busiest frame in the page. This raster used to re-run on every draw()
+    // even when the seams were identical; the signature check halves that frame's texture upload.
+    var isig = n+'|'+(angs?angs.join(','):'-');
+    if (isig===inkSig && inkCanvas.width===DISC_S*dpr) return;
+    inkSig = isig;
+    if (inkCanvas.width !== DISC_S*dpr){ inkCanvas.width=DISC_S*dpr; inkCanvas.height=DISC_S*dpr; }
+    ictx.setTransform(dpr,0,0,dpr,0,0);
+    ictx.clearRect(0,0,DISC_S,DISC_S);
+    if (!angs || n<=1) return;                     // seams exist only when >1 wedge
+    var cx=DISC_S/2, cy=DISC_S/2;
+    ictx.save();
+    // clip to the saturn annulus (a hair beyond the rails) so ink only re-asserts seams where they cross the ring
+    ictx.beginPath();
+    ictx.arc(cx,cy,RING_R_OUT+10,0,Math.PI*2,false);   // +10/-10, not +3/-3: room for the feathered ends
+    ictx.arc(cx,cy,RING_R_IN-10, 0,Math.PI*2,true);
+    ictx.clip('evenodd');
+    angs.forEach(function(a0){
+      var dx=Math.cos(a0), dy=Math.sin(a0);
+      var r0=RING_R_IN-10, r1=RING_R_OUT+10;
+      // 0.45, not 0.6: the wheel canvas ALREADY laid this exact seam at 0.6 underneath. 0.6-over-0.6
+      // composites to 0.84 and the seam visibly FATTENS where it crosses the band. And the stroke is
+      // now a gradient with transparent ends, so it dissolves into the wedge field instead of
+      // hard-cutting at the clip radius and leaving four floating stub-ends per seam.
+      var lg=ictx.createLinearGradient(cx+dx*r0, cy+dy*r0, cx+dx*r1, cy+dy*r1);
+      lg.addColorStop(0.00,'rgba(0,0,0,0)');
+      lg.addColorStop(0.18,'rgba(0,0,0,0.45)');
+      lg.addColorStop(0.82,'rgba(0,0,0,0.45)');
+      lg.addColorStop(1.00,'rgba(0,0,0,0)');
+      ictx.strokeStyle=lg; ictx.lineWidth=2.5;
+      ictx.beginPath(); ictx.moveTo(cx+dx*r0,cy+dy*r0); ictx.lineTo(cx+dx*r1,cy+dy*r1); ictx.stroke();
+      // the CUT EDGE — where the structural seam severs the inlay. Cooled to match the new silver.
+      var ox=-dy*1.3, oy=dx*1.3;
+      var lg2=ictx.createLinearGradient(cx+dx*r0+ox, cy+dy*r0+oy, cx+dx*r1+ox, cy+dy*r1+oy);
+      lg2.addColorStop(0.00,'rgba(212,226,242,0)');
+      lg2.addColorStop(0.22,'rgba(212,226,242,0.11)');
+      lg2.addColorStop(0.78,'rgba(212,226,242,0.11)');
+      lg2.addColorStop(1.00,'rgba(212,226,242,0)');
+      ictx.strokeStyle=lg2; ictx.lineWidth=1;
+      ictx.beginPath(); ictx.moveTo(cx+dx*r0+ox,cy+dy*r0+oy); ictx.lineTo(cx+dx*r1+ox,cy+dy*r1+oy); ictx.stroke();
+    });
+    ictx.restore();
+  }
+
+  // ---- wheel rendering ---- (the resting frame is always this)
+  function draw(){
+    buildPlates(); syncPlateVerdict();     // both self-guard; both must run BEFORE the sig early-out below
+    var segs = segments();
+    var winner = (!busy() && state.winner!=null) ? state.winner : null;   // verdict withheld while spinning OR revealPending
+    var nsig = segs.map(function(s){return s.color+'|'+s.text;}).join(';')+'#w'+(winner==null?'-':winner);
+    if (nsig===sig) return; sig=nsig;
+
+    if (canvas.width!==DISC_S*dpr){ canvas.width=DISC_S*dpr; canvas.height=DISC_S*dpr; }   // realloc backing store only when size changes (skips per-keystroke reallocs)
+    var ctx = canvas.getContext('2d');
+    ctx.setTransform(dpr,0,0,dpr,0,0); ctx.clearRect(0,0,DISC_S,DISC_S);
+    var cx=DISC_S/2, cy=DISC_S/2, R=R_WEDGE, n=segs.length, segDeg=360/n;
+
+    var wedges = segs.map(function(s,k){
+      var mid=(-90+k*segDeg)*Math.PI/180, half=Math.PI/n;
+      return {color:s.color, text:s.text, mid:mid, a0:mid-half, a1:mid+half};
+    });
+
+    // 1) flat matte base fills — no per-wedge sheen/gradient
+    wedges.forEach(function(w){
+      ctx.save(); ctx.beginPath();
+      if (n===1) ctx.arc(cx,cy,R,0,Math.PI*2);
+      else { ctx.moveTo(cx,cy); ctx.arc(cx,cy,R,w.a0,w.a1); ctx.closePath(); }
+      ctx.clip();
+      ctx.fillStyle=w.color; ctx.fillRect(cx-R,cy-R,R*2,R*2);
+      ctx.restore();
+    });
+
+    // 2) ONE shared texture — BLIT the baked whisper-grain (same field the transitions use = rock-stable, no flicker)
+    ctx.save();
+    ctx.beginPath(); ctx.arc(cx,cy,R,0,Math.PI*2); ctx.clip();
+    ctx.drawImage(ensureTexture(), 0,0, DISC_S, DISC_S);
+    ctx.restore();
+
+    // 2b) obsidian glass light rig — shared, disc-wide (this is what makes it read as glass)
+    ctx.save();
+    ctx.beginPath(); ctx.arc(cx,cy,R,0,Math.PI*2); ctx.clip();
+    glassRig(ctx, cx, cy, R);
+    ctx.restore();
+
+    // 2c) shelf + channel floor — the nameplate bed + the groove the band sits in. AFTER glassRig
+    //     (so the dome light doesn't re-lift it) and BEFORE winner-dim/seams (so labels sit on it).
+    ctx.save();
+    ctx.beginPath(); ctx.arc(cx,cy,R,0,Math.PI*2); ctx.clip();
+    ctx.drawImage(ensureShelf(), 0,0, DISC_S, DISC_S);
+    ctx.restore();
+
+    // 3) winner dim / highlight — the WINNER keeps its full bright colour (no dark tint), losers dim
+    if (winner!=null){
+      wedges.forEach(function(w,k){
+        ctx.save(); ctx.beginPath();
+        if (n===1) ctx.arc(cx,cy,R,0,Math.PI*2);
+        else { ctx.moveTo(cx,cy); ctx.arc(cx,cy,R,w.a0,w.a1); ctx.closePath(); }
+        ctx.clip();
+        ctx.fillStyle=(k===winner)?'rgba(0,0,0,0)':'rgba(2,2,4,0.48)';
+        ctx.fillRect(cx-R,cy-R,R*2,R*2);
+        ctx.restore();
+      });
+    }
+
+    // 4) seams — dark groove + a faint warm sliver, never a bright hairline
+    if (n!==1){
+      wedges.forEach(function(w){
+        var dx=Math.cos(w.a0), dy=Math.sin(w.a0);
+        ctx.strokeStyle='rgba(0,0,0,0.6)'; ctx.lineWidth=2.5;
+        ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(cx+dx*R,cy+dy*R); ctx.stroke();
+        var ox=-dy*1.3, oy=dx*1.3;
+        ctx.strokeStyle='rgba(210,214,222,0.09)'; ctx.lineWidth=1;
+        ctx.beginPath(); ctx.moveTo(cx+ox,cy+oy); ctx.lineTo(cx+dx*R+ox,cy+dy*R+oy); ctx.stroke();
+      });
+    }
+
+    // (option names are no longer painted here — they are the horizontal .nameplates ring above)
+
+    // 6) thin dark edge seating the painted disc on black; hub (suppressed on the clean empty orb)
+    ctx.save(); ctx.beginPath(); ctx.arc(cx,cy,R-1,0,Math.PI*2); ctx.lineWidth=2.5; ctx.strokeStyle='rgba(18,11,5,0.85)'; ctx.stroke(); ctx.restore();
+    // 5) winner wedge outline — warm gold, painted ON TOP of the dark seating ring so an obsidian winner's rim stays lit
+    if (winner!=null && n>1){
+      var ww=wedges[winner];
+      ctx.beginPath(); ctx.moveTo(cx,cy); ctx.arc(cx,cy,R-1,ww.a0,ww.a1); ctx.closePath();
+      ctx.strokeStyle='rgba(255,206,132,0.7)'; ctx.lineWidth=2.5; ctx.stroke();
+    }
+    var isEmptyOrb = (n===1 && !segs[0].text);
+    /* the brass axle-cap is GONE: the compass needle assembly replaces it, and it lives on its own
+       layer because a needle that spun with the wedges would be pointing at nothing. */
+    void isEmptyOrb;
+
+    // structural-ink: re-assert the black seams OVER the drifting saturn band (cleared when n<=1)
+    drawInkSeams(wedges.map(function(w){ return w.a0; }), n);
+  }
+
+  // ======================================================================
+  // ============  ADD / REMOVE PHYSICS  (kept verbatim)  ==================
+  //   Optimization-forward: rAF only during a transition; whisper texture
+  //   baked ONCE and blitted; spin is rAF over the transform only.
+  // ======================================================================
+
+  // ---- tuning knobs ----
+  var DUR_POP   = 360;   // ms — re-partition pop (adds 1->2 .. 5->6); 7 held steps -> ~51ms/step
+  var DUR_FIRST = 240;   // ms — first add (single-wedge confirm punch)
+  var DUR_REMOVE= 520;   // was 560 — a continuous eased curve reads faster at equal ms; real snap-up
+  var VANISH_FRAC = 0.24;// was 0.28 — beat A ≈ 125ms; trim comes out of the dissolve, reflow keeps ~395ms
+  var OVERSHOOT = 0.11;  // was 0.15 — softer back-out; survivors glide closed, still alive not floaty
+
+  // SMOOTH POP — one continuous eased-back scalar for the re-partition (was 7 held jump-cut waypoints).
+  // Front-loaded grow from a visible click-tick chunk (POP_BASE, no dead first frame) to a tiny gentle
+  // overshoot, then eases home to exactly 1. easeOutBack shape: fast rise, small bounce, settle.
+  var POP_BASE = 0.30, POP_C1 = 1.4, POP_C3 = POP_C1 + 1;   // C1 tunes overshoot; ~1.4 => peak s ≈ 1.05
+  function popS(p){
+    if (p <= 0) return POP_BASE;      // synchronous click-tick paint shows a real chunk, never s=0
+    if (p >= 1) return 1;             // exact final share; loop finalizes to draw() at p>=1 anyway
+    var u = p - 1;                    // easeOutBack(p) = 1 + C3*u^3 + C1*u^2
+    var eb = 1 + POP_C3*u*u*u + POP_C1*u*u;
+    return POP_BASE + (1 - POP_BASE) * eb;
+  }
+  // back-out settle — the shared "gravity into place" curve (overshoot then damp); SMOOTH by design (the remove reflow)
+  function settle(p,s){ var u=p-1; return 1+(s+1)*u*u*u+s*u*u; }
+  // smooth vanish — eased S radius collapse + a quadratic alpha dissolve (the removed wedge fades as it shrinks)
+  function easeInOutCubic(t){ return t<0.5 ? 4*t*t*t : 1-Math.pow(-2*t+2,3)/2; }
+  function vanishRadius(pA){ return 1 - easeInOutCubic(Math.min(1,pA)); }        // smooth S collapse 1->0
+  function vanishAlpha(pA){ var t = Math.min(1, pA/0.75); return (1-t)*(1-t); }  // fade to 0 by 75% of beat A
+  function prefersReduced(){ return !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches); }
+
+  var anim = null;     // active wheel transition, or null (idle)
+  var rafId = 0;
+
+  // ---- memoized whisper texture (baked ONCE, blitted every frame) ----
+  var texCanvas = null;
+  function ensureTexture(){
+    if (texCanvas) return texCanvas;
+    texCanvas = document.createElement('canvas');
+    texCanvas.width = DISC_S*dpr; texCanvas.height = DISC_S*dpr;
+    var tctx = texCanvas.getContext('2d');
+    tctx.setTransform(dpr,0,0,dpr,0,0);
+    weather(tctx, DISC_S/2, DISC_S/2, 0, R_WEDGE, 0x5EED09, {});
+    return texCanvas;
+  }
+
+  // ---- perf-baked light layers (dome+belly+rim / vignette / hub) — geometry-fixed, blitted every frame ----
+  var glossCanvas = null, vigCanvas = null, hubCanvas = null;
+  function makeDiscCanvas(){
+    var c = document.createElement('canvas');
+    c.width = DISC_S*dpr; c.height = DISC_S*dpr;
+    var g = c.getContext('2d'); g.setTransform(dpr,0,0,dpr,0,0);   // same recipe as ensureTexture
+    return c;                                                       // drawImage(c,0,0,DISC_S,DISC_S) maps 1:1
+  }
+  // dome + belly + rim, baked source-over onto transparent (caller blits with 'screen')
+  function ensureGloss(){
+    if (glossCanvas) return glossCanvas;
+    glossCanvas = makeDiscCanvas();
+    var g = glossCanvas.getContext('2d'), cx = DISC_S/2, cy = DISC_S/2, R = R_WEDGE;
+    // A) dome sheen (verbatim stops)
+    var dome = g.createRadialGradient(216,136,0, 216,136,R*1.05);
+    dome.addColorStop(0.00,'rgba(60,60,64,0.55)'); dome.addColorStop(0.12,'rgba(60,60,64,0.40)');
+    dome.addColorStop(0.30,'rgba(60,60,64,0.18)'); dome.addColorStop(0.60,'rgba(60,60,64,0.05)');
+    dome.addColorStop(1.00,'rgba(60,60,64,0)');
+    g.fillStyle = dome; g.fillRect(cx-R,cy-R,R*2,R*2);
+    // B) belly pool (verbatim stops)
+    var belly = g.createRadialGradient(264,316,0, 264,316,R*0.62);
+    belly.addColorStop(0.00,'rgba(32,32,34,0.34)'); belly.addColorStop(0.35,'rgba(32,32,34,0.15)');
+    belly.addColorStop(0.70,'rgba(32,32,34,0.04)'); belly.addColorStop(1.00,'rgba(32,32,34,0)');
+    g.fillStyle = belly; g.fillRect(cx-R,cy-R,R*2,R*2);
+    // C) rim catch (verbatim)
+    g.lineCap = 'round';
+    g.strokeStyle = 'rgba(72,72,80,0.14)'; g.lineWidth = 8;
+    g.beginPath(); g.arc(cx,cy,R-1.5, 15*Math.PI/180, 130*Math.PI/180); g.stroke();
+    g.strokeStyle = 'rgba(72,72,80,0.50)'; g.lineWidth = 3;
+    g.beginPath(); g.arc(cx,cy,R-1.5, 35*Math.PI/180, 100*Math.PI/180); g.stroke();
+    return glossCanvas;
+  }
+  // edge vignette, baked source-over onto transparent (caller blits with 'source-over')
+  function ensureVig(){
+    if (vigCanvas) return vigCanvas;
+    vigCanvas = makeDiscCanvas();
+    var g = vigCanvas.getContext('2d'), cx = DISC_S/2, cy = DISC_S/2, R = R_WEDGE;
+    var vig = g.createRadialGradient(cx,cy,0, cx,cy,R);           // verbatim stops
+    vig.addColorStop(0.00,'rgba(0,0,0,0)');    vig.addColorStop(0.62,'rgba(0,0,0,0)');
+    vig.addColorStop(0.80,'rgba(0,0,0,0.22)'); vig.addColorStop(0.92,'rgba(0,0,0,0.55)');
+    vig.addColorStop(1.00,'rgba(0,0,0,0.92)');
+    g.fillStyle = vig; g.fillRect(cx-R,cy-R,R*2,R*2);
+    return vigCanvas;
+  }
+  // ---- shelf + channel floor: ONE rotationally-symmetric ramp, baked once and blitted. It does two
+  //      jobs at once: it lays a dark BED under the horizontal nameplates at r≈85-135 so white text
+  //      reads cleanly even on citrine #8a6a16, and it cuts the GROOVE the saturn band sits in at
+  //      r≈176. Rotationally symmetric ⇒ the wheel's rotation is irrelevant to it. ----
+  var shelfCanvas = null;
+  function ensureShelf(){
+    if (shelfCanvas) return shelfCanvas;
+    shelfCanvas = makeDiscCanvas();
+    var g = shelfCanvas.getContext('2d'), cx = DISC_S/2, cy = DISC_S/2;
+    var s = g.createRadialGradient(cx,cy,40, cx,cy,220);   // offset = (r-40)/180
+    s.addColorStop(0.000,'rgba(2,4,8,0)');      // r= 40
+    s.addColorStop(0.111,'rgba(2,4,8,0.06)');   // r= 60
+    s.addColorStop(0.250,'rgba(2,4,8,0.18)');   // r= 85
+    s.addColorStop(0.389,'rgba(2,4,8,0.22)');   // r=110  ← the label ring
+    s.addColorStop(0.528,'rgba(2,4,8,0.18)');   // r=135
+    s.addColorStop(0.667,'rgba(2,4,8,0.10)');   // r=160  ← lift under the inner rail: keeps it crisp
+    s.addColorStop(0.756,'rgba(2,4,8,0.26)');   // r=176  ← channel floor, deepest
+    s.addColorStop(0.867,'rgba(2,4,8,0.18)');   // r=196
+    s.addColorStop(0.933,'rgba(2,4,8,0.05)');   // r=208
+    s.addColorStop(1.000,'rgba(2,4,8,0)');      // r=220
+    g.fillStyle = s; g.fillRect(0,0,DISC_S,DISC_S);
+    return shelfCanvas;
+  }
+
+  // hub, baked once via the existing drawHub (blit source-over)
+  function ensureHub(){
+    if (hubCanvas) return hubCanvas;
+    hubCanvas = makeDiscCanvas();
+    drawHub(hubCanvas.getContext('2d'), DISC_S/2, DISC_S/2, HUB_R);   // reuse existing drawHub verbatim
+    return hubCanvas;
+  }
+
+  // ---- engraved inlay ring — baked ONCE to a data-URI, drifts on its own compositor layer (replaces the strobe) ----
+  // 158→166: a 44px band is a gutter you have to fill with junk; 36px is a precision limb. The 8px
+  // freed goes to the label lane below it. RING_COL cooled to #D2DEEC.
+  var RING_R_IN = 166, RING_R_OUT = 202, RING_COL = '210,222,236';  // cool silver-patina
+  function bakeEngraveRing(){
+    var ss = 2, S = DISC_S;                       // supersample for crisp non-integer-angle edges
+    var c = document.createElement('canvas'); c.width = c.height = S*ss;
+    var g = c.getContext('2d'); g.scale(ss,ss);
+    var cx = S/2, cy = S/2;                        // 240,240
+    g.globalCompositeOperation = 'source-over';    // a TRUE solid mark (NOT 'lighter')
+    g.lineCap = 'round';
+
+    // ETCHED-IN: every mark is an inlay SET INTO a carved groove — a dark near-wall + a faint lit
+    // far-wall + the silver inlay centred.
+    //
+    // THE EMBOSS IS NOW ROTATION-INVARIANT BY CONSTRUCTION. The old version offset every pass by a
+    // fixed SCREEN vector (-0.7,-0.7), so the engraving's light source rotated with the drifting
+    // bitmap — which is why the ring never quite settled as a solid carved thing. Here each mark is
+    // offset along ITS OWN NORMAL instead: radial for circles and sigils, TANGENTIAL for radial
+    // ticks. A mark set built that way looks identically carved at every angle — not "less
+    // noticeably", but mathematically. All directional light now lives in the static .engrave-glass,
+    // which is where a fixed observer's light belongs.
+    //
+    // marks(sgn, col, A, gleam): sgn -1 = dark near-wall · +1 = lit far-wall · 0 = the silver inlay.
+    var EMB = 0.55;   // groove offset (px, disc-space) — was 0.7; denser marks need a tighter groove
+    var TAU_ = Math.PI*2;
+    function marks(sgn, col, A, gleam){
+      var e = sgn*EMB;
+      if (gleam){ g.shadowColor='rgba('+RING_COL+',0.30)'; g.shadowBlur=1.2; }   // 2x the marks ⇒ dim the gleam
+      else { g.shadowColor='transparent'; g.shadowBlur=0; }
+
+      // (1) RAILS — circles: normal is radial ⇒ offset the radius
+      g.strokeStyle='rgba('+col+','+A.railOut+')'; g.lineWidth=1.6;
+      g.beginPath(); g.arc(cx,cy,RING_R_OUT+e,0,TAU_); g.stroke();
+      g.strokeStyle='rgba('+col+','+A.railIn+')';  g.lineWidth=1.1;
+      g.beginPath(); g.arc(cx,cy,RING_R_IN+e,0,TAU_); g.stroke();
+
+      // (2) OUTER SCALE — 72 @5°: cardinal every 45° (i%9), major every 15° (i%3), else minor.
+      //     Radial ticks ⇒ normal is TANGENTIAL ⇒ offset along t=(-uy,ux).
+      for (var i=0;i<72;i++){
+        var a=(i/72)*TAU_, ux=Math.cos(a), uy=Math.sin(a), tx=-uy*e, ty=ux*e, r0, lw, al;
+        if      (i%9===0){ r0=RING_R_IN; lw=2.0; al=A.card; }   // 8 cardinals, full 36px bridge
+        else if (i%3===0){ r0=187;       lw=1.4; al=A.maj;  }   // 16 majors, 15px
+        else             { r0=195;       lw=1.0; al=A.min;  }   // 48 minors, 7px
+        g.strokeStyle='rgba('+col+','+al+')'; g.lineWidth=lw;
+        g.beginPath();
+        g.moveTo(cx+ux*r0+tx, cy+uy*r0+ty);
+        g.lineTo(cx+ux*RING_R_OUT+tx, cy+uy*RING_R_OUT+ty);
+        g.stroke();
+      }
+      // (3) INNER SCALE — 36 @10°, OFFSET BY 2.5°, growing off the inner rail. Two opposed scales
+      //     facing each other across a clear middle lane = the classic graduated limb. The 2.5°
+      //     offset is the fix for the old 24-dot row, which sat at exactly the tick angles and so
+      //     only smeared the ticks instead of adding texture.
+      g.strokeStyle='rgba('+col+','+A.inner+')'; g.lineWidth=0.9;
+      for (var j=0;j<72;j+=2){
+        var b=((j+0.5)/72)*TAU_, vx=Math.cos(b), vy=Math.sin(b), sx=-vy*e, sy=vx*e;
+        g.beginPath();
+        g.moveTo(cx+vx*RING_R_IN+sx, cy+vy*RING_R_IN+sy);
+        g.lineTo(cx+vx*172+sx,        cy+vy*172+sy);
+        g.stroke();
+      }
+      // (4) SIGILS — 8 lozenges at r=176 (in from 180: they now occupy the middle lane). Filled ⇒ radial normal.
+      g.fillStyle='rgba('+col+','+A.sigil+')';
+      for (var k=0;k<8;k++){
+        var c2=(k/8)*TAU_, wx=Math.cos(c2), wy=Math.sin(c2);
+        var mx=cx+wx*(176+e), my=cy+wy*(176+e), nx=-wy, ny=wx, H=4.5;
+        g.beginPath();
+        g.moveTo(mx+wx*H,my+wy*H); g.lineTo(mx+nx*H,my+ny*H);
+        g.lineTo(mx-wx*H,my-wy*H); g.lineTo(mx-nx*H,my-ny*H);
+        g.closePath(); g.fill();
+      }
+    }
+    // Brightness ceiling: cardinals 0.36, majors 0.30. Nothing on the DRIFTING limb may out-shine the
+    // fixed gem at 12 o'clock — otherwise a cardinal arriving at the top reads as a second pointer.
+    // PASS 1 — dark near-wall (#04060A)
+    marks(-1, '4,6,10',      {railOut:.46, railIn:.38, card:.52, maj:.46, min:.36, inner:.30, sigil:.48}, false);
+    // PASS 2 — lit far-wall (#E8F2FF)
+    marks(+1, '232,242,255', {railOut:.09, railIn:.07, card:.11, maj:.09, min:.07, inner:.05, sigil:.10}, false);
+    // PASS 3 — the silver inlay (#D2DEEC), centred, with the baked gleam
+    marks( 0, RING_COL,      {railOut:.30, railIn:.22, card:.36, maj:.30, min:.22, inner:.17, sigil:.34}, true);
+
+    return c.toDataURL('image/png');
+  }
+
+  // ---- faint blue liquid suspended in the astrolabe band ("second saturn") — baked ONCE, drifts on its own layer ----
+  function bakeRingLiquid(){
+    var ss=2, S=DISC_S;
+    var c=document.createElement('canvas'); c.width=c.height=S*ss;
+    var g=c.getContext('2d'); g.scale(ss,ss); var cx=S/2, cy=S/2;
+    g.save();
+    g.beginPath();
+    g.arc(cx,cy,RING_R_OUT,0,Math.PI*2);
+    g.arc(cx,cy,RING_R_IN, 0,Math.PI*2,true); g.clip('evenodd');   // hard-clip to the band
+
+    // (1) THREE lobes at IRREGULAR angles, all centred at r=190. Two lobes 180° apart read as a
+    //     rendering artefact; three at 80°/124°/156° gaps read as liquid that hasn't settled.
+    function pool(ang,rad,a0,rgb){
+      var px=cx+Math.cos(ang)*190, py=cy+Math.sin(ang)*190;
+      var p=g.createRadialGradient(px,py,3, px,py,rad);
+      p.addColorStop(0,   'rgba('+rgb+','+a0+')');
+      p.addColorStop(0.52,'rgba('+rgb+','+(a0*0.36).toFixed(3)+')');
+      p.addColorStop(1,   'rgba('+rgb+',0)');
+      g.fillStyle=p; g.fillRect(0,0,S,S);
+    }
+    var D2 = Math.PI/180;
+    pool(-58*D2, 104, 0.30, '104,168,226');   // #68A8E2
+    pool(146*D2,  88, 0.19, '104,168,226');
+    pool( 22*D2,  58, 0.12, '104,168,226');
+
+    // (2) OUTER-WALL POOLING. A liquid in a spinning channel piles against the far wall.
+    //     destination-in multiplies alpha by this ramp ⇒ every lobe is reshaped at once.
+    g.globalCompositeOperation='destination-in';
+    var ramp=g.createRadialGradient(cx,cy,RING_R_IN, cx,cy,RING_R_OUT);   // offset=(r-166)/36
+    ramp.addColorStop(0.000,'rgba(0,0,0,0)');     // r=166 — dry at the near wall
+    ramp.addColorStop(0.222,'rgba(0,0,0,0.05)');  // r=174
+    ramp.addColorStop(0.444,'rgba(0,0,0,0.28)');  // r=182
+    ramp.addColorStop(0.611,'rgba(0,0,0,0.62)');  // r=188 ← the surface knee
+    ramp.addColorStop(0.778,'rgba(0,0,0,0.92)');  // r=194
+    ramp.addColorStop(0.917,'rgba(0,0,0,1)');     // r=199
+    ramp.addColorStop(1.000,'rgba(0,0,0,0.88)');  // r=202 — surface-tension relief; keeps the rail visible
+    g.fillStyle=ramp; g.fillRect(0,0,S,S);
+
+    // (3) source-atop ⇒ everything below paints ONLY where liquid exists. This is what turns a tint
+    //     into a body: it acquires a surface and a depth instead of a fade.
+    g.globalCompositeOperation='source-atop';
+
+    // (3a) MENISCUS — the light catching the curved surface, sitting on the density knee
+    g.strokeStyle='rgba(206,232,255,0.50)'; g.lineWidth=1.6;      // #CEE8FF
+    g.beginPath(); g.arc(cx,cy,188,0,Math.PI*2); g.stroke();
+    g.strokeStyle='rgba(206,232,255,0.18)'; g.lineWidth=3.4;
+    g.beginPath(); g.arc(cx,cy,190.5,0,Math.PI*2); g.stroke();
+
+    // (3b) DEPTH TINT — deep water darkens toward the wall it's piled against
+    var dep=g.createRadialGradient(cx,cy,184, cx,cy,RING_R_OUT);
+    dep.addColorStop(0,'rgba(22,52,95,0)'); dep.addColorStop(1,'rgba(22,52,95,0.34)');   // #16345F
+    g.fillStyle=dep; g.fillRect(0,0,S,S);
+
+    // (3c) CAUSTIC SPECKS on the outer wall — 4 tiny bright points; what makes it read WET
+    g.fillStyle='rgba(224,242,255,0.40)';
+    [-71,-44,138,157].forEach(function(d){
+      var a=d*D2, sx=cx+Math.cos(a)*198, sy=cy+Math.sin(a)*198;
+      g.beginPath(); g.arc(sx,sy,1.5,0,Math.PI*2); g.fill();
+    });
+    g.restore();
+    return c.toDataURL('image/png');
+  }
+
+  // ---- THE COMPASS ROSE, baked ONCE. Engraved into the empty annulus at r 34–90 with the same
+  //      normal-based emboss the astrolabe uses, so it reads as carved from the same instrument and
+  //      its light does not rotate with the drift. Rays only — see the CSS note on why no letters. ----
+  function bakeCompassRose(){
+    var ss=2, S=DISC_S, cx=S/2, cy=S/2, TAU=Math.PI*2;
+    var c=document.createElement('canvas'); c.width=c.height=S*ss;
+    var g=c.getContext('2d'); g.scale(ss,ss);
+    g.lineJoin='miter'; g.miterLimit=8; g.lineCap='butt';
+    var R0=34, R1=90;
+    // one ray = the classic split kite: a LIT half and a SHADOW half meeting on its spine, which is
+    // what makes a rose read as folded metal rather than a drawn star.
+    function ray(a, len, w, lit, dark, e){
+      var ux=Math.cos(a), uy=Math.sin(a), nx=-uy, ny=ux;
+      var bx=cx+ux*R0+nx*e, by=cy+uy*R0+ny*e;          // base, offset along its own normal
+      var tx=cx+ux*len+nx*e, ty=cy+uy*len+ny*e;        // tip
+      var sx=cx+ux*(R0+len*0.30), sy=cy+uy*(R0+len*0.30);   // the shoulder, where it is widest
+      g.beginPath(); g.moveTo(bx,by); g.lineTo(sx+nx*w, sy+ny*w); g.lineTo(tx,ty); g.closePath();
+      g.fillStyle=lit; g.fill();
+      g.beginPath(); g.moveTo(bx,by); g.lineTo(sx-nx*w, sy-ny*w); g.lineTo(tx,ty); g.closePath();
+      g.fillStyle=dark; g.fill();
+    }
+    function pass(e, lit, dark, ring, tick){
+      var i;
+      for (i=0;i<4;i++)  ray((i/4)*TAU - Math.PI/2, R1,      7.0, lit, dark, e);   // 4 principals
+      for (i=0;i<4;i++)  ray((i/4)*TAU - Math.PI/4, R1*0.66, 4.4, lit, dark, e);   // 4 intercardinals
+      for (i=0;i<8;i++)  ray((i/8)*TAU + TAU/16,    R1*0.46, 2.6, lit, dark, e);   // 8 half-winds
+      g.strokeStyle=ring; g.lineWidth=1.0;
+      g.beginPath(); g.arc(cx,cy,R1+e,0,TAU); g.stroke();
+      g.lineWidth=0.8;
+      g.beginPath(); g.arc(cx,cy,R0-4+e,0,TAU); g.stroke();
+      g.strokeStyle=tick; g.lineWidth=0.9;                                          // the outer graduation
+      for (i=0;i<48;i++){
+        var a=(i/48)*TAU, ux=Math.cos(a), uy=Math.sin(a), tx=-uy*e, ty=ux*e;
+        var r0=(i%6===0)?R1-7:R1-3.5;
+        g.beginPath();
+        g.moveTo(cx+ux*r0+tx, cy+uy*r0+ty); g.lineTo(cx+ux*(R1-0.5)+tx, cy+uy*(R1-0.5)+ty); g.stroke();
+      }
+    }
+    pass(-0.55,'rgba(4,6,10,0.50)','rgba(4,6,10,0.62)','rgba(4,6,10,0.44)','rgba(4,6,10,0.34)');   // near wall
+    pass( 0.55,'rgba(232,242,255,0.10)','rgba(232,242,255,0.05)','rgba(232,242,255,0.08)','rgba(232,242,255,0.05)');
+    pass( 0,   'rgba(210,222,236,0.30)','rgba(210,222,236,0.11)','rgba(210,222,236,0.24)','rgba(210,222,236,0.20)');
+    return c.toDataURL('image/png');
+  }
+
+  // ---- THE NEEDLE, baked ONCE: blued tempered steel, NOT a second gem. The arrow outside is
+  //      polished crystal; making the needle a different material class is what keeps them from
+  //      competing. North lobe lit and cold, south lobe near-black, one hard spine between them. ----
+  function bakeNeedle(){
+    var ss=3, S=DISC_S, cx=S/2, cy=S/2, L=80, W=6.2;
+    var c=document.createElement('canvas'); c.width=c.height=S*ss;
+    var g=c.getContext('2d'); g.scale(ss,ss);
+    g.lineJoin='miter'; g.miterLimit=8; g.lineCap='butt';
+    function lobe(dir, fillL, fillR, edge){
+      var ty=cy-dir*L, sy=cy-dir*W*2.6;                 // tip and shoulder
+      g.beginPath(); g.moveTo(cx,ty); g.lineTo(cx-W,sy); g.lineTo(cx,cy); g.closePath();
+      g.fillStyle=fillL; g.fill();
+      g.beginPath(); g.moveTo(cx,ty); g.lineTo(cx+W,sy); g.lineTo(cx,cy); g.closePath();
+      g.fillStyle=fillR; g.fill();
+      g.strokeStyle=edge; g.lineWidth=0.9;
+      g.beginPath(); g.moveTo(cx,ty); g.lineTo(cx-W,sy); g.lineTo(cx,cy);
+      g.lineTo(cx+W,sy); g.closePath(); g.stroke();
+    }
+    // south first, so the north lobe's spine paints over the joint
+    lobe(-1, 'rgba(14,20,32,1)', 'rgba(8,12,20,1)', 'rgba(120,150,190,0.20)');
+    var nl=g.createLinearGradient(cx-W,cy-L,cx,cy); nl.addColorStop(0,'#8FB4E2'); nl.addColorStop(1,'#33506F');
+    var nr=g.createLinearGradient(cx,cy-L,cx+W,cy);  nr.addColorStop(0,'#3C5C82'); nr.addColorStop(1,'#182B41');
+    lobe(1, nl, nr, 'rgba(198,222,252,0.55)');
+    g.strokeStyle='rgba(226,240,255,0.72)'; g.lineWidth=0.8;                      // the spine
+    g.beginPath(); g.moveTo(cx,cy-L+1); g.lineTo(cx,cy+L*0.42); g.stroke();
+    // the boss the needle turns on
+    var bg=g.createRadialGradient(cx-3,cy-4,1, cx,cy,13);
+    bg.addColorStop(0,'#5D7A9E'); bg.addColorStop(0.55,'#24374F'); bg.addColorStop(1,'#0B1220');
+    g.fillStyle=bg; g.beginPath(); g.arc(cx,cy,13,0,Math.PI*2); g.fill();
+    g.strokeStyle='rgba(198,222,252,0.34)'; g.lineWidth=1;
+    g.beginPath(); g.arc(cx,cy,13,0,Math.PI*2); g.stroke();
+    return c.toDataURL('image/png');
+  }
+
+  // ---- SATURN: the ring system, baked ONCE. A ring is not a stripe — it is MADE OF THINGS, so this
+  //      is a smooth band profile with real gaps (the Cassini structure) plus ~900 particle streaks
+  //      whose angular density clumps. The clumps are what make the drift legible: an even wash
+  //      rotating looks static, a clumped one visibly orbits. ----
+  function bakeSaturnRing(){
+    var ss=1.5, S=640, cx=S/2, cy=S/2;   // a soft particulate body — 1.5x is plenty, and it halves the data URI
+    var c=document.createElement('canvas'); c.width=c.height=S*ss;
+    var g=c.getContext('2d'); g.scale(ss,ss);
+    var R_IN=218, R_OUT=268;
+    // radial profile: faint inner band · GAP · the dense main band · thin gap · faint outer band
+    function prof(r){
+      if (r<218||r>268) return 0;
+      if (r<231) return 0.34*(r-218)/13;
+      if (r<237) return 0;                       // the Cassini division
+      if (r<257) return 1;
+      if (r<260) return 0.10;
+      return 0.42*(268-r)/8;
+    }
+    // (1) the smooth body of the ring
+    var grad=g.createRadialGradient(cx,cy,R_IN, cx,cy,R_OUT);
+    for (var s=0;s<=25;s++){
+      var rr=R_IN+(R_OUT-R_IN)*s/25;
+      grad.addColorStop(s/25, 'rgba(104,168,226,'+(0.30*prof(rr)).toFixed(4)+')');
+    }
+    g.save();
+    g.beginPath(); g.arc(cx,cy,R_OUT,0,Math.PI*2); g.arc(cx,cy,R_IN,0,Math.PI*2,true); g.clip('evenodd');
+    g.fillStyle=grad; g.fillRect(0,0,S,S);
+
+    // (2) the particles. Angular density clumps at 3 broad nodes so the orbit is readable.
+    var rnd=rng(0x5A7C21), TAU=Math.PI*2;
+    function dens(a){ return 0.55 + 0.45*Math.pow(0.5+0.5*Math.sin(3*a+1.1),1.6); }
+    var placed=0, guard=0;
+    while (placed<700 && guard<9000){
+      guard++;
+      var a=rnd()*TAU;
+      if (rnd()>dens(a)) continue;
+      var r=R_IN+(R_OUT-R_IN)*rnd();
+      var p=prof(r);
+      if (p<=0 || rnd()>p) continue;
+      placed++;
+      var len=(0.4+rnd()*1.6)*Math.PI/180;          // a short arc: a streak, not a dot
+      var al=(0.05+rnd()*0.22)*p;
+      var warmish=rnd()<0.14;                        // a few brighter grains catch the light
+      g.strokeStyle= warmish ? 'rgba(198,226,255,'+(al*1.5).toFixed(3)+')'
+                             : 'rgba(104,168,226,'+al.toFixed(3)+')';
+      g.lineWidth=0.5+rnd()*1.3;
+      g.beginPath(); g.arc(cx,cy,r,a,a+len); g.stroke();
+    }
+    // (3) two bright edge lines: a ring's sharpest feature is where it ENDS
+    g.strokeStyle='rgba(186,218,252,0.26)'; g.lineWidth=1.1;
+    g.beginPath(); g.arc(cx,cy,256.6,0,TAU); g.stroke();
+    g.strokeStyle='rgba(186,218,252,0.14)'; g.lineWidth=0.9;
+    g.beginPath(); g.arc(cx,cy,237.4,0,TAU); g.stroke();
+    g.restore();
+    return c.toDataURL('image/png');
+  }
+
+  // ---- per-frame layout builders (angles in DEGREES; each entry: {color,a0,a1,r,full?}) ----
+  // ADD: one scalar s drives the whole re-partition — always tiles 360 (gap-free), overshoot = the pop
+  function addLayout(oldSegs, newSeg, s){
+    var n=oldSegs.length, segDegEff=360/(n+s), O=-90-segDegEff/2, arr=[];
+    for (var k=0;k<n;k++)
+      arr.push({ color:oldSegs[k].color, a0:O+k*segDegEff, a1:O+(k+1)*segDegEff, r:R_WEDGE });
+    arr.push({ color:newSeg.color, a0:O+n*segDegEff, a1:O+(n+s)*segDegEff, r:R_WEDGE });
+    return arr;
+  }
+  // FIRST add: single full-disc wedge with a tiny whole-disc "confirm" punch
+  function firstLayout(newSeg, p){
+    var rmul = 1 + 0.045*Math.sin(Math.min(1,p)*Math.PI);   // 1 -> ~1.045 -> 1, never dips
+    return [{ color:newSeg.color, a0:0, a1:360, r:R_WEDGE*rmul, full:true }];
+  }
+  // REMOVE: beat A = blocky vanish (removed wedge radius steps to 0, survivors hold);
+  //         beat B = gravity reflow (survivors interpolate old->new seams via settle)
+  function removeLayout(oldSegs, i, p){
+    var n=oldSegs.length, arr=[];
+    if (p < VANISH_FRAC){
+      var pA = p/VANISH_FRAC, rr = vanishRadius(pA), av = vanishAlpha(pA), segDeg = 360/n;
+      for (var k=0;k<n;k++){
+        var a0=-90+(k-0.5)*segDeg, a1=-90+(k+0.5)*segDeg;
+        if (k===i){ if (av<=0.02) continue; arr.push({color:oldSegs[k].color,a0:a0,a1:a1,r:R_WEDGE*rr,alpha:av}); }
+        else arr.push({color:oldSegs[k].color,a0:a0,a1:a1,r:R_WEDGE});   // survivors: no alpha field -> 1 downstream
+      }
+    } else {
+      var pB=(p-VANISH_FRAC)/(1-VANISH_FRAC), e=settle(pB,OVERSHOOT), m=n-1;
+      for (var k=0;k<n;k++){
+        if (k===i) continue;
+        var oA0=-90+(k-0.5)*(360/n), oA1=-90+(k+0.5)*(360/n);
+        var np=(k<i)?k:k-1;
+        var nA0=-90+(np-0.5)*(360/m), nA1=-90+(np+0.5)*(360/m);
+        arr.push({ color:oldSegs[k].color, a0:oA0+(nA0-oA0)*e, a1:oA1+(nA1-oA1)*e, r:R_WEDGE });
+      }
+    }
+    return arr;
+  }
+
+  var TAU = Math.PI*2, D2R = Math.PI/180, FULLISH = TAU - 0.0009;
+  function isFull(w, span){ return w.full || span >= FULLISH; }
+
+  // ---- the animated wheel frame (mirrors draw()'s passes; texture is BLITTED, not re-run) ----
+  function drawTransition(a, p){
+    var layout = a.kind==='add'   ? addLayout(a.oldSegs, a.newSeg, popS(p))
+               : a.kind==='first' ? firstLayout(a.newSeg, p)
+               :                     removeLayout(a.oldSegs, a.removed, p);
+
+    var ctx=wctx, cx=DISC_S/2, cy=DISC_S/2, i, w, a0, a1, span;
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+    ctx.clearRect(0,0,DISC_S,DISC_S);
+
+    // 1) flat matte fills
+    for (i=0;i<layout.length;i++){
+      w=layout[i]; a0=w.a0*D2R; a1=w.a1*D2R; span=a1-a0;
+      if (!w.full && span<0.0009) continue;
+      ctx.save(); ctx.globalAlpha = (w.alpha==null?1:w.alpha); ctx.beginPath();
+      if (isFull(w,span)) ctx.arc(cx,cy,w.r,0,TAU);
+      else { ctx.moveTo(cx,cy); ctx.arc(cx,cy,w.r,a0,a1); ctx.closePath(); }
+      ctx.clip(); ctx.fillStyle=w.color; ctx.fillRect(cx-R_WEDGE,cy-R_WEDGE,R_WEDGE*2,R_WEDGE*2); ctx.restore();
+    }
+
+    // 2) baked whisper texture — ONE drawImage, clipped to the union of the wedge shapes (gap stays transparent)
+    ctx.save(); ctx.beginPath();
+    for (i=0;i<layout.length;i++){
+      w=layout[i]; a0=w.a0*D2R; a1=w.a1*D2R; span=a1-a0;
+      if (!w.full && span<0.0009) continue;
+      if (isFull(w,span)){ ctx.moveTo(cx+w.r,cy); ctx.arc(cx,cy,w.r,0,TAU); }
+      else { ctx.moveTo(cx,cy); ctx.arc(cx,cy,w.r,a0,a1); ctx.closePath(); }
+    }
+    ctx.clip(); ctx.drawImage(ensureTexture(), 0,0, DISC_S, DISC_S);
+    glassRig(ctx, cx, cy, R_WEDGE);   // same wedge-union clip; disc-space rig (fixed full R while a shrinking wedge crops it)
+    ctx.drawImage(ensureShelf(), 0,0, DISC_S, DISC_S);   // parity with draw() — without this the groove pops out mid add/remove
+    ctx.restore();
+
+    // 3) seams — dark groove + faint warm sliver (only when >1 wedge)
+    if (layout.length>1){
+      for (i=0;i<layout.length;i++){
+        w=layout[i]; a0=w.a0*D2R; a1=w.a1*D2R; if ((a1-a0)<0.0009) continue;
+        ctx.globalAlpha = (w.alpha==null?1:w.alpha);
+        var dx=Math.cos(a0), dy=Math.sin(a0);
+        ctx.strokeStyle='rgba(0,0,0,0.6)'; ctx.lineWidth=2.5;
+        ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(cx+dx*w.r,cy+dy*w.r); ctx.stroke();
+        var ox=-dy*1.3, oy=dx*1.3;
+        ctx.strokeStyle='rgba(210,214,222,0.09)'; ctx.lineWidth=1;
+        ctx.beginPath(); ctx.moveTo(cx+ox,cy+oy); ctx.lineTo(cx+dx*w.r+ox,cy+dy*w.r+oy); ctx.stroke();
+      }
+      ctx.globalAlpha = 1;
+    }
+
+    // 4) dark seating edge — per wedge arc so it follows coverage and skips any gap
+    for (i=0;i<layout.length;i++){
+      w=layout[i]; a0=w.a0*D2R; a1=w.a1*D2R; span=a1-a0;
+      if (!w.full && span<0.0009) continue;
+      ctx.globalAlpha = (w.alpha==null?1:w.alpha);
+      ctx.strokeStyle='rgba(18,11,5,0.85)'; ctx.lineWidth=2.5; ctx.beginPath();
+      if (isFull(w,span)) ctx.arc(cx,cy,w.r-1,0,TAU); else ctx.arc(cx,cy,w.r-1,a0,a1);
+      ctx.stroke();
+    }
+    ctx.globalAlpha = 1;
+
+    // 5) hub
+
+    // structural-ink: mirror the transition's seams onto the over-ring layer (degrees→radians; clears when <=1 wedge)
+    drawInkSeams(layout.map(function(w){ return w.a0*D2R; }), layout.length);
+  }
+
+  // ---- rAF controller: runs ONLY while a transition is alive ----
+  function kick(){ if(!rafId){ rafId=requestAnimationFrame(loop); } }
+  function loop(now){
+    rafId=0;
+    var running=false;
+    if (anim){
+      var p=(now-anim.start)/anim.dur;
+      if (p>=1){ anim=null; sig=null; draw(); }                 // canonical resting frame (text + winner)
+      else { drawTransition(anim,p); running=true; }
+    }
+    if (running) rafId=requestAnimationFrame(loop);
+    // idle => loop not rescheduled => zero rAF
+  }
+  // snap any in-flight transition to its canonical end-state (interrupt / coalesce)
+  function finalizeTransition(){
+    abortCeremony();                                    // single interrupt choke point — silently kills any in-flight ceremony
+    if (rafId){ cancelAnimationFrame(rafId); rafId=0; }
+    if (spinRAF){ cancelAnimationFrame(spinRAF); spinRAF=0; canvas.style.willChange=''; state.spinning=false; }
+    if (anim){ anim=null; sig=null; draw(); }
+  }
+
+  // ======================================================================
+  // ============  SPIN — frictionless free coast + landing settle  =======
+  // ======================================================================
+  // Normalized easing f(p): f(0)=0, f(1)=1, f'(1)=0. Near-constant coast for
+  // ~94% of the time, then a short C1-continuous brake that drops it into place.
+  function spinEase(p){
+    if (p>=1) return 1;
+    if (p<=0) return 0;
+    var pA=FREE_END, fL=FREE_DIST, k=DROOP;
+    if (p<=pA){ var u=p/pA; return fL*((1+k)*u - k*u*u); }        // constant-ish coast, slight droop
+    var q=(p-pA)/(1-pA), q2=q*q, q3=q2*q;                          // cubic Hermite brake fL->1, C1 seam, f'(1)=0
+    var s0=(fL*(1-k)/pA)*(1-pA);                                   // = coast exit slope, mapped to q-space
+    return (2*q3-3*q2+1)*fL + (q3-2*q2+q)*s0 + (-2*q3+3*q2);
+  }
+  // tiny compass-needle settle in the final 10% — a single smooth hump, value AND slope = 0 at p=1 (no wobble)
+  function spinDetent(p){
+    if (DETENT_DEG<=0 || p<=0.9) return 0;
+    var q=(p-0.9)/0.1, s=Math.sin(Math.PI*q);
+    return DETENT_DEG*s*s;
+  }
+
+  var spinRAF = 0;
+  // winner is resolved PURELY from the final rot value — never from the animation path.
+  // The ORIGINAL resolveWinner math, verbatim (segDeg/nrm/idx), minus the render() — decide now, paint later.
+  function resolveWinnerSilently(){
+    var segs = segments(), n = segs.length;
+    var isDefault = n===1 && !segs[0].text;   // empty state is now the 1-wedge obsidian orb (was the 4-color fan)
+    var segDeg = 360/n;
+    var nrm = (((-rot + segDeg/2)%360)+360)%360;
+    var idx = Math.floor(nrm/segDeg)%n;
+    state.spinning = false;
+    state.result = isDefault ? null : segs[idx].text;
+    state.winner = isDefault ? null : idx;
+    return isDefault;
+  }
+  // idempotent — the single disclosure tick; wheel light-up + SOLID name print share ONE render() call ⇒ auto-synced.
+  // Now fired at the arrow-SEAT (impact) frame (see armCeremony), not at the drip. Stays interrupt-safe via revealPending.
+  function commitReveal(){
+    if (!state.revealPending) return;
+    state.revealPending = false;
+    justRevealed = true;
+    sig = null;                                // bust the cache — force the ONE winner repaint
+    render();                                  // draw() winner-dim + gold rim + renderControls name+swatch, one tick
+    justRevealed = false;                      // flag consumed synchronously by renderControls
+  }
+  function spin(){
+    if (state.spinning) return;
+    finalizeTransition();
+    var arc = CEREMONY_AUTO_DECAY ? (spunSinceEdit===0 ? 'full' : 'lean') : 'full';   // FULL on first spin of a set, LEAN on repeats
+    spunSinceEdit++;
+    var reduce = prefersReduced();
+    var turns = DRAW_TURNS[DRAW][0] + Math.floor(Math.random()*DRAW_TURNS[DRAW][1]);   // draw-length turns — the free, fast feel
+    var start = rot;
+    rot = rot + turns*360 + Math.random()*360;          // θ_final — the ONLY source of truth for the winner
+    state.spinning = true; state.result = null; state.winner = null; render();
+
+    if (reduce){                                        // short, no coast/detent
+      canvas.style.transition='transform 0.6s cubic-bezier(0.2,0.8,0.2,1)';
+      if (inkCanvas){ inkCanvas.style.transition=canvas.style.transition; }
+      void canvas.offsetWidth;
+      canvas.style.transform='rotate('+rot+'deg)'; mirrorInk('rotate('+rot+'deg)');
+      var rmT=setTimeout(function(){ if(state.revealPending===false && state.result===null){ state.revealPending=true; resolveWinnerSilently(); commitReveal(); } }, 800);   // watchdog: a dropped transitionend must not strand on "Deciding…"
+      canvas.addEventListener('transitionend', function(){ clearTimeout(rmT); state.revealPending=true; resolveWinnerSilently(); commitReveal(); }, {once:true});
+      return;
+    }
+
+    canvas.style.transition='none';                     // rAF owns the transform
+    canvas.style.willChange='transform';
+    if (inkCanvas){ inkCanvas.style.transition='none'; inkCanvas.style.willChange='transform'; }
+    var dist=rot-start, t0=performance.now();
+    (function frame(now){
+      var p=(now-t0)/DRAW_MS[DRAW]; if (p>1) p=1;
+      canvas.style.transform='rotate('+(start + spinEase(p)*dist + spinDetent(p))+'deg)';
+      mirrorInk(canvas.style.transform);                // ink layer rides the exact same per-frame angle
+      if (p<1){ spinRAF=requestAnimationFrame(frame); }
+      else { spinRAF=0; canvas.style.transform='rotate('+rot+'deg)';   // exact lock onto rot (unchanged)
+             // the two willChange teardowns that used to sit HERE now run in endCeremony: clearing them
+             // on the lock frame de-promoted two layers and then re-promoted them ~900ms later at the
+             // seat — two layer churns on the two frames that can least afford them.
+             mirrorInk('rotate('+rot+'deg)');
+             state.revealPending = true;
+             var isDefault = resolveWinnerSilently();                  // winner decided NOW, silently
+             if (isDefault || prefersReduced() || !ceremonyOn){ commitReveal(); }   // empty orb / ceremony off: instant reveal, no theatre
+             else { renderControls();                                  // result row blanks; wheel stays neutral
+                    armCeremony(arc, commitReveal); } }                // theatre begins; reveals at the ARROW-SEAT (impact) frame
+    })(performance.now());
+  }
+
+  // ======================================================================
+  // ============  THE VERDICT CEREMONY  (100% additive, post-settle)  =====
+  //   The wheel stops, the arrow laps and SEATS at the top — and on that seat
+  //   (impact) frame commitReveal() lights the winner + prints the verdict SOLID.
+  //   The milk-bead then births at the top rim, splits down both edges, and
+  //   SPLATS onto the already-visible verdict as a finishing kiss (no reveal).
+  //   Zero per-frame canvas work; all motion is WAAPI on pre-placed overlays.
+  // ======================================================================
+
+  // ---- tunables (spec §7 defaults) ----
+  var CEREMONY_AUTO_DECAY = false;   // full ritual on EVERY spin (arc resolves to 'full'); on/off governed by the toggle, not decay
+  // ---- ceremony on/off toggle (persisted) ----
+  var CEREMONY_KEY='brWheelCeremony';
+  var ceremonyOn=(function(){ try{ return localStorage.getItem(CEREMONY_KEY)!=='off'; }catch(e){ return true; } })();
+  function setCeremonyOn(on){ ceremonyOn=on; try{ localStorage.setItem(CEREMONY_KEY,on?'on':'off'); }catch(e){} syncCeremonyToggle(); }
+  function syncCeremonyToggle(){ var b=document.getElementById('ceremonyToggle'); if(!b) return;
+    b.setAttribute('aria-checked', ceremonyOn?'true':'false');
+    b.textContent = ceremonyOn ? 'Ceremony · On' : 'Ceremony · Off'; }
+  // ---- ring mode toggle (persisted): the new SATURN ring system vs the original in-channel band ----
+  var SATURN_KEY='brWheelSaturn';
+  var saturnOn=(function(){ try{ return localStorage.getItem(SATURN_KEY)!=='off'; }catch(e){ return true; } })();
+  function setSaturnOn(on){ saturnOn=on; try{ localStorage.setItem(SATURN_KEY,on?'on':'off'); }catch(e){} syncSaturnToggle(); }
+  function syncSaturnToggle(){
+    if (wheelArea) wheelArea.classList.toggle('saturn-on', saturnOn);
+    var b=document.getElementById('saturnToggle'); if(!b) return;
+    b.setAttribute('aria-checked', saturnOn?'true':'false');
+    b.textContent = saturnOn ? 'Ring · Saturn' : 'Ring · Band';
+  }
+  var CEREMONY_MAX_FULL   = 2500;    // watchdog — force-fires endCeremony(true) if a callback is throttled/dropped
+  var CEREMONY_MAX_LEAN   = 1200;
+  // ---- THE LAP: g-force launch · linear cruise · kinetic-hammer stop ("G-LONG") ----
+  //   T_A = 140ms launch · T_B = 712ms cruise · T_C = 48ms hammer.  ω = 0.4277286 deg/ms.
+  //   θ_A = 41.298 · θ_B = 304.543 · θ_C = 14.159  ⇒  Σ = 360.000 exactly.
+  //   Velocity is CONTINUOUS at both seams (|Δv| < 1e-7 deg/ms) and EXACTLY ZERO at both ends, so
+  //   acceleration is discontinuous at precisely two instants — the yank and the strike — and
+  //   nowhere else. The hammer crushes 4.5x more deceleration into its 48ms than the launch spends
+  //   accelerating, which is what makes a zero-exit-velocity stop still read as a blow rather than
+  //   a glide; the energy then leaves the arrow and enters the ORB (see orbAbsorb).
+  //   Cruise is 7.129 deg/frame @60Hz — BETTER sampled than the old 820ms lap's 7.317.
+  var LAP_MS         = 900;
+  var SMEAR_DEG      = 26;           // arc-smear sweep; 18 / 26 / 34 are the sanctioned choices
+  var ORBIT_DIR      = 1;            // 1 = clockwise
+  var TICK_SPARK_MS  = 80;
+  var TICK_RING_MS   = 120;
+  var VITRIFY_MS     = 160;          // B4b glaze opacity pulse, peak 0.6
+  // ---- impact-to-the-core (DIRECTIONAL CHAIN: strike → lens plunges the axis → core swallows inward → orb squashes/sinks, over-damped, no bounce) ----
+  var IMPACT_SCALE_Y = 0.972;        // top flattens under the blow (anisotropic squash → circle to ellipse)
+  var IMPACT_SCALE_X = 1.009;        // slight lateral bulge
+  var IMPACT_SINK    = 5.0;          // px the whole orb dips under the strike
+  var IMPACT_MS      = 260;          // orb squash-and-sink duration — do NOT walk this into the liquid window
+  var PLUNGE_MS      = 170;          // the bright lens travelling 12 o'clock → core
+  var CORE_DELAY     = 120;          // the core swallows inward as the lens lands
+  var CORE_MS        = 200;          // core pinch-to-zero duration
+  // PLUNGE_DIST is MEASURED from the live top-rim→hub gap in the wire-up block (do NOT hardcode px — breaks on mobile)
+
+  // ---- element refs ----
+  var wheelArea  = document.querySelector('.wheel-area');
+  var ptr        = document.querySelector('.pointer');
+  var orbitArm   = document.querySelector('.orbit-arm');
+  var armSmear   = document.querySelector('.arm-smear');
+  var ringBody   = document.querySelector('.ring-body');
+  var liquidShell= document.querySelector('.ring-liquid-shell');
+  var glassBand  = document.querySelector('.engrave-glass');
+  var shadowEl   = document.querySelector('.disc-shadow');
+  var fxLayer    = document.querySelector('.fx');
+  var vitrifyEl  = document.querySelector('.vitrify');
+  var sparkEl    = document.querySelector('.spark');
+  var ringEl     = document.querySelector('.ring');
+  var sparkEls   = [sparkEl, ringEl];
+  function fq(sel){ return fxLayer ? fxLayer.querySelector(sel) : null; }
+  var dropEl=fq('.drop'), splatEl=fq('.splat'), wetmarkEl=fq('.wetmark'), wetEl=fq('.wet'),
+      wellEl=fq('.well'), wellStainEl=fq('.wellStain'), poolEl=fq('.pool'), teatEl=fq('.teat'),
+      headR=fq('.headR'), headL=fq('.headL'),
+      coatR=fq('.coatR'), coatL=fq('.coatL'), chanR=fq('.chanR'), chanL=fq('.chanL'),
+      coreR=fq('.coreR'), coreL=fq('.coreL');
+  var headWakeR = headR ? headR.querySelector('.wake') : null;
+  var headWakeL = headL ? headL.querySelector('.wake') : null;
+  var coats  = [coatR, coatL];
+  var comets = [chanR, chanL, coreR, coreL];
+  var coreEl  = document.querySelector('.coreflash');
+  var plungeEl = document.querySelector('.plunge');
+
+  // ============ THE STONE: a blue-black CORUNDUM, shield cut ============
+  // Mohs 9, second-hardest natural mineral, SG 4.0 — the honest "weighs tons / hardest thing"
+  // claim without pretending to be diamond. Its darkest grade reads BLACK and only confesses
+  // blue in its speculars and in its depths, so the colour lives in the highlights and never in
+  // the fill: restraint enforced by the material rather than by discipline. It contrasts the
+  // obsidian orb by FINISH, not hue — obsidian is volcanic glass with a broad soft dome sheen;
+  // corundum is crystalline, plane-broken, mirror-flat, hard-edged. Same darkness family,
+  // different material class: a harder thing about to strike a softer thing. That IS the hammer
+  // story, told in substance.
+  //
+  // THE INVERSION THAT SELLS IT: the TABLE is the DARKEST broad plane, not the brightest. Looking
+  // down through a dark stone's table returns the black room. A bright table is what makes a drawn
+  // gem look like a drawn logo; a dark one is what makes it look like a stone.
+  //
+  // Facet geometry, disc-space (same translated frame as the old triangle). The CULET is FROZEN at
+  // (240,-14): DROP_TOP / the liquid's contact frame are authored against it. Top edge held at
+  // y=-67 so the 760 canvas margin and header clearance are unchanged; the stone gains mass
+  // laterally only (52→56 wide). Widest point sits 24.5% down = top-heavy = a hammer head.
+  var ARROW_TIP_R = 254;    // culet radius from the disc centre — the liquid's source frame reads this
+  var GEM = {
+    SIL:   [[216,-67],[264,-67],[268,-54],[256,-35],[240,-14],[224,-35],[212,-54]],
+    TAB:   [[222,-67],[258,-67],[252,-56],[228,-56]],
+    CR_L:  [[216,-67],[222,-67],[228,-56],[212,-54]],
+    CR_R:  [[258,-67],[264,-67],[268,-54],[252,-56]],
+    PV_L:  [[212,-54],[228,-56],[240,-56],[240,-14],[224,-35]],
+    PV_R:  [[240,-56],[252,-56],[268,-54],[256,-35],[240,-14]],
+    FLASH: [[232.5,-30],[240,-38],[240,-22]],
+    GIRD:  [[212,-54],[228,-56],[252,-56],[268,-54]],
+    GHOST: [[212,-54],[224,-35],[240,-14],[256,-35],[268,-54]]
+  };
+
+  // rasterize the arrow ONCE to a PNG data-URI: a frozen bitmap on a permanently-promoted block layer
+  function rasterizeArrow(){
+    var S=760, OFF=(S-480)/2 /*=140*/;                      // canvas contract UNCHANGED — orbit maths depend on it
+    var ss = (window.devicePixelRatio||1) >= 1.5 ? 3 : 2;   // the diagonal arrises want the oversample where it shows
+    var c=document.createElement('canvas'); c.width=c.height=S*ss;
+    var g=c.getContext('2d'); g.scale(ss,ss); g.translate(OFF,OFF);   // 480-space, centre still (240,240)
+    g.lineJoin='miter'; g.miterLimit=8; g.lineCap='butt';   // HARD arrises. The old round join+cap inflated the
+                                                            // shape ~4.5px a side and rounded every corner —
+                                                            // roundness reads ductile, a preserved arris reads hard.
+    var SIL=GEM.SIL, TAB=GEM.TAB, CR_L=GEM.CR_L, CR_R=GEM.CR_R,
+        PV_L=GEM.PV_L, PV_R=GEM.PV_R, FLASH=GEM.FLASH, GIRD=GEM.GIRD, PGHOST=GEM.GHOST;
+    function path(p,close,dx,dy){ dx=dx||0; dy=dy||0; g.beginPath(); g.moveTo(p[0][0]+dx,p[0][1]+dy);
+      for(var i=1;i<p.length;i++) g.lineTo(p[i][0]+dx,p[i][1]+dy); if(close) g.closePath(); }
+    function lin(x0,y0,x1,y1,st){ var q=g.createLinearGradient(x0,y0,x1,y1);
+      for(var i=0;i<st.length;i++) q.addColorStop(st[i][0],st[i][1]); return q; }
+    function rad(x,y,r,c0,c1){ var q=g.createRadialGradient(x,y,0,x,y,r); q.addColorStop(0,c0); q.addColorStop(1,c1); return q; }
+
+    // (1) RIM SMUDGE — the pool of dark the hovering mass presses onto the glass below it
+    g.save(); g.fillStyle=rad(240,-6,18,'rgba(0,0,0,0.46)','rgba(0,0,0,0)');
+      g.beginPath(); g.ellipse(240,-6,18,6.5,0,0,Math.PI*2); g.fill(); g.restore();
+    // (2) SIDE WALL (+3.0,+3.4) — real thickness. Filled twice to hang two shadow tiers off the UNION
+    //     shape, both keyed to the world's upper-left light (the old shadow had offsetX 0 = a sticker).
+    g.save(); g.fillStyle='#04070C';
+      g.shadowColor='rgba(0,0,0,0.42)'; g.shadowBlur=16; g.shadowOffsetX=4; g.shadowOffsetY=11;
+      path(SIL,true,3.0,3.4); g.fill();
+      g.shadowColor='rgba(0,0,0,0.72)'; g.shadowBlur=4;  g.shadowOffsetX=2; g.shadowOffsetY=3;
+      path(SIL,true,3.0,3.4); g.fill();
+    g.restore();
+    g.strokeStyle='rgba(126,154,192,0.18)'; g.lineWidth=1;          // the wall is polished too, not a blob
+      path([SIL[1],SIL[2],SIL[3]],false,3.0,3.4); g.stroke();
+    // (3) BODY UNDERPAINT — so no transparent hairline can survive between facets
+    path(SIL,true); g.fillStyle=lin(206,-70,274,-16,[[0,'#1B2B44'],[0.42,'#101B2D'],[1,'#070B12']]); g.fill();
+    // (4) PAVILIONS — shadow side first
+    path(PV_R,true); g.fillStyle=lin(250,-56,244,-16,[[0,'#0D1626'],[1,'#05080E']]); g.fill();
+    path(PV_L,true); g.fillStyle=lin(213,-52,240,-28,[[0,'#16233A'],[0.62,'#213450'],[1,'#2C4568']]); g.fill();
+    // (5) TABLE — the DARK window, + one sky reflection in its upper-left corner
+    path(TAB,true); g.fillStyle=lin(224,-67,252,-56,[[0,'#111C2E'],[0.5,'#0B1220'],[1,'#070C15']]); g.fill();
+    g.save(); path(TAB,true); g.clip(); g.globalCompositeOperation='screen';
+      g.fillStyle=rad(230,-64,8.5,'rgba(168,198,236,0.16)','rgba(168,198,236,0)');
+      g.fillRect(210,-70,60,20); g.restore();
+    // (6) CROWN BEVELS — CR_L is the ONE bright broad plane in the object
+    path(CR_L,true); g.fillStyle=lin(214,-66,228,-55,[[0,'#7099CE'],[0.45,'#3B5A8A'],[1,'#20334D']]); g.fill();
+    path(CR_R,true); g.fillStyle=lin(256,-66,268,-54,[[0,'#243A57'],[1,'#101A2B']]); g.fill();
+    // (7) SUB-SURFACE — in a real cut stone you see the BACK facets through the front, MISREGISTERED
+    //     because they are on the other side of the body. That offset is what separates "a shape with
+    //     facet lines on it" from "a volume you are looking into".
+    g.save(); path(SIL,true); g.clip();
+      g.lineWidth=1.1; g.strokeStyle='rgba(122,168,224,0.15)'; path(PGHOST,false, 2.6,-3.2); g.stroke();
+      g.beginPath(); g.moveTo(242.6,-58.7); g.lineTo(242.6,-17.7); g.stroke();            // ghost keel
+      g.strokeStyle='rgba(4,7,12,0.55)';   path(PGHOST,false,-1.9, 2.4); g.stroke();      // the ghost's own shadow
+      g.globalCompositeOperation='screen';
+      g.fillStyle=rad(236,-34,20,'rgba(46,80,124,0.42)','rgba(46,80,124,0)'); g.fillRect(206,-70,68,60);
+    g.restore();
+    // (8) THE ONE INTERNAL GLINT — gems flash sparsely; two refractions in the whole stone, not five
+    path(FLASH,true); g.fillStyle='rgba(168,198,236,0.52)'; g.fill();
+    g.strokeStyle='rgba(220,233,248,0.62)'; g.lineWidth=0.8;
+      g.beginPath(); g.moveTo(232.5,-30); g.lineTo(240,-38); g.stroke();
+    // (9) GIRDLE — the frosted band + its under-shade: the instant "this is a CUT stone" signal
+    g.strokeStyle='rgba(206,216,226,0.30)'; g.lineWidth=1.2; path(GIRD,false); g.stroke();
+    g.strokeStyle='rgba(4,7,12,0.55)';      g.lineWidth=1.0; path(GIRD,false,0,1.3); g.stroke();
+    // (10) KEEL — the brightest line in the stone, and its one cold glint
+    g.strokeStyle='rgba(220,233,248,0.60)'; g.lineWidth=1.3;
+      g.beginPath(); g.moveTo(240,-55.5); g.lineTo(240,-14.5); g.stroke();
+    g.strokeStyle='rgba(220,233,248,0.75)'; g.lineWidth=0.6;
+      g.beginPath(); g.moveTo(240,-55.5); g.lineTo(240,-33); g.stroke();
+    // (11) COLD SEPARATION HAIRLINE — the sky catching the polished edge; keeps a near-black stone
+    //      legible against a near-black room WITHOUT a warm or dark outline. Runs BEFORE the arrises
+    //      so they paint over it and the occluded lower-left contour stays truly black.
+    //      THIS IS THE VISIBILITY KNOB: 0.18 → 0.26 if the stone reads as a hole. Never a glow.
+    g.lineWidth=2.4; g.strokeStyle='rgba(150,190,242,0.18)'; path(SIL,true); g.stroke();
+    // (12) ARRISES — key side hard, off-key side cold-weak, occluded side black. A polished arris is
+    //      a mirror LINE, not a glow: no blur, ever. (The old rgba(32,15,6,0.8) "definition edge" is
+    //      deliberately not reproduced — against this room a dark outline only feathers warm and
+    //      thins the shape. A gem on a dark ground is defined by its BRIGHT edge.)
+    g.lineWidth=1.5; g.strokeStyle='rgba(220,233,248,0.85)'; path([SIL[6],SIL[0],SIL[1]],false); g.stroke();
+    g.lineWidth=1.1; g.strokeStyle='rgba(168,198,236,0.34)'; path([SIL[1],SIL[2]],false); g.stroke();
+    g.lineWidth=1.0; g.strokeStyle='rgba(126,154,192,0.26)'; path([SIL[2],SIL[3],SIL[4]],false); g.stroke();
+    g.lineWidth=1.3; g.strokeStyle='rgba(4,7,12,0.90)';      path([SIL[4],SIL[5],SIL[6]],false); g.stroke();
+    // (13) CULET — the sharpest point gets the sharpest light, and it is where the liquid is born
+    g.fillStyle=rad(240,-14.6,3,'rgba(220,233,248,0.35)','rgba(220,233,248,0)');
+      g.beginPath(); g.arc(240,-14.6,3,0,Math.PI*2); g.fill();
+    g.fillStyle='#FFFFFF'; g.beginPath(); g.arc(240,-14.6,1.4,0,Math.PI*2); g.fill();   // ONE white point on the stone
+    return c.toDataURL('image/png');
+  }
+
+  // ---- THE ARC SMEAR bake: N ghosts of the stone's ARRIS NETWORK ONLY, swept BEHIND a clockwise
+  //      orbit. Lines, not fills, and no white tip glint — a trail, not a second arrow. Quadratic
+  //      alpha falloff so the head stays the object and the tail is only persistence. ss=2: the
+  //      trail peaks at 0.55 for well under a second and sub-pixel softness there is invisible. ----
+  function rasterizeArrowSmear(){
+    var S=760, OFF=(S-480)/2, ss=2, N=16;
+    var c=document.createElement('canvas'); c.width=c.height=S*ss;
+    var g=c.getContext('2d'); g.scale(ss,ss); g.translate(OFF,OFF);
+    g.lineJoin='miter'; g.miterLimit=8; g.lineCap='butt';
+    var SIL=GEM.SIL, GIRD=GEM.GIRD;
+    function path(p,close){ g.beginPath(); g.moveTo(p[0][0],p[0][1]);
+      for(var i=1;i<p.length;i++) g.lineTo(p[i][0],p[i][1]); if(close) g.closePath(); }
+    for (var i=1;i<=N;i++){
+      var a=-(SMEAR_DEG*i/N)*Math.PI/180, f=1-(i-1)/N, al=0.30*f*f;
+      g.save(); g.translate(240,240); g.rotate(a); g.translate(-240,-240);
+      g.strokeStyle='rgba(220,233,248,'+al.toFixed(4)+')'; g.lineWidth=1.4; path(SIL,true); g.stroke();
+      g.strokeStyle='rgba(220,233,248,'+(al*0.7).toFixed(4)+')'; g.lineWidth=1.0; path(GIRD,false); g.stroke();
+      g.strokeStyle='rgba(220,233,248,'+(al*0.85).toFixed(4)+')'; g.lineWidth=1.2;
+      g.beginPath(); g.moveTo(240,-55.5); g.lineTo(240,-14.5); g.stroke();
+      g.restore();
+    }
+    return c.toDataURL('image/png');
+  }
+
+  // ---- the controller (single owner of all beats + all teardown) ----
+  var ceremony = { active:false, raf:0, timers:[], anims:[], watchdog:0 };
+  var lapAnim = null;   // the live orbit animation — held so a tap-skip can FINISH it instead of cancelling it
+  function ct(fn, delay){ ceremony.timers.push(setTimeout(fn, delay)); }   // registered timer
+  function reg(a){ ceremony.anims.push(a); return a; }                     // registered WAAPI anim
+  function showFx(el){ if (el) el.style.opacity='1'; }
+  function hideFx(el){ if (el) el.style.opacity='0'; }
+  // EXPLICIT rest transforms, never ''. A bare '' is what allows a one-frame blob at viewBox (0,0)
+  // when an interrupt lands between a hide and the next placement. And the comets' rest dashoffset
+  // MUST be their exact start value — a naive '1' against dasharray "0.30 1.40" leaves a stray dash.
+  function resetFx(){
+    [dropEl, splatEl, wetmarkEl, wetEl, wellEl, wellStainEl, poolEl, teatEl, headR, headL, coreEl, plungeEl]
+      .forEach(function(el){ if (el) el.style.opacity='0'; });
+    if (wellEl) wellEl.style.transform='translate(280px,68px) scale(0.18,0.10)';
+    if (headR)  headR.style.transform='translate(280px,68px) rotate(-90deg) scale(0.542,0.576)';
+    if (headL)  headL.style.transform='translate(280px,68px) rotate(90deg) scale(0.542,0.576)';
+    if (poolEl) poolEl.style.transform='translate(280px,540px) scale(0.30,0.16)';
+    if (teatEl) teatEl.style.transform='translate(280px,540px) scale(1,1.15)';
+    if (dropEl) dropEl.style.transform='translate(280px,540px) scale(0.62,0.55)';
+    if (splatEl)   splatEl.style.transform='';
+    if (wetmarkEl) wetmarkEl.style.transform='';
+    [headWakeR, headWakeL].forEach(function(el){ if (el) el.style.opacity='1'; });
+    if (coreEl)  coreEl.style.transform='translate(-50%,-50%)';
+    coats.forEach(function(el){ if (el) el.style.strokeDashoffset='1.00'; });
+    if (chanR) chanR.style.strokeDashoffset='2.00';
+    if (chanL) chanL.style.strokeDashoffset='2.00';
+    if (coreR) coreR.style.strokeDashoffset='1.60';
+    if (coreL) coreL.style.strokeDashoffset='1.60';
+  }
+
+  function armCeremony(arc, onDone){          // arc = 'full' | 'lean'
+    var lean = (arc==='lean');
+    ceremony.active = true;
+    ceremony.timers = [];
+    ceremony.anims  = [];
+    ceremony.watchdog = setTimeout(function(){ endCeremony(true); }, lean ? CEREMONY_MAX_LEAN : CEREMONY_MAX_FULL);
+    document.addEventListener('visibilitychange', ceremonyVis);
+    wheelArea.addEventListener('click', ceremonySkip);
+
+    // promote the static wrappers now — the full branch gets ~900ms of lead, the lean branch a task
+    // boundary. They carry no will-change at rest, so this costs nothing until a spin is under way.
+    if (ringBody)    ringBody.style.willChange='transform';
+    if (liquidShell) liquidShell.style.willChange='transform';
+    if (glassBand)   glassBand.style.willChange='transform';
+
+    resetFx();
+    if (fxLayer) fxLayer.classList.add('live');
+
+    // The four seat statements below stay verbatim and FIRST on both paths; liquid() is appended, and
+    // it schedules everything else RELATIVE TO THIS INSTANT — so the whole coating stays glued to the
+    // strike no matter what LAP_MS becomes.
+    if (lean){                                // repeat spins: no orbit lap; the arrow is already at the top
+      ct(function(){ tickFlash(); impactToCore(); vitrify(); if(onDone) onDone(); liquid(true); needleFind(); },  0);
+      ct(function(){ endCeremony(true); }, LIQ.lean.total + 40);          // = 1091 < CEREMONY_MAX_LEAN 1200
+    } else {                                  // first spin of a set: the lap runs and the SEAT reveals
+      arrowLap(function(){ tickFlash(); impactToCore(); vitrify(); if(onDone) onDone(); liquid(false); needleFind(); });
+      ct(function(){ endCeremony(true); }, LAP_MS + LIQ.full.total + 40); // = 2360 < CEREMONY_MAX_FULL 2500
+    }
+  }
+
+  function endCeremony(reveal){               // IDEMPOTENT — the SINGLE teardown
+    if (!ceremony.active) return;
+    ceremony.active = false;
+    if (ceremony.raf){ cancelAnimationFrame(ceremony.raf); ceremony.raf = 0; }
+    ceremony.timers.forEach(clearTimeout); ceremony.timers.length = 0;
+    // THE LAP IS FINISHED, NOT CANCELLED. Cancelling it mid-orbit reverts the arm to its pre-animation
+    // inline transform and the arrow TELEPORTS home from wherever it was; finishing jumps it to
+    // rotate(360deg), which is visually identical to the rest angle, so a tap-skip lands instead of
+    // snapping. (ceremony.active is already false above, so the finished-handler's reveal cannot fire.)
+    if (lapAnim){ try{ lapAnim.finish(); }catch(e){} }
+    ceremony.anims.forEach(function(a){ if (a!==lapAnim){ try{ a.cancel(); }catch(e){} } });
+    ceremony.anims.length = 0; lapAnim = null;
+    clearTimeout(ceremony.watchdog);
+    document.removeEventListener('visibilitychange', ceremonyVis);
+    wheelArea.removeEventListener('click', ceremonySkip);
+    // hard-reset every decorative overlay to rest:
+    if (orbitArm){ orbitArm.style.transform='rotate(0deg)'; }   // arrow stays VISIBLE (it is the pointer); revert inner to the rest angle
+    if (armSmear){ armSmear.style.opacity='0'; }
+    if (ringBody){    ringBody.style.transform='';    ringBody.style.willChange=''; }
+    if (liquidShell){ liquidShell.style.transform=''; liquidShell.style.willChange=''; }
+    if (glassBand){   glassBand.style.transform='';   glassBand.style.willChange=''; }
+    if (shadowEl)   shadowEl.style.transform='';
+    if (plateLayer) plateLayer.style.transform='';   // syncPlates rewrites it on the mirrorInk below
+    canvas.style.willChange='';                      // moved OFF the spin's lock frame — see spin()
+    if (ptr){ ptr.style.transform=''; ptr.style.willChange=''; ptr.style.opacity=''; ptr.style.transition=''; }
+    if (fxLayer)   fxLayer.classList.remove('live');   // display:none hides the drop + splat
+    if (vitrifyEl) vitrifyEl.style.opacity='0';
+    if (coreEl)    coreEl.style.opacity='0';
+    if (plungeEl)  plungeEl.style.opacity='0';
+    // an interrupt anywhere in the flow leaves nothing stranded, and NEVER leaves the word unpainted
+    if (paintTarget){ paintTarget.style.clipPath=''; paintTarget=null; }
+    resetFx();
+    canvas.style.transform = 'rotate('+rot+'deg)';     // byte-identical to the lock — nothing drifts
+    if (inkCanvas){ inkCanvas.style.transition='none'; inkCanvas.style.willChange=''; } mirrorInk('rotate('+rot+'deg)');
+    if (reveal) commitReveal(); else state.revealPending = false;
+  }
+  function abortCeremony(){ endCeremony(false); }
+  function ceremonyVis(){ if (document.hidden) endCeremony(true); }
+  function ceremonySkip(){ endCeremony(true); }
+
+  // ---- THE LAP: G-FORCE LAUNCH → LINEAR CRUISE → KINETIC-HAMMER STOP ----
+  // The magnetic breathe lives on the OUTER (.orbit-hover) and never rotates, so this rotate() never
+  // shares a transform with it. Three welded segments, C1-continuous at every joint (see the constants
+  // block for the derivation): the arrow is TORN out of rest, sweeps one clean lap, and is stopped dead
+  // in ~3 frames. It arrives at exactly zero velocity — the impact is sold by the crushed deceleration
+  // and by the ORB taking the energy, never by a hard cut, which is what reads as teleport.
+  function arrowLap(onImpact){
+    if (!orbitArm){ if (onImpact) onImpact(); return; }
+    orbitArm.style.transform = 'rotate(0deg)';
+    lapAnim = reg(orbitArm.animate([
+      { transform:'rotate(0deg)',       offset:0.000000, easing:'cubic-bezier(.32,0,.60,.42)' },  // v(0)=0 EXACT
+      { transform:'rotate(41.298deg)',  offset:0.155556, easing:'linear'                      },  // launch → cruise, |Δv|<1e-7
+      { transform:'rotate(345.841deg)', offset:0.946667, easing:'cubic-bezier(.40,.58,.68,1)' },  // the 48ms hammer
+      { transform:'rotate(360deg)',     offset:1.000000 }
+    ], { duration: LAP_MS, easing:'linear', fill:'forwards' }));
+    smearRun();                                      // same task ⇒ same startTime; no sync surface at all
+    lapAnim.finished.then(function(){
+      if (ceremony.active && onImpact) onImpact();   // fires at the SEATED frame (v=0), still at t=LAP_MS
+    }).catch(function(){});
+  }
+  // The trail dies at t≈880 — 20ms before the seat — so the last frames are the naked stone slamming home.
+  function smearRun(){
+    if (!armSmear) return;
+    reg(armSmear.animate([
+      {opacity:0,offset:0.0000},{opacity:0.10,offset:0.0400},{opacity:0.55,offset:0.1556},
+      {opacity:0.55,offset:0.9200},{opacity:0.22,offset:0.9600},{opacity:0,offset:0.9778},{opacity:0,offset:1.0}
+    ], {duration:LAP_MS, easing:'linear'}));         // fill defaults to 'none' ⇒ reverts to the CSS rest 0
+  }
+
+  // ---- B3b tick flash (light, not motion) ----
+  function tickFlash(){
+    if (sparkEl) reg(sparkEl.animate(
+      [{opacity:0,transform:'translate(-50%,-50%) scale(.6)'},
+       {opacity:1,transform:'translate(-50%,-50%) scale(.9)',offset:0.2},
+       {opacity:0,transform:'translate(-50%,-50%) scale(1.1)'}],
+      {duration:TICK_SPARK_MS, easing:'ease-out'}));
+    if (ringEl) reg(ringEl.animate(
+      [{opacity:.9,transform:'translate(-50%,-50%) scale(.4)'},
+       {opacity:0, transform:'translate(-50%,-50%) scale(1.3)'}],
+      {duration:TICK_RING_MS, easing:'ease-out'}));
+  }
+
+  // ---- IMPACT-TO-THE-CORE: a legible DIRECTIONAL CHAIN — orb squashes/sinks under the strike, a bright lens
+  //      PLUNGES down the 12→centre axis, and the core swallows it INWARD (sequenced: strike → travel → absorb) ----
+  function impactToCore(){ orbAbsorb(); plunge(); ct(coreFlash, CORE_DELAY); }
+
+  // ORB SQUASH-AND-SINK on #wheel: anisotropic compression (circle→ellipse) + a small downward dip, then
+  // over-damped e^-decay home — a felt, COLD, contained blow with NO rebound.
+  // scale/translateY are PREPENDED (left of rotate(rot)) so the locked rotation stays byte-identical.
+  function orbAbsorb(){
+    // cFrac 0.075 = a 19.5ms compression, barely over one frame: a STRIKE, not a squeeze.
+    // e^-5.2 is dead by ~200ms. Monotone decay, no rebound term anywhere — a cold contained blow.
+    var N=14, kf=[], kfR=[], kfShadow=[], cFrac=0.075, OPT={duration:IMPACT_MS, easing:'linear'};
+    for(var i=0;i<=N;i++){ var u=i/N, sx, sy, dy;
+      if(u<=cFrac){ var w=u/cFrac; sy=1-(1-IMPACT_SCALE_Y)*w; sx=1+(IMPACT_SCALE_X-1)*w; dy=IMPACT_SINK*w; }
+      else{ var v=(u-cFrac)/(1-cFrac), e=Math.exp(-5.2*v); sy=1-(1-IMPACT_SCALE_Y)*e; sx=1+(IMPACT_SCALE_X-1)*e; dy=IMPACT_SINK*e; }
+      var body='translateY('+dy.toFixed(2)+'px) scale('+sx.toFixed(4)+','+sy.toFixed(4)+')';
+      kf.push({transform: body+' rotate('+rot+'deg)'});     // the wheel carries its locked rotation
+      kfR.push({transform: body});                          // the ring/glass/film never did
+      kfShadow.push({transform:'translateY('+(dy*0.45).toFixed(2)+'px) scale('+(1+0.010*(dy/IMPACT_SINK)).toFixed(4)+')'});
+    }
+    kf[N]       = {transform:'translateY(0px) scale(1,1) rotate('+rot+'deg)'};
+    kfR[N]      = {transform:'translateY(0px) scale(1,1)'};
+    kfShadow[N] = {transform:'translateY(0px) scale(1)'};
+    var a = reg(canvas.animate(kf, OPT));                                    // fill:none → reverts to inline rotate(rot)
+    a.onfinish = function(){ canvas.style.transform='rotate('+rot+'deg)'; };
+    if (inkCanvas){                                                          // the over-ring seams squash in lockstep
+      var ai = reg(inkCanvas.animate(kf, OPT));
+      ai.onfinish = function(){ mirrorInk('rotate('+rot+'deg)'); };
+    }
+    // EVERYTHING THE ORB IS MADE OF RIDES THE SAME FRAME. If any one of these stays rigid it visibly
+    // detaches at the exact climax — which is the moment the whole ceremony is built around.
+    if (ringBody)  reg(ringBody.animate(kfR, OPT));                          // astrolabe + liquid, as one body
+    if (glassBand) reg(glassBand.animate(kfR, OPT));                         // the glass channel over them
+    if (fxLayer)   reg(fxLayer.animate(kfR, OPT));                           // the white film clings to the sinking glass
+    if (shadowEl)  reg(shadowEl.animate(kfShadow, OPT));                     // the cast shadow compresses toward it
+    if (plateLayer){                                                         // the names squash with the wheel they name
+      var pre='translate(-50%,-50%) scale('+plateK+') ';
+      reg(plateLayer.animate(kfR.map(function(k){ return {transform: pre+k.transform}; }), OPT));
+    }
+    ringSlosh();
+  }
+
+  // ---- THE NEEDLE FINDS NORTH. While nothing is decided it wanders on a slow CSS drift; on the
+  //      blow it is released and settles, ringing past centre and back. This is the ONE place a
+  //      damped overshoot is correct — the hammer bans rebound because a struck orb must not bounce,
+  //      but a needle that arrived without ringing would not be a needle. ----
+  var needleLayer = document.getElementById('needleLayer');
+  var needleFound = false;
+  function needleWake(){                       // a new spin: nothing is decided again
+    if (!needleLayer || !needleFound) return;
+    needleFound = false;
+    needleLayer.style.transform = '';
+    needleLayer.classList.remove('found');
+  }
+  function needleAngleNow(){                   // read the live angle out of the wander's matrix
+    if (!needleLayer) return 0;
+    var m = getComputedStyle(needleLayer).transform;
+    if (!m || m === 'none') return 0;
+    var v = m.slice(m.indexOf('(')+1).split(',');
+    var a = Math.atan2(parseFloat(v[1]), parseFloat(v[0]))*180/Math.PI;
+    return isFinite(a) ? a : 0;
+  }
+  var NEEDLE_MS=900, NEEDLE_HZ=1.75, NEEDLE_Z=0.30;
+  function needleFind(){
+    if (!needleLayer) return;
+    var from = needleAngleNow();
+    needleFound = true;
+    needleLayer.classList.add('found');        // stop the wander at exactly where it had got to
+    needleLayer.style.transform = 'rotate('+from.toFixed(3)+'deg)';
+    var w=2*Math.PI*NEEDLE_HZ/1000, lam=w*NEEDLE_Z/Math.sqrt(1-NEEDLE_Z*NEEDLE_Z), N=24, kf=[];
+    for (var i=0;i<=N;i++){
+      var t=i/N*NEEDLE_MS, e=Math.exp(-lam*t)*Math.cos(w*t);
+      kf.push({transform:'rotate('+(from*e).toFixed(3)+'deg)'});
+    }
+    kf[N]={transform:'rotate(0deg)'};          // value AND slope at rest — it stops, it does not cut
+    var a=reg(needleLayer.animate(kf,{duration:NEEDLE_MS, easing:'linear', fill:'forwards'}));
+    a.onfinish=function(){ needleLayer.style.transform='rotate(0deg)'; };
+    a.oncancel=function(){ needleLayer.style.transform='rotate(0deg)'; };   // an interrupt still lands north
+  }
+
+  // THE LIQUID LAGS THE BLOW. Only the WRAPPER moves, so .ring-liquid's own drift is never suspended.
+  // A single damped sine starting at exactly ZERO: the nonzero initial VELOCITY is the impulse — the
+  // container stops and the liquid keeps going, which is the physically right story and lands on the
+  // liquid rather than on the arrow. Peak −6.2px at 44.5ms, naturally lagging the orb's 19.5ms
+  // compression; residual at 560ms is 0.055px and the last keyframe pins it to exact rest.
+  var SL_MS=560, SL_DIP=6.2, SL_ROT=1.35, SL_HZ=4.6, SL_Z=0.28;
+  function ringSlosh(){
+    if (!liquidShell) return;
+    var w=2*Math.PI*SL_HZ/1000,                 // 0.0289027 rad/ms
+        lam=w*SL_Z/Math.sqrt(1-SL_Z*SL_Z),      // 0.0084295 /ms
+        A=SL_DIP/0.6597, Ar=SL_ROT/0.6597, N=18, kf=[];
+    for (var i=0;i<=N;i++){ var t=i/N*SL_MS, e=Math.exp(-lam*t)*Math.sin(w*t);
+      kf.push({transform:'translateY('+(A*e).toFixed(2)+'px) rotate('+(Ar*e).toFixed(3)+'deg)'}); }
+    kf[N]={transform:'translateY(0px) rotate(0deg)'};
+    var a=reg(liquidShell.animate(kf,{duration:SL_MS, easing:'linear'}));
+    a.onfinish=function(){ liquidShell.style.transform=''; };   // if it sloshes the wrong way, negate SL_ROT
+  }
+
+  // THE PLUNGE LENS: flares just inside the top rim (the strike), accelerates DOWN the 12→centre axis,
+  // narrows to a thread and vanishes exactly at the hub = the core swallowing the energy inward.
+  function plunge(){
+    if(!plungeEl) return;
+    reg(plungeEl.animate([
+      {transform:'translate(-50%,-50%) translateY(0px) scale(1,1)',                        opacity:0.0, offset:0.00, easing:'cubic-bezier(.2,.7,.4,1)'},
+      {transform:'translate(-50%,-50%) translateY('+(PLUNGE_DIST*0.083)+'px) scale(1,1)',  opacity:0.95, offset:0.14},
+      {transform:'translate(-50%,-50%) translateY('+PLUNGE_DIST+'px) scale(0.34,0.5)',     opacity:0.0, offset:1.00, easing:'cubic-bezier(.4,0,.7,.5)'}
+    ],{duration:PLUNGE_MS, easing:'linear'}));
+  }
+
+  // CORE FLASH: the hub swallowing the plunge INWARD — blooms then pinches to scale 0 (energy eaten, not radiated).
+  function coreFlash(){
+    if(!coreEl) return;
+    reg(coreEl.animate([
+      {opacity:0,    transform:'translate(-50%,-50%) scale(0.45)'},
+      {opacity:0.95, transform:'translate(-50%,-50%) scale(1.02)', offset:0.32},
+      {opacity:0,    transform:'translate(-50%,-50%) scale(0.0)'}
+    ],{duration:CORE_MS, easing:'cubic-bezier(.3,.7,.3,1)'}));
+  }
+
+  // ---- B4b vitrify (opacity-only glaze pulse; filter animation banned) ----
+  function vitrify(){
+    if (!vitrifyEl) return;
+    reg(vitrifyEl.animate([{opacity:0},{opacity:0.6,offset:0.5},{opacity:0}], {duration:VITRIFY_MS, easing:'ease'}));
+  }
+
+  // ======================================================================
+  // ============  THE COATING FLOW  (the white liquid)  ==================
+  //   The glass SWEATS at the strike point; the meniscus rises until it touches the gem's culet and
+  //   breaks; two heads run the meridians dragging a broad clinging film; they pool at the bottom
+  //   pole; a drop necks, snaps, falls onto the verdict — and PAINTS IT WHITE FROM INVISIBLE.
+  //   Then the whole orb dries, top-down.
+  //
+  //   THE VELOCITY LAW.  S(t) = 0.55t + 2.35t³ − 1.90t⁴   (S(0)=0, S(1)=1)
+  //   S'(1) = 0.55 + 7.05 − 7.60 = 0 EXACTLY. The head cannot hard-cut at speed: its last three
+  //   steps are 5.17°, 3.35°, 1.19°. (The old bead's penultimate keyframe sat at full arc speed and
+  //   its final keyframe was a stationary pool — a literal teleport-stop, which is precisely the
+  //   failure this repo has been chasing.) 26 EQUAL-TIME samples of a C¹ curve keep adjacent-segment
+  //   speed ratios inside 1.035–1.103, under the ~15% velocity-step perception threshold; the old
+  //   code sampled equal ANGLE in unequal TIME, so its biggest step landed at its fastest moment.
+  // ======================================================================
+  var LIQ_S  = function(t){ return 0.55*t + 2.35*t*t*t - 1.90*t*t*t*t; };
+  var LIQ_SP = function(t){ return 0.55 + 7.05*t*t - 7.60*t*t*t; };
+  var LIQ_VMAX = 1.4494, LIQ_N = 25, LIQ_CX = 280, LIQ_CY = 304, LIQ_R = 236;
+  // all beats are Δ FROM THE IMPACT INSTANT, so the liquid stays glued to the strike whatever LAP_MS does
+  var LIQ = {
+   full:{ well:20, wellMs:380, run:150, runMs:560, pool:710, poolMs:150, wetIn:710, wetInMs:250,
+          drip:795, dripMs:220, splatMs:300, markMs:400,
+          drain:940, drainMs:340, poolDry:1060, poolDryMs:320, total:1420 },
+   lean:{ well:15, wellMs:282, run:111, runMs:414, pool:526, poolMs:111, wetIn:526, wetInMs:185,
+          drip:588, dripMs:163, splatMs:222, markMs:296,
+          drain:696, drainMs:252, poolDry:784, poolDryMs:237, total:1051 } };
+
+  var LAND = { x:280, y:684, dx:0, dy:0 };   // measured from the live verdict word — see armVerdictPaint
+  var paintTarget = null;
+
+  // THE DROP MUST LAND ON THE WORD, so the word is measured, not assumed: the result row's own
+  // layout (and the wheel's responsive scale) decide where it actually is.
+  function armVerdictPaint(){
+    paintTarget = null;
+    LAND.x=280; LAND.y=684; LAND.dx=0; LAND.dy=0;
+    var v = document.querySelector('.result .v');
+    if (!v || !wheelArea) return;
+    var r = v.getBoundingClientRect(), wa = wheelArea.getBoundingClientRect();
+    if (!r.width || !wa.width || !wa.height) return;
+    var px = r.width/2, py = r.height*0.42;                  // the strike point inside the word's own box
+    // wa.height is the 700-unit wheel box; the fx canvas is 860 tall in those same units, so the
+    // word (which sits BELOW the wheel) maps straight in. Clamped so an unusually tall layout makes
+    // the drop land a little high rather than fall off the bottom of the canvas.
+    LAND.x = (r.left + px - wa.left)/wa.width*560;
+    LAND.y = Math.min(848, (r.top + py - wa.top)/wa.height*700);
+    LAND.dx = LAND.x-280; LAND.dy = LAND.y-684;
+    if (splatEl)   splatEl.style.transform  ='translate('+LAND.dx.toFixed(1)+'px,'+LAND.dy.toFixed(1)+'px)';
+    if (wetmarkEl) wetmarkEl.style.transform='translate('+LAND.dx.toFixed(1)+'px,'+LAND.dy.toFixed(1)+'px)';
+    // the word goes INVISIBLE and waits to be painted; radius covers its furthest corner
+    var R = Math.sqrt(Math.pow(Math.max(px, r.width-px),2) + Math.pow(Math.max(py, r.height-py),2));
+    v.setAttribute('data-paint', px.toFixed(1)+'|'+py.toFixed(1)+'|'+(R*1.04).toFixed(1));
+    v.style.clipPath = 'circle(0px at '+px.toFixed(1)+'px '+py.toFixed(1)+'px)';
+    paintTarget = v;
+  }
+  // the drip lands and the white floods OUT of the point it struck
+  function paintVerdict(ms){
+    var v = paintTarget; if (!v) return;
+    paintTarget = null;
+    var p = (v.getAttribute('data-paint')||'').split('|');
+    if (p.length!==3){ v.style.clipPath=''; return; }
+    var at = ' at '+p[0]+'px '+p[1]+'px)';
+    var a = reg(v.animate([{clipPath:'circle(0px'+at},{clipPath:'circle('+p[2]+'px'+at}],
+      {duration:ms, easing:'cubic-bezier(.18,.66,.3,1)', fill:'forwards'}));
+    a.onfinish = function(){ v.style.clipPath=''; };
+    a.oncancel = function(){ v.style.clipPath=''; };   // an interrupt must never leave the word invisible
+  }
+
+  function headKf(side){                       // side = +1 right | -1 left
+    var kf=[];
+    for (var i=0;i<=LIQ_N;i++){
+      var t=i/LIQ_N, th=180*LIQ_S(t), u=LIQ_SP(t)/LIQ_VMAX, r=th*Math.PI/180,
+          x=LIQ_CX+side*LIQ_R*Math.sin(r), y=LIQ_CY-LIQ_R*Math.cos(r),
+          g=0.55+0.45*Math.min(1,t/0.30),                  // grows out of the well
+          sx=g*(1.10-0.30*u), sy=g*(0.72+0.86*u),          // stretches with speed, fattens as it slows
+          phi=side*(th-90);
+      kf.push({transform:'translate('+x.toFixed(2)+'px,'+y.toFixed(2)+'px) rotate('+phi.toFixed(2)+'deg) scale('+sx.toFixed(3)+','+sy.toFixed(3)+')', offset:t, easing:'linear'});
+    }
+    kf[0].opacity=0; kf[1].opacity=1; kf[LIQ_N].opacity=1;   // a 22ms fade-in INSIDE the well = never a pop
+    return kf;
+  }
+  // dashoffsets stay POSITIVE by construction (offset = len + gap − h), so no SVG-1.1 negative-offset
+  // risk and no adjacent pattern repeat can land inside [0,1] and paint a stray second dash.
+  function cometKf(len){
+    var kf=[]; for (var i=0;i<=LIQ_N;i++){ var t=i/LIQ_N;
+      kf.push({strokeDashoffset:(len+1.40-LIQ_S(t)).toFixed(4), offset:t, easing:'linear'}); }
+    kf[0].opacity=0; kf[1].opacity=1; kf[LIQ_N].opacity=1; return kf;
+  }
+  // the film LAGS the head — further behind when it is fast, catching up as it slows. That lag is
+  // what makes it read as a coating clinging to glass rather than a line being drawn.
+  function coatKf(){
+    var kf=[]; for (var i=0;i<=LIQ_N;i++){ var t=i/LIQ_N, u=LIQ_SP(t)/LIQ_VMAX;
+      kf.push({strokeDashoffset:(1-Math.max(0,LIQ_S(t)-(0.030+0.045*u))).toFixed(4), offset:t, easing:'linear'}); }
+    kf[0].opacity=0; kf[1].opacity=1; kf[LIQ_N].opacity=1; return kf;
+  }
+
+  function liquid(lean){
+    var L = lean ? LIQ.lean : LIQ.full;
+    armVerdictPaint();
+    ct(function(){ wellSwell(L); }, L.well);
+    ct(function(){ runHeads(L); }, L.run);
+    ct(function(){ drainAll(L); }, L.drain);
+  }
+  function wellSwell(L){
+    if (!wellEl) return;
+    showFx(wellEl);
+    reg(wellEl.animate([
+      {transform:'translate(280px,68px) scale(0.18,0.10)', opacity:0,    offset:0.00, easing:'cubic-bezier(.12,.72,.30,1)'},
+      {transform:'translate(280px,68px) scale(1.06,1.14)', opacity:1,    offset:0.34, easing:'cubic-bezier(.35,0,.42,1)'},   // apex y≈46.3: TOUCHES the gem at r=254
+      {transform:'translate(280px,68px) scale(1.00,0.94)', opacity:1,    offset:0.52, easing:'linear'},                      // surface tension holds
+      {transform:'translate(280px,68px) scale(1.28,0.60)', opacity:0.86, offset:0.72, easing:'cubic-bezier(.4,0,.6,1)'},     // BREAKS as the heads pull out
+      {transform:'translate(280px,68px) scale(1.52,0.22)', opacity:0,    offset:1.00}
+    ], {duration:L.wellMs, easing:'linear', fill:'forwards'}));
+    if (wellStainEl) ct(function(){                        // the source leaves a wetted patch, it doesn't just vanish
+      reg(wellStainEl.animate([{opacity:0},{opacity:0.14}], {duration:180, easing:'ease-out', fill:'forwards'}));
+    }, L.wellMs*0.72);
+  }
+  function runHeads(L){
+    var o = {duration:L.runMs, easing:'linear', fill:'forwards'};
+    if (headR) showFx(headR); if (headL) showFx(headL);
+    var runR = null;
+    if (headR) runR = reg(headR.animate(headKf(+1), o));
+    if (headL) reg(headL.animate(headKf(-1), o));
+    [headWakeR, headWakeL].forEach(function(el){ if (el)                       // no speed, no wake
+      reg(el.animate([{opacity:1,offset:0},{opacity:1,offset:0.80},{opacity:0,offset:1}], o)); });
+    coats.forEach(function(el){ if (el) reg(el.animate(coatKf(), o)); });
+    if (chanR) reg(chanR.animate(cometKf(0.30), o));
+    if (chanL) reg(chanL.animate(cometKf(0.30), o));
+    if (coreR) reg(coreR.animate(cometKf(0.10), o));
+    if (coreL) reg(coreL.animate(cometKf(0.10), o));
+    if (runR) runR.finished.then(function(){ if (ceremony.active) poolAndHang(L); }).catch(function(){});
+    else ct(function(){ if (ceremony.active) poolAndHang(L); }, L.runMs);
+  }
+  function poolAndHang(L){
+    if (poolEl){
+      showFx(poolEl);
+      reg(poolEl.animate([{transform:'translate(280px,540px) scale(0.30,0.16)', opacity:0},
+                          {transform:'translate(280px,540px) scale(1,1)',       opacity:1}],
+        {duration:L.poolMs, easing:'cubic-bezier(.18,.74,.30,1)', fill:'forwards'}));
+    }
+    // CONTAINMENT SWAP: the heads squash into the pool and are hidden only once they are 22x5.9
+    // inside a 38x17.6 pool with their wakes already at 0 — the hide is geometrically undetectable.
+    [headR, headL].forEach(function(el, i){
+      if (!el) return;
+      var side = i===0 ? 1 : -1;
+      // starts from the run's EXACT final state (t=1 ⇒ u=0 ⇒ sx 1.100, sy 0.720) so there is no jump
+      reg(el.animate([{transform:'translate(280px,540px) rotate('+(side*90)+'deg) scale(1.100,0.720)'},
+                      {transform:'translate(280px,540px) rotate('+(side*90)+'deg) scale(1.485,0.396)'}],
+        {duration:110, easing:'cubic-bezier(.35,.6,.4,1)', fill:'forwards'}));
+      ct(function(){ hideFx(el); }, 110);
+    });
+    coats.forEach(function(el){ if (el)                                        // the film closes onto the pool
+      reg(el.animate([{strokeDashoffset:'0.0300'},{strokeDashoffset:'0.0000'}],
+        {duration:150, easing:'cubic-bezier(.3,.6,.4,1)', fill:'forwards'})); });
+    if (wetEl) reg(wetEl.animate([{opacity:0},{opacity:0.16}],                 // the whole orb goes wet
+      {duration:L.wetInMs, easing:'ease-out', fill:'forwards'}));
+    ct(function(){ hangAndDrip(L); }, L.drip - L.pool);
+  }
+  function hangAndDrip(L){
+    if (teatEl){                                                              // the thread retracts once the drop snaps
+      showFx(teatEl);
+      reg(teatEl.animate([{transform:'translate(280px,540px) scale(1,1.15)', opacity:1},
+                          {transform:'translate(280px,540px) scale(0.90,0.16)', opacity:0}],
+        {duration:190, easing:'cubic-bezier(.3,.7,.3,1)', fill:'forwards'}));
+    }
+    if (!dropEl){ ct(function(){ dripImpact(L); }, L.dripMs); return; }
+    // Δy per unit offset 53.8 / 84.6 / 140 / 182 / 188 — monotonically accelerating and landing AT
+    // SPEED, because it is being handed to an impact, not brought to rest.
+    var Y0=540, D=LAND.y-556, X=function(f){ return (280+LAND.dx*f).toFixed(1); };
+    showFx(dropEl);
+    var d = reg(dropEl.animate([
+      {transform:'translate(280px,'+Y0+'px) scale(0.62,0.55)',                     opacity:0, offset:0.00, easing:'cubic-bezier(.25,.55,.35,1)'},
+      {transform:'translate(280px,547px) scale(0.86,1.02)',                        opacity:1, offset:0.13, easing:'cubic-bezier(.42,0,.72,.45)'},
+      {transform:'translate(280px,556px) scale(0.80,1.20)',                        opacity:1, offset:0.26, easing:'cubic-bezier(.36,0,.78,.42)'},  // SNAP — detaches
+      {transform:'translate('+X(0.22)+'px,'+(556+D*0.22).toFixed(1)+'px) scale(0.86,1.26)', opacity:1, offset:0.46, easing:'linear'},
+      {transform:'translate('+X(0.53)+'px,'+(556+D*0.53).toFixed(1)+'px) scale(0.90,1.30)', opacity:1, offset:0.68, easing:'linear'},
+      {transform:'translate('+LAND.x.toFixed(1)+'px,'+LAND.y.toFixed(1)+'px) scale(0.94,1.32)', opacity:1, offset:1.00}
+    ], {duration:L.dripMs, easing:'linear', fill:'forwards'}));
+    d.finished.then(function(){ if (ceremony.active) dripImpact(L); }).catch(function(){});
+  }
+  function dripImpact(L){        // the drop lands ON the word and the white floods out of the strike point
+    hideFx(dropEl);
+    paintVerdict(Math.round(L.splatMs*0.72));
+    if (splatEl){
+      showFx(splatEl);
+      reg(splatEl.animate([
+        {opacity:0,   transform:'translate('+LAND.dx.toFixed(1)+'px,'+LAND.dy.toFixed(1)+'px) scale(0.34,0.34)', offset:0.00, easing:'cubic-bezier(.1,.75,.3,1)'},
+        {opacity:1,   transform:'translate('+LAND.dx.toFixed(1)+'px,'+LAND.dy.toFixed(1)+'px) scale(1.00,0.92)', offset:0.18, easing:'cubic-bezier(.3,.4,.4,1)'},
+        {opacity:0.8, transform:'translate('+LAND.dx.toFixed(1)+'px,'+LAND.dy.toFixed(1)+'px) scale(1.30,1.06)', offset:0.46, easing:'cubic-bezier(.35,0,.6,1)'},
+        {opacity:0,   transform:'translate('+LAND.dx.toFixed(1)+'px,'+LAND.dy.toFixed(1)+'px) scale(1.72,1.20)', offset:1.00}
+      ], {duration:L.splatMs, easing:'linear', fill:'forwards'}));
+    }
+    if (wetmarkEl){                                                            // the word drinks the drop
+      showFx(wetmarkEl);
+      reg(wetmarkEl.animate([{opacity:0,offset:0},{opacity:0.55,offset:0.30},{opacity:0.55,offset:0.60},{opacity:0,offset:1}],
+        {duration:L.markMs, easing:'linear', fill:'forwards'}));
+    }
+  }
+  function drainAll(L){          // THE ORB DRIES, TOP-DOWN
+    // 2.600 ≡ 0.000 (mod the 2.60 dash period) so the first frame is byte-identical to the resting
+    // film; the visible run then goes [0,1] → [0.62,1], i.e. the film RETREATS DOWNWARD and the last
+    // of it clings at the bottom pole. stroke-linecap:round gives the receding edge a wet nose.
+    coats.forEach(function(el){ if (el) reg(el.animate([
+      {strokeDashoffset:'2.6000', opacity:1, offset:0},
+      {strokeDashoffset:'2.2400', opacity:1, offset:0.55},
+      {strokeDashoffset:'1.9800', opacity:0, offset:1}
+    ], {duration:L.drainMs, easing:'cubic-bezier(.32,.06,.62,1)', fill:'forwards'})); });
+    comets.forEach(function(el){ if (el) reg(el.animate([{opacity:1},{opacity:0}],
+      {duration:L.drainMs*0.6, easing:'ease-in', fill:'forwards'})); });
+    if (wetEl) reg(wetEl.animate([{opacity:0.16},{opacity:0}], {duration:L.drainMs, easing:'ease-in', fill:'forwards'}));
+    if (wellStainEl) reg(wellStainEl.animate([{opacity:0.14},{opacity:0}], {duration:L.drainMs, easing:'ease-in', fill:'forwards'}));
+    ct(function(){
+      if (poolEl) reg(poolEl.animate([{transform:'translate(280px,540px) scale(1,1)', opacity:1},
+                                      {transform:'translate(280px,540px) scale(0.70,0.24)', opacity:0}],
+        {duration:L.poolDryMs, easing:'cubic-bezier(.4,.1,.7,1)', fill:'forwards'}));
+    }, L.poolDry - L.drain);
+  }
+  function addOption(){
+    var t = (state.draft||'').trim();
+    if (!t || state.spinning || state.options.length>=MAX) return;
+    finalizeTransition();                                   // collapse any in-flight transition first (also aborts any ceremony)
+    spunSinceEdit = 0;                                      // option-set changed → next spin is a FULL arc
+    var isFirst = state.options.length===0;
+    var col = (isFirst && state.preview) ? state.preview : paletteColor(state.options.length);   // slot-by-add-order
+    var oldSegs = segments().slice();                       // snapshot BEFORE the push
+    state.options.push({ text:t.slice(0,24), color:col.color, hue:col.hue });
+    state.draft=''; state.preview=null; state.result=null; state.winner=null;
+    document.getElementById('draft').value='';
+    if (prefersReduced()){ sig=null; render(); return; }    // snap — no pop, no rAF
+    renderControls();                                       // list/buttons update now; the canvas is owned by rAF
+    var newSeg = { color: col.color, text: t.slice(0,24) };
+    anim = { kind: isFirst?'first':'add', start: performance.now(),
+             dur: isFirst?DUR_FIRST:DUR_POP, oldSegs: (isFirst?[]:oldSegs),
+             newSeg: newSeg };
+    if (plateLayer) plateLayer.style.opacity='0';   // names sit out the re-partition (parity: drawTransition never painted text)
+    drawTransition(anim, 0);   // paint the first chunk SYNCHRONOUSLY on the click tick — no one-rAF deferral
+    kick();
+    draftEl.focus();           // parity with Enter-to-add: keep focus in the field for the next choice
+  }
+
+  function removeOption(i){
+    if (state.spinning) return;
+    finalizeTransition();
+    spunSinceEdit = 0;                                      // option-set changed → next spin is a FULL arc
+    var oldSegs = segments().slice();                       // the n real wedges, BEFORE splice
+    var oldN = oldSegs.length;
+    state.options.splice(i,1); state.result=null; state.winner=null;
+    // snap: reduced-motion, or the last real option leaving (1 real -> the obsidian orb, an unrelated state)
+    if (prefersReduced() || state.options.length===0 || oldN<=1){ sig=null; render(); return; }
+    renderControls();
+    anim = { kind:'remove', start: performance.now(), dur: DUR_REMOVE,
+             oldSegs: oldSegs, removed:i };
+    if (plateLayer) plateLayer.style.opacity='0';   // restored by syncPlateVerdict on the next canonical resting frame
+    kick();
+  }
+
+  function reset(){
+    if (state.spinning) return;
+    finalizeTransition();
+    rot = 0; canvas.style.transition='none'; canvas.style.transform='rotate(0deg)';
+    if (inkCanvas){ inkCanvas.style.transition='none'; } mirrorInk('rotate(0deg)');
+    spunSinceEdit = 0;                                       // option-set cleared → next spin is a FULL arc
+    state.options=[]; state.draft=''; state.preview=null; state.result=null; state.winner=null; state.revealPending=false;
+    document.getElementById('draft').value='';
+    render();
+  }
+
+  // ---- view sync ----  (draw() is suppressed while a transition owns the canvas)
+  function renderControls(){
+    var r = document.getElementById('result');
+    if (state.spinning){           r.innerHTML = '';        // status carried by the disabled button; the verdict slot stays withheld
+                                   needleWake(); }          // a new question: the needle loses north again
+    else if (state.revealPending)  r.innerHTML = '';       // verdict withheld — the drop delivers it
+    else if (state.result){
+      var wc = (state.winner!=null && state.options[state.winner]) ? state.options[state.winner].color : null;
+      r.innerHTML = '<span class="k">Verdict</span><span class="line"><span class="rsw"></span><span class="v"></span></span>';
+      if (wc) r.querySelector('.rsw').style.background = wc;
+      var v = r.querySelector('.v');
+      v.textContent = state.result;                        // solid #FFFFFF + glow, printed the instant the arrow seats (no paint-up)
+    } else if (state.options.length < 2) r.innerHTML = '<span class="spin">Add two or more options</span>';
+    else r.innerHTML = '';
+    document.getElementById('count').textContent = state.options.length + '/' + MAX;
+    var atMax = state.options.length>=MAX;
+    var draftOk = !!(state.draft||'').trim();
+    document.getElementById('add').disabled = state.spinning || atMax || !draftOk;
+    document.getElementById('spin').disabled = state.spinning || state.options.length < 2;   // a decider needs ≥2 choices
+    document.getElementById('spin').textContent = state.spinning ? 'Deciding…' : 'Spin';
+    document.getElementById('reset').disabled = state.spinning || (!state.options.length && !draftOk && !state.result);
+    var wrap = document.getElementById('optsWrap'), list = document.getElementById('opts');
+    wrap.hidden = state.options.length===0;
+    document.getElementById('optsHead').textContent = 'Options · ' + state.options.length;
+    list.innerHTML = '';
+    state.options.forEach(function(o,i){
+      var row=document.createElement('div'); row.className='opt';
+      var x=document.createElement('button'); x.className='x'; x.title='Remove'; x.textContent='×'; x.setAttribute('aria-label','Remove '+o.text);
+      x.addEventListener('click', function(){ removeOption(i); });
+      var sw=document.createElement('span'); sw.className='sw'; sw.style.background=o.color;
+      var tx=document.createElement('span'); tx.className='tx'; tx.textContent=o.text;
+      row.appendChild(x); row.appendChild(sw); row.appendChild(tx); list.appendChild(row);
+    });
+  }
+  function render(){ if(!anim) draw(); renderControls(); }   // never paint over an in-flight transition
+
+  // ---- events ---- (unchanged)
+  var draftEl = document.getElementById('draft');
+  draftEl.addEventListener('input', function(e){
+    state.draft = e.target.value;
+    if (state.options.length===0){
+      if (state.draft.trim() && !state.preview) state.preview = paletteColor(state.options.length);
+      if (!state.draft.trim()) state.preview = null;
+    }
+    state.result=null; state.winner=null;
+    sig=null; render();
+  });
+  draftEl.addEventListener('keydown', function(e){ if (e.key==='Enter'){ e.preventDefault(); addOption(); } });
+  document.getElementById('add').addEventListener('click', addOption);
+  document.getElementById('spin').addEventListener('click', spin);
+  document.getElementById('reset').addEventListener('click', reset);
+  var ceremonyToggle=document.getElementById('ceremonyToggle');
+  if (ceremonyToggle) ceremonyToggle.addEventListener('click', function(){
+    setCeremonyOn(!ceremonyOn);
+    if (!ceremonyOn && ceremony.active) endCeremony(true);   // collapse an in-flight ritual straight to the verdict
+  });
+  syncCeremonyToggle();   // reflect persisted state onto the toggle at load
+  var saturnToggle=document.getElementById('saturnToggle');
+  if (saturnToggle) saturnToggle.addEventListener('click', function(){ setSaturnOn(!saturnOn); });
+  syncSaturnToggle();
+
+  var _roseEl = document.querySelector('.compass-rose');
+  if (_roseEl){
+    var _roseURI = bakeCompassRose();
+    _roseEl.style.backgroundImage = 'url('+_roseURI+')';
+    var _rI=new Image(); _rI.src=_roseURI; if(_rI.decode) _rI.decode().catch(function(){});
+  }
+  var _ndlEl = document.querySelector('.needle');
+  if (_ndlEl){
+    var _ndlURI = bakeNeedle();
+    _ndlEl.style.backgroundImage = 'url('+_ndlURI+')';
+    var _nI=new Image(); _nI.src=_ndlURI; if(_nI.decode) _nI.decode().catch(function(){});
+  }
+
+  var _satSpins = document.querySelectorAll('.saturn-spin');
+  if (_satSpins.length){
+    var _satURI = bakeSaturnRing();
+    for (var _s=0; _s<_satSpins.length; _s++) _satSpins[_s].style.backgroundImage = 'url('+_satURI+')';
+    var _sI=new Image(); _sI.src=_satURI; if(_sI.decode) _sI.decode().catch(function(){});   // GPU-ready
+  }
+
+  var _ringEl = document.querySelector('.engrave-ring');
+  if (_ringEl){
+    var _ringURI = bakeEngraveRing();
+    _ringEl.style.backgroundImage = 'url('+_ringURI+')';
+    var _ri = new Image(); _ri.src = _ringURI; if (_ri.decode) _ri.decode().catch(function(){});  // GPU-ready, no first-frame flash
+  }
+  var _liqEl = document.querySelector('.ring-liquid');
+  if (_liqEl){
+    var _lU = bakeRingLiquid();
+    _liqEl.style.backgroundImage = 'url('+_lU+')';
+    var _li = new Image(); _li.src = _lU; if (_li.decode) _li.decode().catch(function(){});   // GPU-ready, no first-frame flash
+  }
+  // measure the top-rim→hub gap ONCE (responsive; scales with the disc) so the plunge lens lands on the hub at any width
+  var PLUNGE_DIST = (plungeEl && coreEl)
+    ? (coreEl.getBoundingClientRect().top + coreEl.getBoundingClientRect().height/2)
+      - (plungeEl.getBoundingClientRect().top + plungeEl.getBoundingClientRect().height/2)
+    : 240;   // fallback for the authored 480 disc
+  // ---- nameplate ring wire-up: one fixed 480 coordinate system scaled to the live disc ----
+  plateLayer = document.getElementById('nameplates');
+  var _dw = document.querySelector('.disc-wrap');
+  function measurePlates(){
+    // measure .disc-wrap, NEVER #wheel — the wheel is WAAPI-scaled during orbAbsorb
+    var w = _dw ? _dw.getBoundingClientRect().width : DISC_S, k = (w||DISC_S)/DISC_S;
+    if (Math.abs(k-plateK) < 0.002) return;
+    plateK = k; psig = null; buildPlates();
+  }
+  measurePlates();
+  if (window.ResizeObserver && _dw) new ResizeObserver(measurePlates).observe(_dw);
+  else window.addEventListener('resize', measurePlates);
+  // measureText returns fallback metrics until Inter lands — one-shot refit
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(function(){ psig=null; buildPlates(); }).catch(function(){});
+
+  if (orbitArm){
+    var _arrowURI = rasterizeArrow();
+    orbitArm.style.backgroundImage = 'url('+_arrowURI+')';
+    var _im=new Image(); _im.src=_arrowURI; if(_im.decode) _im.decode().catch(function(){}); // GPU-ready, kills first-frame flash
+  }
+  if (armSmear){
+    var _smearURI = rasterizeArrowSmear();
+    armSmear.style.backgroundImage = 'url('+_smearURI+')';
+    var _si=new Image(); _si.src=_smearURI; if(_si.decode) _si.decode().catch(function(){});  // warmed like the gem
+  }
+  render();
+})();
+</script>
+</body>
+</html>
