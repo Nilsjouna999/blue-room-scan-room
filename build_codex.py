@@ -36,6 +36,12 @@ TIDE_TOGGLE = True           # C3: where the plate's foot stands
 TIDE_DEFAULT = 'float'       # 'float' (26px of air) | 'datum' (10px submerged)
 VX_MODES = ('stable', 'fitted', 'tempered')
 TIDE_MODES = ('float', 'datum')
+# R4/S1: the scroll.  Snap lost on measurement, not on taste - but nothing is
+# taken away irreversibly here, so the old behaviour keeps a door.  ?snap=on is
+# persisted and written back into the URL exactly like ?vx= and ?tide=.
+SNAP_TOGGLE = True           # R1: whether the room re-aims your wheel gesture
+SNAP_DEFAULT = 'off'         # 'off' (the page scrolls) | 'on' (y proximity)
+SNAP_MODES = ('off', 'on')
 
 MID = u'·'          # MIDDLE DOT - the only separator in the bank
 VS15 = u'︎'    # VARIATION SELECTOR-15: "this symbol is text, not an emoji"
@@ -676,17 +682,35 @@ html{
   -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;
   -webkit-text-size-adjust:100%;text-rendering:optimizeLegibility;
   background-color:var(--ground);
-  scroll-snap-type:y proximity;
-  /* PROXIMITY SNAP IS A WHEEL AFFORDANCE ONLY.  It fights every programmatic
-     scroll: it dragged the page back after the Ember was perched, and threw it
-     past on the walls where it did not.  While a plate is up, and for the frame
-     in which a mark is being placed, the room does not snap. */
+  scroll-snap-type:none;
+  /* SNAP IS OFF.  R4, measured, 40 real gestures per condition at ten seats:
+     with `y proximity` a flick asked for 240px and the page delivered 0 on 10 of
+     40 gestures and under half on 19 - it rose 235px and then handed every pixel
+     back over nine frames, 136ms AFTER the hand had stopped.  373 frames ran
+     backwards, 5,246px of them.  Snap costs no frames at all (a clean 16.7ms in
+     both conditions); what it costs is 136ms of unrequested motion after 100% of
+     gestures, which is exactly what "jarring" and "annoying" look like from a
+     chair.  Worse, the snap AREA (802px wall + 66px scroll-margin-top) exceeds
+     the snapport, so every wall admitted a SECOND valid rest 68px past its seat,
+     with the plate numeral already off the top edge - half the places snap
+     actively dragged you to were a decapitated composition.
+     What is NOT lost: the one-wall-per-screen reading is structural (every wall
+     is min-height:100svh with its own air), and the correct seat is delivered by
+     scroll-margin-top below, which scrollIntoView honours on its own.  So the
+     composition is now AUTHORED - by the tick rail, the deep links and the
+     keyboard - instead of imposed at random +/-240px by the browser.
+     The old behaviour is one query away: ?snap=on, persisted and reflected in
+     the URL like the other switches. */
   /* NO scroll-padding-top: the walls carry scroll-margin-top, and the two ADD -
      every anchor jump was landing 132px down instead of 66, which cost the room
      a whole rank and pushed the last row of the I Ching square into the water. */
   scroll-padding-bottom:calc(var(--tide) + 32px);
   scrollbar-width:thin;scrollbar-color:#1c1915 transparent;
 }
+html.snap-on{scroll-snap-type:y proximity}
+/* and these still win over the hatch, because they come after it at equal
+   specificity: while a plate is up, and for the frame in which a mark is being
+   placed, the room does not snap even for someone who asked for snap. */
 html.is-reading,html.no-snap{scroll-snap-type:none}
 /* THE KEY LIGHT.  A real fixed element, never background-attachment:fixed - a
    fixed-attachment ROOT background cannot be composited-scrolled, so Chrome
@@ -813,6 +837,32 @@ html.is-searching .tick.is-cold{opacity:.30}
 .dict{position:relative;flex:0 1 244px;min-width:0}
 .search--dict{width:100%}
 .dtoggle{display:none}
+/* R3 - THE SHOT.  A hairline ring, not the old filled circle: exactly one object
+   in this document carries depth and it is the vessel.  26px clears the page's
+   own 24px hit floor (the same floor the ticks are held to on a phone).
+   IT IS NOT SHOWN ON THE FIRST PLATE.  Restraint over density - a control whose
+   act is already done is furniture, and this bar has ten ticks, a slug, a way
+   home and two live instruments in 52px already.  body.past-first is written by
+   the scroll-spy that was already running (setWall), so this costs no scroll
+   listener, no observer and no geometry read: the button appears the moment the
+   room you are reading is no longer the first one, about half a screen down.
+   visibility, not display: the box keeps its place, so the rail never jumps
+   sideways when it arrives - and visibility:hidden takes it out of the tab order
+   and out of the accessibility tree, which display-toggling would have to do by
+   hand and would get wrong. */
+.totop{flex:0 0 auto;width:26px;height:26px;display:grid;place-items:center;
+  padding:0;background:none;border:1px solid var(--hair-2);border-radius:50%;
+  color:var(--t-ghost);font-family:var(--ff-mono);font-size:12px;line-height:1;
+  visibility:hidden;opacity:0;
+  transition:color var(--dur-step) ease,border-color var(--dur-step) ease,
+             opacity var(--dur-lit) ease,visibility var(--dur-lit) ease}
+body.past-first .totop{visibility:visible;opacity:1}
+.totop:hover,.totop:focus-visible{color:var(--gold);border-color:var(--gold-dim);outline:none}
+.totop:focus-visible{box-shadow:0 0 0 1px var(--gold-dim)}
+/* it recedes with the other wayfinding while a record is up, and goes inert with
+   it - the two live instruments are the only things that stay at full strength.
+   .seek's own opacity:1 above it is a no-op group, so this still lands. */
+body.is-reading .stickybar .totop{opacity:.42}
 .sr{position:absolute;width:1px;height:1px;margin:-1px;padding:0;border:0;clip:rect(0 0 0 0);clip-path:inset(50%);overflow:hidden;white-space:nowrap}
 """
 
@@ -829,7 +879,14 @@ main{display:block;padding-bottom:calc(var(--tide-safe) + 72vh);
   position:relative;min-height:100vh;min-height:100svh;
   padding:0 var(--wall-pad) var(--tide-safe);
   display:flex;flex-direction:column;
+  /* KEPT, and inert: with scroll-snap-type:none on the root this declares an
+     alignment nobody reads.  It is the whole of what ?snap=on turns back on, so
+     it stays where it is rather than being reconstructed by a second rule. */
   scroll-snap-align:start;
+  /* LOAD-BEARING, and the reason snap could go.  This 66px IS the seat: every
+     correct rest position measured on this page was wallTop-66, and scrollIntoView,
+     the tick rail, the deep links and the keyboard stepper all honour it without
+     any help from snap. */
   scroll-margin-top:calc(var(--bar-h) + 14px);
   background-image:var(--grain);background-repeat:repeat;background-size:160px 160px;
 }
@@ -874,6 +931,18 @@ body.is-reading .wall.is-lit{content-visibility:visible}
   background:linear-gradient(90deg,var(--hair-0),var(--hair-1) 4%,var(--hair-1) 88%,var(--hair-0))}
 .wl-rule::after{content:"";position:absolute;inset:0;opacity:0;transition:opacity var(--dur-step) ease;
   background:linear-gradient(90deg,var(--gold-fade),var(--gold) 4%,var(--gold) 88%,var(--gold-fade))}
+/* MEASURED AND LEFT ALONE (R4/S1).  This looks like the classic invalidation
+   trap - a descendant selector rooted at a state class, so that toggling
+   `is-here` should mean "walk the whole wall looking for .wl-rule", twice per
+   boundary crossing, on the same frame the wall unlocks and the parent draws
+   its line.  It is not.  Counted out of the trace, one toggle at a time:
+   `is-here` on a wall re-styles SIX elements, and body's `on-prose` re-styles
+   ONE.  Chrome resolves these invalidation sets precisely; rewriting them as
+   `.wall.is-here>.wl-head>.wl-rule::after` changed the count by nothing and the
+   timing by nothing (3,300us before, 3,700us after, on a 100us control - i.e.
+   noise, and the 3ms is the forced layout, not the style walk).  Reverted.
+   This also retires the standing suspicion that the body-class flip in setWall()
+   is what costs the Antechamber its exit frame.  One element is not a cost. */
 .wall.is-here .wl-rule::after{opacity:1}
 .wl-furn{margin:11px 0 0;font-family:var(--ff-mono);font-size:9px;line-height:1.5;
   letter-spacing:.2em;text-transform:uppercase;color:var(--t-meta);max-width:110ch}
@@ -1424,6 +1493,17 @@ CSS_MOVE = u"""
    inert here, which silently cancelled the un-inerting done in shutRoom(). */
 body.is-reading .br-floatunit.br-floating{z-index:5;opacity:.55}
 .br-dragging,.br-dragging *{cursor:grabbing!important;user-select:none!important;-webkit-user-select:none!important}
+/* R4 - THE EMPTY PLACE.  A bar in the hand leaves a hole the width it had, and
+   the hole is drawn the way the archive draws an absence: a dashed hairline and
+   nothing inside it.  Not a dropzone - no fill, no glow, no label, and it is not
+   there at all until a bar is actually being carried.  Coming within reach turns
+   the dashes to a line in gold-dim: the same move the search field makes when it
+   takes focus, so "this is live now" is already a sentence this bar can say. */
+.br-slot{display:none}
+.br-slot.is-open{display:block;flex:0 0 auto;max-width:100%;height:30px;
+  box-sizing:border-box;border:1px dashed var(--hair-2);border-radius:9px;
+  transition:border-color var(--dur-step) ease}
+.br-slot.is-near{border-style:solid;border-color:var(--gold-dim)}
 /* the strip lives in its lintel home now and only ever toggles .on there - it
    used to re-parent onto whichever unit last synced, which made it visibly
    teleport between the search and the dictionary the instant both floated,
@@ -1507,6 +1587,11 @@ CSS_RESPONSIVE = u"""
     opacity:0;pointer-events:none;transition:opacity var(--dur-step) ease}
   .seek.is-dict>.dict{opacity:1;pointer-events:auto}
   .seek.is-dict>#q,.seek.is-dict>.br-floatwrap{opacity:0;pointer-events:none}
+  /* the English register's field is laid over the WHOLE seek at left:0, so the
+     way back up goes under it with the search rather than sitting on top of a
+     field it has nothing to do with.  visibility, to keep it out of the tab
+     order too - the same reason the base rule uses it. */
+  .seek.is-dict>.totop{visibility:hidden;opacity:0}
   .br-floatunit.br-floating{opacity:1!important;pointer-events:auto;position:fixed;
     right:auto;transform:none}
   .seek:not(.is-dict)>.dict .br-grip{display:none}
@@ -1552,6 +1637,10 @@ CSS_RESPONSIVE = u"""
    returns intact. */
 @media (max-height:520px){
   html{scroll-snap-type:none}
+  /* and the hatch cannot defeat the escape hatch: ?snap=on raises specificity to
+     (0,1,1), which would out-rank the bare `html` above and put the snap back on
+     the one screen that provably cannot hold it. */
+  html.snap-on{scroll-snap-type:none}
   .wl-field{height:auto;max-height:none}
   .wl-ord{display:none}
   /* --room is what every wall divides to get its own pitch, and at 292px of
@@ -1863,6 +1952,11 @@ function setWall(n){
   /* the prose wall is read continuously - the shallows must not dissolve a line
      of the argument at the foot of every screenful */
   D.body.classList.toggle('on-prose', BRC.WALLS[n].k==='tarot-guide');
+  /* R3 - the way back up appears once the room you are reading is not the first
+     one, and it is this spy that says so.  A second class on a node this
+     function already dirties costs one more toggle inside a restyle that was
+     going to happen anyway - and it is why the button needs no scroll listener. */
+  D.body.classList.toggle('past-first', n>0);
   slug('rest', BRC.WALLS[n].slug+' · '+(n+1)+' of 10');
 }
 if(W.IntersectionObserver){
@@ -1918,7 +2012,7 @@ var INERT=('inert' in D.documentElement), barEl=D.querySelector('.stickybar');
    English register while a record was up, and a K2 lookup begun mid-record had
    no way to open in the first place.  Only the wayfinding pieces recede - the
    way home, the slug, the ten plates - never the two live instruments. */
-var barInertEls=barEl?[].slice.call(barEl.querySelectorAll('.back,.slug,.ticks')):[];
+var barInertEls=barEl?[].slice.call(barEl.querySelectorAll('.back,.slug,.ticks,.totop')):[];
 function shutRoom(on){
   if(!INERT) return;
   var r=D.getElementById('room');
@@ -2174,6 +2268,154 @@ function goWall(n){
   try{ walls[n].focus({preventScroll:true}); }catch(e){}
   say(ticks[n].getAttribute('aria-label'));
 }
+
+/* ---------- 7b - R2 + R3.  ONE GLIDE, ONE LIST OF STOPS. ----------
+   THE GLIDE.  CSS smooth-scroll is banned and asserted against, and
+   scrollIntoView({behavior:'smooth'}) is the same engine under another name: no
+   duration dial, and it ends on a long slow tail - which is the exact shape the
+   builder has twice now called lag.  So the ride is owned, the way app.js owns
+   _u1GlideTo for the U1 descent: rAF, the panel-slide's own bezier, terminated
+   HARD within half a pixel rather than asymptoted, a setTimeout backstop for a
+   throttled background tab, and a reduced-motion path that simply lands.  It is
+   written here rather than called out to the parent because the parent is a
+   different document; only the CONSTANTS are shared, so the two read as one hand.
+   The curve is styles.css's own .menu__track transition, cubic-bezier(.22,.61,
+   .25,1): 78% of the distance is spent in the first half and the last 60px take
+   200ms, so it arrives rather than stopping.  (The house's other lesson - a whip
+   curve reads as stop-then-lurch, linear beat it - is about a 40px arrow head,
+   not about an 800px room; the flat-then-settle shape is what makes a full
+   viewport of travel legible instead of a cut.) */
+var EASE=[0.22,0.61,0.25,1];
+function _bx(a,b,u){ var v=1-u; return 3*v*v*u*a+3*v*u*u*b+u*u*u; }
+function _bd(a,b,u){ var v=1-u; return 3*v*v*a+6*v*u*(b-a)+3*u*u*(1-b); }
+function ease(t){
+  if(t<=0) return 0;
+  if(t>=1) return 1;
+  var u=t,i,x,d;
+  for(i=0;i<8;i++){
+    x=_bx(EASE[0],EASE[2],u)-t;
+    if(x<1e-4&&x>-1e-4) break;
+    d=_bd(EASE[0],EASE[2],u);
+    if(d<1e-5&&d>-1e-5) break;
+    u-=x/d;
+  }
+  return _bx(EASE[1],EASE[3],u<0?0:(u>1?1:u));
+}
+var glR=0, glT=0, glTo=null, glEnd=null;
+function docY(){ return W.pageYOffset||R.scrollTop||0; }
+function glideStop(){
+  if(glR){ W.cancelAnimationFrame(glR); glR=0; }
+  if(glT){ clearTimeout(glT); glT=0; }
+  glTo=null; glEnd=null;
+}
+function glide(y,ms,done){
+  var floor=Math.max(0,R.scrollHeight-W.innerHeight);
+  y=Math.round(Math.max(0,Math.min(y,floor)));
+  glideStop();
+  var from=docY(), d=y-from;
+  if(REDUCE||!W.requestAnimationFrame||(d<1&&d>-1)){ W.scrollTo(0,y); if(done)done(); return; }
+  glTo=y; glEnd=done;
+  var t0=0;
+  function tick(now){
+    if(glTo===null) return;
+    if(!t0) t0=now;
+    var p=(now-t0)/ms; if(p>1)p=1;
+    W.scrollTo(0, from+d*ease(p));
+    if(p<1){ glR=W.requestAnimationFrame(tick); return; }
+    glR=0; W.scrollTo(0,y);
+    var f=glEnd; glTo=null; glEnd=null; if(f) f();
+  }
+  glR=W.requestAnimationFrame(tick);
+  glT=setTimeout(function(){ glT=0; if(glTo===null) return;
+    var f=glEnd, at=glTo; glideStop(); W.scrollTo(0,at); if(f) f(); }, ms+400);
+}
+/* A GLIDE ONLY EVER OWNS THE ACT THAT STARTED IT.  The U1 descent's own rule:
+   the instant a hand touches the page the ride is handed back untouched, rather
+   than fighting live input - which is the mechanism snap used and the reason it
+   had to go.  These are not scroll listeners: they fire on a gesture, never on
+   the scrollTo this file is itself performing. */
+function glideLet(){ if(glTo!==null) glideStop(); }
+W.addEventListener('wheel',glideLet,{passive:true});
+W.addEventListener('touchstart',glideLet,{passive:true});
+W.addEventListener('pointerdown',glideLet,{passive:true});
+
+/* THE STOPS.  Ten walls - and, inside the Antechamber, its own eight authored
+   sections, because 6,100px of prose is not one keystroke.  The rail already
+   names those eight positions; this reads them rather than inventing a second
+   set that could drift from the ticks the reader can see.
+   THE SEAT IS THE WALL'S TOP, NOT ITS MIDDLE.  The house learned this on the
+   About surface: centring a section left 136px of the previous surface on screen
+   and read as an almost-arrival with no frame.  The number is scroll-margin-top -
+   66 on a wall, 74 on a guide section - which is the same number scrollIntoView,
+   the tick rail and every deep link already land on, so a stepped arrival and a
+   clicked one are the same position and cannot drift apart.
+   Measured live on every press.  Cached stops go stale the moment anything above
+   them reflows, and this page reflows on a dictionary open and on every resize. */
+function seatOf(el,fb){
+  try{ var v=parseFloat(W.getComputedStyle(el).scrollMarginTop);
+       return (v>=0&&v<400)?v:fb; }catch(e){ return fb; }
+}
+var SEAT=seatOf(walls[0],66), GSEAT=gsecs.length?seatOf(gsecs[0],74):74, SLACK=24;
+var gName=[];
+for(i=0;i<gsecs.length;i++){
+  var _r=rail[i], _b=_r&&_r.querySelector('b'), _s=_r&&_r.querySelector('span');
+  gName.push(_b&&_s?(_b.textContent+' · '+_s.textContent):('Section '+(i+1)));
+}
+function stops(){
+  var y=docY(), floor=Math.max(0,R.scrollHeight-W.innerHeight);
+  var raw=[], j, g;
+  for(j=0;j<walls.length;j++){
+    raw.push({y:walls[j].getBoundingClientRect().top+y-SEAT,
+              n:ticks[j].getAttribute('aria-label'), el:walls[j]});
+    if(walls[j].classList.contains('wall--prose')){
+      for(g=0;g<gsecs.length;g++)
+        raw.push({y:gsecs[g].getBoundingClientRect().top+y-GSEAT,
+                  n:gName[g], el:gsecs[g]});
+    }
+  }
+  /* clamp into the real scroll range, then drop anything the clamp collapsed
+     onto its neighbour - two stops 3px apart are one stop that stutters */
+  var out=[], last=-1e9, v;
+  for(j=0;j<raw.length;j++){
+    v=Math.round(Math.max(0,Math.min(raw[j].y,floor)));
+    if(v<=last+8) continue;
+    raw[j].y=v; last=v; out.push(raw[j]);
+  }
+  return out;
+}
+/* the ride is sized to the distance so a 260px hop between two guide sections is
+   not given the same 640ms as a whole room: 300ms floor, 680ms ceiling. */
+function stepMs(d){ if(d<0)d=-d; return Math.min(680,Math.max(300,260+d*0.38)); }
+var psT=0;
+function pageStep(dir,repeat){
+  var now=(W.performance&&performance.now)?performance.now():Date.now();
+  /* KEY REPEAT.  Held down, a browser fires ~30 keydowns a second; unthrottled
+     that is the whole document in half a second and ten announcements nobody
+     can read.  A swallowed repeat still returns true, so the native scroll it
+     would otherwise have done is still prevented - the page holds still between
+     steps instead of sliding underneath them. */
+  if(repeat&&(now-psT)<260) return true;
+  var S=stops(), k;
+  if(S.length<2) return false;
+  /* a press landing MID-GLIDE steps on from where the glide was AIMED, not from
+     wherever the page happens to be at that instant - otherwise a second press
+     re-solves into the stop it is already travelling into and stalls. */
+  var at=(glTo!==null)?glTo:docY();
+  if(dir>0){ for(k=0;k<S.length;k++){ if(S[k].y>at+SLACK) break; } if(k>=S.length) return false; }
+  else{ for(k=S.length-1;k>=0;k--){ if(S[k].y<at-SLACK) break; } if(k<0) return false; }
+  psT=now;
+  var s=S[k];
+  glide(s.y, stepMs(s.y-docY()), function(){
+    try{ s.el.focus({preventScroll:true}); }catch(e){}
+  });
+  /* the room's name reaches a screen reader through the one channel the page
+     already has; say() debounces, so a fast walk announces where you stopped */
+  say(s.n);
+  writeHash(s.el.id);
+  return true;
+}
+BRX.pageStep=pageStep;
+BRX.stops=stops;
 
 /* ---------- 8 - walking both axes.  data-ax is build-emitted: left right up down. ---------- */
 var AX={ArrowLeft:0,ArrowRight:1,ArrowUp:2,ArrowDown:3};
@@ -2477,6 +2719,24 @@ ticksEl.addEventListener('click',function(e){
   var a=e.target.closest('.tick'); if(!a) return;
   e.preventDefault(); tickPos=ticks.indexOf(a); goWall(+a.getAttribute('data-wi'));
 });
+/* R3 - the shot.  Same glide as the keyboard step, on a much shorter clock: the
+   duration grows at 1/20th of the distance rather than 2/5ths, so 800px takes
+   ~300ms and the whole 14,000px document takes ~620 - fast enough to read as a
+   shot, and still on the curve that settles rather than stopping dead.  Focus is
+   moved to the first wall on the PRESS, not on arrival: the button itself goes
+   visibility:hidden the moment the spy says plate I is the room again, which is
+   mid-flight, and a focused element that vanishes drops focus to the body. */
+(function(){
+  var tt=D.getElementById('totop');
+  if(!tt) return;
+  tt.addEventListener('click',function(){
+    var d=docY();
+    try{ walls[0].focus({preventScroll:true}); }catch(e){}
+    glide(0, Math.min(620,Math.max(300,260+d*0.05)), null);
+    say(ticks[0].getAttribute('aria-label'));
+    writeHash(walls[0].id);
+  });
+})();
 for(i=0;i<rail.length;i++){
   rail[i].addEventListener('click',function(e){
     e.preventDefault();
@@ -2554,6 +2814,27 @@ D.addEventListener('keydown',function(e){
       if(j>=0){ roving(marks[j]); marks[j].focus({preventScroll:true}); perch(marks[j], null); }
       return;
     }
+    /* R2 - THE PAGE STEP, AND IT IS THE LAST CLAIM ON THE ARROW.  Everything
+       above owns Down and Up for a reason a reader can see: a raised record
+       walks its records, a live search walks its lit list, a focused mark walks
+       its own wall.  The page steps only when nothing nearer has asked for the
+       key - so the answer to "which one wins" is always "the smallest thing you
+       are standing in", and it never changes under you.
+       THE FOUR IT MUST NOT TAKE.  typing() above already keeps it out of #q and
+       #dq.  The other three run their own arrow handlers in the BUBBLE phase,
+       which this capture listener precedes - so without this line the page would
+       step INSTEAD of them, silently: the tick rail's roving focus, K3's grip
+       nudge (which even calls stopPropagation, and would never be reached), and
+       anything inside the vessel. */
+    if(slot!==2&&slot!==3) return;
+    /* A MODIFIED ARROW IS NEVER OURS.  app.js's own keyboard nav opens with this
+       line and it is the reason the browser's shortcuts survive: Shift+Down is a
+       selection, Ctrl/Cmd+Down is the platform's, Alt+Down opens a select.  Only
+       this branch is guarded - the three above it are pre-existing contracts
+       inside a raised record and a live filter, and are not mine to re-decide. */
+    if(e.shiftKey||e.ctrlKey||e.metaKey||e.altKey) return;
+    if(ae&&ae.closest&&ae.closest('#ticks,.br-grip,#lectern')) return;
+    if(BRX.pageStep(slot===3?1:-1,!!e.repeat)) e.preventDefault();
     return;
   }
   if((e.key==='Enter'||e.key===' ')&&ae&&ae.classList&&ae.classList.contains('mark')){
@@ -2856,7 +3137,13 @@ lec.addEventListener('keydown',function(e){
 #       grip: lift() re-parents mid-gesture, which drops the grip's pointer capture.
 JS_MOVE = r"""
 (function(){
-  var KEY='brCodexSearchPos_v1', MARGIN=6, THRESH=4, MINW=300;
+  /* DOCK is how far outside the empty slot the bar's own centre may be and still
+     come home on release: 72px on every side of the slot's box.  On a 400px slot
+     that is a 544x172 target sitting in the lintel - generous enough to hit with
+     a thrown gesture, small enough that it can never be reached from the middle
+     of the room, and the two slots are never confused because each bar is only
+     ever measured against its OWN. */
+  var KEY='brCodexSearchPos_v1', MARGIN=6, THRESH=4, MINW=300, DOCK=72;
   var qEl=document.getElementById('q'), dictEl=document.querySelector('.dict');
   if(!qEl||!dictEl) return;
   var FRAMED=(function(){ try{ return window.self!==window.top; }catch(e){ return true; } })();
@@ -2893,16 +3180,69 @@ JS_MOVE = r"""
     u.el.style.left=px+'px';
     u.el.style.top =py+'px';
   }
+  /* R4 - THE SLOT IS AN ELEMENT NOW.  It was a Comment node: the right anchor -
+     drop() has always put the unit back in front of it - but a comment has no
+     box, so the flex row simply closed over the gap and there was nothing in the
+     lintel to aim at.  That is the whole of why you could drag a bar out and
+     not drag it home.  Node identity and lifetime are unchanged: it is still
+     created once per lift, still lives at the unit's own place in the row for
+     as long as the unit floats, and is still consumed by drop().  It is
+     display:none at rest, so an element in the row costs the row nothing. */
+  function mkslot(){
+    var s=document.createElement('i');
+    s.className='br-slot'; s.setAttribute('aria-hidden','true');
+    return s;
+  }
   function lift(u){
     if(isFloating(u)) return;
     var r=u.el.getBoundingClientRect();
-    if(!u.ph){ u.ph=document.createComment('br-slot');
+    if(!u.ph){ u.ph=mkslot();
                u.el.parentNode.insertBefore(u.ph,u.el);
                document.body.appendChild(u.el); }
+    /* the width the row gave it, remembered BEFORE the float adds its padding -
+       the hole must be the size of the thing that left, not of the lamp */
+    if(!u.slotw) u.slotw=Math.round(r.width);
     u.el.style.width=r.width+'px';
     u.el.classList.add('br-floating');
     measure(u); place(u,r.left,r.top);
     syncCtl();
+  }
+  /* opened only while that bar is in the hand, and closed on release whatever
+     the release did.  The rect is read ONCE here and cached: the pointermove
+     path may not call getBoundingClientRect - the parent app is measuring the
+     lintel across the iframe boundary on every one of its own frames. */
+  function openSlot(u){
+    if(!u.ph||!u.ph.classList) return null;
+    u.ph.style.width=(u.slotw||u.el.offsetWidth)+'px';
+    u.ph.classList.add('is-open');
+    var s=u.ph.getBoundingClientRect();
+    if(!s.width&&!s.height) return null;
+    return {l:s.left-DOCK,t:s.top-DOCK,r:s.right+DOCK,b:s.bottom+DOCK};
+  }
+  function shutSlot(u){
+    if(!u.ph||!u.ph.classList) return;
+    u.ph.classList.remove('is-open','is-near');
+    u.ph.style.width='';
+  }
+  /* R4 - HOME BY HAND.  Return has always put BOTH bars back; there was no way
+     to put one back with the hand that took it out.  This is that gesture and
+     nothing else: it ends in drop(), the same call Return makes, so the state it
+     leaves is the state Return leaves - no slot left in the row, no inline
+     geometry, no floating class.  And the kept position for THIS bar is struck
+     from the record, because a bar sitting in the lintel that springs back out
+     on the next reload is a bar that did not come home.  The other bar's kept
+     position is untouched, for the same reason Keep merges rather than
+     overwrites: a second tab may own it. */
+  function dockHome(u){
+    drop(u);
+    var prev={}, raw=null;
+    try{ raw=localStorage.getItem(KEY); if(raw) prev=JSON.parse(raw)||{}; }catch(e){}
+    if(!raw) return;
+    prev[u.key]=null;
+    try{
+      if(!prev.q&&!prev.dict) localStorage.removeItem(KEY);
+      else localStorage.setItem(KEY,JSON.stringify(prev));
+    }catch(e){}
   }
   function drop(u){
     u.el.classList.remove('br-floating');
@@ -2912,6 +3252,7 @@ JS_MOVE = r"""
   }
   function attachDrag(u,g){
     var sx=0,sy=0,ox=0,oy=0,pending=false,dragging=false,pid=null,dx=0,dy=0;
+    var zone=null,near=false;   /* R4: the cached slot target, and whether we are over it */
     /* the drag path writes a transform, not left/top, while the pointer is
        moving - left/top triggers layout on every sample, transform is
        compositor-only.  will-change is set for the gesture's duration alone
@@ -2927,6 +3268,7 @@ JS_MOVE = r"""
         pending=false; dragging=true; dx=0; dy=0;
         document.body.classList.add('br-dragging');
         u.el.style.willChange='transform';
+        near=false; zone=openSlot(u);       /* R4: the hole opens with the lift */
       }
       if(dragging){
         e.preventDefault();
@@ -2934,6 +3276,14 @@ JS_MOVE = r"""
         var nx=clampX(ox+(e.clientX-sx),w), ny=clampY(oy+(e.clientY-sy),h);
         dx=nx-ox; dy=ny-oy;
         u.el.style.transform='translate('+dx+'px,'+dy+'px)';
+        /* R4: no reads on this path - zone was measured once, at the lift - and
+           the class is written only when the answer CHANGES, so crossing the
+           threshold costs one style write and holding still costs none. */
+        if(zone){
+          var cx=nx+w/2, cy=ny+h/2;
+          var n=(cx>=zone.l&&cx<=zone.r&&cy>=zone.t&&cy<=zone.b);
+          if(n!==near){ near=n; u.ph.classList.toggle('is-near',n); }
+        }
       }
     }
     function onUp(e){
@@ -2941,13 +3291,17 @@ JS_MOVE = r"""
       document.removeEventListener('pointermove',onMove,true);
       document.removeEventListener('pointerup',onUp,true);
       document.removeEventListener('pointercancel',onUp,true);
-      var was=dragging; pending=false; dragging=false; pid=null;
+      /* R4: a CANCEL is the system taking the gesture away, not a reader letting
+         go - it may not be read as "put it down here".  Only a real release docks. */
+      var was=dragging, home=(near&&e.type==='pointerup');
+      pending=false; dragging=false; pid=null; near=false; zone=null;
       document.body.classList.remove('br-dragging');
+      shutSlot(u);
       if(was){
         u.el.style.transform='';
         u.el.style.willChange='';
-        place(u,ox+dx,oy+dy);
-        syncCtl();
+        if(home){ dockHome(u); }
+        else{ place(u,ox+dx,oy+dy); syncCtl(); }
       }
     }
     g.addEventListener('pointerdown',function(e){
@@ -2969,6 +3323,13 @@ JS_MOVE = r"""
       else if(e.key==='ArrowUp')kdy=-step; else if(e.key==='ArrowDown')kdy=step; else return;
       e.preventDefault(); e.stopPropagation();
       lift(u);
+      /* lift() re-parents the unit onto <body>, and a re-parent drops focus held by
+         a descendant - so the grip loses the keyboard on its own FIRST press.  In
+         BR-S214 the next press merely did nothing; with R2's page stepper in the
+         document's capture phase it would step the whole page instead.  Take the
+         focus straight back: the grip keeps the keyboard for as long as the reader
+         is nudging, and the stepper's .br-grip guard keeps its precondition. */
+      g.focus();
       var r=u.el.getBoundingClientRect(); place(u,r.left+kdx,r.top+kdy);
       syncCtl();
     });
@@ -2976,6 +3337,7 @@ JS_MOVE = r"""
   var order=['q','dict'];
   order.forEach(function(k){
     var u=units[k], g=document.createElement('span');
+    u.key=k;                    /* R4: which half of the stored record is this bar's */
     g.className='br-grip';
     g.setAttribute('role','button');
     g.setAttribute('tabindex','0');
@@ -3021,7 +3383,11 @@ JS_MOVE = r"""
   });
   function applySaved(u,s){
     if(!s||!s.floating) return;
-    if(!u.ph){ u.ph=document.createComment('br-slot');
+    if(!u.ph){ /* the row's own width for this unit, taken while it is still IN
+                  the row - after the re-parent there is nothing left to ask */
+               if(!u.slotw) u.slotw=Math.round(u.el.getBoundingClientRect().width)
+                                    ||Math.round(s.w||240);
+               u.ph=mkslot();
                u.el.parentNode.insertBefore(u.ph,u.el);
                document.body.appendChild(u.el); }
     u.el.classList.add('br-floating');
@@ -3638,6 +4004,17 @@ def lintel_html():
           '</div>'
         + '<nav class="ticks" id="ticks" aria-label="The ten plates">' + ''.join(ticks) + '</nav>'
         + '<div class="seek" role="search">'
+        # R3 - THE SHOT.  The old codex kept a 38px circle beside the search with
+        # an arrow in it; round one deleted it along with the masthead, and the
+        # builder asked for it back by name.  Same place - the lintel, first in
+        # the search group, where the hand already goes.  Rendered as a sibling
+        # of .seek instead it drifted 130px left and joined the tick rail, which
+        # reads as a plate rather than as a control.  The lintel is also the one
+        # strip of screen that is provably NOT the membrane's band: 52px at the
+        # very top, against a band that starts at 0.955H.
+        + '<button type="button" id="totop" class="totop"'
+          ' aria-label="Back to the top of the Codex" title="Back to the top">'
+          '<span aria-hidden="true">&#8593;</span></button>'
         + '<input id="q" class="search" type="search" autocomplete="off" spellcheck="false"'
           ' aria-label="Search the Codex" placeholder="search the Codex — a sign, a card, a number…">'
         + '<button type="button" id="dtoggle" class="dtoggle" aria-label="Look up an English word"'
@@ -3808,6 +4185,9 @@ def _a3_apply(js):
         # only while the toggle is up: with it down the chosen number is baked
         # into the sheet's own declaration and there is no class to hang.
         picks += u"  if(TIDEMODE==='datum') R.classList.add('tide-datum');\n"
+    if SNAP_TOGGLE:
+        picks += (u"  if(pick('snap',%s,'%s','brCodexSnap_v1')==='on') R.classList.add('snap-on');\n"
+                  % (json.dumps(list(SNAP_MODES), separators=(',', ':')), SNAP_DEFAULT))
     if picks:
         boot = _A3_PICK % {'vxdef': VX_DEFAULT, 'tidedef': TIDE_DEFAULT, 'picks': picks}
     if not VX_TOGGLE and VX_DEFAULT == 'fitted':
@@ -3951,7 +4331,8 @@ def assert_geometry(css_tight):
     # page still snapping one screen at a time is a document that fights itself
     m = re.search(r'@media\(max-height:520px\)\{(.*?)\}\}', css_tight, flags=re.S)
     blk = m.group(1) if m else ''
-    for _r in ('html{scroll-snap-type:none}', '.wl-field{height:auto;max-height:none}'):
+    for _r in ('html{scroll-snap-type:none}', 'html.snap-on{scroll-snap-type:none}',
+               '.wl-field{height:auto;max-height:none}'):
         need(_r in blk, 'GEOMETRY LAW: the short-viewport branch is half-applied - %s' % _r)
     # THE LANDSCAPE PLATE, asserted as one object.  Measured before these five
     # declarations existed: at 844x390 the plate took 96% of the width and 68% of
@@ -3976,6 +4357,155 @@ def assert_geometry(css_tight):
              'it - that is the signal, and it is why nothing prints below')):
         need(_r in blk, 'GEOMETRY LAW: the landscape plate is half-applied - %s (%s)'
              % (_r, _why))
+
+
+def assert_scroll(css_tight, js_tight):
+    """THE SCROLL LAW (R4/S1).  Measured, 40 gestures per condition: with
+       `scroll-snap-type:y proximity` the page ran 373 frames BACKWARDS, handed
+       back 5,246px, delivered under half of what was asked on 19 of 40 gestures
+       and literally nothing on 10, and kept moving for a median 136ms after the
+       hand stopped.  Every one of those numbers went to zero with snap off.  The
+       four rules below are the whole of that fix; any one of them re-written puts
+       one of those numbers back."""
+    need('html{' in css_tight and 'scroll-snap-type:none' in css_tight,
+         'SCROLL LAW: the root must declare scroll-snap-type - a page that leaves '
+         'it to the initial value has no statement to read and no hatch to open')
+    need(css_tight.count('scroll-snap-type:yproximity') == (1 if SNAP_TOGGLE else 0),
+         'SCROLL LAW: proximity snap may appear exactly once, behind html.snap-on, '
+         'and never in the base rule')
+    if SNAP_TOGGLE:
+        i_on = css_tight.find('html.snap-on{scroll-snap-type:yproximity}')
+        i_off = css_tight.find('html.is-reading,html.no-snap{scroll-snap-type:none}')
+        need(i_on > 0 and i_off > i_on,
+             'SCROLL LAW: html.snap-on and the reading/placing hatches are the same '
+             'specificity, so the hatches must be written AFTER it - otherwise '
+             '?snap=on drags the page back off a freshly perched Ember')
+        need("pick('snap'" in js_tight and "classList.add('snap-on')" in js_tight,
+             'SCROLL LAW: nothing reads ?snap= - the escape hatch is a comment')
+    else:
+        need('snap-on' not in css_tight and "pick('snap'" not in js_tight,
+             'SCROLL LAW: with SNAP_TOGGLE off the losing branch must be GONE')
+    need('scroll-margin-top:calc(var(--bar-h)+14px)' in css_tight,
+         'SCROLL LAW: scroll-margin-top IS the seat now that snap is gone - every '
+         'correct rest on this page is wallTop-66, and the tick rail, the deep '
+         'links and the keyboard all get it from here')
+    # `overscroll-behavior` is a different property and the tick rail needs it,
+    # so this looks for the word at a declaration boundary, not anywhere.
+    need(re.search(r'(^|[;{])scroll-behavior:', css_tight) is None,
+         'SCROLL LAW: no CSS smooth-scroll - a glide with no duration dial ends on '
+         'a slow tail, and a slow tail is what the builder called lag')
+
+
+def assert_controls(css_tight, js_tight, doc):
+    """THE THREE CONTROLS (R4/S2).  The builder asked for all three by name, and
+       one of them - the drag home - has already been silently lost once in a
+       regeneration.  Each rule below is one whole decision; a later tidy-up that
+       reads any of them as redundant fails the build instead of shipping a page
+       that quietly stopped answering the key or the hand."""
+    # ---- R2, the stepper ----
+    need('functionstops(' in js_tight and 'functionpageStep(' in js_tight,
+         'R2 LAW: the keyboard stepper has gone - Down and Up no longer stop at '
+         'the major sections')
+    need('BRX.pageStep(' in js_tight,
+         'R2 LAW: the stepper exists but nothing presses it - the document '
+         'keydown listener is where the arrow is actually claimed')
+    need("classList.contains('wall--prose')" in js_tight,
+         "R2 LAW: the Antechamber is 6,100px of prose in eight authored sections "
+         "and must carry its own sub-stops - one keystroke past all of it is not "
+         "a step, it is a jump")
+    need('getComputedStyle(el).scrollMarginTop' in js_tight,
+         'R2 LAW: the seat is read from scroll-margin-top, never written twice - '
+         'a literal here is a second source of truth for the one number the tick '
+         'rail, every deep link and scrollIntoView already agree on')
+    need('e.shiftKey||e.ctrlKey||e.metaKey||e.altKey' in js_tight,
+         'R2 LAW: a modified arrow belongs to the browser - Shift is a selection '
+         'and Ctrl/Cmd is the platform\'s')
+    need("ae.closest('#ticks,.br-grip,#lectern')" in js_tight,
+         'R2 LAW: the page step is the LAST claim on the arrow.  The tick rail, '
+         "K3's grip and the vessel each run their own arrow handler in the bubble "
+         'phase this capture listener precedes, so they must be named here or '
+         'the page steps instead of them, silently')
+    need('if(repeat&&(now-psT)<260)' in js_tight,
+         'R2 LAW: key repeat is throttled - a held arrow fires ~30 times a second '
+         'and would walk the whole document in half of one')
+    # ---- the glide both R2 and R3 ride ----
+    need('functionglide(' in js_tight and 'requestAnimationFrame(tick)' in js_tight,
+         'R2/R3 LAW: the ride is owned.  CSS smooth-scroll is banned; '
+         'scrollIntoView({behavior:"smooth"}) is the same engine under another '
+         'name and ends on the slow tail the builder called lag')
+    need('if(REDUCE||!W.requestAnimationFrame' in js_tight,
+         'MOTION LAW: reduced motion must LAND, not travel')
+    need("W.addEventListener('wheel',glideLet" in js_tight,
+         'R2/R3 LAW: a glide owns only the act that started it - a hand on the '
+         'page takes it back.  Fighting live input is what snap did')
+    # ---- R3, the shot ----
+    need(doc.count('id="totop"') == 1 and '<button type="button" id="totop"' in doc,
+         'R3 LAW: exactly one back-to-top, and it is a real button')
+    need('<div class="seek" role="search"><button type="button" id="totop"' in doc,
+         'R3 LAW: the way back up lives in the lintel, first in the search group. '
+         'Outside .seek it drifts to the tick rail and reads as an eleventh plate; '
+         'below the lintel it would be in the membrane\'s band')
+    need('aria-label="Back to the top of the Codex"' in doc,
+         'R3 LAW: an arrow glyph is not a name')
+    _tt = re.search(r'\.totop\{[^}]*width:(\d+)px;height:(\d+)px', css_tight)
+    need(_tt and int(_tt.group(1)) >= 24 and int(_tt.group(2)) >= 24,
+         'R3 LAW: 24px is this page\'s hit floor (WCAG 2.5.8), the same floor the '
+         'ten ticks are held to on a phone')
+    # anchored on `flex:` so this reads the BASE rule and not the phone branch's
+    # `.seek.is-dict>.totop{visibility:hidden;opacity:0}`, which says the same
+    # words about a different question and let an early draft of this probe pass
+    need(re.search(r'\.totop\{flex:[^}]*visibility:hidden;opacity:0', css_tight)
+         and 'body.past-first.totop{visibility:visible;opacity:1}' in css_tight,
+         'R3 LAW: quiet at rest.  It is not shown on the first plate, where its '
+         'act is already done - and it is hidden by VISIBILITY, which keeps the '
+         'box (so the rail never jumps) and still takes it out of the tab order')
+    need("classList.toggle('past-first'" in js_tight,
+         'R3 LAW: the reveal rides the scroll-spy that was already running.  A '
+         'scroll listener here would be a second one on the thread the parent '
+         'measures the lintel on')
+    need('.seek.is-dict>.totop{visibility:hidden;opacity:0}' in css_tight,
+         'R3 LAW: on a phone the English register is laid over the WHOLE seek at '
+         'left:0, so the way back up goes under it with the search rather than '
+         'sitting on top of a field it has nothing to do with')
+    # ---- R4, the drag home ----
+    need('document.createComment' not in js_tight,
+         "R4 LAW: the slot must be an ELEMENT.  As a comment node it had the "
+         "right anchor and no box, so the row closed over the gap and there was "
+         "nothing in the lintel to drag a bar back to - which is exactly the "
+         "gesture the builder asked for by name")
+    need('.br-slot{display:none}' in css_tight and '.br-slot.is-open{' in css_tight
+         and '.br-slot.is-near{' in css_tight,
+         'R4 LAW: the empty place is drawn only while a bar is in the hand, and '
+         'says so twice - open, and within reach')
+    need('functiondockHome(' in js_tight and 'functionopenSlot(' in js_tight
+         and 'functionshutSlot(' in js_tight,
+         'R4 LAW: the docking gesture has gone')
+    need('DOCK=72' in js_tight,
+         'R4 LAW: the docking reach is one stated number, not a magic literal '
+         'buried in the pointermove path')
+    need("if(home){ dockHome(u); }".replace(' ', '') in js_tight.replace(' ', ''),
+         'R4 LAW: docking happens on RELEASE, in onUp, before the place() that '
+         'would otherwise bake the floating position back in')
+    need("e.type==='pointerup'" in js_tight,
+         'R4 LAW: a pointercancel is the system taking the gesture away, not a '
+         'reader letting go - it may not be read as "put it down here"')
+    need('functionmkslot(' in js_tight and js_tight.count('u.ph=mkslot()') == 2,
+         'R4 LAW: both places that open a slot - the lift and the restore - must '
+         'mint the same node, or a bar restored from storage has no way home')
+    # THE PARENT MEASURES THIS LINTEL EVERY FRAME.  A getBoundingClientRect on
+    # the pointermove path is a forced layout per pointer sample, across the
+    # iframe boundary, while the builder is watching his own white line.
+    _m = re.search(r'functiononMove\(e\)\{(.*?)functiononUp\(e\)\{', js_tight, flags=re.S)
+    need(_m, 'R4 LAW: onMove/onUp are no longer where they were - re-derive this check')
+    _mv = _m.group(1)
+    need(_mv.count('getBoundingClientRect') == 1,
+         'R4 LAW: exactly ONE getBoundingClientRect on the drag path, and it is '
+         'the one at the lift.  The slot target is measured once there and '
+         'cached; the app reads .stickybar across the iframe on every frame, so '
+         'a read per pointer sample is a forced layout per sample')
+    need('zone=openSlot(u)' in _mv and 'if(n!==near)' in _mv,
+         'R4 LAW: the slot is measured at the lift and the near class is written '
+         'only when the answer CHANGES - holding still must cost nothing')
 
 
 def assert_membrane(css_tight, doc):
@@ -4298,6 +4828,8 @@ DOC = (
 assert_membrane(_tightbare, DOC)
 assert_design(_tightbare, DOC, _jsbare)
 assert_geometry(_tightbare)
+assert_scroll(_tightbare, _jsbare)
+assert_controls(_tightbare, _jsbare, DOC)
 assert_toggle(_tightbare, _jsbare)
 assert_no_bare_symbol(DOC)
 assert_chrome(DOC)
