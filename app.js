@@ -2445,11 +2445,53 @@ function _hashIndex() {                                 // '', '#about', a futur
 }
 
 function cancelMenuSettle() { if (_menuSettle) { _menuSettle.cancel(); _menuSettle = null; } }
+
+/* BR-S269 — THE PRIME. Why a panel switch stuttered on its FIRST frame, every time.
+   `.is-offstage` is `visibility:hidden; height:0; overflow:hidden`, so an offstage
+   panel holds no layout box and no paint. menuSlideTo un-offstages ALL panels for
+   stable geometry and then, in the SAME synchronous block, adds the state class that
+   starts the 640ms transform. So frame one of every slide had to lay out and first-
+   paint two full-viewport panels (The Draw's monument, the Reliquary) before it could
+   move a pixel — and because menuSettle re-collapses them at transitionend, nothing
+   stayed warm: the identical cost was paid on every single switch.
+
+   The fix buys that work its own frame instead of making the transition wait for it.
+   PIN the track to the transform it already has (`transition:none` + an explicit inline
+   transform), THEN reveal the panels, then force the layout flush while nothing is
+   moving — invisible, because the pin holds the old position. Two rAFs later the inline
+   styles are dropped, the CSS class transform takes over, and the glide starts on a
+   frame with no layout debt.
+
+   EVERYTHING ELSE STAYS SYNCHRONOUS. The state class, inert/aria, history and focus are
+   untouched and still land in the calling task, so _menuIndex(), Esc and popstate read
+   the same truth they always did — only the visual start moves. A token guards against
+   a stale release from a previous slide unpinning a newer one. */
+let _menuPrimeTok = 0;
+function _menuUnprime(track) { track.style.transition = ""; track.style.transform = ""; track.style.willChange = ""; }
+function _menuPrime(track, cur) {
+  track.style.transition = "none";
+  track.style.transform  = "translateX(" + (cur * -100) + "%)";
+  track.style.willChange = "transform";                             // promoted for the slide only — cleared in fin(), mirroring BR-S141's add-then-clear
+}
+function _menuRelease(track) {
+  const tok = ++_menuPrimeTok;
+  void track.offsetWidth;                                           // flush the freshly-revealed panels NOW, behind the pin
+  let fired = false;
+  const go = () => {
+    if (fired || tok !== _menuPrimeTok) return;                     // already released, or a newer slide re-primed — leave its pin alone
+    fired = true;
+    track.style.transition = "";
+    track.style.transform  = "";                                    // → the .is-wall/.is-reliquary class transform, now glide-able
+  };
+  requestAnimationFrame(() => requestAnimationFrame(go));           // the normal path: release on a frame with no layout debt
+  setTimeout(go, 80);                                               // BACKSTOP — rAF is starved in a hidden/background tab, and a pin that never lifts is a panel that never arrives. 80ms clears two frames at 30Hz, so rAF wins on any live page.
+}
+
 function menuSettle(track, panels, activeIdx, after) {
   cancelMenuSettle();
   let done = false, t;
   const collapse = () => panels.forEach((p, i) => { if (p && i !== activeIdx) p.classList.add("is-offstage"); });   // ALL non-active panels
-  const fin = () => { if (done) return; done = true; track.removeEventListener("transitionend", onEnd); clearTimeout(t); collapse(); if (after) after(); };
+  const fin = () => { if (done) return; done = true; track.removeEventListener("transitionend", onEnd); clearTimeout(t); _menuUnprime(track); collapse(); if (after) after(); };   // BR-S269: drops the promotion, and rescues the pin if rAF never ran (hidden tab)
   const onEnd = (e) => { if (e.target === track && e.propertyName === "transform") fin(); };
   const reduce = window.BRMotion ? window.BRMotion.prefersReduced() : window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   track.addEventListener("transitionend", onEnd);
@@ -2492,6 +2534,10 @@ function menuSlideTo(target, opts = {}) {
   if (target === cur && !opts.seed) return;                         // idempotent
   try { window.scrollTo(0, 0); } catch (e) {}                       // reset any About scroll-depth before the slide
   cancelMenuSettle();
+  const _reduce = window.BRMotion ? window.BRMotion.prefersReduced()
+                                  : window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const _prime = !opts.seed && !_reduce;                            // BR-S269: no pin on a deep-link paint (no transition) or reduced motion (transition:none)
+  if (_prime) _menuPrime(track, cur); else _menuUnprime(track);     // else-branch clears any inline left by an interrupted slide
   panels.forEach(p => p && p.classList.remove("is-offstage"));      // un-offstage ALL for stable geometry during the slide
   MENU_PANELS.forEach(p => { if (p.cls) host.classList.remove(p.cls); });   // exactly one state class
   if (MENU_PANELS[target].cls) host.classList.add(MENU_PANELS[target].cls);
@@ -2519,6 +2565,7 @@ function menuSlideTo(target, opts = {}) {
       else { const pill = host.querySelector(".menu__codex--rooms"); if (pill) pill.focus(); }
     });
   }
+  if (_prime) _menuRelease(track);                                  // BR-S269: last — flush every mutation above behind the pin, then glide
 }
 
 function menuPopstate() {
