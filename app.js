@@ -2467,8 +2467,14 @@ function cancelMenuSettle() { if (_menuSettle) { _menuSettle.cancel(); _menuSett
    the same truth they always did — only the visual start moves. A token guards against
    a stale release from a previous slide unpinning a newer one. */
 let _menuPrimeTok = 0;
-function _menuUnprime(track) { track.style.transition = ""; track.style.transform = ""; track.style.willChange = ""; }
+function _menuUnprime(track) {
+  const h = track.closest(".menu") || document.getElementById("menuView");
+  if (h) h.classList.remove("is-sliding");                          // BR-S270: the blurs come back at rest
+  track.style.transition = ""; track.style.transform = ""; track.style.willChange = "";
+}
 function _menuPrime(track, cur) {
+  const h = track.closest(".menu") || document.getElementById("menuView");
+  if (h) h.classList.add("is-sliding");                             // BR-S270: suppresses backdrop-filter for the travel — see styles.css
   track.style.transition = "none";
   track.style.transform  = "translateX(" + (cur * -100) + "%)";
   track.style.willChange = "transform";                             // promoted for the slide only — cleared in fin(), mirroring BR-S141's add-then-clear

@@ -2792,6 +2792,22 @@ body[data-view="room"] .dev { display: none; }
   /* off-stage panel contributes zero height → no phantom scrollbar on short desks */
 @media (prefers-reduced-motion: reduce) { .menu__track { transition: none; } }
 
+/* BR-S270 — NOTHING BLURS ITS BACKDROP WHILE THE TRACK IS MOVING.
+   Promoting .menu__track (BR-S269) lets the browser rasterise the panels ONCE and
+   then just translate the layer — every ordinary filter, gradient and shadow rides
+   along for free. `backdrop-filter` is the one thing that cannot: by definition it
+   must re-sample whatever sits BEHIND it, so it is recomputed on every frame of the
+   640ms slide and it drags the promoted layer back down with it. Measured on the
+   Desk: four backdrop-filters (two .cardqr at blur(10px) saturate(.9), two
+   .photo__tag at blur(4px)) — all of them on the panel that slides out.
+   Suppressed only while .is-sliding is on, which is exactly the window between the
+   prime and the settle. The blurs come straight back at rest, and losing them for
+   the ~0.6s a panel is travelling is invisible-grade: the same trade BR-S141 made
+   when it stripped the per-frame drop-shadow off the pip ignite.
+   Specificity, not !important — #menuView.is-sliding .menu__panel * outranks the
+   .cardqr / .photo__tag rules that set the blurs. */
+#menuView.is-sliding .menu__panel * { backdrop-filter: none; -webkit-backdrop-filter: none; }
+
 /* ============================================================
    BR-S203 — THE PROCESSION: "About Blue Room" (the vertical scroll-depth below the desk).
    Hidden whenever the menu is off the desk (wall slide / reveal fullview).
