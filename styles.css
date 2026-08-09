@@ -2626,7 +2626,7 @@ body[data-view="room"] .dev { display: none; }
    0 every time. Stating 14px makes the file honest about what actually renders. */
 .menu__foot { font-family: var(--font-mono); font-size: 8.5px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--faint); margin-top: 14px; }
 /* BR-S155: quiet pill link from the front door to the Codex reference page */
-.menu__codex { align-self: start; display: inline-flex; align-items: center; gap: 8px; margin-top: 4px; padding: 8px 16px; font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--t-meta); text-decoration: none; border: 1px solid var(--line); border-radius: 999px; transition: color 160ms ease, border-color 160ms ease; }
+.menu__codex { background: none; cursor: pointer; align-self: start; display: inline-flex; align-items: center; gap: 8px; margin-top: 4px; padding: 8px 16px; font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--t-meta); text-decoration: none; border: 1px solid var(--line); border-radius: 999px; transition: color 160ms ease, border-color 160ms ease; }
 .menu__codex:hover { color: var(--t-display); border-color: var(--t-meta); }
 /* BR-S254 — SEND THE ACCENT HOME. Violet is the paid/kept register (this file says
    so in three separate places: "the one violet in the room"). It was being spent on
@@ -2804,9 +2804,15 @@ body[data-view="room"] .dev { display: none; }
    prime and the settle. The blurs come straight back at rest, and losing them for
    the ~0.6s a panel is travelling is invisible-grade: the same trade BR-S141 made
    when it stripped the per-frame drop-shadow off the pip ignite.
-   Specificity, not !important — #menuView.is-sliding .menu__panel * outranks the
-   .cardqr / .photo__tag rules that set the blurs. */
-#menuView.is-sliding .menu__panel * { backdrop-filter: none; -webkit-backdrop-filter: none; }
+   BR-S271 — NAME THE TARGETS. The first form of this rule used `.menu__panel *`, and the
+   universal selector was the whole cost: it matched 427 nodes and spent 8.1-9.9ms of style
+   recalc every time .is-sliding was toggled — twice per switch — to suppress 2,993px of blur,
+   0.08% of the moving layer. The decisive control: the same selector shape carrying a
+   harmless non-paint property (outline-color) cost 9.9ms; the same rule with the elements
+   NAMED cost 0.2ms. Naming them takes the replayed synchronous block 10.6ms -> 5.6ms.
+   Specificity (1 id + 1 class) still beats the base .photo__tag / .cardqr rules. */
+#menuView.is-sliding .photo__tag,
+#menuView.is-sliding .cardqr { backdrop-filter: none; -webkit-backdrop-filter: none; }
 
 /* ============================================================
    BR-S203 — THE PROCESSION: "About Blue Room" (the vertical scroll-depth below the desk).
@@ -3021,7 +3027,7 @@ body[data-view="room"] .dev { display: none; }
 .menu__draw-rail .menu__codex__mark { color: var(--silver-dim); }   /* kill the app-wide violet mark drift */
 .menu__draw-foot { font-family: var(--font-mono); font-size: 8.5px; letter-spacing: .18em; text-transform: uppercase; color: var(--t-meta); margin-top: 4px; line-height: 1.7; }
 .menu__draw-cuttick { display: inline-block; width: 20px; height: 1px; vertical-align: middle; margin-right: 7px; background: linear-gradient(90deg, #c8ad70, #a2864a); opacity: .55; }
-.menu__draw-credo { color: var(--t-meta); }
+/* BR-S271: .menu__draw-credo deleted with its span — it set the colour the parent already had. */
 .menu__draw-wm { position: absolute; left: -34px; top: 50%; transform: translateY(-50%); width: 360px; max-width: 42vw; opacity: .05; pointer-events: none; z-index: 0; }
 .menu__draw-wm svg { width: 100%; height: auto; display: block; }
 
@@ -3030,8 +3036,11 @@ body[data-view="room"] .dev { display: none; }
 @keyframes m2-back-fade { from { opacity: 1; } to { opacity: .12; } }
 @keyframes m2-breath { 0%, 100% { opacity: .5; } 50% { opacity: .9; } }
 @media (prefers-reduced-motion: no-preference) {
-  .m2hero--turn .m2hero__face { animation: m2-turn 1.4s cubic-bezier(.2, .7, .2, 1) both; }
-  .m2hero--turn .m2hero__back { animation: m2-back-fade 1.4s cubic-bezier(.2, .7, .2, 1) both; }
+  /* BR-S271: 1.4s -> 0.6s. The turn now starts AFTER the 640ms travel instead of under it,
+     so the old duration left 760ms of animation still running past arrival — a 1.45s smear
+     from press to settled. Two clean beats at 0.6s: the slide lands, then the card turns. */
+  .m2hero--turn .m2hero__face { animation: m2-turn .6s cubic-bezier(.2, .7, .2, 1) both; }
+  .m2hero--turn .m2hero__back { animation: m2-back-fade .6s cubic-bezier(.2, .7, .2, 1) both; }
   .m2pip-glow { animation: m2-breath 9s ease-in-out infinite; }
 }
 
@@ -3143,7 +3152,7 @@ body[data-view="room"] .dev { display: none; }
 .menu__wall-back { display: none; }
 @media (max-width: 1199px) {
   .menu__go { display: none; }
-  .menu__codex--rooms { display: inline-flex; background: none; cursor: pointer; }
+  .menu__codex--rooms { display: inline-flex; }   /* BR-S271: background/cursor moved to the base rule — they were never narrow-only */
   .menu__wall-back, .menu__reliq-navback { display: inline-block; background: none; border: 0; cursor: pointer; font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.1em; color: var(--t-meta); padding: 6px 10px; }   /* BR-S204: reliquary text-back mirrors the wall's (edge arrows are hidden here) */
   .menu__wall-back:hover, .menu__reliq-navback:hover { color: var(--t-display); }
   .menu__wall { width: 100%; max-width: 500px; }
@@ -3808,7 +3817,16 @@ body[data-devnav="1"] .devnav {
 /* The seal REskinned to the universe's WHITE full-codex ball (a bright ivory sphere)
    while KEEPING its in-page iris behaviour (wireMenuCodex untouched): ◆ hidden at rest
    so it's a plain sphere like the rooms' ball, ◆ (dark) surfaces on hover, × on open. */
-#menuView .seed { position: fixed; right: clamp(12px,2.6vw,40px); bottom: clamp(118px,19vh,150px);
+/* BR-S271 — THE ORBS SIT LOWER. The builder: "codexes are a bit too high". The same
+   clamp was written out three times and all three had to move together or the stack
+   separates, so it is one token now. Measured live at 1440x900: the cream seal's bottom
+   edge goes 150px -> 99px off the floor and the orange mini 204px -> 153px — the pair
+   drops exactly 51px and stops reading as floating mid-air, and the dead air between the
+   seal and the rooms cue closes from 82.3px to 31.3px. The collision floor at 900 tall is
+   bottom < ~68px, so 96px keeps ~28px of margin. The Bloom aperture needs no change —
+   geometry() reads the seal's live rect for --cx/--cy, so the iris origin follows. */
+#menuView { --orb-bottom: clamp(96px, 11vh, 110px); }
+#menuView .seed { position: fixed; right: clamp(12px,2.6vw,40px); bottom: var(--orb-bottom);
   z-index: 60; width: 42px; height: 42px; border-radius: 50%; padding: 0; cursor: pointer; text-decoration: none;
   display: grid; place-items: center; border: none;
   /* "Deep Glass" sphere — catchlight / crescent rim / body as STATIC background layers.
@@ -4000,7 +4018,7 @@ body[data-devnav="1"] .devnav {
 
 #menuView .mini { position: fixed;
   right: calc(clamp(12px,2.6vw,40px) + 7px);
-  bottom: calc(clamp(118px,19vh,150px) + 54px);   /* sits ABOVE the seal, ~10px clear — no overlap */
+  bottom: calc(var(--orb-bottom) + 54px);   /* sits ABOVE the seal, ~10px clear — no overlap */
   width: 30px; height: 30px; z-index: 62; touch-action: none;
   transform: translate3d(var(--mx,0px), var(--my,0px), 0); }
 /* .is-dragging means "the pointer is down"; .is-carry means "the object is airborne" — and
@@ -4081,7 +4099,7 @@ body[data-devnav="1"] .devnav {
 /* the ghost home-dock — where the ball belongs; shown only once the ball is dragged away */
 #menuView .mini-dock { position: fixed;
   right: calc(clamp(12px,2.6vw,40px) + 7px);
-  bottom: calc(clamp(118px,19vh,150px) + 54px);
+  bottom: calc(var(--orb-bottom) + 54px);
   width: 30px; height: 30px; z-index: 61; padding: 0; border-radius: 50%; cursor: pointer;
   background: transparent; border: 1px dashed rgba(224,108,60,.5);
   box-shadow: inset 0 0 8px rgba(224,108,60,.14);

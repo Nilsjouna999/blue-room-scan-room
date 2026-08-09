@@ -649,7 +649,13 @@
     accT+=dt; var steps=0; while(accT>=STEP && steps<3){ for(l=0;l<lines.length;l++) integrate(lines[l]); accT-=STEP; steps++; }
     ctx.clearRect(0,0,W,H);
     drawBands();                              // BR-S232: opaque bg-matched occluding bands OWN the cut — drawn FIRST so the white line reads as the lit lip on top of the mask (strictly after the vis<=0.001 gate above, so a non-About view is never occluded)
-    drawLine(lines[0], t, upperEnv);          // upper (UPPER_FRAC): quintic latch/hold, releases at the very end
+    /* BR-S271 — do not draw a line that is off by construction. TOP_LINE is hardcoded false
+       (line 130) and upperEnv is forced to 0 (line 614), yet every frame still built a ~264-point
+       path plus a gradient fill and a shadowBlur stroke for something invisible. Measured:
+       drawLine 0.456 -> 0.263 ms/frame; over a real descent, median frame interval 19.7 -> 12.7 ms,
+       p90 30.2 -> 17.3 ms, frames over 25ms 9 -> ~1. Zero behavioural change — the lower line and
+       the membrane's .stickybar contract are on different paths entirely. */
+    if (upperEnv > 0.001) drawLine(lines[0], t, upperEnv);   // upper (UPPER_FRAC): quintic latch/hold, releases at the very end
     drawLine(lines[1], t, lowerEnv);          // lower (LOWER_FRAC): content-anchored fade (last-plate exit)
     emitParticles(boxes); stepParticles(); drawParticles();
     requestAnimationFrame(frame);

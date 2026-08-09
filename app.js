@@ -1415,12 +1415,12 @@ function renderWall() {
     // CTRL — one loud act under the gold cut-line, then a steep ladder (source-first for a11y)
     + '<div class="menu__draw-ctrl">'
     + '<span class="menu__draw-cutline" aria-hidden="true"></span>'
-    + '<p class="msample__seal">The deck is already cut to you. One card is free to turn.</p>'
+    + '<p class="msample__seal">The deck is already cut. What remains is the turn.</p>'
     + '<div class="menu__draw-doors">'
     + '<a class="menu__door menu__door--add menu__door--pull" href="?dev=drawing-room&pull=1">'
     + '<span class="menu__door-kicker">The Pull · By the Draw</span>'
     + '<span class="menu__door-name">Draw a card — free</span>'
-    + '<span class="menu__door-desc">One card, cut to your question. Free — and yours to keep.</span>'
+    + '<span class="menu__door-desc">One card, cut to your question.</span>'
     + '</a>'
     + '<div class="menu__door menu__door--sample menu__door--birth">'
     + '<a class="menu__draw-hit" href="?dev=arcane" aria-label="The Arcana Reading"></a>'
@@ -1431,12 +1431,12 @@ function renderWall() {
     + '<a class="menu__draw-aside" href="?dev=arcana-reading#/concord">Or two names, one bond — a Concord &rarr;</a>'
     + '</div>'
     + '</div>'
-    + '<a class="menu__draw-tiers" href="?dev=drawing-room">Deeper draws — A Sitting · three, free · The Deep Read · five, <em class="menu__draw-kept">kept</em> &rarr;</a>'
+    + '<a class="menu__draw-tiers" href="?dev=drawing-room">Deeper draws — A Sitting · three, free · The Deep Read · five &rarr;</a>'
     + '<div class="menu__draw-rail">'
-    + '<button type="button" class="menu__codex menu__codex--reliq" data-annex-go><span class="menu__codex__mark" aria-hidden="true">◆</span> The Reliquary — what you draw is kept <span class="menu__codex__arr" aria-hidden="true">→</span></button>'
+    + '<button type="button" class="menu__codex menu__codex--reliq" data-annex-go><span class="menu__codex__mark" aria-hidden="true">◆</span> The Reliquary — <em class="menu__draw-kept">kept</em> <span class="menu__codex__arr" aria-hidden="true">→</span></button>'
     + '<a class="menu__codex" href="?dev=settings"><span class="menu__codex__mark" aria-hidden="true">◆</span> Settings <span class="menu__codex__arr" aria-hidden="true">→</span></a>'
     + '</div>'
-    + '<p class="menu__draw-foot"><span class="menu__draw-cuttick" aria-hidden="true"></span> One archive · every door kept. <span class="menu__draw-credo">Drawn once. Not reissued.</span></p>'
+    + '<p class="menu__draw-foot"><span class="menu__draw-cuttick" aria-hidden="true"></span> Drawn once. Not reissued.</p>'
     + '</div>'
     // STAGE — the standing monument: the XVII Star, turned in gold
     + '<section class="menu__draw-stage">'
@@ -2489,8 +2489,15 @@ function _menuRelease(track) {
     track.style.transition = "";
     track.style.transform  = "";                                    // → the .is-wall/.is-reliquary class transform, now glide-able
   };
-  requestAnimationFrame(() => requestAnimationFrame(go));           // the normal path: release on a frame with no layout debt
-  setTimeout(go, 80);                                               // BACKSTOP — rAF is starved in a hidden/background tab, and a pin that never lifts is a panel that never arrives. 80ms clears two frames at 30Hz, so rAF wins on any live page.
+  /* BR-S271 — ONE rAF, not two. The two-frame split was measured and it bought nothing:
+     `void track.offsetWidth` above already forces the revealed panels' layout SYNCHRONOUSLY,
+     inside the click task, because _menuRelease is called from menuSlideTo which is itself
+     inside the handler. So the second frame relocated no work — it only delayed the start of
+     the movement by one whole frame (~16.7ms at 60Hz; +40ms paired median untethered). A
+     synchronous release measured the same as a single-rAF one, which is the proof. The
+     promotion stays: un-promoted, the glide stalled 225ms vs 97ms. */
+  requestAnimationFrame(go);
+  setTimeout(go, 80);                                               // BACKSTOP — rAF is starved in a hidden/background tab, and a pin that never lifts is a panel that never arrives.
 }
 
 function menuSettle(track, panels, activeIdx, after) {
@@ -2562,8 +2569,16 @@ function menuSlideTo(target, opts = {}) {
   if (target > 0) {                                                 // arriving ANY non-desk panel (forward OR back): focus its title now
     const el = host.querySelector(MENU_PANELS[target].focus);
     if (el) el.focus({ preventScroll: true });
-    if (MENU_PANELS[target].cls === "is-wall") wireM2Turn(host);    // BR-S231: play the monument's turn on arrival (once)
-    menuSettle(track, panels, target);
+    /* BR-S271 — the monument turns AFTER the travel, not during it. wireM2Turn starts a
+       clip-path animation, and clip-path is not compositor-only: it repainted the arriving
+       panel on every frame of the 640ms slide, defeating the very layer promotion _menuPrime
+       exists to buy — and it began one to three frames BEFORE the track moved a pixel. Moved
+       into menuSettle's `after`, which fires on transitionend or the 900ms backstop, so the
+       arrival reads as two clean beats instead of one 1.45s smear. Still once per load
+       (M2_TURN_PLAYED), so this was never the whole "still laggy" answer — only a real part. */
+    menuSettle(track, panels, target, () => {
+      if (MENU_PANELS[target].cls === "is-wall") wireM2Turn(host);  // BR-S231: play the monument's turn on arrival (once)
+    });
   } else {                                                          // returning to the desk: settle, then focus the rooms arrow/pill
     menuSettle(track, panels, 0, () => {
       const arrow = host.querySelector(".menu__panel--desk .menu__go-btn");   // scoped to the desk — never a wall/reliquary arrow
