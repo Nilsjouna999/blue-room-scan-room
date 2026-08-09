@@ -372,7 +372,7 @@
         ev.preventDefault();
         var d = el.getAttribute("data-door");
         if (d === "menu") { if (inApp()) location.href = location.pathname; else note(root, "Returns to the main menu. (Inert in preview.)"); }
-        else if (d === "codex") { if (inApp()) location.href = "codex.html"; else note(root, "Opens the Codex. (Inert in preview.)"); }
+        else if (d === "codex") { if (inApp()) location.href = "codex.html?v=237"; else note(root, "Opens the Codex. (Inert in preview.)"); }   // BR-S272: the ONE codex link that shipped un-busted — every other caller carries ?v=
         else if (d === "arcane") toInput("", "Opens the Arcana Reading. (Inert in preview.)");
         else if (d === "drawing-room") { if (inApp()) location.href = "?dev=drawing-room"; else note(root, "Opens the Drawing Room — the tarot room. (Inert in preview.)"); }
         else if (d === "ceremony") { if (inApp()) location.href = "?dev=ceremony"; else note(root, "Opens the Ceremony — the arcana forge. (Inert in preview.)"); }
