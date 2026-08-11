@@ -1428,21 +1428,38 @@ function renderAbout() {
    One bit, house try/catch pattern, FAIL-OPEN, read at render: entering the Drawing Room
    is a full navigation, so the menu is rebuilt on return and the bit is always current. */
 function m2SittingUsed() { try { return localStorage.getItem("br_dr_sitting_used") === "1"; } catch (e) { return false; } }
-/* BR-S327 — what people actually bring. Honest, not crude: the room never asks you to
-   be salacious, it asks you to be specific, and these are the questions people are
-   already carrying when they open a tarot page at midnight. Kept in the room's register
-   — short, plain, no melodrama, and not one of them asks the deck to predict anything.
-   Eight, because the cycle is 8 × 3.4s ≈ 27s: long enough that it never feels like a
-   loop while you are reading a card. */
+/* ── BR-S331 — NOT QUESTIONS ASKED. THOUGHTS OVERHEARD. ──────────────────────
+   BR-S327's eight were good and they were all the same SHAPE: balanced "X, or Y?"
+   binaries, which is the shape of a question you pose to someone — considered,
+   symmetrical, said out loud. The builder wanted the other thing: mind curiosity,
+   rolling thoughts, intimate, almost too close. That is not a question you ask a
+   deck. It is what is already running when you open the page.
+   So the set is rewritten for the register rather than the topic:
+     · MOST DO NOT END IN A QUESTION MARK. "Why do I keep checking." is a thought;
+       "Why do I keep checking?" is a survey item. The full stop is what makes it
+       sound like it came from inside.
+     · THE BINARIES ARE CUT TO TWO. One or two still land ("Is it loyalty, or is it
+       fear?") — eight of them read as a quiz.
+     · FRAGMENTS ARE ALLOWED. "The thing I haven't told anyone." has no verb and is
+       the closest line here, because that is how the thought actually arrives.
+     · UNIVERSAL-SPECIFIC. Not "am I happy" (nobody thinks that sentence) and not a
+       named situation either. "I keep almost saying it" belongs to everyone who has
+       ever nearly said something.
+   Still inside the canon: every one is a present inner state. Not one asks what will
+   happen, because this room describes and never forecasts.
+   Ten now, not eight — a 36s cycle, long enough that the loop never closes while
+   someone is reading a card, and enough variety that no two neighbours rhyme. */
 const M2_ASKS = [
-  "Should I say it, or let it pass?",
+  "Why do I keep checking.",
+  "I already know, don't I.",
   "Is it loyalty, or is it fear?",
-  "Am I building something, or just busy?",
-  "Do they think about me at all?",
+  "I keep almost saying it.",
   "What am I pretending not to know?",
-  "Is this love, or is it habit?",
-  "Is the door closed, or only heavy?",
-  "What am I waiting for permission to do?",
+  "Do they think about me at all.",
+  "The thing I haven't told anyone.",
+  "Am I waiting, or am I hiding.",
+  "Something is off and I can't name it.",
+  "Would I choose this again.",
 ];
 
 function renderWall() {
@@ -1550,7 +1567,7 @@ function renderWall() {
        panel you can slide away from would. */
     + '<div class="m2asks" aria-hidden="true">'
     +   M2_ASKS.map(function (q, i) {
-          return '<span class="m2asks__q" style="animation-delay:' + (-i * 3.4).toFixed(1) + 's">' + q + '</span>';
+          return '<span class="m2asks__q" style="animation-delay:' + (-i * 3.6).toFixed(1) + 's">' + q + '</span>';
         }).join('')
     + '</div>'
     + '<span class="menu__draw-cutline menu__draw-cutline--read" aria-hidden="true"></span>'
