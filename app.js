@@ -2467,14 +2467,37 @@ function cancelMenuSettle() { if (_menuSettle) { _menuSettle.cancel(); _menuSett
    the same truth they always did — only the visual start moves. A token guards against
    a stale release from a previous slide unpinning a newer one. */
 let _menuPrimeTok = 0;
+
+/* BR-S276 — FLATTEN THE DESK WHILE IT TRAVELS.  The builder's own diagnosis, which is
+   worth more than any of my measurements: "it starts immediately, but feels like 2
+   pause lag; M2/M3 feels fine, M1/M2 and M1&U1 feel the lag."  That maps exactly onto
+   what the fleet measured and nobody had connected to a symptom: 100% of the menu's
+   paint weight is on the DESK (costly-property elements — desk 91, wall 3, reliquary 2).
+   Every transition that feels bad involves M1; the one that involves neither is fine.
+   The Desk carries ~1,762,000px of mix-blend-mode inside a ~1,252,800px viewport — about
+   1.4 backdrop-reading blend passes per viewport pixel, all of it inside the layer the
+   prime just promoted.  A blend mode must READ what is behind it every frame, which is
+   precisely the thing a flat translating layer is supposed to avoid, so the promotion
+   was being paid for and then given back.
+   Flattened for the travel window only, on both surfaces that reported it: the panel
+   slide AND the U1 descent, via one class on <html> so the two can never drift apart.
+   THE COST IS REAL AND IS A TASTE CALL: shimmer, foil, grain and the card finish will
+   pop at the start and end of a travel, which is what a "pause" would have to trade
+   against.  So it ships with an off-switch — ?flat=0 restores every blend — and the
+   builder decides by looking, not by reading this comment. */
+const _FLATTRAVEL = !/[?&]flat=0/.test(String(location.search || ""));
+function _travelOn()  { if (_FLATTRAVEL) document.documentElement.classList.add("is-travel"); }
+function _travelOff() { document.documentElement.classList.remove("is-travel"); }
 function _menuUnprime(track) {
   const h = track.closest(".menu") || document.getElementById("menuView");
   if (h) h.classList.remove("is-sliding");                          // BR-S270: the blurs come back at rest
+  _travelOff();                                                     // BR-S276: and the blends come back with them
   track.style.transition = ""; track.style.transform = ""; track.style.willChange = "";
 }
 function _menuPrime(track, cur) {
   const h = track.closest(".menu") || document.getElementById("menuView");
   if (h) h.classList.add("is-sliding");                             // BR-S270: suppresses backdrop-filter for the travel — see styles.css
+  _travelOn();                                                      // BR-S276: and flattens the Desk's blend stack for the same window
   track.style.transition = "none";
   track.style.transform  = "translateX(" + (cur * -100) + "%)";
   track.style.willChange = "transform";                             // promoted for the slide only — cleared in fin(), mirroring BR-S141's add-then-clear
@@ -2776,6 +2799,7 @@ function _u1Reduced() {
 }
 function _u1Release() {
   _u1Gliding = false;
+  _travelOff();
   if (_u1GlideT) { clearTimeout(_u1GlideT); _u1GlideT = null; }
   if (_u1RAF) { cancelAnimationFrame(_u1RAF); _u1RAF = null; }
 }
@@ -2798,6 +2822,7 @@ function _u1GlideTo(target) {
   if (Math.abs(dist) < 2) return false;
   if (_u1Reduced()) { window.scrollTo(0, target); return true; }      // no motion: land, don't travel
   _u1Gliding = true;
+  _travelOn();                                                        // BR-S276: the descent shows the Desk too — same flattening, same window
   const t0 = _u1Now();
   let expect = from;                                                  // where WE put the page last frame
   const step = function () {
