@@ -2207,6 +2207,39 @@ function wireMiniCodex(host) {
     const dist = sp * D * K;
     return dist < 1 ? null : { ux: vx / sp, uy: vy / sp, sp: sp, D: D, dist: dist };
   }
+  /* THE PRESS AND THE RETURN.  A critically damped spring, so it comes back once and stops:
+     x(t) = A(1 + wt)e^(-wt), which is zero-velocity at both ends and never crosses the bound
+     it is returning to. w is fixed at 26/s -> visually done by ~170ms, quick enough that it
+     reads as contact rather than as a second animation. Amplitude scales with the momentum
+     the wall actually absorbed, so a hard throw presses in and a gentle one barely marks it.
+     ?edge=hard restores the old dead clamp for comparison. */
+  const EDGE_MAX = 11, EDGE_W = 26;
+  const EDGE_HARD = /[?&]edge=hard/.test(String(location.search || ""));
+  function edgeCatch(sx, sy, rem, settle) {
+    /* SATURATING, not linear-then-clipped. `min(11, rem*0.045)` measured as a feature that
+       barely existed: it reached the 11px cap at 244px/s, so every throw above a nudge
+       pressed exactly the same amount and the stated "a hard throw presses in, a gentle one
+       barely marks it" was false for the whole real speed range. An exponential approach to
+       the cap spends the range properly — 150px/s -> 1.1px, 900 -> 5.2px, 2600 -> 9.3px,
+       6000 -> 10.8px — so the wall records how hard it was actually hit. */
+    const A = EDGE_MAX * (1 - Math.exp(-rem / 1400));
+    if (EDGE_HARD || A < 0.6 || (!sx && !sy)) { land(); settle(); return; }
+    const bx = ox, by = oy, t0 = now();
+    (function press() {
+      const t = (now() - t0) / 1000;
+      const e = Math.exp(-EDGE_W * t);
+      const d = A * (1 + EDGE_W * t) * e;                // A at t=0, 0 at rest, no crossing
+      if (t > 0.34 || d < 0.25) {
+        coastRaf = null;
+        ox = bx; oy = by;
+        mini.style.transform = "translate3d(" + bx + "px," + by + "px,0)";
+        land(); settle(); return;
+      }
+      mini.style.transform = "translate3d(" + (bx + sx * d) + "px," + (by + sy * d) + "px,0)";
+      coastRaf = requestAnimationFrame(press);
+    })();
+  }
+
   function stopCoast() { if (coastRaf) { cancelAnimationFrame(coastRaf); coastRaf = null; } }
 
   function startCoast(vx, vy, settle) {
@@ -2223,7 +2256,23 @@ function wireMiniCodex(host) {
       mini.style.transform = "translate3d(" + cx + "px," + cy + "px,0)";
       const pinX = (cx !== px) || Math.abs(pl.ux) < 0.01;
       const pinY = (cy !== py) || Math.abs(pl.uy) < 0.01;
-      if (u >= 1 || (pinX && pinY)) { coastRaf = null; land(); settle(); return; }
+      if (u >= 1 || (pinX && pinY)) {
+        coastRaf = null;
+        /* BR-S302 — THE EDGE CATCH.  The flight itself is right: v(0)=v0 exactly so it leaves
+           at hand speed, v(D)=0 exactly so the set-down is a real event. The one unphysical
+           moment left was the WALL. A throw that met an edge was clamped dead on the frame it
+           arrived — all remaining momentum deleted, no contact, no consequence. Everything in
+           this room has weight except the instant it actually hits something.
+           So the momentum that the clamp would have thrown away is spent instead: the orb
+           presses PAST the bound by a capped amount proportional to the speed it still had,
+           then returns on a critically damped spring. Not a bounce — a bounce would be rubber,
+           and this is paper and brass. It reads as the wall taking the blow.
+           Capped at 11px against EDGE=12, so the press can never take the orb off-screen. */
+        const rem = pl.sp * (1 - pow(u, SHAPE));         // the speed the clamp was about to delete
+        edgeCatch(cx !== px ? Math.sign(px - cx) : 0,
+                  cy !== py ? Math.sign(py - cy) : 0, rem, settle);
+        return;
+      }
       coastRaf = requestAnimationFrame(step);
     })();
   }
