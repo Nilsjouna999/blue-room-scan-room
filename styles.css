@@ -4762,7 +4762,13 @@ html.orbit-wings .orbit__field { --orbit-rx: clamp(200px, 25.5vw, 368px); --orbi
   transform: translate3d(calc(var(--ox) * var(--orbit-rx) * var(--or, 1) * 0.34), calc(var(--oy) * var(--orbit-ry) * var(--or, 1) * 0.34), 0) translate(-50%, -50%) rotate(var(--orot, 0deg)) scale(calc(var(--os, 1) * .96));
   transition: opacity 340ms var(--ease-settle, cubic-bezier(.2,.7,.2,1)) var(--od, 0ms),
               transform 460ms var(--ease-settle, cubic-bezier(.2,.7,.2,1)) var(--od, 0ms),
-              color 180ms ease;
+              color 180ms ease,
+              /* BR-S312: `translate` is the RECEDE channel (see .is-detail below). It is
+                 listed here, on the resting rule, so the way BACK is eased too — a rule
+                 that only exists in the detail state snaps 30px on exit. The field never
+                 writes plate translate (it uses scale/rotate there), so there is still
+                 exactly one owner. */
+              translate 420ms var(--ease-settle, cubic-bezier(.2,.7,.2,1));
 }
 .orbit.is-open .orbit__plate {
   opacity: 1; will-change: transform;
@@ -4921,6 +4927,26 @@ html.orbit-wings .orbit__field { --orbit-rx: clamp(200px, 25.5vw, 368px); --orbi
    two beats slower and the whole reason the gesture reads.
    The two-press ladder is untouched: this is what the FIRST press now looks like. */
 .orbit.is-detail .orbit__plate { opacity: .18; pointer-events: none; transition-delay: 40ms; }   /* 3 — the field loses contrast around what you chose */
+/* ── BR-S312 — NOTHING MAY LAND ON TOP OF ANYTHING. ───────────────────────────
+   THE BUG, exactly: a displayed plate travels to `translate(-50%,-50%)` — dead centre
+   — and the PRIME plate is already at dead centre, because `--ox:0; --oy:0` is what
+   makes it the prime. So every first press stacked two complete plate designs on the
+   same spot, the one underneath still painting at .18. It was not a z-index problem
+   and raising z-index would not have fixed it: two things were in one place.
+   "The other nodes RECEDE" is the direction's own word and it is also the fix. The
+   ring pushes 30px further out along each plate's OWN angle — one line, because every
+   plate already carries its unit vector as --ox/--oy — which clears the centre and
+   reads as the field opening to make room rather than dimming politely in place.
+   THE PRIME IS THE EXCEPTION, AND IT HAS TO BE. Its vector is (0,0): it cannot recede
+   outward because it has no outward. It is the centre. So when it is not the plate you
+   chose it leaves entirely rather than lying underneath at .18 — the only honest answer
+   for an object whose position is the one the arriving plate needs. */
+@media (min-width: 720px) {
+  .orbit.is-detail .orbit__plate:not(.is-display) {
+    translate: calc(var(--ox) * 30px) calc(var(--oy) * 30px);
+  }
+}
+.orbit.is-detail .orbit__plate--prime:not(.is-display) { opacity: 0; }
 .orbit.is-detail .orbit__plate.is-display { opacity: 1; pointer-events: auto; z-index: 3; }
 .orbit .orbit__plate.is-display {
   width: 300px;
@@ -4928,15 +4954,14 @@ html.orbit-wings .orbit__field { --orbit-rx: clamp(200px, 25.5vw, 368px); --orbi
   transition-delay: 90ms;                                    /* 4 — only then does it start for the centre */
 }
 .orbit__plate.is-display .orbit__mark { width: 128px; height: 128px; color: #1c150d; transform: rotate(0deg) scale(1); }
-/* 5 — the icon GROWS into the destination instead of jumping to its final size. Scoped
-   to the display state so the mark carries no width transition at rest, and left off the
-   way back on purpose: an arrival earns beats, a dismissal does not. */
-.orbit__plate.is-display .orbit__mark {
-  transition: color 180ms ease,
-              transform 300ms var(--ease-settle, cubic-bezier(.2,.7,.2,1)),
-              width 320ms var(--ease-settle, cubic-bezier(.2,.7,.2,1)) 90ms,
-              height 320ms var(--ease-settle, cubic-bezier(.2,.7,.2,1)) 90ms;
-}
+/* 5 — BR-S312: THE ICON'S GROWTH IS BACK TO INSTANT, ON PURPOSE. BR-S311 transitioned
+   the mark's width and height so it would "grow into the destination". width and height
+   are LAYOUT properties: that animation relaid out a 128px box inside a 300px flex
+   column every frame for 320ms, and it re-flowed the label and the meaning under it on
+   each of those frames — the single least smooth thing on this sheet, added by me, one
+   commit ago. The beat is not worth a layout animation. The arrival is already carried
+   by the plate's composited travel and the halo closing around the icon; the size lands
+   with the rest of the layout, exactly as it did for every version before S311. */
 .orbit__plate.is-display .orbit__label { font-size: 12.5px; letter-spacing: .22em; color: #1c150d; }
 .orbit__plate.is-display .orbit__sub { font-size: 15px; color: #4b4133; max-width: 17em; }
 /* 2 — BR-S311: "decorative geometry contracts inward". It used to only fade, which is a

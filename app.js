@@ -5485,6 +5485,18 @@ render();
     }
     return moving;
   }
+  /* BR-S312 — WRITE ONLY WHAT CHANGED. The first version wrote every property of every
+     layer of every plate on every frame: 6 plates × (3 translates + a halo's 4 props +
+     the plate's scale and rotate) ≈ 34 style writes per frame, and about thirty of them
+     were setting a value to the value it already held. Each one still invalidates style
+     for that element, and `rotate` on a plate re-rasterises its text.
+     At 2-decimal precision a spring is unchanged for whole runs of frames — at rest it
+     is unchanged forever — so comparing against the last string written turns a hovered
+     sheet from ~34 writes/frame into roughly the 6 that are actually moving, and a
+     settled one into zero. This is the difference between a loop that is parked and a
+     loop that is idling. */
+  function setp(el, prop, v) { if (el._p !== undefined && el._p[prop] === v) return; (el._p || (el._p = {}))[prop] = v; el.style.setProperty(prop, v); }
+  function setv(el, key, v) { if (el._v !== undefined && el._v[key] === v) return; (el._v || (el._v = {}))[key] = v; el.style[key] = v; }
   function fieldPaint(nodes) {
     for (var i = 0; i < nodes.length; i++) {
       var n = nodes[i];
@@ -5493,20 +5505,20 @@ render();
         if (a.halo) {
           var m = Math.sqrt(a.x * a.x + a.y * a.y);
           var st = Math.min(0.16, m * 0.020);                             // ≤16% elongation — a deformation, not a squash
-          a.el.style.setProperty("--halor", (m > 0.01 ? Math.atan2(a.y, a.x) * 57.2957795 : 0).toFixed(1) + "deg");
-          a.el.style.setProperty("--halosx", (F_HALO * (1 + st)).toFixed(3));
-          a.el.style.setProperty("--halosy", (F_HALO * (1 - st * 0.62)).toFixed(3));
+          setp(a.el, "--halor", (m > 0.01 ? Math.atan2(a.y, a.x) * 57.2957795 : 0).toFixed(1) + "deg");
+          setp(a.el, "--halosx", (F_HALO * (1 + st)).toFixed(3));
+          setp(a.el, "--halosy", (F_HALO * (1 - st * 0.62)).toFixed(3));
           /* the −1.0 floor is what keeps the halo the property of the plate you are
              pointing at: a neighbour's 1.7 of displacement barely lifts it off zero,
              the hovered plate's 7.6 takes it to full. */
-          a.el.style.setProperty("--haloo", Math.min(1, Math.max(0, m - 1.0) * 0.22).toFixed(3));
+          setp(a.el, "--haloo", Math.min(1, Math.max(0, m - 1.0) * 0.22).toFixed(3));
           continue;
         }
-        if (a.prop) { a.el.style.setProperty("--ornx", a.x.toFixed(2) + "px"); a.el.style.setProperty("--orny", a.y.toFixed(2) + "px"); }
-        else a.el.style.translate = a.x.toFixed(2) + "px " + a.y.toFixed(2) + "px";
+        if (a.prop) { setp(a.el, "--ornx", a.x.toFixed(2) + "px"); setp(a.el, "--orny", a.y.toFixed(2) + "px"); }
+        else setv(a.el, "translate", a.x.toFixed(2) + "px " + a.y.toFixed(2) + "px");
       }
-      n.p.style.scale = n.s.toFixed(4);
-      n.p.style.rotate = n.r.toFixed(2) + "deg";
+      setv(n.p, "scale", n.s.toFixed(4));
+      setv(n.p, "rotate", n.r.toFixed(2) + "deg");
     }
   }
   function fieldStep(now) {
@@ -5558,11 +5570,13 @@ render();
       for (var i = 0; i < ps.length; i++) {                               // hand every property back exactly as it was found
         ps[i].style.scale = ""; ps[i].style.rotate = "";
         ps[i].style.removeProperty("--ornx"); ps[i].style.removeProperty("--orny");
+        ps[i]._p = ps[i]._v = undefined;                                  // BR-S312: the write-memo describes the styles we just cleared — keeping it would make the next arm skip the writes that restore them
         var kids = ps[i].querySelectorAll(".orbit__mark, .orbit__label, .orbit__sub");
         for (var j = 0; j < kids.length; j++) {
           kids[j].style.translate = "";
           kids[j].style.removeProperty("--haloo"); kids[j].style.removeProperty("--halor");
           kids[j].style.removeProperty("--halosx"); kids[j].style.removeProperty("--halosy");
+          kids[j]._p = kids[j]._v = undefined;
         }
       }
     }
