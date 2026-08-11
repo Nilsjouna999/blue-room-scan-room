@@ -2840,6 +2840,20 @@ html.is-travel .cardfinish { mix-blend-mode: normal; }
    `.card .cardfinish` is (0,3,1) and takes it. */
 html.is-travel .card .cardfinish { mix-blend-mode: normal; }
 
+/* BR-S279 — the lean. One transform chain on the card itself: perspective() lives
+   INSIDE the transform so no ancestor becomes a containing block (BR-S204: the reveal
+   depends on an untransformed ancestor). Scoped to the Desk — no other .card in the
+   app is touched. The transition is the return journey; while .is-tilting is on, the
+   pointer drives it directly and a transition would only add lag to the hand. */
+#menuView .menu__panel--desk .card {
+  transform: perspective(1100px) rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg));
+  transition: transform 320ms var(--ease-settle, cubic-bezier(.2,.7,.2,1));
+}
+#menuView .menu__panel--desk .card.is-tilting { transition: none; }
+@media (prefers-reduced-motion: reduce) {
+  #menuView .menu__panel--desk .card { transform: none; transition: none; }
+}
+
 /* ============================================================
    BR-S203 — THE PROCESSION: "About Blue Room" (the vertical scroll-depth below the desk).
    Hidden whenever the menu is off the desk (wall slide / reveal fullview).

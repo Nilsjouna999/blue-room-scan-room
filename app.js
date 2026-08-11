@@ -4685,3 +4685,81 @@ if (state.view === "dev") mountDev();
    in and SHOULD survive a refresh. */
 if (state.dev === "vault" && !DEVNAV) _devUrlStrip();
 render();
+
+/* ============================================================================
+   BR-S279 — THE CARD LEANS TOWARD YOU. A hover microinteraction on M1's card:
+   it tilts slightly toward the pointer and settles back when you leave.
+
+   WHAT IT DELIBERATELY IS NOT. The reference for this pattern is the holographic
+   card — gyroscope parallax, pastel gradient, floating hearts, bloom. The builder
+   asked for exactly one part of it: "not the flashy colours and stuff, but where
+   it tilts slightly depending where you hover." So this adds NO colour, NO sheen,
+   NO glow and no second layer. The card already has a finish; it just never had a
+   relationship with the hand.
+
+   FOUR pounds of caution for two degrees of tilt:
+   1. The transform is a SINGLE chain on .card itself — perspective() inside the
+      transform, never `perspective` on a parent. Both forms tilt; only the parent
+      form creates a containing block for fixed descendants, and BR-S204 records
+      that the reveal system depends on an untransformed ancestor. The card is a
+      leaf here, so nothing above it moves.
+   2. It is scoped to #menuView's DESK. Every other .card in the app — the room,
+      the dossier, the reveal stage — is untouched.
+   3. MAX_DEG is 2.6. "Slight" was the whole brief, and a card that leans like a
+      toy stops reading as an artifact. The pointer maps linearly from the card's
+      own centre, so the far corner is the maximum and the middle is flat.
+   4. It stands down while the page is in motion (html.is-travel), for coarse
+      pointers, and under reduced motion — a tilt fighting a slide is the kind of
+      double-motion this room keeps refusing.
+
+   Writes two custom properties and nothing else, rAF-coalesced so a 120Hz mouse
+   cannot outrun the compositor. ?tilt=0 turns it off.
+   ============================================================================ */
+(function () {
+  var MAX_DEG = 2.6, PERSP = 1100;
+  if (/[?&]tilt=0/.test(String(location.search || ""))) return;
+  var host = document.getElementById("menuView");
+  if (!host || !window.requestAnimationFrame) return;
+
+  var reduced = function () {
+    return window.BRMotion ? window.BRMotion.prefersReduced()
+                           : window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  };
+  var coarse = window.matchMedia && window.matchMedia("(pointer: coarse)").matches;
+  if (coarse) return;
+
+  var card = null, raf = 0, px = 0, py = 0;
+
+  function apply() {
+    raf = 0;
+    if (!card) return;
+    var r = card.getBoundingClientRect();
+    if (!r.width || !r.height) return;
+    var nx = (px - (r.left + r.width / 2)) / (r.width / 2);      // -1 .. 1
+    var ny = (py - (r.top + r.height / 2)) / (r.height / 2);
+    nx = nx < -1 ? -1 : nx > 1 ? 1 : nx;
+    ny = ny < -1 ? -1 : ny > 1 ? 1 : ny;
+    card.style.setProperty("--tilt-y", (nx * MAX_DEG).toFixed(2) + "deg");   // horizontal pointer → rotateY
+    card.style.setProperty("--tilt-x", (-ny * MAX_DEG).toFixed(2) + "deg");  // toward the pointer, not away
+  }
+
+  function rest(c) {
+    if (!c) return;
+    c.style.setProperty("--tilt-x", "0deg");
+    c.style.setProperty("--tilt-y", "0deg");
+    c.classList.remove("is-tilting");
+  }
+
+  host.addEventListener("pointermove", function (e) {
+    if (e.pointerType === "touch" || reduced()) return;
+    if (document.documentElement.classList.contains("is-travel")) { rest(card); card = null; return; }
+    var t = e.target.closest ? e.target.closest(".menu__panel--desk .card") : null;
+    if (!t) { if (card) { rest(card); card = null; } return; }
+    if (t !== card) { rest(card); card = t; card.classList.add("is-tilting"); }
+    px = e.clientX; py = e.clientY;
+    if (!raf) raf = requestAnimationFrame(apply);
+  }, { passive: true });
+
+  host.addEventListener("pointerleave", function () { rest(card); card = null; }, { passive: true });
+  window.addEventListener("blur", function () { rest(card); card = null; });
+})();
