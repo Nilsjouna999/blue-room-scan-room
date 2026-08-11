@@ -3239,18 +3239,38 @@ html.is-travel .card .cardfinish { mix-blend-mode: normal; }
    snap rather than a fade. Registered as <color>, the pair-hover ramps. */
 @property --grade-a { syntax: "<color>"; inherits: false; initial-value: #d8cdb4; }
 @property --grade-b { syntax: "<color>"; inherits: false; initial-value: #a9a49a; }
-.m2read { display: grid; gap: 6px; --m2read-size: 17px; --m2read-lh: 1.6; --m2read-lines: 4; }
+/* ── BR-S349 — THE 110% FINDING, BAKED IN AT 100%. ───────────────────────────
+   The builder read the panel at 80/90/100/110/125% browser zoom and preferred 110
+   — "felt a lot better reading". Measured what actually differs at each stop, and
+   it is not scale, it is RATIO: three things here scale by three different laws.
+   The type is fixed px and never answers the viewport; the card is
+   clamp(380px,54vh,560px); the column is min(1180px,94vw). Zooming moves the type
+   against the other two.
+     110%  card 466 / type 18.7  ->  ratio 27.4   <- the one that read best
+     100%  card 513 / type 17.0  ->  ratio 30.2
+      90%  card 560 (ceiling)    ->  ratio 32.9
+   So the preference is for MORE TYPE relative to the room, and browser zoom is a
+   poor way to get it: at 125% the column itself starts shrinking (1180 -> 1053) and
+   the reader loses page. Raising the type instead reproduces 110%'s ratio exactly
+   (513/18.7 = 27.4) while the geometry stays where it was designed.
+   +11% across the block, and the box follows because its height is derived rather
+   than restated. Five lines now, not four: the same sentences need one more line at
+   this size, and clipping the birth read to keep a number round would be trading the
+   thing the builder liked for tidiness. */
+.m2read { display: grid; gap: 6px; --m2read-size: 19px; --m2read-lh: 1.6; --m2read-lines: 5; }
 /* the static half of the frame: a label that never changes, over words that always do */
 /* the grade runs down the whole block, not just the sentence: the label is the
    faintest thing, the meta takes the gold, the meaning cools out of it */
-.m2read__label { font-family: var(--font-mono); font-size: 9.5px; letter-spacing: .22em; text-transform: uppercase; color: var(--t-ghost); margin: 0 0 2px; }
+/* the labels rise with the sentence — lifting only the body would leave the mono
+   marks looking shrunken beside it, which is a different composition again */
+.m2read__label { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: .22em; text-transform: uppercase; color: var(--t-ghost); margin: 0 0 2px; }
 /* BR-S345 — the meta is THREE registers, not one fact: a class, an index, a
    meaning. One colour across all of it said they were the same kind of thing and
    the line read as a row of perks. Graded, the hierarchy is free — brightest at
    the class, dimmest at the keyword — and only the NUMERAL is gold, because a
    number is the one part of a record that identifies rather than describes. */
 .m2read__meta {
-  font-family: var(--font-mono); font-size: 10.5px; letter-spacing: .2em; text-transform: uppercase;
+  font-family: var(--font-mono); font-size: 11.5px; letter-spacing: .2em; text-transform: uppercase;
   color: var(--t-meta); margin: 0;
 }
 /* BR-S346 — the segments are named by ROLE, so every card shows its element. The
@@ -3324,7 +3344,7 @@ html.is-travel .card .cardfinish { mix-blend-mode: normal; }
 .m2asks__q {
   position: absolute; inset: 0;
   display: flex; align-items: center;
-  font-family: var(--font-display); font-style: italic; font-size: 15.5px; line-height: 1.45;
+  font-family: var(--font-display); font-style: italic; font-size: 17px; line-height: 1.45;
   color: var(--t-body); opacity: 0;
   /* the cycle length is written onto .m2asks by app.js from M2_CYCLE — the same
      constant the per-line delays are computed from. Hard-coding it here as well
