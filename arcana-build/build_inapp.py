@@ -31,7 +31,7 @@ eng_body = eng[len('(function(){'):-len('})();')]    # unwrap the IIFE
 js = (
 '/* ============================================================\n'
 '   THE ARCANA READING (?dev=arcana-reading) — the FULL reading:\n'
-'   birth-derived draw (default: Antton Aikio, 9 Apr 2001, Inari) + per-draw\n'
+'   birth-derived draw (default: a neutral sample seeker) + per-draw\n'
 '   record pages ("Open the record"). PORTED IN-APP from the artifact engine\n'
 '   (arcana-build/gen_body.js), data inline->fetch. Exposes window.BRArcanaReading.\n'
 '   DO NOT hand-edit — regenerate: python arcana-build/build_inapp.py\n'

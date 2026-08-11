@@ -415,13 +415,28 @@
 
   function secCredits() {
     var body =
-      p("Built by Antton Aikio, working alone. The reading engines — the birth readings, the tarot draws, the Codex tables — are hand-built lookups and formulas, not generative models: they output the same result every time, with nothing produced by a language model at runtime. The design and words are the builder’s own, assembled by hand.") +
+      /* BR-S347: the byline was the builder's full legal name. An author credit is
+         a normal thing to want, but it is also the string that ties every other
+         detail on this site to a findable person — and the builder's call is that
+         their personal details do not belong on a public page. The claim the
+         paragraph exists to make is about HOW it was built, and that survives
+         without a name on it. */
+      p("Built by one person, working alone. The reading engines — the birth readings, the tarot draws, the Codex tables — are hand-built lookups and formulas, not generative models: they output the same result every time, with nothing produced by a language model at runtime. The design and words are the builder’s own, assembled by hand.") +
       p("Built with plain HTML, CSS, and JavaScript — no framework and no bundler; the browser runs the source files directly. No external code libraries beyond the web fonts (and the optional dictionary lookup described above). One stylesheet, one app file, a handful of room modules, kept deliberately small.") +
       lead("Typefaces.", "Cormorant Garamond for display and reading text; IBM Plex Mono (weights 400 and 500 only) for labels and data; Inter for interface text. All three are open-source, served via Google Fonts.") +
       p("The systems in the Codex draw on public and widely-published traditions: the Western tropical zodiac, the Chinese zodiac and five elements, Pythagorean numerology, the Major Arcana in the Rider-Waite lineage, the Elder Futhark runes, and the eight trigrams and sixty-four hexagrams of the I Ching — synthesized and written in Blue Room’s own voice. The Codex is a first bank: a considered starting reference, not an exhaustive or final one. For serious study, read past it, to the sources.") +
       p("Dictionary definitions in the Codex’s word-lookup come from a free public dictionary service — see Data &amp; Privacy above for what that sends, and when.") +
-      lead("Where it lives.", "Live archive: nilsjouna999.github.io/blue-room-scan-room. Source: github.com/Nilsjouna999/blue-room-scan-room, public. Public visibility is for transparency, not an invitation to redeploy the design or copy as a separate product.") +
-      lead("Contact.", "Questions, corrections, and feedback: nilsjouna@gmail.com. Blue Room is a personal study kept in the open, not a company with a support desk — feedback is genuinely welcome; a fast reply is not promised.");
+      /* ── BR-S347 — WHAT A PUBLIC PAGE MAY NOT CARRY. ──────────────────────
+         Two things came out of this section. The SOURCE LINK, because publishing
+         the address of the repository is an invitation to redeploy the whole
+         thing, and the sentence asking people not to was doing no work at all.
+         And the BUILDER'S PERSONAL EMAIL, which was printed in full on a page
+         reachable by anyone — a permanent, scrapeable address attached to a real
+         person, for a project that has no support desk to justify it.
+         The commitment to fix mistakes stays, because The Rules makes it and a
+         promise with no way to reach anyone is worse than no promise. A route
+         back will be a project address, not a person's inbox. */
+      lead("Contact.", "Blue Room is a personal study kept in the open, not a company with a support desk. There is no contact route in this build; when there is one it will be a project address, and it will be printed here.");
     return docSec("credits", "Credits & Information", "Credits &amp; Information", "Who built this, and with what.", body);
   }
 
@@ -470,8 +485,10 @@
     ["The Codex", "codex.html", false],
     ["The Shelf", "?dev=profile", false],
     ["About &amp; Legal", "?dev=settings&p=legal", false],
-    ["Source", "https://github.com/Nilsjouna999/blue-room-scan-room", true],
-    ["nilsjouna@gmail.com", "mailto:nilsjouna@gmail.com", true]
+    /* BR-S347: the Source link and the mailto are gone from here for the reasons
+       set out in Credits — a repository address is an invitation to redeploy, and
+       a personal inbox is not a standing link. */
+    ["What's coming", "?dev=roadmap", false]
   ];
   function footerHTML() {
     var links = STANDING.map(function (l) {

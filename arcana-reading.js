@@ -1,6 +1,6 @@
 /* ============================================================
    THE ARCANA READING (?dev=arcana-reading) — the FULL reading:
-   birth-derived draw (default: Antton Aikio, 9 Apr 2001, Inari) + per-draw
+   birth-derived draw (default: a neutral sample seeker) + per-draw
    record pages ("Open the record"). PORTED IN-APP from the artifact engine
    (arcana-build/gen_body.js), data inline->fetch. Exposes window.BRArcanaReading.
    DO NOT hand-edit — regenerate: python arcana-build/build_inapp.py
@@ -427,7 +427,7 @@
   // per pair. Reads TWO people together; relates ONLY where the engine already holds a
   // tradition table (sun triplicities, animal San He/Liu He/clash). No score, no verdict,
   // no pair-epithet, no third drawn object — a roll-up over the relations IS the verdict.
-  var REF_CONCORD_A="birth~Antton Aikio~2001~4~9", REF_CONCORD_B="birth~Ingrid Sandberg~1993~8~10";
+  var REF_CONCORD_A="birth~The Seeker~2000~1~1", REF_CONCORD_B="birth~The Companion~1995~6~15";
   function encSeed(s){return encodeURIComponent(s)}
   function concordURL(a,b){return "#/c/"+encSeed(a)+"/"+encSeed(b)}
   // order-independent pair key from the two normalized half-seeds (norm strips ~, so join on |)
@@ -524,13 +524,13 @@
         '<div data-cc-sealwrap><button type="button" class="ck-seal cc-seal" data-cc-seal>Seal the concord &middot; $7.99</button>'+
         '<p class="dr-mocknote">Dev mock &mdash; no real payment in this build.</p></div>'+
         '<p class="cc-notice" data-cc-notice role="status" aria-live="polite"></p>'+
-        '<p class="cc-ref">The standing concord of Antton Aikio &amp; Ingrid Sandberg — <a href="'+concordURL(REF_CONCORD_A,REF_CONCORD_B)+'">open to any visitor &rarr;</a></p>'+
+        '<p class="cc-ref">The standing concord of The Seeker &amp; The Companion — <a href="'+concordURL(REF_CONCORD_A,REF_CONCORD_B)+'">open to any visitor &rarr;</a></p>'+
       '</div>';
   }
 
   // router — the reading comes from ?seed= (the intake builds "birth~name~y~m~d");
-  // with no seed it opens the reference reading (Antton Aikio, 9 April 2001).
-  var curSeed=(function(){try{return new URLSearchParams(location.search).get("seed")||""}catch(e){return ""}})()||"birth~Antton Aikio~2001~4~9",n=0;
+  // with no seed it opens the reference reading (The Seeker, 1 January 2000).
+  var curSeed=(function(){try{return new URLSearchParams(location.search).get("seed")||""}catch(e){return ""}})()||"birth~The Seeker~2000~1~1",n=0;
   function route(){
     var h=location.hash.replace(/^#/,""),m=h.match(/^\/e\/([^\/]+)\/([^\/]+)(?:\/([^\/]+))?(?:\/([^\/]+))?(?:\/([^\/]+))?$/),app=document.getElementById("app");
     var redraw=document.getElementById("redraw"),isCC=/^\/(c|concord)(\/|$)/.test(h);
@@ -549,7 +549,7 @@
   // ---- Concord wiring (BR-S196): the desk seal + the claim, one delegated listener ----
   function ckVal(k){var el=document.querySelector('[data-ck="'+k+'"]');return el?el.value.trim():""}
   function sealBeat(btn,label,after){
-    var reduce=window.matchMedia&&(window.BRMotion ? window.BRMotion.prefersReduced() : window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+    var reduce=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if(!btn||reduce)return after();
     btn.disabled=true;btn.classList.add("is-settled");btn.textContent=label;setTimeout(after,620);
   }

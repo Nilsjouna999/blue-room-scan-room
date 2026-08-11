@@ -35,13 +35,17 @@
     return d + " " + M[m - 1] + " " + (+p[0]);
   }
 
-  /* ---- MOCK seeker ---- */
+  /* ---- MOCK seeker ----
+     BR-S347: this was the builder's real name, real birth date and real town,
+     served on a public page as the sample profile. A mock is exactly the place a
+     real identity should never be, because it is the one surface that renders
+     without anyone asking it to. Neutral placeholder; the shape is unchanged. */
   var SEEKER = {
-    display_name: "Antton Aikio",
-    handle: "@antton",
-    avatar: "A",
-    birth: "9 April 2001",
-    place: "Inari, Finland",
+    display_name: "The Seeker",
+    handle: "@seeker",
+    avatar: "S",
+    birth: "1 January 2000",
+    place: "—",
     crown_record: {
       reading_id: "BR-3F9A2C",
       name: "The Twice-Kindled Giver",
@@ -66,9 +70,12 @@
       { id: "s2", chosen: null },
       { id: "s3", chosen: null }
     ],
+    /* BR-S347: these were real people's first names in the builder's own life,
+       shown on a public page as their "friends" with a reading attached. Mock data
+       is not a private notebook — every name in it is published. Placeholders. */
     friends: [
-      { name: "Ingrid", av: "I", crown: "The Deep-Tided Weaver", sees: "friends" },
-      { name: "Mikkel", av: "M", crown: "no crown yet", sees: "everyone" }
+      { name: "A friend", av: "A", crown: "The Deep-Tided Weaver", sees: "friends" },
+      { name: "Another",  av: "B", crown: "no crown yet", sees: "everyone" }
     ]
   };
 
