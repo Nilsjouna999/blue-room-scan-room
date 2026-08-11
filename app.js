@@ -1458,12 +1458,18 @@ function renderWall() {
        a line of link text under it, which is not a pair, it is a product and a footnote.
        Same door grammar for both, so the panel offers two readings rather than one
        reading and a suggestion. */
-    + '<a class="menu__door menu__door--add menu__door--tarot" href="?dev=drawing-room">'
-    + '<span class="menu__door-kicker">By the Draw &middot; Tarot</span>'
-    + '<span class="menu__door-name">A Tarot Reading</span>'
-    + '<span class="menu__door-desc">A Sitting — three cards to one question, ' + (m2SittingUsed() ? 'your first is filed' : 'your first free') + '. Or the Deep Read — five.</span>'
-    + '<span class="menu__draw-spine">The Ground · The Crossing · The Root · The Crown · The Turn</span>'
-    + '</a>'
+    /* BR-S326 — THE BIRTH READING LEADS. Builder's call: it is the best first product,
+       so it takes the first door. It is also the one this panel can argue for hardest —
+       it is GIVEN rather than drawn, which means it is the same in ten years as it is
+       tonight, and that is a claim almost nothing else can make. Tarot follows, and
+       loses nothing by it: a reader who wants to be dealt to knows they want that.
+       A price line was tried on both doors here and REMOVED. A fleet called it the
+       highest-leverage change on the panel; the builder looked at it and called it what
+       it was. Two priced tiles side by side stop being doors and become a pricing
+       table, and this room's grammar is that you are shown a thing, not sold one. The
+       figure lives in the room behind each door, and again on the cut button at the
+       moment it is actually owed — which is where a price belongs: at the point of
+       committing, not the point of looking. */
     + '<div class="menu__door menu__door--add menu__door--birth">'
     + '<a class="menu__draw-hit" href="?dev=arcane" aria-label="The Birth Reading"></a>'
     + '<span class="menu__door-kicker"><svg class="menu__draw-crown" viewBox="0 0 120 90" aria-hidden="true"><path d="M16 64 L26 28 L45 50 L60 18 L75 50 L94 28 L104 64" fill="none" stroke="url(#mwGold)" stroke-width="4" stroke-linejoin="round"/><path d="M15 64 H105" stroke="url(#mwGold)" stroke-width="3"/><circle cx="60" cy="18" r="5" fill="url(#mwGold)"/></svg> By Birth · Given, not drawn</span>'
@@ -1472,6 +1478,12 @@ function renderWall() {
     + '<span class="menu__draw-spine">Sun Sign · Year Animal · Life Path · Rune · Trigram · Hexagram</span>'
     + '<a class="menu__draw-aside" href="?dev=arcana-reading#/concord">Or two names, one bond — a Concord &rarr;</a>'
     + '</div>'
+    + '<a class="menu__door menu__door--add menu__door--tarot" href="?dev=drawing-room">'
+    + '<span class="menu__door-kicker">By the Draw &middot; Tarot</span>'
+    + '<span class="menu__door-name">A Tarot Reading</span>'
+    + '<span class="menu__door-desc">A Sitting — three cards to one question, ' + (m2SittingUsed() ? 'your first is filed' : 'your first free') + '. Or the Deep Read — five.</span>'
+    + '<span class="menu__draw-spine">The Ground · The Crossing · The Root · The Crown · The Turn</span>'
+    + '</a>'
     + '</div>'
     /* BR-S321: the "Deeper draws" link retired — its whole sentence is now the tarot
        door above, and a link repeating the door beside it is two roads to one room. */
@@ -1597,6 +1609,12 @@ function m2Pull(host) {
   const set = (sel, txt) => { const el = root.querySelector(sel); if (el) el.textContent = txt; };
   set("[data-m2-facemeta]", m2Head(c));
   set("[data-m2-facename]", c.name);
+  /* BR-S326: the hero's name is 20px FIXED in a card that is 216px of usable width at
+     its floor — "Seven of Pentacles" and "The Wheel of Fortune" had nowhere to go. The
+     dealt card solved this in BR-S316 with an is-long threshold at 13 characters; the
+     hero was left on a static "The Star" and never asked. Same threshold, same word. */
+  const nameEl = root.querySelector("[data-m2-facename]");
+  if (nameEl) nameEl.classList.toggle("is-long", String(c.name || "").length >= 13);
   set("[data-m2-faceorient]", rev ? "Reversed" : "Upright");
   set("[data-m2-heroname]", c.name);
   const rank = String(c.tag || "").split("·")[0].trim();
@@ -1624,6 +1642,17 @@ function wireM2Turn(host) {
   const reduced = window.BRMotion ? window.BRMotion.prefersReduced()
     : !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
   if (reduced) return;                                   // base css already shows the settled gold face
+  /* ── BR-S326 — THIS ANIMATION HAS BEEN DEAD SINCE BR-S306, AND IT WAS LEAKING. ──
+     Parchment became the default deck yesterday, and `html.m2-parch` sets
+     display:none on .m2hero__face, .m2hero__back and .m2hero__name (styles.css:3323).
+     A CSS animation does not run on a display:none element — so the turn never
+     played, `animationend` never fired, and the handler below never ran: the
+     .m2hero--turn class and TWO inline will-change hints stayed set for the whole
+     session, holding compositor memory for a movement nobody ever saw.
+     Three separate agent designs cited this function as "the will-change discipline
+     to copy". It was the counter-example. Bail before touching anything when the
+     face it animates is not being rendered. */
+  if (document.documentElement.classList.contains("m2-parch")) return;
   const face = hero.querySelector(".m2hero__face"), back = hero.querySelector(".m2hero__back");
   if (face) face.style.willChange = "transform, opacity, clip-path";
   if (back) back.style.willChange = "opacity";

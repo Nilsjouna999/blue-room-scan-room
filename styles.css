@@ -2604,9 +2604,17 @@ body[data-view="room"] .dev { display: none; }
    clearly-labelled demo, not the user's result). Develop is NOT a menu door (it only exists
    inside a real Free card, which needs the unbuilt scan engine). */
 .menu__doors { display: grid; gap: 10px; width: 100%; max-width: 360px; margin: 0; }
+/* BR-S326 — A DOOR IS NEVER A RAW LINK. This class was written for <button> doors and
+   never had to defend itself; the moment a door became an <a> (BR-S321 gave tarot its
+   own door) every line inside it took the browser's link colour and underline, and a
+   priced tile in underlined lavender is the visual language of spam. The old
+   .menu__door--pull .menu__door-desc { color: var(--silver) } rule was a patch for this
+   exact leak on the one <a> door that existed before — a symptom treated once, at one
+   element, instead of the class being made safe. */
 .menu__door {
   display: grid; gap: 4px; text-align: left; padding: 11px 16px; border-radius: 8px;
   cursor: pointer; background: none;
+  text-decoration: none; color: var(--t-primary);
   transition: border-color 160ms ease, background 160ms ease, transform 160ms ease;
 }
 .menu__door:hover { transform: translateY(-1px); }
@@ -3344,11 +3352,18 @@ html.m2-parch .m2face {
 }
 .m2face-head { width: 100%; display: flex; align-items: center; justify-content: space-between; }
 .m2face-meta { font-family: var(--font-mono); font-weight: 600; font-size: 11px; letter-spacing: .12em; color: #5c503c; }
-.m2face-glyph { font-family: var(--font-display); font-weight: 700; font-size: 13px; line-height: 1; color: #c98a5e; }
+/* BR-S326 — CONTRAST, on the card every single visitor sees. #c98a5e on this parchment
+   measures 1.87:1; #8a6a42 clears 4.5:1 and stays inside tarot-v2's own copper register,
+   so the mark is the same mark, just legible. This was reported as a "dev toggle" issue
+   by the contrast survey — it is not: parchment is the shipped default. */
+.m2face-glyph { font-family: var(--font-display); font-weight: 700; font-size: 13px; line-height: 1; color: #8a6a42; }
 .m2face-name { margin: auto 0 0; font-family: var(--font-display); font-weight: 600; font-size: 20px; line-height: 1.05; color: #1c150d; }
+/* 13 characters or more — the same threshold the DEALT card uses (BR-S316). At the
+   clamp floor this card is 216px of usable width and the name was unclamped. */
+.m2face-name.is-long { font-size: 16px; }
 .m2face-div { width: 26px; height: 1px; background: rgba(28, 21, 13, .35); margin: 8px 0; }
 .m2face-orient { margin: 0 0 auto; font-family: var(--font-mono); font-weight: 600; font-size: 9px; letter-spacing: .16em; text-transform: uppercase; color: #6a5c45; }
-.m2tick { position: absolute; width: 10px; height: 10px; border-color: rgba(28, 21, 13, .5); }
+.m2tick { position: absolute; width: 10px; height: 10px; border-color: rgba(28, 21, 13, .74); }   /* BR-S326: .5 measured 2.76:1 on parchment; .74 clears 3:1 for a non-text mark */
 .m2tick.tl { left: 9px; top: 9px; border-left: 1.5px solid; border-top: 1.5px solid; }
 .m2tick.br { right: 9px; bottom: 9px; border-right: 1.5px solid; border-bottom: 1.5px solid; }
 .m2hero__back, .m2hero__face { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
@@ -3363,7 +3378,9 @@ html.m2-parch .m2face {
 .menu__draw-ctrl { grid-area: ctrl; display: flex; flex-direction: column; gap: 14px; position: relative; z-index: 2; }
 .menu__draw-cutline { display: block; width: 100%; max-width: 360px; height: 1px; background: linear-gradient(90deg, #c8ad70, #a2864a); opacity: .55; margin: 2px 0; }
 .menu__draw-doors { display: grid; gap: 12px; width: 100%; max-width: 360px; }
-.menu__door--pull .menu__door-desc { color: var(--silver); }
+/* BR-S326: .menu__door--pull's rule removed with the door it patched. It was never
+   dead weight — it was the symptom of the link-colour leak now fixed on .menu__door
+   itself, treated once at one element instead of at the class. */
 .menu__door--birth { position: relative; }
 .menu__draw-hit { position: absolute; inset: 0; z-index: 0; border-radius: 8px; }
 .menu__door--birth:hover:not(:has(.menu__draw-aside:hover)) { border-color: var(--silver); }
