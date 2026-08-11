@@ -3213,7 +3213,11 @@ html.is-travel .card .cardfinish { mix-blend-mode: normal; }
 .menu__draw-title:focus { outline: none; }
 .menu__draw-thesis { font-family: var(--font-display); font-size: 19px; line-height: 1.4; color: var(--t-primary); }
 
-.menu__draw-stage { grid-area: stage; align-self: center; display: flex; flex-direction: column; align-items: center; gap: 14px; position: relative; z-index: 2; }
+/* BR-S354: the column's own gap rises with the card it holds — 14px between a
+   560px monument and its caption is a different proportion than 14px under a 620px
+   one, and leaving it behind is what makes a scaled-up object look crowded rather
+   than larger. */
+.menu__draw-stage { grid-area: stage; align-self: center; display: flex; flex-direction: column; align-items: center; gap: 18px; position: relative; z-index: 2; }
 .menu__draw-herosub { font-family: var(--font-display); font-style: italic; font-size: 14px; line-height: 1.5; color: var(--t-body); text-align: center; }
 
 /* ── BR-S321 — the live pull's two new parts. ────────────────────────────────
@@ -3481,7 +3485,20 @@ html.is-travel .card .cardfinish { mix-blend-mode: normal; }
    own name, the way a dealt card does — which is why the caption above it stopped
    repeating "XVII · The Star". */
 .m2hero {
-  position: relative; height: clamp(380px, 54vh, 560px); aspect-ratio: 120 / 190; width: auto;
+  /* ── BR-S354 — 90's SPACING, 110's TYPE. ────────────────────────────────────
+     The builder liked the SPACING at 90% zoom and the READING at 110%, which sound
+     contradictory and are not: they are the two ends of one ratio, and both are
+     reachable at 100% now that the type has moved.
+       at  90%   card 560 (at this ceiling) / type 17.0  ->  ratio 32.9   the spacing
+       at 110%   card 466 / type 18.7                    ->  ratio 27.4   the reading
+     Type is 19px since BR-S349, so matching 90%'s ratio means the card wants
+     19 x 32.9 = 625. The ceiling goes 560 -> 620 and the floor 380 -> 400 with it,
+     because a floor left behind turns into a cliff on a short screen.
+     THE CEILING IS WHY THIS IS A CHANGE AT ALL: on any viewport taller than ~1040
+     the card was already pinned at 560, so it had stopped answering the room. The
+     builder's screen is one of those — which is exactly why 90% felt more spacious
+     there and would not have on a laptop. */
+  position: relative; height: clamp(400px, 56vh, 620px); aspect-ratio: 120 / 190; width: auto;
   border-radius: 12px;
   background: linear-gradient(178deg, #171b22 0%, #12151b 46%, #0d1014 100%);
   box-shadow:
