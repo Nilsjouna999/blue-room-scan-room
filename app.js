@@ -89,7 +89,18 @@ const state = { source: 0, treatment: "free", tab: "diagram", view: "menu", draf
   /* Dev-only harness route (NOT a product feature): ?dev=uploaded-result |
      uploaded-blocked renders a validated DEV fixture, never a user scan.
      free-scan-sim = Free Pull mock · halo-gate = sealed card-back mock. */
-  const dev = q.get("dev");
+  /* BR-S304 — A REAL ADDRESS, NOT A DEV PARAM.  The two products we sell have shipped at
+     ?dev=drawing-room and ?dev=arcana-reading — the commerce spine addressed as a developer
+     route, and the Atlas called it the single largest instinct failure in the build: "things
+     be where you think they be" fails at the address bar, on the two rooms that take money.
+     A real path needs no server on GitHub Pages: /tarot/index.html is served at /tarot/, and
+     a <base href="../"> makes every relative asset resolve from the site root exactly as it
+     does at /. The stub then names its room in one line, and this reads it.
+     The stub is GENERATED from index.html, never hand-written — a hand-copied shell is two
+     files that drift. Same discipline as codex.html from build_codex.py.
+     ?dev= keeps working: it is how the dev room reaches everything, and nothing that exists
+     today breaks. */
+  const dev = q.get("dev") || (typeof window !== "undefined" && window.BR_ROOM) || null;
   if (["uploaded-result", "uploaded-blocked", "free-scan-sim", "halo-gate", "before-after", "review-map", "proto-cards", "staged-reveal", "menu-reveal", "vault", "arcane", "arcana-reading", "profile", "ceremony", "drawing-room", "settings"].includes(dev)) { state.view = "dev"; state.dev = dev; }
   else if (q.has("src") || q.has("t") || q.has("tab")) state.view = "room";
 }
