@@ -4875,6 +4875,15 @@ render();
   };
 
   var card = null, box = null, raf = 0, over = false;
+  /* BR-S303 — A CARD YOU ARE HOLDING DOES NOT LEAN.  The builder: dragging on the M1 card
+     to select its text is laggy. It was: pointermove keeps firing all the way through a
+     selection drag, so the field went on writing four properties a frame and repainting the
+     card's own box for the engraved light — on the heaviest element on the page, while the
+     browser was simultaneously doing selection hit-testing and extending a range. Two owners
+     of the same frames, one of them decorative.
+     So the field stands down from pointerdown to pointerup, and again whenever a real
+     selection exists. It is also just true: you cannot tilt something you are holding. */
+  var held = false;
   var tx = 0, ty = 0;                 // target, -1..1 from the centre of the face
   var cx = 0, cy = 0;                 // the lean, following
   var lx = 0, ly = 0;                 // the light, following further behind
@@ -4933,8 +4942,19 @@ render();
     if (card && !raf) raf = requestAnimationFrame(frame);
   }
 
+  host.addEventListener("pointerdown", function () { held = true; release(); }, true);
+  var letGo = function () {
+    held = false;
+    var sel = window.getSelection && window.getSelection();
+    if (sel && !sel.isCollapsed) held = true;                 // a live selection keeps it down
+  };
+  window.addEventListener("pointerup", letGo, true);
+  window.addEventListener("pointercancel", letGo, true);
+
   host.addEventListener("pointermove", function (e) {
-    if (e.pointerType === "touch" || reduced()) return;
+    if (held || e.pointerType === "touch" || reduced()) return;
+    var sel = window.getSelection && window.getSelection();
+    if (sel && !sel.isCollapsed) { release(); return; }        // text is selected: leave it alone
     if (document.documentElement.classList.contains("is-travel")) { release(); return; }
     var t = e.target.closest ? e.target.closest(".menu__panel--desk .card") : null;
     if (!t) { release(); return; }
