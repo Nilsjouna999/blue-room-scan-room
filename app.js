@@ -2510,6 +2510,9 @@ const _FLATTRAVEL = !/[?&]flat=0/.test(String(location.search || ""));
   const m = String(location.search || "").match(/[?&]land=(spring2|spring|m3|detent2|detent)/);
   if (m) document.documentElement.classList.add("land-" + m[1]);
 })();
+(function () {
+  if (/[?&]orbit=wings/.test(String(location.search || ""))) document.documentElement.classList.add("orbit-wings");
+})();
 /* BR-S287 — the parchment M2 prototype, ?m2=white.  There are TWO tarot decks in this
    repo and they disagree: tarot-v2 (the dealing ceremony, unintegrated) is white
    parchment and says so in its own comment — "keeps the parchment cards white" — while
@@ -4946,6 +4949,11 @@ render();
   if (!host || !document.body) return;
 
   var open = false, sheet = null, btn = null, detail = -1;
+  var WINGS = /[?&]orbit=wings/.test(String(location.search || ""));
+  function hh(i, salt) {                                       // the same stable hash the jitter already uses
+    var v = Math.sin((i + 1) * (salt === 2 ? 78.233 : 12.9898)) * (salt === 2 ? 12345.6789 : 43758.5453);
+    return v - Math.floor(v);
+  }
 
   function reduced() {
     return window.BRMotion ? window.BRMotion.prefersReduced()
@@ -4970,7 +4978,7 @@ render();
         /* BR-S293 — MEANING. A name alone tells you what a room is CALLED, not what it
            is for, and half of these names are not self-evident to a first visitor. One
            line each, in the room's own voice, no jargon. */
-        var SUBS = { "": "A photograph, filed as a card",
+        var SUBS = { "": "A photograph, filed",
                      "is-wall": "Draw a card · or be read by birth",
                      "is-reliquary": "Everything you have kept" };
         /* RANK is the point of the whole layout. 0 takes the centre. Post-pivot the
@@ -4978,16 +4986,17 @@ render();
            where they are, so the likeliest destination gets the easiest target -- not
            the room they are standing in. */
         var RANK = { "is-wall": 0, "": 2, "is-reliquary": 3 };
+        var WING = { "is-wall": "work", "": "work", "is-reliquary": "work" };
         var key = p.cls || "";
         var MARKS = { "": ORBIT_MARKS.desk, "is-wall": AB_EMBLEMS.tarot, "is-reliquary": ORBIT_MARKS.reliquary };
         out.push({ label: NAMES[key] || ("Room " + (i + 1)), sub: SUBS[key] || "",
-                   mark: MARKS[key] || ORBIT_MARKS.desk, rank: RANK[key] === undefined ? 6 : RANK[key],
+                   mark: MARKS[key] || ORBIT_MARKS.desk, rank: RANK[key] === undefined ? 6 : RANK[key], wing: WING[key] || "work",
                    here: key === (_menuIndex(host) === i ? key : " "), idx: i, kind: "panel" });
       }
     } catch (e) {}
-    if (host.querySelector("#about")) out.push({ label: "About Blue Room", sub: "What this is, and where it goes", mark: ORBIT_MARKS.about, rank: 4, idx: 0, kind: "about" });
-    out.push({ label: "The Codex", sub: "Every mark, defined", mark: AB_EMBLEMS.codex, rank: 1, href: "codex.html?v=237", kind: "link" });
-    out.push({ label: "Settings", sub: "Motion, contrast, the room", mark: ORBIT_MARKS.settings, rank: 5, href: "?dev=settings", kind: "link" });
+    if (host.querySelector("#about")) out.push({ label: "About Blue Room", sub: "What this is", mark: ORBIT_MARKS.about, rank: 4, wing: "house", idx: 0, kind: "about" });
+    out.push({ label: "The Codex", sub: "Every mark, defined", mark: AB_EMBLEMS.codex, rank: 1, wing: "work", href: "codex.html?v=237", kind: "link" });
+    out.push({ label: "Settings", sub: "Motion, and what's kept", mark: ORBIT_MARKS.settings, rank: 6, wing: "house", href: "?dev=settings", kind: "link" });
     return out;
   }
 
@@ -5001,7 +5010,7 @@ render();
     sheet.setAttribute("aria-modal", "true");
     sheet.setAttribute("aria-label", "Rooms");
     var html = '<div class="orbit__scrim" data-orbit-close></div><div class="orbit__field">'
-             + '<span class="orbit__hub" aria-hidden="true">◆</span>';
+            ;
     var ringN = n - 1;                                           // one plate holds the centre
     for (var i = 0; i < n; i++) {
       if (i === 0) {                                             // THE DESTINATION: centre, larger, no jitter
@@ -5027,12 +5036,35 @@ render();
          and scale between .88 and 1.06, so no two plates are twins and none can collide
          with its neighbour. */
       var k = i - 1;                                             // ring index, rank order clockwise from the top
-      var a = (k / ringN) * Math.PI * 2 - Math.PI / 2;
+      var a;
+      if (WINGS) {
+        /* BR-S300 — THE WING RULE (?orbit=wings).  The ring answers "where does plate 7
+           go?" with "wherever the seventh sixth of a circle is" — and at seven that is a
+           perfect mirrored hexagon, the clock face BR-S291 tore out. A wing answers it
+           with "at the end of its own side", and that answer still works at 9 and 11.
+           RIGHT WING = rooms you walk into. LEFT WING = the building explaining itself.
+           The three-surfaces-three-verbs decision stated by GEOMETRY, with no copy spent
+           on it, and "rooms are on the right" learned once and never moved.
+           The jitter's MAGNITUDE comes from the hash; its SIGN is always outward from the
+           wing centre — a free-signed jitter closes the gap between neighbours and brings
+           back the overlapping hit areas this file already calls a nav bug. */
+        var mine = [];
+        for (var q = 1; q < n; q++) if ((list[q].wing || "work") === (list[i].wing || "work")) mine.push(q);
+        var j0 = mine.indexOf(i), m = mine.length;
+        var step = m > 1 ? Math.min(50, 150 / (m - 1)) : 0;
+        var mid = (m - 1) / 2;
+        var sgn = j0 < mid ? -1 : (j0 > mid ? 1 : 0);
+        var house = (list[i].wing === "house");
+        a = ((house ? 186 : 0) + (house ? -1 : 1) *
+             ((j0 - mid) * step + sgn * (0.14 + hh(i, 2) * 0.16) * step)) * Math.PI / 180;
+      } else {
+        a = (k / ringN) * Math.PI * 2 - Math.PI / 2;
+      }
       var h = Math.sin((i + 1) * 12.9898) * 43758.5453; h = h - Math.floor(h);  // stable [0,1)
       var h2 = Math.sin((i + 1) * 78.233) * 12345.6789;  h2 = h2 - Math.floor(h2);
       var h3 = Math.sin((i + 1) * 39.425) * 24634.6345;  h3 = h3 - Math.floor(h3);
       a += (h - 0.5) * (Math.PI * 2 / ringN) * 0.22;             // BR-S293: half the old wander. Placed, not thrown.
-      var rad = (0.78 + h2 * 0.28).toFixed(3);
+      var rad = (WINGS ? (0.86 + h2 * 0.20) : (0.78 + h2 * 0.28)).toFixed(3);   // BR-S300: a .78 floor under an ellipse pulls the extremes back inside the prime
       var scl = (0.88 + h3 * 0.18).toFixed(3);
       html += '<button type="button" class="orbit__plate" data-orbit-go="' + i + '"'
             + ' style="--ox:' + Math.cos(a).toFixed(4) + '; --oy:' + Math.sin(a).toFixed(4)
@@ -5055,6 +5087,8 @@ render();
     if (open) return;
     open = true;
     if (!sheet) build();
+    var fld = sheet.querySelector(".orbit__field");
+    if (fld) fld.scrollTop = 0;                                    // BR-S300: the phone grid scrolls; a sheet built once must not reopen mid-list
     sheet.classList.add("is-open");
     document.documentElement.classList.add("orbit-open");
     btn.setAttribute("aria-expanded", "true");
@@ -5126,7 +5160,7 @@ render();
   btn = document.createElement("button");
   btn.type = "button";
   btn.className = "orbitbtn";
-  btn.setAttribute("aria-label", "Show every room");
+  btn.setAttribute("aria-label", "Rooms");
   btn.setAttribute("aria-expanded", "false");
   btn.innerHTML = '<span class="orbitbtn__dots" aria-hidden="true"></span>'
                 + '<span class="orbitbtn__txt">ROOMS</span>';

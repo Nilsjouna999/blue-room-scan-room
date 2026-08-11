@@ -4674,7 +4674,8 @@ body[data-devnav="1"] .devnav {
   background: none; border: 1px solid var(--line); border-radius: 999px;
   color: var(--t-meta); cursor: pointer;
   transition: color 200ms var(--ease-settle, cubic-bezier(.2,.7,.2,1)),
-              border-color 200ms var(--ease-settle, cubic-bezier(.2,.7,.2,1));
+              border-color 200ms var(--ease-settle, cubic-bezier(.2,.7,.2,1)),
+              background-color 200ms var(--ease-settle, cubic-bezier(.2,.7,.2,1));   /* BR-S300 M1: the background was the one thing in this feature that popped */
 }
 .orbitbtn:hover, .orbitbtn:focus-visible { color: var(--t-display); border-color: var(--t-meta); outline: none; }
 .orbitbtn__txt { font-family: var(--font-mono); font-size: 9px; letter-spacing: .22em; }
@@ -4733,19 +4734,21 @@ html.orbit-open .orbitbtn__txt::after {
 }
 .orbit.is-open .orbit__scrim { opacity: 1; }
 .orbit__field { position: absolute; inset: 0; }
-.orbit__hub {
-  position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
-  font-size: 11px; color: rgba(28, 21, 13, .30); opacity: 0;
-  transition: opacity 300ms var(--ease-settle, cubic-bezier(.2,.7,.2,1)) 120ms;
-}
-.orbit.is-open .orbit__hub { opacity: 1; }
+/* BR-S300 — .orbit__hub deleted with its glyph: measured at 1440x900 the diamond sat at
+   (708,443) and the prime mark's bottom edge at 444 — not an origin marker, an accidental
+   rule between the card and its name. The prime plate already IS the centre. */
 
 /* --orbit-r is the ring radius; the plate's own position is cos/sin baked in at build */
 /* Tighter than the ring was — the reference CLUSTERS — but not so tight that two
    plates touch: at 25vh the 54px marks brought a pair into contact, and overlapping
    hit areas are a nav bug, not a look. 27.5vh is the last value where every pair
    still clears. Each plate rides --or between .78 and 1.06 of this. */
-.orbit__field { --orbit-r: clamp(152px, 27.5vh, 268px); }
+.orbit__field { --orbit-r: clamp(152px, 27.5vh, 268px); --orbit-rx: var(--orbit-r); --orbit-ry: var(--orbit-r); }
+/* BR-S300 — S2, THE ELLIPSE. Width never entered the ring's formula, so a wider monitor
+   only grew the void: the constellation measured 591px across a 1425px frame, 41% of it.
+   Splitting the radius into rx/ry takes it to 60% with zero overlaps. Scoped to the wing
+   A/B, because an ellipse under a ring just makes an oval clock. */
+html.orbit-wings .orbit__field { --orbit-rx: clamp(200px, 25.5vw, 368px); --orbit-ry: clamp(150px, 27vh, 243px); }
 .orbit__plate {
   /* centred on its ring point by translate(-50%,-50%) rather than by a negative
      margin: the margin assumed every plate was the same height, and a two-line label
@@ -4756,19 +4759,19 @@ html.orbit-open .orbitbtn__txt::after {
   padding: 14px 10px 12px;
   background: none; border: 0; cursor: pointer; color: #5c503c;
   opacity: 0;
-  transform: translate3d(calc(var(--ox) * var(--orbit-r) * var(--or, 1) * 0.34), calc(var(--oy) * var(--orbit-r) * var(--or, 1) * 0.34), 0) translate(-50%, -50%) rotate(var(--orot, 0deg)) scale(calc(var(--os, 1) * .96));
+  transform: translate3d(calc(var(--ox) * var(--orbit-rx) * var(--or, 1) * 0.34), calc(var(--oy) * var(--orbit-ry) * var(--or, 1) * 0.34), 0) translate(-50%, -50%) rotate(var(--orot, 0deg)) scale(calc(var(--os, 1) * .96));
   transition: opacity 340ms var(--ease-settle, cubic-bezier(.2,.7,.2,1)) var(--od, 0ms),
               transform 460ms var(--ease-settle, cubic-bezier(.2,.7,.2,1)) var(--od, 0ms),
               color 180ms ease;
 }
 .orbit.is-open .orbit__plate {
   opacity: 1; will-change: transform;
-  transform: translate3d(calc(var(--ox) * var(--orbit-r) * var(--or, 1)), calc(var(--oy) * var(--orbit-r) * var(--or, 1)), 0) translate(-50%, -50%) rotate(var(--orot, 0deg)) scale(var(--os, 1));
+  transform: translate3d(calc(var(--ox) * var(--orbit-rx) * var(--or, 1)), calc(var(--oy) * var(--orbit-ry) * var(--or, 1)), 0) translate(-50%, -50%) rotate(var(--orot, 0deg)) scale(var(--os, 1));
 }
 .orbit__plate:hover, .orbit__plate:focus-visible { color: #1c150d; outline: none; }
 .orbit.is-open .orbit__plate:hover,
 .orbit.is-open .orbit__plate:focus-visible {
-  transform: translate3d(calc(var(--ox) * var(--orbit-r) * var(--or, 1)), calc(var(--oy) * var(--orbit-r) * var(--or, 1) - 3px), 0) translate(-50%, -50%) rotate(0deg) scale(calc(var(--os, 1) * 1.03));   /* hover straightens it — the one you are pointing at squares up */
+  transform: translate3d(calc(var(--ox) * var(--orbit-rx) * var(--or, 1)), calc(var(--oy) * var(--orbit-ry) * var(--or, 1) - 3px), 0) translate(-50%, -50%) rotate(0deg) scale(calc(var(--os, 1) * 1.03));   /* hover straightens it — the one you are pointing at squares up */
   transition-delay: 0ms;
 }
 /* the plate IS the room's own object now, not an empty frame with a caption. The
@@ -4802,7 +4805,7 @@ html.orbit-open .orbitbtn__txt::after {
 }
 .orbit.is-open .orbit__mark {
   transform: rotate(0deg) scale(1);
-  transition-delay: 0ms, calc(var(--od, 0ms) + 40ms);
+  transition-delay: 0ms, calc(var(--od, 0ms) + 120ms);   /* BR-S300 M2: the mark used to finish 120ms before its own plate — punctuation landing before the sentence stopped */
 }
 .orbit:not(.is-open) .orbit__mark { transition-delay: 0ms; }   /* leave together, never in sequence */
 @media (prefers-reduced-motion: reduce) {
@@ -4835,7 +4838,7 @@ html.orbit-open .orbitbtn__txt::after {
 /* meaning: a name says what a room is CALLED, this says what it is for */
 .orbit__sub {
   font-family: var(--font-display); font-style: italic; font-size: 11.5px;
-  line-height: 1.35; text-align: center; color: #6a5c45; max-width: 15em;
+  line-height: 1.35; text-align: center; color: #635641; max-width: 15em;   /* BR-S300 U1: 5.51:1 -> 6.06:1 on the paper, still a step below the label */
 }
 /* BR-S294 — ON DISPLAY. Taken from the reference's video, which I had not watched when
    I built the first version: clicking a card does not navigate, it brings that card UP
@@ -4860,7 +4863,11 @@ html.orbit-open .orbitbtn__txt::after {
 /* the second press is the one that travels, so it has to be visible */
 .orbit__enter {
   margin-top: 4px; font-family: var(--font-mono); font-size: 9.5px; letter-spacing: .22em;
-  text-transform: uppercase; color: #8a6fb0;
+  /* BR-S300 U2 — the violet comes OFF free navigation. Violet is the kept/paid register,
+     spent sparingly, and it was sitting on the go-affordance of Settings, About and the
+     Codex. It also measured 3.57:1 on paper, failing AA on the one control that travels.
+     Ink is 17.2:1 and the arrow already carries the affordance. Not copper (2.48:1). */
+  text-transform: uppercase; color: #1c150d;
   opacity: 0; transform: translateY(-3px);
   transition: opacity 240ms var(--ease-settle, cubic-bezier(.2,.7,.2,1)) 60ms,
               transform 240ms var(--ease-settle, cubic-bezier(.2,.7,.2,1)) 60ms;
@@ -4870,6 +4877,55 @@ html.orbit-open .orbitbtn__txt::after {
 .orbit__plate--prime .orbit__sub { font-size: 13px; color: #5c503c; }
 
 @media (prefers-reduced-motion: reduce) {
-  .orbit__scrim, .orbit__hub, .orbit__plate { transition: none; }
-  .orbit__plate { transform: translate3d(calc(var(--ox) * var(--orbit-r) * var(--or, 1)), calc(var(--oy) * var(--orbit-r) * var(--or, 1)), 0) translate(-50%, -50%) rotate(var(--orot, 0deg)) scale(var(--os, 1)); }
+  .orbit__scrim, .orbit__plate, .orbit__enter, .orbit__plate--prime::after { transition: none; }
+  .orbit__enter { transform: none; }
+  .orbit__plate { transform: translate3d(calc(var(--ox) * var(--orbit-rx) * var(--or, 1)), calc(var(--oy) * var(--orbit-ry) * var(--or, 1)), 0) translate(-50%, -50%) rotate(var(--orot, 0deg)) scale(var(--os, 1)); }
+}
+
+/* ============================================================================
+   BR-S300 — PHONE: below 720px the polar layout is abandoned, not retuned.
+   It is not mistuned, it is OVER-SUBSCRIBED, and the constraint set is provably
+   empty: a satellite must clear the 190px prime (r >= 161px) and stay on a 390px
+   screen (r <= 129px). 161 > 129. A radius sweep confirms it — at 27.5vh four
+   plates render off-screen; at 15.5vh none do but twelve pairs overlap and a tap
+   on About's mark hit-tests to The Reading Rooms. No value of --orbit-r both fits
+   and clears, so the arrangement changes rather than its numbers.
+   WHAT SURVIVES THE TRIP: rank order top-to-bottom, the prime holding the first
+   full-width row, the +-3.5deg rotation, the 26ms stagger, hover-straightens, the
+   two-step display ladder, the paper, and every string. What does not: the polar
+   arrangement, the ellipse, the wing rule, the prime's hairline ring, the 54/76px
+   marks and the radius jitter.
+   THREE TRAPS, all of them real:
+   1. SPECIFICITY. `.orbit.is-open .orbit__plate` is (0,3,0) and a media query adds
+      nothing — a bare `.orbit__plate` loses and the polar translate3d still applies
+      on top of the grid. Every transform rule below is prefixed `.orbit` AND paired
+      with `.orbit.is-open`.
+   2. The entrance must not be spent on the stagger: the visual offset rides
+      margin-top (layout) so translateY stays free to carry the arrival, or the open
+      degrades to a pure opacity fade and the --od cascade animates nothing.
+   3. Rotation costs width. At 100% wide, +-3.5deg pushed Settings to x -8; 90% plus
+      14px padding buys it back and keeps the rotation, which is the entire reason
+      this still reads as scattered objects rather than a settings list.
+   ============================================================================ */
+@media (max-width: 719px) {
+  .orbit .orbit__field {
+    display: grid; grid-template-columns: 1fr 1fr;
+    align-content: start; justify-items: center;
+    gap: 8px 10px; padding: 30px 14px 0; overflow-y: auto;
+  }
+  .orbit .orbit__plate, .orbit.is-open .orbit__plate {
+    position: static; width: 90%;
+    transform: translateY(10px) rotate(var(--orot, 0deg));
+  }
+  .orbit.is-open .orbit__plate { transform: translateY(0) rotate(var(--orot, 0deg)); }
+  .orbit .orbit__plate:not(.orbit__plate--prime):nth-child(even) { margin-top: 14px; }
+  .orbit .orbit__plate--prime, .orbit.is-open .orbit__plate--prime {
+    grid-column: 1 / -1; width: 290px; transform: none; margin-top: 0;
+  }
+  .orbit .orbit__mark { width: 44px; height: 44px; }
+  .orbit .orbit__plate--prime .orbit__mark { width: 58px; height: 58px; }
+  .orbit .orbit__sub { max-width: none; font-size: 11px; }
+  /* at grid-column 1/-1 the 168px ring no longer encloses a 290px plate; it would
+     draw a circle through the mark */
+  .orbit .orbit__plate--prime::after { display: none; }
 }
