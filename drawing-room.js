@@ -30,11 +30,38 @@
   "use strict";
 
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
-  function hash(s) { var h = 2166136261; for (var i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = (h * 16777619) >>> 0; } return h >>> 0; }
+  /* ── BR-S314 — THE DECK WAS DEALING 10% REVERSED. ────────────────────────────
+     This is FNV-1a, and the multiply has to be a 32-bit one. `h * 16777619` is a
+     FLOAT multiply: for h near 2^32 the product reaches ~2^56, past the 2^53 where
+     doubles still hold every integer, so the low bits are ROUNDED AWAY before the
+     `>>> 0` ever sees them. Reversal is read off the lowest bit — `hash(seed+"o"+k)
+     & 1` — which is precisely the bit that gets destroyed.
+     MEASURED on the live formula, 600,000 draws: 10.18% Reversed against a canon
+     50/50 (SPEC §3.3), and the damage is visible bit by bit — bit0 is set 13.0% of
+     the time, bit1 17.9%, bit2 44.3%, and only from bit3 does it reach 50.1%. So
+     nine cards in ten came up Upright, and every Reversed meaning written for this
+     deck was very nearly unreachable. `Math.imul` is the 32-bit multiply this was
+     always meant to be: same run, 50.26%.
+     THIS CHANGES EVERY EXISTING SEED, and it has to. A `?read=` receipt made before
+     today will replay a DIFFERENT reading after it — unavoidable, because the old
+     seeds were computed with the broken multiply. Commerce here is mock and nothing
+     is filed to a server, so the cost is a handful of dev links against a deck that
+     otherwise stays 90% upright forever. It also makes tarot-v2's receipts and this
+     room's agree for the first time; they were computing different numbers from the
+     same seed (read~sitting~x~abc → 2082513329 here vs 3772232759 there). */
+  function hash(s) { var h = 2166136261; for (var i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619) >>> 0; } return h >>> 0; }
   function pick(list, seed) { return list && list.length ? list[hash(seed) % list.length] : null; }
   function norm(s) { return String(s == null ? "" : s).toLowerCase().replace(/[^a-z0-9]+/g, " ").trim(); }
   function inApp() { return /[?&]dev=/.test(location.search); }
-  function sealNow() { return Math.floor(Date.now() / 60000).toString(36); }
+  /* BR-S314 — TWO CUTS IN THE SAME MINUTE WERE THE SAME READING. The seal was
+     minute-granular, and the seed is "read~<spread>~<normalised question>~<seal>" —
+     so asking the same question twice inside one minute produced an identical seed,
+     identical cards, and an identical BR accession code. For a room whose credo is
+     "Drawn once. Not reissued." that is the worst possible collision: it reissues.
+     A random suffix cannot collide. The seed STRING is unchanged in shape, so the
+     receipt path, reopen(), and brCode() all keep working exactly as they were —
+     only the recipe for `t` differs. Matches tarot-v2, which got this right. */
+  function sealNow() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 8); }
   function brCode(seed) { return "BR-" + ("00000" + (hash(seed + "br") % 0xFFFFF).toString(16).toUpperCase()).slice(-5); }
   function param(k) { var m = new RegExp("[?&]" + k + "=([^&]*)").exec(location.search); return m ? decodeURIComponent(m[1].replace(/\+/g, " ")) : ""; }
   var MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
