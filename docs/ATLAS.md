@@ -1,0 +1,354 @@
+# THE ATLAS
+**The canonical register of every surface in Blue Room.**
+
+> Status: v1, composed 2026-08-11 against HEAD `18d7f4e` (BR-S275).
+> This file supersedes `docs/FILE_MAP.md`, `docs/UNIVERSE_ZONE_MAP_V1.md` §2/§5/§6, `?dev=review-map` and the `?devnav=1` button list as the answer to *what rooms exist*.
+> **It is hand-written today and that is a known defect.** Every previous register in this repo (review-map, the devnav rail, FILE_MAP, TASK_QUEUE) rotted the same way: it was written once and the code moved. The Atlas must become generated from `app.js` (the `?dev=` allow-list at app.js:93, `MENU_PANELS`, the `#about` nugget array) the way `codex.html` is generated from `build_codex.py`. Until it is, treat this file as the freshest thing available, not as a thing that stays true by itself.
+
+**Method key.** *OBSERVED* means the surface was loaded and painted in a browser against `http://localhost:8744` and its rendered text read. *INFERRED* means read in code but not run. Rows carry no hedge words; where two surveys disagreed, the row says **CONTESTED** and names both readings. `index.html` returns 200 for **any** `?dev=` value — HTTP status proves nothing about a route. The single route gate is the 16-value allow-list at **app.js:93**:
+
+```
+uploaded-result · uploaded-blocked · free-scan-sim · halo-gate · before-after ·
+review-map · proto-cards · staged-reveal · menu-reveal · vault · arcane ·
+arcana-reading · profile · ceremony · drawing-room · settings
+```
+
+Anything else in `?dev=` **falls silently to the Desk with the bad param still in the URL** (app.js:93-94, deliberate — commit `51b0e12`).
+
+---
+
+## 1 · THE PRIMARY TIER — the rooms that carry the product
+
+After the 2026-08-09 pivot: **tarot and arcana are the products being sold. The photo Card is roadmap.** Eight surfaces are primary. Everything else in this repo exists to serve one of them.
+
+| # | Room | What it carries | Sells |
+|---|---|---|---|
+| 1 | **M1 — The Desk** (`/`) | The only unconditional way in. Four working doors. | — |
+| 2 | **M2 — The Reading Rooms** (`/#rooms`) | The storefront for both sold products. | the doors |
+| 3 | **The Drawing Room** (`?dev=drawing-room`) | Tarot. Free Pull · A Sitting (first free) · The Deep Read **$2.99**. | **YES** |
+| 4 | **The Arcana intake** (`?dev=arcane`) | The name and birth date the reading is drawn from. | front half |
+| 5 | **The Arcana Reading** (`?dev=arcana-reading`) | Six marks, one name. The deepest content surface after the Codex. | **YES** |
+| 6 | **The record page** (`#/e/<system>/<slug>/<seed>`) | One mark opened out in full — 11,524 chars observed. The share-safe keepable page. | the keep |
+| 7 | **The Codex** (`codex.html`) | 222 marks on ten walls. The only free thing with real depth; the most-linked surface in the repo. | free anchor |
+| 8 | **The Profile / Reliquary hub** (`?dev=profile`) | Where a reading is owned. Already an atlas of the other rooms in miniature. | the keep |
+
+**Two facts that follow from this and are not yet acted on:**
+
+- **Both sold products live behind a param literally named `dev`.** `?dev=drawing-room` and `?dev=arcana-reading` are the commerce spine. That is the single largest instinct failure in the build — "things be very you think they be" fails at the address bar.
+- **The Scan Room (`?src=1&t=free`) is primary by inheritance, not by current weight.** It is a complete, live, well-built surface demonstrating the product that moved to a roadmap. Keep it, keep it labelled SAMPLE, and stop treating it as the spine.
+
+---
+
+## 2 · THE REGISTER
+
+Ordered by weight, then by nav position — a walk through the building, not an alphabet.
+
+| Name | Code id | How reached | Purpose | State | Weight | Back |
+|---|---|---|---|---|---|---|
+| **M1 — The Desk** | `mountMenu()`/`renderMenu()` → `#menuView.menu.menurev`, `MENU_PANELS[0]` | `/` — and the landing for any unrecognised `?dev=` | The way in: one sample card that develops in place, and the doors to everything else. | live · OBSERVED | primary | It is home. → M2 (button/→), ↓ U1 |
+| **U1 — About Blue Room** | `#about.about`, `wireMenuAbout()`, `u1-membrane.js`, `u1-plates.css` | Scroll ↓ from M1, or the ▼ cue. **`/#about` is an anchor, not a route** — renders byte-identical to `/` | The five-plate map of what Blue Room is. | live · OBSERVED | primary | Scroll up / ↑ checkpoints. No control, no hash — nothing marks that you left M1 |
+| **M2 — The Reading Rooms** | `MENU_PANELS[1]` `.is-wall` / `.menu__panel--wall` | `/#rooms`, the M2 pill, → from M1 | Choose between drawing a tarot card and being given a birth reading. | live · OBSERVED | primary | "Back to the desk" button · ← key · browser back (real hash) |
+| **The Drawing Room — landing** | `drawing-room.js` `landingHTML()`, `STATE.view="landing"` | `?dev=drawing-room`, `&pull=1` to land drawn | Pull one card free to meet the deck; see the two readings you can draw. | live · OBSERVED | primary | "← BACK TO THE MENU" — `href="#"`, JS-dependent, leaves `?dev=` in the URL |
+| **The Drawing Room — the table** | `drawing-room.js` `readingHTML()`/`reopen()` | cut the deck → URL becomes `?dev=drawing-room&read=sitting&t=<seed>` | Your cards, turned one at a time, then read in full. | live · OBSERVED | primary | "← THE DECK". **The URL is the receipt** — reopening never re-rolls |
+| **The Arcana intake** | `arcane.js` `window.BRArcane` | `?dev=arcane`; `?for=other`/`?subject=` unlocks family/friend | Give the name and birth date the reading is drawn from. | live · OBSERVED | primary | "← BACK TO THE MENU" `data-view-to="menu"` — **cleans the URL. The correct idiom.** |
+| **The Arcana Reading** | `arcana-reading.js` (GENERATED by `arcana-build/build_inapp.py`) `window.BRArcanaReading` | `?dev=arcana-reading`, `&seed=birth~name~y~m~d` | Your full birth reading — six systems, each with its own record page. | live · OBSERVED | primary | "← PROFILE" — returns to the hub, never to the menu you came from |
+| **A mark's record page** | `arcana-reading.js` `renderEntry()`, `route()` `/^\/e\//` | `#/e/<system>/<slug>/<seed>` e.g. `#/e/rune/gebo/birth~Antton%20Aikio~2001~4~9` | One mark, opened out in full, and what it gave your name. | live · OBSERVED | primary | "← BACK TO THE READING" + "← <your title>" + sibling links. **Best back in the build** |
+| **The Codex** | `codex.html` (GENERATED by `build_codex.py`, 432,393 B) | `codex.html?v=237` — the wax seal, the Codex pill, the U1 plate, the orbit, the two-ball dock | The archive of every mark the rooms read from — ten plates on a wall. | live · OBSERVED | primary | "← BLUE ROOM" → `index.html`. As the in-page aperture: Esc |
+| **M3 — The Reliquary** | `MENU_PANELS[2]` `.is-reliquary`, `renderReliquaryTeaser()`/`renderReliquaryOpen()` | `/#reliquary`, "Open the Reliquary" on M2, → ×2 | The shelf for what you have kept. Sealed until you keep something. | live · OBSERVED (442 chars sealed) | primary | "Back to the Reading Rooms" · browser back |
+| **The Profile / Reliquary hub** | `arcana-profile.js` `window.BRArcanaProfile`, `wire()` `data-door` at :374 | `?dev=profile` — M3's open door, the M3 preview toggle, Settings, the reading's "← PROFILE" | Your home in the archive: crown, rings, vault, showcase, friends, a door per room. | live · OBSERVED | primary | **Hidden** — the "◆ Blue Room" wordmark (`data-door="menu"` → `location.pathname`). Nothing says "back" |
+| **The Scan Room (sample card)** | `index.html <main class="room">` + `.topbar`; `state.view="room"` | `?src=1&t=free`, `?src=2`, bare `?t=`/`?tab=`; "View sample card" on M1 | A finished sample card with its reading and dossier. | live · OBSERVED (~3,000 chars) | primary *(inherited — roadmap product)* | ◆ brand mark · "↑ Menu" footer. **Escape does nothing here** |
+| **The Drawing Room — intake** | `drawing-room.js` `intakeHTML()`, `STATE.view="intake"` | Click "A Sitting" or "The Deep Read" | Write the matter you are laying, then cut. | live · OBSERVED | secondary | "← THE DECK" |
+| **The Concord desk** | `arcana-reading.js` `renderDesk()`, `[data-cc-seal]` | `?dev=arcana-reading#/concord`; "Or two names, one bond" on M2 | Enter two names and dates to draw a bond. | live · OBSERVED (508 chars — it is a form) | secondary | "← PROFILE" only. **Seal is mocked: "Dev mock — no real payment"**, $7.99 |
+| **A standing Concord** | `arcana-reading.js` `renderConcord()`/`concordURL()` | `#/c/<nameA~y~m~d>/<nameB~y~m~d>` | A reading of the bond between two people. | live · OBSERVED (8,236 chars) | secondary | "← PROFILE". **Cannot redraw — one-bond law enforced by a missing control** |
+| **Scan Room — Halo / developed** | `state.treatment="shiny"`, `[data-goto]` app.js:4400 | `?t=shiny`; the "Develop" CTA | The same sample card with its sealed back opened. | live · OBSERVED (3,007 chars) | secondary | brand mark / "↑ Menu"; F returns to Free in place |
+| **The dossier (the card's back)** | `renderDossier()` → `#dossierMount .dplate` | scroll below the card, or "▼ SCAN DOSSIER BELOW" | The record behind the card: surfaces, mood, mint, verdict. | live · OBSERVED — **5 plates** (01 Surface Record, 02 Archetype, 03 Aura, 04 Mint Record, 05 Oracle Read) | secondary | scroll up. app.js:25 SECTION MAP still says "(7 plates)" — **stale** |
+| **Left panel — Source/Diagram/Metrics** | `renderSourceTab()`/`renderDiagramTab()`/`renderMetricsTab()` | `?tab=source\|diagram\|metrics`, or the three tabs | Three ways to look at the same photograph. | live · OBSERVED | secondary | Any other tab; **`?tab=` makes each linkable and refresh-stable — the model for tabbed sub-surfaces** |
+| **The draft intake (your photo)** | `renderDraft()`→`renderDraftIntake()` app.js:3132; `#draftView`, `pickPhoto()`→`#draftFile` change→`loadDraftFile()` app.js:4471 | M1 "Add your photo" → file picker; re-entered via `.menu__resume` (app.js:1660) | Stage your own photo as a card, in this browser only. | **live · OBSERVED** (image decoded 800×1200, zone "ARCHIVE · LOCAL DRAFT") | secondary | "Main menu"; Escape ladder gate→intake→menu (app.js:4653). **In-memory only — a refresh drops it; no URL truth** |
+| **The filed local front card** | `renderLocalCard()` app.js:3202; `draft.scan_state="unscanned"` | draft intake → "Build Local Card" | Your photo, filed as a card front, on this device only. | **live · OBSERVED** — minted `BR-LOCAL-1786450629074-DA1C`, zone "ARCHIVE · YOUR PHOTO · LOCAL ONLY" | secondary | "Main menu"; `.menu__resume` returns to it |
+| **Settings — controls** | `settings.js` `window.BRSettings`, `#st-panel-controls` | `?dev=settings`; the Settings pill; the orbit | The controls this build actually has: Motion, Appearance, The Reliquary. | live · OBSERVED (1,592 chars) | secondary | **Hidden** — the ◆ wordmark (settings.js:500). Visible links go *forward* to `?dev=profile` |
+| **Settings — About & Legal** | `settings.js` `#st-panel-record`, `tabsHTML()` | `?dev=settings` → click the tab | About · How It Works · The Rules · Data & Privacy · Disclaimers & Legal · Credits. | live · OBSERVED | secondary | Click back to Settings. **NO ADDRESS — client-side tab only; a refresh throws you out. For a legal surface this is a defect** |
+| **The Vault** | `renderVault()`/`wireVault()` app.js:3514+; `_devUrlStrip()` at app.js:4737 | `?dev=vault`; the "To the Vault" arrow; the Profile | Where kept, minted cards are filed. | live · OBSERVED (812 chars, mock `VAULT_MINTS`, SRC-03 "Shore Dispatch") | secondary | "← BACK TO THE MENU" `data-view-to`. **Strips its own URL on mount — cannot be bookmarked or refreshed into** |
+| **The ROOMS orbit sheet** | app.js ~4943 IIFE, `.orbitbtn`/`.orbit`; `?orbit=0` removes | "ROOMS" button on any menu panel | The whole map at once — six plates in a ring. | live · OBSERVED (6 plates) | secondary | Esc · scrim · the button again. **Derives its list from `MENU_PANELS` + `#about` + the pills — the only register in the repo that cannot drift** |
+| **The Ceremony (the forge)** | `ceremony.js` `window.BRCeremony` | `?dev=ceremony`; also plays inside the Arcana intake | The moment a reading is struck into being. | live · OBSERVED (timed; 40-50 chars at 3.5s/6s) | secondary | **CONTESTED** — one survey observed "Back to readings" `data-view-to="menu"` wired correctly; another observed no exit at all. **Recheck before shipping** |
+| **tarot-v2 — the dealing ceremony** | `tarot-v2/index.html` + own `app.js`/`style.css`/`data.js` | `tarot-v2/index.html` — **nothing in the app links here.** Tracked → publicly live | A second, complete tarot room where the cards are dealt as a ceremony. | prototype · OBSERVED (three tiers, $2.99 Deep Read) | secondary | **Best-behaved page in the repo** — persistent "Blue Room" leave-mark to `../index.html` in every state, plus `../codex.html` balls |
+| **The Compass Wheel** | `compass-wheel.html` (TRACKED, 170 KB) | `compass-wheel.html` — zero references anywhere. Publicly live | Type in choices, spin, one is chosen. | prototype · OBSERVED | secondary | **NONE — zero hrefs in the file** |
+| **The five About plates (I–V)** | `aboutNugget()` / `li.about__nugget[data-nug]`; `u1-plates.css` (BR-S253) | inside `#about` | Five plaques: I Codex · II Tarot · III The Birth Reading · IV The Card Mint · V The Unlit Room. Each carries a price and a first act. | live · OBSERVED | support | n/a — you never left U1. Four of five door to a real surface |
+| **The Unlit Room (plate V)** | `AB_EMBLEMS.unlit`, `.about__nugget--unlit` | last plate on the `#about` rail | A plaque saying a fifth room does not exist yet. Priced "Not yet open · no date". | parked-by-design · OBSERVED | support | n/a — not enterable and does not pretend to be |
+| **The mini Codex (ball + popover)** | `#codexMiniBall`, `.mini__panel`, `.mini__results` | the small ◆ ball on the front door | Look up a sign, rune or card without leaving the room. Ends "Open the full Codex →". | live · OBSERVED | support | dismiss — the menu never moved |
+| **M3 preview toggle** | `reliqPreviewToggle()`/`onReliqPreviewClick()` app.js:1537-1559 | "Preview as: No account / The profile" on `#reliquary` | Flips the shelf between sealed and open so both can be seen. | live · pre-launch · OBSERVED | support *(control, not a room)* | Round trip OBSERVED: profile → ◆ wordmark → menu; "No account" restores sealed in place. **Sole UI door to `?dev=profile` when devnav is off** |
+| **The Codex lintel** | `header.stickybar` — `lintel_html()` | always at the top of `codex.html`, sticky 52px | The strip you steer the Codex with. | live · OBSERVED | support | n/a — **the parent app reads `.stickybar` out of the iframe every frame to draw the membrane. Named contract. Do not touch** |
+| **The Codex search + slug + tick rail** | `input#q.search`, `div.slug#slug`, `nav.ticks#ticks` — `JS_SEEK` (K1) | in the lintel; `#q` via skip link | Type a sign, card or number; the room lights the marks that answer. | live · OBSERVED | support | "clear ×", Esc. Ticks print per-wall answer counts and go cold at zero |
+| **The Codex lectern (record plate)** | `aside#lectern[role=dialog]` — `VESSEL_HTML` | click/Enter any of the 222 marks | One mark's full record, drawn up out of the wall. | live · OBSERVED | support | × · Esc · the dimmer. **This is the plate the membrane exists for** |
+| **Codex plates I–X** | `section.wall#western \| #chinese \| #numerology \| #tarot-guide \| #tarot-major \| #tarot-minor \| #runes \| #trigrams \| #iching \| #lexicon`; `geo_*()` | `codex.html#<id>` or the tick rail | Ten systems: 12 · 17 · 12 · 8 prose sections · 22 · 56 · 24 · 8 · 64 · 7. | live · OBSERVED | support | tick rail reaches every wall from anywhere; ↑ to top. Plate IV carries its own 8-tick sub-rail (`#tg-01`…`#tg-08`) |
+| **The English register (dictionary)** | `button#dtoggle` + `input#dq` — `JS_DICT` (K2), dictionaryapi.dev | "Aa" in the lintel; double-click any word | Look up an ordinary English word without leaving the archive. | live · OBSERVED | support | toggle closes it. **The only network call in the page**, fires only on Enter/double-click |
+| **The movable search bars** | `JS_MOVE` (K3), `brCodexSearchPos_v1`, `.br-slot`/`.br-grip`, DOCK=72 | drag the search field out of the lintel by its grip | Set the search down wherever you are reading. | live · INFERRED | support | release within 72px docks it home; the empty slot says so twice |
+| **The photo lightbox** | `[data-lightbox-open]` / `#lightbox` (BR-S115) | room → "Source" tab → click the photo | The original photograph, full size. | live · INFERRED | support | dismiss — you are exactly where you were. Reachable only via `?tab=source` |
+| **The Mint Record showcase** | `closeMintShowcase()`/`onMintOutside()`, `body.is-mint-showcase`, `#mintScrim` | `?src=1&t=shiny` → click "Mint Record" (inert on free) | Lifts the mint record to mid-screen. | live · OBSERVED | support | **BROKEN** — Esc/outside-click closes it then smooth-scrolls to the **top of the page**, not back where you were |
+| **The card QR pop-out** | `[data-card-qr]` / `.cardqr` | minted treatment → click the barcode strip | A scan code on the card. Captioned "Placeholder · scan link develops". | prototype · INFERRED | support | mutually exclusive with the Mint showcase. Ghosted + `tabindex=-1` on free cards |
+| **Profile — Showcase** | `arcana-profile.js` `showcaseHTML()` | inside `?dev=profile` | Pick three results to display. Three slots, all `chosen: null`. | prototype · OBSERVED | support | re-renders in place. The one profile section with real mechanism |
+| **Profile — Friends** | `arcana-profile.js` `friendsHTML()` :278, rendered :334; CSS :192-200 | inside `?dev=profile` | A quiet list of people, not a feed. Two mock seeds (Ingrid, Mikkel). | prototype · OBSERVED | support | in place; both actions resolve to "(Mocked.)" at :445-446. **Sole repo-wide carrier of the per-viewer visibility model** (`shows you: <audience>`, one grep hit, arcana-profile.js:284) |
+| **Profile — Rings** | `arcana-profile.js` `ringsHTML()`/`pickMenu()` | inside `?dev=profile` | Read someone else — pick who they are to you. 12 relations, "none set yet". | prototype · OBSERVED | support | in place |
+| **Profile — The Vault** | `arcana-profile.js` `vaultHTML()`, `minted_cards: []` | inside `?dev=profile` | Where minted cards would sit. Captioned "not open yet". | prototype · OBSERVED | support | in place. **NAME COLLISION with the live `?dev=vault`** |
+| **Profile — The Rooms** | `arcana-profile.js` `roomsHTML()` | inside `?dev=profile` | One door to every room. Observed: Arcana Reading · Drawing Room · The Reading · The Codex. | prototype · OBSERVED | support | in place. **A third hand-written room list — omits the Desk and Settings** |
+| **The Vault forward-arrow hand-off** | `wireMenuReveal()` `.menurev__fwdbtn` — app.js:2365 **and** :3833 | the purple scribble arrow at the right edge of the developed menu card | The step from a developed card to the shelf. | live · INFERRED (wired twice; not clicked) | support | the Vault's own back returns to a clean menu. **Hidden at rest until `.is-vaultready`** |
+| **The skip links + live region** | `a.skip` ×2, `p#sr[role=status]`, `h1.u-vh` | Tab once on `codex.html` | Shortcuts to the search or the plates. | live · INFERRED | support | the page deleted its masthead — this is where it still tells a screen reader what it is |
+| **The membrane furniture** | `.tide`/`.tide-guard`/`.shore`/`.shallows`/`.floorlight`/`.keylight`/`#dim`; `BRC` `BAR=52 TIDE=0.045 TIDE_AT=0.955` | painted, not clickable | The water-line the record plate rises through. | live · INFERRED | support | n/a — aria-hidden. **One constant, three consumers (CSS floor, page JS, parent app) so they cannot drift** |
+| **The Codex keyboard stepper** | `stops()`/`pageStep()`/`glide()`; `assert_controls()` | ↓↑ anywhere · ←→ walk a wall · Enter draws a record | Walk the archive from the keyboard. | live · INFERRED | support | ↑ steps back through every stop. CSS smooth-scroll is banned outright — the glide is owned in rAF |
+| **The Codex A/B toggles** | `VX_TOGGLE`/`TIDE_TOGGLE`/`SNAP_TOGGLE`, `assert_toggle()` | `?vx=stable\|fitted\|tempered`, `?tide=float\|datum`, `?snap=off\|on` | Two ways to size the record plate; whether the page re-aims your scroll. | live · INFERRED | internal | each defaults to what ships. **3 unclaimed decisions still riding in a 432 KB page with 7.6 KB of headroom** |
+| **Scan Room — the Lab** | `state.labMaterial`, `CARD_TECH_LAB §20` | `?t=mint`, `?lab=cold-foil\|black-star\|night-gloss`; M key | An internal bench for judging card finishes. | dev-route · OBSERVED | internal | brand mark / "↑ Menu" |
+| **`?dev=staged-reveal`** | `reveal/stage-controller.js` `window.BRReveal`; stages PHOTO\|FREE\|FREE_READING\|HALO\|HALO_READING | `?dev=staged-reveal`, `&rv=developed` | The develop animation on its own. **One room, five stages — not five rooms.** | dev-route · OBSERVED | internal | **NONE.** `reveal/*.js` contains no nav code at all |
+| **`?dev=proto-cards`** | `renderProtoCards()` app.js:3450+ | `?dev=proto-cards` | Three local photos through the card design, free and halo. | dev-route · OBSERVED (3,302 chars) | internal | "MAIN MENU" + "SAMPLE SCAN ROOM", both `data-view-to`. Labelled "NOT A PRODUCT SURFACE" |
+| **`?dev=free-scan-sim`** | `renderUploadedScanResultDev(simFixture,{mode:"free-scan-sim"})` app.js:3851 | `?dev=free-scan-sim`; devnav rail | A mocked free-pull result for checking layout. | dev-route · OBSERVED (862 chars) | internal | two exits. Banner "DEV SIMULATION · NOT REAL ANALYSIS · NOT USER SCAN" |
+| **`?dev=halo-gate`** | `renderHaloGateMock()` app.js:4212; routed :3845; `.halogate*` styles.css ~3889 (33 rules) | `?dev=halo-gate`; devnav rail; dev index | The sealed card back, before it is opened. | dev-route · **spec fixture** · OBSERVED (card 705px, full plate) | internal | "KEEP FREE PULL" · "ENTER SAMPLE SCAN ROOM" · "MAIN MENU". Banner "DEV MOCK · NOT PAYMENT". **Governed by `docs/halo/HALO_GATE_BOUNDARY_V1.md` (ACTIVE); the only drawing of the card back in the repo** |
+| **`?dev=uploaded-result`** | `renderUploadedScanResultDev(result)` app.js:3857; `scan-contract.js` `DEV_FIXTURES` | `?dev=uploaded-result`; devnav rail | A known-good scan result, to check the safety contract renders. | dev-route · OBSERVED (1,537 chars) | internal | two exits |
+| **`?dev=uploaded-blocked`** | `scan-contract.js` validation path; `renderBlockedScan()` render | `?dev=uploaded-blocked`; devnav rail | A refused result, and why. Names `containsAttractivenessScoring`, a forbidden "beauty" term. | dev-route · OBSERVED | internal | two exits. **The negative case of a safety contract is the half that matters** |
+| **`?dev=before-after`** | `renderBeforeAfter()` app.js:3415+ | `?dev=before-after`, `&src=2`. Linked only from the review map | The photograph beside the card it became — a capture surface. | generated · OBSERVED (838-960 chars) | internal | **NONE. Zero `<a>`, zero `<button>` in the entire surface** |
+| **`?dev=menu-reveal`** | `mountDev()` branch app.js:3772-3835; `.menurev`; markup is a **hardcoded string**, not `renderMenu()` | `?dev=menu-reveal` | A staging copy of the front door from before the reveal was promoted (BR-S150). | dev-route · **superseded duplicate** · OBSERVED | internal | **NONE that works.** Both edge affordances are `opacity:0/visibility:hidden` at rest; the button labelled "← Back to the menu" calls `rev.toFree()` (app.js:3831) and never navigates |
+| **`?dev=review-map`** | `renderReviewMap()` app.js:3364+ | `?dev=review-map` | A hand-written list of routes for walking the build. | **dead** · OBSERVED | internal | NONE as such. Lists 4-12 routes; **missing drawing-room, arcane, arcana-reading, profile, settings, ceremony — every product room** |
+| **The devnav rail** | `renderDevnav()` app.js:2968; DEVNAV gate app.js:100; `body[data-devnav]` + CSS `display:none` | `?devnav=1` (sticks in localStorage; `?devnav=0` clears; the **`** key toggles) | A builder-only strip of jump buttons. | dev-route · OBSERVED | internal | overlay, not a place. **Its button list stopped at the 2026-06 route set — not one product room** |
+| **`dev-live.html`** | `dev-live.html` (TRACKED, 7.9 KB) — `fetch("/"+f,{cache:"reload"})` | `dev-live.html` — **publicly live** | A dev console that frames the real app with source/treatment/tab switches. | dev-route · OBSERVED, working | internal | "Open ↗" / "Copy" go forward. No return. **`docs/security/SECURITY_REVIEW_PLAYBOOK.md` rows 56/184/209 require it inert in prod; the row is marked "open (N/A today)" and it is no longer N/A** |
+| **`arcana-name-harness.html`** | `arcana-name-harness.html` (TRACKED, 4.6 KB) → `arcana-name-engine.js` | direct URL — publicly live | Sweeps 60 readings through the name engine. | prototype · OBSERVED — 60/60 unique, 75% tension-beat rate | internal | **NONE.** A passing regression harness over shipped code |
+| **`arrow-orbit-test.html`** | `arrow-orbit-test.html` (TRACKED, 24 KB) | direct URL — publicly live | Isolates the spinning arrow's motion so judder can be proved fixed. | prototype · OBSERVED | internal | **NONE.** Defaults pinned to the shipped build (439°/s); carries an ordered acceptance gate. **The only motion-feel instrument that exists** (the agent pane freezes rAF) |
+| **`fortune-wheel-black.html`** | TRACKED, 150 KB, Jul 26 14:22 | direct URL — publicly live | The dark wheel one step before the compass needle. | **dead** · OBSERVED | internal | NONE. Superseded by `compass-wheel.html` 84 minutes later the same afternoon |
+| **`fortune-wheel.html`** | TRACKED, 35 KB, Jul 24 | direct URL — publicly live | The bright carnival wheel kept as the look being matched. | **dead** · OBSERVED | internal | NONE. 0/6 options, no ceremony toggle, title still reads "Ref FINAL · free-coast…" |
+| **`u1-boxes-photo.html`** | untracked, 21,808 B, Jul 25 23:24 — consumes `assets/plate-alpha.png`, `plate-sheet-grey.png`, `sheet-01..05.png` | direct URL — local only | The plate bench that **won**: five dials MARKS/LIGHT/GRADE/FRAME/UNLIT, six deep-link params. | prototype · OBSERVED | internal | NONE. Carries the current shipped U1 copy verbatim. **The only re-runnable way to re-tune the plates** |
+| **`_u1-full.html`** | untracked, 14 KB — `<link>`s the real `u1-plates.css` | direct URL — local only | A standing copy of the whole U1 surface, so it can be photographed headless (the live page can't — `u1-membrane.js` needs a real rAF). | prototype · OBSERVED, current | internal | NONE. Markup is a hand-copy of live and **will drift** |
+| **`u1-boxes-prototype.html`** | untracked, 28 KB, pure CSS | direct URL — local only | Paper/type/copy dials. Sole surviving statement of the two paper laws (two folds per plate, ~3% tonal lift, routed clear of the type). | parked · OBSERVED | internal | NONE |
+| **`reliquary-frame.html`** | untracked, 7.8 KB → mounts real `arcana-profile.js/.css` unchanged; art in `#gutter-frame` | direct URL — local only | The profile with a botanical border in the wide-screen margins. | parked · OBSERVED, zero console errors | internal | NONE. **Not shipped** (no `gutter-frame` token in `styles.css`/`arcana-profile.css`). Zero-risk: the art is a `pointer-events:none` layer outside the 620px column |
+| **`arcana-build/arcana-reading-artifact.html`** | GENERATED by `gen_artifact3.py`, 1.4 MB, 2026-07-23 | direct file; also published to an external claude.ai artifact URL | A frozen full reading, the spec the in-app generator is checked against. | generated · OBSERVED | internal | **NONE.** Two weeks stale against `gen_body.js` (07-25). **The only generated file whose publish target lives outside this repo — which is exactly how it drifted** |
+| **`m2-reading-menu.html`** | untracked, 18 KB, pins `styles.css?v=215` | direct URL — local only | A preview of M2 from before it was built. | **dead** · OBSERVED | internal | **BROKEN** — its "← Back to the desk" and six `?dev=` doors resolve relative to itself, so every door reloads the mockup |
+| **`u1-boxes-photo-v3.html`** | untracked, 7,902 B, Jul 25 **23:17** | direct URL — local only | An early pass at masking the plates with the five sheet files. | **dead** · OBSERVED, renders | internal | NONE. **The version numbers lie: v3 PREDATES `u1-boxes-photo.html` by 7 minutes.** Lineage is v2 → v3 → photo.html → shipped `u1-plates.css` |
+| **`u1-boxes-photo-v2.html`** | untracked, 10,248 B, Jul 25 21:22 — sole consumer of `assets/plate-mask.png` + `_bench-grey.png` | direct URL — local only | Four compositing recipes side by side on the loudest crop. | **dead** · OBSERVED, renders, assets serve | internal | NONE. Recipe C won and shipped; its copy names five rooms the app abandoned |
+| **`u1-boxes-photo-standalone.html`** | untracked, 543,627 B — 8 data URIs (7 unique) | direct URL — local only | A one-file portable export of the plate bench for sending/screenshotting. | **CONTESTED** · OBSERVED | internal | NONE. See §3 |
+| **`_u1-header-v2.html`** | untracked, 12 KB, self-titled "prototype, BR-S26x" | direct URL — local only | A rejected headline for the top of U1 ("Every reading becomes a page"). | **dead** · OBSERVED | internal | NONE. What shipped is the BR-S261 vitrine label (app.js:1358-1380) |
+| **`_u1-strength.html`** | untracked, 5.4 KB — `OPTS = [0.092, 0.14, 0.20, 0.28]` | direct URL — local only | Four paper strengths side by side. | **dead** · OBSERVED | internal | NONE. **Labels 0.092 "SHIPPED NOW"; `u1-plates.css:54` records BR-S258 moved it to 0.200. The bench now lies about the build** |
+| **Unrecognised `?dev=` value** | app.js:93 allow-list — the else branch never fires; `state.view` stays "menu" | any `?dev=<not-in-the-16>` | Nothing — a mistyped or retired address quietly shows the front door. | live (deliberate, commit `51b0e12`) · OBSERVED | support | you are already on the Desk. **The bogus param stays in the URL** |
+| **Scan Development Gate** | `renderGate()` app.js:3279-3322; `state.draftGate`; CSS `styles.css:3618-3663` | **UNREACHABLE — closed loop.** The only `[data-gate]` element in the repo is the `data-gate="close"` button *inside* `renderGate()` (app.js:3315). No `data-gate="open"` exists anywhere | The step where a staged photo would be sent to be scanned. | **parked · intact · doorless** | internal | n/a. Documented dormant at app.js:4481-4485. Escape ladder (app.js:4655) still models it as a real level |
+| **Blocked-scan state** | `renderBlockedScan()` app.js ~3324; `.gatepanel--blocked`, `styles.css:3662-3663` | **UNREACHABLE** — needs an externally supplied blocked_scan_state | The safe failure state when a photo is refused. | **parked · intact · doorless** | internal | n/a. Same species as the Gate, held for the same future engine |
+| **Free Front Pull — ingest** | none. `scan-contract.js` (458 lines) validates a result nothing can produce | **UNREACHABLE — engine-gated** | The real card a scan would produce. | parked (roadmap) | primary-when-built | n/a. `MASTER_SPINE §1` state 2 declares it unbuilt and bans the words "Free Card"/"complete" on the local stand-in |
+| **Paid Full Develop** | none. `COMMERCIAL_SPEC_V1` is "spec only, NO impl" | **UNREACHABLE** | The paid deep version of a card's record. | parked (roadmap) | secondary-when-built | n/a. **There is no payment path anywhere in this build** |
+| **`/record/{serial}`** | none. `record.html` 404s | **UNREACHABLE** | A page of its own for one card's record. | parked · **contradicted** | secondary | n/a. See §5 |
+| **`?dev=arcana-result`** | none — deleted at BR-S172 (commit `51b0e12`); `arcana-result.js`/`.css` 404 | **UNREACHABLE.** Not in the allow-list. `docs/HANDOFF.md:32` still says "LIVE" | The scrapped "Armor Received" result room. | **dead — history row only** | — | n/a. Redirects nowhere; degrades silently to the Desk. **Superseded by `?dev=arcana-reading`** |
+| **`?dev=arcana-entry`** | none. `entry.html`, `detail.html` both 404. Zero code references repo-wide | **UNREACHABLE.** `BR-ARCANA-READING-MASTERPLAN.md:49` calls it a "Locked URL contract" | Doc claims it is the page for one entry from a reading. | **declared-but-absent — never built** | — | n/a. The contract is unlocked at both ends: nothing emits it, nothing parses it. `f1_gate.txt:60` records **three incompatible schemes** for it |
+
+### Generators — the files that write surfaces
+
+Never hand-edit an output. Every one of these is re-run and the edit is gone.
+
+| Generator | Writes | Guard |
+|---|---|---|
+| `build_codex.py` (4,923 lines) | `codex.html` (432,393 B) | 9 `assert_*` passes + a BANNED-token palette sweep + a 222-mark count + a 440,000 B ceiling (7,607 B headroom) + a disk-equals-memory check. Zero bare `assert`s. `codex.html` and its generator share mtime — the page on disk **is** the page this generator built |
+| `arcana-build/build_inapp.py` (75 lines) | `arcana-reading.js` (57 KB) + `arcana-reading.css` (346 KB) | one bare `assert` (line 28, IIFE shape). **Line 47 hardcodes `arcana-reading.css?v=201` while `index.html:122` loads `arcana-reading.js?v=236` — confirmed in the live DOM. The generator breaks the cache-bust law it states about itself** |
+| `arcana-build/gen_artifact3.py` | `arcana-build/arcana-reading-artifact.html` | `assert html.isascii()`. Publish target is external. Output 2 weeks stale |
+| `arcana-build/build_kwcolor.py` | `arcana-build/kwcolor.json` (14 KB) | — |
+| `arcana-build/build_fonts.py` | `arcana-build/fonts.css` (328 KB) | **needs network** — the one generator not reproducible offline |
+| `arcana-build/codex_overlap_audit.py` | `codex-overlap-report.md` | read-only against `codex-data.json`; re-runnable before/after a revision |
+| `build_plate_sheets.py` | `assets/sheet-01..05.png` from `assets/plate-stock.png` | needs Pillow + numpy. Bakes flat-field divide (3.68× ramp) + levels statically; luminance becomes **alpha**, never colour |
+
+---
+
+## 3 · THE KILL LIST
+
+The kill rule: *a room that exists to seem big makes the universe smaller.* Applied only to what a **visitor** can see. A dev bench behind `?dev=` cannot inflate the public map and is judged as infrastructure, not as a room.
+
+### Condemnations that did NOT survive verification — deliberately **NOT** on this list
+
+These were called filler or thin by a survey and cleared by an independent agent. Recording them here rather than dropping them silently, because the *reason* they cleared is load-bearing:
+
+1. **The local draft / your photo** — called "unclear/parked, unreachable". **Refuted by direct observation.** Both beats were driven live (`renderDraftIntake` → `renderLocalCard`, minted `BR-LOCAL-1786450629074-DA1C`). It is shipped, honest, self-limiting, and does image-container facts only. **KEEP.** The unreachable mark belongs to its siblings `renderGate()` and `renderBlockedScan()`, not to it.
+2. **M3 preview toggle** — called filler with "no way back". **The load-bearing claim is false**: the full round trip was observed (profile → ◆ wordmark → menu → "No account" restores sealed in place). It is also the **sole UI door** to the open Reliquary and to `?dev=profile` when the devnav rail is off (`br_holdings` has exactly three writers; the other two are devnav-gated and param-gated). **KEEP** — with a launch-hygiene note, not a kill.
+3. **Profile — Friends** — called filler. **Every fact true, the verdict fails.** It is exactly as inert as its four siblings and more built than two of them, and it is the **only place in the entire codebase** where per-viewer record visibility is expressed in UI (`shows you: <audience>`, one grep hit repo-wide). Deleting it deletes the only existing spec for the share-safe record primitive. **KEEP.**
+4. **`?dev=halo-gate`** — called filler, "a mock of what the dossier now renders live". **False**: the live room's Halo gate is a text-only `unlock--spine` module plus three `lockedModule()` teasers and draws **no back face**. This route is the only rendering of the sealed card back in the repo, it is the compliance fixture for the ACTIVE `HALO_GATE_BOUNDARY_V1`, and it passed a formal ethics audit. **KEEP** as a spec fixture and design-of-record.
+5. **Free Front Pull** — the register entry (`CODE: none`, `UNREACHABLE`) was **refuted**. `?src=1&t=free` returns 200 and paints a complete "FREE PULL EDITION" surface with a 5-plate dossier, and the app's own dev index badges it REAL. **Split, don't kill:** the *presentation* leg is built and live; only the *ingest* leg (photo → ScanResult) is parked. Both now appear in §2 as separate rows.
+
+### DELETE
+
+| Surface | Why, in one line |
+|---|---|
+| `?dev=menu-reveal` | A staging copy of a front door that was **promoted to live at BR-S150** — and it has **drifted**: SRC-01 where live shows SRC-03, no M2, no M3, no `#about`, no codex portals, no mini-codex, no A/B toggle, no draft-resume. Its own comment ("the REAL menu grid — byte-identical start frame") is now a false statement in the source. Retiring it also frees `menu-reveal` from the allow-list; `?dev=staged-reveal` already holds its isolation role. |
+| `?dev=review-map` | The drifted register the Atlas replaces: it lists 4-12 routes, omits every product room, and still frames the photo Card as the real product — exactly inverted against the 2026-08-09 pivot. **Delete it the day this file lands.** |
+| `fortune-wheel-black.html` | `compass-wheel.html`'s immediate losing sibling, written 84 minutes earlier and superseded the same afternoon. 150 KB of a rejected twin **at a public URL with no way back**. |
+| `fortune-wheel.html` | Two generations superseded (0/6 options, no ceremony toggle, scaffolding still in the title). The reference-match job it existed for is done and its result lives on in `compass-wheel.html`. Third wheel at a third public URL. |
+| `u1-boxes-photo-v2.html` | Its question is **answered** — recipe C (mask) shipped as `u1-plates.css:44-52` — and its copy names five rooms the app abandoned within two hours of writing it. Frees `assets/plate-mask.png` (81 KB) + `_bench-grey.png` (65 KB), which nothing else consumes. |
+| `u1-boxes-photo-v3.html` | Strictly dominated by `u1-boxes-photo.html` (7 minutes newer): same five masks, no dials, no frame layer, superseded copy. Its one distinctive touch — the unlit gold floor-glow — already shipped, evolved, at `u1-plates.css:391`. |
+| `_u1-header-v2.html` | The losing branch. What shipped is the later BR-S261 vitrine label whose own comment kills what this file still does. |
+| `_u1-strength.html` | One-question A/B, answered and committed (`u1-plates.css:54`, BR-S258, α .092 → .200) — and the page still labels .092 "SHIPPED NOW", so it now **actively misinforms**. |
+| `m2-reading-menu.html` | Fully shipped verbatim — its strings match `app.js:1415-1469` one for one. Worse than redundant: it **looks navigable** and every door is a trap that reloads the mockup. |
+| `dupe_report.txt` | The bug it reports is fixed (`id="rn-01"` now occurs once in `codex.html`). Stale audit output sitting at the repo root where it reads as an open defect. If the check is worth repeating it belongs in `build_codex.py`. |
+| `corrupt_log.txt` | 72 bytes of one `print()` statement. Its filename costs a reader more attention than the file is worth. |
+| `assets/plate-field.png`, `plate-field@half.png`, `plate-sheet.png`, `plate-sheet@half.png`, `plate-mask.webp` | Orphaned intermediates from three superseded recipes. Verified live chain is `plate-stock.png` → `build_plate_sheets.py` → `sheet-01..05.png`; `u1-plates.css:67-71,94` loads only those plus `plate-frame.png`. |
+| `assets/codex/chinese-zodiac.webp` | An abandoned format experiment. `SHOW_SYSTEM_IMAGE` is `False`, and grep for `chinese-zodiac` across `build_codex.py` and `codex.html` returns nothing — **note the tracked `.png` beside it appears unreferenced too.** |
+
+**CONTESTED — decide before sweeping: `u1-boxes-photo-standalone.html` (543,627 B).** Two independent verifiers reached opposite conclusions on the same file.
+- *For deletion:* rendered text is identical to its source; the 34-line source diff is entirely mechanical (a title suffix, an `@supports` probe swapped from `url()` to `linear-gradient`, seven CSS `url()`s inlined, constants rescaled); the five sheet embeds are **bit-identical** to `assets/sheet-01..05.png`; the other two are pure downscales of `plate-alpha.png` and `plate-sheet-grey.png`, which are still on disk.
+- *Against:* the two downscaled embeds (232×308 and 464×616) exist at those sizes nowhere else, and with `?grade=raw&frame=1` the two files diverge across 2.8% of subpixels.
+- **The tiebreak fact both agree on:** the unique bytes are downscales of files that still exist, i.e. regenerable in one line. **Recommendation: DELETE, after regenerating the two downscales into `assets/` if anything still wants them.** Also note its source `u1-boxes-photo.html` has zero inbound references too — judge that file on its own merits (§ PARK), not by inheritance.
+
+### PARK
+
+| Surface | Why park rather than delete |
+|---|---|
+| `u1-boxes-photo.html` | The bench that **won**, and the only re-runnable way to re-tune the plates (five live dials the shipped page cannot give). Carries the current shipped copy verbatim. Park it out of the repo root; do not lose it. |
+| `_u1-full.html` | The only way to photograph U1 whole headless — the live page can't be, because `u1-membrane.js` needs a real rAF. It re-stacks the three-layer cascade in the correct order and links the **real** `u1-plates.css`. Its markup is a hand-copy and will drift; park with a dated warning. |
+| `u1-boxes-prototype.html` | Its COPY and TYPE dials are dead, but its PAPER dial is the **only surviving statement of the two paper laws**. 28 KB, zero asset deps. Delete the day the fold question is closed in writing. |
+| `reliquary-frame.html` | A genuine open decision, correctly built: the ornament is a `pointer-events:none` layer living only outside the 620px column, so removing `#gutter-frame` returns the profile exactly as it ships. Zero-risk proposal on a shipping product's hub. **Decide it; don't let it rot.** |
+| `arrow-orbit-test.html` | Method, not decoration — the only motion-feel instrument that exists, since the agent pane freezes rAF. Defaults pinned to the shipped build, one variable per gate, explicit ordered acceptance criteria. Park it out of the **public** deploy, keep it runnable. |
+| `arcana-name-harness.html` | A passing regression harness (60/60 unique names, 75% tension beat) over shipped code that crowns a product now actually sold. 4.6 KB. Same treatment: keep, unpublish. |
+| `dev-live.html` | Works, and docs route reviewers through it. But `SECURITY_REVIEW_PLAYBOOK.md` rows 56/184/209 require it inert in prod and mark that row "open (N/A today)" — it is **tracked at the deploy root of a live public Pages site and does `fetch("/"+f,{cache:"reload"})`**, so it is no longer N/A. Park behind the gate or unpublish. |
+| `arcana-build/arcana-reading-artifact.html` | The reference output the in-app generator is checked against — worth keeping, worth **not** being a public URL. Two weeks stale; regenerate or date-stamp it. |
+| `renderGate()` + `renderBlockedScan()` | Two complete, honest, doorless surfaces held for a scan engine that does not exist. **Register them as parked-unreachable so nobody rebuilds them from scratch.** Group them under one "Scan Engine, parked" heading — they share a cause (the 2026-08-09 pivot). |
+
+### MERGE
+
+| Merge | Into | Why |
+|---|---|---|
+| The three room lists: `#about`'s five plates, `arcana-profile.js roomsHTML()`, and the hardcoded orbit fallback | **one derived source** | Three hand-written registers of the same building already disagree — `roomsHTML()` omits the Desk and Settings; the About plates and the profile doors name rooms differently. The orbit already derives; make everything derive from the same constant. |
+| `?dev=vault` **and** Profile → "The Vault" | one shelf, one name | Two surfaces called The Vault in **opposite states** — one live and populated, one captioned "not open yet" — plus M3 The Reliquary, which states the same job. This is the sharpest instinct failure in the build. |
+| `tarot-v2/` | The Drawing Room, or a decided retirement | An entire parallel implementation of a shipping product's core ceremony, unregistered and unlinked — while `?dev=ceremony` exists in the main app and no doc says which is canonical. **Two ceremonies make the universe smaller.** |
+| `compass-wheel.html` | a Tools room with a door and a return | 170 KB of finished, chosen work at a public URL that nothing links to and nothing returns from. Give it a room or the kill rule eventually eats it. |
+| `?dev=review-map` + the `?devnav=1` button list | the generated Atlas | Both are the code's own attempts at this file. Both rotted identically. Generate them from the same source. |
+
+---
+
+## 4 · THE REVERSIBILITY AUDIT
+
+*Every path must go around and back.* Ordered by how stranded a person actually gets.
+
+| # | Surface | The defect | Severity |
+|---|---|---|---|
+| 1 | **`?dev=menu-reveal`** | Both edge affordances (`.menurev__back`, `.menurev__fwd`) compute to `opacity:0/visibility:hidden` at rest — **zero visible exits** until you develop the card. Then the control **labelled "← Back to the menu"** is wired to `rev.toFree()` (app.js:3831), which resets the reveal in place and never navigates. A mislabelled back button is worse than no back button. | **critical** |
+| 2 | **`?dev=staged-reveal`** (`&rv=developed`) | Zero exits. `reveal/*.js` contains no `data-view-to`, no `location.href`, no back handler at all. **And the Vault routes a user-facing action — "reopen this reading" — straight into it**, so a real person lands on a dead end stamped "NOT A PRODUCT SURFACE YET". | **critical** |
+| 3 | **`?dev=before-after`** | Zero `<a>`, zero `<button>` in the entire surface. Honest as a screenshot target; absolute as a violation. If it ever becomes a real page it needs a door. | high |
+| 4 | **`?dev=ceremony`** standalone | **CONTESTED** — one survey observed a "Back to readings" button with `data-view-to="menu"` wired correctly; another loaded it and found only "THE SKIES ARE CONSULTED" with no exit. Both cannot be true. **Recheck before this row is trusted either way.** | high, unresolved |
+| 5 | **The Mint Record showcase** | Esc or an outside click closes it and then smooth-scrolls you to the **top of the document**. A dismissal that relocates you is worse than no shortcut — it shows a plate the page already contains and then loses your place. | high |
+| 6 | **`?dev=profile` and `?dev=settings`** | Both work, both hide the exit inside the "◆ Blue Room" wordmark (`arcana-profile.js:374`, `settings.js:500`). A first-time reader on the Profile sees **no back control at all**, and every other link on the page is `href="#"`. An instinct failure, not a bug. | high |
+| 7 | **The public orphan pages** — `compass-wheel.html`, `fortune-wheel.html`, `fortune-wheel-black.html`, `arrow-orbit-test.html`, `arcana-name-harness.html`, `dev-live.html`, `arcana-build/arcana-reading-artifact.html` | **Eight tracked pages are published to the public web that nothing links to and no visitor can get back from.** Only three pages in the whole repo have a way back: `codex.html`, `tarot-v2/index.html` (a persistent leave-mark in every state — the best-behaved page here, and the one nothing links to), and `index.html` itself. | high — and invisible from inside the app, which is why it survived |
+| 8 | **`m2-reading-menu.html`** | Has a "← Back to the desk" control and six `?dev=` doors, and **every one is relative** — `?dev=drawing-room` resolves to `m2-reading-menu.html?dev=drawing-room`. Every door reloads the mockup. Doors that look like doors and are walls. | medium (local only) |
+| 9 | **`?dev=review-map`** | Cards link one-way out; the only thing resembling a back is a card whose href happens to be `index.html`. | medium |
+| 10 | **The Vault (`?dev=vault`)** | `app.js:4737` strips `?dev=vault` from the address bar the instant it mounts (unless `?devnav=1`). You cannot bookmark it, and a **refresh silently lands you on the Desk**. Deliberate (BR-S266) and correct for a hand-off destination — but any register that lists `?dev=vault` as an address is telling a half-truth. | medium |
+| 11 | **The Scan Room** | **Escape does nothing.** The keydown handler at app.js:4643 returns early for `state.view !== "room"`, and inside the room Escape is bound to nothing. The draft view has a proper Escape ladder; the room — older and more used — does not. Back exists (brand mark + "↑ Menu"), just not by the key every other surface trained you on. | medium |
+| 12 | **Settings → About & Legal** | A client-side tab with no address. It cannot be linked to, and a refresh throws you back to the controls. **For a legal and privacy surface, unlinkable is a defect, not a style choice.** | medium |
+| 13 | **U1 (`#about`)** | `/#about` and `/` return byte-identical rendered content (2,540 chars, same container, same 4,274px height). `#about` is a scroll anchor; the hash never becomes boot truth the way `#rooms` and `#reliquary` do. **M2 and M3 are linkable; U1 — the surface the public roadmap wants to point at — is not.** | medium |
+| 14 | **The draft view** | No URL rewrite and `draft` is in-memory only (`let draft = null`, app.js:2993 — no storage). A refresh drops you to the lobby; it cannot be deep-linked or restored. Mitigated by `.menu__resume` on M1, which is state-aware. | low |
+| 15 | **Unrecognised `?dev=`** | Falls to the Desk — right instinct. Falls **silently, with the bad param still in the URL** — wrong. A retired route, a typo, and the real homepage all look identical. | low, but it is what hides doc rot |
+
+**The one implementation to copy:** the fullview takeover in the reveal (`onFullview`/`onBack`, `.menurev.is-fullview`). Going back does not reset you — it re-plays the free read to the exact state you left. That is the law done properly.
+
+---
+
+## 5 · THE DIVERGENCES
+
+### A. Declared LIVE, does not exist
+
+| Claim | Reality |
+|---|---|
+| `docs/HANDOFF.md:32` — "THE ARMOR RECEIVED — arcana reading RESULT room (BR-S161, **LIVE**, `?dev=arcana-result`, `arcana-result.js` + `.css`)" | Deleted at BR-S172 (commit `51b0e12`, 2026-07-21). Both files 404. Not in the allow-list. The URL degrades silently to the Desk. **Nuance: HANDOFF.md is a dated session log ("Last written: 2026-07-07"), correct on the day it was written. The failure is that a frozen log is being read as a live register.** The same stale text is duplicated in six places (`docs/` + five `.claude/worktrees/*` copies) — any derivation pass must read from `docs/` only. |
+| `BR-ARCANA-READING-MASTERPLAN.md:49` — `?dev=arcana-entry` is a "**Locked URL contract**" | Never built. Not in the allow-list; `entry.html`/`detail.html` 404; **zero code references repo-wide** — the reading code constructs no such URL. The contract is unlocked at both ends. `f1_gate.txt:60` records **three mutually incompatible schemes** with conflicting param names (`entry` vs `slug`, `from` vs `seed`). |
+| `UNIVERSE_ZONE_MAP_V1 §6` — "Codex \| ASPIRATIONAL \| Backlog. No taxonomy page, no lore layer." | `codex.html` is a shipped, generated, 432 KB, ten-wall, 222-mark surface with a nine-assertion build guard. §6 also marks Vault ASPIRATIONAL behind a "premature-ship guard" while `?dev=vault` is in the shipped allow-list. **2 of 5 rows in the doc's own self-described "load-bearing part" are wrong.** |
+| `BLUE_ROOM_MASTER_SPINE.md` — "STRATEGIC SOURCE-OF-TRUTH (RATIFIED 2026-06-21)", pins "Latest pushed HEAD: 60a5c75" | One commit ever (`2c91a32`, written at BR-S092). HEAD is now ~200 sessions later. Its §3 hero sentence ("Free gives you the card. Paid develops its production record") describes the photo Card; **tarot and arcana — the products actually sold — appear nowhere in it.** It carries the strongest authority claim of any doc and is the most confidently wrong. Salvage §4 (canonical `card_record`) and §5 (evidence contract). |
+| `docs/SCREENS.md` + `docs/screens/*.png` | The table is internally honest — all 11 declared PNGs exist, no undeclared extras. But every PNG is dated **2026-06-13**, `menu-front.png` shows a menu that no longer exists, `capture-screens.ps1` points at **port 8743** while the server runs on **8744**, and `FILE_MAP`'s cardinal rule ("screenshots beat imagined CSS") routes every reviewer to a two-month-old product. SCREENS.md's own rule: *"Stale screens are worse than no screens."* |
+| `app.js:25` SECTION MAP — the dossier is "(7 plates)" | **5 plates in the live DOM.** Two were killed for not earning their place; the map never caught up. |
+| `arcana-build/build_inapp.py:47` — hardcodes `arcana-reading.css?v=201` with the comment *"bump with index.html's arcana-reading.js?v= (cache-bust law)"* | `index.html:122` loads `arcana-reading.js?v=236`; `#arc-full-css` resolves to `?v=201` in the live DOM. **The generator breaks the law it states about itself.** Fix in `build_inapp.py` and re-run — never touch `arcana-reading.css`. |
+
+### B. Real, shipped, and undeclared
+
+- **`?dev=drawing-room`** and **`?dev=settings`** — the string "drawing-room" appears in **zero** files under `docs/`. It is one of the two first products sold.
+- **`codex.html` and `build_codex.py`** — **zero** occurrences in `FILE_MAP.md`, the doc that claims to win for "where things live" and instructs "Read this before opening anything else". A session obeying it never learns the Codex exists.
+- **U1 / `#about`** — `"#about"` and `"renderAbout"` return zero hits across `docs/`. `u1-membrane.js` and `u1-plates.css` are unknown to `FILE_MAP`, despite `u1-plates.css` carrying a documented specificity hazard (the live plate is injected by `u1-membrane.js` at ID specificity and eats later background rules).
+- **The M1/M2/M3 ribbon** — `MENU_PANELS` returns zero hits across `docs/`.
+- **`compass-wheel.html` and `tarot-v2/`** — each appears in exactly one file, `docs/arcana-research/audit_digest.txt`.
+- **18 loose root `.html` prototypes** — zero `FILE_MAP` entries, sitting in the same directory as `index.html` and `codex.html` with no naming convention separating live from scratch.
+- **The photo-less arcane reading's safety consequence** — no photo means the photo-read person-safety walls do not apply on its result page. `UNIVERSE_ZONE_MAP_V1 §7` is the doc that should carry this and does not.
+
+### C. Renamed without record
+
+- **Vault → The Reliquary (M3)** — no doc records the rename, so `UNIVERSE_ZONE_MAP_V1` still calls the zone "Vault / ASPIRATIONAL" while a Reliquary panel ships in the ribbon **and** a separate `?dev=vault` is live.
+- **`arcana-result` → `arcana-reading`** — recorded only in a commit message.
+
+### D. Two live docs giving opposite orders
+
+**The `/record/{serial}` conflict.** `UNIVERSE_ZONE_MAP_V1 §5/§6`: *"the /record/{serial} route is aspirational — **do not stub or imply it**."* `docs/GROWTH_AND_UNIVERSE_STRATEGY_V1.md` (2026-07-25, **still untracked**): a share-safe record page is *"the keystone share-safe record-page primitive."* Same object, opposite instructions, neither doc citing the other. Today a builder's orders depend on which file they happen to open. **Note the arcana record page (`#/e/…`) and the standing Concord (`#/c/…`) already implement the keystone behaviour — the ban is being honoured only on the photo-Card side.**
+
+### E. Name collisions
+
+1. **"The Vault"** — `?dev=vault` (live, populated) vs Profile → The Vault ("not open yet") vs M3 The Reliquary (the same stated job). Three names, two states, one shelf.
+2. **M1/M2/M3** — the nav naming law (M1/M2/M3 horizontal, U1/U2/U3 vertical) appears in **no repo doc**. The only M1/M2/M3 occurrences in `docs/` are `TASK_QUEUE.md:27` and `HANDOFF.md:272-273`, where they mean **Mission 1/2/3** within BR-S134. **The Atlas is the first document to state the nav law, and it must resolve this collision rather than inherit it.**
+
+### F. The staleness ladder
+
+`TASK_QUEUE.md` stops at BR-S141 · `HANDOFF.md` at BR-S164 · `FILE_MAP.md` self-stamps 2026-06-21 · `docs/map/` 2026-06-14 · `docs/screens/` 2026-06-13 · **git HEAD is BR-S275.** The router docs are 110–250 sessions behind the code they route to.
+
+### G. What in the paperwork is still trustworthy — do not throw these out
+
+- **`UNIVERSE_ZONE_MAP_V1 §7`** — the aggregate-refusal wall (no person-key join; serial = object address). LOCKED-grade safety canon, **not stale**. Kill the map, keep §7.
+- **`MASTER_SPINE §4`** (canonical `card_record`) and **§5** (evidence contract) — still-good schemas.
+- **`MASTER_SPINE §1` state 2** — names Free Front Pull unbuilt and bans the words "Free Card"/"complete" on the local stand-in. That discipline is live and honoured (`UNSCANNED` appears 4× in app.js).
+- **`SCREENS.md`'s exemption notes** — the correct way to record a surface that cannot be screenshotted.
+- **`FILE_MAP`'s `reveal/*` row** and the whole **`docs/map/` citation method** (every claim cites a render function, CSS class or URL param). That is the quality bar this file tries to hold.
+- **`docs/halo/HALO_GATE_BOUNDARY_V1.md`** — ACTIVE, and `?dev=halo-gate` is the surface it is testable on.
+- **`docs/GROWTH_AND_UNIVERSE_STRATEGY_V1.md`** — 22 KB of live doctrine, directly upstream of this file, and **still untracked in a repo with a documented parallel-session hazard**. Commit it.
+
+---
+
+## 6 · WHAT THE HUB SHOULD SHOW
+
+The orbit sheet (`.orbit`, app.js ~4943) currently paints six plates — Reading Rooms, Codex, Archive Desk, Reliquary, About, Settings — derived from `MENU_PANELS` + `#about` + the two pills. **Deriving is right; the source is now wrong.** `MENU_PANELS` knows about three ribbon slides and nothing about the two products being sold, so the hub cannot show a tarot door or an arcana door without one being hardcoded.
+
+**The fix: the hub's source becomes the Atlas.** Emit a `ROOMS` constant from this register — `{name, href, rank, blurb, public}` — and have `.orbit`, `#about`'s plates, and `arcana-profile.js roomsHTML()` all read it. Three hand-written room lists collapse to one. That is the same move `build_codex.py` already makes for the Codex.
+
+### Rank order
+
+| Rank | Plate | Href | Why here |
+|---|---|---|---|
+| 1 | **The Reading Rooms** | `/#rooms` | The storefront for both sold products. The default centre plate. |
+| 2 | **Tarot — The Drawing Room** | `?dev=drawing-room` | **New.** A product that sells should be one click from the map, not two. Free Pull is the hook. |
+| 3 | **The Birth Reading** | `?dev=arcane` | **New.** The other sold product, entered at its intake — never at its result. |
+| 4 | **The Codex** | `codex.html` | The deepest free surface and the most-linked destination in the repo. Free depth belongs high. |
+| 5 | **The Reliquary** | `/#reliquary` → `?dev=profile` when held | Where what you keep lives. **One entry, not two** — resolve the Vault collision first (§7 Q2). |
+| 6 | **About Blue Room** | `#about` | The five-plate map and the colour law (gold = free, violet = paid). **Needs a real address first** (§7 Q5). |
+| 7 | **The Desk** | `/` | Home. Last in the ring because you are usually standing on it — but it must be *in* the ring, so the ring is complete. |
+| 8 | **Settings** | `?dev=settings` | Support, not a room. Bottom of the ring or in the sheet's foot, visually demoted. |
+
+### Deliberately absent
+
+- **The Scan Room (`?src=1&t=free`)** — live and good, but it demonstrates the roadmap product. It belongs as *"See a card develop"* on M1 and as About plate IV, **not as a room in the map**. Putting a roadmap demo in the hub is exactly the false-bigness the kill rule names.
+- **The Vault (`?dev=vault`)** — it strips its own URL, so a hub plate pointing there would produce a link you can't refresh. It is a hand-off destination. It also duplicates the Reliquary's job.
+- **Every `?dev=` bench** — `staged-reveal`, `menu-reveal`, `review-map`, `proto-cards`, `free-scan-sim`, `halo-gate`, `uploaded-result`, `uploaded-blocked`, `before-after`. They are infrastructure. They already have a home: the `?devnav=1` rail, whose button list should be regenerated from the same constant with `public: false`.
+- **The local draft** — a door on M1, not a room. It has no address and cannot survive a refresh.
+- **The Ceremony (`?dev=ceremony`)** — a beat inside the intake, not a destination.
+- **`tarot-v2/`, `compass-wheel.html`, the wheels** — orphans with no home yet. They enter the hub the day they get a room and a return path (§7 Q6), not before.
+- **The Concord desk (`#/concord`)** — reached from M2 and from the reading. A second-order door; keeping it out of the ring keeps the ring at eight.
+
+**One rule for the hub:** a plate in the ring is a promise that the surface has a way back. Nothing on the §4 reversibility list may be added to the hub until its back is built.
+
+---
+
+## 7 · OPEN QUESTIONS FOR THE BUILDER
+
+Each is a single decidable question. None can be answered by more surveying.
+
+1. **Do the two sold products get real addresses — `/tarot` and `/reading` — or do they ship at `?dev=drawing-room` and `?dev=arcana-reading`?**
+2. **"The Vault", "The Reliquary" and the Profile's "not open yet" vault: is that one shelf or two?** (If one: which name survives, and which surface is deleted?)
+3. **Does `UNIVERSE_ZONE_MAP_V1 §6`'s ban on `/record/{serial}` stand, or does `GROWTH_AND_UNIVERSE_STRATEGY_V1`'s "keystone record page" win?** One of the two docs must be amended this week.
+4. **M1/M2/M3: does the nav keep the name and the missions get renamed, or the reverse?**
+5. **Should `#about` become boot truth — a real route that survives a refresh and can be linked — given the plan to make U1 the public roadmap?**
+6. **Do the wheels (`compass-wheel.html` + two dead siblings) get a Tools room with a door and a return, or do they come off the public deploy?**
+7. **`dev-live.html` is tracked at the public deploy root and does `fetch("/"+f)`, against a playbook row requiring it inert in prod — gate it, or unpublish it?**
+8. **Does the M3 preview toggle get its `?devnav` gate now?** (If yes: what replaces it as the door to the open Reliquary and `?dev=profile`, since it is currently the only one?)
+9. **The dossier: is the SECTION MAP corrected to 5 plates, or are the two killed plates restored?**
+10. **Does plate 02 "Archetype" — a numbered slot in a live record holding only "reserved" — get content, or get removed?**
+11. **`?dev=ceremony` standalone: does it have a back button or not?** (Two surveys observed opposite results; someone must load it once and settle it.)
+12. **Does the Atlas become generated from `app.js` + `MENU_PANELS` + the `#about` array, the way `codex.html` is generated — and does `?dev=review-map` get deleted on the same commit?**
+13. **`tarot-v2/` versus `?dev=ceremony`: which dealing ceremony is canonical, and is the other retired or integrated?**
+14. **The three Codex A/B toggles (`?vx`, `?tide`, `?snap`) are still up, shipping both branches' CSS and data in a 432 KB page with 7.6 KB of headroom. Are the winners made permanent now?**
+15. **Does `docs/GROWTH_AND_UNIVERSE_STRATEGY_V1.md` get committed?** It is 22 KB of live doctrine, untracked, in a repo where another session's `git add -A` will eventually sweep it somewhere unintended.
+
+---
+
+## APPENDIX · Non-route URL flags
+
+None of these are surfaces. All confirmed present in `app.js` or the generated pages.
+
+`?devnav=1|0` (+ `localStorage br_devnav`, backtick toggles) · `?flat=0` · `?tilt=0` · `?orbit=0` · `?land=spring|spring2|m3|detent|detent2` · `?m2=white` · `?lab=cold-foil|black-star|night-gloss` (t=mint only) · `?holdings=` · `?seed=birth~name~y~m~d` · `?for=other` / `?subject=` · `?pull=1` · `?read=` + `?t=` (drawing-room receipt) · `?rv=developed` · `?src=1|2` · `?t=free|shiny|mint` · `?tab=source|diagram|metrics` · Codex: `?vx=` `?tide=` `?snap=` `?v=` · U1 benches: `?dial= ?ink= ?grade= ?frame= ?f= ?unlit=`
+
+**One leftover that ships to real visitors:** `[data-m1-variant="a"|"b"]` buttons labelled *"M1 layout A · original / B"*, commented *"Remove once chosen"*. The choice was made (BR-S271) and the toggle is still in the live M1 markup.
