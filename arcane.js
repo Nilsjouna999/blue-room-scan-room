@@ -377,7 +377,7 @@
           '<div class="ac-cta" data-gift-cta>' +
             '<button type="button" class="ac-draw ac-gift-send" data-gift-send><span>Send the Gift</span> <span class="ac-draw__price">$4.99</span></button>' +
             '<p class="ac-hope">Nothing is drawn now. They draw it, and it is theirs.</p>' +
-            '<p class="ac-mocknote">Dev mock — no real payment in this build.</p>' +
+            '<p class="ac-mocknote">Nothing is charged here yet.</p>' +
           "</div>" +
         "</div>" +
       "</div>";
@@ -1263,7 +1263,7 @@
           '<input class="ac-deed__link" data-deed-link readonly value="' + esc(url) + '" aria-label="The deed link">' +
           '<button type="button" class="ac-draw ac-deed__copy" data-gift-copy>Copy the deed link</button>' +
           '<p class="ac-deed__note" data-deed-note>Hand this to them. They sit the reading free, read it free, and keep it as a Gift of you.</p>' +
-          '<p class="ac-mocknote">Dev mock — the link works; keeping it needs an account, later.</p>' +
+          '<p class="ac-mocknote">Nothing is charged yet. The link works; keeping what it opens will need an account.</p>' +
         '</div>';
       var copyBtn = root.querySelector("[data-gift-copy]"), linkEl = root.querySelector("[data-deed-link]"), note = root.querySelector("[data-deed-note]");
       copyBtn.addEventListener("click", function () {

@@ -1367,13 +1367,13 @@ function renderAbout() {
        Lines are held under ~110 chars: 31ch of Cormorant buys ~38 characters,
        so three lines is the plaque's real ceiling. */
     { key: 'codex', ord: 'I', side: 'left', cls: 'is-free', name: 'The Codex',
-      line: '166 entries across eight systems. Every card, sign, rune and hexagram the rooms read from.', micro: 'Free · no account',
+      line: '222 entries across ten systems. Every card, sign, rune and hexagram the rooms read from.', micro: 'Free · no account',
       door: '<a class="about__door" href="codex.html?v=237">Open the Codex &rarr;</a>' },
     { key: 'tarot', ord: 'II', side: 'right', cls: '', name: 'Tarot Divination',
       line: 'Three cards for a Sitting, five for the Deep Read, cut from the full 78 and filed where each fell.', micro: 'First sitting free · to $2.99',
       door: '<a class="about__door" href="?dev=drawing-room">Cut the deck &rarr;</a>' },
     { key: 'arcana', ord: 'III', side: 'left', cls: 'is-paid', name: 'The Birth Reading',
-      line: 'Six marks from a name and birth date: astrology, numerology, runes, the I Ching, each with a record.', micro: '$4.99 · $7.99 for two',
+      line: 'Six marks from a name and birth date: astrology, the Chinese year, numerology, runes, the I Ching — each with a record.', micro: '$4.99 · $7.99 for two',
       door: '<a class="about__door" href="?dev=arcane">Give a name and date &rarr;</a>' },
     { key: 'mint', ord: 'IV', side: 'right', cls: 'is-free', name: 'The Card Mint',
       line: 'One card from one photograph. The room develops what is already in it, then keeps it a page.', micro: 'Free · or the paid Halo Mint',
@@ -1437,7 +1437,7 @@ function renderAbout() {
    door never mounts anything). Colour law: #mwGold is the ONE hero metal; the lone
    violet in the room is the word "kept". */
 /* THE STOREFRONT MUST NOT PROMISE WHAT THE ROOM BEHIND IT HAS ALREADY SPENT. The
-   Drawing Room's own landing already says "your first is filed" once the free sitting is
+   Drawing Room's own landing already says the free sitting is spent once it is
    cut (drawing-room.js landingHTML / sittingUsed). M2 said "your first free" to everyone,
    so a returning reader met an offer on the storefront that the very next screen retracts
    — on the one panel whose differentiating line is "Asked the same, they answer the same".
@@ -1616,7 +1616,7 @@ function renderWall() {
     + '<a class="menu__door menu__door--add menu__door--tarot" href="?dev=drawing-room">'
     + '<span class="menu__door-kicker">By the Draw &middot; Tarot</span>'
     + '<span class="menu__door-name">A Tarot Reading</span>'
-    + '<span class="menu__door-desc">A Sitting — three cards to one question, ' + (m2SittingUsed() ? 'your first is filed' : 'your first free') + '. Or the Deep Read — five.</span>'
+    + '<span class="menu__door-desc">A Sitting — three cards to one question, ' + (m2SittingUsed() ? 'your free one is spent' : 'your first free') + '. Or the Deep Read — five.</span>'
     + '<span class="menu__draw-spine">The Ground · The Crossing · The Root · The Crown · The Turn</span>'
     + '</a>'
     + '</div>'
@@ -1948,6 +1948,32 @@ function m2MetaHTML(meta) {
     return '<span class="m2read__seg m2read__seg--' + role + '">' + inner + "</span>";
   }).join('<span class="m2read__dot" aria-hidden="true">&middot;</span>');
 }
+/* ── BR-S353 — THE READ ENDS ON A SENTENCE, NOT MID-WORD. ─────────────────────
+   Raising the type to the 110% ratio (BR-S349) made an existing fault visible: the
+   meaning is clamped to a fixed number of lines, and every one of the 78 tarot
+   meanings is longer than the box — so the panel was ending on "…the first steps
+   of" and stopping. A -webkit-line-clamp ellipsis is honest about a paragraph; it
+   is not honest about a sentence, because the reader cannot tell whether the
+   thought was finished.
+   The clamp stays as the belt — the box may never resize — but the text handed to
+   it is now cut at a SENTENCE boundary that fits, so the clamp has nothing left to
+   do. Whole thoughts, and the rest is one Codex link away, which is what the
+   original comment always claimed this did.
+   The budget is derived from the box, not guessed: lines x the measure, at the
+   ~2.1 characters per em this serif runs to. Fewer characters than the box holds,
+   deliberately — a sentence that only just fits reads as a near-miss. */
+function m2Excerpt(text, lines, cols) {
+  var t = String(text || "").trim();
+  var budget = Math.floor((lines || 5) * (cols || 46));
+  if (t.length <= budget) return t;
+  var out = "", re = /[^.!?]+[.!?]+(\s|$)/g, m;
+  while ((m = re.exec(t))) {
+    if (out.length + m[0].length > budget) break;
+    out += m[0];
+  }
+  out = out.trim();
+  return out || t;                       // one very long sentence: let the clamp have it
+}
 function m2WriteRead(root, r) {
   const set = (sel, txt) => { const el = root.querySelector(sel); if (el) el.textContent = txt; };
   set(".m2read__label", r.label);
@@ -2025,7 +2051,7 @@ function m2Pull(host) {
   M2_LAST = {
     label: "The card in hand",
     meta: rank + (rev ? " · reversed" : "") + (kw ? " · " + kw : ""),
-    mean: (rev && c.reversed) ? c.reversed : c.meaning,
+    mean: m2Excerpt((rev && c.reversed) ? c.reversed : c.meaning, 5, 46),
     accent: m2Accent(c)          // BR-S346: the suit's element tints its own read
   };
   m2WriteRead(root, M2_LAST);
@@ -2089,7 +2115,7 @@ function renderReliquaryTeaser() {
     +   '<span class="menu__reliq-rule" aria-hidden="true"></span>'
     +   '<p class="menu__reliq-line">The Shelf is where the archive keeps what has been filed. Nothing is filed here yet — so the shelf stays sealed.</p>'
     +   '<p class="menu__reliq-how">It opens the moment a reading is drawn and kept. Looking is free, always; keeping is what fills the shelf.</p>'
-    +   '<a class="menu__reliq-door" href="?dev=arcane">See a reading — free to look &rarr;</a>'
+    +   '<a class="menu__reliq-door" href="?dev=arcane">Draw a Birth Reading — the form is free &rarr;</a>'
     + '</div>'
     + '<p class="menu__reliq-foot">Sealed · held in conservation · Blue Room Archive</p>'
     + reliqPreviewToggle(false)
@@ -2101,9 +2127,9 @@ function renderReliquaryOpen() {
     + '<p class="menu__reliq-eyebrow"><span class="menu__reliq-eyemark" aria-hidden="true">◆</span> THE SHELF</p>'
     + '<div class="menu__reliq-niche">'
     +   '<span class="menu__reliq-emblem menu__reliq-emblem--lit" aria-hidden="true">' + RELIQ_SEAL_SVG + '</span>'
-    +   '<h2 class="menu__reliq-title" tabindex="-1">The shelf is open</h2>'
+    +   '<h2 class="menu__reliq-title" tabindex="-1">The shelf is yours</h2>'
     +   '<span class="menu__reliq-rule" aria-hidden="true"></span>'
-    +   '<p class="menu__reliq-line">What has been kept is held here — the crowned name, the rings, the vault.</p>'
+    +   '<p class="menu__reliq-line">What has been kept is held here — the crowned name, the rings, the cards.</p>'
     +   '<a class="menu__reliq-door menu__reliq-door--enter" href="?dev=profile">Open the Shelf &rarr;</a>'
     + '</div>'
     + '<p class="menu__reliq-foot">Filed &amp; sealed · Blue Room Archive</p>'

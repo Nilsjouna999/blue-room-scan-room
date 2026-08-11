@@ -480,7 +480,7 @@
     return '<div class="cc-col'+(cls?' '+cls:'')+'">'+CROWN_SVG+'<div class="eyebrow">'+eye+'</div><div class="cc-name">'+esc(c.name)+'</div>'+(cls==="cc-col--b"?
       '<div class="cc-claim" data-cc-claimwrap><button type="button" class="ck-seal ck-claim" data-cc-claim>Your reading, held &middot; $4.99</button>'+
       '<p class="cc-claimnote">Reading this page is free, always — claiming files your half to a Reliquary of your own.</p>'+
-      '<p class="dr-mocknote">Dev mock &mdash; no account, no real payment in this build.</p></div>':'')+'</div>';
+      '<p class="dr-mocknote">Nothing is charged here yet, and nothing is kept to an account.</p></div>':'')+'</div>';
   }
 
   function renderConcord(sa,sb){
@@ -522,7 +522,7 @@
       '<div class="col cc-desk">'+fs("a","The first name borne")+fs("b","The second name borne")+
         '<p class="cc-fine">One concord per pair. The same two names, the same dates — the same concord, always. A drawn concord is open to both names at its link, forever.</p>'+
         '<div data-cc-sealwrap><button type="button" class="ck-seal cc-seal" data-cc-seal>Seal the concord &middot; $7.99</button>'+
-        '<p class="dr-mocknote">Dev mock &mdash; no real payment in this build.</p></div>'+
+        '<p class="dr-mocknote">Nothing is charged here yet.</p></div>'+
         '<p class="cc-notice" data-cc-notice role="status" aria-live="polite"></p>'+
         '<p class="cc-ref">The standing concord of The Seeker &amp; The Companion — <a href="'+concordURL(REF_CONCORD_A,REF_CONCORD_B)+'">open to any visitor &rarr;</a></p>'+
       '</div>';
@@ -573,7 +573,7 @@
   }
   function claimHalf(){
     var btn=document.querySelector("[data-cc-claim]"),wrap=document.querySelector("[data-cc-claimwrap]");
-    sealBeat(btn,"Held",function(){if(wrap)wrap.innerHTML='<p class="cc-heldnote">Held. This page is the record; the link is the receipt.</p><p class="dr-mocknote">Dev mock &mdash; no account in this build.</p>';});
+    sealBeat(btn,"Held",function(){if(wrap)wrap.innerHTML='<p class="cc-heldnote">Held. This page is the record; the link is the receipt.</p><p class="dr-mocknote">Nothing is kept to an account yet.</p>';});
   }
   document.getElementById("app").addEventListener("click",function(ev){
     var el=ev.target.closest("[data-cc-seal],[data-cc-claim]");if(!el)return;

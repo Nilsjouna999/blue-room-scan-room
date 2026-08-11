@@ -186,7 +186,7 @@
       '<div class="pf-vaulthead">' +
       '<span class="pf-vaulteyebrow">Blue Room Archive&nbsp;&nbsp;·&nbsp;&nbsp;The Drawing Room</span>' +
       '<h1 class="pf-vaulttitle">The Drawing Room</h1>' +
-      '<p class="dr-fineprint">The tarot does not predict the future. A card is drawn once, offers a reflection on your situation, and is kept.</p>' +
+      '<p class="dr-fineprint">The tarot does not predict the future. Cards are drawn once, read where they fall, and kept at their link.</p>' +
       '</div><div class="dr-stage" data-dr-stage>';
   }
   function shellClose() { return '</div></div></div>'; }
@@ -220,9 +220,9 @@
       '<section class="dr-tiers">' +
       '<p class="dr-tiers__label">Draw a reading — it is cut, and kept at its own link.</p>' +
       tierDoor(SPREADS.sitting, sittingUsed()
-        ? "Three cards to one question — your first is filed."
+        ? "Three cards to one question — your free sitting is spent."
         : "Three cards to one question — your first is free.") +
-      tierDoor(SPREADS.deep, "Five cards, a deeper read.") +
+      tierDoor(SPREADS.deep, "One question, taken further — what it grew from, and what it reaches for.") +
       '</section></div>';
   }
   /* a paid door carries its price in the specimen label; the free-first sitting stays untouched */
@@ -284,10 +284,10 @@
     return '<p class="dr-intake__which">' + esc(sp.title) + ' &middot; ' + sp.n + ' cards</p>' +
       '<label class="dr-field"><span class="dr-field__label">Lay a matter on the table <span class="dr-field__opt">— optional</span></span>' +
       '<input type="text" class="dr-field__in" data-dr-question maxlength="120" autocomplete="off" placeholder="a question, in your own words" ' +
-      'aria-label="A question or situation. Optional. It is kept with your reading, and it does not choose the cards."></label>' +
+      'aria-label="A question or situation. Optional. It is kept with your reading."></label>' +
       '<div class="dr-control" data-dr-control>' + controlHTML(sp, "ready") + '</div>' +
       '<p class="dr-cut__note">The cut does not choose the cards. It closes the question.</p>' +
-      (paid ? '<p class="dr-mocknote">Dev mock &mdash; no real payment in this build.</p>' : '') +
+      (paid ? '<p class="dr-mocknote">Nothing is charged here yet.</p>' : '') +
       '<a class="dr-intake__back" href="#" data-dr-home>&larr; the deck</a>';   /* BR-S318: the .dr-intake wrapper is now the persistent [data-dr-intake] region in the flow shell — this returns its CONTENTS, so the cut can empty it without removing it */
   }
 

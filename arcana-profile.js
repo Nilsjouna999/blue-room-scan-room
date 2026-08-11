@@ -64,7 +64,7 @@
       { kind: "Life path", name: "Life Path 7" },
       { kind: "Rune", name: "Gebo" }
     ],
-    minted_cards: [],   // none yet — the Vault is not open
+    minted_cards: [],   // none yet — minting is not open
     showcase: [
       { id: "s1", chosen: null },
       { id: "s2", chosen: null },
@@ -206,7 +206,7 @@
         '</button>' +
         '<div class="pf-crownstage__cap">' +
           '<p class="pf-prov">A crown is earned by taking a reading — it gains a gem for each reading it holds.</p>' +
-          '<a class="pf-openreading pf-openreading--lg pf-paid" href="#" data-draw="self" data-intent="new">Draw your Arcana &middot; $4.99 &rarr;</a>' +
+          '<a class="pf-openreading pf-openreading--lg pf-paid" href="#" data-draw="self" data-intent="new">Draw your Birth Reading &middot; $4.99 &rarr;</a>' +
         '</div></div>';
     }
 
@@ -243,8 +243,13 @@
     }).join("");
     // Empty state is one calm line (the lede) — no ghost slots. Cards appear when minting is live.
     var body = cards ? '<div class="pf-vault"><div class="pf-cards">' + cards + '</div></div>' : "";
-    return section("The Shelf", "not open yet",
-      "Your minted cards are filed here — nothing has been minted yet. The Shelf opens once minting begins.",
+    /* BR-S353: this section was called "The Shelf" while settings.js names the WHOLE
+       page The Shelf and reports it Open — so following "The Shelf →" landed on a
+       section of that name saying it was not open. The page keeps the name; the
+       section says what it actually holds. The lede stated the same fact three
+       times over; once is enough. */
+    return section("Minted cards", "not open yet",
+      "Minted cards are filed here. None yet.",
       body);
   }
 
@@ -256,7 +261,7 @@
     var readOpts = SEEKER.reading_results.map(function (o) { return pickOpt(id, o); }).join("");
     var mintOpts = SEEKER.minted_cards.length
       ? SEEKER.minted_cards.map(function (o) { return pickOpt(id, o); }).join("")
-      : '<p class="pf-pickempty">No minted cards yet — the Vault is not open.</p>';
+      : '<p class="pf-pickempty">No minted cards yet — minting is not open.</p>';
     return '<div class="pf-pickmenu" role="menu" aria-label="Choose what to feature" hidden>' +
       '<div class="pf-pickmenu__h">From your reading</div>' +
       '<div class="pf-pickmenu__grid">' + readOpts + '</div>' +
