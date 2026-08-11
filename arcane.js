@@ -49,6 +49,10 @@
       var r = ROLE[role];
       var a = 'data-ink data-op="' + r.op + '"';
       if (role === "jewel") a += " data-jewel";
+      /* BR-S332: the five spike-tip pearls become the five MARKS — one field, one gem.
+         opts.mark carries the DEFS index so the crown can be lit per field instead of
+         all-at-once. Band diamonds keep plain data-jewel and stay the all-complete bonus. */
+      if (opts.mark != null) a += ' data-mark-jewel="' + opts.mark + '"';
       if (role === "seal") a += " data-final";
       if (opts.idle) a += " data-idle";
       var g = "";
@@ -99,8 +103,9 @@
     line(v[2], BYT, 285, 224, "band"); line(285, 224, v[3], BYT, "band");
     line(v[3], BYT, 340, 262, "band"); line(340, 262, BX1, BYT, "band");
 
-    // 6 — PEARLS at spike tips (jewels)
-    tips.forEach(function (t) { circle(t[0], t[1], 8, "jewel"); });
+    // 6 — PEARLS at spike tips (jewels). BR-S332: five tips, five marks — index-matched
+    //     to DEFS, so the crown can be read left-to-right as which marks are set.
+    tips.forEach(function (t, i) { circle(t[0], t[1], 8, "jewel", { mark: i }); });
 
     // 7 — HERALDIC FESTOONS
     path("M120,262 Q147.5,318 175,224", "orn");
@@ -148,6 +153,31 @@
     });
     glow.style.background = "radial-gradient(circle at 50% 46%, " + ACCENT + "4d 0%, transparent 62%)";
 
+    /* ── BR-S332 — ONE MARK SET LIGHTS ONE GEM. ────────────────────────────────
+       The crown's jewels used to be an all-or-nothing event: every one of them filled
+       together the moment the form crossed 64 aggregate characters. So the object the
+       whole page is built around answered a reader exactly ONCE, and only after they
+       had already finished. Five of them are the five marks now — set your name and
+       the first pearl takes the gold, and the crown becomes a thing you are visibly
+       assembling rather than a meter that flips at the end.
+       THE REAL WORK WAS TEACHING draw() TO LET GO. It rewrote `fill` and `fillOpacity`
+       on EVERY jewel on EVERY keystroke, so any per-field state written from outside
+       was clobbered by the next character typed. It now skips the five mark-pearls
+       entirely and setMark() owns them; the three band diamonds keep the old
+       all-complete behaviour, which is what makes finishing still feel like an event.
+       The fill transition is already declared at .9s on every node (line above), so
+       there is no new CSS and nothing new to animate. */
+    var markState = [];
+    function paintMark(n, on) {
+      n.style.fill = on ? ACCENT : "none";
+      n.style.fillOpacity = on ? "0.3" : "0";
+    }
+    function setMark(i, on) {
+      if (markState[i] === !!on) return;                     // idempotent: the listener fires on every keystroke
+      markState[i] = !!on;
+      var n = svg.querySelector('[data-mark-jewel="' + i + '"]');
+      if (n) paintMark(n, on);
+    }
     function draw(p) {
       var N = nodes.length;
       p = Math.max(0, Math.min(1, p || 0));
@@ -162,7 +192,9 @@
           var baseOp = parseFloat(n.getAttribute("data-op") || "0.9");
           n.style.opacity = lp <= 0 ? "0" : (baseOp * (0.4 + 0.6 * lp)).toFixed(3);
         }
-        if (n.hasAttribute("data-jewel")) {
+        /* the five mark-pearls belong to setMark() — draw() must not touch their fill
+           or every keystroke would erase the gem the previous one lit */
+        if (n.hasAttribute("data-jewel") && !n.hasAttribute("data-mark-jewel")) {
           n.style.fill = complete ? ACCENT : "none";
           n.style.fillOpacity = complete ? "0.3" : "0";
         }
@@ -170,7 +202,7 @@
       glow.style.opacity = complete ? "1" : "0";
     }
     draw(0);
-    return { draw: draw };
+    return { draw: draw, setMark: setMark };
   }
 
   /* ---------------------------------------------------------------
@@ -992,12 +1024,20 @@
 
     function totalChars() { var c = 0; inputs.forEach(function (i) { c += (i.value || "").length; }); return c; }
     function progress() { return Math.min(1, totalChars() / Math.max(8, COMPLETION_CHARS)); }
-    function refresh() { crown.draw(progress()); }
+    /* BR-S332: the crown now answers twice — the strokes still draw from aggregate
+       progress, and each of the five pearls lights the moment ITS OWN field has
+       something in it. Idempotent inside setMark, so this stays cheap on every
+       keystroke: five booleans compared, at most one style write. */
+    function refresh() {
+      crown.draw(progress());
+      if (crown.setMark) inputs.forEach(function (inp, i) { crown.setMark(i, (inp.value || "").trim().length > 0); });
+    }
 
     function exitCeremony() {
       if (ceremony && ceremony.destroy) ceremony.destroy();
       ceremony = null;
       ceremonyHost.hidden = true;
+      ceremonyHost.classList.remove("is-arriving");   // BR-S332: never leave the overlay staged transparent for the next mount
       ceremonyHost.innerHTML = "";
     }
     function startCeremony() {
@@ -1024,7 +1064,15 @@
         location.href = "?dev=arcana-reading&seed=" + encodeURIComponent(seed);
       };
       if (ceremony && ceremony.destroy) ceremony.destroy();
+      /* BR-S332: unhide TRANSPARENT, then release on the next frame so the fade has a
+         start state to travel from — set both in one tick and the browser has nothing
+         to interpolate and you get the old cut back. Reduced motion skips straight to
+         opaque; the class is removed either way so nothing can strand invisible. */
+      var rmArrive = window.matchMedia && (window.BRMotion ? window.BRMotion.prefersReduced() : window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+      ceremonyHost.classList.add("is-arriving");
       ceremonyHost.hidden = false;
+      if (rmArrive) ceremonyHost.classList.remove("is-arriving");
+      else requestAnimationFrame(function () { requestAnimationFrame(function () { ceremonyHost.classList.remove("is-arriving"); }); });
       // BR-S164: "Draw the reading" now opens the redesigned ceremony (ceremony.js,
       // window.BRCeremony) — the builder's pixel-perfect forge scene, alive, with the
       // crown forged over 5 hits. Back → the marks; "Enter the reading" → the result.

@@ -88,12 +88,25 @@
 .ac-cta { text-align: center; }
 /* the $4.99 price on the draw button — the commerce register (violet) */
 .ac-draw__price { color: #a487c8; font-variant-numeric: tabular-nums; margin-left: 5px; }
+/* ── BR-S332 — THE PAID ACTION LOOKS LIKE AN ACTION. ─────────────────────────
+   This button was `background: transparent; border: none` — so the one control on the
+   page that takes $4.99 had LESS visual shape than the free for-whom radio chips above
+   it, which carry a 1px border. Its pill padding and 999px radius were already here and
+   rendering invisible; they only needed something to draw. A neutral hairline and the
+   faintest fill, both from the existing family — no gold, which is reserved for what is
+   kept, and no violet, which belongs to the price span alone.
+   AND IT PRESSES. There was no :active anywhere on the page: the single most consequential
+   click in the room reported nothing back. 90ms, one step darker and a hair down — a
+   button that answers the finger, not a bounce. */
 .ac-draw {
   font-family: var(--font-ui); font-size: 11px; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase;
-  color: var(--t-meta); background: transparent; border: none; border-radius: 999px; padding: 9px 16px; cursor: pointer;
-  transition: color 0.16s ease;
+  color: var(--t-meta); background: rgba(233, 229, 220, 0.03);
+  border: 1px solid var(--line-strong); border-radius: 999px; padding: 11px 24px; cursor: pointer;
+  transition: color 0.16s ease, background 0.16s ease, border-color 0.16s ease, transform 0.09s ease;
 }
-.ac-draw:hover { color: var(--silver); }
+.ac-draw:hover { color: var(--silver); background: rgba(233, 229, 220, 0.06); border-color: var(--silver-dim); }
+.ac-draw:active { background: rgba(233, 229, 220, 0.09); transform: translateY(1px); }
+@media (prefers-reduced-motion: reduce) { .ac-draw:active { transform: none; } }
 .ac-hope { font-family: var(--font-display); font-style: italic; font-size: 13.5px; color: var(--t-ghost); margin: 18px 0 0; }
 .ac-notice { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.18em; color: var(--t-ghost); margin: 14px 0 0; min-height: 14px; }
 
@@ -155,8 +168,17 @@
 .ac-deed__note { font-family: var(--font-display); font-style: italic; font-size: 13px; color: var(--t-ghost); margin: 16px auto 0; max-width: 44ch; }
 
 /* ---- THE FORGING CEREMONY (overlay) ---- */
-.ac-ceremony { position: fixed; inset: 0; z-index: 60; }
+/* ── BR-S332 — THE HANDOFF BREATHES. ────────────────────────────────────────
+   `ceremonyHost.hidden = false` against `display:none` is a CUT: the page you were
+   typing on is replaced by the forge between one frame and the next. That is the most
+   important transition in the room — the moment the marks become a reading — and it was
+   the only one with no motion on it at all. A 220ms fade is enough; the ceremony has
+   its own opening beat and does not need help, it just needs to not arrive as a jolt.
+   Opacity only, enumerated, never transition:all. */
+.ac-ceremony { position: fixed; inset: 0; z-index: 60; opacity: 1; transition: opacity 220ms cubic-bezier(.2,.7,.2,1); }
 .ac-ceremony[hidden] { display: none; }
+.ac-ceremony.is-arriving { opacity: 0; }
+@media (prefers-reduced-motion: reduce) { .ac-ceremony { transition: none; } }
 .ac-forge {
   position: relative; width: 100%; height: 100%; min-height: 560px; background: var(--ac-bg-room);
   overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center;
