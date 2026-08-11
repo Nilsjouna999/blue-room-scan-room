@@ -2892,6 +2892,39 @@ html.is-travel .card .cardfinish { mix-blend-mode: normal; }
   transition: transform 320ms var(--ease-settle, cubic-bezier(.2,.7,.2,1));
 }
 #menuView .menu__panel--desk .card.is-tilting { transition: none; }
+
+/* BR-S283 — THE ENGRAVED LIGHT.  The builder: "slight light that feels like engraved
+   deep in the card and travels where mouse... sleek and not super bright, just nice
+   touch."
+   WHY A PAIR OF LOBES AND NOT ONE.  A single radial highlight reads as a LAMP shining
+   onto the surface — glossy, sitting on top, the holo-card look that was explicitly
+   not wanted.  What reads as ENGRAVING is a lit edge with its own shadow immediately
+   beneath it: that is the only cue that says a channel has been cut into the material
+   rather than a light laid over it.  So there are two gradients at the pointer, the
+   dark one offset 3% below the bright one, and the offset is the entire effect.
+   WHY soft-light.  overlay and screen both push toward the light and read as gloss;
+   soft-light MODULATES what is already there, so the mark stays inside the material.
+   At .075 and .10 alpha it is a touch, not a beam — "not super bright" was the brief.
+   It only exists while the hand is on the card (.is-tilting), which is also why it
+   cannot cost anything during a travel: BR-S276 flattens blends for the slide, and
+   the tilt stands down there anyway, so this layer is already at opacity 0 by then.
+   Same handler, same rAF, same four writes as the tilt — no second listener. */
+#menuView .menu__panel--desk .card::after {
+  content: "";
+  position: absolute; inset: 0; z-index: 3;
+  border-radius: inherit; pointer-events: none;
+  opacity: 0; transition: opacity 300ms var(--ease-settle, cubic-bezier(.2,.7,.2,1));
+  mix-blend-mode: soft-light;
+  background:
+    radial-gradient(34% 26% at var(--lx, 50%) var(--ly, 50%),
+      rgba(233, 229, 220, 0.075) 0%, rgba(233, 229, 220, 0.028) 42%, transparent 64%),
+    radial-gradient(40% 30% at var(--lx, 50%) calc(var(--ly, 50%) + 3%),
+      rgba(0, 0, 0, 0.10) 0%, rgba(0, 0, 0, 0.04) 46%, transparent 66%);
+}
+#menuView .menu__panel--desk .card.is-tilting::after { opacity: 1; }
+@media (prefers-reduced-motion: reduce) {
+  #menuView .menu__panel--desk .card::after { display: none; }
+}
 @media (prefers-reduced-motion: reduce) {
   #menuView .menu__panel--desk .card { transform: none; transition: none; }
 }

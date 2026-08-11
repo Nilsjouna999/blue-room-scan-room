@@ -4745,19 +4745,32 @@ render();
   var coarse = window.matchMedia && window.matchMedia("(pointer: coarse)").matches;
   if (coarse) return;
 
-  var card = null, raf = 0, px = 0, py = 0;
+  var card = null, raf = 0, px = 0, py = 0, box = null;
+
+  /* BR-S283 — the rect is CACHED, not re-read.  The first version called
+     getBoundingClientRect() inside the rAF, i.e. a forced layout read on every frame
+     the mouse moved, on the heaviest object on the page — the exact class of mistake
+     this session has been unpicking all day.  The card's box only changes on resize,
+     scroll or a panel switch, so it is measured once on entry and invalidated by
+     those three events instead. */
+  function measure() { box = card ? card.getBoundingClientRect() : null; }
 
   function apply() {
     raf = 0;
     if (!card) return;
-    var r = card.getBoundingClientRect();
-    if (!r.width || !r.height) return;
-    var nx = (px - (r.left + r.width / 2)) / (r.width / 2);      // -1 .. 1
-    var ny = (py - (r.top + r.height / 2)) / (r.height / 2);
-    nx = nx < -1 ? -1 : nx > 1 ? 1 : nx;
-    ny = ny < -1 ? -1 : ny > 1 ? 1 : ny;
+    if (!box || !box.width) measure();
+    if (!box || !box.width || !box.height) return;
+    var fx = (px - box.left) / box.width;                        // 0 .. 1 across the face
+    var fy = (py - box.top) / box.height;
+    fx = fx < 0 ? 0 : fx > 1 ? 1 : fx;
+    fy = fy < 0 ? 0 : fy > 1 ? 1 : fy;
+    var nx = fx * 2 - 1, ny = fy * 2 - 1;                        // -1 .. 1 from the centre
     card.style.setProperty("--tilt-y", (nx * MAX_DEG).toFixed(2) + "deg");   // horizontal pointer → rotateY
     card.style.setProperty("--tilt-x", (-ny * MAX_DEG).toFixed(2) + "deg");  // toward the pointer, not away
+    /* the engraved light rides the same frame and the same numbers — one handler,
+       one rAF, four properties.  See styles.css for why it is a PAIR of lobes. */
+    card.style.setProperty("--lx", (fx * 100).toFixed(1) + "%");
+    card.style.setProperty("--ly", (fy * 100).toFixed(1) + "%");
   }
 
   function rest(c) {
@@ -4765,6 +4778,7 @@ render();
     c.style.setProperty("--tilt-x", "0deg");
     c.style.setProperty("--tilt-y", "0deg");
     c.classList.remove("is-tilting");
+    if (c === card) box = null;
   }
 
   host.addEventListener("pointermove", function (e) {
@@ -4772,11 +4786,14 @@ render();
     if (document.documentElement.classList.contains("is-travel")) { rest(card); card = null; return; }
     var t = e.target.closest ? e.target.closest(".menu__panel--desk .card") : null;
     if (!t) { if (card) { rest(card); card = null; } return; }
-    if (t !== card) { rest(card); card = t; card.classList.add("is-tilting"); }
+    if (t !== card) { rest(card); card = t; box = null; card.classList.add("is-tilting"); }
     px = e.clientX; py = e.clientY;
     if (!raf) raf = requestAnimationFrame(apply);
   }, { passive: true });
 
   host.addEventListener("pointerleave", function () { rest(card); card = null; }, { passive: true });
   window.addEventListener("blur", function () { rest(card); card = null; });
+  var stale = function () { box = null; };                       // the three things that can move the box
+  window.addEventListener("resize", stale, { passive: true });
+  window.addEventListener("scroll", stale, { passive: true });
 })();
