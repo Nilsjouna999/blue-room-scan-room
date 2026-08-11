@@ -2301,11 +2301,26 @@ function ease(t){
   }
   return _bx(EASE[1],EASE[3],u<0?0:(u>1?1:u));
 }
-var glR=0, glT=0, glTo=null, glEnd=null;
+var glR=0, glT=0, glTo=null, glEnd=null, glFin=null;
+/* BR-S273 - THE GLIDE A/B.  The owned ride above is main-thread by construction:
+   it writes W.scrollTo on every rAF frame, so every frame of a step competes with
+   whatever else the main thread is doing.  Chromium's programmatic smooth scroll
+   does not - "smooth scrolls initiated using the new API can be driven on the
+   compositor thread, and hence remain smooth even when the main thread is busy"
+   (the CSSOM View smooth-scroll intent).  That is the one property no amount of
+   curve work can buy back, and it is exactly what this page gave up.
+   The rejection note above is still half right: native has no duration dial and
+   its tail is the browser's, not ours.  Which of the two costs more is a FEEL
+   question, so it gets a switch instead of an argument - the house rule from the
+   M1 rank reversal: build the A/B, then look.  ?glide=native rides the compositor,
+   the bare URL keeps the owned ride.  Nothing is taken away; delete these two
+   blocks and the page is byte-identical to before. */
+var NATIVEGLIDE=/[?&]glide=native/.test(String(location.search||''));
 function docY(){ return W.pageYOffset||R.scrollTop||0; }
 function glideStop(){
   if(glR){ W.cancelAnimationFrame(glR); glR=0; }
   if(glT){ clearTimeout(glT); glT=0; }
+  if(glFin){ try{ W.removeEventListener('scrollend',glFin); }catch(e){} glFin=null; }
   glTo=null; glEnd=null;
 }
 function glide(y,ms,done){
@@ -2314,6 +2329,25 @@ function glide(y,ms,done){
   glideStop();
   var from=docY(), d=y-from;
   if(REDUCE||!W.requestAnimationFrame||(d<1&&d>-1)){ W.scrollTo(0,y); if(done)done(); return; }
+  if(NATIVEGLIDE){
+    /* Hand the ride to the compositor.  done() fires on scrollend where it exists
+       and on a timeout everywhere else; the timeout does NOT jump-cut, it only
+       settles the bookkeeping, because native may still be easing when it lands. */
+    var native=true;
+    try{ W.scrollTo({top:y,left:0,behavior:'smooth'}); }catch(e){ native=false; }
+    if(native){
+      glTo=y; glEnd=done;
+      glFin=function(){
+        if(glTo===null) return;
+        if(glFin){ try{ W.removeEventListener('scrollend',glFin); }catch(e2){} }
+        if(glT){ clearTimeout(glT); glT=0; }
+        var f=glEnd; glTo=null; glEnd=null; glFin=null; if(f) f();
+      };
+      try{ W.addEventListener('scrollend',glFin); }catch(e){}
+      glT=setTimeout(function(){ glT=0; if(glFin) glFin(); }, ms+700);
+      return;
+    }
+  }
   glTo=y; glEnd=done;
   var t0=0;
   function tick(now){

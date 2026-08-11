@@ -1121,11 +1121,13 @@ u-=x/d;
 }
 return _bx(EASE[1],EASE[3],u<0?0:(u>1?1:u));
 }
-var glR=0, glT=0, glTo=null, glEnd=null;
+var glR=0, glT=0, glTo=null, glEnd=null, glFin=null;
+var NATIVEGLIDE=/[?&]glide=native/.test(String(location.search||''));
 function docY(){ return W.pageYOffset||R.scrollTop||0; }
 function glideStop(){
 if(glR){ W.cancelAnimationFrame(glR); glR=0; }
 if(glT){ clearTimeout(glT); glT=0; }
+if(glFin){ try{ W.removeEventListener('scrollend',glFin); }catch(e){} glFin=null; }
 glTo=null; glEnd=null;
 }
 function glide(y,ms,done){
@@ -1134,6 +1136,22 @@ y=Math.round(Math.max(0,Math.min(y,floor)));
 glideStop();
 var from=docY(), d=y-from;
 if(REDUCE||!W.requestAnimationFrame||(d<1&&d>-1)){ W.scrollTo(0,y); if(done)done(); return; }
+if(NATIVEGLIDE){
+var native=true;
+try{ W.scrollTo({top:y,left:0,behavior:'smooth'}); }catch(e){ native=false; }
+if(native){
+glTo=y; glEnd=done;
+glFin=function(){
+if(glTo===null) return;
+if(glFin){ try{ W.removeEventListener('scrollend',glFin); }catch(e2){} }
+if(glT){ clearTimeout(glT); glT=0; }
+var f=glEnd; glTo=null; glEnd=null; glFin=null; if(f) f();
+};
+try{ W.addEventListener('scrollend',glFin); }catch(e){}
+glT=setTimeout(function(){ glT=0; if(glFin) glFin(); }, ms+700);
+return;
+}
+}
 glTo=y; glEnd=done;
 var t0=0;
 function tick(now){
