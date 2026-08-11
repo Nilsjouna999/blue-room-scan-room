@@ -3271,7 +3271,11 @@ html.is-travel .card .cardfinish { mix-blend-mode: normal; }
   position: absolute; inset: 0;
   font-family: var(--font-display); font-style: italic; font-size: 15.5px; line-height: 1.45;
   color: var(--t-body); opacity: 0;
-  animation-duration: 36s; animation-iteration-count: infinite; animation-fill-mode: both;
+  /* the cycle length is written onto .m2asks by app.js from M2_CYCLE — the same
+     constant the per-line delays are computed from. Hard-coding it here as well
+     would be two owners of one number, and the failure mode is silent: the
+     schedule would simply drift out of the loop it was written against. */
+  animation-duration: var(--m2ask-cycle, 36s); animation-iteration-count: infinite; animation-fill-mode: both;
   /* linear ONLY as the outer default — every segment overrides it from inside the
      keyframe, which is the one place a per-segment curve can be declared. */
   animation-timing-function: linear;
@@ -3280,7 +3284,11 @@ html.is-travel .card .cardfinish { mix-blend-mode: normal; }
    and the rest of the cycle is silence; a per-line negative delay slides that window
    to its appointed second. Attack is always faster than release — a thought appears
    more suddenly than it fades, and a symmetric fade is the tell of a slideshow.
-   Percentages are of the 36s cycle: 4.17% = 1.5s · 8.9% = 3.2s · 15% = 5.4s. */
+   BR-S344: the percentages are unchanged and the CYCLE grew 36s -> 44s, so every
+   envelope lengthened with it — flick 4.17% = 1.83s · hold 8.9% = 3.92s · dwell
+   15% = 6.6s. That is deliberate: the builder asked for spacious, and a longer hold
+   is half of what makes a line feel held rather than flashed. The schedule in
+   app.js#M2_ASKS is written against these seconds. */
 .m2asks__q--flick { animation-name: m2ask-flick; }
 .m2asks__q--hold  { animation-name: m2ask-hold; }
 .m2asks__q--dwell { animation-name: m2ask-dwell; }

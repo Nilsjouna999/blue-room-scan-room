@@ -1501,37 +1501,41 @@ function m2SittingUsed() { try { return localStorage.getItem("br_dr_sitting_used
        defect as a repeated interval: it announces an author.
      · Several were written rather than thought. "Something is off and I can't
        name it" is a good sentence and nobody has ever said it to themselves.
-   MY FIRST REWRITE FIXED THE SAMENESS AND KEPT THE GLOOM. "Is it too late." /
-   "Will it always be like this." / "Is it me." — ten lines of a person at their
-   worst. The builder's correction: real questions, no emo, no doomer, no wacky,
-   intimate but POSITIVE-ish, some risky love ones, and questions about the future
-   and about decisions.
-   That is the right instruction and it is also better product sense. Someone who
-   arrives curious is not in crisis — they are deciding something, or wondering
-   whether to say something, or looking at a year they might move in. A wall of
-   despair beside a card you can buy reads as bait; a wall of live, forward
-   questions reads as the reason people sit for a reading at all.
-   So: two risky love ones (the first move, telling him), two decisions, two about
-   what is next, and one — "Is this the good part." — that is the one worth sitting
-   with, which is why it gets the dwell and the highest peak. Full stops, not
-   question marks: a question mark is asked AT you; a full stop is someone thinking
-   near you. Shapes run from "Do I say yes." to "What am I actually good at."
-   THE TIMING IS UNCHANGED and stays as verified in BR-S341 — only the words moved.
-   The two form-change pairs are chosen for MEANING: a nerve becoming a bolder
-   nerve, and a readiness becoming a decision. */
-const M2_CYCLE = 36;
+   TWO REWRITES IN AND THE BUILDER WAS STILL RIGHT: it built anxiety, fed negative
+   energy, and the vibe was muddy. The second set had dropped the doom and kept the
+   defect, because the defect was never the mood — IT WAS THE GRAMMAR.
+     "Should I take the offer."  "Am I ready for this."  "Do I say yes."
+   Every one of those is closed and self-directed. "Should I" carries the premise
+   that you might be about to get it wrong; "Am I ready" carries the premise that
+   you might not be. They are the mind AUDITING ITSELF, and a wall of self-audit
+   generates exactly the low hum the builder felt — no matter how upbeat the noun
+   at the end is. A yes/no question also has nowhere to go: you can only sit in it.
+   SO THE GRAMMAR CHANGED. Every line is open now — what, where, who — and every
+   one points OUTWARD, at the world or another person, at something genuinely not
+   known. "What does he actually feel." is a question you would lean toward the
+   answer of. "Should I tell him." is a question you would flinch from. Same
+   subject, opposite feeling, and the difference is entirely the first word.
+   These are also answerable, which matters more than it sounds: an open question
+   about what is coming is one a reading can meet. A yes/no about your own nerve is
+   one it can only judge.
+   AND IT IS SPACIOUS NOW. Ten lines became seven, the cycle 36s became 44s, and
+   the envelopes ran longer with it — roughly a third of the loop is silence, in
+   six gaps of 2.1–2.6s. Fewer questions, further apart, each held longer: room to
+   finish one and want the next, which is the difference between a mind wondering
+   and a feed scrolling.
+   Full stops, not question marks — a question mark is asked AT you; a full stop is
+   someone thinking near you. One form-change pair remains, and it is the truest one
+   here: "What does he actually feel." becoming "What is this between us." */
+const M2_CYCLE = 44;
 const M2_ASKS = [
   //  question                                  at     env      peak   dy
-  ["What comes after this.",                     0.0, "dwell",  0.44,  6],
-  ["Do I make the first move.",                  3.9, "hold",   0.38,  0],   // ─┐ a nerve becoming
-  ["Should I tell him.",                         6.2, "flick",  0.36,  0],   // ─┘ a bolder nerve
-  ["Should I take the offer.",                   9.6, "flick",  0.40,  5],
-  ["What am I actually good at.",               13.4, "hold",   0.42,  7],
-  ["Is this the good part.",                    15.9, "dwell",  0.54, -4],   // the one that stays
-  ["Is this the year I move.",                  23.2, "flick",  0.32,  8],
-  ["Am I ready for this.",                      25.6, "hold",   0.40,  0],   // ─┐ readiness becoming
-  ["Do I say yes.",                             28.1, "hold",   0.46,  0],   // ─┘ a decision
-  ["Who do I want beside me.",                  33.2, "flick",  0.36,  6],
+  ["Where does this one go.",                    0.0, "dwell",  0.44,  6],
+  ["What is on its way.",                        9.0, "hold",   0.40,  5],
+  ["What does he actually feel.",               15.5, "hold",   0.42,  0],   // ─┐ one person
+  ["What is this between us.",                  18.6, "flick",  0.38,  0],   // ─┘ becoming the pair
+  ["Who do I become after this.",               23.0, "dwell",  0.54, -4],   // the one that stays
+  ["Who am I going to meet.",                   32.0, "hold",   0.42,  7],
+  ["What is worth my next year.",               38.0, "hold",   0.48,  6],
 ];
 
 function renderWall() {
@@ -1646,7 +1650,7 @@ function renderWall() {
        9-36 = -27s: it then has 27s of its own tail to run out before the window at
        the head of its keyframe comes round. Getting this backwards mirrors the whole
        schedule and quietly destroys every cluster and silence in it. */
-    + '<div class="m2asks" aria-hidden="true">'
+    + '<div class="m2asks" aria-hidden="true" style="--m2ask-cycle:' + M2_CYCLE + 's">'
     +   M2_ASKS.map(function (a) {
           return '<span class="m2asks__q m2asks__q--' + a[2] + '"'
             + ' style="animation-delay:' + (a[1] - M2_CYCLE).toFixed(2) + 's'
