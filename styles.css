@@ -2741,7 +2741,33 @@ body[data-view="room"] .dev { display: none; }
 ============================================================ */
 .menu { overflow-x: clip; }   /* belt; clip ≠ scroll container, never clips fixed els */
 
-.menu__track { display: flex; width: 100%; min-height: 100vh; flex: none; transition: transform 640ms cubic-bezier(.22, .61, .25, 1); }
+.menu__track { display: flex; width: 100%; min-height: 100vh; flex: none; transition: transform 640ms var(--track-ease, cubic-bezier(.22, .61, .25, 1)); }
+/* BR-S280 — THE LANDING, AS AN A/B.  The builder: M1<->M2 "does not have major issue
+   but feels visually unsatisfying as it switches... something that creates this
+   satisfying effect, bouncy smooth landing."  A pure ease-out arrives and simply
+   STOPS; what reads as satisfying is a landing with follow-through — the thing
+   overshoots its seat by a hair and settles back into it.  Springs cannot be
+   expressed as a CSS transition, but a cubic-bezier whose final control point sits
+   above 1 overshoots for free and stays a single composited transform.
+   THE NUMBER IS THE WHOLE DESIGN, and my first guess at it was wrong in a way worth
+   recording: overshoot is driven by the FIRST control point's y, not the last.  A
+   final y of 1.024 sounds like 2.4% and measures 0.22% — 1px.  Solved numerically
+   instead, per curve, as a percentage of the travel:
+       easeOutBack .34,1.56,.64,1 ....... 9.78%  = 119px at 1217   (a lurch)
+       spring      .26,1.22,.40,1 ....... 1.55%  =  19px           (a hair)
+       spring2     .24,1.30,.38,1 ....... 2.99%  =  36px           (a landing)
+   Those two also spend 39% and 46% of the duration settling BACK from the peak,
+   which is where the satisfaction actually lives — the overshoot is the event, the
+   settle is the feeling.  Both keep 640ms, which the fleet measured as correct and
+   which BR-S265 couples to U1_GLIDE_MS; only the shape changes.
+   The neighbouring panel is still onstage during the overshoot (menuSettle does not
+   collapse until transitionend), so the sliver that swings in is a real room, never
+   a gap.
+   ?land=spring is the gentle one, ?land=spring2 the pronounced one, bare URL keeps
+   the incumbent.  Build the A/B, then look — the rule that has now settled two of
+   these arguments in one day. */
+html.land-spring  .menu__track { --track-ease: cubic-bezier(.26, 1.22, .40, 1); }
+html.land-spring2 .menu__track { --track-ease: cubic-bezier(.24, 1.30, .38, 1); }
   /* BR-S203: the stage is the first full-viewport screen; the desk/wall centre inside their panels, the About surface flows below */
   /* literal ease — --rv-ease is scoped to .reveal-stage and does not resolve here */
 .menu.is-wall .menu__track { transform: translateX(-100%); }

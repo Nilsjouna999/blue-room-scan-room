@@ -2487,6 +2487,12 @@ let _menuPrimeTok = 0;
    against.  So it ships with an off-switch — ?flat=0 restores every blend — and the
    builder decides by looking, not by reading this comment. */
 const _FLATTRAVEL = !/[?&]flat=0/.test(String(location.search || ""));
+/* BR-S280 — the landing A/B; see styles.css. One class, read once, no persistence:
+   this is a probe to look at, not a setting to live with. */
+(function () {
+  const m = String(location.search || "").match(/[?&]land=(spring2|spring)/);
+  if (m) document.documentElement.classList.add("land-" + m[1]);
+})();
 function _travelOn()  { if (_FLATTRAVEL) document.documentElement.classList.add("is-travel"); }
 function _travelOff() { document.documentElement.classList.remove("is-travel"); }
 function _menuUnprime(track) {
@@ -2841,7 +2847,18 @@ function _u1GlideTo(target) {
   if (Math.abs(dist) < 2) return false;
   if (_u1Reduced()) { window.scrollTo(0, target); return true; }      // no motion: land, don't travel
   _u1Gliding = true;
-  _travelOn();                                                        // BR-S276: the descent shows the Desk too — same flattening, same window
+  /* BR-S281 — GET OFF THE ONSET FRAME.  The builder: M1<->U1 "feels laggish when it
+     starts propelling."  BR-S278 moved the teardown off the frame where motion STOPS;
+     this is the same fault at the other end.  _travelOn() switches the Desk's whole
+     blend stack, which is a repaint of the heaviest object on the page, and it was
+     landing on the exact frame the glide begins — stacked on top of _navStops()'s
+     forced layout, which the fleet measured at 24-31ms per descent.  Deferred one
+     frame: the first frame of a glide moves almost nothing (the curve starts slow),
+     so one frame with the blends still on costs nothing visible, and the repaint no
+     longer collides with the launch.  The teardown in _u1Release stays immediate —
+     it only ever removes work. */
+  requestAnimationFrame(function () { if (_u1Gliding) _travelOn(); });
+  setTimeout(function () { if (_u1Gliding) _travelOn(); }, 60);        // backstop for a throttled tab
   const t0 = _u1Now();
   let expect = from;                                                  // where WE put the page last frame
   const step = function () {
