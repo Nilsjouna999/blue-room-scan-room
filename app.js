@@ -4704,96 +4704,173 @@ if (state.dev === "vault" && !DEVNAV) _devUrlStrip();
 render();
 
 /* ============================================================================
-   BR-S279 — THE CARD LEANS TOWARD YOU. A hover microinteraction on M1's card:
-   it tilts slightly toward the pointer and settles back when you leave.
+   BR-S279 / BR-S285 — THE CARD LEANS TOWARD YOU.
+   M1's card leans toward the pointer, a light travels under its surface, and both
+   settle back when the hand leaves. No colour, no sheen, no glow, no second card —
+   one part of the holographic reference was asked for, not the rest.
 
-   WHAT IT DELIBERATELY IS NOT. The reference for this pattern is the holographic
-   card — gyroscope parallax, pastel gradient, floating hearts, bloom. The builder
-   asked for exactly one part of it: "not the flashy colours and stuff, but where
-   it tilts slightly depending where you hover." So this adds NO colour, NO sheen,
-   NO glow and no second layer. The card already has a finish; it just never had a
-   relationship with the hand.
+   ── WHAT FIVE SHIPPED MOTION SYSTEMS SAY, AND WHAT WAS TAKEN FROM EACH ──────
+   1. SwiftUI / Apple. Springs are described by RESPONSE + DAMPING, never by a
+      duration and a curve; .smooth is critically damped (no overshoot) and their
+      reposition preset is damping 1.0. TAKEN: the model itself. This is a damped
+      follow, not a tween — there is no duration anywhere in this file.
+   2. Motion (Framer). Splits `visualDuration` from settle: "the bulk of the
+      transition occurs before it, the bouncy bit after." TAKEN: the idea that how
+      long it LOOKS like it takes and how long it takes to SETTLE are two numbers.
+      The lean reaches the eye fast and finishes quietly.
+   3. react-spring. Ships named presets with real numbers — gentle 120/14,
+      stiff 210/20, slow 280/60 — and calls `stiff` "a quick, controlled response."
+      TAKEN: the calibration. A hover follow is `stiff`, not `gentle`; k=0.16 per
+      frame is that ratio.
+   4. GSAP. power2.out is the sweet spot; power4 "feels over-engineered"; back and
+      elastic are for elements that need PERSONALITY, not for standard transitions.
+      TAKEN: the restraint. A card leaning under a hand is standard, so no back, no
+      elastic, no overshoot anywhere in this interaction.
+   5. Material 3 Expressive. Motion tokens are split into SPATIAL and EFFECTS, each
+      with its own spring. TAKEN: the split, literally — K_TILT moves the object,
+      K_LIGHT moves the light, and they are deliberately different.
 
-   FOUR pounds of caution for two degrees of tilt:
-   1. The transform is a SINGLE chain on .card itself — perspective() inside the
-      transform, never `perspective` on a parent. Both forms tilt; only the parent
-      form creates a containing block for fixed descendants, and BR-S204 records
-      that the reveal system depends on an untransformed ancestor. The card is a
-      leaf here, so nothing above it moves.
-   2. It is scoped to #menuView's DESK. Every other .card in the app — the room,
-      the dossier, the reveal stage — is untouched.
-   3. MAX_DEG is 2.6. "Slight" was the whole brief, and a card that leans like a
-      toy stops reading as an artifact. The pointer maps linearly from the card's
-      own centre, so the far corner is the maximum and the middle is flat.
-   4. It stands down while the page is in motion (html.is-travel), for coarse
-      pointers, and under reduced motion — a tilt fighting a slide is the kind of
-      double-motion this room keeps refusing.
+   ── WHY A FOLLOW AND NOT A TWEEN ────────────────────────────────────────────
+   The first version nailed the card to the pointer: every move wrote the angle for
+   that exact position. That is accurate and it feels cheap, because a mouse does not
+   move smoothly — it arrives in jittery integer jumps and the card reproduced every
+   one. It also needed a CSS transition for the RETURN and none during the drag, so
+   there were two motion models with a seam between them.
+   Now there is one. Every frame the card eases a fixed fraction of the remaining
+   distance toward the target: cur += (target - cur) * k. That is exponential decay —
+   the same law as the codex orb's throw (BR-S250). Jitter is filtered by
+   construction, the card gains weight, and coming home is not a special case: the
+   target becomes centre and the same loop carries it there. No transition, no seam.
 
-   Writes two custom properties and nothing else, rAF-coalesced so a 120Hz mouse
-   cannot outrun the compositor. ?tilt=0 turns it off.
+   THE LIGHT LAGS THE LEAN ON PURPOSE. 0.16 against 0.105. That gap is follow-through:
+   the light arrives a beat after the surface it is set into, which is what something
+   buried in a heavy object would do. Equal constants read as one flat sticker.
+
+   MAX_DEG IS 1.6. It was 2.6 and the builder said the card moves more than it needs
+   to. Under a damped follow a smaller angle reads as MORE substantial, not less —
+   the weight comes from the lag, and the angle only has to be enough to catch light.
+
+   ── OPTIMISATION ────────────────────────────────────────────────────────────
+   1. ONE rAF loop, not one per pointermove. pointermove stores two numbers and
+      returns; it never measures, never writes, never schedules more than once.
+   2. THE LOOP STOPS. Hand gone and every channel within epsilon of home, it cancels
+      itself, strips its own custom properties and drops will-change — zero cost at
+      rest, no orphan backing store. (The add-then-clear lifecycle from BR-S141.)
+   3. ZERO forced layout. The box is measured once on entry and invalidated only by
+      resize, scroll and panel change. The first version called
+      getBoundingClientRect() inside the frame — a forced layout read per frame, on
+      the heaviest object on the page.
+   4. No write when the value has not changed to 2dp, so a settled frame touches no
+      style at all.
+   5. Stands down entirely during a travel (html.is-travel), on coarse pointers and
+      under reduced motion.
+
+   HONEST COST: the light moves by re-positioning two radial gradients, which repaints
+   the card's own box on the frames it changes — bounded to that box, and only while a
+   hand is on it. A transform-driven lobe would be composite-only but needs a clip on
+   .card that would also clip .card__halo, so it is not free either. If it ever shows
+   in a profile, that is the trade to revisit.
+
+   ?tilt=0 disables the block.
    ============================================================================ */
 (function () {
-  var MAX_DEG = 2.6, PERSP = 1100;
+  var MAX_DEG = 1.6;
+  var K_TILT = 0.160, K_LIGHT = 0.105;
+  var EPS = 0.0009;
+
   if (/[?&]tilt=0/.test(String(location.search || ""))) return;
   var host = document.getElementById("menuView");
   if (!host || !window.requestAnimationFrame) return;
+  if (window.matchMedia && window.matchMedia("(pointer: coarse)").matches) return;
 
   var reduced = function () {
     return window.BRMotion ? window.BRMotion.prefersReduced()
                            : window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   };
-  var coarse = window.matchMedia && window.matchMedia("(pointer: coarse)").matches;
-  if (coarse) return;
 
-  var card = null, raf = 0, px = 0, py = 0, box = null;
+  var card = null, box = null, raf = 0, over = false;
+  var tx = 0, ty = 0;                 // target, -1..1 from the centre of the face
+  var cx = 0, cy = 0;                 // the lean, following
+  var lx = 0, ly = 0;                 // the light, following further behind
+  var wx = null, wy = null, wlx = null, wly = null, wsx = null, wsy = null;   // last written, to skip no-op writes
+  var COUNTER_PX = 13;               // how far the ground shadow swings AGAINST the lean
 
-  /* BR-S283 — the rect is CACHED, not re-read.  The first version called
-     getBoundingClientRect() inside the rAF, i.e. a forced layout read on every frame
-     the mouse moved, on the heaviest object on the page — the exact class of mistake
-     this session has been unpicking all day.  The card's box only changes on resize,
-     scroll or a panel switch, so it is measured once on entry and invalidated by
-     those three events instead. */
   function measure() { box = card ? card.getBoundingClientRect() : null; }
 
-  function apply() {
-    raf = 0;
-    if (!card) return;
-    if (!box || !box.width) measure();
-    if (!box || !box.width || !box.height) return;
-    var fx = (px - box.left) / box.width;                        // 0 .. 1 across the face
-    var fy = (py - box.top) / box.height;
-    fx = fx < 0 ? 0 : fx > 1 ? 1 : fx;
-    fy = fy < 0 ? 0 : fy > 1 ? 1 : fy;
-    var nx = fx * 2 - 1, ny = fy * 2 - 1;                        // -1 .. 1 from the centre
-    card.style.setProperty("--tilt-y", (nx * MAX_DEG).toFixed(2) + "deg");   // horizontal pointer → rotateY
-    card.style.setProperty("--tilt-x", (-ny * MAX_DEG).toFixed(2) + "deg");  // toward the pointer, not away
-    /* the engraved light rides the same frame and the same numbers — one handler,
-       one rAF, four properties.  See styles.css for why it is a PAIR of lobes. */
-    card.style.setProperty("--lx", (fx * 100).toFixed(1) + "%");
-    card.style.setProperty("--ly", (fy * 100).toFixed(1) + "%");
+  function put(name, val, last) {
+    if (val === last) return last;
+    card.style.setProperty(name, val);
+    return val;
   }
 
-  function rest(c) {
-    if (!c) return;
-    c.style.setProperty("--tilt-x", "0deg");
-    c.style.setProperty("--tilt-y", "0deg");
-    c.classList.remove("is-tilting");
-    if (c === card) box = null;
+  function frame() {
+    raf = 0;
+    if (!card) return;
+    cx += (tx - cx) * K_TILT;
+    cy += (ty - cy) * K_TILT;
+    lx += (tx - lx) * K_LIGHT;
+    ly += (ty - ly) * K_LIGHT;
+
+    wy  = put("--tilt-y", (cx * MAX_DEG).toFixed(2) + "deg", wy);
+    wx  = put("--tilt-x", (-cy * MAX_DEG).toFixed(2) + "deg", wx);
+    wlx = put("--lx", ((lx * 0.5 + 0.5) * 100).toFixed(1) + "%", wlx);
+    wly = put("--ly", ((ly * 0.5 + 0.5) * 100).toFixed(1) + "%", wly);
+    /* BR-S286 — THE COUNTERWEIGHT. Driven from the SAME smoothed lean, negated. A
+       tilting card with a shadow nailed under it reads as loose — the object moves and
+       nothing answers, so it drifts out of the composition. Swing the ground shadow
+       the other way and the pair stays balanced: the card leans, the weight shifts
+       against it, the frame holds still. It is also just true — the contact shadow of
+       a real leaning object moves opposite the lean. Transform only, so it composites. */
+    wsx = put("--cshx", (-cx * COUNTER_PX).toFixed(1) + "px", wsx);
+    wsy = put("--cshy", (-cy * COUNTER_PX).toFixed(1) + "px", wsy);
+
+    var still = Math.abs(tx - cx) < EPS && Math.abs(ty - cy) < EPS &&
+                Math.abs(tx - lx) < EPS && Math.abs(ty - ly) < EPS;
+    if (over || !still) { raf = requestAnimationFrame(frame); return; }
+    park();
+  }
+
+  function park() {
+    if (!card) return;
+    card.style.willChange = "";
+    card.classList.remove("is-tilting");
+    card.style.removeProperty("--tilt-x"); card.style.removeProperty("--tilt-y");
+    card.style.removeProperty("--lx");     card.style.removeProperty("--ly");
+    card.style.removeProperty("--cshx");   card.style.removeProperty("--cshy");
+    wx = wy = wlx = wly = wsx = wsy = null;
+    cx = cy = lx = ly = tx = ty = 0;
+    card = null; box = null;
+  }
+
+  function release() {                 // hand gone: aim home and let the same loop land it
+    over = false; tx = 0; ty = 0;
+    if (card && !raf) raf = requestAnimationFrame(frame);
   }
 
   host.addEventListener("pointermove", function (e) {
     if (e.pointerType === "touch" || reduced()) return;
-    if (document.documentElement.classList.contains("is-travel")) { rest(card); card = null; return; }
+    if (document.documentElement.classList.contains("is-travel")) { release(); return; }
     var t = e.target.closest ? e.target.closest(".menu__panel--desk .card") : null;
-    if (!t) { if (card) { rest(card); card = null; } return; }
-    if (t !== card) { rest(card); card = t; box = null; card.classList.add("is-tilting"); }
-    px = e.clientX; py = e.clientY;
-    if (!raf) raf = requestAnimationFrame(apply);
+    if (!t) { release(); return; }
+    if (t !== card) {
+      if (card) park();
+      card = t; box = null;
+      card.classList.add("is-tilting");
+      card.style.willChange = "transform";
+    }
+    if (!box || !box.width) measure();
+    if (!box || !box.width || !box.height) return;
+    var fx = (e.clientX - box.left) / box.width, fy = (e.clientY - box.top) / box.height;
+    fx = fx < 0 ? 0 : fx > 1 ? 1 : fx;
+    fy = fy < 0 ? 0 : fy > 1 ? 1 : fy;
+    tx = fx * 2 - 1; ty = fy * 2 - 1;
+    over = true;
+    if (!raf) raf = requestAnimationFrame(frame);
   }, { passive: true });
 
-  host.addEventListener("pointerleave", function () { rest(card); card = null; }, { passive: true });
-  window.addEventListener("blur", function () { rest(card); card = null; });
-  var stale = function () { box = null; };                       // the three things that can move the box
+  host.addEventListener("pointerleave", release, { passive: true });
+  window.addEventListener("blur", release);
+  var stale = function () { box = null; };
   window.addEventListener("resize", stale, { passive: true });
   window.addEventListener("scroll", stale, { passive: true });
 })();

@@ -2947,6 +2947,36 @@ html.is-travel .card .cardfinish { mix-blend-mode: normal; }
       rgba(0, 0, 0, 0.10) 0%, rgba(0, 0, 0, 0.04) 46%, transparent 66%);
 }
 #menuView .menu__panel--desk .card.is-tilting::after { opacity: 1; }
+
+/* BR-S286 — THE COUNTERWEIGHT.  The builder: "counter radiation of effect or visual
+   or something when it moves so it feels balanced and in frame."
+   A card that leans while its shadow stays nailed underneath reads as LOOSE — the
+   object moves and nothing answers it, so it drifts out of the composition. Swing the
+   ground shadow the other way and the pair balances: the card leans, the weight shifts
+   against it, the frame holds still. It is also simply true — the contact shadow of a
+   real leaning object travels opposite the lean.
+   Driven from the same smoothed lean the tilt uses, negated, 13px at the extreme. The
+   element only ever TRANSLATES, so it composites and never repaints; the softness is a
+   radial gradient rather than a blur() filter, because an animated blur is a known
+   landmine in this repo.
+   z-index:-1 is safe here: the tilt transform is always applied to .card, so the card
+   is permanently its own stacking context and this cannot fall behind an ancestor. */
+#menuView .menu__panel--desk .card::before {
+  content: "";
+  position: absolute; z-index: -1;
+  inset: 8% 3% -7% 3%;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(58% 56% at 50% 52%,
+    rgba(0, 0, 0, 0.58) 0%, rgba(0, 0, 0, 0.30) 44%, rgba(0, 0, 0, 0) 72%);
+  transform: translate3d(var(--cshx, 0px), var(--cshy, 0px), 0);
+  transition: opacity 340ms var(--ease-settle, cubic-bezier(.2,.7,.2,1));
+}
+#menuView .menu__panel--desk .card.is-tilting::before { opacity: 1; will-change: transform; }
+@media (prefers-reduced-motion: reduce) {
+  #menuView .menu__panel--desk .card::before { display: none; }
+}
 @media (prefers-reduced-motion: reduce) {
   #menuView .menu__panel--desk .card::after { display: none; }
 }
