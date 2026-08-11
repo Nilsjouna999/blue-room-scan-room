@@ -2490,7 +2490,7 @@ const _FLATTRAVEL = !/[?&]flat=0/.test(String(location.search || ""));
 /* BR-S280 — the landing A/B; see styles.css. One class, read once, no persistence:
    this is a probe to look at, not a setting to live with. */
 (function () {
-  const m = String(location.search || "").match(/[?&]land=(spring2|spring)/);
+  const m = String(location.search || "").match(/[?&]land=(spring2|spring|m3)/);
   if (m) document.documentElement.classList.add("land-" + m[1]);
 })();
 function _travelOn()  { if (_FLATTRAVEL) document.documentElement.classList.add("is-travel"); }

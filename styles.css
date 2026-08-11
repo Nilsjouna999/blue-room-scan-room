@@ -2768,6 +2768,22 @@ body[data-view="room"] .dev { display: none; }
    these arguments in one day. */
 html.land-spring  .menu__track { --track-ease: cubic-bezier(.26, 1.22, .40, 1); }
 html.land-spring2 .menu__track { --track-ease: cubic-bezier(.24, 1.30, .38, 1); }
+/* BR-S282 — ?land=m3, and the research that says it should probably win.
+   Apple's own rule, from their shipped spring table: "Add bounce (damping ~0.8) ONLY
+   when the gesture itself carried momentum — a flick, a throw, a drag release.
+   Overshoot on a menu that just faded in feels wrong; overshoot on a card you flicked
+   feels right."  For reposition — which is exactly what a panel switch is — they ship
+   damping 1.0, response 0.4: critically damped, NO bounce.  A panel switched by an
+   arrow key or a click carries no momentum, so the two curves above are decoration
+   pretending to be physics, and the proven guidance is that they will read as wrong
+   rather than as satisfying.
+   Material 3 says the same thing from the other side: M3 Expressive replaced
+   duration+bezier with springs, and damping 1.0 is its no-bounce default too.  Its
+   EMPHASIZED easing is the bezier form of that idea — a hard decelerate that spends
+   almost the whole curve arriving, with zero overshoot.  That is a landing with
+   weight, which is what "satisfying" usually means when nobody threw anything.
+   cubic-bezier(0.2, 0, 0, 1) is Material's emphasized curve, unmodified. */
+html.land-m3      .menu__track { --track-ease: cubic-bezier(0.2, 0, 0, 1); }
   /* BR-S203: the stage is the first full-viewport screen; the desk/wall centre inside their panels, the About surface flows below */
   /* literal ease — --rv-ease is scoped to .reveal-stage and does not resolve here */
 .menu.is-wall .menu__track { transform: translateX(-100%); }
