@@ -211,3 +211,125 @@
   .ac-crown-svg [data-ink] { transition: none !important; }
   .ac-crown-glow { transition: none !important; }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   BR-S333 — THE DESK.  Winner of a six-layout design pass, judged on
+   composition, feel and buildability, then specified against the real file.
+
+   WHAT IT CHANGES: the page stops being a 456px column adrift in a 1440px room
+   (68.3% of the width was empty) and becomes a two-zone desk — a drafting sheet
+   held still on the left with the crown inked on it, the marks written beside it
+   on the right. Measured against today: field one moves from y=757 to y=254, the
+   $4.99 button from y=1201 to y=738 — above the fold at 900px, so the scroll
+   required to reach the act you came for goes from 301px to zero.
+
+   MARKUP CHANGES: NONE. .ac-crown and .ac-form are already flat siblings of
+   .arcane (arcane.js:338-339), and the only other children — .ac-back and
+   .ac-ceremony — are position:fixed and therefore out of grid flow. The grid
+   goes onto .arcane itself. No wrapper, no JS, no change to DEFS, no change to
+   tab order.
+
+   Appended at the end of the file on purpose: source order does every override,
+   so there is no !important anywhere and nothing above this line is edited.
+   Three blocks, each independently revertible.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── STEP 1 — THE SHEET ─────────────────────────────────────────────────────
+   The crown was 338x422 of transparent ink floating on the room. It is a
+   DRAFTING SHEET — it already carries crop-marks in its own four corners (the
+   "seal" strokes in buildCrownInner) — so it is given the paper those marks are
+   cut into, and the marks finally have something to be cut into.
+   THE LIFT IS A box-shadow ON THE MOUNT, never filter:drop-shadow on the SVG:
+   that SVG is stroke-only with no fills, so a drop-shadow would smear every
+   individual stroke rather than lift a sheet.
+   FLUID, WHICH FIXES A REAL BUG: at 375px the fixed 338px overflowed the 327px
+   content box by 11px and .arcane's overflow-x:hidden simply cut the crown off. */
+.ac-crown {
+  width: min(100%, 260px);
+  height: auto;
+  aspect-ratio: 460 / 558;
+  padding: 22px;
+  box-sizing: border-box;
+  margin-bottom: 10px;
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  background: rgba(233, 229, 220, 0.018);
+  box-shadow: 0 22px 44px -20px rgba(0, 0, 0, 0.55);
+  transform: rotate(-1.4deg);
+}
+/* the sheet has a visible edge now, so the fixed back button can no longer be
+   allowed to land on it. It has ALWAYS overlapped the crown's top 10px — that
+   was invisible while the crown was transparent ink and becomes obvious the
+   moment it gets a border. A fix riding in, not a new cost. */
+.arcane { padding-top: 84px; }
+
+/* ── STEP 2 — THE PAIRED MARKS ─────────────────────────────────────────────
+   .ac-marks has never had a rule of its own. The day and the hour are ONE fact
+   asked in two boxes, so from 1180px up they share a line.
+   Done with :nth-child on the DOM that already exists — DEFS is untouched, no
+   markup changes, so tab order is byte-for-byte what it is today.
+   Scoped with `>` so the lone .ac-mark in the gift composer, which is NOT inside
+   .ac-marks, keeps its own margin. */
+.ac-marks { display: grid; grid-template-columns: 1fr; column-gap: 24px; row-gap: 24px; }
+.ac-marks > .ac-mark { margin-bottom: 0; }
+@media (min-width: 1180px) {
+  .ac-marks { grid-template-columns: 1fr 1fr; }
+  .ac-marks > .ac-mark:nth-child(1),   /* the name       */
+  .ac-marks > .ac-mark:nth-child(4),   /* the birthplace */
+  .ac-marks > .ac-mark:nth-child(5) {  /* the question   */
+    grid-column: 1 / -1;
+  }
+  /* auto-placement then sets the day and the hour side by side */
+}
+
+/* ── STEP 3 — THE DESK ─────────────────────────────────────────────────────
+   :has(.ac-crown) scopes the desk OFF the gift composer, which renders
+   .arcane > .ac-form with NO crown and would otherwise be shoved into column 4
+   beside an empty 460px hole. */
+@media (min-width: 1180px) {
+  .arcane:has(.ac-crown) {
+    display: grid;
+    grid-template-columns: 1fr 460px 88px minmax(360px, 692px) 1fr;
+    column-gap: 0;
+    align-items: start;   /* LOAD-BEARING: the default `stretch` fills the row
+                             with the crown and leaves sticky no travel at all */
+    padding-top: 92px;
+  }
+  .arcane:has(.ac-crown) > .ac-crown {
+    grid-column: 2;
+    position: sticky;
+    top: 92px;            /* = padding-top, so the sheet is dead still for the
+                             whole of the scroll rather than drifting to a stop */
+    width: 460px;
+    height: 558px;
+    aspect-ratio: auto;   /* the explicit w+h supersede step 1's ratio */
+    padding: 32px;
+    margin: 0;
+  }
+  .arcane:has(.ac-crown) > .ac-form {
+    grid-column: 4;
+    max-width: none;      /* the 456px cap would strangle a 692px column back
+                             down to exactly today's layout, silently */
+  }
+
+  /* a desk is written on from its left edge, not from a centre line */
+  .arcane:has(.ac-crown) .ac-head,
+  .arcane:has(.ac-crown) .ac-forwhom,
+  .arcane:has(.ac-crown) .ac-cta,
+  .arcane:has(.ac-crown) .ac-redraw-banner,
+  .arcane:has(.ac-crown) .ac-giftbanner    { text-align: left; }
+  .arcane:has(.ac-crown) .ac-head          { margin-bottom: 34px; }
+  .arcane:has(.ac-crown) .ac-sub           { max-width: 46ch; }   /* 692px of 17px italic runs ~110ch */
+  .arcane:has(.ac-crown) .ac-forwhom       { margin-bottom: 24px; }
+  .arcane:has(.ac-crown) .ac-forwhom__opts { justify-content: flex-start; }
+  .arcane:has(.ac-crown) .ac-forwhom__note { margin-left: 0; }
+  .arcane:has(.ac-crown) .ac-fammenu       { justify-content: flex-start; margin-left: 0; }
+  .arcane:has(.ac-crown) .ac-concord       { margin-left: 0; }
+}
+
+/* the mobile counterpart to the desk's tightening — gives back 22 of the 32px
+   step 1 spent on back-button clearance */
+@media (max-width: 1179px) {
+  .ac-head    { margin-bottom: 34px; }
+  .ac-forwhom { margin-bottom: 24px; }
+}
