@@ -3253,13 +3253,16 @@ html.is-travel .card .cardfinish { mix-blend-mode: normal; }
   font-family: var(--font-mono); font-size: 10.5px; letter-spacing: .2em; text-transform: uppercase;
   color: var(--t-meta); margin: 0;
 }
+/* BR-S346 — the segments are named by ROLE, so every card shows its element. The
+   leading segment takes the accent; the last one (always the meaning) takes it too,
+   pulled toward the body grey so the line still has a hierarchy; the state word gets
+   its own oxide, because upright/reversed is a flag rather than a description. */
 .m2read__seg { transition: color 220ms var(--ease-settle); }
-/* BR-S346: the leading segment takes the accent when the card has one — the suit's
-   element, or the crown's brass on the birth face. Falls back to the plain grade for
-   anything with no element to read. */
-.m2read__seg--0 { color: var(--m2acc, #cfc7b6); transition: color 220ms var(--ease-settle); }
+.m2read__seg--0 { color: var(--m2acc, #cfc7b6); }
 .m2read__seg--1 { color: #a49e93; }
 .m2read__seg--2 { color: #8b867e; }
+.m2read__seg--state { color: #9c6a55; }
+.m2read__seg--key { color: color-mix(in srgb, var(--m2acc, #a49e93) 72%, #8b867e); }
 .m2read__num { color: #c8ad70; transition: color 220ms var(--ease-settle); }
 .m2read__dot { color: #6f6b64; margin: 0 .5em; }
 /* ── BR-S343 — THE READ IS COLOUR-GRADED. ────────────────────────────────────
@@ -3419,6 +3422,10 @@ html.is-travel .card .cardfinish { mix-blend-mode: normal; }
 .menu__draw:has(.m2read:hover) .m2read__seg--1 { color: #bdb7ab; }
 .menu__draw:has(.menu__draw-stage:hover) .m2read__seg--2,
 .menu__draw:has(.m2read:hover) .m2read__seg--2 { color: #a29d94; }
+.menu__draw:has(.menu__draw-stage:hover) .m2read__seg--state,
+.menu__draw:has(.m2read:hover) .m2read__seg--state { color: #b57f68; }
+.menu__draw:has(.menu__draw-stage:hover) .m2read__seg--key,
+.menu__draw:has(.m2read:hover) .m2read__seg--key { color: color-mix(in srgb, var(--m2acc, #bdb7ab) 86%, #bdb7ab); }
 .menu__draw:has(.menu__draw-stage:hover) .m2read__num,
 .menu__draw:has(.m2read:hover) .m2read__num { color: #e0c184; }
 @media (prefers-reduced-motion: reduce) {
@@ -3688,7 +3695,12 @@ html.m2-parch .m2hero {
 /* the birth act takes the same seat as "Pull another" so the column never resizes */
 /* BR-S343: `.menu__draw-pull--birth` is deleted with the "Set your marks" link it
    dressed. The birth face has no act under it — the card demonstrates, the door in
-   the left column sells. */
+   the left column sells.
+   BR-S346: which is exactly why the seat has to be RESERVED. The stage is a centred
+   column, so an empty act on one face and a button on the other moved the card 24px
+   between them. The row holds the button's own height whether or not it is showing;
+   38px is the measured height of `.menu__draw-pull` (9px padding + its 20px line box). */
+.menu__draw-act { min-height: 38px; display: flex; align-items: center; justify-content: center; }
 /* both acts state their own hidden. `display:inline-flex` above beats the UA's
    [hidden] rule, and the button is now served hidden too — one of these two is always
    the wrong one to show, and neither may win by accident. */

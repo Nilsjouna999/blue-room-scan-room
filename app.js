@@ -1741,10 +1741,18 @@ function renderWall() {
     /* BR-S321 — THE CONTROL THAT CHANGES THE CARD SITS UNDER THE CARD. Beside the copy
        it would read as a way to continue; beneath the card it reads as a way to change
        THAT card, which is all it does. Disabled until the deck is actually in hand. */
-    /* BR-S340: the pull starts HIDDEN and the birth door starts visible, because birth is
-       the opening face. It also keeps `disabled` — the deck is fetched lazily, so it must
-       not become clickable merely by being unhidden before codex-data.json has landed. */
-    + '<button type="button" class="menu__draw-pull" data-m2-pull disabled hidden>Pull another</button>'
+    /* BR-S346 — THE SEAT IS RESERVED WHETHER OR NOT ANYTHING SITS IN IT. Measured: the
+       card was IDENTICAL in size on both faces (324x513) and still looked like it
+       changed, because the stage is a centred column and hiding the act on the birth
+       side shortened it — so the card rose 24px on every flip. A monument that moves
+       when you change what it shows reads as a resize even when nothing resized.
+       The act now lives in a fixed-height row that holds its space empty.
+       BR-S340: the pull starts HIDDEN and keeps `disabled` — the deck is fetched
+       lazily, so it must not become clickable merely by being unhidden before
+       codex-data.json has landed. */
+    + '<div class="menu__draw-act">'
+    +   '<button type="button" class="menu__draw-pull" data-m2-pull disabled hidden>Pull another</button>'
+    + '</div>'
     /* BR-S343: the birth side has NO act under the card. "Set your marks" stood here
        for one commit and was a third road to a room the left column already opens with
        a full door — and under a card that is explicitly a sample, a call to action
@@ -1907,16 +1915,33 @@ function m2MetaHTML(meta) {
      number-words in it and gilding both put two gold marks in one short line, which
      is a pattern rather than an emphasis — and "one name" is a phrasing, not a count.
      The builder said "only number", singular, and meant it. */
+  /* ── BR-S346 — EVERY SEGMENT CARRIES MEANING, NOT JUST THE FIRST. ───────────
+     Builder, on "TEN · REVERSED · EMOTIONAL FULFILLMENT": grade these too. And the
+     screenshot exposed a real hole — on a pip card the rank IS a numeral, so the
+     whole first segment went gold and the suit's element never appeared at all.
+     That is most of the deck: fifty-six of seventy-eight cards had no element
+     colour on them.
+     So the roles are named rather than counted:
+       the NUMERAL   gold      — it identifies rather than describes
+       the STATE     oxide     — upright/reversed is a flag, not a word, and
+                                 reversal is the one thing that turns a meaning over
+       the KEYWORD   element   — the card's meaning, tinted by the element that
+                                 produces it: "emotional fulfilment" in Cups blue
+       anything else element   — unless it is the numeral, which keeps the gold
+     The element now lands on the LAST segment, which is the one that is always
+     present and always about meaning, so every card in the deck shows its suit. */
   let gilded = false;
+  const last = parts.length - 1;
   return parts.map(function (p, i) {
-    const tier = i > 2 ? 2 : i;                       // three tones; anything past the third joins the last
+    const isState = /^(reversed|upright)$/i.test(p);
+    const role = isState ? "state" : (i === last && last > 0 ? "key" : (i > 2 ? 2 : i));
     const inner = p.split(/\s+/).map(function (w) {
       const bare = w.replace(/[^\w]/g, "");
       const isNum = /^\d+$/.test(bare) || /^[IVXLCDM]+$/.test(bare) || M2_NUMWORD.test(bare);
       if (isNum && !gilded) { gilded = true; return '<span class="m2read__num">' + esc(w) + "</span>"; }
       return esc(w);
     }).join(" ");
-    return '<span class="m2read__seg m2read__seg--' + tier + '">' + inner + "</span>";
+    return '<span class="m2read__seg m2read__seg--' + role + '">' + inner + "</span>";
   }).join('<span class="m2read__dot" aria-hidden="true">&middot;</span>');
 }
 function m2WriteRead(root, r) {
