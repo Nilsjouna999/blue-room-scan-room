@@ -125,7 +125,7 @@
 /* folder-tab heading — an opaque chip straddling the elbow, knocking a clean gap in the top-rule */
 .pf-sec__h { position: absolute; top: 0; left: 14px; transform: translateY(-50%); z-index: 1; display: inline-flex; align-items: center; gap: 10px; margin: 0; padding: 3px 12px; background: var(--pf-tab-bg); border: 1px solid var(--pf-line); border-radius: 4px; font-family: var(--pf-mono); font-size: 9.5px; font-weight: 500; letter-spacing: .22em; text-transform: uppercase; color: var(--pf-gold); }
 .pf-sec__note { font-family: var(--pf-mono); font-size: 8.5px; letter-spacing: .16em; text-transform: uppercase; color: var(--pf-ghost); }
-.pf-lede { font-family: var(--pf-serif); font-size: 16px; line-height: 1.6; color: var(--pf-body); max-width: 60ch; margin: 2px 0 20px; }
+.pf-lede { font-family: var(--pf-serif); font-size: 17.5px; line-height: 1.6; color: var(--pf-body); max-width: 60ch; margin: 2px 0 20px; }
 
 /* Rings — mini-crowns (§3.4) */
 .pf-family { display: flex; flex-wrap: wrap; gap: 14px; }

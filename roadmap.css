@@ -26,7 +26,7 @@
   font-size: clamp(32px, 5vw, 52px); color: var(--pf-cream-display); margin: 0;
 }
 .rm-sub {
-  font-family: var(--pf-serif); font-style: italic; font-size: 16.5px; line-height: 1.55;
+  font-family: var(--pf-serif); font-style: italic; font-size: 18px; line-height: 1.55;
   color: var(--pf-meta); margin: 12px 0 0; max-width: 66ch;
 }
 
@@ -40,7 +40,7 @@
   letter-spacing: .005em; color: var(--rm-head); line-height: 1.1;
 }
 .rm-col__lede {
-  margin: 8px 0 0; font-family: var(--pf-serif); font-style: italic; font-size: 14px; line-height: 1.5;
+  margin: 8px 0 0; font-family: var(--pf-serif); font-style: italic; font-size: 15.5px; line-height: 1.5;
   color: var(--rm-meta);
 }
 .rm-col__list { list-style: none; margin: 20px 0 0; padding: 0; counter-reset: rm; }
@@ -51,7 +51,7 @@
   color: var(--rm-head);
 }
 .rm-item__d {
-  margin: 6px 0 0; font-family: var(--pf-ui); font-size: 12.5px; line-height: 1.65; color: var(--rm-body);
+  margin: 6px 0 0; font-family: var(--pf-ui); font-size: 14px; line-height: 1.65; color: var(--rm-body);
 }
 
 /* THE THREE INKS. One token set per column, and nothing else changes between
