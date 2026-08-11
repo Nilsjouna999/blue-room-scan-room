@@ -3420,19 +3420,38 @@ html.m2-parch .m2face {
    itself, treated once at one element instead of at the class. */
 .menu__door--birth { position: relative; }
 .menu__draw-hit { position: absolute; inset: 0; z-index: 0; border-radius: 8px; }
-.menu__door--birth:hover:not(:has(.menu__draw-aside:hover)) { border-color: var(--silver); }
-/* the Concord aside is a DIFFERENT destination inside this door, so the door's own hover
-   must be fully suppressed while the aside is the pointer target — otherwise the tile
-   lights and lifts while a click would land somewhere else. The old :not(:has()) guard
-   only covered border-colour; .menu__door:hover's lift always leaked, and once the door
-   carries the hero grammar .menu__door--add:hover's fill leaks too. This restores the
-   door's settled look (--add's own border/background) at higher specificity. */
-.menu__door--birth:has(.menu__draw-aside:hover) { border-color: var(--silver-dim); background: rgba(255, 255, 255, 0.05); transform: none; }
+/* BR-S328: was `:hover:not(:has(.menu__draw-aside:hover))`. The guard existed only
+   because a second destination lived inside this tile; the Concord is its own line
+   now, so the door can simply answer to its own hover like every other door. */
+.menu__door--birth:hover { border-color: var(--silver); }
+/* BR-S328: the `:has(.menu__draw-aside:hover)` suppression is deleted with the nesting
+   it defended. It existed to stop the tile lighting while a click would land on a
+   different destination inside it — there is no second destination inside it now. */
 .menu__door--birth .menu__door-kicker { color: #c8ad70; opacity: .82; display: inline-flex; align-items: center; gap: 6px; }
 .menu__draw-crown { width: 15px; height: auto; display: inline-block; }
-.menu__draw-spine { font-family: var(--font-mono); font-size: 8.5px; letter-spacing: .16em; text-transform: uppercase; color: var(--t-meta); line-height: 1.5; margin-top: 2px; }
-.menu__draw-aside { position: relative; z-index: 1; display: block; margin-top: 8px; font-family: var(--font-display); font-style: italic; font-size: 12.5px; line-height: 1.4; color: var(--silver-dim); text-align: left; text-decoration: none; transition: color 160ms var(--ease-settle); }
+/* ── BR-S328 — THE SPINE LIGHTS WITH ITS DOOR. ───────────────────────────────
+   The spine is the row of marks a reading is actually made of — SUN SIGN · YEAR
+   ANIMAL · … and THE GROUND · THE CROSSING · … — and at --t-meta it read as filing
+   detail rather than as the contents of the thing you are about to buy. Hovering the
+   door now brings it up a step, so pointing at a door shows you what is inside it.
+   One property, one step, 160ms: the same restraint as the card's pair-hover. Focus
+   gets it too, or a keyboard reader would be the only one never shown the inside. */
+.menu__draw-spine { font-family: var(--font-mono); font-size: 8.5px; letter-spacing: .16em; text-transform: uppercase; color: var(--t-meta); line-height: 1.5; margin-top: 2px; transition: color 160ms var(--ease-settle); }
+.menu__door:hover .menu__draw-spine,
+.menu__door:focus-within .menu__draw-spine { color: var(--silver); }
+/* ── BR-S328 — THE CONCORD, STANDING ON ITS OWN. ─────────────────────────────
+   Out of the birth door and onto its own line beneath it. It keeps the italic aside
+   register — this is a variation on the reading above, not a third product — but it
+   gets a real target now: padding, its own arrow, and a hover that answers. Inside
+   the tile it was a 12.5px line in the corner of a control that claimed every pixel. */
+.menu__draw-aside {
+  display: inline-block; margin-top: 10px; padding: 6px 2px;
+  font-family: var(--font-display); font-style: italic; font-size: 13px; line-height: 1.4;
+  color: var(--silver); text-align: left; text-decoration: none;
+  transition: color 160ms var(--ease-settle);
+}
 .menu__draw-aside:hover, .menu__draw-aside:focus-visible { color: var(--t-display); outline: none; }
+.menu__draw-aside:focus-visible { outline: 1px solid var(--silver-dim); outline-offset: 3px; border-radius: 4px; }
 .menu__draw-tiers { display: block; font-family: var(--font-mono); font-size: 9px; letter-spacing: .14em; color: var(--t-meta); text-decoration: none; line-height: 1.6; transition: color 160ms var(--ease-settle); max-width: 360px; }
 .menu__draw-tiers:hover, .menu__draw-tiers:focus-visible { color: var(--t-display); outline: none; }
 .menu__draw-kept { color: #8a6fb0; font-style: normal; }   /* the one violet in the room — canon literal, NEVER var(--violet) */
@@ -3475,7 +3494,7 @@ html.m2-parch .m2face {
 .menu__wall-eyemark { color: var(--silver-dim); }
 .menu__wall-trust { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em; line-height: 1.5; color: var(--t-body); }
 
-/* ── BR-S204: the Memory Vault threshold (slide 3) — a conservation niche in the
+/* ── BR-S204: the Shelf threshold (slide 3) — a conservation niche in the
    wall-plaque double-rule register. Sealed (locked) by default, lit when opened.
    Colour law: gold/neutral throughout; violet ONLY on the open --enter door. */
 .menu__reliq { position: relative; z-index: 1; width: min(440px, 92vw); display: flex; flex-direction: column; align-items: center; text-align: center; gap: 15px; }
@@ -4891,7 +4910,7 @@ html.orbit-wings .orbit__field { --orbit-rx: clamp(200px, 25.5vw, 368px); --orbi
   transform: translate3d(calc(var(--ox) * var(--orbit-rx) * var(--or, 1)), calc(var(--oy) * var(--orbit-ry) * var(--or, 1)), 0) translate(-50%, -50%) rotate(var(--orot, 0deg)) scale(var(--os, 1));
 }
 /* the plate IS the room's own object now, not an empty frame with a caption. The
-   Desk's card, the deck's tarot back, the Memory Vault's case, U1's descending plates,
+   Desk's card, the deck's tarot back, the Shelf's case, U1's descending plates,
    the Codex's open book, Settings' two rules — all from AB_EMBLEMS' own grammar and
    all currentColor, so they take the ink without a second palette. An empty rectangle
    with a label under it is a placeholder pretending to be a system; recognising a

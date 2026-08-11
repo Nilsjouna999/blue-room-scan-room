@@ -1277,13 +1277,13 @@ const ANNEX_DOWNCUE =
   + '<span class="menu__downcue-txt">About Blue Room</span>'
   + '<span class="menu__downcue-arr" aria-hidden="true">&#8964;</span></a>';
 
-/* BR-S204 — the Memory Vault edge arrows (menu slide 3, stepped past the Reading Rooms).
+/* BR-S204 — the Shelf edge arrows (menu slide 3, stepped past the Reading Rooms).
    Same hairline glyph + silver register as the desk↔wall arrows; hidden <=1199px
    (the .menu__go mobile hide), where the wall-rail pill / text back carry the nav. */
 const RELIQ_GO =
   '<div class="menu__go menu__go--reliq">'
-  + '<span class="menu__go-cap" aria-hidden="true">The Memory Vault</span>'
-  + '<button type="button" class="menu__go-btn" data-annex-go aria-label="Open the Memory Vault">' + ANNEX_ARROW + '</button>'
+  + '<span class="menu__go-cap" aria-hidden="true">The Shelf</span>'
+  + '<button type="button" class="menu__go-btn" data-annex-go aria-label="Open the Shelf">' + ANNEX_ARROW + '</button>'
   + '</div>';
 const RELIQ_BACK =
   '<div class="menu__go menu__go--reliq-back">'
@@ -1493,8 +1493,18 @@ function renderWall() {
     + '<span class="menu__door-name">The Birth Reading</span>'
     + '<span class="menu__door-desc">Six marks. One name. The deeper reading — given at birth, read here.</span>'
     + '<span class="menu__draw-spine">Sun Sign · Year Animal · Life Path · Rune · Trigram · Hexagram</span>'
-    + '<a class="menu__draw-aside" href="?dev=arcana-reading#/concord">Or two names, one bond — a Concord &rarr;</a>'
     + '</div>'
+    /* ── BR-S328 — THE CONCORD COMES OUT OF THE DOOR IT WAS TRAPPED IN. ─────────
+       It lived INSIDE the birth door, which covers itself edge to edge with an
+       absolutely-positioned hit area so a click anywhere on the tile opens the
+       reading. A second destination inside that meant the aside had to be lifted
+       above the overlay by z-index, its hover had to be suppressed on the parent by
+       :has() so the tile did not light while a click would land somewhere else, and
+       even then it was a 12.5px italic line sitting in the corner of a large target
+       that wanted every pixel. The builder's words: too tough to spot or click.
+       Out here it is nobody's passenger — its own line, after the door it belongs
+       to, with a real target of its own and no rule needed to stop the tile lying. */
+    + '<a class="menu__draw-aside" href="?dev=arcana-reading#/concord">Or two names, one bond — a Concord &rarr;</a>'
     + '<a class="menu__door menu__door--add menu__door--tarot" href="?dev=drawing-room">'
     + '<span class="menu__door-kicker">By the Draw &middot; Tarot</span>'
     + '<span class="menu__door-name">A Tarot Reading</span>'
@@ -1505,7 +1515,7 @@ function renderWall() {
     /* BR-S321: the "Deeper draws" link retired — its whole sentence is now the tarot
        door above, and a link repeating the door beside it is two roads to one room. */
     + '<div class="menu__draw-rail">'
-    + '<button type="button" class="menu__codex menu__codex--reliq" data-annex-go><span class="menu__codex__mark" aria-hidden="true">◆</span> The Memory Vault — <em class="menu__draw-kept">kept</em> <span class="menu__codex__arr" aria-hidden="true">→</span></button>'
+    + '<button type="button" class="menu__codex menu__codex--reliq" data-annex-go><span class="menu__codex__mark" aria-hidden="true">◆</span> The Shelf — <em class="menu__draw-kept">kept</em> <span class="menu__codex__arr" aria-hidden="true">→</span></button>'
     + '<a class="menu__codex" href="?dev=settings"><span class="menu__codex__mark" aria-hidden="true">◆</span> Settings <span class="menu__codex__arr" aria-hidden="true">→</span></a>'
     + '</div>'
     + '<p class="menu__draw-foot"><span class="menu__draw-cuttick" aria-hidden="true"></span> Drawn once. Not reissued.</p>'
@@ -1700,7 +1710,7 @@ function wireM2Turn(host) {
   }, { once: true });
 }
 
-/* BR-S204 — the Memory Vault threshold (menu slide 3). A GATED conservation niche:
+/* BR-S204 — the Shelf threshold (menu slide 3). A GATED conservation niche:
    locked by default (the mock localStorage `br_holdings` flag unset) → a quiet
    "held in conservation" sealed teaser; unlocked → an open threshold that doors
    to the full ?dev=profile route. Both branches are PURE static strings — the menu
@@ -1711,12 +1721,12 @@ function wireM2Turn(host) {
 function renderReliquaryTeaser() {
   return '<div class="menu__reliq menu__reliq--sealed">'
     + '<button type="button" class="menu__reliq-navback" data-annex-back>&larr; Back to the Reading Rooms</button>'
-    + '<p class="menu__reliq-eyebrow"><span class="menu__reliq-eyemark" aria-hidden="true">◆</span> THE MEMORY VAULT</p>'
+    + '<p class="menu__reliq-eyebrow"><span class="menu__reliq-eyemark" aria-hidden="true">◆</span> THE SHELF</p>'
     + '<div class="menu__reliq-niche">'
     +   '<span class="menu__reliq-emblem" aria-hidden="true">' + RELIQ_SEAL_SVG + '</span>'
     +   '<h2 class="menu__reliq-title" tabindex="-1">Held in conservation</h2>'
     +   '<span class="menu__reliq-rule" aria-hidden="true"></span>'
-    +   '<p class="menu__reliq-line">The Memory Vault is the shelf where the archive keeps what has been filed. Nothing is filed here yet — so the shelf stays sealed.</p>'
+    +   '<p class="menu__reliq-line">The Shelf is where the archive keeps what has been filed. Nothing is filed here yet — so the shelf stays sealed.</p>'
     +   '<p class="menu__reliq-how">It opens the moment a reading is drawn and kept. Looking is free, always; keeping is what fills the shelf.</p>'
     +   '<a class="menu__reliq-door" href="?dev=arcane">See a reading — free to look &rarr;</a>'
     + '</div>'
@@ -1727,13 +1737,13 @@ function renderReliquaryTeaser() {
 function renderReliquaryOpen() {
   return '<div class="menu__reliq menu__reliq--open">'
     + '<button type="button" class="menu__reliq-navback" data-annex-back>&larr; Back to the Reading Rooms</button>'
-    + '<p class="menu__reliq-eyebrow"><span class="menu__reliq-eyemark" aria-hidden="true">◆</span> THE MEMORY VAULT</p>'
+    + '<p class="menu__reliq-eyebrow"><span class="menu__reliq-eyemark" aria-hidden="true">◆</span> THE SHELF</p>'
     + '<div class="menu__reliq-niche">'
     +   '<span class="menu__reliq-emblem menu__reliq-emblem--lit" aria-hidden="true">' + RELIQ_SEAL_SVG + '</span>'
     +   '<h2 class="menu__reliq-title" tabindex="-1">The shelf is open</h2>'
     +   '<span class="menu__reliq-rule" aria-hidden="true"></span>'
     +   '<p class="menu__reliq-line">What has been kept is held here — the crowned name, the rings, the vault.</p>'
-    +   '<a class="menu__reliq-door menu__reliq-door--enter" href="?dev=profile">Open the Memory Vault &rarr;</a>'
+    +   '<a class="menu__reliq-door menu__reliq-door--enter" href="?dev=profile">Open the Shelf &rarr;</a>'
     + '</div>'
     + '<p class="menu__reliq-foot">Filed &amp; sealed · Blue Room Archive</p>'
     + reliqPreviewToggle(true)
@@ -1897,7 +1907,7 @@ function renderMenu(reveal) {
     ${RELIQ_GO}
     ${renderWall()}
     </section>
-    <section class="menu__panel menu__panel--reliquary is-offstage" inert aria-hidden="true" aria-label="The Memory Vault">
+    <section class="menu__panel menu__panel--reliquary is-offstage" inert aria-hidden="true" aria-label="The Shelf">
     ${RELIQ_BACK}
     ${renderReliquary(held)}
     </section>
@@ -2782,7 +2792,7 @@ function cancelMenuSettle() { if (_menuSettle) { _menuSettle.cancel(); _menuSett
    panel holds no layout box and no paint. menuSlideTo un-offstages ALL panels for
    stable geometry and then, in the SAME synchronous block, adds the state class that
    starts the 640ms transform. So frame one of every slide had to lay out and first-
-   paint two full-viewport panels (The Draw's monument, the Memory Vault) before it could
+   paint two full-viewport panels (The Draw's monument, the Shelf) before it could
    move a pixel — and because menuSettle re-collapses them at transitionend, nothing
    stayed warm: the identical cost was paid on every single switch.
 
@@ -3010,7 +3020,7 @@ function wireMenuAnnex(host) {                                      // KEEP the 
 }
 
 /* BR-S243 — KEYBOARD NAVIGATION (the first, easiest pass).
-   ← / →  step the horizontal panels: Desk ⇄ The Reading Rooms ⇄ The Memory Vault.
+   ← / →  step the horizontal panels: Desk ⇄ The Reading Rooms ⇄ The Shelf.
    ↓ / ↑  walk the DESK's vertical depth as CHECKPOINTS — the desk itself, the
           About intro, then each of the five plates in turn, then the close. One
           press = one stop, so the page always settles ON a box, never between two.
@@ -3802,7 +3812,7 @@ function renderReviewMap() {
         card("share", "?dev=before-after&src=2", "?dev=before-after&src=2", "Before / After · Ice Field", "second source"),
       ])}
       ${group("Archive surface", [
-        card("share", "?dev=vault", "?dev=vault", "The Memory Vault", "saved minted cards · revisit moments · reopen readings · QR access"),
+        card("share", "?dev=vault", "?dev=vault", "The Shelf", "saved minted cards · revisit moments · reopen readings · QR access"),
       ])}
       ${group("Dev mock", [
         card("mock", "?dev=halo-gate", "?dev=halo-gate", "Halo Gate mock", "sealed card-back gate · not payment, not analysis"),
@@ -3919,7 +3929,7 @@ function renderProtoCards() {
 }
 
 /* ============================================================
-   THE MEMORY VAULT (?dev=vault) — BR-S144
+   THE SHELF (?dev=vault) — BR-S144
    A private archive of SAVED MINTED cards: revisit favorite image moments,
    reopen a saved mint's Stats & Readings, and access each mint by QR code.
    It is NOT a gallery / marketplace / leaderboard / profile / human archive —
@@ -3931,7 +3941,7 @@ function renderProtoCards() {
    touched, the back button reuses the menu nav (data-view-to="menu").
 ============================================================ */
 
-/* BR-S265 — THE FEATURED MINT FOLLOWS M1. The Memory Vault is reached by the see-deeper
+/* BR-S265 — THE FEATURED MINT FOLLOWS M1. The Shelf is reached by the see-deeper
    hand-off ("To the Vault"), so the first thing in it should be the card you just
    developed. It was pinned to SOURCES[0] "Checkpoint Wave" while the desk moved to
    SRC-03 "Shore Dispatch" in BR-S259 — so you developed one card and were handed a
@@ -4043,8 +4053,8 @@ function renderVault() {
         <a class="pf-back" href="#" data-view-to="menu">&larr; Back to the menu</a>
 
         <div class="pf-vaulthead">
-          <span class="pf-vaulteyebrow">Blue Room Archive&nbsp;&nbsp;·&nbsp;&nbsp;The Memory Vault</span>
-          <h1 class="pf-vaulttitle">The Memory Vault</h1>
+          <span class="pf-vaulteyebrow">Blue Room Archive&nbsp;&nbsp;·&nbsp;&nbsp;The Shelf</span>
+          <h1 class="pf-vaulttitle">The Shelf</h1>
           <p class="pf-vaultintro">Saved minted cards are filed here.</p>
         </div>
 
@@ -5155,13 +5165,13 @@ document.addEventListener("keydown", function (e) {
   else { document.body.dataset.devnav = "1"; if (el) { el.innerHTML = renderDevnav(); el.removeAttribute("hidden"); } }
 });
 if (state.view === "dev") mountDev();
-/* BR-S266 — THE MEMORY VAULT IS A DESTINATION, NOT A STATE. The reported bug was "hard refresh
+/* BR-S266 — THE SHELF IS A DESTINATION, NOT A STATE. The reported bug was "hard refresh
    still gives me the vault page no matter what page I'm in", and BR-S265 did not fix it:
    that fix only cleaned the URL when you CLICKED an in-app exit, and a refresh never
    clicks anything. So a tab whose URL still read ?dev=vault kept resurrecting the Vault
    forever, and because M1↔M2↔M3 move on hashes and U1 is a scroll, the URL never changed
    as you moved around — hence "no matter what page I'm in".
-   The Memory Vault is reached by the see-deeper hand-off, i.e. it is somewhere you are SENT, not
+   The Shelf is reached by the see-deeper hand-off, i.e. it is somewhere you are SENT, not
    a page you sit in. So the param is consumed on arrival: the route still mounts for this
    visit, but the address bar goes clean immediately, and a refresh returns to the desk.
    Kept STICKY when the dev rail is on (?devnav=1 / the backtick toggle, persisted), so
@@ -5420,12 +5430,12 @@ render();
         if (!el) continue;
         /* EXISTENCE is derived from MENU_PANELS so a new room appears here for free;
            the NAME is not, because the panels do not carry one. Scraping the first
-           heading returned the Desk's eyebrow ("◆ BLUE ROOM") and the Memory Vault's
+           heading returned the Desk's eyebrow ("◆ BLUE ROOM") and the Shelf's
            gated teaser ("Held in conservation") — a room's name is not whatever
            happens to be the largest text in it. Keyed on the state class, which is
            the same key the ribbon itself uses, with a derived fallback so an
            unnamed new panel still gets a plate rather than being dropped. */
-        var NAMES = { "": "The Archive Desk", "is-wall": "The Reading Rooms", "is-reliquary": "The Memory Vault" };
+        var NAMES = { "": "The Archive Desk", "is-wall": "The Reading Rooms", "is-reliquary": "The Shelf" };
         /* BR-S293 — MEANING. A name alone tells you what a room is CALLED, not what it
            is for, and half of these names are not self-evident to a first visitor. One
            line each, in the room's own voice, no jargon. */

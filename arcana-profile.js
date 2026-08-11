@@ -50,7 +50,7 @@
       result_count: 3, created_at: "2026-07-09", is_current: true
     },
     // Rings section is only the "read for someone" box now (no example rings).
-    // The Memory Vault is minted-card slots only — empty until minting is live (real vault not built).
+    // The Shelf is minted-card slots only — empty until minting is live (real vault not built).
     vault_slots: 4,
     // What the Showcase can feature: the seeker's OWN reading results, and minted cards.
     reading_results: [
@@ -236,8 +236,8 @@
     }).join("");
     // Empty state is one calm line (the lede) — no ghost slots. Cards appear when minting is live.
     var body = cards ? '<div class="pf-vault"><div class="pf-cards">' + cards + '</div></div>' : "";
-    return section("The Memory Vault", "not open yet",
-      "Your minted cards are filed here — nothing has been minted yet. The Memory Vault opens once minting begins.",
+    return section("The Shelf", "not open yet",
+      "Your minted cards are filed here — nothing has been minted yet. The Shelf opens once minting begins.",
       body);
   }
 
@@ -294,7 +294,7 @@
   }
 
   // The Rooms — the hub's purpose: a labelled door to every room, each with a
-  // deadpan one-line descriptor. (The Memory Vault has its own section above, so it is
+  // deadpan one-line descriptor. (The Shelf has its own section above, so it is
   // not repeated here.) Commerce is not shown on the hub — price lives in the room.
   function roomsHTML() {
     var rooms = [

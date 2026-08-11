@@ -347,7 +347,7 @@
 @media (prefers-contrast: more) { .pf-id__name { filter: none; } }
 
 /* ============================================================
-   BR-S185 — THE MEMORY VAULT ported into the profile's museum language.
+   BR-S185 — THE SHELF ported into the profile's museum language.
    Vault-specific .pf-* additions only; the rest reuses profile classes
    (.pf-wrap / .pf-sec / .pf-crownstage__cap / .pf-prov / .pf-openreading).
 ============================================================ */
