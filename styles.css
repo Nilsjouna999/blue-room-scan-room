@@ -3564,19 +3564,9 @@ html.m2-parch .m2hero { --bf-ink: #1c150d; --bf-meta: #6a5c45; --bf-rule: rgba(2
 .menu__draw-spine { font-family: var(--font-mono); font-size: 8.5px; letter-spacing: .16em; text-transform: uppercase; color: var(--t-meta); line-height: 1.5; margin-top: 2px; transition: color 160ms var(--ease-settle); }
 .menu__door:hover .menu__draw-spine,
 .menu__door:focus-within .menu__draw-spine { color: var(--silver); }
-/* ── BR-S328 — THE CONCORD, STANDING ON ITS OWN. ─────────────────────────────
-   Out of the birth door and onto its own line beneath it. It keeps the italic aside
-   register — this is a variation on the reading above, not a third product — but it
-   gets a real target now: padding, its own arrow, and a hover that answers. Inside
-   the tile it was a 12.5px line in the corner of a control that claimed every pixel. */
-.menu__draw-aside {
-  display: inline-block; margin-top: 10px; padding: 6px 2px;
-  font-family: var(--font-display); font-style: italic; font-size: 13px; line-height: 1.4;
-  color: var(--silver); text-align: left; text-decoration: none;
-  transition: color 160ms var(--ease-settle);
-}
-.menu__draw-aside:hover, .menu__draw-aside:focus-visible { color: var(--t-display); outline: none; }
-.menu__draw-aside:focus-visible { outline: 1px solid var(--silver-dim); outline-offset: 3px; border-radius: 4px; }
+/* BR-S342: `.menu__draw-aside` is deleted with the Concord line it dressed. The
+   Concord now lives only where it is an answer to a question being asked — the
+   intake's for-whom row (BR-S335). Nothing else on M2 used this class. */
 .menu__draw-tiers { display: block; font-family: var(--font-mono); font-size: 9px; letter-spacing: .14em; color: var(--t-meta); text-decoration: none; line-height: 1.6; transition: color 160ms var(--ease-settle); max-width: 360px; }
 .menu__draw-tiers:hover, .menu__draw-tiers:focus-visible { color: var(--t-display); outline: none; }
 .menu__draw-kept { color: #8a6fb0; font-style: normal; }   /* the one violet in the room — canon literal, NEVER var(--violet) */

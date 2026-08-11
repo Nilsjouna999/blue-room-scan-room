@@ -1490,19 +1490,48 @@ function m2SittingUsed() { try { return localStorage.getItem("br_dr_sitting_used
      env   flick 1.5s · hold 3.2s · dwell 5.4s
      peak  opacity at its loudest
      dy    drift in px; 0 = holds the baseline (the form-change pairs)          */
+/* ── BR-S342 — THE QUESTIONS THEMSELVES. ─────────────────────────────────────
+   The builder, on the previous set: the questions are bad. They were — and the
+   trouble was not the writing line by line, it was the SET.
+     · Seven of ten were the same register: a suspicious partner. Checking,
+       loyalty-or-fear, do they think about me, the thing I haven't told anyone.
+       A person who is not currently doubting someone found nothing of theirs here.
+     · Two shared a shape — "Is it loyalty, or is it fear?" / "Am I waiting, or am
+       I hiding." — and a repeated construction across ten short lines is the same
+       defect as a repeated interval: it announces an author.
+     · Several were written rather than thought. "Something is off and I can't
+       name it" is a good sentence and nobody has ever said it to themselves.
+   MY FIRST REWRITE FIXED THE SAMENESS AND KEPT THE GLOOM. "Is it too late." /
+   "Will it always be like this." / "Is it me." — ten lines of a person at their
+   worst. The builder's correction: real questions, no emo, no doomer, no wacky,
+   intimate but POSITIVE-ish, some risky love ones, and questions about the future
+   and about decisions.
+   That is the right instruction and it is also better product sense. Someone who
+   arrives curious is not in crisis — they are deciding something, or wondering
+   whether to say something, or looking at a year they might move in. A wall of
+   despair beside a card you can buy reads as bait; a wall of live, forward
+   questions reads as the reason people sit for a reading at all.
+   So: two risky love ones (the first move, telling him), two decisions, two about
+   what is next, and one — "Is this the good part." — that is the one worth sitting
+   with, which is why it gets the dwell and the highest peak. Full stops, not
+   question marks: a question mark is asked AT you; a full stop is someone thinking
+   near you. Shapes run from "Do I say yes." to "What am I actually good at."
+   THE TIMING IS UNCHANGED and stays as verified in BR-S341 — only the words moved.
+   The two form-change pairs are chosen for MEANING: a nerve becoming a bolder
+   nerve, and a readiness becoming a decision. */
 const M2_CYCLE = 36;
 const M2_ASKS = [
   //  question                                  at     env      peak   dy
-  ["Why do I keep checking.",                    0.0, "dwell",  0.44,  6],
-  ["I already know, don't I.",                   3.9, "hold",   0.38,  0],   // ─┐ form-change
-  ["I keep almost saying it.",                   6.2, "flick",  0.34,  0],   // ─┘ same baseline, 0.9s together
-  ["Is it loyalty, or is it fear?",              9.6, "flick",  0.40,  5],
-  ["What am I pretending not to know?",         13.4, "hold",   0.42,  7],
-  ["The thing I haven't told anyone.",          15.9, "dwell",  0.54, -4],   // the one that stays
-  ["Do they think about me at all.",            23.2, "flick",  0.32,  8],
-  ["Am I waiting, or am I hiding.",             25.6, "hold",   0.40,  0],   // ─┐ form-change
-  ["Would I choose this again.",                28.1, "hold",   0.46,  0],   // ─┘
-  ["Something is off and I can't name it.",     33.2, "flick",  0.36,  6],
+  ["What comes after this.",                     0.0, "dwell",  0.44,  6],
+  ["Do I make the first move.",                  3.9, "hold",   0.38,  0],   // ─┐ a nerve becoming
+  ["Should I tell him.",                         6.2, "flick",  0.36,  0],   // ─┘ a bolder nerve
+  ["Should I take the offer.",                   9.6, "flick",  0.40,  5],
+  ["What am I actually good at.",               13.4, "hold",   0.42,  7],
+  ["Is this the good part.",                    15.9, "dwell",  0.54, -4],   // the one that stays
+  ["Is this the year I move.",                  23.2, "flick",  0.32,  8],
+  ["Am I ready for this.",                      25.6, "hold",   0.40,  0],   // ─┐ readiness becoming
+  ["Do I say yes.",                             28.1, "hold",   0.46,  0],   // ─┘ a decision
+  ["Who do I want beside me.",                  33.2, "flick",  0.36,  6],
 ];
 
 function renderWall() {
@@ -1554,17 +1583,16 @@ function renderWall() {
     + '<span class="menu__door-desc">Six marks. One name. The deeper reading — given at birth, read here.</span>'
     + '<span class="menu__draw-spine">Sun Sign · Year Animal · Life Path · Rune · Trigram · Hexagram</span>'
     + '</div>'
-    /* ── BR-S328 — THE CONCORD COMES OUT OF THE DOOR IT WAS TRAPPED IN. ─────────
-       It lived INSIDE the birth door, which covers itself edge to edge with an
-       absolutely-positioned hit area so a click anywhere on the tile opens the
-       reading. A second destination inside that meant the aside had to be lifted
-       above the overlay by z-index, its hover had to be suppressed on the parent by
-       :has() so the tile did not light while a click would land somewhere else, and
-       even then it was a 12.5px italic line sitting in the corner of a large target
-       that wanted every pixel. The builder's words: too tough to spot or click.
-       Out here it is nobody's passenger — its own line, after the door it belongs
-       to, with a real target of its own and no rule needed to stop the tile lying. */
-    + '<a class="menu__draw-aside" href="?dev=arcana-reading#/concord">Or two names, one bond — a Concord &rarr;</a>'
+    /* ── BR-S342 — THE CONCORD LEAVES M2 ENTIRELY; IT LIVES ON THE BIRTH PAGE. ───
+       BR-S328 pulled it out of the birth door and gave it its own line here, which
+       fixed a hit-target problem and left a naming one: the storefront now offered
+       THREE things where the room only sells two, and the third was a one-line
+       aside with no object, no price and no explanation beside two full doors.
+       BR-S335 then put a properly glossed Concord chip in the intake's for-whom
+       row — the moment someone has already chosen a birth reading and is being
+       asked who it is for, which is the only question a Concord is an answer to.
+       That is the better door, and two doors to one room from two different rooms
+       is how a building starts lying about its own shape. This one goes. */
     + '<a class="menu__door menu__door--add menu__door--tarot" href="?dev=drawing-room">'
     + '<span class="menu__door-kicker">By the Draw &middot; Tarot</span>'
     + '<span class="menu__door-name">A Tarot Reading</span>'
