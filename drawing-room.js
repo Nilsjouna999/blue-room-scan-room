@@ -234,44 +234,127 @@
       '<a class="dr-intake__back" href="#" data-dr-home>&larr; the deck</a></div>';
   }
 
-  function readingHTML(st) {
-    var sp = SPREADS[st.spread], drawn = st.drawn, done = st.revealed >= sp.n, i;
-    var cards = "";
+  /* ══ BR-S317 — THE CEREMONY SUBTREE. ══════════════════════════════════════════
+     THE DEFECT, exactly. `turn()` used to add `.is-revealed` to a card and then, 720ms
+     later, run `stage().innerHTML = readingHTML(STATE)` — rebuilding the ENTIRE reading,
+     every card node included, on every single turn. Nothing here could ever be
+     choreographed: a deal is a chain of transitions over nodes that must still exist
+     when the next beat fires, and these nodes were being replaced mid-flight. That is
+     why the ceremony was never portable from tarot-v2, and why copying its keyframes
+     would have produced nothing but a flicker.
+
+     THE FIX IS A BOUNDARY, NOT A REWRITE. The product-level machine is untouched —
+     `landing → intake → reading` still lives in STATE.view and still renders by
+     replacing markup, because none of it animates. Only ONE region becomes persistent:
+     `.dr-spread`, the cards. It is built once by mountReading() and from then on is
+     MUTATED, never re-rendered. Everything outside it — the reads, the filed block, the
+     matter line — keeps the old cheap discipline, which is correct for prose that has
+     no motion to protect.
+
+     Deliberately NOT tarot-v2's model. v2 converts the whole room to a `phase` machine;
+     doing that here would put the entire product on the regression surface to buy
+     something only the cards need. The subtree carries its own local phase instead, on
+     `data-dr-phase`, so CSS and later steps have one place to hang:
+       ready → shuffling → shuffled → committed → cutting → dealing → dealt → revealing
+       → complete
+     Only `dealt / revealing / complete` are reachable today. The deck, the riffle, the
+     cut and the deal (INTEGRATION §3 steps 4-8) plug into the earlier ones without
+     touching this boundary again — which is the whole point of drawing it now.
+
+     ONE MARKUP CONSEQUENCE, and it is an improvement. A turned card used to have its
+     <button> REMOVED and the plain card put back in its place — a node swap, i.e. the
+     same defect in miniature. The button now stays for the life of the reading and is
+     marked aria-disabled instead, so DOM identity holds, keyboard order does not
+     reshuffle under someone mid-reading, and focus survives a turn. */
+  var CEREMONY = { el: null, phase: "" };
+  function ceremonyPhase(p) {
+    CEREMONY.phase = p;
+    if (CEREMONY.el) CEREMONY.el.setAttribute("data-dr-phase", p);
+  }
+  function faceDownLabel(sp, i) {
+    return esc(sp.positions[i]) + ", card " + (i + 1) + " of " + sp.n + ", face down. Press to turn it.";
+  }
+  function faceUpLabel(sp, st, i) {
+    var d = st.drawn[i];
+    return esc(sp.positions[i]) + ", " + esc(d.card.name) + ", " + (d.reversed ? "reversed" : "upright") + ". Turned.";
+  }
+  function cardHTML(d) {
+    return '<div class="dr-card">' +
+      '<div class="dr-cardface dr-cardface--back">' + backSVG() + '</div>' +
+      '<div class="dr-cardface dr-cardface--front">' + faceSVG(d.card, d.reversed) + '</div></div>';
+  }
+  /* built ONCE per reading; after this the nodes are only ever mutated */
+  function spreadHTML(st) {
+    var sp = SPREADS[st.spread], out = "", i;
     for (i = 0; i < sp.n; i++) {
-      var d = drawn[i], shown = d.shown;
-      var flip = '<div class="dr-card' + (shown ? " is-revealed" : "") + '">' +
-        '<div class="dr-cardface dr-cardface--back">' + backSVG() + '</div>' +
-        '<div class="dr-cardface dr-cardface--front">' + faceSVG(d.card, d.reversed) + '</div></div>';
-      cards += '<div class="dr-slot' + (shown ? " is-shown" : "") + '">' +
+      out += '<div class="dr-slot" data-dr-slot="' + i + '">' +
         '<span class="dr-slot__pos">' + esc(sp.positions[i]) + '</span>' +
-        (shown ? flip : '<button type="button" class="dr-cardbtn" data-dr-turn="' + i + '" aria-label="' + esc(sp.positions[i]) + ', card ' + (i + 1) + ' of ' + sp.n + ', face down. Press to turn it.">' + flip + '</button>') +
-        '</div>';
+        '<button type="button" class="dr-cardbtn" data-dr-turn="' + i + '" aria-label="' + faceDownLabel(sp, i) + '">' +
+        cardHTML(st.drawn[i]) + '</button></div>';
     }
-    var readings = "";
+    return out;
+  }
+  /* the ONE place a card is turned face up — used by a live turn and by a reopened
+     receipt alike, so the two can never drift into different DOM */
+  function applyShown(st, i) {
+    if (!CEREMONY.el) return;
+    var sp = SPREADS[st.spread];
+    var slot = CEREMONY.el.querySelector('[data-dr-slot="' + i + '"]');
+    if (!slot) return;
+    slot.classList.add("is-shown");
+    var card = slot.querySelector(".dr-card");
+    if (card) card.classList.add("is-revealed");
+    var btn = slot.querySelector("[data-dr-turn]");
+    if (btn) { btn.setAttribute("aria-disabled", "true"); btn.setAttribute("aria-label", faceUpLabel(sp, st, i)); }
+  }
+
+  function readsHTML(st) {
+    var sp = SPREADS[st.spread], out = "", i;
     for (i = 0; i < sp.n; i++) {
-      if (!drawn[i].shown) continue;
-      var c = drawn[i].card, rev = drawn[i].reversed;
-      readings += '<div class="dr-read"><p class="dr-read__pos">' + esc(sp.positions[i]) + ' <span class="dr-read__posn">— ' + esc(sp.notes[i]) + '</span></p>' +
+      if (!st.drawn[i].shown) continue;
+      var c = st.drawn[i].card, rev = st.drawn[i].reversed;
+      out += '<div class="dr-read"><p class="dr-read__pos">' + esc(sp.positions[i]) + ' <span class="dr-read__posn">— ' + esc(sp.notes[i]) + '</span></p>' +
         '<h3 class="dr-read__name">' + esc(c.name) + '<span class="dr-read__orient">' + (rev ? "Reversed" : "Upright") + '</span></h3>' +
         '<p class="dr-read__mean">' + esc((rev && c.reversed) ? c.reversed : c.meaning) + '</p></div>';
     }
-    var tail = "";
-    if (done) {
-      tail = '<div class="dr-filed" data-dr-filed>' +
-        '<p class="dr-binding">' + esc(bindingLine(sp, drawn)) + '</p>' +
-        '<p class="dr-read__frame">Drawn to the matter you laid down — a reflection to sit with, not a forecast.</p>' +
-        '<div class="dr-stamp">' + hallmarkSVG(st.seed) +
-        '<p class="dr-filed__line">Filed to your Reliquary &middot; ' + esc(brCode(st.seed)) + ' &middot; ' + esc(filedDate()) + '</p></div>' +
-        '<p class="dr-credo">Drawn once. Not reissued.</p>' +
-        '<a class="pf-openreading pf-openreading--lg" href="#" data-door="profile">Open your Reliquary &rarr;</a>' +
-        '<a class="dr-intake__back" href="#" data-dr-home>&larr; the deck</a></div>';
-    } else {
-      tail = '<p class="dr-draw__cue">Turn each card.</p><a class="dr-intake__back" href="#" data-dr-home>&larr; the deck</a>';
-    }
+    return out;
+  }
+  function tailHTML(st) {
+    var sp = SPREADS[st.spread];
+    if (st.revealed < sp.n) return '<p class="dr-draw__cue">Turn each card.</p><a class="dr-intake__back" href="#" data-dr-home>&larr; the deck</a>';
+    return '<div class="dr-filed" data-dr-filed>' +
+      '<p class="dr-binding">' + esc(bindingLine(sp, st.drawn)) + '</p>' +
+      '<p class="dr-read__frame">Drawn to the matter you laid down — a reflection to sit with, not a forecast.</p>' +
+      '<div class="dr-stamp">' + hallmarkSVG(st.seed) +
+      '<p class="dr-filed__line">Filed to your Reliquary &middot; ' + esc(brCode(st.seed)) + ' &middot; ' + esc(filedDate()) + '</p></div>' +
+      '<p class="dr-credo">Drawn once. Not reissued.</p>' +
+      '<a class="pf-openreading pf-openreading--lg" href="#" data-door="profile">Open your Reliquary &rarr;</a>' +
+      '<a class="dr-intake__back" href="#" data-dr-home>&larr; the deck</a></div>';
+  }
+  /* the shell around the subtree: everything here is prose, so it may still be replaced */
+  function readingShellHTML(st) {
+    var sp = SPREADS[st.spread];
     return '<div class="dr-reading">' + (st.question ? '<p class="dr-reading__matter">Drawn to: “' + esc(st.question) + '”</p>' : '') +
-      '<div class="dr-spread dr-spread--' + sp.n + '">' + cards + '</div>' +
-      '<div class="dr-reads">' + readings + '</div>' + tail +
+      '<div class="dr-spread dr-spread--' + sp.n + '" data-dr-spread data-dr-phase=""></div>' +
+      '<div class="dr-reads" data-dr-reads></div>' +
+      '<div class="dr-tail" data-dr-tail></div>' +
       '<div class="dr-live" role="status" aria-live="assertive" data-dr-live></div></div>';
+  }
+  function refreshReads(st) {
+    var r = stage().querySelector("[data-dr-reads]"), t = stage().querySelector("[data-dr-tail]");
+    if (r) r.innerHTML = readsHTML(st);
+    if (t) t.innerHTML = tailHTML(st);
+  }
+  /* the single entry point into a reading — a fresh cut and a reopened receipt both
+     arrive here, so there is one way the cards get onto the table */
+  function mountReading(st) {
+    var sp = SPREADS[st.spread], i;
+    stage().innerHTML = readingShellHTML(st);
+    CEREMONY.el = stage().querySelector("[data-dr-spread]");
+    CEREMONY.el.innerHTML = spreadHTML(st);
+    for (i = 0; i < sp.n; i++) if (st.drawn[i].shown) applyShown(st, i);
+    ceremonyPhase(st.revealed >= sp.n ? "complete" : "dealt");
+    refreshReads(st);
   }
 
   /* ---------- flow ---------- */
@@ -296,7 +379,7 @@
     STATE.drawn = drawSpread(STATE.seed, sp.n).map(function (d) { d.shown = false; return d; });
     STATE.revealed = 0; STATE.view = "reading";
     if (inApp() && history.replaceState) history.replaceState(null, "", "?dev=drawing-room&read=" + sp.key + "&t=" + encodeURIComponent(t) + (STATE.question ? "&q=" + encodeURIComponent(STATE.question) : ""));
-    stage().innerHTML = readingHTML(STATE);
+    mountReading(STATE);
   }
   function cut() {
     var sp = SPREADS[STATE.spread];
@@ -312,14 +395,19 @@
   }
   function turn(i) {
     if (!STATE.drawn[i] || STATE.drawn[i].shown) return;
-    var el = HOST.querySelector('[data-dr-turn="' + i + '"] .dr-card');
     STATE.drawn[i].shown = true; STATE.revealed++;
     var sp = SPREADS[STATE.spread], c = STATE.drawn[i].card, rev = STATE.drawn[i].reversed;
     var msg = sp.positions[i] + ": " + c.name + ", " + (rev ? "reversed" : "upright") + ". " + firstSentence((rev && c.reversed) ? c.reversed : c.meaning);
     if (STATE.revealed >= sp.n) msg += " Filed to your Reliquary, " + brCode(STATE.seed) + ".";
+    /* BR-S317: the flip happens on the node that is already there and STAYS there. The
+       spread is never re-rendered — only the prose below it is, and only after the flip
+       has had its 720ms. Previously this line was followed by a full teardown of every
+       card on the table, which is the reason no ceremony could live here. */
+    applyShown(STATE, i);
+    ceremonyPhase(STATE.revealed >= sp.n ? "complete" : "revealing");
     var reduce = window.matchMedia && (window.BRMotion ? window.BRMotion.prefersReduced() : window.matchMedia("(prefers-reduced-motion: reduce)").matches);
-    var done = function () { stage().innerHTML = readingHTML(STATE); announce(msg); };
-    if (el && !reduce) { el.classList.add("is-revealed"); setTimeout(done, 720); } else done();  // flip, then reveal the read
+    var done = function () { refreshReads(STATE); announce(msg); };
+    if (reduce) done(); else setTimeout(done, 720);
   }
   function reopen() {
     // a filed reading is already drawn and settled — its URL is the receipt; never gate here.
@@ -327,7 +415,7 @@
     var sp = SPREADS[key];
     STATE.spread = key; STATE.question = param("q"); STATE.seed = "read~" + key + "~" + norm(STATE.question) + "~" + t;
     STATE.drawn = drawSpread(STATE.seed, sp.n).map(function (d) { d.shown = true; return d; });
-    STATE.revealed = sp.n; STATE.view = "reading"; stage().innerHTML = readingHTML(STATE); return true;
+    STATE.revealed = sp.n; STATE.view = "reading"; mountReading(STATE); return true;
   }
 
   function wire(root) {

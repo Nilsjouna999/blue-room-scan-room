@@ -436,6 +436,11 @@
 
 /* the flip card (shared by pull + spread) */
 .dr-cardbtn { background: none; border: 0; padding: 0; cursor: pointer; perspective: 1200px; }
+/* BR-S317: a turned card keeps its button so the DOM identity the ceremony depends on
+   survives the turn — but it is no longer a control, and it must stop offering itself
+   as one. Still focusable on purpose: removing it from the tab order mid-reading would
+   move the ground under a keyboard reader who has just turned it. */
+.dr-cardbtn[aria-disabled="true"] { cursor: default; }
 .dr-cardbtn:focus-visible { outline: 2px solid var(--pf-gold-lit); outline-offset: 6px; border-radius: 12px; }
 .dr-card { position: relative; width: clamp(170px, 38vw, 210px); aspect-ratio: 120 / 190; transform-style: preserve-3d; transition: transform .7s cubic-bezier(.4, 0, .2, 1); margin: 0 auto; }
 .dr-card.is-revealed { transform: rotateY(180deg); }
@@ -540,6 +545,11 @@
 
 /* ---- the reading: the spread + per-card reads + the filed close ---- */
 .dr-reading { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 22px; }
+/* BR-S317: the tail became a real element so it can be re-rendered on its own without
+   touching the card subtree. display:contents keeps it out of the layout entirely — its
+   children stay direct flex items of .dr-reading, so the gap, centring and .dr-filed's
+   own width all behave exactly as they did when they were siblings. */
+.dr-tail { display: contents; }
 .dr-reading__matter { font-family: var(--pf-serif); font-style: italic; font-size: 15px; color: var(--pf-meta); margin: 0; }
 .dr-spread { display: flex; flex-wrap: wrap; justify-content: center; gap: 16px 14px; }
 .dr-slot { display: flex; flex-direction: column; align-items: center; gap: 8px; }
