@@ -3226,7 +3226,48 @@ html.m2-parch .m2hero__face circle[fill]:not([fill="none"]) { fill: #c98a5e; }
 html.m2-parch .m2hero__face rect[stroke] { stroke: #c98a5e; opacity: .75; }
 html.m2-parch .m2hero__back { opacity: .07; }
 html.m2-parch .m2hero__back [stroke] { stroke: #2a2118; }
-html.m2-parch .m2hero__name { color: #1c150d; }
+/* BR-S289 — THE ACTUAL CARD, not a recreation of one.  The builder: "you tried to
+   recreate but its not same card."  Correct.  BR-S287 borrowed tarot-v2's COLOURS and
+   kept M1's big engraved star, but tarot-v2's real face is not an engraving at all —
+   it is TYPOGRAPHIC.  Reproduced from tarot-v2/style.css and app.js#faceHTML, band for
+   band and value for value:
+       .face-head   a top row, space-between: meta left, the diamond right
+       .face-meta   mono 11px / .12em / #5c503c        (major cards: "ARCANA · <rank>")
+       .face-glyph  the diamond, display 700 13px, copper #c98a5e — "the original card
+                    art, on EVERY card", per its own comment
+       .face-name   Cormorant 600 at 20px, pushed down by margin:auto 0 0
+       .face-div    a 26x1px rule at rgba(28,21,13,.35)
+       .face-orient mono 9px / .16em / uppercase / #6a5c45, margin 0 0 auto
+       ticks        10px corner brackets, 1.5px, rgba(28,21,13,.5), tl + br only
+   The stock is --parchment verbatim: linear-gradient(165deg,#efe9db,#dcd4c2) — BR-S287
+   used a different gradient off a neighbouring rule, which is part of why it read wrong.
+   Border and drop are .face's own: 1px rgba(20,14,8,.35), 0 20px 40px rgba(0,0,0,.6).
+   The star SVG and its ghost back are hidden under ?m2=white rather than deleted, so
+   the dark hero is untouched and this stays one switch away from gone. */
+html.m2-parch .m2hero__face,
+html.m2-parch .m2hero__back,
+html.m2-parch .m2hero__name { display: none; }
+html.m2-parch .m2hero {
+  background: linear-gradient(165deg, #efe9db, #dcd4c2);
+  border: 1px solid rgba(20, 14, 8, 0.35);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+}
+.m2face { display: none; }
+html.m2-parch .m2face {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
+  padding: 14px 12px; text-align: center; color: #1c150d;
+  border-radius: inherit;
+}
+.m2face-head { width: 100%; display: flex; align-items: center; justify-content: space-between; }
+.m2face-meta { font-family: var(--font-mono); font-weight: 600; font-size: 11px; letter-spacing: .12em; color: #5c503c; }
+.m2face-glyph { font-family: var(--font-display); font-weight: 700; font-size: 13px; line-height: 1; color: #c98a5e; }
+.m2face-name { margin: auto 0 0; font-family: var(--font-display); font-weight: 600; font-size: 20px; line-height: 1.05; color: #1c150d; }
+.m2face-div { width: 26px; height: 1px; background: rgba(28, 21, 13, .35); margin: 8px 0; }
+.m2face-orient { margin: 0 0 auto; font-family: var(--font-mono); font-weight: 600; font-size: 9px; letter-spacing: .16em; text-transform: uppercase; color: #6a5c45; }
+.m2tick { position: absolute; width: 10px; height: 10px; border-color: rgba(28, 21, 13, .5); }
+.m2tick.tl { left: 9px; top: 9px; border-left: 1.5px solid; border-top: 1.5px solid; }
+.m2tick.br { right: 9px; bottom: 9px; border-right: 1.5px solid; border-bottom: 1.5px solid; }
 .m2hero__back, .m2hero__face { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
 .m2hero__back { opacity: .12; }
 .m2hero__face { opacity: 1; clip-path: none; }
