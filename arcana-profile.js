@@ -144,8 +144,13 @@
   function headerHTML() {
     // Room-nav is consolidated into the in-body "The Rooms" doors block below; the
     // masthead keeps only the wordmark — a quiet door back to the Main Menu.
+    // BR-S307: the wordmark alone was the ONLY exit, and a wordmark does not read as
+    // a back — a first-time reader saw no way out at all (every other link here is
+    // href="#"). The labelled control says so out loud. Same door, same data-door
+    // handler, so there is one exit with two faces rather than two exits.
     return '<header class="pf-top">' +
       '<a class="pf-wordmark" href="#" data-door="menu" aria-label="Main Menu" title="Main Menu"><span class="pf-wordmark__mark" aria-hidden="true">&#9670;</span> Blue&nbsp;Room</a>' +
+      '<a class="pf-back pf-back--top" href="#" data-door="menu">&larr; Main Menu</a>' +
       '</header>';
   }
 

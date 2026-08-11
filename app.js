@@ -4648,7 +4648,16 @@ document.addEventListener("click", (e) => {
 document.addEventListener("keydown", (e) => {
   if (e.key !== "Escape") return;
   const lb = document.getElementById("lightbox");
-  if (lb && lb.classList.contains("is-open")) { lb.classList.remove("is-open"); lb.setAttribute("aria-hidden", "true"); }
+  if (lb && lb.classList.contains("is-open")) {
+    lb.classList.remove("is-open"); lb.setAttribute("aria-hidden", "true");
+    /* BR-S307: the innermost thing owns the key. This listener is bubble-phase and
+       registered BEFORE the room's Escape, so without stopping here a single press
+       would close the lightbox AND walk you out of the room — one key, two levels.
+       stopImmediatePropagation, not stopPropagation: both listeners sit on document,
+       and plain stopPropagation does nothing between listeners on the SAME node —
+       measured, not assumed (the first attempt still walked out of the room). */
+    e.stopImmediatePropagation();
+  }
 });
 
 /* QR pop-out (BR-S120): the placeholder scan code seats to the card centre while the
@@ -4776,6 +4785,23 @@ document.addEventListener("keydown", (e) => {
       if (state.draftGate) { state.draftGate = false; document.getElementById("draftView").innerHTML = renderDraft(); }
       else { state.view = "menu"; applyView(); }
     }
+    return;
+  }
+  /* BR-S307 — ESCAPE LEAVES THE ROOM. Every other surface in the build trained this
+     key; the room — the oldest and the most used — was the one that ignored it. Back
+     already existed here (the ◆ brand mark, the "↑ Menu" footer), just not by the key
+     a reader had been taught. This is the third face of the SAME door, not a new exit:
+     it mirrors the [data-view-to="menu"] handler, dev-strip included, so leaving via
+     the key cannot land you somewhere leaving via the button does not.
+     WHAT IS MOUNTED ON TOP OWNS THE KEY FIRST. The QR pop-out and the Mint showcase
+     bind at capture and stop propagation; the lightbox now stops it too. So Escape
+     dismisses the innermost thing, and only an empty room hands it to the exit. */
+  if (e.key === "Escape") {
+    if (e.ctrlKey || e.metaKey || e.altKey || e.shiftKey) return;
+    if (_cxOpen || _navBlocked(e.target)) return;         // the Codex aperture owns Esc; never yank a typist out of a field
+    e.preventDefault();
+    if (state.dev) { state.dev = null; _devUrlStrip(); }   // same shared helper the click path uses — it cannot drift
+    state.view = "menu"; applyView(); window.scrollTo(0, 0);
     return;
   }
   if (/^[1-9]$/.test(e.key) && Number(e.key) <= SOURCES.length) state.source = Number(e.key) - 1;

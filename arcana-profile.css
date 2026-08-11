@@ -353,6 +353,9 @@
 ============================================================ */
 .pf-back { display: inline-block; margin: 0 0 clamp(16px, 3.5vh, 30px); font-family: var(--pf-mono); font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: var(--pf-meta); text-decoration: none; transition: color .18s; }
 .pf-back:hover, .pf-back:focus-visible { color: var(--pf-cream-display); outline: none; }
+/* BR-S307: the same control seated in the sticky masthead — no block margin, so it
+   sits on the wordmark's baseline row instead of pushing the header open. */
+.pf-back--top { margin: 0; }
 
 .pf-vaulthead { text-align: center; }
 .pf-vaulteyebrow { font-family: var(--pf-mono); font-size: 9.5px; letter-spacing: .28em; text-transform: uppercase; color: var(--pf-meta); }
