@@ -440,7 +440,24 @@
             "</button>" +
             '<p class="ac-hope">' + (recipient ? "Each mark, once set, is hope." : "Each mark, once set, is hope.") + '</p>' +
             '<p class="ac-notice" data-ac-notice role="status" aria-live="polite" aria-atomic="true"></p>' +
-            (recipient ? '' : '<a class="ac-giftlink" href="?dev=arcane&gift=compose">Giving this to someone? Send it as a gift &rarr;</a>') +
+            /* ── BR-S336 — THE GIFT IS AN OFFER, NOT A FOOTNOTE. ──────────────────
+               This was 10px uppercase mono in --t-ghost: the exact register as "← back
+               to the menu", which is to say the register the room uses for ITS OWN
+               plumbing. A whole second way to buy — the same price, a different act —
+               was dressed as navigation chrome and sat at the bottom of the column
+               where nobody reads. It is a real door and it now looks like one: the
+               room's display voice, a mark to catch the eye, and the second line that
+               says what a gift here actually is, because "send it as a gift" does not
+               tell you the recipient sits their own reading rather than receiving one
+               you drew for them. That is the surprising part and it was unsaid. */
+            (recipient ? '' :
+              '<a class="ac-giftlink" href="?dev=arcane&gift=compose">' +
+                '<span class="ac-giftlink__mark" aria-hidden="true">&#10022;</span>' +
+                '<span class="ac-giftlink__body">' +
+                  '<span class="ac-giftlink__line">Or <strong>give it</strong> to someone<span class="ac-giftlink__arr" aria-hidden="true">&rarr;</span></span>' +
+                  '<span class="ac-giftlink__sub">They sit their own reading, and keep it. <span class="ac-giftlink__price">$4.99</span></span>' +
+                '</span>' +
+              '</a>') +
             /* BR-S335: the Concord block that stood here is gone — it has moved UP to the
                for-whom row (forwhomHTML). Below the draw button it could only read as an
                upsell at the till; beside the question it answers, it is an alternative.
