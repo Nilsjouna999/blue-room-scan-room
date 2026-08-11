@@ -3207,13 +3207,43 @@ html.is-travel .card .cardfinish { mix-blend-mode: normal; }
    `calc(15px * 1.55 * 4)` beside the font-size it had to agree with, which is two
    numbers that must be edited together and a comment asking someone to remember.
    One token set now: change the size and the box follows. */
+/* A custom property only animates if it is REGISTERED — an unregistered one flips
+   at the halfway point of any transition, which on two gradient stops is a visible
+   snap rather than a fade. Registered as <color>, the pair-hover ramps. */
+@property --grade-a { syntax: "<color>"; inherits: false; initial-value: #d8cdb4; }
+@property --grade-b { syntax: "<color>"; inherits: false; initial-value: #a9a49a; }
 .m2read { display: grid; gap: 6px; --m2read-size: 17px; --m2read-lh: 1.6; --m2read-lines: 4; }
 /* the static half of the frame: a label that never changes, over words that always do */
+/* the grade runs down the whole block, not just the sentence: the label is the
+   faintest thing, the meta takes the gold, the meaning cools out of it */
 .m2read__label { font-family: var(--font-mono); font-size: 9.5px; letter-spacing: .22em; text-transform: uppercase; color: var(--t-ghost); margin: 0 0 2px; }
-.m2read__meta { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: .2em; text-transform: uppercase; color: var(--t-meta); margin: 0; }
+.m2read__meta {
+  font-family: var(--font-mono); font-size: 10.5px; letter-spacing: .2em; text-transform: uppercase;
+  color: #b39a68; margin: 0; transition: color 220ms var(--ease-settle);
+}
+/* ── BR-S343 — THE READ IS COLOUR-GRADED. ────────────────────────────────────
+   Builder's note. The block was three flat greys and it read as a spec sheet — a
+   list of perks beside a card, which is exactly what a storefront must not look
+   like. Graded, it reads as one lit object: warm at the top where the eye lands,
+   cooling into the body as the sentence runs out.
+   The tint is the card's own gold, not a new hue — #c8ad70 already lives on this
+   panel (the cutline, the placard mark, the hero's edge), so this ties the words
+   to the thing they describe rather than introducing a colour.
+   COLOUR IS A GRADIENT ON THE TEXT ITSELF (background-clip), which means `color`
+   can no longer carry the hover. The stops are variables and the pair-hover moves
+   THOSE — otherwise BR-S324's "card and its words light together" would silently
+   stop working, since setting `color` on transparent text does nothing at all.
+   The plain `color` above the gradient is a real fallback: anywhere
+   background-clip:text is unsupported the sentence is still ink, never invisible. */
 .m2read__mean {
   font-family: var(--font-display); font-size: var(--m2read-size); line-height: var(--m2read-lh);
   color: var(--t-body); margin: 0;
+  --grade-a: #d8cdb4;                 /* warm cream, where the eye lands */
+  --grade-b: #a9a49a;                 /* the body grey it settles into */
+  background-image: linear-gradient(175deg, var(--grade-a) 0%, var(--grade-a) 22%, var(--grade-b) 88%);
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent;
+  transition: --grade-a 220ms var(--ease-settle), --grade-b 220ms var(--ease-settle);
   display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 4; overflow: hidden;
   /* FIXED at four lines, not merely capped at four. A clamp alone still lets the box
      shrink for a terse card, so the column jumped on every pull — the exact instability
@@ -3315,10 +3345,14 @@ html.is-travel .card .cardfinish { mix-blend-mode: normal; }
   filter: brightness(1.035);
   box-shadow: inset 0 0 0 1px rgba(200, 173, 112, 0.30), 0 22px 46px rgba(0, 0, 0, 0.62), 0 0 26px rgba(200, 173, 112, 0.07);
 }
+/* BR-S343: the meaning is gradient-filled now, so `color` cannot carry this — the
+   text-fill is transparent and a colour step would do nothing at all. The pair-hover
+   moves the GRADE instead: both stops step up, which is the same gesture (the words
+   light with the card) expressed in the property that is actually painting them. */
 .menu__draw:has(.menu__draw-stage:hover) .m2read__mean,
-.menu__draw:has(.m2read:hover) .m2read__mean { color: var(--t-primary); }
+.menu__draw:has(.m2read:hover) .m2read__mean { --grade-a: #ece4d2; --grade-b: #bdb8ad; }
 .menu__draw:has(.menu__draw-stage:hover) .m2read__meta,
-.menu__draw:has(.m2read:hover) .m2read__meta { color: var(--t-body); }
+.menu__draw:has(.m2read:hover) .m2read__meta { color: #c8ad70; }
 @media (prefers-reduced-motion: reduce) {
   .m2hero, .m2read__mean { transition: none; }
 }
@@ -3469,6 +3503,38 @@ html.m2-parch .m2face {
    the card goes edge-on, the faces are swapped there, and it comes back. One
    composited property, no stacking-context surprises, no half-mirrored state.
 ============================================================ */
+/* ── BR-S343 — THE LEAN, ON THIS CARD TOO. ───────────────────────────────────
+   The same chain M1's card carries (BR-S279), with perspective() INSIDE the
+   transform for the same reason: a `perspective` property would make this a
+   containing block. The transition is the return journey only — while .is-tilting
+   is on, the pointer drives it and a transition would just add lag to the hand.
+   Longer than the desk card's 320ms, because this one is meant to settle rather
+   than snap back.
+   The flip's own animation overrides this transform while it runs, which is
+   correct: you cannot be leaning a card that is turning over. */
+.m2hero {
+  transform: perspective(1200px) rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg));
+  transition: transform 420ms var(--ease-settle, cubic-bezier(.2, .7, .2, 1)),
+              filter 220ms var(--ease-settle), box-shadow 220ms var(--ease-settle);
+}
+.m2hero.is-tilting { transition: none; }
+/* the engraved light, at half the desk card's strength — "ever slight". Two lobes,
+   the dark one just below the bright one, because a lit edge with its own shadow
+   under it is what reads as a channel cut into the stock rather than a lamp shining
+   on it (BR-S283). soft-light modulates the material instead of adding gloss. */
+.m2hero::before {
+  content: ""; position: absolute; inset: 0; z-index: 5; pointer-events: none;
+  border-radius: inherit; opacity: 0; mix-blend-mode: soft-light;
+  transition: opacity 260ms var(--ease-settle);
+  background:
+    radial-gradient(120px 120px at var(--lx, 50%) calc(var(--ly, 50%) + 3%), rgba(0, 0, 0, .075), transparent 70%),
+    radial-gradient(120px 120px at var(--lx, 50%) var(--ly, 50%), rgba(255, 255, 255, .055), transparent 70%);
+}
+.m2hero.is-tilting::before { opacity: 1; }
+@media (prefers-reduced-motion: reduce) {
+  .m2hero { transform: none; transition: none; }
+  .m2hero::before { display: none; }
+}
 .m2hero.is-turning { animation: m2-flip 480ms cubic-bezier(.42, 0, .58, 1) both; }
 @keyframes m2-flip {
   0%   { transform: perspective(1100px) rotateY(0deg); }
@@ -3522,7 +3588,9 @@ html.m2-parch .m2hero { --bf-ink: #1c150d; --bf-meta: #6a5c45; --bf-rule: rgba(2
 .m2flip__opt.is-on { color: var(--t-display); background: rgba(233, 229, 220, .06); }
 .m2flip__opt:focus-visible { outline: 1px solid rgba(233, 229, 220, .38); outline-offset: 2px; }
 /* the birth act takes the same seat as "Pull another" so the column never resizes */
-.menu__draw-pull--birth { display: inline-flex; align-items: center; justify-content: center; text-decoration: none; }
+/* BR-S343: `.menu__draw-pull--birth` is deleted with the "Set your marks" link it
+   dressed. The birth face has no act under it — the card demonstrates, the door in
+   the left column sells. */
 /* both acts state their own hidden. `display:inline-flex` above beats the UA's
    [hidden] rule, and the button is now served hidden too — one of these two is always
    the wrong one to show, and neither may win by accident. */

@@ -1717,10 +1717,12 @@ function renderWall() {
        the opening face. It also keeps `disabled` — the deck is fetched lazily, so it must
        not become clickable merely by being unhidden before codex-data.json has landed. */
     + '<button type="button" class="menu__draw-pull" data-m2-pull disabled hidden>Pull another</button>'
-    /* The birth side's equivalent act. "Pull another" is meaningless on a face that is
-       not dealt from a deck, so the two swap places with the flip — one act visible at
-       a time, in the same seat, so the column never changes height. */
-    + '<a class="menu__draw-pull menu__draw-pull--birth" href="?dev=arcane" data-m2-birthgo>Set your marks</a>'
+    /* BR-S343: the birth side has NO act under the card. "Set your marks" stood here
+       for one commit and was a third road to a room the left column already opens with
+       a full door — and under a card that is explicitly a sample, a call to action
+       reads as though the sample itself is the product. The card demonstrates; the
+       door sells. Only the tarot side keeps a control, because "Pull another" changes
+       the card you are looking at rather than sending you somewhere. */
     + '<a class="menu__draw-placard" href="codex.html?v=237" data-codex-open><span class="menu__draw-placard-mark" aria-hidden="true">✦</span>The Codex — where every mark is defined &rarr;</a>'
     + '</section>'
     + '<span class="menu__draw-wm" aria-hidden="true"><svg viewBox="0 0 120 190" preserveAspectRatio="xMidYMid meet"><g stroke="url(#mwInk)" fill="none"><circle cx="60" cy="98" r="31" stroke-width=".8"/><circle cx="60" cy="98" r="23" stroke-width=".6"/><path d="M60 69 L64.6 86.9 L80.5 77.5 L71.1 93.4 L89 98 L71.1 102.6 L80.5 118.5 L64.6 109.1 L60 127 L55.4 109.1 L39.5 118.5 L48.9 102.6 L31 98 L48.9 93.4 L39.5 77.5 L55.4 86.9 Z" stroke-width=".9"/></g></svg></span>'
@@ -1855,9 +1857,7 @@ function m2SetFace(host, which, opts) {
   const settle = function () {
     hero.setAttribute("data-face", which);
     const pull = root.querySelector("[data-m2-pull]");
-    const go = root.querySelector("[data-m2-birthgo]");
-    if (pull) pull.hidden = which === "birth";
-    if (go) go.hidden = which !== "birth";
+    if (pull) pull.hidden = which === "birth";   // BR-S343: the birth side has no act of its own
     m2WriteRead(root, which === "birth" ? M2_BIRTH_READ : (M2_LAST || M2_SAMPLE_READ));
     /* the caption and the herosub travel with the face. The caption keeps "Your Pull"
        once a card has actually been drawn — it stopped being a sample at that moment
@@ -5529,8 +5529,23 @@ render();
    ?tilt=0 disables the block.
    ============================================================================ */
 (function () {
-  var MAX_DEG = 1.6;
-  var K_TILT = 0.160, K_LIGHT = 0.105;
+  /* ── BR-S343 — THE SAME FIELD REACHES M2's CARD, TUNED SOFTER. ───────────────
+     The builder: the same micro-hover as M1, "bit more sleeker and smoother, just
+     an ever slight touch". So this is not a second implementation — it is the same
+     handler, the same rAF, the same four writes, with one extra selector and a
+     per-target constant set. A second tilt engine would be two owners of the same
+     frames, which is the failure BR-S303 already had to undo once.
+     SOFTER MEANS TWO THINGS, and they pull in opposite directions: a smaller angle
+     (1.0deg against M1's 1.6) so it is barely there, and a SLOWER follow (K .105
+     against .160) so it trails the hand further and lands longer. Reduce only the
+     angle and it reads as a small version of the same snap; reduce only the follow
+     and it reads as lag. Both, and it reads as heavier glass. */
+  var TUNE = {
+    card:  { deg: 1.6, kt: 0.160, kl: 0.105 },
+    hero:  { deg: 1.0, kt: 0.105, kl: 0.070 }
+  };
+  var MAX_DEG = TUNE.card.deg;
+  var K_TILT = TUNE.card.kt, K_LIGHT = TUNE.card.kl;
   var EPS = 0.0009;
 
   if (/[?&]tilt=0/.test(String(location.search || ""))) return;
@@ -5625,11 +5640,16 @@ render();
     var sel = window.getSelection && window.getSelection();
     if (sel && !sel.isCollapsed) { release(); return; }        // text is selected: leave it alone
     if (document.documentElement.classList.contains("is-travel")) { release(); return; }
-    var t = e.target.closest ? e.target.closest(".menu__panel--desk .card") : null;
+    var t = e.target.closest ? e.target.closest(".menu__panel--desk .card, .m2hero") : null;
     if (!t) { release(); return; }
     if (t !== card) {
       if (card) park();
       card = t; box = null;
+      /* BR-S343: pick the tune from what was actually entered. Set BEFORE the first
+         frame, or the hero would lean at the desk card's angle for one frame — small,
+         and exactly the kind of thing that reads as a flinch on a 1deg effect. */
+      var tune = t.classList.contains("m2hero") ? TUNE.hero : TUNE.card;
+      MAX_DEG = tune.deg; K_TILT = tune.kt; K_LIGHT = tune.kl;
       card.classList.add("is-tilting");
       card.style.willChange = "transform";
     }
