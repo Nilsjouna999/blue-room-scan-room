@@ -2326,10 +2326,23 @@ var glR=0, glT=0, glTo=null, glEnd=null, glFin=null;
    curve work can buy back, and it is exactly what this page gave up.
    The rejection note above is still half right: native has no duration dial and
    its tail is the browser's, not ours.  Which of the two costs more is a FEEL
-   question, so it gets a switch instead of an argument - the house rule from the
+   question, so it got a switch instead of an argument - the house rule from the
    M1 rank reversal: build the A/B, then look.  ?glide=native rides the compositor,
-   the bare URL keeps the owned ride.  Nothing is taken away; delete these two
-   blocks and the page is byte-identical to before. */
+   the bare URL keeps the owned ride.
+
+   ** THE A/B RAN.  THE OWNED RIDE WON. **  (builder, 2026-08-09, comparing the two
+   URLs live: "it was smoother, the link I sent" - the bare one.)  So compositor
+   execution, real as it is, did NOT beat this page's own curve here, and the
+   original rejection of native smooth-scroll stands vindicated on feel rather than
+   on argument.  The switch STAYS as a door, the way ?snap=on stayed after snap
+   lost - a rejected alternative that is one query away costs 650 bytes and saves
+   the next session from re-litigating it from scratch.  DO NOT re-propose swapping
+   the default to native without a new measurement AND a new look.
+
+   Caveat recorded honestly: a #hash deep link ARRIVES with behavior:'auto', so a
+   judgement made on page load alone would not have exercised the glide at all.
+   The verdict above is taken at face value; if it is ever revisited, compare by
+   STEPPING (Down/Down/Up), not by loading. */
 var NATIVEGLIDE=/[?&]glide=native/.test(String(location.search||''));
 function docY(){ return W.pageYOffset||R.scrollTop||0; }
 function glideStop(){
