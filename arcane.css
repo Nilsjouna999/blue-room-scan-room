@@ -52,6 +52,65 @@
 .ac-mark__field::placeholder { color: var(--t-ghost); font-style: italic; opacity: 0.72; }
 .ac-mark__field:focus { border-color: var(--line-strong); color: var(--t-display); }
 
+/* ── BR-S334 — THE READY ANSWERS (date and hour). ───────────────────────────
+   These are selects, and a select is the one control a browser will happily
+   render as a grey pill from 1996 in the middle of a drafting sheet. So the
+   chrome is taken off (`appearance:none`) and the field's own inscribed-line
+   look is put back on: same border-bottom, same display serif at 19px, same
+   focus behaviour — the slots read as the same object as the text marks, just
+   with the answers already laid out. The chevron is a background gradient
+   rather than a glyph so nothing has to be positioned against the text. */
+.ac-slots { display: flex; align-items: flex-end; gap: 10px; }
+.ac-slot {
+  flex: 1 1 0; min-width: 0; box-sizing: border-box;
+  -webkit-appearance: none; -moz-appearance: none; appearance: none;
+  background: transparent; border: none; border-bottom: 1px solid var(--line); border-radius: 0;
+  padding: 7px 18px 7px 2px; color: var(--t-primary);
+  font-family: var(--font-display); font-size: 19px; line-height: 1.2; outline: none; cursor: pointer;
+  background-image: linear-gradient(45deg, transparent 50%, var(--t-ghost) 50%), linear-gradient(135deg, var(--t-ghost) 50%, transparent 50%);
+  background-position: right 7px center, right 2px center;
+  background-size: 5px 5px, 5px 5px;
+  background-repeat: no-repeat;
+  transition: border-color 0.25s ease, color 0.25s ease;
+}
+.ac-slot:focus { border-color: var(--line-strong); color: var(--t-display); }
+/* The placeholder option is the unset state — italic and ghosted, exactly like a
+   text mark's placeholder, so an unanswered slot looks unanswered. `:invalid` is
+   not used: these carry no `required`, and the guard lives in JS where the message
+   can say which mark is missing. */
+.ac-slot:has(option[value=""]:checked) { color: var(--t-ghost); font-style: italic; }
+.ac-slot option { color: var(--t-primary); font-style: normal; background: var(--bg-deep, #14140f); }
+.ac-slot:disabled { opacity: 0.4; cursor: default; }
+/* the day is narrower than the month, and the year narrower than both */
+.ac-slot--d { flex: 0 1 22%; }
+.ac-slot--y { flex: 0 1 30%; }
+.ac-slots--time { justify-content: flex-start; }
+.ac-slots--time .ac-slot { flex: 0 1 84px; }
+.ac-slots__sep { font-family: var(--font-display); font-size: 19px; color: var(--t-ghost); padding-bottom: 7px; }
+
+/* "I don't know the hour" — an ANSWER, not an absence. It sits under the slots in
+   the plain register, the same voice as the gloss beside the label. */
+.ac-unknown { display: inline-flex; align-items: center; gap: 7px; margin-top: 9px; cursor: pointer;
+  font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.04em; color: var(--t-meta); opacity: .8; }
+.ac-unknown:hover { opacity: 1; }
+/* A default checkbox is a bright grey chip from another operating system, and it was
+   the only bought-in object on a hand-drawn sheet. Drawn instead: an empty square that
+   takes a moss tick, matching the crown's accent — the same ink everything else here
+   is set in. The tick is a rotated two-sided border, so there is no glyph to load and
+   nothing to align against a font. */
+.ac-unknown__box {
+  -webkit-appearance: none; -moz-appearance: none; appearance: none;
+  position: relative; flex: 0 0 auto; width: 12px; height: 12px; margin: 0;
+  background: transparent; border: 1px solid var(--line-strong); border-radius: 1px; cursor: pointer;
+  transition: border-color 0.2s ease;
+}
+.ac-unknown__box:hover, .ac-unknown__box:focus-visible { border-color: var(--t-meta); }
+.ac-unknown__box:checked::after {
+  content: ""; position: absolute; left: 3px; top: 0px; width: 4px; height: 8px;
+  border: solid #7e937f; border-width: 0 1.5px 1.5px 0; transform: rotate(42deg);
+}
+[data-mark-group="hour"].is-unknown .ac-slots { opacity: 0.4; }
+
 /* who is it for? — self / a family or friend crown / someone new */
 .ac-forwhom { margin: 0 0 34px; text-align: center; }
 .ac-forwhom__label { display: block; font-family: var(--font-ui); font-size: 10px; font-weight: 500; letter-spacing: 0.22em; text-transform: uppercase; color: var(--t-ghost); margin-bottom: 14px; }

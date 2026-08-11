@@ -209,24 +209,58 @@
      THE INTAKE — "The Setting of Marks"
   --------------------------------------------------------------- */
 
-  /* Parse the free-text "day" mark (birth date) → {y,m,d}. The prompt order is
-     day-month-year, so ambiguous numeric dates read as D M Y. ISO (YYYY-MM-DD)
-     and month names are handled. Returns null if a full date can't be read —
-     the reading then degrades to a name-seeded draw rather than defaulting. */
-  function parseBirth(txt) {
-    txt = String(txt || "").trim();
-    if (!txt) return null;
-    var MO = { jan:1, feb:2, mar:3, apr:4, may:5, jun:6, jul:7, aug:8, sep:9, oct:10, nov:11, dec:12 };
-    function ok(y, m, d) { return (y && m >= 1 && m <= 12 && d >= 1 && d <= 31) ? { y: y, m: m, d: d } : null; }
-    var iso = txt.match(/\b(1[89]\d\d|20\d\d)[-\/.](\d{1,2})[-\/.](\d{1,2})\b/);
-    if (iso) return ok(+iso[1], +iso[2], +iso[3]);
-    var year = null, ym = txt.match(/\b(1[89]\d\d|20\d\d)\b/); if (ym) year = +ym[1];
-    var month = null, mm = txt.toLowerCase().match(/(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)/); if (mm) month = MO[mm[1]];
-    var nums = (txt.match(/\d+/g) || []).map(Number).filter(function (n) { return n !== year; });
-    var day = null;
-    if (month) day = nums.filter(function (n) { return n >= 1 && n <= 31; })[0] || null;
-    else if (nums.length >= 2) { day = nums[0]; month = nums[1]; }   // day-month order
-    return ok(year, month, day);
+  /* ── BR-S334 — THE DAY AND THE HOUR ARE CHOSEN, NOT GUESSED AT. ───────────────
+     The date of birth was a free-text line read by a parser, and when the parser
+     could not read it the intake said nothing and QUIETLY SWAPPED THE PRODUCT: the
+     seed fell back to "draw~name~charcount", so the sun sign, the year animal and
+     the life path — the three things a birth reading IS — were replaced by a draw
+     off the reader's name, and the page they landed on looked exactly the same.
+     "9/4/01" is a different date in two hemispheres and "the ninth of April" was
+     never readable at all. A reader paying $4.99 for a reading of their birth could
+     be handed a reading of nobody, and never be told.
+     So the date is now three ready answers, and the hour is two more plus an
+     explicit "I don't know" — because an unanswered optional field and a field
+     someone deliberately left blank are different facts, and only one of them
+     should be silent. There is no parse left to fail, and no fallback left to hide
+     behind: an incomplete date stops the draw and says so.
+     PLACE STAYS FREE TEXT — a list of towns would not have the reader's town in it. */
+  var MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+  var YEAR_MIN = 1900;
+  function yearMax() { return new Date().getFullYear(); }
+  /* Leap-aware, and deliberately permissive before a year is picked: with no year the
+     length comes off 2000 (a leap year) so 29 February can be chosen in either order —
+     picking the year afterwards is what prunes it. */
+  function daysIn(y, m) { return m ? new Date(y || 2000, m, 0).getDate() : 31; }
+  function pad2(n) { return (n < 10 ? "0" : "") + n; }
+  function optionsHTML(list, placeholder) {
+    var h = '<option value="">' + esc(placeholder) + "</option>";
+    for (var i = 0; i < list.length; i++) h += '<option value="' + esc(list[i][0]) + '">' + esc(list[i][1]) + "</option>";
+    return h;
+  }
+  function slotHTML(slot, aria, placeholder, list, cls) {
+    return '<select class="ac-slot' + (cls ? " " + cls : "") + '" data-slot="' + slot + '" aria-label="' + esc(aria) + '">' +
+      optionsHTML(list, placeholder) + "</select>";
+  }
+  function rangeList(a, b, fmt) {
+    var out = [], step = a <= b ? 1 : -1;
+    for (var i = a; step > 0 ? i <= b : i >= b; i += step) out.push([i, fmt ? fmt(i) : String(i)]);
+    return out;
+  }
+  function dateSlotsHTML(d) {
+    return '<div class="ac-slots" role="group" aria-label="' + esc(d.label + " — " + d.plain) + '">' +
+      slotHTML("d", "Day of birth", "Day", rangeList(1, 31), "ac-slot--d") +
+      slotHTML("m", "Month of birth", "Month", MONTHS.map(function (n, i) { return [i + 1, n]; }), "ac-slot--m") +
+      slotHTML("y", "Year of birth", "Year", rangeList(yearMax(), YEAR_MIN), "ac-slot--y") +
+      "</div>";
+  }
+  function timeSlotsHTML(d) {
+    return '<div class="ac-slots ac-slots--time" role="group" aria-label="' + esc(d.label + " — " + d.plain) + '">' +
+      slotHTML("hh", "Hour of birth", "Hour", rangeList(0, 23, pad2), "ac-slot--hh") +
+      '<span class="ac-slots__sep" aria-hidden="true">:</span>' +
+      slotHTML("mi", "Minute of birth", "Minute", rangeList(0, 59, pad2), "ac-slot--mi") +
+      "</div>" +
+      '<label class="ac-unknown"><input type="checkbox" class="ac-unknown__box" data-slot="unknown">' +
+      "<span>I don&rsquo;t know the hour</span></label>";
   }
 
   /* ── BR-S330 — EVERY FIELD SAYS PLAINLY WHAT IT WANTS. ────────────────────────
@@ -243,8 +277,8 @@
      breath, because "the hour, if it is known" was carrying that too, in a placeholder. */
   var DEFS = [
     { key: "name",   label: "The name borne",            plain: "your name",              ph: "the name you answer to" },
-    { key: "day",    label: "The day first counted",     plain: "date of birth",          ph: "the day, the month, the year" },
-    { key: "hour",   label: "The hour first struck",     plain: "time of birth — optional", ph: "the hour, if it is known" },
+    { key: "day",    label: "The day first counted",     plain: "date of birth",          kind: "date" },
+    { key: "hour",   label: "The hour first struck",     plain: "time of birth — optional", kind: "time" },
     { key: "ground", label: "The ground first stood on", plain: "place of birth",         ph: "the town, and the land" },
     { key: "matter", label: "What is brought",           plain: "your question — optional", ph: "the matter you carry, in a line — or leave it unspoken" },
   ];
@@ -325,10 +359,18 @@
          into the aria-label too, because the accessible name was the evocative phrase
          alone and a screen-reader user was being told "The ground first stood on, edit
          text" with no way to know that meant their birthplace. */
-      return '<label class="ac-mark">' +
-        '<span class="ac-mark__label">' + esc(d.label) +
-          (d.plain ? '<span class="ac-mark__plain">' + esc(d.plain) + '</span>' : '') +
-        "</span>" +
+      var head = '<span class="ac-mark__label">' + esc(d.label) +
+        (d.plain ? '<span class="ac-mark__plain">' + esc(d.plain) + '</span>' : '') + "</span>";
+      /* BR-S334: the two slotted marks are a <div role="group">, not a <label> — a label
+         may name exactly one control, and these name three. Each select carries its own
+         aria-label so the group reads "date of birth: Day, Month, Year". They keep the
+         .ac-mark class and their position in DEFS order, which is what the desk's
+         nth-child layout and the crown's five gems are both counting on. */
+      if (d.kind === "date" || d.kind === "time") {
+        return '<div class="ac-mark ac-mark--slots" data-mark-group="' + d.key + '">' + head +
+          (d.kind === "date" ? dateSlotsHTML(d) : timeSlotsHTML(d)) + "</div>";
+      }
+      return '<label class="ac-mark">' + head +
         '<input class="ac-mark__field" type="text" data-mark="' + d.key + '" autocomplete="off" spellcheck="false" placeholder="' + esc(d.ph) + '" aria-label="' + esc(d.label) + (d.plain ? " — " + esc(d.plain) : "") + '">' +
         "</label>";
     }).join("");
@@ -1022,15 +1064,85 @@
       if (drawLabel) drawLabel.textContent = "Draw the richer reading";
     }
 
-    function totalChars() { var c = 0; inputs.forEach(function (i) { c += (i.value || "").length; }); return c; }
+    /* ── BR-S334 — THE MARKS ARE READ BY KEY NOW, NOT BY INPUT INDEX. ────────────
+       Everything downstream used to walk the five .ac-mark__field inputs and trust
+       that position N was DEFS[N]. Two of those five are no longer a text input, so
+       the walk is replaced by a per-key read. The crown still gets five booleans in
+       DEFS order and the stroke budget still counts characters — a chosen date just
+       contributes the characters of the date it spells. */
+    function slotOf(key, s) {
+      var g = root.querySelector('[data-mark-group="' + key + '"]');
+      return g ? g.querySelector('[data-slot="' + s + '"]') : null;
+    }
+    var selD = slotOf("day", "d"), selM = slotOf("day", "m"), selY = slotOf("day", "y");
+    var selH = slotOf("hour", "hh"), selMi = slotOf("hour", "mi"), selUnk = slotOf("hour", "unknown");
+    var slots = [selD, selM, selY, selH, selMi, selUnk].filter(Boolean);
+
+    /* The whole point of the change: this returns a date or nothing, and nothing is
+       never quietly substituted for. A day left standing past a month change (31 April)
+       is impossible by construction — syncDayOptions prunes the list — but the bound is
+       re-tested here anyway, because the guard that matters should not depend on the
+       guard that is only cosmetic. */
+    function birthValue() {
+      var d = +((selD && selD.value) || 0), m = +((selM && selM.value) || 0), y = +((selY && selY.value) || 0);
+      if (!d || !m || !y || d > daysIn(y, m)) return null;
+      return { y: y, m: m, d: d };
+    }
+    // null = not answered · "unknown" = answered "I don't know" · "HH:MM" = a time.
+    function timeValue() {
+      if (selUnk && selUnk.checked) return "unknown";
+      var h = selH && selH.value, mi = selMi && selMi.value;   // "0" is a real hour — test emptiness, never truthiness
+      if (h == null || mi == null || h === "" || mi === "") return null;
+      return pad2(+h) + ":" + pad2(+mi);
+    }
+    function fieldVal(key) {
+      var el = root.querySelector('.ac-mark__field[data-mark="' + key + '"]');
+      return el ? (el.value || "") : "";
+    }
+    function markText(key) {
+      if (key === "day") { var b = birthValue(); return b ? b.d + " " + MONTHS[b.m - 1] + " " + b.y : ""; }
+      if (key === "hour") { var t = timeValue(); return t && t !== "unknown" ? t : ""; }
+      return fieldVal(key);
+    }
+    // A gem lights when its mark is ANSWERED — and "I don't know the hour" is an answer.
+    function markSet(key) {
+      if (key === "day") return !!birthValue();
+      if (key === "hour") return timeValue() != null;
+      return markText(key).trim().length > 0;
+    }
+    /* Re-length the day list from the chosen month and year. A day that no longer exists
+       is dropped rather than clamped: silently moving someone's 31st to the 30th is the
+       same class of lie this whole change exists to remove. */
+    function syncDayOptions() {
+      if (!selD) return;
+      var max = daysIn(+(selY && selY.value || 0), +(selM && selM.value || 0));
+      if (selD.options.length - 1 === max) return;
+      var cur = +(selD.value || 0), h = '<option value="">Day</option>';
+      for (var i = 1; i <= max; i++) h += '<option value="' + i + '">' + i + "</option>";
+      selD.innerHTML = h;
+      selD.value = cur && cur <= max ? String(cur) : "";
+    }
+    function syncUnknown() {
+      var off = !!(selUnk && selUnk.checked);
+      [selH, selMi].forEach(function (s) { if (!s) return; s.disabled = off; if (off) s.value = ""; });
+      var g = root.querySelector('[data-mark-group="hour"]');
+      if (g) g.classList.toggle("is-unknown", off);
+    }
+
+    function totalChars() {
+      var c = 0;
+      DEFS.forEach(function (d) { c += markText(d.key).length; });
+      return c;
+    }
     function progress() { return Math.min(1, totalChars() / Math.max(8, COMPLETION_CHARS)); }
     /* BR-S332: the crown now answers twice — the strokes still draw from aggregate
        progress, and each of the five pearls lights the moment ITS OWN field has
        something in it. Idempotent inside setMark, so this stays cheap on every
        keystroke: five booleans compared, at most one style write. */
     function refresh() {
+      syncDayOptions();
       crown.draw(progress());
-      if (crown.setMark) inputs.forEach(function (inp, i) { crown.setMark(i, (inp.value || "").trim().length > 0); });
+      if (crown.setMark) DEFS.forEach(function (d, i) { crown.setMark(i, markSet(d.key)); });
     }
 
     function exitCeremony() {
@@ -1047,18 +1159,23 @@
         noticeT = setTimeout(function () { notice.textContent = ""; }, 3400);
         return;
       }
+      /* ── BR-S334 — THE DRAW STOPS RATHER THAN SUBSTITUTES. ────────────────────
+         This used to read `b ? birth~… : draw~name~charcount`, and that second branch
+         was the bug: with no readable date the product silently became a different
+         product. There is no second branch now. An incomplete date is refused out
+         loud, at the field that is missing, before anything is drawn. */
+      var b = birthValue();
+      if (!b) {
+        var missing = (selD && !selD.value) ? selD : (selM && !selM.value) ? selM : selY;
+        flashNotice("THE DATE OF BIRTH IS NOT SET. THE READING IS DRAWN FROM IT.");
+        if (missing) missing.focus();
+        return;
+      }
       notice.textContent = "";
-      var nameVal = "", dayVal = "";
-      inputs.forEach(function (i) {
-        if (i.dataset.mark === "name") nameVal = i.value;
-        if (i.dataset.mark === "day") dayVal = i.value;
-      });
-      // Build the reading's seed FROM THE MARKS: a real birth date derives the
-      // reading (sun sign / year animal / life path); otherwise a name-seeded draw
-      // so a reading still lands. The reading (arcana-reading.js) reads ?seed=.
-      var nm = (nameVal || "Seeker").replace(/~/g, " ").trim() || "Seeker";
-      var b = parseBirth(dayVal);
-      var seed = b ? ("birth~" + nm + "~" + b.y + "~" + b.m + "~" + b.d) : ("draw~" + nm + "~" + totalChars());
+      // The reading's seed comes FROM THE MARKS — the date derives the sun sign, the
+      // year animal and the life path. The reading (arcana-reading.js) reads ?seed=.
+      var nm = (fieldVal("name") || "Seeker").replace(/~/g, " ").trim() || "Seeker";
+      var seed = "birth~" + nm + "~" + b.y + "~" + b.m + "~" + b.d;
       var enterReading = function () {
         try { localStorage.setItem("br_has_reading", "1"); } catch (e) {}   // unlocks Family/Friend next time
         location.href = "?dev=arcana-reading&seed=" + encodeURIComponent(seed);
@@ -1085,6 +1202,10 @@
     }
 
     inputs.forEach(function (i) { i.addEventListener("input", refresh); });
+    slots.forEach(function (s) {
+      s.addEventListener("change", function () { if (s === selUnk) syncUnknown(); refresh(); });
+    });
+    syncUnknown();
     root.addEventListener("keydown", function (e) {
       if (e.key === "Enter" && e.target && e.target.classList && e.target.classList.contains("ac-mark__field")) {
         e.preventDefault(); startCeremony();
