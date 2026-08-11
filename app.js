@@ -2020,6 +2020,7 @@ function wireMiniCodex(host) {
   let panelOpen = false, away = false;
   let ox = 0, oy = 0;                                   // current dropped offset from home
   let dragging = false, moved = false, sx = 0, sy = 0, bx = 0, by = 0, pid = null, homeT = null, qt = null;
+  let rbPx = 0, rbSx = 0, rbPy = 0, rbSy = 0;      // live drag excursion past a bound (raw px)
 
   function setOffset(x, y) { ox = x; oy = y; mini.style.setProperty("--mx", x + "px"); mini.style.setProperty("--my", y + "px"); }
 
@@ -2030,15 +2031,23 @@ function wireMiniCodex(host) {
      transform straight onto the node, coalesced to ONE write per frame (a high-rate mouse
      fires pointermove several times per frame; only the last position matters).
      On release we hand the position back to --mx/--my so `.is-homing` can transition it. */
-  let rafId = null, pendX = 0, pendY = 0, pending = false;
-  function dragTo(x, y) {
-    ox = x; oy = y; pendX = x; pendY = y; pending = true;
+  let rafId = null, pendX = 0, pendY = 0, pendRx = 0, pendRy = 0, pending = false;
+  /* BR-S305 — TRUTH AND PAINT ARE SEPARATE NOW. ox/oy remain the CLAMPED position: they are
+     what nearSealAt, measureBounds and land() all read, and poisoning them with a boundary
+     excursion would corrupt the seal test, the bounds and the handoff at once. The give is
+     an additive paint offset that nothing else can see. */
+  let pressFx = 0, pressFy = 0;                          // the live painted excursion, for measureBounds
+  function dragTo(x, y, rx, ry) {
+    ox = x; oy = y; pendX = x; pendY = y;
+    pendRx = rx || 0; pendRy = ry || 0;
+    pressFx = pendRx; pressFy = pendRy;
+    pending = true;
     if (rafId) return;
     rafId = requestAnimationFrame(function () {
       rafId = null;
       if (!pending) return;
       pending = false;
-      mini.style.transform = "translate3d(" + pendX + "px," + pendY + "px,0)";
+      mini.style.transform = "translate3d(" + (pendX + pendRx) + "px," + (pendY + pendRy) + "px,0)";
     });
   }
   /* THE HANDOFF. Both the placement path and the end of a carry come through here, and the
@@ -2170,7 +2179,10 @@ function wireMiniCodex(host) {
 
   function measureBounds() {
     const r = ball.getBoundingClientRect();
-    const homeL = r.left - ox, homeTop = r.top - oy;    // where it sits at offset 0
+    /* BR-S305 — subtract the LIVE PRESS. During a press the painted rect sits at ox+pressFx
+       while ox is unchanged, so measuring here (a resize mid-press does exactly that) would
+       shift every bound by up to 11px for the rest of the session. */
+    const homeL = r.left - ox - pressFx, homeTop = r.top - oy - pressFy;   // where it sits at offset 0
     minX = EDGE - homeL;  maxX = window.innerWidth  - EDGE - r.width  - homeL;
     minY = EDGE - homeTop; maxY = window.innerHeight - EDGE - r.height - homeTop;
   }
@@ -2218,38 +2230,43 @@ function wireMiniCodex(host) {
     const dist = sp * D * K;
     return dist < 1 ? null : { ux: vx / sp, uy: vy / sp, sp: sp, D: D, dist: dist };
   }
-  /* THE PRESS AND THE RETURN.  A critically damped spring, so it comes back once and stops:
-     x(t) = A(1 + wt)e^(-wt), which is zero-velocity at both ends and never crosses the bound
-     it is returning to. w is fixed at 26/s -> visually done by ~170ms, quick enough that it
-     reads as contact rather than as a second animation. Amplitude scales with the momentum
-     the wall actually absorbed, so a hard throw presses in and a gentle one barely marks it.
-     ?edge=hard restores the old dead clamp for comparison. */
-  const EDGE_MAX = 11, EDGE_W = 26;
+  /* BR-S305 — THE BOUNDARY, REBUILT FROM SHIPPED SYSTEMS.
+     BR-S302's press was invented, and a 13-agent study found it was also INERT for most real
+     wall hits: startCoast exited on (pinX && pinY), so a throw with any off-axis component ran
+     to u=1, where rem = sp*(1-1^3) is exactly 0 -- no press at all. It fired only within ~0.57
+     degrees of an axis. Most wall contacts were still the old dead clamp.
+
+     WHAT WAS TAKEN, AND FROM WHERE:
+     - iOS/UIKit: the saturating give f(p) = (c*d*p)/(c*p + d), applied as a stateless
+       coordinate map while the finger is down. Gain drops 1.0 -> 0.55 exactly at the bound, so
+       the wall is FELT during the drag, not only after a throw. c = 0.55 is REVERSE-ENGINEERED
+       from a single 2012 tweet by @chpwn -- Apple has never published it. Do not imply they did.
+     - AppKit / WebKit ScrollElasticityController: a boundary return is critically damped,
+       zeta = 1, never bouncy -- and a minimum elapsed time before the rest test.
+     - Android 12 EdgeEffect: independent corroboration that impact injects VELOCITY, not
+       amplitude -- onAbsorb sets mVelocity and never touches mDistance, so the deformation
+       rises from zero. Two teams, opposite media, same architecture. (Its stretch itself gave
+       nothing: 3.2% on a 30px orb is 0.96px, invisible.)
+     - Box2D/Rapier: no formula, one ruling -- Erin Catto's own drag handler couples the
+       pointer softly against hard walls, so the elasticity belongs in the POINTER COUPLING and
+       clampX/clampY stay hard. That is why the give lives in onMove and not in the clamp.
+     - Framer Motion: nothing. Its position handoff is frame-rate dependent (a 2000px/s hit
+       starts ~33px out at 60Hz and ~17px at 120Hz) and its during-drag give is flat linear.
+
+     d = 11px is OURS, not Apple's: EDGE is 12, so a displayed excursion below 11 can never
+     take the orb off-screen. Apple's d is a viewport dimension and does not transfer.
+     w = 26/s is OURS and unverified -- AppKit's boundary return is 12.5/s, SwiftUI's
+     interactiveSpring 41.9/s, and a 30px orb sits defensibly between them. The cleaner algebra
+     must not launder 26 into a published number. */
+  const GIVE   = 11;      // px  — the displayed asymptote. Unreachable, so no cap is needed.
+  const RB_C   = 0.55;    //      — iOS rubber-band coefficient. REVERSE-ENGINEERED, not published.
+  const EDGE_W = 26;      // s^-1 — critically damped. OURS.
   const EDGE_HARD = /[?&]edge=hard/.test(String(location.search || ""));
-  function edgeCatch(sx, sy, rem, settle) {
-    /* SATURATING, not linear-then-clipped. `min(11, rem*0.045)` measured as a feature that
-       barely existed: it reached the 11px cap at 244px/s, so every throw above a nudge
-       pressed exactly the same amount and the stated "a hard throw presses in, a gentle one
-       barely marks it" was false for the whole real speed range. An exponential approach to
-       the cap spends the range properly — 150px/s -> 1.1px, 900 -> 5.2px, 2600 -> 9.3px,
-       6000 -> 10.8px — so the wall records how hard it was actually hit. */
-    const A = EDGE_MAX * (1 - Math.exp(-rem / 1400));
-    if (EDGE_HARD || A < 0.6 || (!sx && !sy)) { land(); settle(); return; }
-    const bx = ox, by = oy, t0 = now();
-    (function press() {
-      const t = (now() - t0) / 1000;
-      const e = Math.exp(-EDGE_W * t);
-      const d = A * (1 + EDGE_W * t) * e;                // A at t=0, 0 at rest, no crossing
-      if (t > 0.34 || d < 0.25) {
-        coastRaf = null;
-        ox = bx; oy = by;
-        mini.style.transform = "translate3d(" + bx + "px," + by + "px,0)";
-        land(); settle(); return;
-      }
-      mini.style.transform = "translate3d(" + (bx + sx * d) + "px," + (by + sy * d) + "px,0)";
-      coastRaf = requestAnimationFrame(press);
-    })();
-  }
+  function band(p) { return p <= 0 ? 0 : (RB_C * GIVE * p) / (RB_C * p + GIVE); }
+  /* p(t) = (p0 + (v0 + w*p0)t) e^(-wt): critically damped, p(0)=p0, p'(0)=v0, monotone home,
+     never crosses the bound. Impact is p0=0 with v0=the contact speed; release-from-stretch is
+     v0=0 with p0=the live excursion -- which reduces to BR-S302's formula, correctly placed. */
+  function springP(p0, v0, t) { return (p0 + (v0 + EDGE_W * p0) * t) * Math.exp(-EDGE_W * t); }
 
   function stopCoast() { if (coastRaf) { cancelAnimationFrame(coastRaf); coastRaf = null; } }
 
@@ -2257,32 +2274,60 @@ function wireMiniCodex(host) {
     const pl = carryPlan(vx, vy);
     if (!pl) { land(); settle(); return; }
     const x0 = ox, y0 = oy, t0 = now(), pow = Math.pow;
+    /* BR-S305 — the press is LATCHED AT THE CROSSING and runs CONCURRENTLY with the rest of
+       the flight, per axis. Both changes are load-bearing:
+       - Reading the speed at loop exit was zero on any diagonal (the inert bug) and one frame
+         late on the axis paths. carryPlan shortens D for fast throws, so at 2000px/s up to 32%
+         of v0 is lost inside a single 16.7ms frame -- exactly on the throws that reach walls.
+         A linear back-solve for u at the moment the bound was crossed fixes both.
+       - Running the press alongside the flight means a throw into one wall still coasts along
+         the other axis, which is what actually happens to a thrown object. */
+    let impVx = 0, impT0x = 0, impSx = 0, impVy = 0, impT0y = 0, impSy = 0;
+    let uPrev = 0, xPrev = x0, yPrev = y0;
+    const fireGate = function (v) { return band(v / (EDGE_W * Math.E)) >= 0.4; };
     (function step() {
       let u = (now() - t0) / 1000 / pl.D;
       if (u > 1) u = 1;
       const travelled = pl.sp * pl.D * (u - pow(u, SHAPE + 1) / (SHAPE + 1));
       const px = x0 + pl.ux * travelled, py = y0 + pl.uy * travelled;
       const cx = clampX(px), cy = clampY(py);
-      ox = cx; oy = cy;                                  // the loop's state IS the painted position
-      mini.style.transform = "translate3d(" + cx + "px," + cy + "px,0)";
-      const pinX = (cx !== px) || Math.abs(pl.ux) < 0.01;
-      const pinY = (cy !== py) || Math.abs(pl.uy) < 0.01;
-      if (u >= 1 || (pinX && pinY)) {
+
+      if (!EDGE_HARD && !impVx && cx !== px && Math.abs(pl.ux) > 1e-6) {
+        const W = px > cx ? maxX : minX;
+        const span = px - xPrev;
+        const a = Math.abs(span) > 1e-6 ? (W - xPrev) / span : 0;
+        const uc = uPrev + Math.max(0, Math.min(1, a)) * (u - uPrev);
+        const v = pl.sp * (1 - pow(uc, SHAPE)) * Math.abs(pl.ux);
+        if (fireGate(v)) { impVx = v; impT0x = now(); impSx = Math.sign(px - cx); }
+      }
+      if (!EDGE_HARD && !impVy && cy !== py && Math.abs(pl.uy) > 1e-6) {
+        const W = py > cy ? maxY : minY;
+        const span = py - yPrev;
+        const a = Math.abs(span) > 1e-6 ? (W - yPrev) / span : 0;
+        const uc = uPrev + Math.max(0, Math.min(1, a)) * (u - uPrev);
+        const v = pl.sp * (1 - pow(uc, SHAPE)) * Math.abs(pl.uy);
+        if (fireGate(v)) { impVy = v; impT0y = now(); impSy = Math.sign(py - cy); }
+      }
+      uPrev = u; xPrev = px; yPrev = py;
+
+      ox = cx; oy = cy;                                  // truth stays clamped
+      const tx = impVx ? (now() - impT0x) / 1000 : 0, ty = impVy ? (now() - impT0y) / 1000 : 0;
+      const ex = impVx ? impSx * band(springP(0, impVx, tx)) : 0;
+      const ey = impVy ? impSy * band(springP(0, impVy, ty)) : 0;
+      pressFx = ex; pressFy = ey;
+      mini.style.transform = "translate3d(" + (cx + ex) + "px," + (cy + ey) + "px,0)";
+
+      /* the rest test needs BOTH a displayed quarter-pixel and t > 1/w: under p(0)=0 the
+         excursion is zero on frame one, so a bare threshold would end the press before it
+         started. AppKit guards the same way with a hard minimum elapsed. */
+      const restX = !impVx || ((tx > 1 / EDGE_W && Math.abs(ex) < 0.25) || tx > 0.45);
+      const restY = !impVy || ((ty > 1 / EDGE_W && Math.abs(ey) < 0.25) || ty > 0.45);
+      const flightDone = u >= 1 || ((cx !== px || Math.abs(pl.ux) < 0.01) && (cy !== py || Math.abs(pl.uy) < 0.01));
+      if (flightDone && restX && restY) {
         coastRaf = null;
-        /* BR-S302 — THE EDGE CATCH.  The flight itself is right: v(0)=v0 exactly so it leaves
-           at hand speed, v(D)=0 exactly so the set-down is a real event. The one unphysical
-           moment left was the WALL. A throw that met an edge was clamped dead on the frame it
-           arrived — all remaining momentum deleted, no contact, no consequence. Everything in
-           this room has weight except the instant it actually hits something.
-           So the momentum that the clamp would have thrown away is spent instead: the orb
-           presses PAST the bound by a capped amount proportional to the speed it still had,
-           then returns on a critically damped spring. Not a bounce — a bounce would be rubber,
-           and this is paper and brass. It reads as the wall taking the blow.
-           Capped at 11px against EDGE=12, so the press can never take the orb off-screen. */
-        const rem = pl.sp * (1 - pow(u, SHAPE));         // the speed the clamp was about to delete
-        edgeCatch(cx !== px ? Math.sign(px - cx) : 0,
-                  cy !== py ? Math.sign(py - cy) : 0, rem, settle);
-        return;
+        pressFx = 0; pressFy = 0;
+        mini.style.transform = "translate3d(" + cx + "px," + cy + "px,0)";
+        land(); settle(); return;
       }
       coastRaf = requestAnimationFrame(step);
     })();
@@ -2306,10 +2351,20 @@ function wireMiniCodex(host) {
     const dx = e.clientX - sx, dy = e.clientY - sy;
     if (!moved && Math.hypot(dx, dy) > 5) { moved = true; if (panelOpen) closePanel(); }
     if (!moved) return;
-    const nx = clampX(bx + dx), ny = clampY(by + dy);
+    /* BR-S305 — the wall is felt DURING the drag, not only after a throw. Gain drops from 1.0
+       to 0.55 the instant the bound is crossed and saturates at 11px, so pushing 20px past
+       gives 5.5, 100px gives 9.2, 500px gives 10.6. Stateless, so re-grabbing mid-stretch
+       retraces the identical curve with no hysteresis.
+       pushSample keeps taking the CLAMPED value -- the excursion is invisible to the sampler
+       by design, which is what keeps the release direction honest against a wall. */
+    const rawx = bx + dx, rawy = by + dy;
+    const nx = clampX(rawx), ny = clampY(rawy);
+    const soft = !EDGE_HARD && !reduced();
+    rbPx = Math.abs(rawx - nx); rbSx = Math.sign(rawx - nx);
+    rbPy = Math.abs(rawy - ny); rbSy = Math.sign(rawy - ny);
     lastMoveT = e.timeStamp;
     pushSample(nx, ny, e.timeStamp);
-    dragTo(nx, ny);
+    dragTo(nx, ny, soft ? rbSx * band(rbPx) : 0, soft ? rbSy * band(rbPy) : 0);
   }
   function onUp(e) {
     if (!dragging || (e.pointerId != null && e.pointerId !== pid)) return;
