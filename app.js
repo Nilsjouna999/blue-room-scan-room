@@ -4945,7 +4945,7 @@ render();
   var host = document.getElementById("menuView");
   if (!host || !document.body) return;
 
-  var open = false, sheet = null, btn = null;
+  var open = false, sheet = null, btn = null, detail = -1;
 
   function reduced() {
     return window.BRMotion ? window.BRMotion.prefersReduced()
@@ -5010,6 +5010,7 @@ render();
               + '<span class="orbit__mark" aria-hidden="true">' + (list[0].mark || "") + '</span>'
               + '<span class="orbit__label">' + list[0].label.replace(/[<>&]/g, "") + '</span>'
               + (list[0].sub ? '<span class="orbit__sub">' + list[0].sub.replace(/[<>&]/g, "") + '</span>' : "")
+              + '<span class="orbit__enter">Enter &rarr;</span>'
               + '</button>';
         continue;
       }
@@ -5040,6 +5041,7 @@ render();
             + '<span class="orbit__mark" aria-hidden="true">' + (list[i].mark || "") + '</span>'
             + '<span class="orbit__label">' + list[i].label.replace(/[<>&]/g, "") + "</span>"
             + (list[i].sub ? '<span class="orbit__sub">' + list[i].sub.replace(/[<>&]/g, "") + "</span>" : "")
+            + '<span class="orbit__enter">Enter &rarr;</span>'
             + "</button>";
     }
     html += "</div>";
@@ -5064,6 +5066,7 @@ render();
   function hide() {
     if (!open) return;
     open = false;
+    undisplay();
     if (sheet) sheet.classList.remove("is-open");
     document.documentElement.classList.remove("orbit-open");
     btn.setAttribute("aria-expanded", "false");
@@ -5072,10 +5075,39 @@ render();
   }
 
   function onKey(e) {
-    if (e.key === "Escape") { e.preventDefault(); e.stopPropagation(); hide(); }
+    if (e.key !== "Escape") return;
+    e.preventDefault(); e.stopPropagation();
+    if (detail >= 0) { undisplay(); return; }   // put it down first, close second
+    hide();
+  }
+
+  /* BR-S294 — ON DISPLAY.  From the reference's video: clicking a card does not
+     navigate, it BRINGS THAT CARD UP — it becomes the big box on the sheet — and
+     clicking the paper around it puts it back down. That is a better nav than mine
+     was, because a map you can look at is not the same as a map that fires the moment
+     you touch it: you get to inspect a room before committing to leaving for it.
+     So the plates are a two-step. First press = on display, centred and enlarged, its
+     meaning readable and an Enter appearing under it, the rest of the constellation
+     receding. Second press (or the Enter) = travel. Paper puts it back down; paper
+     again closes the sheet. Escape walks the same ladder in reverse, which is the only
+     way an overlay with two depths stays predictable. */
+  function display(i) {
+    detail = i;
+    sheet.classList.add("is-detail");
+    var ps = sheet.querySelectorAll(".orbit__plate");
+    for (var k = 0; k < ps.length; k++) ps[k].classList.toggle("is-display", k === i);
+    ps[i].focus({ preventScroll: true });
+  }
+  function undisplay() {
+    detail = -1;
+    if (!sheet) return;
+    sheet.classList.remove("is-detail");
+    var ps = sheet.querySelectorAll(".orbit__plate");
+    for (var k = 0; k < ps.length; k++) ps[k].classList.remove("is-display");
   }
 
   function go(i) {
+    if (detail !== i) { display(i); return; }   // first press brings it up; only the second travels
     var r = sheet._list[i];
     if (!r) return;
     hide();                                   // close first: never enter a room through a curtain
@@ -5111,7 +5143,18 @@ render();
   document.addEventListener("click", function (e) {
     var t = e.target.closest ? e.target.closest("[data-orbit-close],[data-orbit-go]") : null;
     if (!t) return;
-    if (t.hasAttribute("data-orbit-close")) { if (downOnScrim) hide(); return; }
+    if (t.hasAttribute("data-orbit-close")) {
+      /* BR-S294 — THE HUB IS NOT DISMISSED BY THE PAPER.  The builder: "normally that
+         place hub shouldn't be accidentally closed so easily."  Right — this is a map,
+         not a toast. Paper puts a displayed plate back DOWN, which is a real and
+         reversible action; at the scatter level it does nothing at all. Closing is
+         deliberate: Escape, or the same ROOMS button that opened it, which is raised
+         above the sheet so it stays reachable and reads as the way back out. One
+         control opens and closes it; nothing else can. */
+      if (!downOnScrim) return;
+      if (detail >= 0) undisplay();
+      return;
+    }
     go(parseInt(t.getAttribute("data-orbit-go"), 10));
   });
 })();
