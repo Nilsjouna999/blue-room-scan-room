@@ -5331,6 +5331,220 @@ render();
     return sheet;
   }
 
+  /* ══ BR-S309 — THE SHEET IS ONE FIELD, NOT SIX BUTTONS. ═══════════════════════
+     Direction, verbatim: museum-paper objects governed by invisible magnetic tension.
+     `cursor → tension → displacement → resistance → settle`, NOT `hover → CSS
+     animation → hover state`. And the architectural half, which is the load-bearing
+     part: no `transition: all` anywhere on this screen — a small shared field instead.
+
+     WHY THE OLD HOVER HAD TO GO. It was `transform 460ms` plus a `:hover` rule that
+     lifted the plate 3px and scaled it 1.03. That is a state machine wearing motion:
+     it takes the same 460ms whether you brush past or settle in, it cannot be
+     interrupted mid-flight without a snap, and it moves the plate as ONE RECTANGLE —
+     the single thing the direction rules out. The field replaces it and the CSS rule
+     stands down (`.orbit.has-field`), so there is never a frame with two owners.
+
+     THE PARTS DO NOT MOVE TOGETHER — that is the whole effect. Each layer is its own
+     spring with its own stiffness, damping and gain, so a plate arrives in pieces:
+       icon      medium   gain 1.00  — follows fairly quickly, one hair of overshoot
+       type      heavy    gain 0.34  — almost stationary, critically damped, never bounces
+       meaning   heavy    gain 0.27
+       ornament  light    gain 1.20  — the prime's engraved ring, last to catch up
+     MEASURED, not asserted (field_check.py, same constants, same fixed step): at 60ms
+     after the cursor arrives the icon has travelled 1.13px, the type 0.24px and the
+     ornament 1.32px. That spread IS the effect — four parts of one plate at four
+     different distances from where they are going.
+     Mass is expressed as k and c, not a mass term. ζ ≈ 0.86–1.00 is exactly the
+     "heavy fine paper and thin brass, at most one tiny overshoot" that was asked for —
+     rubber starts around ζ 0.4 and this never goes near it.
+
+     NEIGHBOURS YIELD. The plate you point at is pulled toward the cursor (≤4px); every
+     other plate is pushed away from it (≤0.9px, falling off with distance). That is
+     what makes it one composition rather than six independent widgets — you are
+     deforming a field, not lighting a button.
+
+     WRITTEN THROUGH `translate` / `scale` / `rotate`, NOT `transform`. Both the plate
+     and the mark already carry transitioned `transform` (the entrance, the spin-in), so
+     writing the field into `transform` would put every spring on a 460ms/300ms rubber
+     band and destroy it. The independent transform properties compose with `transform`
+     and are in nobody's transition list, so they land on the frame they are written.
+     The ornament is a pseudo-element and cannot take an inline style, so it moves by
+     custom property instead — the one place the memory's "two custom properties per
+     layer" design is actually needed.
+
+     ONE LOOP FOR THE WHOLE SHEET, AND IT PARKS ITSELF. `pointermove` stores the cursor
+     and returns. A single rAF integrates every node at a FIXED 1/120s step (variable dt
+     is what makes a spring explode on a slow frame) and stops itself when the pointer is
+     outside and everything is within epsilon of rest. Same self-parking discipline the
+     hub already passes its 20-cycle spam test with.
+
+     IT NEVER RUNS DURING THE SHEET'S OWN MOTION. The entrance and the display step are
+     CSS transitions on these same elements; the field arms 720ms after open (past the
+     last plate's 156ms stagger + 460ms travel), disarms the instant a plate goes on
+     display — "the node goes still" is step one of the click sequence — and re-arms when
+     it is put back down. A token guards every re-arm so a spammed open/close cannot
+     leave a loop running against a sheet that is already gone.
+
+     DESKTOP ONLY, BY MEASUREMENT NOT BY GUESS: `(hover: hover) and (pointer: fine)`. A
+     magnetic field you cannot feel is only a battery cost, and on a phone `.orbit__field`
+     is a scrolling grid whose geometry moves under you. Off under reduced motion, and
+     off if the browser lacks the independent transform properties — in both cases the
+     CSS `:hover` rule keeps its 3px lift, so the map never ends up with no response. */
+  var FIELD = { on: false, tok: 0, raf: 0, nodes: null, px: -1e6, py: -1e6, inside: false, t: 0, acc: 0 };
+  var F_PULL = 4.0;          // px toward the cursor — the top of the 2–5px the direction asks for
+  var F_NUDGE = 0.9;         // px the other way for everyone else — the 0.5–1px displacement
+  var F_FALL = 260;          // px; how fast the neighbour push falls off
+  var F_LIFT = 1.015;        // the 1–2% enlarge, sprung rather than transitioned
+  var F_DT = 1 / 120;
+  /* sel, gain, k, zeta */
+  var F_LAYERS = [
+    [".orbit__mark",  1.00, 190, 0.90],
+    [".orbit__label", 0.34, 105, 1.00],
+    [".orbit__sub",   0.27, 105, 1.00],
+  ];
+  function fieldSupported() {
+    if (reduced()) return false;
+    if (!("translate" in document.documentElement.style)) return false;   // no independent transforms → leave the CSS hover in charge
+    return !!(window.matchMedia && window.matchMedia("(hover: hover) and (pointer: fine)").matches);
+  }
+  function spring(g, k, z) { return { g: g, k: k, c: 2 * z * Math.sqrt(k), x: 0, y: 0, vx: 0, vy: 0 }; }
+  function fieldNodes() {
+    var ps = sheet.querySelectorAll(".orbit__plate"), out = [], i, L;
+    for (i = 0; i < ps.length; i++) {
+      var p = ps[i], layers = [];
+      for (L = 0; L < F_LAYERS.length; L++) {
+        var el = p.querySelector(F_LAYERS[L][0]);
+        if (!el) continue;
+        var s = spring(F_LAYERS[L][1], F_LAYERS[L][2], F_LAYERS[L][3]);
+        s.el = el; layers.push(s);
+      }
+      if (p.classList.contains("orbit__plate--prime")) {                  // the engraved ring is the ornament: lightest, and a pseudo-element
+        /* gain 1.20, not 1.45: at 1.45 it peaked at 5.80px against a stated 2–5px
+           envelope. Lightest still means furthest — 4.8px against the icon's 4.0 — but
+           the ornament is not licensed to leave the envelope just because it is light. */
+        var o = spring(1.20, 140, 0.86); o.el = p; o.prop = true; layers.push(o);
+      }
+      var rot = parseFloat(p.style.getPropertyValue("--orot")) || 0;      // its resting tilt, so hover can straighten it on a spring instead of a 460ms tween
+      out.push({ p: p, layers: layers, rot: rot, s: 1, vs: 0, r: 0, vr: 0, tx: 0, ty: 0, ts: 1, tr: 0, cx: 0, cy: 0, hw: 0, hh: 0 });
+    }
+    return out;
+  }
+  function fieldMeasure(nodes) {
+    for (var i = 0; i < nodes.length; i++) {
+      var r = nodes[i].p.getBoundingClientRect();
+      nodes[i].cx = r.left + r.width / 2; nodes[i].cy = r.top + r.height / 2;
+      nodes[i].hw = r.width / 2; nodes[i].hh = r.height / 2;
+    }
+  }
+  function fieldTargets(nodes) {
+    var hov = -1, i, n;
+    if (FIELD.inside) {
+      for (i = 0; i < nodes.length; i++) {
+        n = nodes[i];
+        if (Math.abs(FIELD.px - n.cx) <= n.hw && Math.abs(FIELD.py - n.cy) <= n.hh) { hov = i; break; }
+      }
+    }
+    for (i = 0; i < nodes.length; i++) {
+      n = nodes[i];
+      if (i === hov) {
+        var dx = FIELD.px - n.cx, dy = FIELD.py - n.cy, d = Math.sqrt(dx * dx + dy * dy) || 1;
+        var mag = Math.min(F_PULL, d * 0.10);                             // never past the cursor: a node at 6px away moves 0.6px, not 4
+        n.tx = dx / d * mag; n.ty = dy / d * mag; n.ts = F_LIFT; n.tr = -n.rot;
+      } else if (hov >= 0) {
+        var hx = n.cx - nodes[hov].cx, hy = n.cy - nodes[hov].cy, hd = Math.sqrt(hx * hx + hy * hy) || 1;
+        var f = F_NUDGE / (1 + hd / F_FALL);
+        n.tx = hx / hd * f; n.ty = hy / hd * f; n.ts = 1; n.tr = 0;
+      } else { n.tx = 0; n.ty = 0; n.ts = 1; n.tr = 0; }
+    }
+  }
+  function fieldIntegrate(nodes, dt) {
+    var moving = false, i, L;
+    for (i = 0; i < nodes.length; i++) {
+      var n = nodes[i];
+      for (L = 0; L < n.layers.length; L++) {
+        var a = n.layers[L], gx = n.tx * a.g, gy = n.ty * a.g;
+        a.vx += (-a.k * (a.x - gx) - a.c * a.vx) * dt;                    // F = −k·x − c·v, semi-implicit: velocity first, then position
+        a.vy += (-a.k * (a.y - gy) - a.c * a.vy) * dt;
+        a.x += a.vx * dt; a.y += a.vy * dt;
+        if (Math.abs(a.x - gx) > 0.02 || Math.abs(a.y - gy) > 0.02 || Math.abs(a.vx) > 0.06 || Math.abs(a.vy) > 0.06) moving = true;
+      }
+      n.vs += (-150 * (n.s - n.ts) - 2 * 1.0 * Math.sqrt(150) * n.vs) * dt;
+      n.s += n.vs * dt;
+      n.vr += (-120 * (n.r - n.tr) - 2 * 1.0 * Math.sqrt(120) * n.vr) * dt;
+      n.r += n.vr * dt;
+      if (Math.abs(n.s - n.ts) > 0.0004 || Math.abs(n.vs) > 0.003) moving = true;
+      if (Math.abs(n.r - n.tr) > 0.01 || Math.abs(n.vr) > 0.04) moving = true;
+    }
+    return moving;
+  }
+  function fieldPaint(nodes) {
+    for (var i = 0; i < nodes.length; i++) {
+      var n = nodes[i];
+      for (var L = 0; L < n.layers.length; L++) {
+        var a = n.layers[L];
+        if (a.prop) { a.el.style.setProperty("--ornx", a.x.toFixed(2) + "px"); a.el.style.setProperty("--orny", a.y.toFixed(2) + "px"); }
+        else a.el.style.translate = a.x.toFixed(2) + "px " + a.y.toFixed(2) + "px";
+      }
+      n.p.style.scale = n.s.toFixed(4);
+      n.p.style.rotate = n.r.toFixed(2) + "deg";
+    }
+  }
+  function fieldStep(now) {
+    FIELD.raf = 0;
+    if (!FIELD.on || !FIELD.nodes) return;
+    var nodes = FIELD.nodes;
+    /* FIXED STEP. A dropped frame must produce more small steps, never one big one —
+       a big one is how a spring goes to infinity and the sheet flies apart. */
+    FIELD.acc += FIELD.t ? Math.min(0.1, (now - FIELD.t) / 1000) : F_DT;
+    FIELD.t = now;
+    fieldTargets(nodes);
+    var moving = false, guard = 0;
+    while (FIELD.acc >= F_DT && guard++ < 12) { moving = fieldIntegrate(nodes, F_DT) || moving; FIELD.acc -= F_DT; }
+    fieldPaint(nodes);
+    if (moving || FIELD.inside) FIELD.raf = requestAnimationFrame(fieldStep);
+    else { FIELD.t = 0; FIELD.acc = 0; }                                  // parked at rest: no loop at all until the pointer returns
+  }
+  function fieldWake() {
+    if (!FIELD.on) return;
+    if (!FIELD.raf && !FIELD.t) fieldMeasure(FIELD.nodes);                // waking from parked: re-read geometry, so a resize or a reflow cannot leave stale centres
+    if (!FIELD.raf) FIELD.raf = requestAnimationFrame(fieldStep);
+  }
+  function fieldMove(e) { FIELD.px = e.clientX; FIELD.py = e.clientY; FIELD.inside = true; fieldWake(); }
+  function fieldOut() { FIELD.inside = false; fieldWake(); }
+  function fieldArm() {
+    if (FIELD.on || !sheet || !fieldSupported()) return;
+    FIELD.nodes = fieldNodes();
+    if (!FIELD.nodes.length) { FIELD.nodes = null; return; }
+    fieldMeasure(FIELD.nodes);
+    FIELD.on = true; FIELD.t = 0; FIELD.acc = 0; FIELD.inside = false;
+    sheet.classList.add("has-field");                                     // stands the CSS :hover transform down — one owner per property
+    sheet.addEventListener("pointermove", fieldMove);
+    sheet.addEventListener("pointerleave", fieldOut);
+  }
+  function fieldArmSoon(ms) {
+    FIELD.tok++;
+    var tk = FIELD.tok;
+    window.setTimeout(function () { if (open && detail < 0 && tk === FIELD.tok) fieldArm(); }, ms);
+  }
+  function fieldDisarm() {
+    FIELD.tok++;                                                          // any pending arm is now stale
+    FIELD.on = false;
+    if (FIELD.raf) { cancelAnimationFrame(FIELD.raf); FIELD.raf = 0; }
+    if (sheet) {
+      sheet.classList.remove("has-field");
+      sheet.removeEventListener("pointermove", fieldMove);
+      sheet.removeEventListener("pointerleave", fieldOut);
+      var ps = sheet.querySelectorAll(".orbit__plate");
+      for (var i = 0; i < ps.length; i++) {                               // hand every property back exactly as it was found
+        ps[i].style.scale = ""; ps[i].style.rotate = "";
+        ps[i].style.removeProperty("--ornx"); ps[i].style.removeProperty("--orny");
+        var kids = ps[i].querySelectorAll(".orbit__mark, .orbit__label, .orbit__sub");
+        for (var j = 0; j < kids.length; j++) kids[j].style.translate = "";
+      }
+    }
+    FIELD.nodes = null; FIELD.inside = false; FIELD.t = 0; FIELD.acc = 0;
+  }
+
   function show() {
     if (open) return;
     open = true;
@@ -5343,11 +5557,16 @@ render();
     var first = sheet.querySelector(".orbit__plate");
     if (first) first.focus({ preventScroll: true });
     document.addEventListener("keydown", onKey, true);
+    /* BR-S309: 720ms clears the entrance — the last plate's 156ms stagger plus its
+       460ms travel. The field must never write a transform the entrance is still
+       tweening; two owners for one property is the bug this delay exists to prevent. */
+    fieldArmSoon(720);
   }
 
   function hide() {
     if (!open) return;
     open = false;
+    fieldDisarm();                              // BR-S309: before the fly-out, so the exit transition owns the plates alone
     undisplay();
     if (sheet) sheet.classList.remove("is-open");
     document.documentElement.classList.remove("orbit-open");
@@ -5375,6 +5594,10 @@ render();
      way an overlay with two depths stays predictable. */
   function display(i) {
     detail = i;
+    /* BR-S309 — "the node goes still" is step one of the click sequence, and it is
+       also the only correct engineering: .is-display re-sizes and re-centres the plate
+       with a CSS transition, so the field has to let go of it entirely. */
+    fieldDisarm();
     sheet.classList.add("is-detail");
     var ps = sheet.querySelectorAll(".orbit__plate");
     for (var k = 0; k < ps.length; k++) ps[k].classList.toggle("is-display", k === i);
@@ -5386,6 +5609,7 @@ render();
     sheet.classList.remove("is-detail");
     var ps = sheet.querySelectorAll(".orbit__plate");
     for (var k = 0; k < ps.length; k++) ps[k].classList.remove("is-display");
+    if (open) fieldArmSoon(520);                // put back down: the field returns once the plate has finished going home
   }
 
   function go(i) {

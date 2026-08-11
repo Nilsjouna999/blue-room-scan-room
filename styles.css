@@ -4774,6 +4774,22 @@ html.orbit-wings .orbit__field { --orbit-rx: clamp(200px, 25.5vw, 368px); --orbi
   transform: translate3d(calc(var(--ox) * var(--orbit-rx) * var(--or, 1)), calc(var(--oy) * var(--orbit-ry) * var(--or, 1) - 3px), 0) translate(-50%, -50%) rotate(0deg) scale(calc(var(--os, 1) * 1.03));   /* hover straightens it — the one you are pointing at squares up */
   transition-delay: 0ms;
 }
+/* BR-S309 — WHERE THE FIELD TAKES OVER. When the spring field is armed (.has-field, set
+   by app.js only on a fine-pointer, motion-allowed browser that supports the independent
+   transform properties) the rule above stands down completely: the plate's `transform`
+   goes back to its resting value and the pointer response is carried by `translate` per
+   layer, plus `scale` and `rotate` on the plate — none of which are in any transition
+   list here, so the springs land on the frame they are written.
+   THIS RULE IS THE CONTRACT. Without it the 460ms tween above and the field would both
+   own the same plate, which is the exact "two owners for one property" failure the field
+   is scoped to avoid. Specificity: 5 classes + :hover, so it beats the 4-class rule it
+   suppresses. The suppressed rule is deliberately LEFT IN PLACE — it is the fallback for
+   touch, for reduced motion, and for a browser without independent transforms, and in
+   every one of those cases .has-field is never added. */
+.orbit.has-field.is-open .orbit__plate:hover,
+.orbit.has-field.is-open .orbit__plate:focus-visible {
+  transform: translate3d(calc(var(--ox) * var(--orbit-rx) * var(--or, 1)), calc(var(--oy) * var(--orbit-ry) * var(--or, 1)), 0) translate(-50%, -50%) rotate(var(--orot, 0deg)) scale(var(--os, 1));
+}
 /* the plate IS the room's own object now, not an empty frame with a caption. The
    Desk's card, the deck's tarot back, the Reliquary's case, U1's descending plates,
    the Codex's open book, Settings' two rules — all from AB_EMBLEMS' own grammar and
@@ -4834,6 +4850,10 @@ html.orbit-wings .orbit__field { --orbit-rx: clamp(200px, 25.5vw, 368px); --orbi
   width: 168px; height: 168px; margin: -84px 0 0 -84px;
   border: 1px solid rgba(28, 21, 13, .13); border-radius: 50%;
   pointer-events: none;
+  /* BR-S309 — the ORNAMENT layer of the field: the lightest thing on the sheet, so it
+     travels furthest and settles last. A pseudo-element cannot take an inline style,
+     so this is the one layer the field moves by custom property; unset it reads 0. */
+  translate: var(--ornx, 0px) var(--orny, 0px);
 }
 /* meaning: a name says what a room is CALLED, this says what it is for */
 .orbit__sub {
