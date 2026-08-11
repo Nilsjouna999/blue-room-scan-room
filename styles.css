@@ -3172,6 +3172,9 @@ html.is-travel .card .cardfinish { mix-blend-mode: normal; }
 /* the two side columns settle against the card rather than hanging from the top rail */
 .menu__draw-ctrl { align-self: center; }
 .menu__draw-head { align-self: center; }
+/* BR-S321a: the room's name, now at the head of the column that holds its acts. Same
+   9px rhythm the header had, so nothing about the type changed — only where it stands. */
+.menu__draw-mast { display: grid; gap: 9px; justify-items: start; margin-bottom: 4px; }
 .menu__draw-head { grid-area: head; display: grid; gap: 9px; justify-items: start; position: relative; z-index: 2; }
 .menu__draw-title { font-family: var(--font-display); font-size: 30px; font-weight: 600; letter-spacing: -.005em; color: var(--t-display); line-height: 1.04; }
 .menu__draw-title:focus { outline: none; }
@@ -3187,11 +3190,20 @@ html.is-travel .card .cardfinish { mix-blend-mode: normal; }
    lives in the Codex, one link away. Clamping is the honest choice here — truncating
    the sentence would leave a card half-explained on the storefront. */
 .m2read { display: grid; gap: 6px; }
+/* the static half of the frame: a label that never changes, over words that always do */
+.m2read__label { font-family: var(--font-mono); font-size: 8.5px; letter-spacing: .22em; text-transform: uppercase; color: var(--t-ghost); margin: 0 0 2px; }
 .m2read__meta { font-family: var(--font-mono); font-size: 9px; letter-spacing: .2em; text-transform: uppercase; color: var(--t-meta); margin: 0; }
 .m2read__mean {
   font-family: var(--font-display); font-size: 15px; line-height: 1.55; color: var(--t-body); margin: 0;
   display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 4; overflow: hidden;
+  /* FIXED at four lines, not merely capped at four. A clamp alone still lets the box
+     shrink for a terse card, so the column jumped on every pull — the exact instability
+     the frame is here to remove. 15px x 1.55 x 4. */
+  height: calc(15px * 1.55 * 4);
 }
+/* mirrors the gold cut-line over the acts in the left column, so the two side columns
+   are braced the same way and the card sits between two fixed rules */
+.menu__draw-cutline--read { margin: 0 0 14px; max-width: 100%; }
 /* THE CONTROL sits under the card it changes, in the stage column, styled as the quiet
    sibling of the doors rather than a fourth loud act — the loud act on this panel is
    the Arcana Reading, and a free sample must not shout over the thing that sells. */

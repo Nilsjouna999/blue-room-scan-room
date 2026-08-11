@@ -1427,14 +1427,20 @@ function renderWall() {
     + '<button type="button" class="menu__wall-back" data-annex-back>&larr; Back to the desk</button>'
     // HEAD — the same front-door grammar as M1
     + '<header class="menu__draw-head">'
-    + '<p class="menu__wall-eyebrow"><span class="menu__wall-eyemark" aria-hidden="true">◆</span> BLUE ROOM</p>'
-    + '<h2 class="menu__draw-title" tabindex="-1">The Reading Rooms</h2>'
-    + '<p class="menu__draw-thesis">Not every card is developed. Some are drawn.</p>'
     /* BR-S321 — WHAT THE CARD BESIDE THIS SAYS. The panel's own words stay above; this
        block belongs to whatever is currently face up in the stage. Before the deck has
        loaded it describes the sample that is already there, so the column is never empty
        and never jumps. */
+    /* BR-S321a — THE CHANGING TEXT NEEDS A FRAME THAT DOES NOT CHANGE. This column now
+       holds only the card's read, and a block that rewrites itself with nothing anchoring
+       it reads as unstable — the panel appears to shift every time you pull. So it is
+       braced: a hairline and a fixed label above (mirroring the cutline over the acts in
+       the left column), the trust line below, and the meaning held at a FIXED four-line
+       height so the box never grows or shrinks between a terse card and a wordy one.
+       Only the words inside move. */
+    + '<span class="menu__draw-cutline menu__draw-cutline--read" aria-hidden="true"></span>'
     + '<div class="m2read" data-m2-read>'
+    + '<p class="m2read__label">The card in hand</p>'
     + '<p class="m2read__meta" data-m2-meta>Arcana &middot; XVII &middot; hope</p>'
     + '<p class="m2read__mean" data-m2-mean>The Star stands for hope, renewal and quiet guidance after difficulty — the calm that follows the storm, and the small light you steer by.</p>'
     + '</div>'
@@ -1442,6 +1448,16 @@ function renderWall() {
     + '</header>'
     // CTRL — one loud act under the gold cut-line, then a steep ladder (source-first for a11y)
     + '<div class="menu__draw-ctrl">'
+    /* BR-S321a — THE MASTHEAD MOVED INTO THIS COLUMN, above the acts. It was sitting in
+       the right-hand column, which is now the CARD's column — it says what the card is
+       and what it means, so a room title standing over it read as a caption on the card
+       rather than as the name of the room. The name belongs with the things you can do
+       in the room it names. */
+    + '<div class="menu__draw-mast">'
+    + '<p class="menu__wall-eyebrow"><span class="menu__wall-eyemark" aria-hidden="true">◆</span> BLUE ROOM</p>'
+    + '<h2 class="menu__draw-title" tabindex="-1">The Reading Rooms</h2>'
+    + '<p class="menu__draw-thesis">Not every card is developed. Some are drawn.</p>'
+    + '</div>'
     + '<span class="menu__draw-cutline" aria-hidden="true"></span>'
     + '<p class="msample__seal">The deck is already cut. What remains is the turn.</p>'
     + '<div class="menu__draw-doors">'
