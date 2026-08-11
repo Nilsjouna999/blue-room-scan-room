@@ -26,6 +26,10 @@ ROUTES = [
     # path        room (the value app.js resolves)   what it is
     ("tarot",    "drawing-room",   "The Drawing Room — tarot"),
     ("reading",  "arcane",         "The Arcana intake — the birth reading starts here"),
+    # BR-S308: U1 is not a ?dev= room -- "about" is not in app.js's dev allow-list, so this
+    # boots the ordinary menu and app.js seats it at the U1 stop. The room the public
+    # roadmap points at gets the address a person would actually type.
+    ("about",    "about",          "U1 -- what Blue Room is"),
 ]
 
 ROOT = os.path.dirname(os.path.abspath(__file__))

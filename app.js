@@ -2799,9 +2799,14 @@ function wireMenuAnnex(host) {                                      // KEEP the 
   window.addEventListener("popstate", menuPopstate);
   // BR-S233: annex-go/-back clicks are handled by the delegated onMenuAnnexClick (bound
   // once on host in mountMenu) — survives in-place DOM swaps that per-element binding did not.
+  window.removeEventListener("scroll", _u1OnScroll);                // BR-S308: remove-then-add, same discipline as popstate
+  window.addEventListener("scroll", _u1OnScroll, { passive: true });
   const seedIdx = _hashIndex();
   if (seedIdx > 0) menuSlideTo(seedIdx, { seed: true });            // deep-link: paint composed, no slide
   else MENU_PANELS.forEach(p => { if (p.cls) host.classList.remove(p.cls); });   // stale-state reset on remount
+  /* BR-S308: U1 is arrived at two ways — /#about (the in-app link) and /about/ (the
+     real address the generator emits). Both seat here; neither is a redirect. */
+  if (seedIdx === 0 && (location.hash === U1_HASH || window.BR_ROOM === "about")) _u1BootSeat();
 }
 
 /* BR-S243 — KEYBOARD NAVIGATION (the first, easiest pass).
@@ -2821,6 +2826,73 @@ function _navBlocked(t) {
   if (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.tagName === "SELECT" || t.isContentEditable) return true;
   return !!(t.closest && t.closest("#codexMini"));
 }
+/* ── BR-S308 — U1 IS A PLACE, SO IT GETS AN ADDRESS. ──────────────────────────
+   `/#about` and `/` used to render byte-identical. #about is injected by JS after
+   parse, so the browser's own fragment scroll finds nothing to scroll to and the
+   hash is inert — U1, the surface the public roadmap wants to point at, was the
+   one room in the building you could not link to or refresh into, while M2 and M3
+   both could. A route needs BOTH halves:
+     ARRIVE — a load carrying #about seats the page at U1 instead of the desk.
+     RECORD — walking down to U1 writes #about; returning to the desk clears it.
+              replaceState, never push: a scroll is not a history step.
+   ONE SEAT, ALREADY OWNED. _u1Seat() (= _navStops()[1], the About section's top at
+   the viewport top) is what the ↓ key and the BR-S262 descent glide already ride,
+   so the boot and the orbit now read IT rather than each re-deriving the same sum.
+   I briefly declared a second _u1Seat here; the existing one is later in the file,
+   so it won and _navStops recursed into itself. The seat was never missing — only
+   the callers that had copied it.
+   THE LATCH IS STRUCTURAL, NOT CODED. #about is rendered as a SIBLING of
+   .menu__track, and the vertical axis is gated on `_menuIndex(host) === 0`. So U1
+   hangs under whatever panel is index 0 — drop M1 from MENU_PANELS for the public
+   build and U1 follows M2 down with no edit here. That is why this is a list edit
+   and not a fork. */
+const U1_HASH = "#about";
+function _u1BareURL() { return location.pathname + location.search; }
+
+/* The address follows the descent. TWO EDGES with dead air between them, so a slow
+   drag down the page cannot flap the address bar: the hash is written only once
+   U1's top has reached the viewport top, and cleared only once the desk is fully
+   back at rest. Anything in between changes nothing. Scoped hard — menu view, index
+   0, not fullview — because on M2/M3 the hash belongs to the panel. */
+function _u1SyncHash() {
+  if (window.BR_ROOM === "about") return;               // BR-S308: already AT U1's own address (/about/) — a hash on top of it is noise
+  if (document.body.dataset.view !== "menu") return;
+  const host = document.getElementById("menuView");
+  if (!host || host.classList.contains("is-fullview")) return;
+  if (_menuIndex(host) !== 0) return;
+  const about = host.querySelector("#about");
+  if (!about) return;
+  if (about.getBoundingClientRect().top <= 8) {
+    if (location.hash !== U1_HASH) history.replaceState(history.state, "", U1_HASH);
+  } else if (window.scrollY <= 4) {
+    if (location.hash === U1_HASH) history.replaceState(history.state, "", _u1BareURL());
+  }
+}
+let _u1HashRaf = null;
+function _u1OnScroll() {
+  if (_u1HashRaf) return;
+  _u1HashRaf = requestAnimationFrame(function () { _u1HashRaf = null; _u1SyncHash(); });
+}
+
+/* A load carrying #about ARRIVES at U1 — no glide, because a link should paint
+   where it points rather than travel there from somewhere you never were. */
+function _u1BootSeat() {
+  const y = _u1Seat();
+  if (y == null) return;
+  window.scrollTo(0, y);
+  /* The desk's card and the About plates carry images; one landing after this
+     measurement moves the seat out from under us. Re-seat ONCE on load — and only
+     if the page is still exactly where we put it. The instant a reader has
+     scrolled, the position is theirs and we never take it back. */
+  const placed = Math.round(window.scrollY);
+  window.addEventListener("load", function reseat() {
+    window.removeEventListener("load", reseat);
+    if (Math.round(window.scrollY) !== placed) return;
+    const y2 = _u1Seat();
+    if (y2 != null && Math.abs(y2 - placed) > 2) window.scrollTo(0, y2);
+  });
+}
+
 function _navStops() {
   const host = document.getElementById("menuView");
   const ys = [0];                                                   // the desk, at rest
@@ -2844,7 +2916,9 @@ function _navStops() {
        lines, both paragraphs) and the lower line is already framing the plate
        below. Verified by render at 798 / 934 / 1000; 1000 clips the headline.
        This is deliberately ONE definition shared by the ↓ key and the BR-S262
-       scroll glide — two seats for the same arrival would drift apart. */
+       scroll glide — two seats for the same arrival would drift apart.
+       This line IS that definition; _u1Seat() reads it back out as stops[1], and
+       BR-S308 pointed the boot and the orbit at _u1Seat() so nothing re-derives it. */
     ys.push(Math.round(about.getBoundingClientRect().top + window.scrollY));
     [].forEach.call(about.querySelectorAll(".about__nugget"), (n) => seat(n.querySelector(".about__plate") || n));
     seat(about.querySelector(".about__close"));
@@ -5322,9 +5396,17 @@ render();
     if (r.kind === "link") { location.href = r.href; return; }
     if (typeof menuSlideTo === "function") menuSlideTo(r.idx, {});
     if (r.kind === "about") {
+      /* BR-S308: read the SHARED seat rather than keeping a second copy of the sum.
+         The fallback is not decoration: _u1Seat() is _navStops()[1], and _navStops
+         clamps every stop to the live scroll floor — while a panel is still
+         offstage the document can be shorter than the viewport, every stop collapses
+         onto 0, and the seat comes back null. Measured that happen. So: the shared
+         definition when it is available, the direct measurement when it is not, and
+         the plate always travels. */
       var a = host.querySelector("#about");
-      if (a) {
-        var y = Math.round(a.getBoundingClientRect().top + window.scrollY);
+      var y = (typeof _u1Seat === "function") ? _u1Seat() : null;
+      if (y == null && a) y = Math.round(a.getBoundingClientRect().top + window.scrollY);
+      if (y != null) {
         if (typeof _u1GlideTo === "function" && !reduced()) _u1GlideTo(y);
         else window.scrollTo(0, y);
       }

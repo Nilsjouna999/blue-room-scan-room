@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <base href="../" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- The room is authored dark. Declare it, or browser/OS auto-dark-mode RE-INVERTS the
+       page: it flips light details (the orbs' specular highlight, parchment card faces)
+       into muddy dark blobs. This opts the whole app out of that second inversion. -->
+  <meta name="color-scheme" content="dark" />
+  <title>Blue Room — Scan Room</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="styles.css?v=236y" /><!-- version param busts stale caches on live — bump the whole epoch set together. 232: BR-S254 M1 rank reversal (CSS). 233–234: BR-S259 M1 A/B toggle + the SRC-03 sample — app.js and reveal/stage-controller.js changed too, so the JS needed busting as well as the CSS. -->
+
+  <link rel="stylesheet" href="reveal/reveal.css?v=236" />
+  <link rel="stylesheet" href="arcane.css?v=236" />
+  <link rel="stylesheet" href="arcana-profile.css?v=236c" />
+  <link rel="stylesheet" href="settings.css?v=236" /><!-- BR-S208: Settings + boring page -->
+
+  <link rel="stylesheet" href="ceremony.css?v=236" />
+
+  <!-- BR-S251: the U1 plates — the photographed sheet as a stencil, plus the
+       hover frame and the U1 type corrections. Loads LAST so it overrides the
+       .about__ block in styles.css; kept separate so it is one rollback. -->
+  <link rel="stylesheet" href="u1-plates.css?v=236e" /><!-- 234c: BR-S258 raises the sheet alpha .092 -> .200. 236d: BR-S261 the vitrine header + the plate polish -->
+
+</head>
+<body data-treatment="free" data-view="menu">
+  <!-- DEV NAV — dev-only state jumper. Hidden by default; revealed ONLY when the
+       URL carries ?devnav=1 (app.js sets body[data-devnav="1"] + fills/unhides it).
+       State navigation only — never shown to a real user, never a product control. -->
+  <nav class="devnav" id="devnav" hidden aria-label="Dev navigation"></nav>
+
+  <!-- MAIN MENU (front door) — one existing sample shown as Free Pull vs Halo
+       Mint. The sample is SRC-03 "Shore Dispatch" (BR-S259); the index lives in
+       app.js#M1_SRC_INDEX, never hardcoded here. Rendered by app.js into
+       #menuView; shown only when the URL has no scan-room params. -->
+  <section class="menu" id="menuView"></section>
+
+  <!-- LOCAL DRAFT intake — a browser-local preview of a user-chosen photo.
+       No upload, no storage, no analysis. Rendered into #draftView by
+       app.js; reached only when the user picks a file (never via URL). -->
+  <section class="draft" id="draftView"></section>
+  <input type="file" id="draftFile" accept="image/*" hidden aria-hidden="true" />
+
+  <!-- DEV HARNESS — future uploaded-scan-result renderer. Reachable ONLY via
+       ?dev=uploaded-result | ?dev=uploaded-blocked. Renders a VALIDATED dev
+       fixture (never a user scan, never the local draft). app.js fills it. -->
+  <section class="dev" id="devView"></section>
+
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand__hit" data-view-to="menu" role="button" tabindex="0" title="Back to main menu">
+        <span class="brand__mark">◆</span>
+        <span class="brand__name">BLUE ROOM</span>
+      </span>
+      <span class="brand__sub" id="zoneLabel">ARCHIVE · SCAN ROOM</span>
+    </div>
+
+    <div class="toggle" id="sourceToggle" role="tablist" aria-label="Scan source">
+      <button type="button" data-source="0" class="toggle__btn is-active">SRC 01 · Driver</button>
+      <button type="button" data-source="1" class="toggle__btn">SRC 02 · Ice Field</button>
+    </div>
+
+    <div class="toggle toggle--treatment" id="treatmentToggle" role="tablist" aria-label="Treatment">
+      <button type="button" data-treatment="free" class="toggle__btn is-active">Free Pull</button>
+      <button type="button" data-treatment="shiny" class="toggle__btn toggle__btn--shiny">Halo Mint</button>
+    </div>
+  </header>
+
+  <main class="room">
+    <aside class="panel panel--source" id="sourcePanel"></aside>
+    <section class="stagezone" id="stageZone"></section>
+    <aside class="panel panel--reading" id="readingPanel"></aside>
+  </main>
+
+  <section class="dossier" id="dossierMount"></section>
+
+  <!-- Mint Record showcase scrim (BR-S123) — body-level blur layer. The card's
+       "Mint Record" link adds body.is-mint-showcase: this scrim blurs the page and the
+       real .dplate--mint fixes to mid-screen above it; clicking the scrim dismisses. -->
+  <div class="mintscrim" id="mintScrim" data-mint-dismiss aria-hidden="true"></div>
+
+  <!-- Source lightbox — body-level so it escapes panel overflow; opened from the
+       Source tab photo, closed by the X / backdrop / Esc. Image src set on open. -->
+  <div class="lightbox" id="lightbox" aria-hidden="true">
+    <div class="lightbox__backdrop" data-lightbox-close></div>
+    <figure class="lightbox__fig">
+      <img class="lightbox__img" id="lightboxImg" alt="" />
+      <button type="button" class="lightbox__x" data-lightbox-close aria-label="Close">×</button>
+    </figure>
+  </div>
+
+  <footer class="hint"><button type="button" class="hint__back" data-view-to="menu">↑&nbsp;Menu</button>1 / 2 switch source &nbsp;·&nbsp; F free · H halo mint &nbsp;·&nbsp; M lab state</footer>
+
+  <!-- GENERATED by build_routes.py -- do not edit. Edit index.html or ROUTES. -->
+  <script>window.BR_ROOM = "about";</script>
+  <script src="data.js?v=236"></script>
+  <!-- Scan Contract: pure non-AI validator + safe blocked-state shape for a
+       FUTURE uploaded-photo engine. Exposes window.BlueRoomScanContract.
+       Loaded before app.js; not run against the local draft (no engine yet). -->
+  <script src="scan-contract.js?v=236"></script>
+  <!-- Staged Card Reveal (BR-S124) — isolated dev surface on ?dev=staged-reveal.
+       Loaded BEFORE app.js so window.BRReveal exists when app boots and
+       mountDev() hands it the host. Units call the global renderCard (defined
+       by app.js, present by mount time). Self-contained — touches nothing live. -->
+  <script src="reveal/readings.data.js?v=236"></script>
+  <script src="reveal/arrow-button.js?v=236"></script>
+  <script src="reveal/card-frame.js?v=236"></script>
+  <script src="reveal/reading-panel.js?v=236"></script>
+  <script src="reveal/warning-modal.js?v=236"></script>
+  <script src="reveal/stage-controller.js?v=236"></script>
+  <!-- The Arcana Intake (BR-S159) — "The Setting of Marks". Isolated dev
+       surface on ?dev=arcane; exposes window.BRArcane, mounted by app.js
+       mountDev(). Self-contained (crown blueprint + forging ceremony). -->
+  <script src="arcane.js?v=236"></script>
+  <!-- The Arcana Reading (?dev=arcana-reading) — the full reading + per-draw record
+       pages. Self-contained engine (own name/derivation logic + fetched banks),
+       generated by arcana-build/build_inapp.py. Reads ?seed=birth~name~y~m~d. -->
+  <script src="arcana-reading.js?v=236"></script>
+  <!-- The Profile / Hub (?dev=profile) — the seeker's home: crown, vault, people,
+       doors out. Static design surface, mocked commerce. window.BRArcanaProfile. -->
+  <script src="arcana-profile.js?v=236a"></script>
+  <!-- The Drawing Room (?dev=drawing-room) — the tarot room. Step 1: free single-
+       card draw, cut and filed to the Reliquary. window.BRDrawingRoom. -->
+  <script src="drawing-room.js?v=236"></script>
+  <script src="settings.js?v=236"></script>
+  <!-- The Ceremony (BR-S163) — the forge ceremony on ?dev=ceremony; the builder's
+       exact art kept pixel-perfect + brought to life. window.BRCeremony. -->
+  <script src="ceremony.js?v=236"></script>
+  <script src="app.js?v=237l"></script><!-- suffixed rather than bumping the shared epoch, which a parallel session owns. 236b: BR-S251 U1 copy pass + the frame node. 236c: BR-S262 the M1→U1 descent glide. 236d: BR-S261 the vitrine header markup. 236e: BR-S264 descent fixes — up-trap, owned curve, symmetric snap. 236i: BR-S269 the panel-switch prime -->
+
+  <!-- U1 membrane-lines (2026-07-24) — LIVE by default (BR-S228). Runs the U1
+       effect on the real #about surface. Kill-switch preserved: ?u1lines=0
+       (persists an off preference); ?u1lines re-enables. Builder has further
+       changes pending — promoted to live now, still iterating. -->
+  <script src="u1-membrane.js?v=18" defer></script><!-- BR-S267: 16 -> 17, or the cached copy keeps the top line alive on live -->
+</body>
+</html>
