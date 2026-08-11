@@ -11,7 +11,7 @@
      · "Settings"      — the REAL controls only (nothing fake):
          Motion (Match device / Reduced / Full, via window.BRMotion),
          a locked-honest Appearance row, Restore the free Sitting,
-         Clear the staged draft, Reset the Reliquary (inline confirm),
+         Clear the staged draft, Reset the Memory Vault (inline confirm),
          and a read-only local ledger of the four real marks on file.
      · "About & Legal" — the mandated boring page as ONE scrolling
          document with a sticky six-section jump-rail.
@@ -78,7 +78,7 @@
 
   /* =========================================================
      HEADER — cloned .pf-top: wordmark (→ Main Menu) + a quiet
-     right link (→ The Reliquary). Both carry data-door.
+     right link (→ The Memory Vault). Both carry data-door.
 
      BR-S310: the wordmark was the ONLY way back, and the one other link in this
      header goes FORWARD — so a reader who arrived here from the orbit or the pill
@@ -93,7 +93,7 @@
           '<span class="pf-wordmark__mark" aria-hidden="true">&#9670;</span> Blue&nbsp;Room</a>' +
         '<a class="pf-back pf-back--top" href="#" data-door="menu">&larr; Main Menu</a>' +
       '</span>' +
-      '<a class="st-toplink" href="?dev=profile" data-door="profile">The Reliquary <span aria-hidden="true">&rarr;</span></a>' +
+      '<a class="st-toplink" href="?dev=profile" data-door="profile">The Memory Vault <span aria-hidden="true">&rarr;</span></a>' +
     '</header>';
   }
 
@@ -140,7 +140,7 @@
     '</section>';
   }
 
-  /* The Reliquary — the three real actions + the read-only ledger.
+  /* The Memory Vault — the three real actions + the read-only ledger.
      Re-rendered in place after Restore / Clear so the ledger stays true;
      opts carries a one-shot confirmation line after an action. */
   function ledgerRow(label, value, set) {
@@ -193,29 +193,29 @@
       draftDesc = "No photo is staged this session — nothing to clear.";
     }
 
-    /* Reset the Reliquary (destructive, inline confirm) */
+    /* Reset the Memory Vault (destructive, inline confirm) */
     var resetBtn = '<button type="button" class="st-btn st-btn--danger" data-act="reset-open" aria-expanded="false" aria-controls="st-confirm">Reset&hellip;</button>';
     var confirm = '<div class="st-confirm" id="st-confirm" role="alertdialog" aria-label="Confirm reset" aria-describedby="st-confirm-text" hidden>' +
       '<p class="st-confirm__t" id="st-confirm-text">This clears the marks on this browser. This can’t be undone.</p>' +
       '<div class="st-confirm__row">' +
         '<button type="button" class="st-btn" data-act="reset-cancel">Cancel</button>' +
-        '<button type="button" class="st-btn st-btn--danger" data-act="reset-confirm">Reset the Reliquary</button>' +
+        '<button type="button" class="st-btn st-btn--danger" data-act="reset-confirm">Reset the Memory Vault</button>' +
       '</div>' +
     '</div>';
 
     var ledger = '<div class="st-ledger" aria-label="On file in this browser">' +
       '<p class="st-ledger__h">On file, right now</p>' +
-      ledgerRow("Reliquary shelf", shelf ? "Open" : "Closed", shelf) +
+      ledgerRow("Memory Vault shelf", shelf ? "Open" : "Closed", shelf) +
       ledgerRow("First-reading key", keyed ? "Turned" : "Not yet turned", keyed) +
       ledgerRow("Free Sitting", sittingUsed ? "Used" : "Available", sittingUsed) +
       ledgerRow("Sealed Concords", concords ? concords + " on file" : "None on file", concords > 0) +
     '</div>';
 
-    return '<h2 class="pf-sec__h">The Reliquary</h2>' +
+    return '<h2 class="pf-sec__h">The Memory Vault</h2>' +
       '<p class="pf-lede">Everything Blue Room keeps on this device, and the controls to clear it. Nothing here reaches beyond this browser.</p>' +
       ctrlRow("Restore the free Sitting", restoreDesc, restoreBtn, false) +
       ctrlRow("Clear the staged draft", draftDesc, draftBtn, false) +
-      ctrlRow("Reset the Reliquary",
+      ctrlRow("Reset the Memory Vault",
         "Returns the archive to its first day — the open shelf, the first-reading key, the free Sitting, and every sealed Concord. Nothing is stored anywhere else, so there is nothing else to reset.",
         resetBtn, true) +
       confirm +
@@ -262,7 +262,7 @@
       romanList([
         romanItem("I &middot; The Codex", "the whole archive of meanings, free and always open: seventy-eight tarot cards, plus six further systems — zodiac signs, numerology, runes, trigrams, I-Ching hexagrams, and the Blue Room lexicon of its own instruments."),
         romanItem("II &middot; Tarot Divination", "cut the full deck to a question: the Pull (one card), a Sitting (three cards), or the Deep Read (five cards). What falls is read and filed. Drawn once. Not reissued."),
-        romanItem("III &middot; The Arcana Reading", "a person, read by birth through six systems into a crowned name: the sun sign, the year animal, the life path, the rune, the trigram, and the hexagram. The marks are given, not chosen — the room looks each one up in the Codex and assembles what it finds. By birth alone, or as a Concord of two."),
+        romanItem("III &middot; The Birth Reading", "a person, read by birth through six systems into a crowned name: the sun sign, the year animal, the life path, the rune, the trigram, and the hexagram. The marks are given, not chosen — the room looks each one up in the Codex and assembles what it finds. By birth alone, or as a Concord of two."),
         romanItem("IV &middot; Card Mint", "bring a photo; it is already a card, and the room only develops it. The Free Pull shows the complete card front. If you choose to develop it further, the sealed back opens to a deeper record of the same card — not a different or better one."),
         romanItem("V &middot; The Unlit Room", "something is taking shape here, still too dim to name. The candle has not reached it yet.")
       ]) +
@@ -275,9 +275,9 @@
     var body =
       p("Blue Room runs entirely in the browser you are reading it in. There is no account, no login, and — as of this build — no live server behind any room. Here is exactly what happens, and where.") +
       lead("The photo.", "When you stage a photo in Card Mint, it is held in your browser’s own memory for that session only — never uploaded, never sent anywhere. The scan engine that would read it is not connected yet, so nothing analyzes it either. Close the tab or reload the page and it is gone; nothing about it is saved.") +
-      lead("The reading.", "A reading — the Free Pull, a tarot draw, or the Arcana Reading — is produced by a fixed engine built into the page itself. The same inputs always produce the same result: no chance, no re-roll. Nothing is generated by an outside model, and no reading is looked up from anywhere but the Codex’s own tables.") +
+      lead("The reading.", "A reading — the Free Pull, a tarot draw, or the Birth Reading — is produced by a fixed engine built into the page itself. The same inputs always produce the same result: no chance, no re-roll. Nothing is generated by an outside model, and no reading is looked up from anywhere but the Codex’s own tables.") +
       lead("The Codex.", "Its entries — every card, sign, number, rune, trigram, and hexagram — are a static reference shipped with the page. They do not change between visits and are not fetched from anywhere, with one exception: if you use the Codex’s word-lookup, the word you type is sent to a free public dictionary service to fetch its definition. That happens only when you deliberately search a word — nothing else, anywhere in Blue Room, makes that kind of request.") +
-      lead("What is filed.", "Tarot draws, Concord bonds, and the Reliquary’s open or sealed state are kept in this browser’s local storage — the same mechanism as the Motion setting on this page. They persist across visits to this device but go nowhere else: no server, no sync, no second device.") +
+      lead("What is filed.", "Tarot draws, Concord bonds, and the Memory Vault’s open or sealed state are kept in this browser’s local storage — the same mechanism as the Motion setting on this page. They persist across visits to this device but go nowhere else: no server, no sync, no second device.") +
       lead("The develop step.", "Where a card’s sealed back opens, or a deeper reading unlocks, no real money changes hands in this build. Every “develop,” “mint,” or “buy” prompt is a working preview of a paid step that is not connected to a payment processor. Nothing is charged.") +
       lead("What Blue Room is not yet:", "there is no scan engine reading real photographs, no account system, no cloud storage, and no live commerce. All of the above is true of this build as it stands. If any of it changes, this page will say so plainly, before it happens.");
     return docSec("how-it-works", "How It Works", "How Blue Room Works", "A document, not a service.", body);
@@ -308,12 +308,12 @@
       list([
         "Any photo you stage in Card Mint — held in page memory only, never uploaded, gone on reload.",
         "Any name, birth date, or birthplace you enter for a reading.",
-        "Every tarot draw, Arcana reading, Concord bond, and the Reliquary’s state.",
+        "Every tarot draw, Birth Reading, Concord bond, and the Memory Vault’s state.",
         "Every setting on this page."
       ]) +
       lead("The whole local ledger.", "Blue Room keeps four kinds of archive record in this browser — plus any preference you set on the Settings page, which right now means only your Motion choice. Not one of them is a name or a photo:") +
       list([
-        "whether the Reliquary shelf has been opened,",
+        "whether the Memory Vault shelf has been opened,",
         "whether a first reading has been completed,",
         "whether the one free Sitting has been drawn,",
         "one entry per sealed Concord, so a bond reopens the same record instead of drawing again."

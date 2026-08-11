@@ -8,7 +8,7 @@
        (spine + gold top-rule + folder-tab heading), clearly contained.
 
    Static design surface — mock data, no backend, no payment. Commerce lives in
-   the Arcana Reading, not here: the hub is DOORS to every room (Main Menu, Arcana
+   the Birth Reading, not here: the hub is DOORS to every room (Main Menu, Arcana
    Room, Codex, Vault) + free "Open this reading" portals. No hub-side price,
    modal, or violet remains.
 
@@ -50,7 +50,7 @@
       result_count: 3, created_at: "2026-07-09", is_current: true
     },
     // Rings section is only the "read for someone" box now (no example rings).
-    // The Vault is minted-card slots only — empty until minting is live (real vault not built).
+    // The Memory Vault is minted-card slots only — empty until minting is live (real vault not built).
     vault_slots: 4,
     // What the Showcase can feature: the seeker's OWN reading results, and minted cards.
     reading_results: [
@@ -178,13 +178,13 @@
       : '';
 
     // the Crown — the reading button; "Open this reading" IS the full arcana result page.
-    // No profile-side redraw: to get a new reading, draw one from the Arcana Reading.
+    // No profile-side redraw: to get a new reading, draw one from the Birth Reading.
     var crown;
     // the crown as a single-object museum display: its own centered band, lit,
     // enlarged, with the caption BELOW it and nothing crowding either side.
     if (taken) {
       crown = '<div class="pf-crownstage">' +
-        '<button type="button" class="pf-crownbtn" data-open-reading="' + esc(c.reading_id) + '" aria-label="Open your Arcana reading">' +
+        '<button type="button" class="pf-crownbtn" data-open-reading="' + esc(c.reading_id) + '" aria-label="Open your Birth Reading">' +
           crownSVG(points, gems, { cls: "pf-crown-svg", aria: "Crown holding " + gems + " readings" }) +
         '</button>' +
         '<div class="pf-crownstage__cap">' +
@@ -194,7 +194,7 @@
         '</div></div>';
     } else {
       crown = '<div class="pf-crownstage">' +
-        '<button type="button" class="pf-crownbtn pf-crownbtn--empty pf-paid" data-draw="self" data-intent="new" aria-label="Draw your Arcana reading">' +
+        '<button type="button" class="pf-crownbtn pf-crownbtn--empty pf-paid" data-draw="self" data-intent="new" aria-label="Draw your Birth Reading">' +
           '<span class="pf-crown-empty">No crown yet<br>draw a reading</span>' +
         '</button>' +
         '<div class="pf-crownstage__cap">' +
@@ -236,8 +236,8 @@
     }).join("");
     // Empty state is one calm line (the lede) — no ghost slots. Cards appear when minting is live.
     var body = cards ? '<div class="pf-vault"><div class="pf-cards">' + cards + '</div></div>' : "";
-    return section("The Vault", "not open yet",
-      "Your minted cards are filed here — nothing has been minted yet. The Vault opens once minting begins.",
+    return section("The Memory Vault", "not open yet",
+      "Your minted cards are filed here — nothing has been minted yet. The Memory Vault opens once minting begins.",
       body);
   }
 
@@ -294,11 +294,11 @@
   }
 
   // The Rooms — the hub's purpose: a labelled door to every room, each with a
-  // deadpan one-line descriptor. (The Vault has its own section above, so it is
+  // deadpan one-line descriptor. (The Memory Vault has its own section above, so it is
   // not repeated here.) Commerce is not shown on the hub — price lives in the room.
   function roomsHTML() {
     var rooms = [
-      ["arcane", "The Arcana Reading", "Where a new reading is drawn"],
+      ["arcane", "The Birth Reading", "Where a new reading is drawn"],
       ["drawing-room", "The Drawing Room", "Where cards are cut and filed"],
       ["reading", "The Reading", "Your draw, laid out in full"],
       ["codex", "The Codex", "The archive of meanings"]
@@ -378,7 +378,7 @@
         var d = el.getAttribute("data-door");
         if (d === "menu") { if (inApp()) location.href = location.pathname; else note(root, "Returns to the main menu. (Inert in preview.)"); }
         else if (d === "codex") { if (inApp()) location.href = "codex.html?v=237"; else note(root, "Opens the Codex. (Inert in preview.)"); }   // BR-S272: the ONE codex link that shipped un-busted — every other caller carries ?v=
-        else if (d === "arcane") toInput("", "Opens the Arcana Reading. (Inert in preview.)");
+        else if (d === "arcane") toInput("", "Opens the Birth Reading. (Inert in preview.)");
         else if (d === "drawing-room") { if (inApp()) location.href = "?dev=drawing-room"; else note(root, "Opens the Drawing Room — the tarot room. (Inert in preview.)"); }
         else if (d === "ceremony") { if (inApp()) location.href = "?dev=ceremony"; else note(root, "Opens the Ceremony — the arcana forge. (Inert in preview.)"); }
         else if (d === "reading") { if (inApp()) location.href = "?dev=arcana-reading"; else note(root, "Opens your reading, laid out. (Inert in preview.)"); }
@@ -408,13 +408,13 @@
         return;
       }
 
-      // every draw/redraw routes to the Arcana Reading, carrying intent; commerce lives there
+      // every draw/redraw routes to the Birth Reading, carrying intent; commerce lives there
       if (el.hasAttribute("data-draw")) {
         ev.preventDefault();
         var who = el.getAttribute("data-draw"), intent = el.getAttribute("data-intent"), rel = el.getAttribute("data-rel");
         var params = "for=" + (who === "other" ? "other" : "self") + (intent ? "&intent=" + intent : "") + (rel ? "&subject=" + encodeURIComponent(rel) : "");
         var msg = intent === "redraw"
-          ? "This would open the Arcana Reading to add a richer reading — the redraw confirm and price live there. (Inert in preview.)"
+          ? "This would open the Birth Reading to add a richer reading — the redraw confirm and price live there. (Inert in preview.)"
           : (who === "other" ? "This would open the input room to read for someone. (Inert in preview.)"
                              : "This would open the input room to draw a new reading. (Inert in preview.)");
         toInput(params, msg);

@@ -5,7 +5,7 @@
      • THE PULL (first page, free, unlimited) — draw a single card to meet
        the deck. A showcase; not filed.
      • A SITTING (first is free — a repeat is $1.99) — a 3-card reading,
-       FILED to the Reliquary. Positions: The Ground / The Crossing / The Turn.
+       FILED to the Memory Vault. Positions: The Ground / The Crossing / The Turn.
      • THE DEEP READ ($2.99, violet) — a 5-card reading, filed. The flagship.
 
    COMMERCE IS MOCK (BR-S190): the price rides the door's specimen label
@@ -212,7 +212,7 @@
     return '<div class="dr-landing">' +
       '<div class="dr-live" role="status" aria-live="polite" data-dr-live></div>' +
       '<section class="dr-tiers">' +
-      '<p class="dr-tiers__label">Draw a reading — it is cut, and kept in your Reliquary.</p>' +
+      '<p class="dr-tiers__label">Draw a reading — it is cut, and kept in your Memory Vault.</p>' +
       tierDoor(SPREADS.sitting, sittingUsed()
         ? "Three cards to one question — your first is filed."
         : "Three cards to one question — your first is free.") +
@@ -377,9 +377,9 @@
       '<p class="dr-binding">' + esc(bindingLine(sp, st.drawn)) + '</p>' +
       '<p class="dr-read__frame">Drawn to the matter you laid down — a reflection to sit with, not a forecast.</p>' +
       '<div class="dr-stamp">' + hallmarkSVG(st.seed) +
-      '<p class="dr-filed__line">Filed to your Reliquary &middot; ' + esc(brCode(st.seed)) + ' &middot; ' + esc(filedDate()) + '</p></div>' +
+      '<p class="dr-filed__line">Filed to your Memory Vault &middot; ' + esc(brCode(st.seed)) + ' &middot; ' + esc(filedDate()) + '</p></div>' +
       '<p class="dr-credo">Drawn once. Not reissued.</p>' +
-      '<a class="pf-openreading pf-openreading--lg" href="#" data-door="profile">Open your Reliquary &rarr;</a>' +
+      '<a class="pf-openreading pf-openreading--lg" href="#" data-door="profile">Open your Memory Vault &rarr;</a>' +
       '<a class="dr-intake__back" href="#" data-dr-home>&larr; the deck</a></div>';
   }
   /* ── BR-S318 — THE SUBTREE NOW SPANS THE WHOLE FLOW, intake included. ─────────
@@ -527,7 +527,7 @@
     STATE.drawn[i].shown = true; STATE.revealed++;
     var sp = SPREADS[STATE.spread], c = STATE.drawn[i].card, rev = STATE.drawn[i].reversed;
     var msg = sp.positions[i] + ": " + c.name + ", " + (rev ? "reversed" : "upright") + ". " + firstSentence((rev && c.reversed) ? c.reversed : c.meaning);
-    if (STATE.revealed >= sp.n) msg += " Filed to your Reliquary, " + brCode(STATE.seed) + ".";
+    if (STATE.revealed >= sp.n) msg += " Filed to your Memory Vault, " + brCode(STATE.seed) + ".";
     /* BR-S317: the flip happens on the node that is already there and STAYS there. The
        spread is never re-rendered — only the prose below it is, and only after the flip
        has had its 720ms. Previously this line was followed by a full teardown of every

@@ -3206,7 +3206,7 @@ html.is-travel .card .cardfinish { mix-blend-mode: normal; }
 .menu__draw-cutline--read { margin: 0 0 14px; max-width: 100%; }
 /* THE CONTROL sits under the card it changes, in the stage column, styled as the quiet
    sibling of the doors rather than a fourth loud act — the loud act on this panel is
-   the Arcana Reading, and a free sample must not shout over the thing that sells. */
+   the Birth Reading, and a free sample must not shout over the thing that sells. */
 .menu__draw-pull {
   margin-top: 2px; padding: 9px 22px;
   font-family: var(--font-mono); font-size: 9.5px; letter-spacing: .22em; text-transform: uppercase;
@@ -3425,7 +3425,7 @@ html.m2-parch .m2face {
 .menu__wall-rail .menu__codex { margin-top: 0; align-self: auto; }
 .menu__wall-foot { font-family: var(--font-mono); font-size: 8.5px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--faint); }
 
-/* ── BR-S204: the Reliquary threshold (slide 3) — a conservation niche in the
+/* ── BR-S204: the Memory Vault threshold (slide 3) — a conservation niche in the
    wall-plaque double-rule register. Sealed (locked) by default, lit when opened.
    Colour law: gold/neutral throughout; violet ONLY on the open --enter door. */
 .menu__reliq { position: relative; z-index: 1; width: min(440px, 92vw); display: flex; flex-direction: column; align-items: center; text-align: center; gap: 15px; }
@@ -4855,7 +4855,7 @@ html.orbit-wings .orbit__field { --orbit-rx: clamp(200px, 25.5vw, 368px); --orbi
   transform: translate3d(calc(var(--ox) * var(--orbit-rx) * var(--or, 1)), calc(var(--oy) * var(--orbit-ry) * var(--or, 1)), 0) translate(-50%, -50%) rotate(var(--orot, 0deg)) scale(var(--os, 1));
 }
 /* the plate IS the room's own object now, not an empty frame with a caption. The
-   Desk's card, the deck's tarot back, the Reliquary's case, U1's descending plates,
+   Desk's card, the deck's tarot back, the Memory Vault's case, U1's descending plates,
    the Codex's open book, Settings' two rules — all from AB_EMBLEMS' own grammar and
    all currentColor, so they take the ink without a second palette. An empty rectangle
    with a label under it is a placeholder pretending to be a system; recognising a
