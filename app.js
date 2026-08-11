@@ -1428,6 +1428,23 @@ function renderAbout() {
    One bit, house try/catch pattern, FAIL-OPEN, read at render: entering the Drawing Room
    is a full navigation, so the menu is rebuilt on return and the bit is always current. */
 function m2SittingUsed() { try { return localStorage.getItem("br_dr_sitting_used") === "1"; } catch (e) { return false; } }
+/* BR-S327 — what people actually bring. Honest, not crude: the room never asks you to
+   be salacious, it asks you to be specific, and these are the questions people are
+   already carrying when they open a tarot page at midnight. Kept in the room's register
+   — short, plain, no melodrama, and not one of them asks the deck to predict anything.
+   Eight, because the cycle is 8 × 3.4s ≈ 27s: long enough that it never feels like a
+   loop while you are reading a card. */
+const M2_ASKS = [
+  "Should I say it, or let it pass?",
+  "Is it loyalty, or is it fear?",
+  "Am I building something, or just busy?",
+  "Do they think about me at all?",
+  "What am I pretending not to know?",
+  "Is this love, or is it habit?",
+  "Is the door closed, or only heavy?",
+  "What am I waiting for permission to do?",
+];
+
 function renderWall() {
   return '<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>'
     + '<linearGradient id="mwGold" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#c8ad70"/><stop offset=".55" stop-color="#a2864a"/><stop offset="1" stop-color="#5f471f"/></linearGradient>'
@@ -1506,6 +1523,26 @@ function renderWall() {
        the left column), the trust line below, and the meaning held at a FIXED four-line
        height so the box never grows or shrinks between a terse card and a wordy one.
        Only the words inside move. */
+    /* ── BR-S327 — THE QUESTIONS DRIFT. ─────────────────────────────────────────
+       A storefront can tell you what a reading is, or it can show you what people
+       bring to one. These are the second thing: real questions, murmured above the
+       line, overlapping and fading like something half-remembered rather than
+       ticking like a marquee.
+       It is the panel's best argument and it spends no copy making it — and it
+       lands exactly opposite "Asked the same, they answer the same" at the foot of
+       the same column: the questions at the top, the promise at the bottom.
+       ARIA-HIDDEN, and that is not laziness. This is atmosphere; the card's read
+       below is the content. A region that rewrites itself every three seconds would
+       otherwise talk over a screen reader continuously and tell it nothing.
+       PURE CSS, ONE ANIMATION, NO TIMER. Eight spans stacked in a fixed-height box,
+       each on the same keyframe with a negative delay a slot apart. Nothing is
+       scheduled, nothing accumulates, and it cannot leak the way a setInterval on a
+       panel you can slide away from would. */
+    + '<div class="m2asks" aria-hidden="true">'
+    +   M2_ASKS.map(function (q, i) {
+          return '<span class="m2asks__q" style="animation-delay:' + (-i * 3.4).toFixed(1) + 's">' + q + '</span>';
+        }).join('')
+    + '</div>'
     + '<span class="menu__draw-cutline menu__draw-cutline--read" aria-hidden="true"></span>'
     + '<div class="m2read" data-m2-read>'
     + '<p class="m2read__label">The card in hand</p>'

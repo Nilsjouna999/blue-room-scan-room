@@ -3211,6 +3211,43 @@ html.is-travel .card .cardfinish { mix-blend-mode: normal; }
    are braced the same way and the card sits between two fixed rules */
 .menu__draw-cutline--read { margin: 0 0 14px; max-width: 100%; }
 
+/* ── BR-S327 — THE DRIFTING QUESTIONS. ───────────────────────────────────────
+   Eight questions stacked in one FIXED-HEIGHT box, cross-fading with overlap so two
+   are briefly present at once — a murmur, not a marquee. The height is fixed for the
+   same reason the read box below it is: this column may not resize while you look at
+   it, and a one-line question following a two-line one would jump the whole panel.
+   Italic serif at low alpha, so they read as something overheard rather than as UI.
+   ANIMATION IS OPACITY AND transform ONLY — both compositable, nothing that lays out.
+   One 27.2s keyframe shared by all eight, each offset by a negative delay, so the
+   browser schedules nothing and there is no timer to leak when the panel slides away. */
+.m2asks {
+  position: relative; height: 3.4em; width: 100%; margin: 0 0 10px;
+  pointer-events: none;
+}
+.m2asks__q {
+  position: absolute; inset: 0;
+  font-family: var(--font-display); font-style: italic; font-size: 15.5px; line-height: 1.45;
+  color: var(--t-body); opacity: 0;
+  animation: m2ask 27.2s linear infinite both;
+}
+@keyframes m2ask {
+  0%    { opacity: 0;   transform: translateY(5px); }
+  2.2%  { opacity: .52; transform: translateY(0); }
+  10.4% { opacity: .52; transform: translateY(0); }
+  13.6% { opacity: 0;   transform: translateY(-5px); }
+  100%  { opacity: 0;   transform: translateY(-5px); }
+}
+/* WCAG 2.2.2 — content that moves on its own must be stoppable. Pointing at the column
+   stops it, so anyone who wants to finish reading one can. */
+.menu__draw-head:hover .m2asks__q,
+.menu__draw:focus-within .m2asks__q { animation-play-state: paused; }
+@media (prefers-reduced-motion: reduce) {
+  /* no drift at all: the first question stands, the rest never render. A single
+     honest line beats a cross-fade nobody asked for. */
+  .m2asks__q { animation: none; opacity: 0; }
+  .m2asks__q:first-child { opacity: .52; }
+}
+
 /* ── BR-S324 — THE CARD AND ITS WORDS LIGHT TOGETHER. ────────────────────────
    They sit in different grid columns with a whole card between them, so nothing about
    the layout says they are one thing. Hovering either now lifts BOTH — the card a
