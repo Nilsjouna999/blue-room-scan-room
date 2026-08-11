@@ -583,6 +583,41 @@
 }
 .dr-deck__top { z-index: 8; border-radius: 12px; overflow: hidden; background: linear-gradient(180deg, #111319, #0c0d11); border: 1px solid rgba(10, 8, 5, .55); box-shadow: 0 20px 40px rgba(0, 0, 0, .5); }
 .dr-deck__top .dr-plate { width: 100%; height: 100%; }
+/* ── BR-S319 — THE RIFFLE. ────────────────────────────────────────────────────
+   Two animations over the same 820ms, and the difference between them is the effect:
+   the STACK jitters through six stops with a slight vertical squash (scaleY .965-.99),
+   while the TOP card flicks harder, further and out of step (up to 17px and 8deg). One
+   curve on both and the pile reads as a single block wobbling; offset like this it
+   reads as many cards moving against each other.
+   Keyframes and easing are tarot-v2's verbatim. This is a feel that was tuned once,
+   and re-tuning it by eye in a preview pane that cannot run it would be vandalism.
+   `both` fill so the pile is left exactly where it started — the deck a reader cuts is
+   the deck they were shown. */
+.dr-deck.is-riffling .dr-deck__body { animation: drRiffle .8s cubic-bezier(.3, .7, .2, 1) both; }
+.dr-deck.is-riffling .dr-deck__top { animation: drRifTop .8s cubic-bezier(.3, .7, .2, 1) both; }
+@keyframes drRiffle {
+  0%   { transform: translate(0, 0) rotate(0) scaleY(1); }
+  12%  { transform: translate(-11px, 6px) rotate(-4deg) scaleY(.965); }
+  28%  { transform: translate(9px, -5px) rotate(3deg) scaleY(.98); }
+  44%  { transform: translate(-7px, 4px) rotate(-3deg) scaleY(.97); }
+  60%  { transform: translate(11px, -6px) rotate(4deg) scaleY(.985); }
+  78%  { transform: translate(-5px, 3px) rotate(-2deg) scaleY(.99); }
+  100% { transform: translate(0, 0) rotate(0) scaleY(1); }
+}
+@keyframes drRifTop {
+  0%   { transform: translate(0, 0) rotate(0); }
+  12%  { transform: translate(-17px, -13px) rotate(-8deg); }
+  40%  { transform: translate(14px, -9px) rotate(7deg); }
+  68%  { transform: translate(-9px, -5px) rotate(-4deg); }
+  100% { transform: translate(0, 0) rotate(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .dr-deck.is-riffling .dr-deck__body, .dr-deck.is-riffling .dr-deck__top { animation: none; }
+}
+/* the escape stays visible through the mix and stops being operable — an exit that
+   vanishes mid-ceremony is worse than one that waits 820ms */
+.dr-ceremony[data-dr-phase="shuffling"] ~ .dr-intake .dr-intake__back { pointer-events: none; opacity: .45; }
+
 /* the pile is the thing you are about to cut; once the cards are down it has done its
    job and leaves, rather than sitting beside the reading as a second deck. */
 .dr-ceremony[data-dr-phase="dealt"] .dr-deck,

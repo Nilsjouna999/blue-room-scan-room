@@ -240,14 +240,37 @@
     return out + '</div><div class="dr-deck__top">' + backSVG() + '</div>';
   }
 
-  /* ---------- a reading: intake -> cut -> spread reveal -> binding + filed ---------- */
+  /* ── BR-S319 — ONE CONTROL, AND ITS LABEL FOLLOWS THE PHASE. ─────────────────
+     Question → SHUFFLE → CUT is now a real two-step, and it is one button, not two.
+     tarot-v2's model, and the right one: a second button appearing beside the first
+     asks the reader to choose between two things when the ceremony only ever offers
+     one next move.
+     The order is the decided spine — shuffle is preparatory, reversible and playful,
+     so it is free and carries no price; the money rides the CUT, which is the moment
+     of commitment. Which is why the price only appears on the button once the deck has
+     been mixed: quoting it before there is anything to commit to would be asking for
+     payment ahead of the decision it belongs to.
+     It renders into its OWN region so a phase change can swap the control without
+     re-rendering the intake around it — re-rendering the intake would take the typed
+     question with it, which is the kind of thing that happens once and is never
+     forgiven. */
+  function controlHTML(sp, phase) {
+    var paid = isPaidNow(sp.key);
+    if (phase === "ready" || phase === "shuffling") {
+      return '<button type="button" class="dr-cut" data-dr-shuffle' + (phase === "shuffling" ? " disabled" : "") + '>' +
+        (phase === "shuffling" ? "Mixing&hellip;" : "Shuffle") + '</button>';
+    }
+    return '<button type="button" class="dr-cut' + (paid ? ' dr-cut--paid' : '') + '" data-dr-cut>Cut the deck' + (paid ? ' &middot; ' + sp.price : '') + '</button>';
+  }
+
+  /* ---------- a reading: intake -> shuffle -> cut -> spread reveal -> binding + filed ---------- */
   function intakeHTML(sp) {
     var paid = isPaidNow(sp.key);   // paid: the price rides the cut button; free: byte-identical to before
     return '<p class="dr-intake__which">' + esc(sp.title) + ' &middot; ' + sp.n + ' cards</p>' +
       '<label class="dr-field"><span class="dr-field__label">Lay a matter on the table <span class="dr-field__opt">— optional</span></span>' +
       '<input type="text" class="dr-field__in" data-dr-question maxlength="120" autocomplete="off" placeholder="a question, in your own words" ' +
       'aria-label="A question or situation. Optional. It is kept with your reading, and it does not choose the cards."></label>' +
-      '<button type="button" class="dr-cut' + (paid ? ' dr-cut--paid' : '') + '" data-dr-cut>Cut the deck' + (paid ? ' &middot; ' + sp.price : '') + '</button>' +
+      '<div class="dr-control" data-dr-control>' + controlHTML(sp, "ready") + '</div>' +
       '<p class="dr-cut__note">The cut does not choose the cards. It closes the question.</p>' +
       (paid ? '<p class="dr-mocknote">Dev mock &mdash; no real payment in this build.</p>' : '') +
       '<a class="dr-intake__back" href="#" data-dr-home>&larr; the deck</a>';   /* BR-S318: the .dr-intake wrapper is now the persistent [data-dr-intake] region in the flow shell — this returns its CONTENTS, so the cut can empty it without removing it */
@@ -446,8 +469,45 @@
     laySpread(STATE);
     refreshReads(STATE);
   }
+  function setControl() {
+    var el = stage().querySelector("[data-dr-control]");
+    if (el) el.innerHTML = controlHTML(SPREADS[STATE.spread], CEREMONY.phase);
+  }
+  /* ── BR-S319 — THE RIFFLE. ───────────────────────────────────────────────────
+     The deck is mixed: the stack jitters and squashes through six stops while the top
+     card flicks harder and further over the same 820ms, so the pile reads as many
+     things moving against each other rather than one block wobbling. Keyframes and
+     timing are tarot-v2's verbatim — this is a feel that was tuned once, and re-tuning
+     it by eye through a preview pane that cannot even run it would be vandalism.
+     NOTHING IS DRAWN HERE. Shuffling touches no seed, mints no token and consumes no
+     free sitting; it is the one step of the ceremony you may take and walk away from,
+     which is exactly why the price is not on it. The deck may be mixed again — it costs
+     nothing and changes nothing — but not while it is already mixing.
+     The back link stays VISIBLE and stops being operable for the 820ms, per v2: an
+     escape that vanishes mid-ceremony is worse than one that waits. */
+  var SHUFFLING = false;
+  function shuffle() {
+    if (SHUFFLING || STATE.view !== "intake") return;
+    SHUFFLING = true;
+    ceremonyPhase("shuffling");
+    setControl();
+    announce("Mixing.");
+    var reduce = window.matchMedia && (window.BRMotion ? window.BRMotion.prefersReduced() : window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+    var deck = stage().querySelector("[data-dr-deck]");
+    if (deck && !reduce) deck.classList.add("is-riffling");
+    setTimeout(function () {
+      if (deck) deck.classList.remove("is-riffling");
+      SHUFFLING = false;
+      if (STATE.view !== "intake") return;      // walked away mid-shuffle — leave the flow alone
+      ceremonyPhase("shuffled");
+      setControl();
+      announce("Mixed. Cut when you are ready.");
+    }, reduce ? 150 : 820);                     // v2's own pair: the full riffle, or a beat that only marks the step
+  }
+
   function cut() {
     var sp = SPREADS[STATE.spread];
+    if (SHUFFLING) return;                      // the deck is still moving; the cut is not offered yet
     if (!isPaidNow(sp.key)) return doCut();
     /* the mock settle — on a paid cut the violet button resolves to gold ("Settled"),
        then the cut runs. No sheet, no charge; the beat IS the whole transaction. */
@@ -487,12 +547,14 @@
 
   function wire(root) {
     root.addEventListener("click", function (ev) {
-      var el = ev.target.closest("[data-door],[data-dr-pull],[data-dr-read],[data-dr-cut],[data-dr-turn],[data-dr-home]");
+      var el = ev.target.closest("[data-door],[data-dr-pull],[data-dr-read],[data-dr-shuffle],[data-dr-cut],[data-dr-turn],[data-dr-home]");
       if (!el) return;
       ev.preventDefault();
+      if (SHUFFLING && el.hasAttribute("data-dr-home")) return;   // BR-S319: the escape stays visible but waits out the 820ms
       if (el.hasAttribute("data-door")) { var d = el.getAttribute("data-door"); if (inApp()) location.href = d === "profile" ? "?dev=profile" : location.pathname; return; }
       if (el.hasAttribute("data-dr-pull")) return pull();
       if (el.hasAttribute("data-dr-read")) return startReading(el.getAttribute("data-dr-read"));
+      if (el.hasAttribute("data-dr-shuffle")) return shuffle();
       if (el.hasAttribute("data-dr-cut")) return cut();
       if (el.hasAttribute("data-dr-turn")) return turn(+el.getAttribute("data-dr-turn"));
       if (el.hasAttribute("data-dr-home")) return showLanding();
