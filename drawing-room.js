@@ -123,15 +123,54 @@
       '<rect x="13" y="13" width="94" height="164" rx="5" fill="none" stroke="url(#drInk)" stroke-width=".5" opacity=".6"/>' +
       '<g stroke="url(#drInk)" stroke-width=".6" fill="none" opacity=".7"><path d="M60 42 L86 95 L60 148 L34 95 Z"/><path d="M60 64 L74 95 L60 126 L46 95 Z"/><circle cx="60" cy="95" r="4.5"/></g></svg>';
   }
-  /* the engraved plate; the emblem inverts for a reversed card (per-card art drops in later) */
+  /* ── BR-S316 — THE CARD YOU ARE DEALT IS THE CARD YOU WERE SHOWN. ────────────
+     BR-S306 made the storefront and this room agree on COLOUR and stopped there.
+     M1/M2's sample card had already been given the real face in BR-S289 — a
+     TYPOGRAPHIC one, reproduced from tarot-v2 band for band — while the card this
+     room actually deals stayed an engraved SVG plate wearing parchment paint. So
+     the shelf and the counter still disagreed, one layer down: you were shown a
+     card with a name and a rank, and dealt a card with a compass rose on it.
+     This is the same face, third instance, from the same source of truth
+     (tarot-v2/app.js#faceHTML → styles.css .m2face — head / name / rule / orient /
+     two corner ticks). It is deliberately built BEFORE the ceremony: a ceremony is
+     3.5 seconds of attention paid to a card, and it is not worth choreographing
+     around a face we already know is wrong.
+     THE HEADER DERIVES FROM `tag`, so no data changes and no new fields. Every one
+     of the 78 entries is exactly regular — verified against codex-data.json:
+       Majors  "XXI · Major Arcana"        → ARCANA · XXI
+       Minors  "Ace · Wands · Fire"        → WANDS · FIRE
+     Reversal is spoken by the orientation line, not by rotating the art — v2's
+     faceHTML is the authority here and it does not spin the glyph. The ◆ is on
+     EVERY card, per its own comment: it is the original card art. */
+  /* The element rides its OWN span so CSS can drop it on a narrow card without a
+     second render path. Measured: at 375px the spread deals 96px cards, leaving the
+     meta ~62px, and "PENTACLES · EARTH" at 8.5px mono needs ~87px — it did not
+     overflow, it WRAPPED, which a bounding-box check happily passes and a reader
+     immediately sees as a broken two-line header. Suit alone fits; the element is
+     the part a small card can afford to lose. */
+  function faceHead(c) {
+    var p = String((c && c.tag) || "").split("·");
+    for (var i = 0; i < p.length; i++) p[i] = p[i].trim();
+    if (p.length >= 3) {                                            // Minor: WANDS · FIRE
+      return esc(p[1].toUpperCase()) + '<span class="dr-face__el"> &middot; ' + esc(p[2].toUpperCase()) + '</span>';
+    }
+    return "ARCANA &middot; " + esc(p[0] || "");                    // Major: ARCANA · XXI
+  }
   function faceSVG(c, reversed) {
-    return '<svg class="dr-plate' + (reversed ? ' dr-plate--rev' : '') + '" viewBox="0 0 120 190" aria-hidden="true">' +
-      '<rect x="6" y="6" width="108" height="178" rx="7" fill="none" stroke="url(#drGold)" stroke-width="1.1"/>' +
-      '<rect x="11" y="11" width="98" height="168" rx="5" fill="none" stroke="url(#drInk)" stroke-width=".5" opacity=".7"/>' +
-      '<g class="dr-plate__mark">' +
-      '<text x="60" y="30" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9" letter-spacing="2.5" fill="url(#drGold)">' + esc(numeralOf(c)) + '</text>' +
-      '<g stroke="url(#drGold)" fill="none"><circle cx="60" cy="98" r="31" stroke-width=".8" opacity=".5"/><circle cx="60" cy="98" r="23" stroke-width=".6" opacity=".35"/>' +
-      '<path d="M60 71 L75 98 L60 125 L45 98 Z" stroke-width=".9" opacity=".7"/><circle cx="60" cy="98" r="3.2" fill="url(#drGold)" stroke="none"/></g></g></svg>';
+    var name = String((c && c.name) || "");
+    return '<div class="dr-face">' +
+      '<div class="dr-face__head">' +
+        '<span class="dr-face__meta">' + faceHead(c) + '</span>' +   /* faceHead escapes its own parts — it returns markup */
+        '<span class="dr-face__glyph" aria-hidden="true">&#9670;</span>' +
+      '</div>' +
+      '<div class="dr-face__name' + (name.length >= 13 ? " is-long" : "") + '">' + esc(name) + '</div>' +
+      '<div class="dr-face__div" aria-hidden="true"></div>' +
+      '<div class="dr-face__orient">' +
+        (reversed ? 'Reversed<span class="dr-face__gloss">inward, not yet</span>' : 'Upright') +
+      '</div>' +
+      '<span class="dr-tick dr-tick--tl" aria-hidden="true"></span>' +
+      '<span class="dr-tick dr-tick--br" aria-hidden="true"></span>' +
+      '</div>';
   }
 
   /* ---------- shell ---------- */
@@ -151,7 +190,7 @@
     var card = "";
     if (pulled) {
       card = '<div class="dr-pull__card"><div class="dr-card is-revealed"><div class="dr-cardface dr-cardface--back">' + backSVG() + '</div>' +
-        '<div class="dr-cardface dr-cardface--front">' + faceSVG(pulled.card, pulled.reversed) + '<span class="dr-cardface__name">' + esc(pulled.card.name) + '</span></div></div></div>' +
+        '<div class="dr-cardface dr-cardface--front">' + faceSVG(pulled.card, pulled.reversed) + '</div></div></div>' +   /* BR-S316: the name is IN the face now — a second copy under it read as a caption on a card that already says its name */
         '<p class="dr-pull__num">' + esc(numeralOf(pulled.card)) + (pulled.reversed ? ' &middot; reversed' : '') + (firstKw(pulled.card) ? ' &middot; ' + esc(firstKw(pulled.card)) : '') + '</p>' +
         '<h2 class="dr-pull__name">' + esc(pulled.card.name) + '</h2>' +
         '<p class="dr-pull__mean">' + esc((pulled.reversed && pulled.card.reversed) ? pulled.card.reversed : pulled.card.meaning) + '</p>';
@@ -202,8 +241,7 @@
       var d = drawn[i], shown = d.shown;
       var flip = '<div class="dr-card' + (shown ? " is-revealed" : "") + '">' +
         '<div class="dr-cardface dr-cardface--back">' + backSVG() + '</div>' +
-        '<div class="dr-cardface dr-cardface--front">' + faceSVG(d.card, d.reversed) +
-        '<span class="dr-cardface__name">' + esc(d.card.name) + '</span></div></div>';
+        '<div class="dr-cardface dr-cardface--front">' + faceSVG(d.card, d.reversed) + '</div></div>';
       cards += '<div class="dr-slot' + (shown ? " is-shown" : "") + '">' +
         '<span class="dr-slot__pos">' + esc(sp.positions[i]) + '</span>' +
         (shown ? flip : '<button type="button" class="dr-cardbtn" data-dr-turn="' + i + '" aria-label="' + esc(sp.positions[i]) + ', card ' + (i + 1) + ' of ' + sp.n + ', face down. Press to turn it.">' + flip + '</button>') +

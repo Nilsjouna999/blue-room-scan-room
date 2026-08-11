@@ -447,17 +447,55 @@
    ceremony. Only the FRONT turns. */
 .dr-cardface { position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden; border-radius: 12px; background: linear-gradient(180deg, #111319, #0c0d11); }
 .dr-cardface--front { background: linear-gradient(165deg, #efe9db, #dcd4c2); border: 1px solid rgba(20, 14, 8, .35); }
-/* CSS beats a presentation attribute, so the marks re-point without touching the shared
-   SVG: gold washes out on parchment and drInk is a LIGHT grey that would vanish outright. */
-.dr-cardface--front .dr-plate [stroke] { stroke: #2a2118; }
-.dr-cardface--front .dr-plate text { fill: #c98a5e; }
-.dr-cardface--front .dr-plate circle[fill]:not([fill="none"]) { fill: #c98a5e; }
-.dr-cardface--front .dr-plate rect[stroke]:first-of-type { stroke: #c98a5e; opacity: .75; }
 .dr-cardface--front { transform: rotateY(180deg); box-shadow: 0 14px 34px rgba(0, 0, 0, .5), 0 0 30px rgba(201, 163, 92, .10); }
 .dr-plate { width: 100%; height: 100%; display: block; }
-.dr-plate--rev { transform: rotate(180deg); }
-.dr-cardface__name { position: absolute; bottom: 14px; left: 8px; right: 8px; font-family: var(--pf-serif); font-weight: 600; font-size: 15px; line-height: 1.05; color: var(--pf-cream-display); text-align: center; }
-.dr-cardface--front .dr-cardface__name { color: #1c150d; }   /* BR-S306: ink on parchment */
+
+/* ── BR-S316 — THE REAL FACE, THIRD INSTANCE. ─────────────────────────────────
+   The front is no longer an engraved plate re-tinted for parchment; it is the same
+   TYPOGRAPHIC face M1/M2's sample card has carried since BR-S289, which was itself
+   reproduced from tarot-v2 band for band. Values below are that spec, translated
+   only in their token names (--pf-* here, --font-* there) — the sizes, letter
+   spacings, inks and the 26x1 rule are unchanged, so the three instances cannot
+   drift apart by anybody editing one of them.
+   The four re-tint overrides that used to point the SVG's gold and grey at
+   parchment went with the SVG, along with .dr-plate--rev (the art no longer spins;
+   the orientation line speaks) and .dr-cardface__name (the name is IN the face now
+   — a caption under a card that already says its name read as a label on a label). */
+.dr-face {
+  position: absolute; inset: 0; border-radius: inherit;
+  display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
+  padding: 14px 12px; text-align: center; color: #1c150d;
+}
+.dr-face__head { width: 100%; display: flex; align-items: center; justify-content: space-between; }
+.dr-face__meta { font-family: var(--pf-mono); font-weight: 600; font-size: 11px; letter-spacing: .12em; color: #5c503c; white-space: nowrap; }
+.dr-face__glyph { font-family: var(--pf-serif); font-weight: 700; font-size: 13px; line-height: 1; color: #c98a5e; }
+.dr-face__name { margin: auto 0 0; font-family: var(--pf-serif); font-weight: 600; font-size: 20px; line-height: 1.05; color: #1c150d; }
+.dr-face__name.is-long { font-size: 17px; }   /* 13+ characters, per tarot-v2's own is-long threshold */
+.dr-face__div { width: 26px; height: 1px; background: rgba(28, 21, 13, .35); margin: 8px 0; }
+.dr-face__orient { margin: 0 0 auto; font-family: var(--pf-mono); font-weight: 600; font-size: 9px; letter-spacing: .16em; text-transform: uppercase; color: #6a5c45; }
+.dr-face__gloss { display: block; margin-top: 3px; font-size: 8px; letter-spacing: .1em; text-transform: none; font-style: italic; color: #8a7a60; }
+.dr-tick { position: absolute; width: 10px; height: 10px; border-color: rgba(28, 21, 13, .5); }
+.dr-tick--tl { left: 9px; top: 9px; border-left: 1.5px solid; border-top: 1.5px solid; }
+.dr-tick--br { right: 9px; bottom: 9px; border-right: 1.5px solid; border-bottom: 1.5px solid; }
+/* the spread deals smaller cards than the pull, so the face steps down with them */
+.dr-spread .dr-face { padding: 10px 9px; }
+.dr-spread .dr-face__meta { font-size: 8.5px; letter-spacing: .1em; }
+.dr-spread .dr-face__glyph { font-size: 11px; }
+.dr-spread .dr-face__name { font-size: 15px; }
+.dr-spread .dr-face__name.is-long { font-size: 13px; }
+.dr-spread .dr-face__orient { font-size: 8px; }
+.dr-spread .dr-face__gloss { font-size: 7.5px; }
+.dr-spread .dr-tick { width: 8px; height: 8px; }
+.dr-spread .dr-tick--tl { left: 7px; top: 7px; }
+.dr-spread .dr-tick--br { right: 7px; bottom: 7px; }
+/* BR-S316 — the element goes when the card cannot hold it. At 375px the spread
+   deals 96px cards and "PENTACLES · EARTH" wrapped to two lines in the header row —
+   which no bounding-box check catches, because wrapped text still fits its box.
+   The suit alone is the part that identifies the card; the element is the part a
+   small card can afford to lose. Majors are already short enough to keep whole. */
+@media (max-width: 620px) {
+  .dr-spread .dr-face__el { display: none; }
+}
 .dr-draw__cue { font-family: var(--pf-mono); font-size: 9px; letter-spacing: .2em; text-transform: uppercase; color: var(--pf-meta); text-align: center; }
 
 /* ---- landing: the free pull + the reading doors ---- */
@@ -509,7 +547,8 @@
 .dr-slot.is-shown .dr-slot__pos { color: var(--pf-gold); opacity: .85; }
 .dr-spread .dr-card { width: clamp(96px, 21vw, 132px); }
 .dr-spread--5 .dr-card { width: clamp(80px, 16vw, 110px); }
-.dr-spread .dr-cardface__name { font-size: 11px; bottom: 8px; }
+/* BR-S316: .dr-spread .dr-cardface__name removed with the caption it sized — the
+   spread's face steps down through the .dr-spread .dr-face__* rules above instead. */
 .dr-reads { display: flex; flex-direction: column; gap: 22px; width: 100%; max-width: 48ch; }
 .dr-read { text-align: left; }
 .dr-read__pos { font-family: var(--pf-mono); font-size: 9px; letter-spacing: .16em; text-transform: uppercase; color: var(--pf-gold); margin: 0; }
