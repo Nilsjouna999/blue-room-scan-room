@@ -4765,6 +4765,31 @@ html.orbit-open .orbitbtn { color: var(--t-display); border-color: var(--t-meta)
   font-family: var(--font-mono); font-size: 9px; letter-spacing: .16em; text-transform: uppercase;
   line-height: 1.5; text-align: center;
 }
+/* BR-S293 — THE DESTINATION HOLDS THE CENTRE.  My first pass argued that a scatter's
+   virtue was having no hierarchy — no first row, no top-left.  That is true of a
+   constellation and wrong for a NAV.  There IS a room most people want, and the map
+   should say so with position and size rather than make you read six labels to find
+   it.  Rank 0 takes the centre at 1.3x with no jitter; the rest ring it in rank order,
+   clockwise from the top, with half the previous wander.  Placed, not thrown.
+   Post-pivot the Reading Rooms sell first, and someone who opens a map wants to LEAVE
+   where they are — so the likeliest destination gets the easiest target, not the room
+   they are already standing in. */
+.orbit__plate--prime { width: 190px; z-index: 2; }
+.orbit__plate--prime .orbit__mark { width: 76px; height: 76px; color: #1c150d; }
+.orbit__plate--prime .orbit__label { font-size: 11px; letter-spacing: .2em; color: #1c150d; }
+.orbit__plate--prime::after {
+  content: ""; position: absolute; left: 50%; top: 50%;
+  width: 168px; height: 168px; margin: -84px 0 0 -84px;
+  border: 1px solid rgba(28, 21, 13, .13); border-radius: 50%;
+  pointer-events: none;
+}
+/* meaning: a name says what a room is CALLED, this says what it is for */
+.orbit__sub {
+  font-family: var(--font-display); font-style: italic; font-size: 11.5px;
+  line-height: 1.35; text-align: center; color: #6a5c45; max-width: 15em;
+}
+.orbit__plate--prime .orbit__sub { font-size: 13px; color: #5c503c; }
+
 @media (prefers-reduced-motion: reduce) {
   .orbit__scrim, .orbit__hub, .orbit__plate { transition: none; }
   .orbit__plate { transform: translate3d(calc(var(--ox) * var(--orbit-r) * var(--or, 1)), calc(var(--oy) * var(--orbit-r) * var(--or, 1)), 0) translate(-50%, -50%) rotate(var(--orot, 0deg)) scale(var(--os, 1)); }

@@ -4967,19 +4967,34 @@ render();
            the same key the ribbon itself uses, with a derived fallback so an
            unnamed new panel still gets a plate rather than being dropped. */
         var NAMES = { "": "The Archive Desk", "is-wall": "The Reading Rooms", "is-reliquary": "The Reliquary" };
+        /* BR-S293 — MEANING. A name alone tells you what a room is CALLED, not what it
+           is for, and half of these names are not self-evident to a first visitor. One
+           line each, in the room's own voice, no jargon. */
+        var SUBS = { "": "A photograph, filed as a card",
+                     "is-wall": "Draw a card · or be read by birth",
+                     "is-reliquary": "Everything you have kept" };
+        /* RANK is the point of the whole layout. 0 takes the centre. Post-pivot the
+           Reading Rooms sell first, and someone who opens a map is looking to LEAVE
+           where they are, so the likeliest destination gets the easiest target -- not
+           the room they are standing in. */
+        var RANK = { "is-wall": 0, "": 2, "is-reliquary": 3 };
         var key = p.cls || "";
         var MARKS = { "": ORBIT_MARKS.desk, "is-wall": AB_EMBLEMS.tarot, "is-reliquary": ORBIT_MARKS.reliquary };
-        out.push({ label: NAMES[key] || ("Room " + (i + 1)), mark: MARKS[key] || ORBIT_MARKS.desk, idx: i, kind: "panel" });
+        out.push({ label: NAMES[key] || ("Room " + (i + 1)), sub: SUBS[key] || "",
+                   mark: MARKS[key] || ORBIT_MARKS.desk, rank: RANK[key] === undefined ? 6 : RANK[key],
+                   here: key === (_menuIndex(host) === i ? key : " "), idx: i, kind: "panel" });
       }
     } catch (e) {}
-    if (host.querySelector("#about")) out.push({ label: "About Blue Room", mark: ORBIT_MARKS.about, idx: 0, kind: "about" });
-    out.push({ label: "The Codex", mark: AB_EMBLEMS.codex, href: "codex.html?v=237", kind: "link" });
-    out.push({ label: "Settings", mark: ORBIT_MARKS.settings, href: "?dev=settings", kind: "link" });
+    if (host.querySelector("#about")) out.push({ label: "About Blue Room", sub: "What this is, and where it goes", mark: ORBIT_MARKS.about, rank: 4, idx: 0, kind: "about" });
+    out.push({ label: "The Codex", sub: "Every mark, defined", mark: AB_EMBLEMS.codex, rank: 1, href: "codex.html?v=237", kind: "link" });
+    out.push({ label: "Settings", sub: "Motion, contrast, the room", mark: ORBIT_MARKS.settings, rank: 5, href: "?dev=settings", kind: "link" });
     return out;
   }
 
   function build() {
-    var list = rooms(), n = list.length;
+    var list = rooms();
+    list.sort(function (a, b) { return a.rank - b.rank; });      // rank decides position, not source order
+    var n = list.length;
     sheet = document.createElement("div");
     sheet.className = "orbit";
     sheet.setAttribute("role", "dialog");
@@ -4987,7 +5002,17 @@ render();
     sheet.setAttribute("aria-label", "Rooms");
     var html = '<div class="orbit__scrim" data-orbit-close></div><div class="orbit__field">'
              + '<span class="orbit__hub" aria-hidden="true">◆</span>';
+    var ringN = n - 1;                                           // one plate holds the centre
     for (var i = 0; i < n; i++) {
+      if (i === 0) {                                             // THE DESTINATION: centre, larger, no jitter
+        html += '<button type="button" class="orbit__plate orbit__plate--prime" data-orbit-go="0"'
+              + ' style="--ox:0; --oy:0; --or:0; --os:1; --orot:0deg; --od:0ms">'
+              + '<span class="orbit__mark" aria-hidden="true">' + (list[0].mark || "") + '</span>'
+              + '<span class="orbit__label">' + list[0].label.replace(/[<>&]/g, "") + '</span>'
+              + (list[0].sub ? '<span class="orbit__sub">' + list[0].sub.replace(/[<>&]/g, "") + '</span>' : "")
+              + '</button>';
+        continue;
+      }
       /* BR-S291 — A CONSTELLATION, NOT A RING.  I built the first version off a still
          and shipped a perfect 60-degree ring; the reference's video shows something
          else entirely — an irregular scatter, cards at different distances, different
@@ -5000,11 +5025,12 @@ render();
          wanders up to a fifth of a step, radius rides between .78 and 1.06 of nominal,
          and scale between .88 and 1.06, so no two plates are twins and none can collide
          with its neighbour. */
-      var a = (i / n) * Math.PI * 2 - Math.PI / 2;
+      var k = i - 1;                                             // ring index, rank order clockwise from the top
+      var a = (k / ringN) * Math.PI * 2 - Math.PI / 2;
       var h = Math.sin((i + 1) * 12.9898) * 43758.5453; h = h - Math.floor(h);  // stable [0,1)
       var h2 = Math.sin((i + 1) * 78.233) * 12345.6789;  h2 = h2 - Math.floor(h2);
       var h3 = Math.sin((i + 1) * 39.425) * 24634.6345;  h3 = h3 - Math.floor(h3);
-      a += (h - 0.5) * (Math.PI * 2 / n) * 0.40;
+      a += (h - 0.5) * (Math.PI * 2 / ringN) * 0.22;             // BR-S293: half the old wander. Placed, not thrown.
       var rad = (0.78 + h2 * 0.28).toFixed(3);
       var scl = (0.88 + h3 * 0.18).toFixed(3);
       html += '<button type="button" class="orbit__plate" data-orbit-go="' + i + '"'
@@ -5013,6 +5039,7 @@ render();
             + '; --od:' + (i * 26) + 'ms">'
             + '<span class="orbit__mark" aria-hidden="true">' + (list[i].mark || "") + '</span>'
             + '<span class="orbit__label">' + list[i].label.replace(/[<>&]/g, "") + "</span>"
+            + (list[i].sub ? '<span class="orbit__sub">' + list[i].sub.replace(/[<>&]/g, "") + "</span>" : "")
             + "</button>";
     }
     html += "</div>";
@@ -5074,10 +5101,17 @@ render();
   document.body.appendChild(btn);
   btn.addEventListener("click", function () { open ? hide() : show(); });
 
+  /* BR-S293 — clicking the paper still closes it, but only a click that BEGINS and ENDS
+     on the paper. A press that starts on a plate and drifts off it is a slip, not a
+     dismissal, and dismissing on it is the classic way an overlay feels twitchy. */
+  var downOnScrim = false;
+  document.addEventListener("pointerdown", function (e) {
+    downOnScrim = !!(e.target.closest && e.target.closest("[data-orbit-close]"));
+  }, true);
   document.addEventListener("click", function (e) {
     var t = e.target.closest ? e.target.closest("[data-orbit-close],[data-orbit-go]") : null;
     if (!t) return;
-    if (t.hasAttribute("data-orbit-close")) { hide(); return; }
+    if (t.hasAttribute("data-orbit-close")) { if (downOnScrim) hide(); return; }
     go(parseInt(t.getAttribute("data-orbit-go"), 10));
   });
 })();
