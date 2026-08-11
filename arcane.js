@@ -313,10 +313,41 @@
           FAMILY_MEMBERS.map(function (r) { return '<button type="button" class="ac-famopt" role="menuitem" data-fam-choice="' + esc(r) + '">' + esc(r) + "</button>"; }).join("") +
         "</div>"
       : "";
+    /* ── BR-S335 — THE CONCORD IS OFFERED AT THE CHOOSING, NOT AT THE TILL. ───────
+       BR-S329 put the Concord below the draw button, which is the one place it could
+       only read as an upsell: the reader has already decided, already has a price in
+       front of them, and is being shown a bigger one. It belongs where the question
+       "who is this for?" is actually being answered — a Concord is a different answer
+       to that same question, and it is the only moment where hearing about it is
+       useful rather than noise.
+       IT IS NOT A FOURTH RADIO. The three chips are a radiogroup naming a SUBJECT for
+       this reading; the Concord is a different reading at a different price on a
+       different route. A radio that navigates away is a trap for anyone arrowing
+       through the group, and it would make "a Concord" an answer to "for whom". So it
+       sits beside the group, after a hairline, as a link — visually a peer, ARIA-wise
+       a door, and reachable by Tab straight after the chips either way.
+       THE TRAP THIS WALKS PAST: .ac-forwhom__chip has only ever dressed a <button>, so
+       it never needed to say `color` or `text-decoration`. That is exactly how
+       .menu__door went underlined-lavender the moment a door became an <a>. The
+       --concord variant states both. */
+    var concord =
+      '<span class="ac-forwhom__or" aria-hidden="true"></span>' +
+      '<a class="ac-forwhom__chip ac-forwhom__chip--concord" href="?dev=arcana-reading#/concord">' +
+        '<span class="ac-forwhom__who">Two of us &mdash; a <strong>Concord</strong></span>' +
+        '<span class="ac-forwhom__sub">two people, one reading <span class="ac-forwhom__price">$7.99</span></span>' +
+      "</a>";
     return '<div class="ac-forwhom" data-ac-forwhom>' +
       '<span class="ac-forwhom__label">For whom is this drawn?</span>' +
-      '<div class="ac-forwhom__opts" role="radiogroup" aria-label="For whom is this drawn?">' + chips + "</div>" +
+      '<div class="ac-forwhom__row">' +
+        '<div class="ac-forwhom__opts" role="radiogroup" aria-label="For whom is this drawn?">' + chips + "</div>" +
+        concord +
+      "</div>" +
+      /* Unlock note FIRST: it explains the two dashed chips directly above it, and putting
+         the Concord line in between separated a sentence from the thing it describes.
+         Then the one sentence BR-S329 was right to insist on — a reader cannot tell from
+         the name what a Concord reads. It stays, in the quiet register, at the door. */
       (unlocked ? "" : '<p class="ac-forwhom__note">Reading for family and friends unlocks after your first personal reading.</p>') +
+      '<p class="ac-forwhom__note ac-forwhom__note--concord">A <strong>Concord</strong> reads what runs <em>between</em> two people — not your marks, and not theirs, but the ones the pair make together.</p>' +
       famMenu +
       "</div>";
   }
@@ -410,33 +441,10 @@
             '<p class="ac-hope">' + (recipient ? "Each mark, once set, is hope." : "Each mark, once set, is hope.") + '</p>' +
             '<p class="ac-notice" data-ac-notice role="status" aria-live="polite" aria-atomic="true"></p>' +
             (recipient ? '' : '<a class="ac-giftlink" href="?dev=arcane&gift=compose">Giving this to someone? Send it as a gift &rarr;</a>') +
-            /* ── BR-S329 — THE CONCORD IS OFFERED WHERE THE MARKS ARE SET. ─────────
-               A Concord was reachable from exactly one place in the building: a small
-               italic line on M2. But this is the room where someone has already decided
-               they want a birth reading and is typing a name and a date into it — the
-               single moment where "there is a version of this for two people" is useful
-               rather than noise. It was not offered here at all.
-               AND IT IS EXPLAINED, not just linked. The M2 line said "two names, one
-               bond" and left the reader to guess whether that means two readings, a
-               comparison, or something else. It is none of those: it reads what runs
-               BETWEEN two people, which is a different object from either of their own
-               readings, and that is worth two sentences at the moment it is offered.
-               Held below the draw button and above nothing, in the intake's quiet
-               register — this is an alternative, not a competing act. */
-            (recipient ? '' :
-              '<div class="ac-concord">' +
-                /* ── BR-S329 — THE NAME KEEPS ITS WEIGHT, THE GLOSS CARRIES THE MEANING. ──
-                   "Concord" is the right name and it is also a word a non-native speaker,
-                   or anyone under about twenty, has no reason to know. The room does not
-                   have to choose: the name leads and a plain-English gloss rides beside it
-                   ONCE, at the moment of choosing. Nobody is asked to look anything up, and
-                   nothing is dumbed down — the word is still there, now with its meaning
-                   attached the first time you meet it. This is the pattern for every
-                   important name in the building: keep the word, gloss it at the door. */
-                '<p class="ac-concord__eyebrow">Or, for two</p>' +
-                '<p class="ac-concord__lede">A <strong>Concord</strong> <span class="ac-concord__plain">(a reading for two — you and a friend, a partner, a parent)</span> reads what runs <em>between</em> two people: not your marks, and not theirs, but the ones the pair make together. Both births are set, the bond is drawn once, and it is kept the same way a reading is.</p>' +
-                '<a class="ac-concord__go" href="?dev=arcana-reading#/concord">Draw a Concord &mdash; two people, one reading <span class="ac-concord__price">$7.99</span></a>' +
-              '</div>') +
+            /* BR-S335: the Concord block that stood here is gone — it has moved UP to the
+               for-whom row (forwhomHTML). Below the draw button it could only read as an
+               upsell at the till; beside the question it answers, it is an alternative.
+               The gloss BR-S329 fought for went with it, not into the bin. */
           "</div>" +
         "</div>" +
         '<div class="ac-ceremony" data-ac-ceremony hidden></div>' +
