@@ -4828,6 +4828,46 @@ html.orbit-wings .orbit__field { --orbit-rx: clamp(200px, 25.5vw, 368px); --orbi
   .orbit__mark, .orbit.is-open .orbit__mark { transform: none; transition: color 180ms ease; }
 }
 .orbit__mark svg { width: 100%; height: 100%; display: block; }
+
+/* ── BR-S311 — THE HALO. ──────────────────────────────────────────────────────
+   The direction leans on a halo twice — "extremely light, DEFORMS rather than
+   translates" in the field, and "closes around the icon" on click — and the hub had
+   none. It is a ::before on the mark rather than a new element for one reason worth
+   stating: a halo that is a SIBLING has to be kept centred on the icon by arithmetic,
+   and the icon changes size three times (54 / 76 / 128px). As a child it is centred by
+   construction and cannot drift, at any size, forever.
+   IT IS ENGRAVED, NOT LIT. A 1px ink hairline at low alpha — this is museum paper, and
+   a glow would be the first fake light on the sheet.
+   INVISIBLE AT REST. The field raises it as you approach and deforms it: `rotate` to
+   the pull axis, then an elliptical `scale` along it. That is the "deforms rather than
+   translates" instruction taken literally — it is the one layer that never moves. */
+.orbit__mark { position: relative; }
+.orbit__mark::before {
+  content: ""; position: absolute; inset: 0;
+  border: 1px solid rgba(28, 21, 13, .34); border-radius: 50%;
+  pointer-events: none;
+  opacity: var(--haloo, 0);
+  rotate: var(--halor, 0deg);
+  scale: var(--halosx, 1.5) var(--halosy, 1.5);   /* the unset fallback IS the field's rest value — one number, two places, and they must agree */
+}
+/* THE DISARM WINDOW. While the field is armed the halo must land on the frame it is
+   written, so it carries no transition at all. The moment the field lets go — a plate
+   going on display, touch, reduced motion — these become the only thing moving it, and
+   they are what makes the close read as a closing rather than a cut. Scoped to
+   :not(.has-field) so the two can never both be true. */
+.orbit:not(.has-field) .orbit__mark::before {
+  transition: opacity 260ms var(--ease-settle, cubic-bezier(.2,.7,.2,1)) 60ms,
+              scale 300ms var(--ease-settle, cubic-bezier(.2,.7,.2,1)) 60ms,
+              rotate 220ms var(--ease-settle, cubic-bezier(.2,.7,.2,1)) 60ms;
+}
+/* CLOSES AROUND THE ICON — step three of the click sequence. Not a fade: it contracts
+   from 1.5x to 1.06x, so it ends as a ring the icon is wearing rather than a ring the
+   icon happens to be inside. Written as literals, not var()s, so it holds whether the
+   field was ever armed — this beat has to exist on a phone too. */
+.orbit__plate.is-display .orbit__mark::before { opacity: .55; rotate: 0deg; scale: 1.06; }
+@media (prefers-reduced-motion: reduce) {
+  .orbit__mark::before { transition: none; }
+}
 .orbit__plate:hover .orbit__mark, .orbit__plate:focus-visible .orbit__mark { color: #1c150d; }
 .orbit__label {
   font-family: var(--font-mono); font-size: 9px; letter-spacing: .16em; text-transform: uppercase;
@@ -4868,18 +4908,45 @@ html.orbit-wings .orbit__field { --orbit-rx: clamp(200px, 25.5vw, 368px); --orbi
    The displayed plate is enlarged by SIZE, not by scale() — a scaled label is a
    softened label, and this one has to be read. The rest of the constellation recedes
    rather than disappearing, so you never lose the map you are standing in. */
-.orbit.is-detail .orbit__plate { opacity: .18; pointer-events: none; }
+/* ── BR-S311 — CLICK HAS CONSEQUENCE, IN ORDER. ───────────────────────────────
+   The direction gives the click as a SEQUENCE, not a state change: the node goes
+   still ~80ms, decorative geometry contracts inward, the halo closes around the icon,
+   the other nodes lose contrast and recede, the node drifts to exact centre, and its
+   icon grows into the destination. Every one of those beats already existed here as
+   part of .is-display — they all fired on the same frame, which is why it read as a
+   switch being thrown rather than as a consequence.
+   Nothing below is a new mechanism. It is the same set of transitions with the
+   ORDER written down: the 80ms stillness is a real pause in app.js, and these delays
+   space the rest. Total 80 + 90 + 460 = 630ms to settled, against 460ms before —
+   two beats slower and the whole reason the gesture reads.
+   The two-press ladder is untouched: this is what the FIRST press now looks like. */
+.orbit.is-detail .orbit__plate { opacity: .18; pointer-events: none; transition-delay: 40ms; }   /* 3 — the field loses contrast around what you chose */
 .orbit.is-detail .orbit__plate.is-display { opacity: 1; pointer-events: auto; z-index: 3; }
 .orbit .orbit__plate.is-display {
   width: 300px;
   transform: translate3d(0, 0, 0) translate(-50%, -50%) rotate(0deg) scale(1);
-  transition-delay: 0ms;
+  transition-delay: 90ms;                                    /* 4 — only then does it start for the centre */
 }
 .orbit__plate.is-display .orbit__mark { width: 128px; height: 128px; color: #1c150d; transform: rotate(0deg) scale(1); }
+/* 5 — the icon GROWS into the destination instead of jumping to its final size. Scoped
+   to the display state so the mark carries no width transition at rest, and left off the
+   way back on purpose: an arrival earns beats, a dismissal does not. */
+.orbit__plate.is-display .orbit__mark {
+  transition: color 180ms ease,
+              transform 300ms var(--ease-settle, cubic-bezier(.2,.7,.2,1)),
+              width 320ms var(--ease-settle, cubic-bezier(.2,.7,.2,1)) 90ms,
+              height 320ms var(--ease-settle, cubic-bezier(.2,.7,.2,1)) 90ms;
+}
 .orbit__plate.is-display .orbit__label { font-size: 12.5px; letter-spacing: .22em; color: #1c150d; }
 .orbit__plate.is-display .orbit__sub { font-size: 15px; color: #4b4133; max-width: 17em; }
-.orbit__plate--prime::after { transition: opacity 240ms ease; }
-.orbit.is-detail .orbit__plate--prime::after { opacity: 0; }
+/* 2 — BR-S311: "decorative geometry contracts inward". It used to only fade, which is a
+   thing being switched off; contracting is a thing being drawn in. `translate` stays out
+   of the transition list — that is the field's channel and it must never be tweened. */
+.orbit__plate--prime::after {
+  transition: opacity 240ms ease,
+              scale 260ms var(--ease-settle, cubic-bezier(.2,.7,.2,1));
+}
+.orbit.is-detail .orbit__plate--prime::after { opacity: 0; scale: .78; }
 /* the second press is the one that travels, so it has to be visible */
 .orbit__enter {
   margin-top: 4px; font-family: var(--font-mono); font-size: 9.5px; letter-spacing: .22em;
@@ -4889,8 +4956,11 @@ html.orbit-wings .orbit__field { --orbit-rx: clamp(200px, 25.5vw, 368px); --orbi
      Ink is 17.2:1 and the arrow already carries the affordance. Not copper (2.48:1). */
   text-transform: uppercase; color: #1c150d;
   opacity: 0; transform: translateY(-3px);
-  transition: opacity 240ms var(--ease-settle, cubic-bezier(.2,.7,.2,1)) 60ms,
-              transform 240ms var(--ease-settle, cubic-bezier(.2,.7,.2,1)) 60ms;
+  /* BR-S311: 60ms -> 320ms. The invitation to travel is the LAST beat of the sequence —
+     it used to appear while the plate was still crossing the sheet, which asked for the
+     second press before the first had finished answering. */
+  transition: opacity 240ms var(--ease-settle, cubic-bezier(.2,.7,.2,1)) 320ms,
+              transform 240ms var(--ease-settle, cubic-bezier(.2,.7,.2,1)) 320ms;
 }
 .orbit__plate.is-display .orbit__enter { opacity: 1; transform: none; }
 

@@ -5395,6 +5395,7 @@ render();
   var F_NUDGE = 0.9;         // px the other way for everyone else — the 0.5–1px displacement
   var F_FALL = 260;          // px; how fast the neighbour push falls off
   var F_LIFT = 1.015;        // the 1–2% enlarge, sprung rather than transitioned
+  var F_HALO = 1.5;          // BR-S311: the halo's resting radius, as a multiple of the icon. MUST equal the CSS var() fallback.
   var F_DT = 1 / 120;
   /* sel, gain, k, zeta */
   var F_LAYERS = [
@@ -5418,6 +5419,13 @@ render();
         var s = spring(F_LAYERS[L][1], F_LAYERS[L][2], F_LAYERS[L][3]);
         s.el = el; layers.push(s);
       }
+      /* BR-S311 — the halo is the lightest thing on the sheet and the ONLY layer that
+         never translates: it deforms. Its spring output is read as a direction and a
+         magnitude, then spent on rotate + an elliptical scale, per the direction's
+         "extremely light, deforms rather than translates". Lives on the mark's ::before,
+         so like the ornament it moves by custom property. */
+      var mk = p.querySelector(".orbit__mark");
+      if (mk) { var hl = spring(1.90, 120, 0.82); hl.el = mk; hl.halo = true; layers.push(hl); }
       if (p.classList.contains("orbit__plate--prime")) {                  // the engraved ring is the ornament: lightest, and a pseudo-element
         /* gain 1.20, not 1.45: at 1.45 it peaked at 5.80px against a stated 2–5px
            envelope. Lightest still means furthest — 4.8px against the icon's 4.0 — but
@@ -5482,6 +5490,18 @@ render();
       var n = nodes[i];
       for (var L = 0; L < n.layers.length; L++) {
         var a = n.layers[L];
+        if (a.halo) {
+          var m = Math.sqrt(a.x * a.x + a.y * a.y);
+          var st = Math.min(0.16, m * 0.020);                             // ≤16% elongation — a deformation, not a squash
+          a.el.style.setProperty("--halor", (m > 0.01 ? Math.atan2(a.y, a.x) * 57.2957795 : 0).toFixed(1) + "deg");
+          a.el.style.setProperty("--halosx", (F_HALO * (1 + st)).toFixed(3));
+          a.el.style.setProperty("--halosy", (F_HALO * (1 - st * 0.62)).toFixed(3));
+          /* the −1.0 floor is what keeps the halo the property of the plate you are
+             pointing at: a neighbour's 1.7 of displacement barely lifts it off zero,
+             the hovered plate's 7.6 takes it to full. */
+          a.el.style.setProperty("--haloo", Math.min(1, Math.max(0, m - 1.0) * 0.22).toFixed(3));
+          continue;
+        }
         if (a.prop) { a.el.style.setProperty("--ornx", a.x.toFixed(2) + "px"); a.el.style.setProperty("--orny", a.y.toFixed(2) + "px"); }
         else a.el.style.translate = a.x.toFixed(2) + "px " + a.y.toFixed(2) + "px";
       }
@@ -5539,7 +5559,11 @@ render();
         ps[i].style.scale = ""; ps[i].style.rotate = "";
         ps[i].style.removeProperty("--ornx"); ps[i].style.removeProperty("--orny");
         var kids = ps[i].querySelectorAll(".orbit__mark, .orbit__label, .orbit__sub");
-        for (var j = 0; j < kids.length; j++) kids[j].style.translate = "";
+        for (var j = 0; j < kids.length; j++) {
+          kids[j].style.translate = "";
+          kids[j].style.removeProperty("--haloo"); kids[j].style.removeProperty("--halor");
+          kids[j].style.removeProperty("--halosx"); kids[j].style.removeProperty("--halosy");
+        }
       }
     }
     FIELD.nodes = null; FIELD.inside = false; FIELD.t = 0; FIELD.acc = 0;
@@ -5592,19 +5616,39 @@ render();
      receding. Second press (or the Enter) = travel. Paper puts it back down; paper
      again closes the sheet. Escape walks the same ladder in reverse, which is the only
      way an overlay with two depths stays predictable. */
+  var _stillT = 0, _stillTok = 0;
   function display(i) {
     detail = i;
     /* BR-S309 — "the node goes still" is step one of the click sequence, and it is
        also the only correct engineering: .is-display re-sizes and re-centres the plate
        with a CSS transition, so the field has to let go of it entirely. */
     fieldDisarm();
-    sheet.classList.add("is-detail");
-    var ps = sheet.querySelectorAll(".orbit__plate");
-    for (var k = 0; k < ps.length; k++) ps[k].classList.toggle("is-display", k === i);
-    ps[i].focus({ preventScroll: true });
+    /* BR-S311 — AND THE STILLNESS IS REAL, NOT IMPLIED. 80ms in which the field has
+       let go and nothing has started yet. It is the beat that turns a state change into
+       a consequence: you press, the sheet stops, and THEN it answers. Every other beat
+       of the sequence is a transition-delay in styles.css; this one cannot be, because
+       there is nothing to delay — the point is that nothing happens.
+       `detail` is set BEFORE the pause on purpose: a second press inside the 80ms is a
+       reader who already knows where they are going, and it travels immediately rather
+       than being swallowed. The token makes any pending beat stale, so a press, an
+       Escape and a close in quick succession cannot land on a sheet that has moved on. */
+    _stillTok++;
+    var tk = _stillTok;
+    var apply = function () {
+      if (tk !== _stillTok || detail !== i || !sheet || !open) return;
+      sheet.classList.add("is-detail");
+      var ps = sheet.querySelectorAll(".orbit__plate");
+      for (var k = 0; k < ps.length; k++) ps[k].classList.toggle("is-display", k === i);
+      ps[i].focus({ preventScroll: true });
+    };
+    window.clearTimeout(_stillT);
+    if (reduced()) { apply(); return; }                 // no transitions to sequence — a pause here would just read as lag
+    _stillT = window.setTimeout(apply, 80);
   }
   function undisplay() {
     detail = -1;
+    _stillTok++;                                // BR-S311: kill any beat still waiting on its 80ms
+    window.clearTimeout(_stillT);
     if (!sheet) return;
     sheet.classList.remove("is-detail");
     var ps = sheet.querySelectorAll(".orbit__plate");
