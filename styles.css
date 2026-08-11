@@ -3023,7 +3023,38 @@ html.is-travel .card .cardfinish { mix-blend-mode: normal; }
 .menu__draw-stage { grid-area: stage; align-self: center; display: flex; flex-direction: column; align-items: center; gap: 14px; position: relative; z-index: 2; }
 .menu__draw-herosub { font-family: var(--font-display); font-style: italic; font-size: 14px; line-height: 1.5; color: var(--t-body); text-align: center; }
 
-.m2hero { position: relative; height: clamp(380px, 54vh, 560px); aspect-ratio: 120 / 190; width: auto; }
+/* BR-S277 — M2'S HERO BECOMES AN OBJECT.  The builder: "we gonna change m2 card
+   design, it feels out of place."  It was the only card in the building that was not
+   a THING.  M1's card is photographic and material — a real image under tone, grain,
+   foil, shimmer and a card finish — while this one was outline art with fill:none,
+   two stroked rectangles standing in for an edge and nothing behind them.  Side by
+   side in the same room, one read as an artifact and the other as its blueprint, and
+   at 380–560px tall the diagram reading only got louder: stroke art reads as
+   ENGRAVING at symbol size and as a SPEC DRAWING at hero size.
+   So it gets card stock.  The surface, radius, hairline gold edge and drop are the
+   same grammar as .dr-cardface — the face the Drawing Room actually deals — which
+   matters more now than it did last week: after the pivot, M2 is the storefront for
+   tarot, so its hero should BE the product rather than a symbol standing for it.
+   The outer stroked rect is gone (the edge is real now, it does not need faking) and
+   the inner rule stays as an engraved margin on the stock.  The card also carries its
+   own name, the way a dealt card does — which is why the caption above it stopped
+   repeating "XVII · The Star". */
+.m2hero {
+  position: relative; height: clamp(380px, 54vh, 560px); aspect-ratio: 120 / 190; width: auto;
+  border-radius: 12px;
+  background: linear-gradient(178deg, #171b22 0%, #12151b 46%, #0d1014 100%);
+  box-shadow:
+    inset 0 0 0 1px rgba(200, 173, 112, 0.22),          /* the gold edge, as a real edge */
+    inset 0 1px 0 rgba(233, 229, 220, 0.05),            /* the lit top lip of the stock */
+    0 18px 40px rgba(0, 0, 0, 0.50),
+    0 2px 6px rgba(0, 0, 0, 0.40);
+}
+.m2hero__name {
+  position: absolute; left: 10px; right: 10px; bottom: clamp(14px, 2.4vh, 20px);
+  font-family: var(--font-display); font-size: clamp(15px, 2.1vh, 19px); font-weight: 600;
+  letter-spacing: .005em; line-height: 1.05; text-align: center; color: var(--t-display);
+  pointer-events: none;
+}
 .m2hero__back, .m2hero__face { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
 .m2hero__back { opacity: .12; }
 .m2hero__face { opacity: 1; clip-path: none; }
@@ -3065,7 +3096,8 @@ html.is-travel .card .cardfinish { mix-blend-mode: normal; }
   /* BR-S271: 1.4s -> 0.6s. The turn now starts AFTER the 640ms travel instead of under it,
      so the old duration left 760ms of animation still running past arrival — a 1.45s smear
      from press to settled. Two clean beats at 0.6s: the slide lands, then the card turns. */
-  .m2hero--turn .m2hero__face { animation: m2-turn .6s cubic-bezier(.2, .7, .2, 1) both; }
+  .m2hero--turn .m2hero__face,
+  .m2hero--turn .m2hero__name { animation: m2-turn .6s cubic-bezier(.2, .7, .2, 1) both; }
   .m2hero--turn .m2hero__back { animation: m2-back-fade .6s cubic-bezier(.2, .7, .2, 1) both; }
   .m2pip-glow { animation: m2-breath 9s ease-in-out infinite; }
 }
