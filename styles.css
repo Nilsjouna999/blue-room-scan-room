@@ -4754,10 +4754,36 @@ html.orbit-open .orbitbtn { color: var(--t-display); border-color: var(--t-meta)
    all currentColor, so they take the ink without a second palette. An empty rectangle
    with a label under it is a placeholder pretending to be a system; recognising a
    room by seeing it is the whole reason this arrangement is worth having. */
+/* BR-S295 — THE MARKS SPIN IN.  The builder asked for it fast, sleek, satisfying and
+   "very optimized, that you could spam open close that room and it will work fine and
+   without problem like clockwork."  That last clause is the engineering requirement and
+   it dictates the implementation.
+   IT IS A TRANSITION, NOT A KEYFRAME ANIMATION.  A @keyframes spin restarts from its
+   first frame every time the class flips, so closing mid-arrival snaps the mark back to
+   -132deg and then unwinds — the exact seam that makes a rapid toggle feel broken. A
+   transition interpolates from the CURRENT computed value, so a close caught halfway
+   simply reverses from wherever the mark actually is. Interruptibility is free, and it
+   is the whole difference between clockwork and jitter.
+   It is also nothing per frame: no JS, no timer, one composited transform on an element
+   that is already there. The stagger is transition-delay on open and ZERO on close, so
+   the marks arrive in sequence and leave together — a staggered exit reads as hesitation
+   when you are dismissing something.
+   -132deg and .58 scale: far enough that it reads as a turn rather than a nudge, short
+   enough at 300ms that it never delays the map being usable. */
 .orbit__mark {
   width: 54px; height: 54px; display: block;
   color: rgba(28, 21, 13, .70);
-  transition: color 180ms ease, transform 220ms var(--ease-settle, cubic-bezier(.2,.7,.2,1));
+  transform: rotate(-132deg) scale(.58);
+  transition: color 180ms ease,
+              transform 300ms var(--ease-settle, cubic-bezier(.2,.7,.2,1));
+}
+.orbit.is-open .orbit__mark {
+  transform: rotate(0deg) scale(1);
+  transition-delay: 0ms, calc(var(--od, 0ms) + 40ms);
+}
+.orbit:not(.is-open) .orbit__mark { transition-delay: 0ms; }   /* leave together, never in sequence */
+@media (prefers-reduced-motion: reduce) {
+  .orbit__mark, .orbit.is-open .orbit__mark { transform: none; transition: color 180ms ease; }
 }
 .orbit__mark svg { width: 100%; height: 100%; display: block; }
 .orbit__plate:hover .orbit__mark, .orbit__plate:focus-visible .orbit__mark { color: #1c150d; }
@@ -4803,7 +4829,7 @@ html.orbit-open .orbitbtn { color: var(--t-display); border-color: var(--t-meta)
   transform: translate3d(0, 0, 0) translate(-50%, -50%) rotate(0deg) scale(1);
   transition-delay: 0ms;
 }
-.orbit__plate.is-display .orbit__mark { width: 128px; height: 128px; color: #1c150d; }
+.orbit__plate.is-display .orbit__mark { width: 128px; height: 128px; color: #1c150d; transform: rotate(0deg) scale(1); }
 .orbit__plate.is-display .orbit__label { font-size: 12.5px; letter-spacing: .22em; color: #1c150d; }
 .orbit__plate.is-display .orbit__sub { font-size: 15px; color: #4b4133; max-width: 17em; }
 .orbit__plate--prime::after { transition: opacity 240ms ease; }
