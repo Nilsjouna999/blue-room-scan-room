@@ -1852,11 +1852,11 @@ function m2Head(c) {
 let M2_FACE = "birth", M2_LAST = null, M2_FLIP_T = null;
 const M2_BIRTH_READ = {
   label: "The reading in question",
-  meta: "Six marks · one name · by birth",
+  meta: "By birth · one name",
   /* Trimmed from 251 characters to fit the four lines the box actually has. The old
      one measured FIVE lines at 330px and was being clipped mid-sentence — and the six
      marks it spent two lines listing are printed on the card beside it anyway. */
-  mean: "Six marks you were given rather than chose, read together into one crowned name. Nothing is drawn here — each mark is looked up, and read as it stands.",
+  mean: "Six marks you were given rather than chose, read together into one crowned name. Nothing is dealt here — the same name and the same date return the same six, tonight and in ten years.",
   accent: "#b6a06a"        // the crown's own brass — the birth reading's register
 };
 const M2_SAMPLE_READ = {
@@ -2260,7 +2260,7 @@ function renderMenu(reveal) {
           <button type="button" class="menu__door menu__door--sample" data-view-to="room">
             <span class="menu__door-kicker">Sample</span>
             <span class="menu__door-name">View sample card</span>
-            <span class="menu__door-desc">See a finished developed card — ${srcCode}. A sample, not your photo.</span>
+            <span class="menu__door-desc">See the sample card in its room — ${srcCode}. A sample, not your photo.</span>
           </button>
         </div>
 
@@ -2275,17 +2275,20 @@ function renderMenu(reveal) {
           <button type="button" class="menu__codex menu__codex--rooms" data-annex-go><span class="menu__codex__mark" aria-hidden="true">◆</span> The Reading Rooms <span class="menu__codex__arr" aria-hidden="true">→</span></button>
         </div>
 
-        <p class="menu__foot">One sample · ${srcCode} · ${s && s.short ? s.short : "Sample"}.</p>
-
-        <!-- BR-S259: DEV AFFORDANCE, not a product control. Flips the desk between
-             the original layout (A) and the BR-S254 rank reversal (B) with no
-             reload, so the two can be judged by eye. Remove once chosen. -->
-        <div class="menu__ab" role="group" aria-label="M1 layout variant (dev)">
-          <span class="menu__ab-tag">M1 layout</span>
-          <button type="button" class="menu__ab-btn" data-m1-variant="a">A · original</button>
-          <span class="menu__ab-sep" aria-hidden="true">/</span>
-          <button type="button" class="menu__ab-btn" data-m1-variant="b">B · under glass</button>
-        </div>
+        <!-- BR-S352: the "One sample" footer is cut — third appearance of the source
+             code on one screen, second of the word "sample", and its last field
+             resolved to the bare word "Shore".
+             BR-S352: THE A/B TOGGLE IS GONE. BR-S259 shipped it as an explicit DEV
+             AFFORDANCE whose own comment said "Remove once chosen", and BR-S260
+             chose: A wins, and A is the default. It then rode the live front door
+             for the best part of a hundred commits, showing every visitor an
+             internal surface code, a build word, and two unlabelled variants of a
+             decision already made. The variant machinery below stays, so B is still
+             reachable by setting the storage key by hand: the comparison is not
+             lost, it is just no longer furniture in a stranger's room.
+             NOTE TO THE NEXT EDITOR: this whole block is inside a TEMPLATE LITERAL.
+             A backtick in a comment here ends the string and breaks the file — which
+             is exactly what the first version of this comment did. -->
       </div>
     </div>
     ${ANNEX_GO}
@@ -4617,7 +4620,7 @@ function mountDev() {
             '<p class="msample__seal">The front is complete. The same card has a sealed back.</p>' +
             '<div class="menu__doors">' +
               '<button type="button" class="menu__door menu__door--add" data-draft-pick><span class="menu__door-kicker">Your Photo</span><span class="menu__door-name">Add your photo</span><span class="menu__door-desc">Stage your image as a local draft. The scan engine isn\'t connected yet — nothing reads it.</span></button>' +
-              '<button type="button" class="menu__door menu__door--sample" data-view-to="room"><span class="menu__door-kicker">Sample</span><span class="menu__door-name">View sample card</span><span class="menu__door-desc">See a finished developed card — SRC-01. A sample, not your photo.</span></button>' +
+              '<button type="button" class="menu__door menu__door--sample" data-view-to="room"><span class="menu__door-kicker">Sample</span><span class="menu__door-name">View sample card</span><span class="menu__door-desc">See the sample card in its room — SRC-01. A sample, not your photo.</span></button>' +
             '</div>' +
             '<p class="menu__foot">One sample · SRC-01 · Driver.</p>' +
           '</div>' +

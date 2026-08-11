@@ -279,7 +279,7 @@
     { key: "name",   label: "The name borne",            plain: "your name",              ph: "the name you answer to" },
     { key: "day",    label: "The day first counted",     plain: "date of birth",          kind: "date" },
     { key: "hour",   label: "The hour first struck",     plain: "time of birth — optional", kind: "time" },
-    { key: "ground", label: "The ground first stood on", plain: "place of birth",         ph: "the town, and the land" },
+    { key: "ground", label: "The ground first stood on", plain: "place of birth — optional", ph: "the town, and the land" },
     { key: "matter", label: "What is brought",           plain: "your question — optional", ph: "the matter you carry, in a line — or leave it unspoken" },
   ];
 
@@ -428,7 +428,7 @@
                birth date — and nothing else is used", which was plain, reassuring, and
                false: the form also asks for the hour, the town, and the matter. Checked
                against the rendered inputs rather than against my own copy. */
-            '<p class="ac-sub">' + (recipient ? "The marks are yours to lay down. The gift covers the drawing." : "Your name, your birth date and where you were born — that is what the reading is drawn from. The hour and the question are optional.") + '</p>' +
+            '<p class="ac-sub">' + (recipient ? "The marks are yours to lay down. The gift covers the drawing." : "Your name and your birth date — that is what the reading is drawn from. The hour, the place and the question are yours to add.") + '</p>' +
           "</div>" +
           (recipient ? giftBannerHTML(from) : forwhomHTML()) +
           '<div class="ac-redraw-banner" data-ac-redraw hidden></div>' +
@@ -1085,7 +1085,7 @@
       var subjName = famSubject || (wantId === "self" ? "your crown" : "this crown");   // WHOFOR entries carry no crown name; the chosen family subject is the only personalized handle we have
       redrawBanner.hidden = false;
       redrawBanner.innerHTML = '<span class="ac-redraw-banner__mark" aria-hidden="true">&#10022;</span> Enriching ' +
-        esc(subjName) + " — a new reading is drawn and its rubies are added to the crown. The original is kept, never lost.";
+        esc(subjName) + " — a new reading is drawn and its marks are set into the crown. The original is kept.";
       if (drawLabel) drawLabel.textContent = "Draw the richer reading";
     }
 

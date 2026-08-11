@@ -11,8 +11,8 @@
      · "Settings"      — the REAL controls only (nothing fake):
          Motion (Match device / Reduced / Full, via window.BRMotion),
          a locked-honest Appearance row, Restore the free Sitting,
-         Clear the staged draft, Reset the Shelf (inline confirm),
-         and a read-only local ledger of the four real marks on file.
+         Reset the Shelf (inline confirm), and a read-only local ledger
+         of the four real marks on file.
      · "About & Legal" — the mandated boring page as ONE scrolling
          document with a sticky six-section jump-rail.
 
@@ -23,9 +23,10 @@
    truthfully. Every read/write is fail-open (try/caught). Owns its own
    delegated click/keydown listeners; never touches app.js routing or state.
 
-   Draft hooks (the app wires these; honest "nothing staged" without them):
-     window.BRSettings._hasDraft   -> () => boolean
-     window.BRSettings._clearDraft -> () => truthy-if-cleared
+   BR-S352: the draft hooks this header used to advertise were never wired by
+   app.js, so the control they fed could only ever say "nothing staged" — including
+   to a reader who had just staged something. Both the hooks and the control are
+   gone; the row states the truth instead (page memory, cleared by a reload).
 ============================================================= */
 (function () {
   "use strict";
@@ -67,14 +68,6 @@
     return false;
   }
 
-  /* ---- staged-draft hooks (in-memory only in app.js; nothing persists) ---- */
-  function hasDraft() {
-    try { return !!(window.BRSettings && typeof window.BRSettings._hasDraft === "function" && window.BRSettings._hasDraft()); } catch (e) { return false; }
-  }
-  function clearDraft() {
-    try { if (window.BRSettings && typeof window.BRSettings._clearDraft === "function") return !!window.BRSettings._clearDraft(); } catch (e) {}
-    return false;
-  }
 
   /* =========================================================
      HEADER — cloned .pf-top: wordmark (→ Main Menu) + a quiet
@@ -239,21 +232,29 @@
     var sittingUsed = lsGet("br_dr_sitting_used") === "1";
     var concords = concordKeys().length;
 
-    /* Clear the staged draft (in-memory only) */
-    var draft = hasDraft(), draftBtn, draftDesc;
-    if (opts.draftCleared) {
-      draftBtn = '<button type="button" class="st-btn" disabled>Cleared</button>';
-      draftDesc = "Cleared — no photo is staged.";
-    } else if (draft) {
-      draftBtn = '<button type="button" class="st-btn" data-act="clear-draft">Clear</button>';
-      draftDesc = "A photo is staged this session. Reloading the page already clears it — this clears it without leaving the page.";
-    } else {
-      draftBtn = '<button type="button" class="st-btn" disabled>Nothing staged</button>';
-      draftDesc = "No photo is staged this session — nothing to clear.";
-    }
+    /* ── BR-S352 — A CONTROL THAT COULD ONLY EVER SAY ONE THING. ──────────────
+       This row asked `window.BRSettings._hasDraft`, and app.js NEVER ASSIGNS IT —
+       the staged photo lives in a module-scope `let draft = null` that nothing
+       outside that closure can see. So `hasDraft()` returned false always: the
+       button was permanently dead, and a reader who had just staged a photo was
+       told, in writing, that none was staged. A false statement produced by a
+       hook that was specified and then never wired.
+       Rather than reach into app.js for a state this page does not need, the row
+       becomes the true sentence: the draft is page memory, and reloading clears
+       it. Nothing to press, nothing to lie about. "Session" goes with it — the
+       reader's word for that is "reloading the page". */
+    var draftDesc = "A photo you stage lives in this page's memory only. It never leaves the device, and reloading the page clears it.";
 
-    /* Reset the Shelf (destructive, inline confirm) */
-    var resetBtn = '<button type="button" class="st-btn st-btn--danger" data-act="reset-open" aria-expanded="false" aria-controls="st-confirm">Reset&hellip;</button>';
+    /* Reset the Shelf (destructive, inline confirm)
+       BR-S352: with an empty ledger this offered a live destructive control whose
+       confirm then read "This clears 0 marks and 0 sealed Concords. This can't be
+       undone." — a warning about destroying nothing, which teaches a reader to
+       disbelieve the next one. Its two neighbours already render a disabled honest
+       state when there is nothing to act on; this now does the same. */
+    var nothingOnFile = !shelf && !keyed && !sittingUsed && !concords;
+    var resetBtn = nothingOnFile
+      ? '<button type="button" class="st-btn" disabled>Nothing on file</button>'
+      : '<button type="button" class="st-btn st-btn--danger" data-act="reset-open" aria-expanded="false" aria-controls="st-confirm">Reset&hellip;</button>';
     var confirm = '<div class="st-confirm" id="st-confirm" role="alertdialog" aria-label="Confirm reset" aria-describedby="st-confirm-text" hidden>' +
       '<p class="st-confirm__t" id="st-confirm-text">This clears the marks on this browser. This can’t be undone.</p>' +
       '<div class="st-confirm__row">' +
@@ -274,10 +275,12 @@
        browser, and the controls to clear it" — this section's old lede said the same
        sentence again, four lines down. One of them had to go and it is the lower one. */
     return '<h3 class="pf-sec__h">On file, and how to clear it</h3>' +
-      ctrlRow("Clear the staged draft", draftDesc, draftBtn, false) +
+      ctrlRow("The staged photo", draftDesc, "", false) +
       ctrlRow("Reset the Shelf",
-        "Returns the archive to its first day — the open shelf, the first-reading key, the free Sitting, and every sealed Concord. Nothing is stored anywhere else, so there is nothing else to reset.",
-        resetBtn, true) +
+        nothingOnFile
+          ? "Nothing is on file in this browser — nothing to reset."
+          : "Returns the archive to its first day — the open shelf, the first-reading key, the free Sitting, and every sealed Concord. Nothing is stored anywhere else, so there is nothing else to reset.",
+        resetBtn, !nothingOnFile) +
       confirm +
       ledger;
   }
@@ -640,7 +643,7 @@
     if (lsGet("br_dr_sitting_used") === "1") flags++;
     var concords = concordKeys().length;
     var txt = root.querySelector("#st-confirm-text");
-    if (txt) txt.textContent = "This clears " + plural(flags, "flag", "flags") + " and " +
+    if (txt) txt.textContent = "This clears " + plural(flags, "mark", "marks") + " and " +
       plural(concords, "sealed Concord", "sealed Concords") + " on this browser. This can’t be undone. Confirm?";
     var strip = root.querySelector("#st-confirm");
     if (strip) strip.hidden = false;
@@ -667,7 +670,6 @@
   function handleAct(root, el) {
     var a = el.getAttribute("data-act");
     if (a === "restore-sitting") { lsRemove("br_dr_sitting_used"); refreshReliquary(root, { restored: true }); return; }
-    if (a === "clear-draft") { clearDraft(); refreshReliquary(root, { draftCleared: true }); return; }
     if (a === "reset-open") { openConfirm(root, el); return; }
     if (a === "reset-cancel") { closeConfirm(root); return; }
     if (a === "reset-confirm") { doReset(); return; }
