@@ -2216,7 +2216,12 @@ function renderMenu(reveal) {
       <header class="menu__head">
         <h1 class="menu__brand"><span class="menu__mark">◆</span> BLUE ROOM</h1>
         <p class="menu__thesis">Every photo is already a card. The room develops it.</p>
-        <p class="menu__trust">Image-as-artifact scan — it reads frame, gesture and signal, never the person.</p>
+        <!-- BR-S351: this claimed, in the present tense, that the room READS your
+             photograph — and thirty-four lines below it the door said "the scan engine
+             isn't connected yet — nothing reads it". Both are on screen at once, on the
+             first surface a visitor meets. The promise is kept (what it will read, and
+             what it will never read) and the tense is corrected. -->
+        <p class="menu__trust">Image-as-artifact scan — frame, gesture and signal, never the person. Not connected yet.</p>
       </header>
 
       <!-- BR-S254: the caption comes AFTER the card. It used to be the topmost ink

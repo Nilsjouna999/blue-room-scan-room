@@ -4,9 +4,15 @@
    The tarot room. Three tiers, all DETERMINISTIC (no AI):
      • THE PULL (first page, free, unlimited) — draw a single card to meet
        the deck. A showcase; not filed.
-     • A SITTING (first is free — a repeat is $1.99) — a 3-card reading,
-       FILED to the Shelf. Positions: The Ground / The Crossing / The Turn.
-     • THE DEEP READ ($2.99, violet) — a 5-card reading, filed. The flagship.
+     • A SITTING (first is free — a repeat is $1.99) — a 3-card reading.
+       Positions: The Ground / The Crossing / The Turn.
+     • THE DEEP READ ($2.99, violet) — a 5-card reading. The flagship.
+
+   BR-S351 — NOTHING HERE IS FILED, and this header said twice that it was, which
+   is how the reader-facing copy came to say it too. The only thing this room
+   writes is `br_dr_sitting_used`. A reading exists at its own ?read= link and
+   nowhere else; it does not reach the Shelf and does not survive the tab. That
+   is launch blocker #2, not a description of today.
 
    COMMERCE IS MOCK (BR-S190): the price rides the door's specimen label
    and the cut button (violet, house pf-paid register); pressing a paid
@@ -212,7 +218,7 @@
     return '<div class="dr-landing">' +
       '<div class="dr-live" role="status" aria-live="polite" data-dr-live></div>' +
       '<section class="dr-tiers">' +
-      '<p class="dr-tiers__label">Draw a reading — it is cut, and kept on your Shelf.</p>' +
+      '<p class="dr-tiers__label">Draw a reading — it is cut, and kept at its own link.</p>' +
       tierDoor(SPREADS.sitting, sittingUsed()
         ? "Three cards to one question — your first is filed."
         : "Three cards to one question — your first is free.") +
@@ -376,10 +382,21 @@
     return '<div class="dr-filed" data-dr-filed>' +
       '<p class="dr-binding">' + esc(bindingLine(sp, st.drawn)) + '</p>' +
       '<p class="dr-read__frame">Drawn to the matter you laid down — a reflection to sit with, not a forecast.</p>' +
+      /* ── BR-S351 — IT SAID FILED AND IT FILED NOTHING. ──────────────────────
+         The only thing this room writes is `br_dr_sitting_used` — one flag saying
+         the free Sitting is spent. The reading itself is not stored anywhere: it
+         exists at its own ?read= link and nowhere else. So "Filed to your Shelf"
+         was untrue, and the button under it sent the reader to a room that would
+         tell them nothing has been minted yet — a promise and its own contradiction,
+         two lines apart, at the emotional end of the draw.
+         What is TRUE is better anyway: the draw is closed, it has a mark, and it is
+         reachable by its link. The door now goes to the thing that actually exists.
+         (When readings do survive the tab — launch blocker #2 — this becomes true
+         and the copy can go back.) */
       '<div class="dr-stamp">' + hallmarkSVG(st.seed) +
-      '<p class="dr-filed__line">Filed to your Shelf &middot; ' + esc(brCode(st.seed)) + ' &middot; ' + esc(filedDate()) + '</p></div>' +
+      '<p class="dr-filed__line">Kept at this link &middot; ' + esc(brCode(st.seed)) + ' &middot; ' + esc(filedDate()) + '</p></div>' +
       '<p class="dr-credo">Drawn once. Not reissued.</p>' +
-      '<a class="pf-openreading pf-openreading--lg" href="#" data-door="profile">Open your Shelf &rarr;</a>' +
+      '<p class="dr-read__frame">This reading lives at the address in your bar. Keep the link and it opens exactly as it fell.</p>' +
       '<a class="dr-intake__back" href="#" data-dr-home>&larr; the deck</a></div>';
   }
   /* ── BR-S318 — THE SUBTREE NOW SPANS THE WHOLE FLOW, intake included. ─────────
@@ -527,7 +544,7 @@
     STATE.drawn[i].shown = true; STATE.revealed++;
     var sp = SPREADS[STATE.spread], c = STATE.drawn[i].card, rev = STATE.drawn[i].reversed;
     var msg = sp.positions[i] + ": " + c.name + ", " + (rev ? "reversed" : "upright") + ". " + firstSentence((rev && c.reversed) ? c.reversed : c.meaning);
-    if (STATE.revealed >= sp.n) msg += " Filed to your Shelf, " + brCode(STATE.seed) + ".";
+    if (STATE.revealed >= sp.n) msg += " The draw is closed, " + brCode(STATE.seed) + ". It is kept at this link.";   // BR-S351: it was never filed to the Shelf
     /* BR-S317: the flip happens on the node that is already there and STAYS there. The
        spread is never re-rendered — only the prose below it is, and only after the flip
        has had its 720ms. Previously this line was followed by a full teardown of every
