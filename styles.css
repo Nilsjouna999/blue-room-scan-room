@@ -3199,6 +3199,34 @@ html.is-travel .card .cardfinish { mix-blend-mode: normal; }
   letter-spacing: .005em; line-height: 1.05; text-align: center; color: var(--t-display);
   pointer-events: none;
 }
+
+/* BR-S287 — THE PARCHMENT PROTOTYPE (?m2=white).  tarot-v2's own deck values, used
+   unchanged: the stock is its linear-gradient(180deg,#e7e2d7,#cbc6bb) and the ink is
+   its --card-ink #1c150d.  Its stylesheet says "keeps the parchment cards white", so
+   this is not a new colour decision — it is the OTHER deck this repo already contains,
+   shown on M2 so the two can be compared before one is made canon.
+   THE MARKS HAVE TO INVERT WITH IT.  The face SVG paints with url(#mwGold) and
+   url(#mwInk); gold washes out on parchment and mwInk is a LIGHT grey, so on white it
+   would vanish outright.  CSS beats a presentation attribute, so the strokes are
+   re-pointed without touching the shared markup: everything to ink, and the numeral
+   and centre pip to tarot-v2's own --card-accent copper #c98a5e, the one accent that
+   survives on parchment.  The drop deepens because a light object needs more
+   separation from a dark room than a dark one does. */
+html.m2-parch .m2hero {
+  background: linear-gradient(180deg, #e7e2d7 0%, #dcd7cb 46%, #cbc6bb 100%);
+  box-shadow:
+    inset 0 0 0 1px rgba(28, 21, 13, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.55),
+    0 22px 48px rgba(0, 0, 0, 0.60),
+    0 3px 8px rgba(0, 0, 0, 0.45);
+}
+html.m2-parch .m2hero__face [stroke] { stroke: #2a2118; }
+html.m2-parch .m2hero__face text { fill: #c98a5e; }
+html.m2-parch .m2hero__face circle[fill]:not([fill="none"]) { fill: #c98a5e; }
+html.m2-parch .m2hero__face rect[stroke] { stroke: #c98a5e; opacity: .75; }
+html.m2-parch .m2hero__back { opacity: .07; }
+html.m2-parch .m2hero__back [stroke] { stroke: #2a2118; }
+html.m2-parch .m2hero__name { color: #1c150d; }
 .m2hero__back, .m2hero__face { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
 .m2hero__back { opacity: .12; }
 .m2hero__face { opacity: 1; clip-path: none; }

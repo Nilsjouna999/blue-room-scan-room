@@ -2493,6 +2493,15 @@ const _FLATTRAVEL = !/[?&]flat=0/.test(String(location.search || ""));
   const m = String(location.search || "").match(/[?&]land=(spring2|spring|m3|detent2|detent)/);
   if (m) document.documentElement.classList.add("land-" + m[1]);
 })();
+/* BR-S287 — the parchment M2 prototype, ?m2=white.  There are TWO tarot decks in this
+   repo and they disagree: tarot-v2 (the dealing ceremony, unintegrated) is white
+   parchment and says so in its own comment — "keeps the parchment cards white" — while
+   the live Drawing Room at ?dev=drawing-room is dark, #111319 -> #0c0d11.  BR-S277
+   matched M2's hero to the LIVE one.  This shows the other answer so the builder can
+   pick which deck is canon before the pivot makes M2 the storefront for it. */
+(function () {
+  if (/[?&]m2=white/.test(String(location.search || ""))) document.documentElement.classList.add("m2-parch");
+})();
 function _travelOn()  { if (_FLATTRAVEL) document.documentElement.classList.add("is-travel"); }
 function _travelOff() { document.documentElement.classList.remove("is-travel"); }
 function _menuUnprime(track) {
@@ -2824,7 +2833,15 @@ function _u1Reduced() {
 }
 function _u1Release() {
   _u1Gliding = false;
-  _travelOff();
+  /* BR-S288 — GET OFF THE ARRIVAL FRAME, THE DESCENT'S TURN.  The builder: "M1 to U1
+     lags double during transfer" — two hitches, which is exactly the shape the panel
+     switch had before BR-S278 and BR-S281 took one off each end. BR-S281 already moved
+     the Desk's re-blend off the LAUNCH frame; this is the landing. _travelOff() switches
+     the whole blend stack back on, a repaint of the heaviest object on the page, and it
+     was firing on the frame the glide stops. Deferred one frame, with a timeout backstop
+     for a throttled tab. Idempotent, so a double call is free. */
+  requestAnimationFrame(_travelOff);
+  setTimeout(_travelOff, 120);
   if (_u1GlideT) { clearTimeout(_u1GlideT); _u1GlideT = null; }
   if (_u1RAF) { cancelAnimationFrame(_u1RAF); _u1RAF = null; }
 }
