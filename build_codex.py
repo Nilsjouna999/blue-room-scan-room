@@ -826,14 +826,29 @@ html.is-searching .tick.is-cold{opacity:.30}
    same hairline family as every other rule on the page.  Exactly one element in
    this document carries object-depth, and it is the vessel. */
 .search{min-width:0;height:30px;box-sizing:border-box;background:none;
-  border:0;border-bottom:1px solid var(--hair-2);border-radius:0;box-shadow:none;
+  border:0;border-bottom:1px solid var(--hair-1);border-radius:0;box-shadow:none;
   color:var(--t-display);caret-color:var(--caret);
   font-family:var(--ff-mono);font-size:12px;line-height:1.2;letter-spacing:.06em;
   padding:0 26px 0 2px;outline:none;transition:border-color var(--dur-step) ease}
-.search::placeholder{color:var(--t-meta);opacity:1}
+.search::placeholder{color:var(--t-body);opacity:1}
 .search:focus{border-bottom-color:var(--gold-dim)}
 #q:-webkit-autofill,#dq:-webkit-autofill{-webkit-text-fill-color:var(--t-display);-webkit-box-shadow:0 0 0 40px var(--ground) inset;caret-color:var(--caret)}
-#q{flex:1 1 240px;max-width:400px}
+/* BR-S274 - THE FIELD SAYS WHAT IT IS.  The builder: "search bar too dim, maybe
+   add something it's easy to spot and understand."  Two answers, both inside the
+   existing grammar - no capsule, no fill, no shadow; the vessel keeps its monopoly
+   on depth.  (a) the rule and the words on it move off the two dimmest tokens on
+   the page: hair-2 (.08 alpha) -> hair-1 (.14), placeholder t-meta -> t-body.
+   Both are tokens this sheet already ships, so prefers-contrast:more still lifts
+   them and the print sheet still inverts them.  (b) a magnifier, drawn in strokes
+   like every other symbol here - no emoji, no <img>, no data URI.  A magnifier
+   needs no theory to read, which is the whole test.  The wrapper mirrors .dict,
+   the one element in this bar already proven to carry a field plus a mark. */
+.qfield{position:relative;flex:1 1 240px;max-width:400px;min-width:0;display:flex;align-items:center}
+#q{flex:1 1 auto;width:100%;min-width:0;padding-left:26px}
+.qmark{position:absolute;left:3px;top:50%;margin-top:-7px;width:14px;height:14px;
+  pointer-events:none;color:var(--t-meta);transition:color var(--dur-step) ease}
+.qmark svg{display:block;width:100%;height:100%}
+.qfield:focus-within .qmark{color:var(--gold)}
 .dict{position:relative;flex:0 1 244px;min-width:0}
 .search--dict{width:100%}
 .dtoggle{display:none}
@@ -4049,8 +4064,13 @@ def lintel_html():
         + '<button type="button" id="totop" class="totop"'
           ' aria-label="Back to the top of the Codex" title="Back to the top">'
           '<span aria-hidden="true">&#8593;</span></button>'
+        + '<div class="qfield">'
         + '<input id="q" class="search" type="search" autocomplete="off" spellcheck="false"'
           ' aria-label="Search the Codex" placeholder="search the Codex — a sign, a card, a number…">'
+        + '<span class="qmark" aria-hidden="true"><svg viewBox="0 0 14 14" fill="none"'
+          ' stroke="currentColor" stroke-width="1.3" stroke-linecap="round">'
+          '<circle cx="6" cy="6" r="4.1"/><path d="M9.1 9.1 L12.4 12.4"/></svg></span>'
+        + '</div>'
         + '<button type="button" id="dtoggle" class="dtoggle" aria-label="Look up an English word"'
           ' aria-expanded="false">Aa</button>'
         + '<div class="dict"><input id="dq" class="search search--dict" type="search"'
