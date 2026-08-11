@@ -3241,8 +3241,19 @@ html.is-travel .card .cardfinish { mix-blend-mode: normal; }
   position: absolute; inset: 0;
   font-family: var(--font-display); font-style: italic; font-size: 15.5px; line-height: 1.45;
   color: var(--t-body); opacity: 0;
-  animation: m2ask 36s linear infinite both;
+  animation-duration: 36s; animation-iteration-count: infinite; animation-fill-mode: both;
+  /* linear ONLY as the outer default — every segment overrides it from inside the
+     keyframe, which is the one place a per-segment curve can be declared. */
+  animation-timing-function: linear;
 }
+/* BR-S341 — THREE ENVELOPES, NOT ONE. The window sits at the HEAD of each keyframe
+   and the rest of the cycle is silence; a per-line negative delay slides that window
+   to its appointed second. Attack is always faster than release — a thought appears
+   more suddenly than it fades, and a symmetric fade is the tell of a slideshow.
+   Percentages are of the 36s cycle: 4.17% = 1.5s · 8.9% = 3.2s · 15% = 5.4s. */
+.m2asks__q--flick { animation-name: m2ask-flick; }
+.m2asks__q--hold  { animation-name: m2ask-hold; }
+.m2asks__q--dwell { animation-name: m2ask-dwell; }
 /* ── BR-S331 — THEY ROLL NOW, THEY DO NOT TAKE TURNS. ────────────────────────
    Ten lines over 36s: each owns a 10% slot but stays visible for 13.5%, so for about
    1.3 seconds two are on screen together — one arriving under one leaving. That
@@ -3253,12 +3264,27 @@ html.is-travel .card .cardfinish { mix-blend-mode: normal; }
    Opacity peaks at .46, down from .52: closer to the edge of legibility, because
    something you have to lean very slightly toward reads as overheard, and something
    at full contrast reads as copy written at you. */
-@keyframes m2ask {
-  0%    { opacity: 0;   transform: translateY(6px); }
-  1.8%  { opacity: .46; transform: translateY(0); }
-  9.5%  { opacity: .46; transform: translateY(0); }
-  13.5% { opacity: 0;   transform: translateY(-6px); }
-  100%  { opacity: 0;   transform: translateY(-6px); }
+/* the two curves every envelope shares: a quick settle in, a long release out */
+@keyframes m2ask-flick {                                   /* 1.5s — barely landed before it goes */
+  0%     { opacity: 0; transform: translateY(var(--dy, 6px)); animation-timing-function: cubic-bezier(.16, .84, .44, 1); }
+  0.9%   { opacity: var(--peak, .42); transform: translateY(0); animation-timing-function: linear; }
+  2.6%   { opacity: var(--peak, .42); transform: translateY(0); animation-timing-function: cubic-bezier(.4, 0, .7, .3); }
+  4.17%  { opacity: 0; transform: translateY(calc(var(--dy, 6px) * -1)); }
+  100%   { opacity: 0; transform: translateY(calc(var(--dy, 6px) * -1)); }
+}
+@keyframes m2ask-hold {                                    /* 3.2s — long enough to finish reading */
+  0%     { opacity: 0; transform: translateY(var(--dy, 6px)); animation-timing-function: cubic-bezier(.16, .84, .44, 1); }
+  1.4%   { opacity: var(--peak, .42); transform: translateY(0); animation-timing-function: linear; }
+  5.6%   { opacity: var(--peak, .42); transform: translateY(0); animation-timing-function: cubic-bezier(.4, 0, .7, .3); }
+  8.9%   { opacity: 0; transform: translateY(calc(var(--dy, 6px) * -1)); }
+  100%   { opacity: 0; transform: translateY(calc(var(--dy, 6px) * -1)); }
+}
+@keyframes m2ask-dwell {                                   /* 5.4s — the one that will not leave */
+  0%     { opacity: 0; transform: translateY(var(--dy, 6px)); animation-timing-function: cubic-bezier(.16, .84, .44, 1); }
+  1.7%   { opacity: var(--peak, .42); transform: translateY(0); animation-timing-function: linear; }
+  10.5%  { opacity: var(--peak, .42); transform: translateY(0); animation-timing-function: cubic-bezier(.4, 0, .7, .3); }
+  15%    { opacity: 0; transform: translateY(calc(var(--dy, 6px) * -1)); }
+  100%   { opacity: 0; transform: translateY(calc(var(--dy, 6px) * -1)); }
 }
 /* WCAG 2.2.2 — content that moves on its own must be stoppable. Pointing at the column
    stops it, so anyone who wants to finish reading one can. */

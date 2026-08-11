@@ -1449,17 +1449,60 @@ function m2SittingUsed() { try { return localStorage.getItem("br_dr_sitting_used
    happen, because this room describes and never forecasts.
    Ten now, not eight — a 36s cycle, long enough that the loop never closes while
    someone is reading a card, and enough variety that no two neighbours rhyme. */
+/* ══ BR-S341 — THE QUESTIONS BREATHE. ═════════════════════════════════════════
+   The builder: this is meant to imitate a mind being curious — questions popping,
+   intimate, breathing and rhythmic, sometimes overlapping like one question
+   changing form. What shipped was ten lines on ONE 36s keyframe at a flat 3.6s
+   apiece, identical envelope, `linear`, never empty. That is a carousel with a
+   soft crossfade, and no amount of lowering the opacity hides an even interval —
+   a metronome is the one rhythm a nervous system never produces, so a constant
+   period is read as SCHEDULED, and anything scheduled stops feeling internal.
+
+   Four things were wrong, and each has a column in the table below.
+
+   INTERVAL. Thoughts come in bursts and then not at all. The cycle now holds
+   three clusters and four real SILENCES of 0.9–1.9s where the box is genuinely
+   empty. The silence is the highest-leverage part: with no gap the eye has no
+   edge to detect arrival against, so nothing ever arrives, it only cycles.
+
+   WEIGHT. Some thoughts flick past; one or two snag and will not leave. Three
+   envelopes — flick 1.5s, hold 3.2s, dwell 5.4s — instead of one. "The thing I
+   haven't told anyone" gets a dwell and the highest peak, because that is the
+   line that should sit with you, and it had been given exactly the airtime of
+   every other.
+
+   FORM-CHANGE. A thought does not replace another, it becomes it. Two pairs sit
+   at the SAME baseline with dy:0 and overlap: "I already know, don't I." into "I
+   keep almost saying it.", and "Am I waiting, or am I hiding." into "Would I
+   choose this again." The eye sees letterforms exchanging rather than one line
+   riding past another — one mind turning something over, not two items.
+
+   BREATH. Peaks vary .32–.54 rather than a flat .46, so quiet lines read as
+   half-formed and the loud one reads as the one you have been sitting with.
+
+   STILL DETERMINISTIC, AND STILL WITHOUT A TIMER. Irregular is not random: the
+   schedule is hand-authored, identical on every visit, so it can be tuned and so
+   it never surprises the same person twice. It remains pure CSS — three shared
+   keyframes plus a negative delay per line — so nothing is scheduled in JS and
+   there is nothing to leak when the panel slides away.
+
+     at    when its window opens, in seconds of the 36s cycle
+     env   flick 1.5s · hold 3.2s · dwell 5.4s
+     peak  opacity at its loudest
+     dy    drift in px; 0 = holds the baseline (the form-change pairs)          */
+const M2_CYCLE = 36;
 const M2_ASKS = [
-  "Why do I keep checking.",
-  "I already know, don't I.",
-  "Is it loyalty, or is it fear?",
-  "I keep almost saying it.",
-  "What am I pretending not to know?",
-  "Do they think about me at all.",
-  "The thing I haven't told anyone.",
-  "Am I waiting, or am I hiding.",
-  "Something is off and I can't name it.",
-  "Would I choose this again.",
+  //  question                                  at     env      peak   dy
+  ["Why do I keep checking.",                    0.0, "dwell",  0.44,  6],
+  ["I already know, don't I.",                   3.9, "hold",   0.38,  0],   // ─┐ form-change
+  ["I keep almost saying it.",                   6.2, "flick",  0.34,  0],   // ─┘ same baseline, 0.9s together
+  ["Is it loyalty, or is it fear?",              9.6, "flick",  0.40,  5],
+  ["What am I pretending not to know?",         13.4, "hold",   0.42,  7],
+  ["The thing I haven't told anyone.",          15.9, "dwell",  0.54, -4],   // the one that stays
+  ["Do they think about me at all.",            23.2, "flick",  0.32,  8],
+  ["Am I waiting, or am I hiding.",             25.6, "hold",   0.40,  0],   // ─┐ form-change
+  ["Would I choose this again.",                28.1, "hold",   0.46,  0],   // ─┘
+  ["Something is off and I can't name it.",     33.2, "flick",  0.36,  6],
 ];
 
 function renderWall() {
@@ -1566,13 +1609,20 @@ function renderWall() {
        ARIA-HIDDEN, and that is not laziness. This is atmosphere; the card's read
        below is the content. A region that rewrites itself every three seconds would
        otherwise talk over a screen reader continuously and tell it nothing.
-       PURE CSS, ONE ANIMATION, NO TIMER. Eight spans stacked in a fixed-height box,
-       each on the same keyframe with a negative delay a slot apart. Nothing is
-       scheduled, nothing accumulates, and it cannot leak the way a setInterval on a
-       panel you can slide away from would. */
+       PURE CSS, NO TIMER. Ten spans stacked in a fixed-height box, three shared
+       keyframes, one negative delay each. Nothing is scheduled, nothing accumulates,
+       and it cannot leak the way a setInterval on a panel you can slide away from
+       would. BR-S341 varies the schedule; it does not add a clock.
+       THE DELAY IS `at - CYCLE`, not `-at`. A negative delay starts the animation
+       already that far in, so a line whose window opens at t=9s must be started
+       9-36 = -27s: it then has 27s of its own tail to run out before the window at
+       the head of its keyframe comes round. Getting this backwards mirrors the whole
+       schedule and quietly destroys every cluster and silence in it. */
     + '<div class="m2asks" aria-hidden="true">'
-    +   M2_ASKS.map(function (q, i) {
-          return '<span class="m2asks__q" style="animation-delay:' + (-i * 3.6).toFixed(1) + 's">' + q + '</span>';
+    +   M2_ASKS.map(function (a) {
+          return '<span class="m2asks__q m2asks__q--' + a[2] + '"'
+            + ' style="animation-delay:' + (a[1] - M2_CYCLE).toFixed(2) + 's'
+            + ';--peak:' + a[3] + ';--dy:' + a[4] + 'px">' + a[0] + '</span>';
         }).join('')
     + '</div>'
     + '<span class="menu__draw-cutline menu__draw-cutline--read" aria-hidden="true"></span>'
