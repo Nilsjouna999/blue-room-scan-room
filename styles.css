@@ -4695,57 +4695,77 @@ html.orbit-open .orbitbtn { color: var(--t-display); border-color: var(--t-meta)
   visibility: hidden; pointer-events: none;                 /* closed: no paint, no hit-testing */
 }
 .orbit.is-open { visibility: visible; pointer-events: auto; }
+/* BR-S292 — THE LIGHTBOX.  The builder chose light.  This is now the ONE bright
+   surface in the building: you pull it out to see everything at once, and it is
+   unmistakably a different place from the room you were standing in — which is the
+   point of an overview.  The paper is the deck's own family (#efece4 against
+   tarot-v2's #efe9db) so the lightbox and the cards belong to one material world, and
+   every mark on it is ink, not glow.  A dark scrim would have been the safe choice and
+   would also have made 40px line-drawings almost unreadable; small stroke art needs
+   paper. */
 .orbit__scrim {
-  position: absolute; inset: 0; background: rgba(8, 8, 7, 0.82);
+  position: absolute; inset: 0;
+  background: radial-gradient(120% 90% at 50% 42%, #f4f1ea 0%, #efece4 46%, #e2ded3 100%);
   opacity: 0; transition: opacity 320ms var(--ease-settle, cubic-bezier(.2,.7,.2,1));
 }
 .orbit.is-open .orbit__scrim { opacity: 1; }
 .orbit__field { position: absolute; inset: 0; }
 .orbit__hub {
   position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
-  font-size: 11px; color: var(--t-ghost); opacity: 0;
+  font-size: 11px; color: rgba(28, 21, 13, .30); opacity: 0;
   transition: opacity 300ms var(--ease-settle, cubic-bezier(.2,.7,.2,1)) 120ms;
 }
 .orbit.is-open .orbit__hub { opacity: 1; }
 
 /* --orbit-r is the ring radius; the plate's own position is cos/sin baked in at build */
-.orbit__field { --orbit-r: clamp(160px, 29vh, 285px); }   /* nominal; each plate rides --or between .78 and 1.06 of it */
+/* Tighter than the ring was — the reference CLUSTERS — but not so tight that two
+   plates touch: at 25vh the 54px marks brought a pair into contact, and overlapping
+   hit areas are a nav bug, not a look. 27.5vh is the last value where every pair
+   still clears. Each plate rides --or between .78 and 1.06 of this. */
+.orbit__field { --orbit-r: clamp(152px, 27.5vh, 268px); }
 .orbit__plate {
   /* centred on its ring point by translate(-50%,-50%) rather than by a negative
      margin: the margin assumed every plate was the same height, and a two-line label
      is not, which pushed those plates off the ring by up to 28px. */
   position: absolute; left: 50%; top: 50%;
-  width: 148px; margin: 0;
+  width: 132px; margin: 0;
   display: flex; flex-direction: column; align-items: center; gap: 9px;
   padding: 14px 10px 12px;
-  background: none; border: 0; cursor: pointer; color: var(--t-body);
+  background: none; border: 0; cursor: pointer; color: #5c503c;
   opacity: 0;
-  transform: translate3d(calc(var(--ox) * var(--orbit-r) * var(--or, 1) * 0.34), calc(var(--oy) * var(--orbit-r) * var(--or, 1) * 0.34), 0) translate(-50%, -50%) scale(calc(var(--os, 1) * .96));
+  transform: translate3d(calc(var(--ox) * var(--orbit-r) * var(--or, 1) * 0.34), calc(var(--oy) * var(--orbit-r) * var(--or, 1) * 0.34), 0) translate(-50%, -50%) rotate(var(--orot, 0deg)) scale(calc(var(--os, 1) * .96));
   transition: opacity 340ms var(--ease-settle, cubic-bezier(.2,.7,.2,1)) var(--od, 0ms),
               transform 460ms var(--ease-settle, cubic-bezier(.2,.7,.2,1)) var(--od, 0ms),
               color 180ms ease;
 }
 .orbit.is-open .orbit__plate {
   opacity: 1; will-change: transform;
-  transform: translate3d(calc(var(--ox) * var(--orbit-r) * var(--or, 1)), calc(var(--oy) * var(--orbit-r) * var(--or, 1)), 0) translate(-50%, -50%) scale(var(--os, 1));
+  transform: translate3d(calc(var(--ox) * var(--orbit-r) * var(--or, 1)), calc(var(--oy) * var(--orbit-r) * var(--or, 1)), 0) translate(-50%, -50%) rotate(var(--orot, 0deg)) scale(var(--os, 1));
 }
-.orbit__plate:hover, .orbit__plate:focus-visible { color: var(--t-display); outline: none; }
+.orbit__plate:hover, .orbit__plate:focus-visible { color: #1c150d; outline: none; }
 .orbit.is-open .orbit__plate:hover,
 .orbit.is-open .orbit__plate:focus-visible {
-  transform: translate3d(calc(var(--ox) * var(--orbit-r) * var(--or, 1)), calc(var(--oy) * var(--orbit-r) * var(--or, 1) - 3px), 0) translate(-50%, -50%) scale(calc(var(--os, 1) * 1.03));
+  transform: translate3d(calc(var(--ox) * var(--orbit-r) * var(--or, 1)), calc(var(--oy) * var(--orbit-r) * var(--or, 1) - 3px), 0) translate(-50%, -50%) rotate(0deg) scale(calc(var(--os, 1) * 1.03));   /* hover straightens it — the one you are pointing at squares up */
   transition-delay: 0ms;
 }
+/* the plate IS the room's own object now, not an empty frame with a caption. The
+   Desk's card, the deck's tarot back, the Reliquary's case, U1's descending plates,
+   the Codex's open book, Settings' two rules — all from AB_EMBLEMS' own grammar and
+   all currentColor, so they take the ink without a second palette. An empty rectangle
+   with a label under it is a placeholder pretending to be a system; recognising a
+   room by seeing it is the whole reason this arrangement is worth having. */
 .orbit__mark {
-  width: 34px; height: 46px; border: 1px solid var(--line-strong, rgba(233,229,220,.18));
-  border-radius: 3px; background: linear-gradient(168deg, rgba(233,229,220,.05), rgba(233,229,220,.015));
-  transition: border-color 180ms ease;
+  width: 54px; height: 54px; display: block;
+  color: rgba(28, 21, 13, .70);
+  transition: color 180ms ease, transform 220ms var(--ease-settle, cubic-bezier(.2,.7,.2,1));
 }
-.orbit__plate:hover .orbit__mark, .orbit__plate:focus-visible .orbit__mark { border-color: var(--t-meta); }
+.orbit__mark svg { width: 100%; height: 100%; display: block; }
+.orbit__plate:hover .orbit__mark, .orbit__plate:focus-visible .orbit__mark { color: #1c150d; }
 .orbit__label {
   font-family: var(--font-mono); font-size: 9px; letter-spacing: .16em; text-transform: uppercase;
   line-height: 1.5; text-align: center;
 }
 @media (prefers-reduced-motion: reduce) {
   .orbit__scrim, .orbit__hub, .orbit__plate { transition: none; }
-  .orbit__plate { transform: translate3d(calc(var(--ox) * var(--orbit-r) * var(--or, 1)), calc(var(--oy) * var(--orbit-r) * var(--or, 1)), 0) translate(-50%, -50%) scale(var(--os, 1)); }
+  .orbit__plate { transform: translate3d(calc(var(--ox) * var(--orbit-r) * var(--or, 1)), calc(var(--oy) * var(--orbit-r) * var(--or, 1)), 0) translate(-50%, -50%) rotate(var(--orot, 0deg)) scale(var(--os, 1)); }
 }

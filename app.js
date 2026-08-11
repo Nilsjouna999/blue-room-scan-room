@@ -1295,6 +1295,15 @@ const RELIQ_SEAL_SVG =
 /* BR-S206 (About master): unified engraving contract — every emblem carries the SAME
    attribute string (1.2 primary / .75 secondary strokes, round caps+joins, one opacity ladder)
    so the five read as one instrument set. currentColor → colour law tints them. */
+/* BR-S292 — three more marks in AB_EMBLEMS' own grammar (40x40, currentColor, 1.2
+   stroke, round caps), for the rooms the offerings set never needed one for. Kept
+   separate so the About surface's five are untouched. */
+const ORBIT_MARKS = {
+  desk: '<svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><rect x="12" y="7.5" width="16" height="23" rx="2"/><path d="M15.5 12.5 H24.5 M15.5 16 H24.5 M15.5 19.5 H21" stroke-width=".75" opacity=".5"/><path d="M8 33.5 H32" opacity=".5"/></svg>',
+  reliquary: '<svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 30 V17.5 C9.5 11.7 14.2 7 20 7 C25.8 7 30.5 11.7 30.5 17.5 V30 Z"/><path d="M7 30 H33" /><path d="M20 15.5 L22.6 20 L20 24.5 L17.4 20 Z" stroke-width=".75"/></svg>',
+  about: '<svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="8" width="11" height="8" rx="1.5"/><rect x="21" y="16" width="11" height="8" rx="1.5" opacity=".62"/><rect x="8" y="24" width="11" height="8" rx="1.5" opacity=".4"/><path d="M20 6 V34" stroke-width=".75" opacity=".38"/></svg>',
+  settings: '<svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 14 H32 M8 26 H32" /><circle cx="16" cy="14" r="3"/><circle cx="25" cy="26" r="3"/></svg>'
+};
 const AB_EMBLEMS = {
   codex: '<svg class="about__emblem-svg" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10 V31"/><path d="M20 10 C15 7.5 9 7.3 6 9.2 V29 C9 27.2 15 27.4 20 30"/><path d="M20 10 C25 7.5 31 7.3 34 9.2 V29 C31 27.2 25 27.4 20 30"/><path d="M9.2 14.6 H16 M9.2 18.4 H16 M9.2 22.2 H14.5 M23.8 14.6 H30.6 M23.8 18.4 H30.6 M25.3 22.2 H30.6" stroke-width=".75" opacity=".5"/></svg>',
   tarot: '<svg class="about__emblem-svg" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="7" y="12" width="13" height="20" rx="2" opacity=".42" transform="rotate(-12 13.5 22)"/><rect x="20" y="12" width="13" height="20" rx="2" opacity=".42" transform="rotate(12 26.5 22)"/><rect x="13.5" y="9.5" width="13" height="21" rx="2"/><path d="M20 15 L23.5 20 L20 25 L16.5 20 Z" stroke-width=".75"/></svg>',
@@ -4959,12 +4968,13 @@ render();
            unnamed new panel still gets a plate rather than being dropped. */
         var NAMES = { "": "The Archive Desk", "is-wall": "The Reading Rooms", "is-reliquary": "The Reliquary" };
         var key = p.cls || "";
-        out.push({ label: NAMES[key] || ("Room " + (i + 1)), idx: i, kind: "panel" });
+        var MARKS = { "": ORBIT_MARKS.desk, "is-wall": AB_EMBLEMS.tarot, "is-reliquary": ORBIT_MARKS.reliquary };
+        out.push({ label: NAMES[key] || ("Room " + (i + 1)), mark: MARKS[key] || ORBIT_MARKS.desk, idx: i, kind: "panel" });
       }
     } catch (e) {}
-    if (host.querySelector("#about")) out.push({ label: "About Blue Room", idx: 0, kind: "about" });
-    out.push({ label: "The Codex", href: "codex.html?v=237", kind: "link" });
-    out.push({ label: "Settings", href: "?dev=settings", kind: "link" });
+    if (host.querySelector("#about")) out.push({ label: "About Blue Room", mark: ORBIT_MARKS.about, idx: 0, kind: "about" });
+    out.push({ label: "The Codex", mark: AB_EMBLEMS.codex, href: "codex.html?v=237", kind: "link" });
+    out.push({ label: "Settings", mark: ORBIT_MARKS.settings, href: "?dev=settings", kind: "link" });
     return out;
   }
 
@@ -4999,9 +5009,9 @@ render();
       var scl = (0.88 + h3 * 0.18).toFixed(3);
       html += '<button type="button" class="orbit__plate" data-orbit-go="' + i + '"'
             + ' style="--ox:' + Math.cos(a).toFixed(4) + '; --oy:' + Math.sin(a).toFixed(4)
-            + '; --or:' + rad + '; --os:' + scl
+            + '; --or:' + rad + '; --os:' + scl + '; --orot:' + ((h2 - 0.5) * 7).toFixed(2) + 'deg'
             + '; --od:' + (i * 26) + 'ms">'
-            + '<span class="orbit__mark" aria-hidden="true"></span>'
+            + '<span class="orbit__mark" aria-hidden="true">' + (list[i].mark || "") + '</span>'
             + '<span class="orbit__label">' + list[i].label.replace(/[<>&]/g, "") + "</span>"
             + "</button>";
     }
