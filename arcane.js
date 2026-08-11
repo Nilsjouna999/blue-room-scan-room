@@ -197,12 +197,24 @@
     return ok(year, month, day);
   }
 
+  /* ── BR-S330 — EVERY FIELD SAYS PLAINLY WHAT IT WANTS. ────────────────────────
+     These are the five inputs of a $4.99 product and the labels alone were
+     "The name borne", "The day first counted", "The hour first struck", "The ground
+     first stood on", "What is brought". The plain meaning lived ONLY in the
+     placeholder — which disappears the moment you type into it, and which several
+     browsers never expose to assistive tech at all. So the one reader who most needs
+     to know that "the ground first stood on" means the town they were born in loses
+     that sentence exactly when they start filling the form.
+     The evocative label stays; a `plain` word now rides beside it permanently. That
+     is the gloss pattern from the Concord, applied where it is owed most — the form
+     someone is asked to complete before paying. Optional fields say so in the same
+     breath, because "the hour, if it is known" was carrying that too, in a placeholder. */
   var DEFS = [
-    { key: "name",   label: "The name borne",            ph: "the name you answer to" },
-    { key: "day",    label: "The day first counted",     ph: "the day, the month, the year" },
-    { key: "hour",   label: "The hour first struck",     ph: "the hour, if it is known" },
-    { key: "ground", label: "The ground first stood on", ph: "the town, and the land" },
-    { key: "matter", label: "What is brought",           ph: "the matter you carry, in a line — or leave it unspoken" },
+    { key: "name",   label: "The name borne",            plain: "your name",              ph: "the name you answer to" },
+    { key: "day",    label: "The day first counted",     plain: "date of birth",          ph: "the day, the month, the year" },
+    { key: "hour",   label: "The hour first struck",     plain: "time of birth — optional", ph: "the hour, if it is known" },
+    { key: "ground", label: "The ground first stood on", plain: "place of birth",         ph: "the town, and the land" },
+    { key: "matter", label: "What is brought",           plain: "your question — optional", ph: "the matter you carry, in a line — or leave it unspoken" },
   ];
 
   // WHO the reading is drawn for. The FIRST reading on an account is for yourself;
@@ -277,9 +289,15 @@
   function intakeHTML(params) {
     var recipient = !!(params && params.gift === "1"), from = giftFrom(params);
     var fields = DEFS.map(function (d) {
+      /* BR-S330: the plain word rides WITH the label, so it survives typing — and it goes
+         into the aria-label too, because the accessible name was the evocative phrase
+         alone and a screen-reader user was being told "The ground first stood on, edit
+         text" with no way to know that meant their birthplace. */
       return '<label class="ac-mark">' +
-        '<span class="ac-mark__label">' + esc(d.label) + "</span>" +
-        '<input class="ac-mark__field" type="text" data-mark="' + d.key + '" autocomplete="off" spellcheck="false" placeholder="' + esc(d.ph) + '" aria-label="' + esc(d.label) + '">' +
+        '<span class="ac-mark__label">' + esc(d.label) +
+          (d.plain ? '<span class="ac-mark__plain">' + esc(d.plain) + '</span>' : '') +
+        "</span>" +
+        '<input class="ac-mark__field" type="text" data-mark="' + d.key + '" autocomplete="off" spellcheck="false" placeholder="' + esc(d.ph) + '" aria-label="' + esc(d.label) + (d.plain ? " — " + esc(d.plain) : "") + '">' +
         "</label>";
     }).join("");
     return '' +
@@ -289,7 +307,23 @@
         '<div class="ac-form">' +
           '<div class="ac-head">' +
             '<h1 class="ac-title">' + (recipient ? "Your Reading" : "The Setting of Marks") + '</h1>' +
-            '<p class="ac-sub">' + (recipient ? "The marks are yours to lay down. The gift covers the drawing." : "Before the reading is drawn, lay down what it is drawn from.") + '</p>' +
+            /* ── BR-S330 — THE ONE PLACE THE GLOSS WAS ACTUALLY OWED. ─────────────
+               This is the first screen of a $4.99 product, and it said "The Setting of
+               Marks" over "Before the reading is drawn, lay down what it is drawn from."
+               Beautiful, and a first-time reader — especially one reading in a second
+               language — cannot tell from it what page they are on or what is about to
+               be asked of them. The title keeps its weight; the line beneath it now says
+               the plain thing: what you type, and what it is used for.
+               The tier doors and M3 were checked and deliberately NOT touched — "A
+               Sitting" already sits beside "3 cards" and "Three cards to one question",
+               and "Held in conservation" is followed immediately by "Nothing is filed
+               here yet". Those gloss themselves; adding more would be the over-application
+               the builder warned against. The pattern goes where it is owed, not everywhere. */
+            /* The line must match the FIELDS. A first draft of this said "your name and
+               birth date — and nothing else is used", which was plain, reassuring, and
+               false: the form also asks for the hour, the town, and the matter. Checked
+               against the rendered inputs rather than against my own copy. */
+            '<p class="ac-sub">' + (recipient ? "The marks are yours to lay down. The gift covers the drawing." : "Your name, your birth date and where you were born — that is what the reading is drawn from. The hour and the question are optional.") + '</p>' +
           "</div>" +
           (recipient ? giftBannerHTML(from) : forwhomHTML()) +
           '<div class="ac-redraw-banner" data-ac-redraw hidden></div>' +
