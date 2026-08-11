@@ -98,6 +98,46 @@
 .ac-giftlink { display: inline-block; margin-top: 20px; font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--t-ghost); text-decoration: none; transition: color 0.16s ease; }
 .ac-giftlink:hover, .ac-giftlink:focus-visible { color: #a487c8; }
 .ac-mocknote { font-family: var(--font-mono); font-size: 8.5px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--t-ghost); margin: 12px 0 0; }
+
+/* ── BR-S329 — THE CONCORD OFFER, in the intake's quiet register. ────────────
+   Set below the draw button behind a hairline, because it is an ALTERNATIVE and not a
+   competing act: someone who came here for their own reading should be able to ignore
+   it in one glance. The rule above it does the separating so the type does not have to
+   shout. Violet on the price only — the one commerce register, spent on the one word
+   that is actually commerce. */
+.ac-concord {
+  margin: 26px auto 0; padding-top: 20px; max-width: 46ch;
+  border-top: 1px solid var(--line, rgba(233, 229, 220, 0.12));
+  text-align: left;
+}
+.ac-concord__eyebrow {
+  font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--t-ghost); margin: 0 0 8px;
+}
+.ac-concord__lede {
+  font-family: var(--font-display); font-size: 14.5px; line-height: 1.55;
+  color: var(--t-body); margin: 0 0 12px;
+}
+.ac-concord__lede strong { font-weight: 600; color: var(--t-primary); }
+.ac-concord__lede em { font-style: italic; color: var(--t-primary); }
+/* BR-S329: the plain-English gloss. Quieter than the sentence it sits inside, because it
+   is there for whoever needs it and should read as an aside to whoever does not. */
+.ac-concord__plain { color: var(--t-meta); font-size: 0.92em; }
+
+/* BR-S329 — CLEAR THE FIXED DOCK. Measured at 375x812: the ROOMS button is fixed at
+   12-97 x 684-716 and the Concord link landed at 24-341 x 688-716, so the last control
+   in this room was UNCLICKABLE on a phone — the same class of defect as BR-S301, arriving
+   from a floating element rather than a sibling. Anything that can end up at the bottom of
+   this column needs room to scroll past the dock, so the room reserves it. */
+.arcane .ac-form { padding-bottom: 96px; }
+.ac-concord__go {
+  display: inline-flex; align-items: baseline; gap: 10px; padding: 8px 2px;
+  font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--t-body); text-decoration: none; transition: color 0.16s ease;
+}
+.ac-concord__go:hover, .ac-concord__go:focus-visible { color: var(--t-display); outline: none; }
+.ac-concord__go:focus-visible { outline: 1px solid rgba(233, 229, 220, 0.34); outline-offset: 3px; border-radius: 4px; }
+.ac-concord__price { color: #a487c8; }   /* the violet is unsettled value — the only place it belongs here */
 .ac-gift-send.is-settled { color: var(--gold, #c9a35c); }
 .ac-gift-send.is-settled .ac-draw__price { color: var(--gold, #c9a35c); }
 .ac-deed { text-align: center; }

@@ -302,6 +302,33 @@
             '<p class="ac-hope">' + (recipient ? "Each mark, once set, is hope." : "Each mark, once set, is hope.") + '</p>' +
             '<p class="ac-notice" data-ac-notice role="status" aria-live="polite" aria-atomic="true"></p>' +
             (recipient ? '' : '<a class="ac-giftlink" href="?dev=arcane&gift=compose">Giving this to someone? Send it as a gift &rarr;</a>') +
+            /* ── BR-S329 — THE CONCORD IS OFFERED WHERE THE MARKS ARE SET. ─────────
+               A Concord was reachable from exactly one place in the building: a small
+               italic line on M2. But this is the room where someone has already decided
+               they want a birth reading and is typing a name and a date into it — the
+               single moment where "there is a version of this for two people" is useful
+               rather than noise. It was not offered here at all.
+               AND IT IS EXPLAINED, not just linked. The M2 line said "two names, one
+               bond" and left the reader to guess whether that means two readings, a
+               comparison, or something else. It is none of those: it reads what runs
+               BETWEEN two people, which is a different object from either of their own
+               readings, and that is worth two sentences at the moment it is offered.
+               Held below the draw button and above nothing, in the intake's quiet
+               register — this is an alternative, not a competing act. */
+            (recipient ? '' :
+              '<div class="ac-concord">' +
+                /* ── BR-S329 — THE NAME KEEPS ITS WEIGHT, THE GLOSS CARRIES THE MEANING. ──
+                   "Concord" is the right name and it is also a word a non-native speaker,
+                   or anyone under about twenty, has no reason to know. The room does not
+                   have to choose: the name leads and a plain-English gloss rides beside it
+                   ONCE, at the moment of choosing. Nobody is asked to look anything up, and
+                   nothing is dumbed down — the word is still there, now with its meaning
+                   attached the first time you meet it. This is the pattern for every
+                   important name in the building: keep the word, gloss it at the door. */
+                '<p class="ac-concord__eyebrow">Or, for two</p>' +
+                '<p class="ac-concord__lede">A <strong>Concord</strong> <span class="ac-concord__plain">(a reading for two — you and a friend, a partner, a parent)</span> reads what runs <em>between</em> two people: not your marks, and not theirs, but the ones the pair make together. Both births are set, the bond is drawn once, and it is kept the same way a reading is.</p>' +
+                '<a class="ac-concord__go" href="?dev=arcana-reading#/concord">Draw a Concord &mdash; two people, one reading <span class="ac-concord__price">$7.99</span></a>' +
+              '</div>') +
           "</div>" +
         "</div>" +
         '<div class="ac-ceremony" data-ac-ceremony hidden></div>' +
