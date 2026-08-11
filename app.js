@@ -2801,6 +2801,7 @@ function wireMenuAnnex(host) {                                      // KEEP the 
   // once on host in mountMenu) — survives in-place DOM swaps that per-element binding did not.
   window.removeEventListener("scroll", _u1OnScroll);                // BR-S308: remove-then-add, same discipline as popstate
   window.addEventListener("scroll", _u1OnScroll, { passive: true });
+  _u1SeatInvalidate();                                              // BR-S313: this mount rebuilt the menu — the cached seat describes the old one
   const seedIdx = _hashIndex();
   if (seedIdx > 0) menuSlideTo(seedIdx, { seed: true });            // deep-link: paint composed, no slide
   else MENU_PANELS.forEach(p => { if (p.cls) host.classList.remove(p.cls); });   // stale-state reset on remount
@@ -2854,25 +2855,38 @@ function _u1BareURL() { return location.pathname + location.search; }
    U1's top has reached the viewport top, and cleared only once the desk is fully
    back at rest. Anything in between changes nothing. Scoped hard — menu view, index
    0, not fullview — because on M2/M3 the hash belongs to the panel. */
+/* BR-S313 — THIS RUNS ON EVERY SCROLL FRAME OF THE WHOLE SITE, SO IT READS NOTHING.
+   The first version called getBoundingClientRect() on #about each frame to ask "am I at
+   U1 yet". A rect read is a forced layout flush, scheduled on the one path where this
+   build has always been paint-bound — the Desk, which carries 100% of its paint weight.
+   The seat is a DOCUMENT position: it only changes when the page relayouts, so it is
+   cached and invalidated on the events that can actually move it (resize, load, a menu
+   remount). Everything on the hot path is now arithmetic against window.scrollY, and
+   the rAF hop is gone with it — there was nothing left to batch. */
+let _u1SeatY = null;
+function _u1SeatInvalidate() { _u1SeatY = null; }
 function _u1SyncHash() {
   if (window.BR_ROOM === "about") return;               // BR-S308: already AT U1's own address (/about/) — a hash on top of it is noise
   if (document.body.dataset.view !== "menu") return;
+  const y = window.scrollY;
+  if (y > 4 && _u1SeatY != null && y < _u1SeatY - 8) return;   // the dead air, resolved before anything is touched
   const host = document.getElementById("menuView");
   if (!host || host.classList.contains("is-fullview")) return;
   if (_menuIndex(host) !== 0) return;
-  const about = host.querySelector("#about");
-  if (!about) return;
-  if (about.getBoundingClientRect().top <= 8) {
+  if (_u1SeatY == null) {
+    const about = host.querySelector("#about");
+    if (!about) return;
+    _u1SeatY = Math.round(about.getBoundingClientRect().top + y);         // the one read, once per layout change
+  }
+  if (y >= _u1SeatY - 8) {
     if (location.hash !== U1_HASH) history.replaceState(history.state, "", U1_HASH);
-  } else if (window.scrollY <= 4) {
+  } else if (y <= 4) {
     if (location.hash === U1_HASH) history.replaceState(history.state, "", _u1BareURL());
   }
 }
-let _u1HashRaf = null;
-function _u1OnScroll() {
-  if (_u1HashRaf) return;
-  _u1HashRaf = requestAnimationFrame(function () { _u1HashRaf = null; _u1SyncHash(); });
-}
+function _u1OnScroll() { _u1SyncHash(); }
+window.addEventListener("resize", _u1SeatInvalidate);
+window.addEventListener("load", _u1SeatInvalidate);
 
 /* A load carrying #about ARRIVES at U1 — no glide, because a link should paint
    where it points rather than travel there from somewhere you never were. */
@@ -5397,11 +5411,22 @@ render();
   var F_LIFT = 1.015;        // the 1–2% enlarge, sprung rather than transitioned
   var F_HALO = 1.5;          // BR-S311: the halo's resting radius, as a multiple of the icon. MUST equal the CSS var() fallback.
   var F_DT = 1 / 120;
+  /* ── BR-S313 — MOVE ONLY WHAT IS CHEAP TO MOVE. ──────────────────────────────
+     The direction's per-layer mass says text is "heavy, ALMOST STATIONARY". Measured,
+     that meant the label travelled 0.24px in the first 60ms and 1.36px in total — and
+     paid for it with a full TEXT RE-RASTER of its plate on every single frame, which is
+     the most expensive thing on this sheet by a distance. The cheapest layer to animate
+     was carrying the highest cost for the smallest visible result.
+     So "almost stationary" is taken to its limit: the type does not move at all. That is
+     not a compromise of the concept, it is the concept — heavy means it stays put, and
+     the parallax now reads off the two layers that are cheap to move against type that
+     is nailed down, which is exactly what makes paper feel heavy.
+     What is left moves on its own compositor layer: the icon (an SVG), the halo (a 1px
+     ring), the prime's ornament, and the plate's own 1.5% scale. Springs per sheet drop
+     from 25 to 13 and text re-raster drops to zero. */
   /* sel, gain, k, zeta */
   var F_LAYERS = [
     [".orbit__mark",  1.00, 190, 0.90],
-    [".orbit__label", 0.34, 105, 1.00],
-    [".orbit__sub",   0.27, 105, 1.00],
   ];
   function fieldSupported() {
     if (reduced()) return false;
@@ -5432,8 +5457,7 @@ render();
            the ornament is not licensed to leave the envelope just because it is light. */
         var o = spring(1.20, 140, 0.86); o.el = p; o.prop = true; layers.push(o);
       }
-      var rot = parseFloat(p.style.getPropertyValue("--orot")) || 0;      // its resting tilt, so hover can straighten it on a spring instead of a 460ms tween
-      out.push({ p: p, layers: layers, rot: rot, s: 1, vs: 0, r: 0, vr: 0, tx: 0, ty: 0, ts: 1, tr: 0, cx: 0, cy: 0, hw: 0, hh: 0 });
+      out.push({ p: p, layers: layers, s: 1, vs: 0, tx: 0, ty: 0, ts: 1, cx: 0, cy: 0, hw: 0, hh: 0 });
     }
     return out;
   }
@@ -5457,12 +5481,12 @@ render();
       if (i === hov) {
         var dx = FIELD.px - n.cx, dy = FIELD.py - n.cy, d = Math.sqrt(dx * dx + dy * dy) || 1;
         var mag = Math.min(F_PULL, d * 0.10);                             // never past the cursor: a node at 6px away moves 0.6px, not 4
-        n.tx = dx / d * mag; n.ty = dy / d * mag; n.ts = F_LIFT; n.tr = -n.rot;
+        n.tx = dx / d * mag; n.ty = dy / d * mag; n.ts = F_LIFT;
       } else if (hov >= 0) {
         var hx = n.cx - nodes[hov].cx, hy = n.cy - nodes[hov].cy, hd = Math.sqrt(hx * hx + hy * hy) || 1;
         var f = F_NUDGE / (1 + hd / F_FALL);
-        n.tx = hx / hd * f; n.ty = hy / hd * f; n.ts = 1; n.tr = 0;
-      } else { n.tx = 0; n.ty = 0; n.ts = 1; n.tr = 0; }
+        n.tx = hx / hd * f; n.ty = hy / hd * f; n.ts = 1;
+      } else { n.tx = 0; n.ty = 0; n.ts = 1; }
     }
   }
   function fieldIntegrate(nodes, dt) {
@@ -5478,10 +5502,11 @@ render();
       }
       n.vs += (-150 * (n.s - n.ts) - 2 * 1.0 * Math.sqrt(150) * n.vs) * dt;
       n.s += n.vs * dt;
-      n.vr += (-120 * (n.r - n.tr) - 2 * 1.0 * Math.sqrt(120) * n.vr) * dt;
-      n.r += n.vr * dt;
       if (Math.abs(n.s - n.ts) > 0.0004 || Math.abs(n.vs) > 0.003) moving = true;
-      if (Math.abs(n.r - n.tr) > 0.01 || Math.abs(n.vr) > 0.04) moving = true;
+      /* BR-S313: the hover-straighten spring is gone. It said the same thing the 1.5%
+         scale already says, it was a sixth spring per plate, and now that a plate opens
+         where it stands the jitter tilt is dropped by .is-display anyway — so the tilt
+         had a second, better moment to disappear and did not need this one. */
     }
     return moving;
   }
@@ -5518,7 +5543,6 @@ render();
         else setv(a.el, "translate", a.x.toFixed(2) + "px " + a.y.toFixed(2) + "px");
       }
       setv(n.p, "scale", n.s.toFixed(4));
-      setv(n.p, "rotate", n.r.toFixed(2) + "deg");
     }
   }
   function fieldStep(now) {
@@ -5568,7 +5592,7 @@ render();
       sheet.removeEventListener("pointerleave", fieldOut);
       var ps = sheet.querySelectorAll(".orbit__plate");
       for (var i = 0; i < ps.length; i++) {                               // hand every property back exactly as it was found
-        ps[i].style.scale = ""; ps[i].style.rotate = "";
+        ps[i].style.scale = "";
         ps[i].style.removeProperty("--ornx"); ps[i].style.removeProperty("--orny");
         ps[i]._p = ps[i]._v = undefined;                                  // BR-S312: the write-memo describes the styles we just cleared — keeping it would make the next arm skip the writes that restore them
         var kids = ps[i].querySelectorAll(".orbit__mark, .orbit__label, .orbit__sub");
@@ -5599,6 +5623,19 @@ render();
        460ms travel. The field must never write a transform the entrance is still
        tweening; two owners for one property is the bug this delay exists to prevent. */
     fieldArmSoon(720);
+    /* ── BR-S313 — SEAL THE ROOM BEHIND THE SHEET. ────────────────────────────
+       The scrim is fully OPAQUE — a radial paper gradient at opacity 1, no
+       backdrop-filter — and yet the Desk was still a live painting layer underneath
+       it the whole time the map was open. The Desk carries 100% of this build's paint
+       weight (BR-S276 measured it: 91 costly-property elements against the wall's 3),
+       so every frame of every spring was competing with a full-viewport composite of a
+       room nobody could see. Hiding it is free: `visibility: hidden` keeps LAYOUT
+       intact, so #about still measures and the orbit's About travel still lands.
+       Waits 360ms — past the scrim's own 320ms fade — because sealing it early would
+       show the room vanish through a scrim that had not finished arriving. */
+    _sealTok++;
+    var sk = _sealTok;
+    window.setTimeout(function () { if (open && sk === _sealTok) document.documentElement.classList.add("orbit-sealed"); }, 360);
   }
 
   function hide() {
@@ -5607,6 +5644,8 @@ render();
     fieldDisarm();                              // BR-S309: before the fly-out, so the exit transition owns the plates alone
     undisplay();
     if (sheet) sheet.classList.remove("is-open");
+    _sealTok++;                                 // BR-S313: any pending seal is stale
+    document.documentElement.classList.remove("orbit-sealed");   // unseal FIRST — the room has to be painting before the sheet uncovers it
     document.documentElement.classList.remove("orbit-open");
     btn.setAttribute("aria-expanded", "false");
     document.removeEventListener("keydown", onKey, true);
@@ -5630,6 +5669,7 @@ render();
      receding. Second press (or the Enter) = travel. Paper puts it back down; paper
      again closes the sheet. Escape walks the same ladder in reverse, which is the only
      way an overlay with two depths stays predictable. */
+  var _sealTok = 0;
   var _stillT = 0, _stillTok = 0;
   function display(i) {
     detail = i;

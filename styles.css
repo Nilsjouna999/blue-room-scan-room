@@ -4734,6 +4734,14 @@ html.orbit-open .orbitbtn__txt::after {
 }
 .orbit.is-open .orbit__scrim { opacity: 1; }
 .orbit__field { position: absolute; inset: 0; }
+/* BR-S313 — the room stops painting while the map covers it. See app.js show().
+   visibility, NOT display: layout is preserved, so #about still measures and the
+   About plate's travel still lands on the right seat. */
+html.orbit-sealed #menuView { visibility: hidden; }
+/* BR-S313 — the two layers the field actually moves get their own compositor layer,
+   so moving them cannot re-rasterise the plate they sit in. Six elements, only while
+   the field is armed, dropped again on disarm — never a standing promotion. */
+.orbit.has-field .orbit__mark { will-change: transform; }
 /* BR-S300 — .orbit__hub deleted with its glyph: measured at 1440x900 the diamond sat at
    (708,443) and the prime mark's bottom edge at 444 — not an origin marker, an accidental
    rule between the card and its name. The prime plate already IS the centre. */
@@ -4942,16 +4950,33 @@ html.orbit-wings .orbit__field { --orbit-rx: clamp(200px, 25.5vw, 368px); --orbi
    chose it leaves entirely rather than lying underneath at .18 — the only honest answer
    for an object whose position is the one the arriving plate needs. */
 @media (min-width: 720px) {
+  /* 56px, and the number is measured, not chosen. BR-S313 made the displayed plate open
+     WHERE IT STANDS at 300px wide, so it no longer lands on the prime — but it does now
+     grow into its own neighbours. Swept 30/44/56/68/80px against every plate displayed in
+     turn, at 852x906 and 1440x900: 30px still left one collision (Settings), 44px was the
+     first clean value, 56px is that with a margin, and nothing leaves the viewport at any
+     of them. */
   .orbit.is-detail .orbit__plate:not(.is-display) {
-    translate: calc(var(--ox) * 30px) calc(var(--oy) * 30px);
+    translate: calc(var(--ox) * 56px) calc(var(--oy) * 56px);
   }
 }
 .orbit.is-detail .orbit__plate--prime:not(.is-display) { opacity: 0; }
 .orbit.is-detail .orbit__plate.is-display { opacity: 1; pointer-events: auto; z-index: 3; }
+/* ── BR-S313 — IT OPENS WHERE IT IS. ─────────────────────────────────────────
+   Builder: "clicked don't need to go center." Correct, and it was costing on both
+   counts. The travel WAS the crash — a plate arriving at dead centre lands on the
+   prime, which lives there — and it was the longest single move on the sheet: a
+   460ms transform across the whole field on every first press, for a plate that was
+   already somewhere you were looking at.
+   Opening in place is also the truer gesture. A map that moves the thing you pointed
+   at makes you re-find it; a plate that grows where your eye already is stays the
+   same object. It keeps its ring position and gives up only its jitter — the tilt and
+   the scale wander — because those are what say "one of many", and it is not one of
+   many any more. */
 .orbit .orbit__plate.is-display {
   width: 300px;
-  transform: translate3d(0, 0, 0) translate(-50%, -50%) rotate(0deg) scale(1);
-  transition-delay: 90ms;                                    /* 4 — only then does it start for the centre */
+  transform: translate3d(calc(var(--ox) * var(--orbit-rx) * var(--or, 1)), calc(var(--oy) * var(--orbit-ry) * var(--or, 1)), 0) translate(-50%, -50%) rotate(0deg) scale(1);
+  transition-delay: 90ms;
 }
 .orbit__plate.is-display .orbit__mark { width: 128px; height: 128px; color: #1c150d; transform: rotate(0deg) scale(1); }
 /* 5 — BR-S312: THE ICON'S GROWTH IS BACK TO INSTANT, ON PURPOSE. BR-S311 transitioned
