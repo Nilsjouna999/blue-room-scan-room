@@ -2784,6 +2784,31 @@ html.land-spring2 .menu__track { --track-ease: cubic-bezier(.24, 1.30, .38, 1); 
    weight, which is what "satisfying" usually means when nobody threw anything.
    cubic-bezier(0.2, 0, 0, 1) is Material's emphasized curve, unmodified. */
 html.land-m3      .menu__track { --track-ease: cubic-bezier(0.2, 0, 0, 1); }
+
+/* BR-S284 — THE DETENT.  The builder, on m3: "feels like going room to room... but
+   still lacking that feeling. Like magnetism clicking in place, or NEGATIVE magnetism
+   fuelling the move, and it gets to lock in place after jumping over the negative
+   magnetism below."
+   That is not bounce, and the distinction is the whole point.  Bounce is about the
+   ARRIVAL — overshoot the seat and wobble back — and Apple's rule already ruled it
+   out here because nothing was thrown.  What is being described is ANTICIPATION, a
+   different animation principle entirely and one about the DEPARTURE: the thing loads
+   up against a resistance, breaks free, and then locks.  A knob leaving a magnetic
+   detent does exactly this, and so does Disney's oldest rule — wind up before you go.
+   A cubic-bezier with a NEGATIVE first control point y does it for free: the track
+   travels a little the WRONG way, then releases.  Solved numerically, as a share of
+   travel, with the release point measured as a share of the duration:
+       detent   .50,-.18,.14,1 ... -1.87% =  -23px at 1217, releases at 17%
+       detent2  .55,-.28,.12,1 ... -4.00% =  -49px,          releases at 23%
+   Both end with ZERO overshoot — the arrival is a hard lock, which is the "clicks
+   into place" half and keeps faith with the no-bounce guidance.  Anticipation and
+   bounce are not the same trade.
+   ONE THING TO WATCH ON THE DESK: winding up from panel 0 moves the track RIGHT, and
+   there is nothing to the left of the Desk, so ~23px of page field shows for a beat.
+   The field is the same ink as everything else, so it should read as nothing at all —
+   but that is the first place to look if it reads wrong. */
+html.land-detent  .menu__track { --track-ease: cubic-bezier(.50, -0.18, .14, 1); }
+html.land-detent2 .menu__track { --track-ease: cubic-bezier(.55, -0.28, .12, 1); }
   /* BR-S203: the stage is the first full-viewport screen; the desk/wall centre inside their panels, the About surface flows below */
   /* literal ease — --rv-ease is scoped to .reveal-stage and does not resolve here */
 .menu.is-wall .menu__track { transform: translateX(-100%); }
