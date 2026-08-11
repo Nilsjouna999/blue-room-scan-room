@@ -4978,10 +4978,28 @@ render();
     var html = '<div class="orbit__scrim" data-orbit-close></div><div class="orbit__field">'
              + '<span class="orbit__hub" aria-hidden="true">◆</span>';
     for (var i = 0; i < n; i++) {
-      /* -90deg puts the first room at the top; the ring is walked clockwise */
+      /* BR-S291 — A CONSTELLATION, NOT A RING.  I built the first version off a still
+         and shipped a perfect 60-degree ring; the reference's video shows something
+         else entirely — an irregular scatter, cards at different distances, different
+         angles and different SIZES, clustered rather than spaced. The evenness was the
+         mistake: a ring reads as a dial, a machine part, six items on a clock face. A
+         scatter reads as things that were PLACED. That is the whole difference between
+         the reference feeling alive and mine feeling mechanical.
+         The jitter is DETERMINISTIC, from the index, not random — it must be the same
+         every open or the map stops being a map and muscle memory never forms. Angle
+         wanders up to a fifth of a step, radius rides between .78 and 1.06 of nominal,
+         and scale between .88 and 1.06, so no two plates are twins and none can collide
+         with its neighbour. */
       var a = (i / n) * Math.PI * 2 - Math.PI / 2;
+      var h = Math.sin((i + 1) * 12.9898) * 43758.5453; h = h - Math.floor(h);  // stable [0,1)
+      var h2 = Math.sin((i + 1) * 78.233) * 12345.6789;  h2 = h2 - Math.floor(h2);
+      var h3 = Math.sin((i + 1) * 39.425) * 24634.6345;  h3 = h3 - Math.floor(h3);
+      a += (h - 0.5) * (Math.PI * 2 / n) * 0.40;
+      var rad = (0.78 + h2 * 0.28).toFixed(3);
+      var scl = (0.88 + h3 * 0.18).toFixed(3);
       html += '<button type="button" class="orbit__plate" data-orbit-go="' + i + '"'
             + ' style="--ox:' + Math.cos(a).toFixed(4) + '; --oy:' + Math.sin(a).toFixed(4)
+            + '; --or:' + rad + '; --os:' + scl
             + '; --od:' + (i * 26) + 'ms">'
             + '<span class="orbit__mark" aria-hidden="true"></span>'
             + '<span class="orbit__label">' + list[i].label.replace(/[<>&]/g, "") + "</span>"

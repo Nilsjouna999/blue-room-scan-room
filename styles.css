@@ -4709,7 +4709,7 @@ html.orbit-open .orbitbtn { color: var(--t-display); border-color: var(--t-meta)
 .orbit.is-open .orbit__hub { opacity: 1; }
 
 /* --orbit-r is the ring radius; the plate's own position is cos/sin baked in at build */
-.orbit__field { --orbit-r: clamp(150px, 27vh, 260px); }
+.orbit__field { --orbit-r: clamp(160px, 29vh, 285px); }   /* nominal; each plate rides --or between .78 and 1.06 of it */
 .orbit__plate {
   /* centred on its ring point by translate(-50%,-50%) rather than by a negative
      margin: the margin assumed every plate was the same height, and a two-line label
@@ -4720,19 +4720,19 @@ html.orbit-open .orbitbtn { color: var(--t-display); border-color: var(--t-meta)
   padding: 14px 10px 12px;
   background: none; border: 0; cursor: pointer; color: var(--t-body);
   opacity: 0;
-  transform: translate3d(calc(var(--ox) * var(--orbit-r) * 0.34), calc(var(--oy) * var(--orbit-r) * 0.34), 0) translate(-50%, -50%);
+  transform: translate3d(calc(var(--ox) * var(--orbit-r) * var(--or, 1) * 0.34), calc(var(--oy) * var(--orbit-r) * var(--or, 1) * 0.34), 0) translate(-50%, -50%) scale(calc(var(--os, 1) * .96));
   transition: opacity 340ms var(--ease-settle, cubic-bezier(.2,.7,.2,1)) var(--od, 0ms),
               transform 460ms var(--ease-settle, cubic-bezier(.2,.7,.2,1)) var(--od, 0ms),
               color 180ms ease;
 }
 .orbit.is-open .orbit__plate {
   opacity: 1; will-change: transform;
-  transform: translate3d(calc(var(--ox) * var(--orbit-r)), calc(var(--oy) * var(--orbit-r)), 0) translate(-50%, -50%);
+  transform: translate3d(calc(var(--ox) * var(--orbit-r) * var(--or, 1)), calc(var(--oy) * var(--orbit-r) * var(--or, 1)), 0) translate(-50%, -50%) scale(var(--os, 1));
 }
 .orbit__plate:hover, .orbit__plate:focus-visible { color: var(--t-display); outline: none; }
 .orbit.is-open .orbit__plate:hover,
 .orbit.is-open .orbit__plate:focus-visible {
-  transform: translate3d(calc(var(--ox) * var(--orbit-r)), calc(var(--oy) * var(--orbit-r) - 3px), 0) translate(-50%, -50%);
+  transform: translate3d(calc(var(--ox) * var(--orbit-r) * var(--or, 1)), calc(var(--oy) * var(--orbit-r) * var(--or, 1) - 3px), 0) translate(-50%, -50%) scale(calc(var(--os, 1) * 1.03));
   transition-delay: 0ms;
 }
 .orbit__mark {
@@ -4747,5 +4747,5 @@ html.orbit-open .orbitbtn { color: var(--t-display); border-color: var(--t-meta)
 }
 @media (prefers-reduced-motion: reduce) {
   .orbit__scrim, .orbit__hub, .orbit__plate { transition: none; }
-  .orbit__plate { transform: translate3d(calc(var(--ox) * var(--orbit-r)), calc(var(--oy) * var(--orbit-r)), 0) translate(-50%, -50%); }
+  .orbit__plate { transform: translate3d(calc(var(--ox) * var(--orbit-r) * var(--or, 1)), calc(var(--oy) * var(--orbit-r) * var(--or, 1)), 0) translate(-50%, -50%) scale(var(--os, 1)); }
 }
