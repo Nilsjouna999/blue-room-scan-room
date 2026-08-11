@@ -1255,10 +1255,26 @@ const MENUREV_FWD_ARROW =
    wall of two framed room-plaques. Silver arrows = neutral instrument (no purple —
    that register stays reserved for the vault/see-deeper offers).
    BR-S193: plain hairline arrow (builder call — "normal looking arrow"), not the scribble. */
+/* ── BR-S345 — A BETTER ARROW. ────────────────────────────────────────────────
+   Builder: the bottom page-nav arrows need to be better. They were a 46px line
+   with a head, floating alone in a corner under a centred caption, and the whole
+   response to a hand was a 3px nudge. Two things were wrong and only one of them
+   was the glyph:
+     COMPOSITION. A caption stacked ABOVE a horizontal arrow gives a directional
+     control a vertical axis, so the pair reads as a label with a mark under it
+     rather than as a way out of the room. They sit on ONE line now, caption inside
+     and arrow outward, mirrored on the left-hand controls — so the shape of the
+     control points where it goes before a single word is read.
+     GESTURE. The tail and the head are separate elements now, which is what makes
+     the hover a movement instead of a jiggle: the tail GROWS from its inner end and
+     the head advances by exactly the same 4px, so the line lengthens toward the next
+     room and the arrow rides out on it. One thing extending, not a glyph twitching.
+   Hairline weights (1.15) and a longer tail — at 8.5px caption scale the old 1.4 read
+   as chunky beside the archive's own rules. */
 const ANNEX_ARROW =
-  '<svg class="menu__go-svg" viewBox="0 0 44 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">'
-  + '<line x1="2" y1="8" x2="40" y2="8"/>'
-  + '<path d="M33 2.5 L40 8 L33 13.5"/>'
+  '<svg class="menu__go-svg" viewBox="0 0 56 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.15" stroke-linecap="round" stroke-linejoin="round">'
+  + '<line class="menu__go-tail" x1="1" y1="8" x2="47" y2="8"/>'
+  + '<path class="menu__go-head" d="M40 3 L47 8 L40 13"/>'
   + '</svg>';
 const ANNEX_GO =
   '<div class="menu__go menu__go--rooms">'
@@ -1658,15 +1674,23 @@ function renderWall() {
         }).join('')
     + '</div>'
     + '<span class="menu__draw-cutline menu__draw-cutline--read" aria-hidden="true"></span>'
-    + '<div class="m2read" data-m2-read>'
+    /* the accent is carried on the served markup too — m2WriteRead only runs on a flip
+       or a pull, so without this the FIRST paint is the one uncoloured read on the page */
+    + '<div class="m2read" data-m2-read style="--m2acc:' + M2_BIRTH_READ.accent + '">'
     /* BR-S340: the served markup is the BIRTH state, because that is the face the panel
        opens on. These three lines and the caption below must agree with data-face on the
        hero — a first paint that disagrees with itself is a flash of the wrong product. */
     + '<p class="m2read__label">The reading in question</p>'
-    + '<p class="m2read__meta" data-m2-meta>Six marks &middot; one name &middot; by birth</p>'
+    /* through the same builder as every later write, or the FIRST paint would be the
+       one ungraded line on the panel and nobody would see it until they flipped */
+    + '<p class="m2read__meta" data-m2-meta>' + m2MetaHTML(M2_BIRTH_READ.meta) + '</p>'
     + '<p class="m2read__mean" data-m2-mean>Six marks you were given rather than chose, read together into one crowned name. Nothing is drawn here — each mark is looked up, and read as it stands.</p>'
     + '</div>'
-    + '<p class="menu__wall-trust">Asked the same, they answer the same.</p>'
+    /* BR-S345: "Asked the same, they answer the same." is gone. It was a fixed line
+       pinned under a block whose whole job is to change, so it read as a caption on
+       every card and belonged to none of them — and it argued determinism at a reader
+       who has not asked a question yet. The promise still stands where it is actually
+       load-bearing: on the drawn reading, and in The Rules. */
     + '</header>'
     // STAGE — the standing monument: the XVII Star, turned in gold
     + '<section class="menu__draw-stage">'
@@ -1824,7 +1848,8 @@ const M2_BIRTH_READ = {
   /* Trimmed from 251 characters to fit the four lines the box actually has. The old
      one measured FIVE lines at 330px and was being clipped mid-sentence — and the six
      marks it spent two lines listing are printed on the card beside it anyway. */
-  mean: "Six marks you were given rather than chose, read together into one crowned name. Nothing is drawn here — each mark is looked up, and read as it stands."
+  mean: "Six marks you were given rather than chose, read together into one crowned name. Nothing is drawn here — each mark is looked up, and read as it stands.",
+  accent: "#b6a06a"        // the crown's own brass — the birth reading's register
 };
 const M2_SAMPLE_READ = {
   label: "The card in hand",
@@ -1838,10 +1863,75 @@ const M2_STAGE_COPY = {
   tarot: { cap: "Sample Draw", sub: "Seventy-eight cards. One question." },
   birth: { cap: "By Birth",    sub: "Six marks. One name." }
 };
+/* ── BR-S345 — THE META LINE IS GRADED ACROSS ITS SEGMENTS. ───────────────────
+   Builder: the segments should be graded BETWEEN them, so they read as different
+   kinds of thing carrying different weight — and only the NUMBER should be gold.
+   That is right, and BR-S343 had it wrong in a way worth naming: I painted the
+   whole line one gold, which says every part of it is the same kind of fact. It is
+   not. "Arcana · XVII · hope" is a class, an index, and a meaning — three registers
+   flattened into one colour, which is why it read as a row of perks rather than as
+   a record. Graded, the eye gets the hierarchy for free: brightest at the class,
+   dimmest at the keyword, and the numeral lit because a number is the one part of
+   a record that identifies rather than describes.
+   THE RULE IS MECHANICAL, not a per-card list: any segment splits on its numeral
+   and only that token takes gold. Roman numerals, digits, and the small number
+   words, since "Six marks" is as much a count as "XVII" is. */
+const M2_NUMWORD = /^(one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve)$/i;
+/* ── BR-S346 — COLOUR CARRIES MEANING, NOT JUST HIERARCHY. ────────────────────
+   Builder: the marks should be coloured by how fitting the colour is to what the
+   mark IS — the way a zodiac sign carries its element — muted, but visibly there.
+   BR-S345 graded the meta by BRIGHTNESS, which ranks the segments but says nothing
+   about them: a Cups card and a Wands card came out identical. Every suit already
+   carries an element and every element already has a colour older than this app, so
+   the accent is derived rather than invented.
+   MUTED IS A CONSTRAINT, NOT A HEDGE. These sit at roughly a third of the
+   saturation a "fire = red" palette would use, because the room is warm-neutral and
+   one loud hue in the read column would out-shout the card it belongs to. They are
+   here to differentiate, not to decorate.
+   The gold stays reserved for the numeral — the accent never takes it. */
+const M2_ELEMENT = [
+  [/wand|fire/i,      "#c08055"],   // burnt amber — heat without a red
+  [/cup|water/i,      "#6f9ab0"],   // slate blue, the colour of deep still water
+  [/sword|air/i,      "#a6b0bb"],   // cold pale steel
+  [/pentacle|earth/i, "#93a06b"],   // moss over soil
+  [/arcana|major/i,   "#b0925a"]    // brass: the majors are the archive's own register
+];
+function m2Accent(card) {
+  const tag = String((card && card.tag) || "");
+  for (let i = 0; i < M2_ELEMENT.length; i++) if (M2_ELEMENT[i][0].test(tag)) return M2_ELEMENT[i][1];
+  return "";                                    // unknown suit: fall back to the plain grade
+}
+function m2MetaHTML(meta) {
+  const parts = String(meta || "").split("·").map(function (s) { return s.trim(); }).filter(Boolean);
+  /* ONLY THE FIRST numeral is gilded. "Six marks · one name · by birth" has two
+     number-words in it and gilding both put two gold marks in one short line, which
+     is a pattern rather than an emphasis — and "one name" is a phrasing, not a count.
+     The builder said "only number", singular, and meant it. */
+  let gilded = false;
+  return parts.map(function (p, i) {
+    const tier = i > 2 ? 2 : i;                       // three tones; anything past the third joins the last
+    const inner = p.split(/\s+/).map(function (w) {
+      const bare = w.replace(/[^\w]/g, "");
+      const isNum = /^\d+$/.test(bare) || /^[IVXLCDM]+$/.test(bare) || M2_NUMWORD.test(bare);
+      if (isNum && !gilded) { gilded = true; return '<span class="m2read__num">' + esc(w) + "</span>"; }
+      return esc(w);
+    }).join(" ");
+    return '<span class="m2read__seg m2read__seg--' + tier + '">' + inner + "</span>";
+  }).join('<span class="m2read__dot" aria-hidden="true">&middot;</span>');
+}
 function m2WriteRead(root, r) {
   const set = (sel, txt) => { const el = root.querySelector(sel); if (el) el.textContent = txt; };
   set(".m2read__label", r.label);
-  set("[data-m2-meta]", r.meta);
+  /* the accent rides on the block, so one property change re-tints the whole read */
+  const block = root.querySelector(".m2read");
+  if (block) {
+    if (r.accent) block.style.setProperty("--m2acc", r.accent);
+    else block.style.removeProperty("--m2acc");
+  }
+  /* innerHTML here and nowhere else in this function: the segments need element
+     boundaries to be graded, and every token is escaped on the way in. */
+  const meta = root.querySelector("[data-m2-meta]");
+  if (meta) meta.innerHTML = m2MetaHTML(r.meta);
   set("[data-m2-mean]", r.mean);
 }
 function m2SetFace(host, which, opts) {
@@ -1906,7 +1996,8 @@ function m2Pull(host) {
   M2_LAST = {
     label: "The card in hand",
     meta: rank + (rev ? " · reversed" : "") + (kw ? " · " + kw : ""),
-    mean: (rev && c.reversed) ? c.reversed : c.meaning
+    mean: (rev && c.reversed) ? c.reversed : c.meaning,
+    accent: m2Accent(c)          // BR-S346: the suit's element tints its own read
   };
   m2WriteRead(root, M2_LAST);
   /* SCOPED TO THE STAGE, and it has to be: .msample__label exists on M1's desk too, so

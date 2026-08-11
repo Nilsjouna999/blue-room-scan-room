@@ -3125,22 +3125,49 @@ html.is-travel .card .cardfinish { mix-blend-mode: normal; }
 
 /* edge arrows — bottom-corner dog-ears (right-center is owned by the menustage
    develop arrow at rest and the purple vault arrow in fullview) */
-.menu__go { position: absolute; z-index: 5; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+/* BR-S345: one line, not a stack. The caption sits on the INSIDE and the arrow
+   points outward, so the control's own shape says which way it goes. */
+.menu__go { position: absolute; z-index: 5; display: flex; flex-direction: row; align-items: center; gap: 10px; }
 .menu__go--rooms { right: clamp(12px, 2.6vw, 40px); bottom: clamp(26px, 6vh, 54px); transition: opacity 240ms ease, visibility 0s linear 0s; }
 .menu__go--desk { left: clamp(12px, 2.6vw, 40px); bottom: clamp(26px, 6vh, 54px); }
 .menu__go--reliq { right: clamp(12px, 2.6vw, 40px); bottom: clamp(26px, 6vh, 54px); }   /* BR-S204: wall→reliquary (right edge) */
 .menu__go--reliq-back { left: clamp(12px, 2.6vw, 40px); bottom: clamp(26px, 6vh, 54px); }   /* reliquary→wall (left edge) */
-.menu__go-cap { font-family: var(--font-mono); font-size: 8.5px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--t-meta); }
-/* BR-S193: plain hairline arrow (builder call) — long tail + head, silver, nudges on hover */
-.menu__go-btn { background: none; border: 0; padding: 8px 6px; cursor: pointer; color: var(--t-meta); transition: color 200ms ease; }
-.menu__go-svg { width: 46px; height: auto; display: block; transition: transform 200ms ease; }
+/* the LEFT-hand controls mirror: arrow outward, caption inward. DOM order is
+   caption-then-button in every one of them, so the mirror is a row-reverse rather
+   than a second markup shape. */
+.menu__go--desk, .menu__go--reliq-back { flex-direction: row-reverse; }
+.menu__go-cap {
+  font-family: var(--font-mono); font-size: 8.5px; letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--t-meta); transition: color 220ms var(--ease-settle);
+}
+.menu__go-btn {
+  background: none; border: 0; padding: 10px 4px; cursor: pointer; color: var(--t-meta);
+  transition: color 220ms var(--ease-settle); line-height: 0;
+}
+.menu__go-svg { width: 56px; height: auto; display: block; overflow: visible; }
+/* THE GESTURE. The tail grows from its inner end by 4px and the head advances by
+   the same 4px, so one line extends toward the next room and the arrow rides out on
+   it. Separate elements is the whole trick — translating the glyph as a unit is the
+   nudge this replaces. Transform only; nothing here lays out. */
+.menu__go-tail { transform-origin: 1px 8px; transition: transform 260ms var(--ease-settle); }
+.menu__go-head { transition: transform 260ms var(--ease-settle); }
+.menu__go-btn:hover .menu__go-tail,
+.menu__go-btn:focus-visible .menu__go-tail { transform: scaleX(1.087); }   /* 46px tail + 4px */
+.menu__go-btn:hover .menu__go-head,
+.menu__go-btn:focus-visible .menu__go-head { transform: translateX(4px); }
+.menu__go-btn:active .menu__go-tail { transform: scaleX(1.043); }
+.menu__go-btn:active .menu__go-head { transform: translateX(2px); }
 .menu__go-btn:hover, .menu__go-btn:focus-visible { color: var(--t-display); }
-.menu__go-btn:hover .menu__go-svg, .menu__go-btn:focus-visible .menu__go-svg { transform: translateX(3px); }
-.menu__go-btn:active .menu__go-svg { transform: translateX(1px); }
+/* the caption answers with the arrow — one control, one response */
+.menu__go:hover .menu__go-cap { color: var(--silver); }
 .menu__go-btn:focus-visible { outline: 1px solid var(--silver-dim); outline-offset: 5px; border-radius: 3px; }
+/* the back arrow is the same drawing, mirrored on the SVG — the tail/head transforms
+   above are in local coordinates, so they keep pointing the way the arrow points */
 .menu__go-btn--back .menu__go-svg { transform: scaleX(-1); }
-.menu__go-btn--back:hover .menu__go-svg, .menu__go-btn--back:focus-visible .menu__go-svg { transform: scaleX(-1) translateX(3px); }
-.menu__go-btn--back:active .menu__go-svg { transform: scaleX(-1) translateX(1px); }
+@media (prefers-reduced-motion: reduce) {
+  .menu__go-tail, .menu__go-head, .menu__go-cap, .menu__go-btn { transition: none; }
+  .menu__go-btn:hover .menu__go-tail, .menu__go-btn:hover .menu__go-head { transform: none; }
+}
 /* hide states: never beside the purple vault arrow; steps aside during the in-place scribble read */
 .menurev.is-fullview .menu__go--rooms,
 .menurev:has(.reveal-stage--menustage.is-reading) .menu__go--rooms {
@@ -3217,10 +3244,24 @@ html.is-travel .card .cardfinish { mix-blend-mode: normal; }
 /* the grade runs down the whole block, not just the sentence: the label is the
    faintest thing, the meta takes the gold, the meaning cools out of it */
 .m2read__label { font-family: var(--font-mono); font-size: 9.5px; letter-spacing: .22em; text-transform: uppercase; color: var(--t-ghost); margin: 0 0 2px; }
+/* BR-S345 — the meta is THREE registers, not one fact: a class, an index, a
+   meaning. One colour across all of it said they were the same kind of thing and
+   the line read as a row of perks. Graded, the hierarchy is free — brightest at
+   the class, dimmest at the keyword — and only the NUMERAL is gold, because a
+   number is the one part of a record that identifies rather than describes. */
 .m2read__meta {
   font-family: var(--font-mono); font-size: 10.5px; letter-spacing: .2em; text-transform: uppercase;
-  color: #b39a68; margin: 0; transition: color 220ms var(--ease-settle);
+  color: var(--t-meta); margin: 0;
 }
+.m2read__seg { transition: color 220ms var(--ease-settle); }
+/* BR-S346: the leading segment takes the accent when the card has one — the suit's
+   element, or the crown's brass on the birth face. Falls back to the plain grade for
+   anything with no element to read. */
+.m2read__seg--0 { color: var(--m2acc, #cfc7b6); transition: color 220ms var(--ease-settle); }
+.m2read__seg--1 { color: #a49e93; }
+.m2read__seg--2 { color: #8b867e; }
+.m2read__num { color: #c8ad70; transition: color 220ms var(--ease-settle); }
+.m2read__dot { color: #6f6b64; margin: 0 .5em; }
 /* ── BR-S343 — THE READ IS COLOUR-GRADED. ────────────────────────────────────
    Builder's note. The block was three flat greys and it read as a spec sheet — a
    list of perks beside a card, which is exactly what a storefront must not look
@@ -3263,12 +3304,23 @@ html.is-travel .card .cardfinish { mix-blend-mode: normal; }
    ANIMATION IS OPACITY AND transform ONLY — both compositable, nothing that lays out.
    One 27.2s keyframe shared by all eight, each offset by a negative delay, so the
    browser schedules nothing and there is no timer to leak when the panel slides away. */
+/* ── BR-S346 — THE BOX WAS SIZED FOR QUESTIONS THAT NO LONGER EXIST. ─────────
+   Measured at 330px: all seven of the current lines are ONE line of 22.5px, and the
+   box was 3.4em — 54px, 2.42 lines. Worse, the questions are `inset:0` and therefore
+   top-aligned, so every one of them sat with 32px of dead air underneath it. That is
+   what made the block read as floating too high with a hole under it, and no amount
+   of tuning the timing would have fixed a layout fault.
+   Two lines of headroom (2.9em) so a longer question can still arrive without the
+   column jumping, and CENTRED, so a one-line and a two-line question share an optical
+   centre instead of hanging from the top. The reserved height stays fixed either way
+   — this column may not resize while someone is looking at it. */
 .m2asks {
-  position: relative; height: 3.4em; width: 100%; margin: 0 0 10px;
+  position: relative; height: 2.9em; width: 100%; margin: 0 0 10px;
   pointer-events: none;
 }
 .m2asks__q {
   position: absolute; inset: 0;
+  display: flex; align-items: center;
   font-family: var(--font-display); font-style: italic; font-size: 15.5px; line-height: 1.45;
   color: var(--t-body); opacity: 0;
   /* the cycle length is written onto .m2asks by app.js from M2_CYCLE — the same
@@ -3359,8 +3411,16 @@ html.is-travel .card .cardfinish { mix-blend-mode: normal; }
    light with the card) expressed in the property that is actually painting them. */
 .menu__draw:has(.menu__draw-stage:hover) .m2read__mean,
 .menu__draw:has(.m2read:hover) .m2read__mean { --grade-a: #ece4d2; --grade-b: #bdb8ad; }
-.menu__draw:has(.menu__draw-stage:hover) .m2read__meta,
-.menu__draw:has(.m2read:hover) .m2read__meta { color: #c8ad70; }
+/* the pair-hover lifts each segment by one step and keeps their order — the grade
+   is the point, so brightening them all to one colour would undo it on hover */
+.menu__draw:has(.menu__draw-stage:hover) .m2read__seg--0,
+.menu__draw:has(.m2read:hover) .m2read__seg--0 { color: #e6dfcd; }
+.menu__draw:has(.menu__draw-stage:hover) .m2read__seg--1,
+.menu__draw:has(.m2read:hover) .m2read__seg--1 { color: #bdb7ab; }
+.menu__draw:has(.menu__draw-stage:hover) .m2read__seg--2,
+.menu__draw:has(.m2read:hover) .m2read__seg--2 { color: #a29d94; }
+.menu__draw:has(.menu__draw-stage:hover) .m2read__num,
+.menu__draw:has(.m2read:hover) .m2read__num { color: #e0c184; }
 @media (prefers-reduced-motion: reduce) {
   .m2hero, .m2read__mean { transition: none; }
 }
@@ -3577,11 +3637,41 @@ html.m2-parch .m2hero { --bf-ink: #1c150d; --bf-meta: #6a5c45; --bf-rule: rgba(2
 .m2bface .m2face-meta { color: var(--bf-meta); }
 .m2bface .m2face-div { background: var(--bf-rule); }
 .m2bface .m2face-orient { color: var(--bf-meta); }
+/* ── BR-S346 — SIX MARKS, SIX COLOURS. ───────────────────────────────────────
+   Six systems listed in one grey said "here are six of something". Each one is a
+   different tradition with a different temperature, and giving each its own tone
+   is the cheapest way to say that before anyone reads a word of it:
+     sun sign    amber   — the solar one
+     year animal cinnabar— the Chinese register, its own red
+     life path   indigo  — number as ink on paper
+     rune        moss    — cut into wood and stone
+     trigram     teal    — the bagua's water-and-air pairings
+     hexagram    wine    — the oldest and least legible of the six
+   TUNED FOR PARCHMENT FIRST, because parchment is the shipped deck: these are the
+   DARK forms, all measured above 4.5:1 on the cream stock. The dark register keeps
+   its own lighter set, since a colour that reads on cream disappears on ink.
+   Muted throughout — the brief was "visually there", not bright. */
 .m2bface__marks {
   list-style: none; margin: auto 0 0; padding: 0;
   display: grid; gap: 5px;
   font-family: var(--font-mono); font-size: 9.5px; font-weight: 500;
   letter-spacing: .13em; text-transform: uppercase; color: var(--bf-meta);
+}
+.m2bface__marks li:nth-child(1) { color: var(--mk-sun); }
+.m2bface__marks li:nth-child(2) { color: var(--mk-animal); }
+.m2bface__marks li:nth-child(3) { color: var(--mk-path); }
+.m2bface__marks li:nth-child(4) { color: var(--mk-rune); }
+.m2bface__marks li:nth-child(5) { color: var(--mk-trigram); }
+.m2bface__marks li:nth-child(6) { color: var(--mk-hex); }
+/* dark stock (?m2=dark) — lighter forms of the same six */
+.m2hero {
+  --mk-sun: #c8a463; --mk-animal: #c07d63; --mk-path: #8090ac;
+  --mk-rune: #92a37c; --mk-trigram: #6fa39e; --mk-hex: #a4808c;
+}
+/* parchment — the shipped deck. Darker, all clearing 4.5:1 on #e7e2d7. */
+html.m2-parch .m2hero {
+  --mk-sun: #8a6a2f; --mk-animal: #8c4a38; --mk-path: #3f5170;
+  --mk-rune: #4e6138; --mk-trigram: #2f6360; --mk-hex: #6b4550;
 }
 .m2bface__name { color: var(--bf-ink); margin: 14px 0 0; }
 
@@ -3683,7 +3773,8 @@ html.m2-parch .m2hero { --bf-ink: #1c150d; --bf-meta: #6a5c45; --bf-rule: rgba(2
 }
 .menu__wall-eyebrow { font-family: var(--font-mono); font-size: 9.5px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--faint); }
 .menu__wall-eyemark { color: var(--silver-dim); }
-.menu__wall-trust { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em; line-height: 1.5; color: var(--t-body); }
+/* BR-S345: `.menu__wall-trust` deleted with the line it dressed — grep-confirmed
+   it was used in exactly one place. */
 
 /* ── BR-S204: the Shelf threshold (slide 3) — a conservation niche in the
    wall-plaque double-rule register. Sealed (locked) by default, lit when opened.
