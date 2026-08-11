@@ -1582,7 +1582,7 @@ function renderWall() {
     + '<section class="menu__draw-stage">'
     + '<div class="msample__cap"><span class="msample__label">Sample Draw</span></div>'
     + '<p class="menu__draw-herosub">Seventy-eight cards. One question.</p>'
-    + '<div class="m2hero" data-m2-hero>'
+    + '<div class="m2hero" data-m2-hero data-face="tarot">'
     + '<svg class="m2hero__back" viewBox="0 0 120 190" aria-hidden="true" preserveAspectRatio="xMidYMid meet"><rect x="7" y="7" width="106" height="176" rx="7" fill="none" stroke="url(#mwInk)" stroke-width="1"/><rect x="13" y="13" width="94" height="164" rx="5" fill="none" stroke="url(#mwInk)" stroke-width=".5" opacity=".6"/><g stroke="url(#mwInk)" stroke-width=".6" fill="none" opacity=".7"><path d="M60 42 L86 95 L60 148 L34 95 Z"/><path d="M60 64 L74 95 L60 126 L46 95 Z"/><circle cx="60" cy="95" r="4.5"/></g></svg>'
     + '<svg class="m2hero__face" viewBox="0 0 120 190" role="img" aria-label="XVII — The Star" preserveAspectRatio="xMidYMid meet"><rect x="11" y="11" width="98" height="168" rx="5" fill="none" stroke="url(#mwGold)" stroke-width=".6" opacity=".55"/><text x="60" y="30" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9" letter-spacing="2.5" fill="url(#mwGold)">XVII</text><g stroke="url(#mwGold)" fill="none"><circle cx="60" cy="98" r="31" stroke-width=".8" opacity=".5"/><circle cx="60" cy="98" r="23" stroke-width=".6" opacity=".35"/><path d="M60 69 L64.6 86.9 L80.5 77.5 L71.1 93.4 L89 98 L71.1 102.6 L80.5 118.5 L64.6 109.1 L60 127 L55.4 109.1 L39.5 118.5 L48.9 102.6 L31 98 L48.9 93.4 L39.5 77.5 L55.4 86.9 Z" stroke-width=".9" opacity=".8"/><circle class="m2pip-glow" cx="60" cy="98" r="6.5" fill="url(#mwGold)" stroke="none"/><circle cx="60" cy="98" r="3.2" fill="url(#mwGold)" stroke="none"/></g></svg>'
     + '<div class="m2face" aria-hidden="true">'
@@ -1593,12 +1593,44 @@ function renderWall() {
     +   '<div class="m2face-orient" data-m2-faceorient>Upright</div>'
     +   '<span class="m2tick tl"></span><span class="m2tick br"></span>'
     + '</div>'
+    /* ── BR-S338 — THE MONUMENT SHOWS BOTH PRODUCTS. ─────────────────────────────
+       M2 offers two doors and then puts a tarot card on the plinth between them, so
+       the Birth Reading — the door the panel gives FIRST position to — was the only
+       thing on this storefront with no object. A reader who does not already know
+       what "the Birth Reading" is could look at this panel for a minute and still
+       be looking at tarot.
+       The second face is the same card stock in the same typographic grammar: the
+       six marks a birth is actually read through, and the crowned name they assemble
+       into. Nothing new is invented — those six are what arcana-reading.js derives. */
+    + '<div class="m2bface" aria-hidden="true">'
+    +   '<div class="m2face-head"><span class="m2face-meta">THE BIRTH READING</span>'
+    +   '<span class="m2face-glyph">&#10022;</span></div>'
+    +   '<ul class="m2bface__marks">'
+    +     ['Sun sign', 'Year animal', 'Life path', 'Rune', 'Trigram', 'Hexagram']
+            .map(function (m) { return '<li>' + m + '</li>'; }).join('')
+    +   '</ul>'
+    +   '<div class="m2face-name m2bface__name">The Crowned Name</div>'
+    +   '<div class="m2face-div"></div>'
+    +   '<div class="m2face-orient">By birth alone</div>'
+    +   '<span class="m2tick tl"></span><span class="m2tick br"></span>'
+    + '</div>'
     + '<span class="m2hero__name" data-m2-heroname>The Star</span>'
+    + '</div>'
+    /* The two faces are two ANSWERS to one question, so they are a radiogroup, not two
+       buttons. It sits under the card because it changes what the card is showing —
+       the same argument that put "Pull another" here in BR-S321. */
+    + '<div class="m2flip" role="radiogroup" aria-label="What the card shows" data-m2-flip>'
+    +   '<button type="button" class="m2flip__opt is-on" role="radio" aria-checked="true" tabindex="0" data-m2-face="tarot">Tarot</button>'
+    +   '<button type="button" class="m2flip__opt" role="radio" aria-checked="false" tabindex="-1" data-m2-face="birth">Birth</button>'
     + '</div>'
     /* BR-S321 — THE CONTROL THAT CHANGES THE CARD SITS UNDER THE CARD. Beside the copy
        it would read as a way to continue; beneath the card it reads as a way to change
        THAT card, which is all it does. Disabled until the deck is actually in hand. */
     + '<button type="button" class="menu__draw-pull" data-m2-pull disabled>Pull another</button>'
+    /* The birth side's equivalent act. "Pull another" is meaningless on a face that is
+       not dealt from a deck, so the two swap places with the flip — one act visible at
+       a time, in the same seat, so the column never changes height. */
+    + '<a class="menu__draw-pull menu__draw-pull--birth" href="?dev=arcane" data-m2-birthgo hidden>Set your marks</a>'
     + '<a class="menu__draw-placard" href="codex.html?v=237" data-codex-open><span class="menu__draw-placard-mark" aria-hidden="true">✦</span>The Codex — where every mark is defined &rarr;</a>'
     + '</section>'
     + '<span class="menu__draw-wm" aria-hidden="true"><svg viewBox="0 0 120 190" preserveAspectRatio="xMidYMid meet"><g stroke="url(#mwInk)" fill="none"><circle cx="60" cy="98" r="31" stroke-width=".8"/><circle cx="60" cy="98" r="23" stroke-width=".6"/><path d="M60 69 L64.6 86.9 L80.5 77.5 L71.1 93.4 L89 98 L71.1 102.6 L80.5 118.5 L64.6 109.1 L60 127 L55.4 109.1 L39.5 118.5 L48.9 102.6 L31 98 L48.9 93.4 L39.5 77.5 L55.4 86.9 Z" stroke-width=".9"/></g></svg></span>'
@@ -1665,9 +1697,79 @@ function m2Head(c) {
   const p = String((c && c.tag) || "").split("·").map(function (s) { return s.trim(); });
   return p.length >= 3 ? (p[1] + " · " + p[2]).toUpperCase() : "ARCANA · " + (p[0] || "");
 }
+/* ══ BR-S338 — THE FLIP. ══════════════════════════════════════════════════════
+   TWO RULES, both from the last session's notes, both load-bearing:
+
+   NO `preserve-3d`, NO `perspective` PROPERTY. Either one makes .m2hero a containing
+   block for fixed descendants, which styles.css:2740 forbids by name — the reveal's
+   fullview machinery depends on an untransformed, non-containing ancestor. BR-S279
+   already solved this shape: put perspective() INSIDE the transform. So the flip is
+   one composited `transform: perspective(1100px) rotateY(...)` on the hero and
+   nothing else, which also means there is no true two-sided card here — hence:
+
+   A HALF-TURN SWAP, NOT A BACKFACE. The card turns to edge-on (90deg), the faces are
+   exchanged at that instant while nothing is visible, and it turns back from the
+   other side (-90deg). Reads as one continuous turn, needs no 3D context, and cannot
+   strand a mirrored face if the animation is interrupted — the state is a data
+   attribute, and the END state of every path is a settled, readable card.
+
+   THE FACES DO NOT EAT CLICKS. Each face is `pointer-events:none` with `auto` on its
+   children, rather than a JS list of things-to-ignore: a stacked face that is merely
+   invisible still swallows the pointer, and an exclusion list is a list you have to
+   remember to update the next time a face gains a child. */
+let M2_FACE = "tarot", M2_LAST = null, M2_FLIP_T = null;
+const M2_BIRTH_READ = {
+  label: "The reading in question",
+  meta: "Six marks · one name · by birth",
+  mean: "A person read by birth through six systems — the sun sign, the year animal, the life path, the rune, the trigram and the hexagram — assembled into one crowned name. The marks are given, not chosen; the room looks each one up and reads what it finds."
+};
+const M2_SAMPLE_READ = {
+  label: "The card in hand",
+  meta: "Arcana · XVII · hope",
+  mean: "The Star stands for hope, renewal and quiet guidance after difficulty — the calm that follows the storm, and the small light you steer by."
+};
+function m2WriteRead(root, r) {
+  const set = (sel, txt) => { const el = root.querySelector(sel); if (el) el.textContent = txt; };
+  set(".m2read__label", r.label);
+  set("[data-m2-meta]", r.meta);
+  set("[data-m2-mean]", r.mean);
+}
+function m2SetFace(host, which, opts) {
+  const root = host || document;
+  const hero = root.querySelector("[data-m2-hero]");
+  if (!hero || which === M2_FACE) return;
+  M2_FACE = which;
+  root.querySelectorAll("[data-m2-face]").forEach(function (o) {
+    const on = o.getAttribute("data-m2-face") === which;
+    o.classList.toggle("is-on", on);
+    o.setAttribute("aria-checked", String(on));
+    o.setAttribute("tabindex", on ? "0" : "-1");   // roving tabindex, the ARIA radio pattern
+    if (on && opts && opts.focus) o.focus();
+  });
+  /* The swap itself — everything that must be true of the settled card, in one place,
+     so an interrupted turn can never leave a half-state behind. */
+  const settle = function () {
+    hero.setAttribute("data-face", which);
+    const pull = root.querySelector("[data-m2-pull]");
+    const go = root.querySelector("[data-m2-birthgo]");
+    if (pull) pull.hidden = which === "birth";
+    if (go) go.hidden = which !== "birth";
+    m2WriteRead(root, which === "birth" ? M2_BIRTH_READ : (M2_LAST || M2_SAMPLE_READ));
+  };
+  clearTimeout(M2_FLIP_T);
+  const reduced = window.BRMotion ? window.BRMotion.prefersReduced()
+    : !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+  if (reduced) { hero.classList.remove("is-turning"); settle(); return; }
+  hero.classList.add("is-turning");
+  M2_FLIP_T = setTimeout(function () {          // the edge-on instant, mid-animation
+    settle();
+    M2_FLIP_T = setTimeout(function () { hero.classList.remove("is-turning"); }, 240);
+  }, 240);
+}
 function m2Pull(host) {
   if (!M2_DECK || !M2_DECK.length) return;
   const root = host || document;
+  if (M2_FACE !== "tarot") return;              // the deck deals onto the tarot face only
   const c = M2_DECK[Math.floor(Math.random() * M2_DECK.length)];
   const rev = Math.random() < 0.5;
   const set = (sel, txt) => { const el = root.querySelector(sel); if (el) el.textContent = txt; };
@@ -1683,8 +1785,14 @@ function m2Pull(host) {
   set("[data-m2-heroname]", c.name);
   const rank = String(c.tag || "").split("·")[0].trim();
   const kw = (c.keywords && c.keywords[0]) || "";
-  set("[data-m2-meta]", rank + (rev ? " · reversed" : "") + (kw ? " · " + kw : ""));
-  set("[data-m2-mean]", (rev && c.reversed) ? c.reversed : c.meaning);
+  /* BR-S338: remembered, so flipping to the birth face and back restores the card the
+     reader actually pulled instead of silently reverting them to the Star sample. */
+  M2_LAST = {
+    label: "The card in hand",
+    meta: rank + (rev ? " · reversed" : "") + (kw ? " · " + kw : ""),
+    mean: (rev && c.reversed) ? c.reversed : c.meaning
+  };
+  m2WriteRead(root, M2_LAST);
   /* SCOPED TO THE STAGE, and it has to be: .msample__label exists on M1's desk too, so
      an unscoped query rewrote the DESK's caption from another panel. Caught by reading
      back "Sample Scan" — M1's word — from a selector meant for M2's "Sample Draw". */
@@ -1799,10 +1907,33 @@ function onReliqPreviewClick(e) {
 function onMenuAnnexClick(e) {
   var pull = e.target.closest("[data-m2-pull]");
   if (pull) { e.preventDefault(); m2Pull(e.currentTarget); return; }   // BR-S321: the hero deals itself a new card in place
+  var faceEl = e.target.closest("[data-m2-face]");                     // BR-S338: tarot face / birth face
+  if (faceEl) { e.preventDefault(); m2SetFace(e.currentTarget, faceEl.getAttribute("data-m2-face"), {}); return; }
   var el = e.target.closest("[data-annex-go],[data-annex-back]");
   if (!el) return;
   var host = e.currentTarget;
   menuSlideTo(_menuIndex(host) + (el.hasAttribute("data-annex-go") ? 1 : -1), {});
+}
+/* BR-S338: a radiogroup that only answers to clicks is a radiogroup in costume. Arrow
+   keys move AND select (the ARIA pattern for radios), Home/End jump to the ends. */
+function onMenuAnnexKey(e) {
+  var t = e.target;
+  if (!t || !t.closest || !t.closest("[data-m2-face]")) return;
+  var opts = Array.prototype.slice.call(e.currentTarget.querySelectorAll("[data-m2-face]"));
+  var i = opts.indexOf(t.closest("[data-m2-face]")), to = -1;
+  if (e.key === "ArrowRight" || e.key === "ArrowDown") to = (i + 1) % opts.length;
+  else if (e.key === "ArrowLeft" || e.key === "ArrowUp") to = (i - 1 + opts.length) % opts.length;
+  else if (e.key === "Home") to = 0;
+  else if (e.key === "End") to = opts.length - 1;
+  if (to < 0) return;
+  e.preventDefault();
+  /* Focus moves HERE, not inside m2SetFace: that function early-returns when the
+     target face is already the current one, and a keyboard user whose focus and
+     selection have drifted apart (selected by mouse, then arrowed) would press a key
+     and have nothing at all happen. The arrow always moves the caret; the selection
+     follows only when it actually changes. */
+  try { opts[to].focus(); } catch (err) {}
+  m2SetFace(e.currentTarget, opts[to].getAttribute("data-m2-face"), {});
 }
 
 /* BR-S205: the fixed-leaf Codex aperture — appended unconditionally as trailing #menuView
@@ -1957,6 +2088,8 @@ function mountMenu() {
   host.addEventListener("click", onReliqPreviewClick);
   host.removeEventListener("click", onMenuAnnexClick);      // BR-S233: annex nav delegated (survives DOM swaps like the M3 toggle re-render)
   host.addEventListener("click", onMenuAnnexClick);
+  host.removeEventListener("keydown", onMenuAnnexKey);      // BR-S338: the face radiogroup's arrow keys, delegated the same way
+  host.addEventListener("keydown", onMenuAnnexKey);
   host.removeEventListener("click", onM1VariantClick);      // BR-S259: M1 A/B layout toggle — same single-bind discipline
   host.addEventListener("click", onM1VariantClick);
   m1ApplyVariant(host, m1Variant());                        // BR-S259: restore the chosen variant before first paint of the desk
@@ -3051,6 +3184,13 @@ function wireMenuAnnex(host) {                                      // KEEP the 
 function _navBlocked(t) {
   if (!t) return false;
   if (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.tagName === "SELECT" || t.isContentEditable) return true;
+  /* BR-S338: a radiogroup OWNS its arrow keys — that is the ARIA pattern, not a
+     preference. Without this, focus inside M2's face control pressed ArrowRight and
+     the whole panel slid to M3, because ← → are also the panel keys and preventDefault
+     on a bubbling listener does nothing to a separate document-level one. Written
+     against the ROLE rather than against this one control, so the next radiogroup that
+     lands anywhere in the menu is correct on arrival instead of after the bug report. */
+  if (t.closest && t.closest('[role="radiogroup"]')) return true;
   return !!(t.closest && t.closest("#codexMini"));
 }
 /* ── BR-S308 — U1 IS A PLACE, SO IT GETS AN ADDRESS. ──────────────────────────

@@ -3418,6 +3418,79 @@ html.m2-parch .m2face {
 .m2hero__face { opacity: 1; clip-path: none; }
 .m2pip-glow { opacity: .55; transform-box: fill-box; }
 
+/* ============================================================
+   BR-S338 — THE FLIP: tarot face / birth face on one plinth.
+
+   THE ONE CONSTRAINT THAT SHAPES ALL OF THIS: no `perspective` property and no
+   `transform-style: preserve-3d` on .m2hero or any ancestor. Either makes it a
+   containing block for fixed descendants, which the note at styles.css:2740
+   forbids by name — the reveal's fullview machinery needs an untransformed,
+   non-containing ancestor. So perspective() rides INSIDE the transform, exactly
+   as BR-S279 solved it, and with no 3D context there is no backface to turn:
+   the card goes edge-on, the faces are swapped there, and it comes back. One
+   composited property, no stacking-context surprises, no half-mirrored state.
+============================================================ */
+.m2hero.is-turning { animation: m2-flip 480ms cubic-bezier(.42, 0, .58, 1) both; }
+@keyframes m2-flip {
+  0%   { transform: perspective(1100px) rotateY(0deg); }
+  50%  { transform: perspective(1100px) rotateY(90deg); }
+  100% { transform: perspective(1100px) rotateY(0deg); }
+}
+/* which face is up. display:none on the one that is down keeps it out of the
+   a11y tree and out of the hit-test entirely; the pointer-events pair below is
+   the belt for anything that is merely stacked. */
+.m2hero[data-face="birth"] .m2face,
+.m2hero[data-face="birth"] .m2hero__face,
+.m2hero[data-face="birth"] .m2hero__back,
+.m2hero[data-face="birth"] .m2hero__name { display: none; }
+.m2hero[data-face="tarot"] .m2bface { display: none; }
+/* A FACE IS SCENERY; ITS CHILDREN ARE NOT. Stated as a rule rather than as a JS
+   list of elements to skip — a list is a thing you have to remember to update the
+   next time a face gains a child, and forgetting is silent. */
+.m2face, .m2bface { pointer-events: none; }
+.m2face > *, .m2bface > * { pointer-events: auto; }
+
+/* the birth face — the same card stock and the same typographic grammar as the
+   dealt face, so the two read as two cards from one deck rather than two designs.
+   Register-agnostic: the ink tokens flip with the stock. */
+.m2hero { --bf-ink: #e9e5dc; --bf-meta: #a49c8c; --bf-rule: rgba(233, 229, 220, .28); }
+html.m2-parch .m2hero { --bf-ink: #1c150d; --bf-meta: #6a5c45; --bf-rule: rgba(28, 21, 13, .35); }
+.m2bface {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
+  padding: 14px 12px; text-align: center; color: var(--bf-ink);
+  border-radius: inherit;
+}
+.m2bface .m2face-meta { color: var(--bf-meta); }
+.m2bface .m2face-div { background: var(--bf-rule); }
+.m2bface .m2face-orient { color: var(--bf-meta); }
+.m2bface__marks {
+  list-style: none; margin: auto 0 0; padding: 0;
+  display: grid; gap: 5px;
+  font-family: var(--font-mono); font-size: 9.5px; font-weight: 500;
+  letter-spacing: .13em; text-transform: uppercase; color: var(--bf-meta);
+}
+.m2bface__name { color: var(--bf-ink); margin: 14px 0 0; }
+
+/* the face control — two answers to one question, in the panel's quiet register */
+.m2flip { display: inline-flex; gap: 2px; margin-top: 10px; padding: 3px; border: 1px solid var(--line-faint, rgba(233,229,220,.12)); border-radius: 999px; }
+.m2flip__opt {
+  background: none; border: 0; border-radius: 999px; cursor: pointer; padding: 7px 16px; min-height: 34px;
+  font-family: var(--font-mono); font-size: 9.5px; font-weight: 500; letter-spacing: .16em; text-transform: uppercase;
+  color: var(--t-ghost); transition: color 160ms var(--ease-settle), background 160ms var(--ease-settle);
+}
+.m2flip__opt:hover { color: var(--t-display); }
+.m2flip__opt.is-on { color: var(--t-display); background: rgba(233, 229, 220, .06); }
+.m2flip__opt:focus-visible { outline: 1px solid rgba(233, 229, 220, .38); outline-offset: 2px; }
+/* the birth act takes the same seat as "Pull another" so the column never resizes */
+.menu__draw-pull--birth { display: inline-flex; align-items: center; justify-content: center; text-decoration: none; }
+.menu__draw-pull--birth[hidden] { display: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .m2hero.is-turning { animation: none; }
+  .m2flip__opt { transition: none; }
+}
+
 .menu__draw-placard { margin-top: 4px; font-family: var(--font-display); font-style: italic; font-size: 12px; letter-spacing: .01em; color: var(--t-meta); text-decoration: none; transition: color 160ms var(--ease-settle); }
 .menu__draw-placard:hover, .menu__draw-placard:focus-visible { color: var(--t-display); outline: none; }
 .menu__draw-placard-mark { color: #c8ad70; opacity: .8; font-style: normal; margin-right: 3px; }
