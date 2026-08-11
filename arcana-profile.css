@@ -505,11 +505,41 @@
 
 /* ---- landing: the free pull + the reading doors ---- */
 .dr-landing { display: flex; flex-direction: column; align-items: center; gap: clamp(34px, 7vh, 66px); }
-.dr-pull { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 16px; width: 100%; }
+/* ── BR-S320 — THE FREE PULL, IN THE STOREFRONT'S SHAPE. ─────────────────────
+   M2's example-card arrangement, mirrored: card LEFT, words RIGHT, and the control
+   that changes the card directly under the card it changes. M2 is the shelf, so the
+   words come first there and the object is the proof; this is the counter, so the
+   object is the event and the words are what it turned out to mean.
+   The card column is `auto` and the text column takes the rest, so the grid is sized
+   by the card rather than by a number that would have to be kept in step with it. */
+.dr-pull {
+  display: grid; grid-template-columns: auto minmax(0, 1fr);
+  align-items: center; justify-content: center;
+  column-gap: clamp(28px, 5vw, 64px); row-gap: 18px;
+  width: 100%; text-align: left;
+}
+.dr-pull__stage { display: flex; flex-direction: column; align-items: center; gap: 16px; }
+/* the hero pull is bigger than a dealt card and smaller than M2's shelf hero: this is
+   one card being looked at, not the room's headline object */
+.dr-pull__card { width: clamp(190px, 23vw, 268px); }
+.dr-pull__card .dr-card { width: 100%; margin: 0; }
+.dr-pull__say { display: flex; flex-direction: column; align-items: flex-start; max-width: 46ch; }
+.dr-pull .dr-live { grid-column: 1 / -1; }
 .dr-pull__invite { font-family: var(--pf-serif); font-style: italic; font-size: 16px; color: var(--pf-meta); margin: 0; max-width: 40ch; }
-.dr-pull__num { font-family: var(--pf-mono); font-size: 9px; letter-spacing: .2em; text-transform: uppercase; color: var(--pf-meta); margin: 4px 0 0; }
+.dr-pull__num { font-family: var(--pf-mono); font-size: 9px; letter-spacing: .2em; text-transform: uppercase; color: var(--pf-meta); margin: 0; }
 .dr-pull__name { font-family: var(--pf-serif); font-weight: 600; font-size: clamp(24px, 3.6vw, 32px); color: var(--pf-cream-display); line-height: 1.05; margin: 6px 0 0; }
 .dr-pull__mean { font-family: var(--pf-serif); font-size: 15.5px; line-height: 1.6; color: var(--pf-body); margin: 12px 0 0; max-width: 46ch; }
+/* the card spot is never empty — face down before the first pull, so the button
+   changes a card in front of you rather than conjuring a layout that was not there */
+.dr-pull.is-facedown .dr-pull__say { justify-content: center; }
+@media (max-width: 719px) {
+  /* one column: the card, its own button beneath it, then what it means. The reading
+     order is unchanged, which is the point of putting the button in the card's column
+     rather than in a row of its own. */
+  .dr-pull { grid-template-columns: minmax(0, 1fr); justify-items: center; text-align: center; }
+  .dr-pull__say { align-items: center; text-align: center; }
+  .dr-pull__card { width: min(62vw, 240px); }
+}
 .dr-tiers { width: 100%; display: flex; flex-direction: column; gap: 12px; }
 .dr-tiers__label { font-family: var(--pf-mono); font-size: 9px; letter-spacing: .18em; text-transform: uppercase; color: var(--pf-meta); text-align: center; margin: 0 0 4px; }
 .dr-tier { display: flex; align-items: baseline; gap: 12px; padding: 16px 18px; text-decoration: none; color: inherit; cursor: pointer; border: 1px solid var(--pf-line); border-radius: 7px; background: linear-gradient(180deg, rgba(233, 229, 220, .014), transparent 60%); transition: border-color .18s, background .18s; }

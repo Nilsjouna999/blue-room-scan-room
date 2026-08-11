@@ -185,21 +185,39 @@
   }
   function shellClose() { return '</div></div></div>'; }
 
-  /* ---------- the landing: the free single-card pull + the two reading doors ---------- */
+  /* ── BR-S320 — THE FREE PULL TAKES THE STOREFRONT'S SHAPE. ───────────────────
+     Builder's direction: give it M2's example-card arrangement — the card in the hero
+     spot, the words beside it, and the control that changes the card directly under
+     the card it changes.
+     MIRRORED, DELIBERATELY. M2 runs text-left / card-right; this runs card-left /
+     text-right. M2 is the shelf, where the words come first and the object is the
+     proof; this is the counter, where the object IS the event and the words are what
+     it turned out to mean. Same grammar, read in the direction each room actually
+     works in.
+     THE SPOT IS NEVER EMPTY. Before the first pull the card sits there face down
+     rather than the whole hero being replaced by a line of invitation — so the button
+     changes a card in front of you instead of conjuring a layout that was not there,
+     and nothing jumps when you press it.
+     The button belongs UNDER THE CARD because that is the thing it acts on. Beside the
+     text it would read as a way to continue; beneath the card it reads as a way to
+     change that card, which is exactly what it does. */
   function landingHTML(pulled) {
-    var card = "";
-    if (pulled) {
-      card = '<div class="dr-pull__card"><div class="dr-card is-revealed"><div class="dr-cardface dr-cardface--back">' + backSVG() + '</div>' +
-        '<div class="dr-cardface dr-cardface--front">' + faceSVG(pulled.card, pulled.reversed) + '</div></div></div>' +   /* BR-S316: the name is IN the face now — a second copy under it read as a caption on a card that already says its name */
-        '<p class="dr-pull__num">' + esc(numeralOf(pulled.card)) + (pulled.reversed ? ' &middot; reversed' : '') + (firstKw(pulled.card) ? ' &middot; ' + esc(firstKw(pulled.card)) : '') + '</p>' +
+    var faceDown = !pulled;
+    var flip = '<div class="dr-card' + (faceDown ? '' : ' is-revealed') + '">' +
+      '<div class="dr-cardface dr-cardface--back">' + backSVG() + '</div>' +
+      '<div class="dr-cardface dr-cardface--front">' + (pulled ? faceSVG(pulled.card, pulled.reversed) : '') + '</div></div>';
+    var say = pulled
+      ? '<p class="dr-pull__num">' + esc(numeralOf(pulled.card)) + (pulled.reversed ? ' &middot; reversed' : '') + (firstKw(pulled.card) ? ' &middot; ' + esc(firstKw(pulled.card)) : '') + '</p>' +
         '<h2 class="dr-pull__name">' + esc(pulled.card.name) + '</h2>' +
-        '<p class="dr-pull__mean">' + esc((pulled.reversed && pulled.card.reversed) ? pulled.card.reversed : pulled.card.meaning) + '</p>';
-    } else {
-      card = '<p class="dr-pull__invite">Pull a card to meet the deck — for looking, not keeping.</p>';
-    }
+        '<p class="dr-pull__mean">' + esc((pulled.reversed && pulled.card.reversed) ? pulled.card.reversed : pulled.card.meaning) + '</p>'
+      : '<p class="dr-pull__invite">Pull a card to meet the deck — for looking, not keeping.</p>';
     return '<div class="dr-landing">' +
-      '<section class="dr-pull">' + card +
-      '<button type="button" class="dr-cut dr-pull__btn" data-dr-pull>' + (pulled ? "Pull another" : "Pull a card") + '</button>' +
+      '<section class="dr-pull' + (faceDown ? ' is-facedown' : '') + '">' +
+      '<div class="dr-pull__stage">' +
+        '<div class="dr-pull__card">' + flip + '</div>' +
+        '<button type="button" class="dr-cut dr-pull__btn" data-dr-pull>' + (pulled ? "Pull another" : "Pull a card") + '</button>' +
+      '</div>' +
+      '<div class="dr-pull__say">' + say + '</div>' +
       '<div class="dr-live" role="status" aria-live="polite" data-dr-live></div>' +
       '</section>' +
       '<section class="dr-tiers">' +
