@@ -5009,7 +5009,17 @@ render();
     sheet.setAttribute("role", "dialog");
     sheet.setAttribute("aria-modal", "true");
     sheet.setAttribute("aria-label", "Rooms");
-    var html = '<div class="orbit__scrim" data-orbit-close></div><div class="orbit__field">'
+    /* BR-S301 — THE PAPER WAS NEVER BEING CLICKED.  .orbit__field is position:absolute
+       inset:0 and comes AFTER .orbit__scrim in the DOM, so it covered the scrim entirely:
+       every click on empty paper hit the FIELD, which carried no close hook, and did
+       nothing at all. The scrim has been unreachable since the field was introduced —
+       which is why putting a displayed plate back down by clicking beside it never
+       worked, however many times the ladder was verified by calling the handler directly.
+       Marking the field as paper too fixes it without adding a second closer: a click on
+       a plate still resolves to that plate, because closest() finds the nearest ancestor
+       first, and only clicks that reach bare field resolve to close.
+       Not pointer-events:none — the field is a SCROLLING grid on a phone. */
+    var html = '<div class="orbit__scrim" data-orbit-close></div><div class="orbit__field" data-orbit-close>'
             ;
     var ringN = n - 1;                                           // one plate holds the centre
     for (var i = 0; i < n; i++) {
@@ -5172,7 +5182,14 @@ render();
      dismissal, and dismissing on it is the classic way an overlay feels twitchy. */
   var downOnScrim = false;
   document.addEventListener("pointerdown", function (e) {
-    downOnScrim = !!(e.target.closest && e.target.closest("[data-orbit-close]"));
+    /* BR-S301 — the guard must ask which hook is NEAREST, not merely whether a close hook
+       is anywhere above. Now that the field carries data-orbit-close, every plate has one
+       as an ancestor, so a bare closest("[data-orbit-close]") answered true for a press on
+       a plate and the slip guard silently stopped guarding. Resolve both hooks together
+       and take the nearest: a plate resolves to its own data-orbit-go, bare paper to the
+       field's data-orbit-close. */
+    var t = e.target.closest && e.target.closest("[data-orbit-close],[data-orbit-go]");
+    downOnScrim = !!(t && t.hasAttribute("data-orbit-close"));
   }, true);
   document.addEventListener("click", function (e) {
     var t = e.target.closest ? e.target.closest("[data-orbit-close],[data-orbit-go]") : null;
