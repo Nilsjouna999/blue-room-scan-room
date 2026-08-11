@@ -544,12 +544,50 @@
 .dr-intake__back:hover, .dr-intake__back:focus-visible { color: var(--pf-cream-display); outline: none; }
 
 /* ---- the reading: the spread + per-card reads + the filed close ---- */
-.dr-reading { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 22px; }
+/* BR-S318: .dr-reading removed — .dr-flow is the reading's container now and carries
+   the identical declaration. Nothing in the shipped tree applies the old class. */
 /* BR-S317: the tail became a real element so it can be re-rendered on its own without
    touching the card subtree. display:contents keeps it out of the layout entirely — its
    children stay direct flex items of .dr-reading, so the gap, centring and .dr-filed's
    own width all behave exactly as they did when they were siblings. */
 .dr-tail { display: contents; }
+/* BR-S318: the flow shell replaces .dr-reading as the reading's container and inherits
+   its layout exactly; the intake and reads regions are contents-transparent for the same
+   reason the tail is — they are regions to refill, not boxes to lay out. */
+.dr-flow { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 22px; width: 100%; }
+/* .dr-intake and .dr-reads KEEP their own flex layout — .dr-intake carries a 16px gap
+   that is not the flow's 22px, and making either contents-transparent would hand its
+   children the wrong rhythm. They only need to survive being emptied, and an emptied
+   flex box still claims a gap it no longer earns, so it stands down when it holds
+   nothing. (.dr-tail is different: its children were always siblings of the reading.) */
+.dr-intake:empty, .dr-reads:empty { display: none; }
+
+/* ── BR-S318 — THE DECK. ──────────────────────────────────────────────────────
+   Seven layers, offset and alternately tilted, each a shade darker than the one above,
+   with the printed back on top and a soft pool of light beneath. Sizes follow the
+   spread's own card so the pile and the cards it deals are visibly the same object.
+   It sits inside the ceremony subtree, so the riffle, the cut and the deal all act on
+   these exact nodes rather than rebuilding them. */
+.dr-ceremony { position: relative; display: flex; flex-direction: column; align-items: center; gap: 22px; width: 100%; }
+.dr-deck { position: relative; width: clamp(112px, 24vw, 150px); aspect-ratio: 120 / 190; margin: 4px auto 2px; }
+.dr-deck__glow {
+  position: absolute; left: 50%; top: 50%; width: 300%; height: 220%;
+  transform: translate(-50%, -50%); pointer-events: none; z-index: 0;
+  background: radial-gradient(circle, rgba(150, 112, 74, .09), transparent 66%);
+}
+.dr-deck__body, .dr-deck__top { position: absolute; inset: 0; }
+.dr-deck__layer {
+  position: absolute; inset: 0; border-radius: 12px;
+  border: 1px solid rgba(10, 8, 5, .55);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, .5);
+}
+.dr-deck__top { z-index: 8; border-radius: 12px; overflow: hidden; background: linear-gradient(180deg, #111319, #0c0d11); border: 1px solid rgba(10, 8, 5, .55); box-shadow: 0 20px 40px rgba(0, 0, 0, .5); }
+.dr-deck__top .dr-plate { width: 100%; height: 100%; }
+/* the pile is the thing you are about to cut; once the cards are down it has done its
+   job and leaves, rather than sitting beside the reading as a second deck. */
+.dr-ceremony[data-dr-phase="dealt"] .dr-deck,
+.dr-ceremony[data-dr-phase="revealing"] .dr-deck,
+.dr-ceremony[data-dr-phase="complete"] .dr-deck { display: none; }
 .dr-reading__matter { font-family: var(--pf-serif); font-style: italic; font-size: 15px; color: var(--pf-meta); margin: 0; }
 .dr-spread { display: flex; flex-wrap: wrap; justify-content: center; gap: 16px 14px; }
 .dr-slot { display: flex; flex-direction: column; align-items: center; gap: 8px; }

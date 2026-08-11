@@ -220,18 +220,37 @@
       '<span class="dr-tier__arr" aria-hidden="true">&rarr;</span></a>';
   }
 
+  /* ── BR-S318 — THE DECK. ──────────────────────────────────────────────────────
+     Seven layers, each nudged down-right and alternately tilted, each a shade darker
+     than the one above, with a printed back on top and a soft pool of light beneath.
+     Values are tarot-v2's renderDeck() verbatim — offset k*1.3 / k*1.7, the two hsl
+     ramps, the alternating ±rotation — because the pile's whole job is to look like a
+     stack of objects rather than a drop shadow, and that is a set of numbers somebody
+     already tuned.
+     BUILT AS A COMPONENT ON PURPOSE. It renders into the ceremony subtree, not into
+     the intake, so the riffle, the cut and the deal all have the same deck to act on
+     and none of them has to rebuild it. It is aria-hidden: a pile of card backs is
+     scenery, and the controls beside it already say everything a screen reader needs. */
+  function deckHTML() {
+    var out = '<div class="dr-deck__glow" aria-hidden="true"></div><div class="dr-deck__body">';
+    for (var k = 0; k < 7; k++) {
+      out += '<div class="dr-deck__layer" style="transform:translate(' + (k * 1.3).toFixed(1) + 'px,' + (k * 1.7).toFixed(1) + 'px) rotate(' + (k % 2 ? 0.5 : -0.4) + 'deg);' +
+        'background:linear-gradient(158deg,hsl(34 22% ' + (13 - k) + '%),hsl(32 20% ' + (8 - Math.min(k, 6)) + '%));"></div>';
+    }
+    return out + '</div><div class="dr-deck__top">' + backSVG() + '</div>';
+  }
+
   /* ---------- a reading: intake -> cut -> spread reveal -> binding + filed ---------- */
   function intakeHTML(sp) {
     var paid = isPaidNow(sp.key);   // paid: the price rides the cut button; free: byte-identical to before
-    return '<div class="dr-intake">' +
-      '<p class="dr-intake__which">' + esc(sp.title) + ' &middot; ' + sp.n + ' cards</p>' +
+    return '<p class="dr-intake__which">' + esc(sp.title) + ' &middot; ' + sp.n + ' cards</p>' +
       '<label class="dr-field"><span class="dr-field__label">Lay a matter on the table <span class="dr-field__opt">— optional</span></span>' +
       '<input type="text" class="dr-field__in" data-dr-question maxlength="120" autocomplete="off" placeholder="a question, in your own words" ' +
       'aria-label="A question or situation. Optional. It is kept with your reading, and it does not choose the cards."></label>' +
       '<button type="button" class="dr-cut' + (paid ? ' dr-cut--paid' : '') + '" data-dr-cut>Cut the deck' + (paid ? ' &middot; ' + sp.price : '') + '</button>' +
       '<p class="dr-cut__note">The cut does not choose the cards. It closes the question.</p>' +
       (paid ? '<p class="dr-mocknote">Dev mock &mdash; no real payment in this build.</p>' : '') +
-      '<a class="dr-intake__back" href="#" data-dr-home>&larr; the deck</a></div>';
+      '<a class="dr-intake__back" href="#" data-dr-home>&larr; the deck</a>';   /* BR-S318: the .dr-intake wrapper is now the persistent [data-dr-intake] region in the flow shell — this returns its CONTENTS, so the cut can empty it without removing it */
   }
 
   /* ══ BR-S317 — THE CEREMONY SUBTREE. ══════════════════════════════════════════
@@ -246,8 +265,8 @@
      THE FIX IS A BOUNDARY, NOT A REWRITE. The product-level machine is untouched —
      `landing → intake → reading` still lives in STATE.view and still renders by
      replacing markup, because none of it animates. Only ONE region becomes persistent:
-     `.dr-spread`, the cards. It is built once by mountReading() and from then on is
-     MUTATED, never re-rendered. Everything outside it — the reads, the filed block, the
+     `.dr-spread`, the cards. It is built once (BR-S318 moved that build out to
+     mountFlow(), at the intake) and from then on is MUTATED, never re-rendered. Everything outside it — the reads, the filed block, the
      matter line — keeps the old cheap discipline, which is correct for prose that has
      no motion to protect.
 
@@ -266,7 +285,7 @@
      same defect in miniature. The button now stays for the life of the reading and is
      marked aria-disabled instead, so DOM identity holds, keyboard order does not
      reshuffle under someone mid-reading, and focus survives a turn. */
-  var CEREMONY = { el: null, phase: "" };
+  var CEREMONY = { el: null, spread: null, phase: "" };
   function ceremonyPhase(p) {
     CEREMONY.phase = p;
     if (CEREMONY.el) CEREMONY.el.setAttribute("data-dr-phase", p);
@@ -297,9 +316,9 @@
   /* the ONE place a card is turned face up — used by a live turn and by a reopened
      receipt alike, so the two can never drift into different DOM */
   function applyShown(st, i) {
-    if (!CEREMONY.el) return;
+    if (!CEREMONY.spread) return;
     var sp = SPREADS[st.spread];
-    var slot = CEREMONY.el.querySelector('[data-dr-slot="' + i + '"]');
+    var slot = CEREMONY.spread.querySelector('[data-dr-slot="' + i + '"]');
     if (!slot) return;
     slot.classList.add("is-shown");
     var card = slot.querySelector(".dr-card");
@@ -331,30 +350,64 @@
       '<a class="pf-openreading pf-openreading--lg" href="#" data-door="profile">Open your Reliquary &rarr;</a>' +
       '<a class="dr-intake__back" href="#" data-dr-home>&larr; the deck</a></div>';
   }
-  /* the shell around the subtree: everything here is prose, so it may still be replaced */
-  function readingShellHTML(st) {
+  /* ── BR-S318 — THE SUBTREE NOW SPANS THE WHOLE FLOW, intake included. ─────────
+     BR-S317 made the CARDS persistent and stopped there, because that was all the
+     turn needed. Putting a deck on the intake exposed the next seam immediately: the
+     intake was still a view that gets torn down at the cut, so a deck rendered there
+     would be destroyed at exactly the moment the deal needs to travel OUT of it. The
+     cards would have had somewhere to land and nothing to leave from.
+     So the boundary moves out one ring. ONE shell — `.dr-flow` — is rendered when a
+     reading is chosen, and it holds the ceremony (deck + spread) plus four regions
+     that may be refilled freely: the matter line, the intake prose, the reads, and
+     the tail. The cut no longer replaces anything; it empties the intake region and
+     fills the spread. The ceremony subtree is created once, at `startReading`, and
+     the same nodes are still there when the last card is turned.
+     This is the same lesson as S317 taken one step earlier, and it is cheaper to take
+     now than to discover again at the deal. */
+  function flowShellHTML(st) {
     var sp = SPREADS[st.spread];
-    return '<div class="dr-reading">' + (st.question ? '<p class="dr-reading__matter">Drawn to: “' + esc(st.question) + '”</p>' : '') +
-      '<div class="dr-spread dr-spread--' + sp.n + '" data-dr-spread data-dr-phase=""></div>' +
+    return '<div class="dr-flow">' +
+      '<p class="dr-reading__matter" data-dr-matter hidden></p>' +
+      '<div class="dr-ceremony" data-dr-ceremony data-dr-phase="">' +
+        '<div class="dr-deck" data-dr-deck aria-hidden="true">' + deckHTML() + '</div>' +
+        '<div class="dr-spread dr-spread--' + sp.n + '" data-dr-spread></div>' +
+      '</div>' +
+      '<div class="dr-intake" data-dr-intake></div>' +
       '<div class="dr-reads" data-dr-reads></div>' +
       '<div class="dr-tail" data-dr-tail></div>' +
       '<div class="dr-live" role="status" aria-live="assertive" data-dr-live></div></div>';
+  }
+  function setMatter(st) {
+    var m = stage().querySelector("[data-dr-matter]");
+    if (!m) return;
+    if (st.question) { m.textContent = "Drawn to: “" + st.question + "”"; m.hidden = false; }
+    else { m.textContent = ""; m.hidden = true; }
   }
   function refreshReads(st) {
     var r = stage().querySelector("[data-dr-reads]"), t = stage().querySelector("[data-dr-tail]");
     if (r) r.innerHTML = readsHTML(st);
     if (t) t.innerHTML = tailHTML(st);
   }
-  /* the single entry point into a reading — a fresh cut and a reopened receipt both
-     arrive here, so there is one way the cards get onto the table */
-  function mountReading(st) {
+  /* built ONCE, when a reading is chosen. The deck is on the table from here on and
+     the same nodes carry through the cut, the deal and the last turn. */
+  function mountFlow(st) {
+    stage().innerHTML = flowShellHTML(st);
+    CEREMONY.el = stage().querySelector("[data-dr-ceremony]");
+    CEREMONY.spread = stage().querySelector("[data-dr-spread]");
+    ceremonyPhase("ready");
+  }
+  /* the cards come onto the table — a fresh cut and a reopened receipt share this, so
+     there is exactly one way a spread appears */
+  function laySpread(st) {
     var sp = SPREADS[st.spread], i;
-    stage().innerHTML = readingShellHTML(st);
-    CEREMONY.el = stage().querySelector("[data-dr-spread]");
-    CEREMONY.el.innerHTML = spreadHTML(st);
+    if (!CEREMONY.spread) return;
+    CEREMONY.spread.innerHTML = spreadHTML(st);
     for (i = 0; i < sp.n; i++) if (st.drawn[i].shown) applyShown(st, i);
     ceremonyPhase(st.revealed >= sp.n ? "complete" : "dealt");
-    refreshReads(st);
+  }
+  function closeIntake() {
+    var el = stage().querySelector("[data-dr-intake]");
+    if (el) el.innerHTML = "";       // emptied, never removed — the region outlives the prose in it
   }
 
   /* ---------- flow ---------- */
@@ -369,7 +422,13 @@
     stage().innerHTML = landingHTML(STATE.pulled);
     if (STATE.pulled) announce("Pulled: " + STATE.pulled.card.name + (STATE.pulled.reversed ? ", reversed" : "") + ".");
   }
-  function startReading(key) { STATE.view = "intake"; STATE.spread = key; stage().innerHTML = intakeHTML(SPREADS[key]); var f = HOST.querySelector("[data-dr-question]"); if (f) f.focus(); }
+  function startReading(key) {
+    STATE.view = "intake"; STATE.spread = key;
+    STATE.drawn = []; STATE.revealed = 0; STATE.question = ""; STATE.seed = "";
+    mountFlow(STATE);                                   // BR-S318: the deck arrives HERE and stays
+    stage().querySelector("[data-dr-intake]").innerHTML = intakeHTML(SPREADS[key]);
+    var f = HOST.querySelector("[data-dr-question]"); if (f) f.focus();
+  }
   function doCut() {
     var sp = SPREADS[STATE.spread];
     STATE.question = (((HOST.querySelector("[data-dr-question]") || {}).value) || "").trim();   // whitespace-only must not render `Drawn to: "   "` or pollute the reopen URL (norm() already trims the seed)
@@ -379,7 +438,13 @@
     STATE.drawn = drawSpread(STATE.seed, sp.n).map(function (d) { d.shown = false; return d; });
     STATE.revealed = 0; STATE.view = "reading";
     if (inApp() && history.replaceState) history.replaceState(null, "", "?dev=drawing-room&read=" + sp.key + "&t=" + encodeURIComponent(t) + (STATE.question ? "&q=" + encodeURIComponent(STATE.question) : ""));
-    mountReading(STATE);
+    /* BR-S318: nothing is replaced here any more. The intake prose is emptied out of a
+       region that stays, the cards are laid into the spread that was always there, and
+       the deck the reader has been looking at is the deck they just cut. */
+    setMatter(STATE);
+    closeIntake();
+    laySpread(STATE);
+    refreshReads(STATE);
   }
   function cut() {
     var sp = SPREADS[STATE.spread];
@@ -415,7 +480,9 @@
     var sp = SPREADS[key];
     STATE.spread = key; STATE.question = param("q"); STATE.seed = "read~" + key + "~" + norm(STATE.question) + "~" + t;
     STATE.drawn = drawSpread(STATE.seed, sp.n).map(function (d) { d.shown = true; return d; });
-    STATE.revealed = sp.n; STATE.view = "reading"; mountReading(STATE); return true;
+    STATE.revealed = sp.n; STATE.view = "reading";
+    mountFlow(STATE); setMatter(STATE); closeIntake(); laySpread(STATE); refreshReads(STATE);   // a receipt arrives already cut: same path, no intake
+    return true;
   }
 
   function wire(root) {
