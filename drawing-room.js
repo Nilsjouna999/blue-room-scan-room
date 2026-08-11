@@ -70,7 +70,7 @@
   function firstKw(c) { return (c && c.keywords && c.keywords[0]) || (c ? c.name : ""); }
 
   var DECK = [];            // full 78-card deck (Majors + Minors), from codex-data.json
-  var HOST = null, SESSION = "s", pullN = 0;
+  var HOST = null, SESSION = "s";
 
   var SPREADS = {
     sitting: { key: "sitting", title: "A Sitting", n: 3, paid: false, price: "$1.99",
@@ -201,25 +201,16 @@
      The button belongs UNDER THE CARD because that is the thing it acts on. Beside the
      text it would read as a way to continue; beneath the card it reads as a way to
      change that card, which is exactly what it does. */
-  function landingHTML(pulled) {
-    var faceDown = !pulled;
-    var flip = '<div class="dr-card' + (faceDown ? '' : ' is-revealed') + '">' +
-      '<div class="dr-cardface dr-cardface--back">' + backSVG() + '</div>' +
-      '<div class="dr-cardface dr-cardface--front">' + (pulled ? faceSVG(pulled.card, pulled.reversed) : '') + '</div></div>';
-    var say = pulled
-      ? '<p class="dr-pull__num">' + esc(numeralOf(pulled.card)) + (pulled.reversed ? ' &middot; reversed' : '') + (firstKw(pulled.card) ? ' &middot; ' + esc(firstKw(pulled.card)) : '') + '</p>' +
-        '<h2 class="dr-pull__name">' + esc(pulled.card.name) + '</h2>' +
-        '<p class="dr-pull__mean">' + esc((pulled.reversed && pulled.card.reversed) ? pulled.card.reversed : pulled.card.meaning) + '</p>'
-      : '<p class="dr-pull__invite">Pull a card to meet the deck — for looking, not keeping.</p>';
+  /* BR-S321 — THE FREE PULL MOVED TO THE STOREFRONT, so this room stops offering it.
+     M2's hero is a real card you pull now, which means a visitor meets the deck before
+     they ever open this door — and keeping a second pull here would be the same feature
+     in two places, drifting apart, which is precisely what the tarot-v2 graft exists to
+     undo. So the Drawing Room becomes what its name always said: the room you enter to
+     draw a READING. The landing is the two tiers and nothing else.
+     The BR-S320 two-column pull layout is not lost — it is what M2's hero now is. */
+  function landingHTML() {
     return '<div class="dr-landing">' +
-      '<section class="dr-pull' + (faceDown ? ' is-facedown' : '') + '">' +
-      '<div class="dr-pull__stage">' +
-        '<div class="dr-pull__card">' + flip + '</div>' +
-        '<button type="button" class="dr-cut dr-pull__btn" data-dr-pull>' + (pulled ? "Pull another" : "Pull a card") + '</button>' +
-      '</div>' +
-      '<div class="dr-pull__say">' + say + '</div>' +
       '<div class="dr-live" role="status" aria-live="polite" data-dr-live></div>' +
-      '</section>' +
       '<section class="dr-tiers">' +
       '<p class="dr-tiers__label">Draw a reading — it is cut, and kept in your Reliquary.</p>' +
       tierDoor(SPREADS.sitting, sittingUsed()
@@ -452,17 +443,12 @@
   }
 
   /* ---------- flow ---------- */
-  var STATE = { view: "landing", pulled: null, spread: null, question: "", seed: "", drawn: [], revealed: 0 };
+  var STATE = { view: "landing", spread: null, question: "", seed: "", drawn: [], revealed: 0 };
   function stage() { return HOST.querySelector("[data-dr-stage]"); }
   function announce(m) { var l = HOST.querySelector("[data-dr-live]"); if (l) l.textContent = m; }
   function firstSentence(s) { var m = String(s || "").match(/^[^.]+\./); return m ? m[0] : String(s || ""); }
 
-  function showLanding() { STATE.view = "landing"; stage().innerHTML = landingHTML(STATE.pulled); if (inApp() && history.replaceState) history.replaceState(null, "", "?dev=drawing-room"); }
-  function pull() {
-    STATE.pulled = drawSpread("pull~" + SESSION + "~" + (pullN++), 1)[0];
-    stage().innerHTML = landingHTML(STATE.pulled);
-    if (STATE.pulled) announce("Pulled: " + STATE.pulled.card.name + (STATE.pulled.reversed ? ", reversed" : "") + ".");
-  }
+  function showLanding() { STATE.view = "landing"; stage().innerHTML = landingHTML(); if (inApp() && history.replaceState) history.replaceState(null, "", "?dev=drawing-room"); }
   function startReading(key) {
     STATE.view = "intake"; STATE.spread = key;
     STATE.drawn = []; STATE.revealed = 0; STATE.question = ""; STATE.seed = "";
@@ -565,12 +551,11 @@
 
   function wire(root) {
     root.addEventListener("click", function (ev) {
-      var el = ev.target.closest("[data-door],[data-dr-pull],[data-dr-read],[data-dr-shuffle],[data-dr-cut],[data-dr-turn],[data-dr-home]");
+      var el = ev.target.closest("[data-door],[data-dr-read],[data-dr-shuffle],[data-dr-cut],[data-dr-turn],[data-dr-home]");
       if (!el) return;
       ev.preventDefault();
       if (SHUFFLING && el.hasAttribute("data-dr-home")) return;   // BR-S319: the escape stays visible but waits out the 820ms
       if (el.hasAttribute("data-door")) { var d = el.getAttribute("data-door"); if (inApp()) location.href = d === "profile" ? "?dev=profile" : location.pathname; return; }
-      if (el.hasAttribute("data-dr-pull")) return pull();
       if (el.hasAttribute("data-dr-read")) return startReading(el.getAttribute("data-dr-read"));
       if (el.hasAttribute("data-dr-shuffle")) return shuffle();
       if (el.hasAttribute("data-dr-cut")) return cut();
@@ -583,13 +568,13 @@
   window.BRDrawingRoom = {
     mount: function (host) {
       if (!host) return;
-      HOST = host; SESSION = sealNow(); pullN = 0;
+      HOST = host; SESSION = sealNow();
       host.innerHTML = shellOpen() + '<p class="dr-loading">Opening the room…</p>' + shellClose();
       wire(host);
       fetch("codex-data.json?v=208").then(function (r) { return r.text(); }).then(function (txt) {
         var codex = JSON.parse(txt);
         DECK = codex.filter(function (s) { return /tarot|minor arcana/i.test(String(s.system || "")); }).reduce(function (a, s) { return a.concat(s.entries || []); }, []);
-        if (!reopen()) { var _pull = param("pull"); showLanding(); if (_pull) pull(); }   // BR-S234: honor the M2 "Draw a card — free" door (&pull=1) — land already-drawn (capture before showLanding strips the param)
+        if (!reopen()) showLanding();   // BR-S321: &pull=1 retired with the M2 door that sent it — the storefront pulls its own card now
       }).catch(function () { var st = host.querySelector("[data-dr-stage]"); if (st) st.innerHTML = '<p class="dr-loading">The deck could not be reached. (Standalone preview.)</p>'; });
     }
   };

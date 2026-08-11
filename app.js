@@ -1430,6 +1430,14 @@ function renderWall() {
     + '<p class="menu__wall-eyebrow"><span class="menu__wall-eyemark" aria-hidden="true">◆</span> BLUE ROOM</p>'
     + '<h2 class="menu__draw-title" tabindex="-1">The Reading Rooms</h2>'
     + '<p class="menu__draw-thesis">Not every card is developed. Some are drawn.</p>'
+    /* BR-S321 — WHAT THE CARD BESIDE THIS SAYS. The panel's own words stay above; this
+       block belongs to whatever is currently face up in the stage. Before the deck has
+       loaded it describes the sample that is already there, so the column is never empty
+       and never jumps. */
+    + '<div class="m2read" data-m2-read>'
+    + '<p class="m2read__meta" data-m2-meta>Arcana &middot; XVII &middot; hope</p>'
+    + '<p class="m2read__mean" data-m2-mean>The Star stands for hope, renewal and quiet guidance after difficulty — the calm that follows the storm, and the small light you steer by.</p>'
+    + '</div>'
     + '<p class="menu__wall-trust">Asked the same, they answer the same.</p>'
     + '</header>'
     // CTRL — one loud act under the gold cut-line, then a steep ladder (source-first for a11y)
@@ -1437,10 +1445,19 @@ function renderWall() {
     + '<span class="menu__draw-cutline" aria-hidden="true"></span>'
     + '<p class="msample__seal">The deck is already cut. What remains is the turn.</p>'
     + '<div class="menu__draw-doors">'
-    + '<a class="menu__door menu__door--add menu__door--pull" href="?dev=drawing-room&pull=1">'
-    + '<span class="menu__door-kicker">The Pull · By the Draw</span>'
-    + '<span class="menu__door-name">Draw a card — free</span>'
-    + '<span class="menu__door-desc">One card, cut to your question.</span>'
+    /* BR-S321: the "Draw a card — free" door is GONE, and its removal is the point. It
+       sent you to another room to do the thing this panel now does in front of you —
+       a door to a card you are already holding.
+       TAROT GETS A REAL DOOR IN ITS PLACE. Two readings are sold from this panel and
+       only one of them had a button: the birth reading had a full door while tarot had
+       a line of link text under it, which is not a pair, it is a product and a footnote.
+       Same door grammar for both, so the panel offers two readings rather than one
+       reading and a suggestion. */
+    + '<a class="menu__door menu__door--add menu__door--tarot" href="?dev=drawing-room">'
+    + '<span class="menu__door-kicker">By the Draw &middot; Tarot</span>'
+    + '<span class="menu__door-name">A Tarot Reading</span>'
+    + '<span class="menu__door-desc">A Sitting — three cards to one question, your first free. Or the Deep Read — five.</span>'
+    + '<span class="menu__draw-spine">The Ground · The Crossing · The Root · The Crown · The Turn</span>'
     + '</a>'
     + '<div class="menu__door menu__door--sample menu__door--birth">'
     + '<a class="menu__draw-hit" href="?dev=arcane" aria-label="The Arcana Reading"></a>'
@@ -1451,7 +1468,8 @@ function renderWall() {
     + '<a class="menu__draw-aside" href="?dev=arcana-reading#/concord">Or two names, one bond — a Concord &rarr;</a>'
     + '</div>'
     + '</div>'
-    + '<a class="menu__draw-tiers" href="?dev=drawing-room">Deeper draws — A Sitting · three, free · The Deep Read · five &rarr;</a>'
+    /* BR-S321: the "Deeper draws" link retired — its whole sentence is now the tarot
+       door above, and a link repeating the door beside it is two roads to one room. */
     + '<div class="menu__draw-rail">'
     + '<button type="button" class="menu__codex menu__codex--reliq" data-annex-go><span class="menu__codex__mark" aria-hidden="true">◆</span> The Reliquary — <em class="menu__draw-kept">kept</em> <span class="menu__codex__arr" aria-hidden="true">→</span></button>'
     + '<a class="menu__codex" href="?dev=settings"><span class="menu__codex__mark" aria-hidden="true">◆</span> Settings <span class="menu__codex__arr" aria-hidden="true">→</span></a>'
@@ -1466,20 +1484,108 @@ function renderWall() {
     + '<svg class="m2hero__back" viewBox="0 0 120 190" aria-hidden="true" preserveAspectRatio="xMidYMid meet"><rect x="7" y="7" width="106" height="176" rx="7" fill="none" stroke="url(#mwInk)" stroke-width="1"/><rect x="13" y="13" width="94" height="164" rx="5" fill="none" stroke="url(#mwInk)" stroke-width=".5" opacity=".6"/><g stroke="url(#mwInk)" stroke-width=".6" fill="none" opacity=".7"><path d="M60 42 L86 95 L60 148 L34 95 Z"/><path d="M60 64 L74 95 L60 126 L46 95 Z"/><circle cx="60" cy="95" r="4.5"/></g></svg>'
     + '<svg class="m2hero__face" viewBox="0 0 120 190" role="img" aria-label="XVII — The Star" preserveAspectRatio="xMidYMid meet"><rect x="11" y="11" width="98" height="168" rx="5" fill="none" stroke="url(#mwGold)" stroke-width=".6" opacity=".55"/><text x="60" y="30" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9" letter-spacing="2.5" fill="url(#mwGold)">XVII</text><g stroke="url(#mwGold)" fill="none"><circle cx="60" cy="98" r="31" stroke-width=".8" opacity=".5"/><circle cx="60" cy="98" r="23" stroke-width=".6" opacity=".35"/><path d="M60 69 L64.6 86.9 L80.5 77.5 L71.1 93.4 L89 98 L71.1 102.6 L80.5 118.5 L64.6 109.1 L60 127 L55.4 109.1 L39.5 118.5 L48.9 102.6 L31 98 L48.9 93.4 L39.5 77.5 L55.4 86.9 Z" stroke-width=".9" opacity=".8"/><circle class="m2pip-glow" cx="60" cy="98" r="6.5" fill="url(#mwGold)" stroke="none"/><circle cx="60" cy="98" r="3.2" fill="url(#mwGold)" stroke="none"/></g></svg>'
     + '<div class="m2face" aria-hidden="true">'
-    +   '<div class="m2face-head"><span class="m2face-meta">ARCANA &middot; XVII</span>'
+    +   '<div class="m2face-head"><span class="m2face-meta" data-m2-facemeta>ARCANA &middot; XVII</span>'
     +   '<span class="m2face-glyph">&#9670;</span></div>'
-    +   '<div class="m2face-name">The Star</div>'
+    +   '<div class="m2face-name" data-m2-facename>The Star</div>'
     +   '<div class="m2face-div"></div>'
-    +   '<div class="m2face-orient">Upright</div>'
+    +   '<div class="m2face-orient" data-m2-faceorient>Upright</div>'
     +   '<span class="m2tick tl"></span><span class="m2tick br"></span>'
     + '</div>'
-    + '<span class="m2hero__name">The Star</span>'
+    + '<span class="m2hero__name" data-m2-heroname>The Star</span>'
     + '</div>'
+    /* BR-S321 — THE CONTROL THAT CHANGES THE CARD SITS UNDER THE CARD. Beside the copy
+       it would read as a way to continue; beneath the card it reads as a way to change
+       THAT card, which is all it does. Disabled until the deck is actually in hand. */
+    + '<button type="button" class="menu__draw-pull" data-m2-pull disabled>Pull another</button>'
     + '<a class="menu__draw-placard" href="codex.html?v=237" data-codex-open><span class="menu__draw-placard-mark" aria-hidden="true">✦</span>The Codex — where every mark is defined &rarr;</a>'
     + '</section>'
     + '<span class="menu__draw-wm" aria-hidden="true"><svg viewBox="0 0 120 190" preserveAspectRatio="xMidYMid meet"><g stroke="url(#mwInk)" fill="none"><circle cx="60" cy="98" r="31" stroke-width=".8"/><circle cx="60" cy="98" r="23" stroke-width=".6"/><path d="M60 69 L64.6 86.9 L80.5 77.5 L71.1 93.4 L89 98 L71.1 102.6 L80.5 118.5 L64.6 109.1 L60 127 L55.4 109.1 L39.5 118.5 L48.9 102.6 L31 98 L48.9 93.4 L39.5 77.5 L55.4 86.9 Z" stroke-width=".9"/></g></svg></span>'
     + '</div>';
 }
+/* ══ BR-S321 — M2's HERO BECOMES A CARD YOU ACTUALLY PULL. ════════════════════
+   The storefront held a picture of a card and a door to a room where you could draw
+   one. Now the card is real and the door is gone: you meet the deck on the panel that
+   is selling it, and the Drawing Room goes back to being the room you enter to draw a
+   READING rather than to meet the deck. One free pull in the building, on the surface
+   a first visitor actually lands on.
+
+   THE DECK IS LOADED LAZILY, AND THAT IS NOT AN OPTIMISATION DETAIL — it is the whole
+   reason this is safe to put on the front door. codex-data.json is ~170KB and M1 is the
+   most paint-bound surface in the build (BR-S276). So nothing is fetched at boot; the
+   deck arrives the first time someone actually ARRIVES at M2, and until it does the
+   panel shows the sample it always showed, with the control disabled. If the fetch
+   never lands, M2 is exactly the panel it was yesterday. The failure mode is the old
+   design, which is the only acceptable failure mode for a storefront.
+
+   THE CARD IS A SAMPLE, SO IT IS RANDOM. Determinism is canon for a READING — same
+   seed, same cards, replayable from a receipt — and this is not one: nothing is filed,
+   no question is asked, no token is minted. "Asked the same, they answer the same" is a
+   promise about readings, and this asks nothing. */
+let M2_DECK = null, M2_DECK_PENDING = false;
+/* ── BR-S321a — AND IT WAITS FOR AN IDLE MOMENT, WHICH IS NOT A NICETY. ───────
+   The first version fetched on ARRIVAL at M2, hung off menuSettle's transitionend —
+   so a ~170KB JSON.parse landed on the main thread at the exact instant a slide
+   finished, and the next panel switch (M2 → M1, the heaviest transition in the build)
+   ran straight into it. The builder felt it immediately: "m2 to m1 is super laggy."
+   That is a self-inflicted stall, not a mystery: parse is synchronous and blocking, and
+   arrival is the worst possible time to schedule it.
+   So the whole thing is deferred to an idle slot — requestIdleCallback where it exists,
+   a 600ms timer where it does not, which is well past the 640ms slide either way. The
+   deck is for the SECOND thing a reader does on this panel; nothing needs it during the
+   move onto it. Nothing here blocks a transition, and if the browser never goes idle the
+   panel is simply the one it was yesterday. */
+function m2Idle(fn) {
+  if (typeof requestIdleCallback === "function") requestIdleCallback(fn, { timeout: 2500 });
+  else setTimeout(fn, 600);
+}
+function m2EnsureDeck(host) {
+  if (M2_DECK || M2_DECK_PENDING) { m2ArmPull(host); return; }
+  M2_DECK_PENDING = true;
+  m2Idle(function () {
+    fetch("codex-data.json?v=208").then(function (r) { return r.text(); }).then(function (txt) {
+      m2Idle(function () {                                   // the PARSE is the expensive half — give it its own idle slot too
+        try {
+          const codex = JSON.parse(txt);
+          M2_DECK = codex.filter(function (s) { return /tarot|minor arcana/i.test(String(s.system || "")); })
+                         .reduce(function (a, s) { return a.concat(s.entries || []); }, []);
+          if (!M2_DECK.length) M2_DECK = null;
+        } catch (e) { M2_DECK = null; }
+        m2ArmPull(host);
+      });
+    }).catch(function () { M2_DECK_PENDING = false; });      // silent: the sample card stands, the button stays disabled
+  });
+}
+function m2ArmPull(host) {
+  const btn = (host || document).querySelector("[data-m2-pull]");
+  if (btn && M2_DECK) btn.disabled = false;
+}
+/* the same header grammar the dealt card uses, derived from `tag` — Majors read
+   "ARCANA · XXI", Minors "WANDS · FIRE". One rule, 78 cards, no new data. */
+function m2Head(c) {
+  const p = String((c && c.tag) || "").split("·").map(function (s) { return s.trim(); });
+  return p.length >= 3 ? (p[1] + " · " + p[2]).toUpperCase() : "ARCANA · " + (p[0] || "");
+}
+function m2Pull(host) {
+  if (!M2_DECK || !M2_DECK.length) return;
+  const root = host || document;
+  const c = M2_DECK[Math.floor(Math.random() * M2_DECK.length)];
+  const rev = Math.random() < 0.5;
+  const set = (sel, txt) => { const el = root.querySelector(sel); if (el) el.textContent = txt; };
+  set("[data-m2-facemeta]", m2Head(c));
+  set("[data-m2-facename]", c.name);
+  set("[data-m2-faceorient]", rev ? "Reversed" : "Upright");
+  set("[data-m2-heroname]", c.name);
+  const rank = String(c.tag || "").split("·")[0].trim();
+  const kw = (c.keywords && c.keywords[0]) || "";
+  set("[data-m2-meta]", rank + (rev ? " · reversed" : "") + (kw ? " · " + kw : ""));
+  set("[data-m2-mean]", (rev && c.reversed) ? c.reversed : c.meaning);
+  /* SCOPED TO THE STAGE, and it has to be: .msample__label exists on M1's desk too, so
+     an unscoped query rewrote the DESK's caption from another panel. Caught by reading
+     back "Sample Scan" — M1's word — from a selector meant for M2's "Sample Draw". */
+  const cap = root.querySelector(".menu__draw-stage .msample__label");
+  if (cap) cap.textContent = "Your Pull";          // it stopped being a sample the moment you drew it
+}
+
 /* BR-S231 — the monument's one-shot "turn to gold": played ONCE per session, on the
    first ARRIVAL at the wall (fired from menuSlideTo). Module-level flag so it never
    re-fires on remount/return. The hero's BASE css is the settled face-up state, so if
@@ -1574,6 +1680,8 @@ function onReliqPreviewClick(e) {
    re-render) that per-element listeners did NOT — a freshly-rendered back/forward control
    keeps working without any re-wire. */
 function onMenuAnnexClick(e) {
+  var pull = e.target.closest("[data-m2-pull]");
+  if (pull) { e.preventDefault(); m2Pull(e.currentTarget); return; }   // BR-S321: the hero deals itself a new card in place
   var el = e.target.closest("[data-annex-go],[data-annex-back]");
   if (!el) return;
   var host = e.currentTarget;
@@ -2772,7 +2880,7 @@ function menuSlideTo(target, opts = {}) {
        arrival reads as two clean beats instead of one 1.45s smear. Still once per load
        (M2_TURN_PLAYED), so this was never the whole "still laggy" answer — only a real part. */
     menuSettle(track, panels, target, () => {
-      if (MENU_PANELS[target].cls === "is-wall") wireM2Turn(host);  // BR-S231: play the monument's turn on arrival (once)
+      if (MENU_PANELS[target].cls === "is-wall") { wireM2Turn(host); m2EnsureDeck(host); }  // BR-S231: the monument's turn on arrival (once). BR-S321: and the deck it will deal from
     });
   } else {                                                          // returning to the desk: settle, then focus the rooms arrow/pill
     menuSettle(track, panels, 0, () => {
@@ -2804,6 +2912,7 @@ function wireMenuAnnex(host) {                                      // KEEP the 
   _u1SeatInvalidate();                                              // BR-S313: this mount rebuilt the menu — the cached seat describes the old one
   const seedIdx = _hashIndex();
   if (seedIdx > 0) menuSlideTo(seedIdx, { seed: true });            // deep-link: paint composed, no slide
+  if (MENU_PANELS[seedIdx] && MENU_PANELS[seedIdx].cls === "is-wall") m2EnsureDeck(host);   // BR-S321: a deep link to #rooms never runs the settle, so the deck is fetched here too
   else MENU_PANELS.forEach(p => { if (p.cls) host.classList.remove(p.cls); });   // stale-state reset on remount
   /* BR-S308: U1 is arrived at two ways — /#about (the in-app link) and /about/ (the
      real address the generator emits). Both seat here; neither is a redirect. */
