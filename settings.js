@@ -79,11 +79,20 @@
   /* =========================================================
      HEADER — cloned .pf-top: wordmark (→ Main Menu) + a quiet
      right link (→ The Reliquary). Both carry data-door.
+
+     BR-S310: the wordmark was the ONLY way back, and the one other link in this
+     header goes FORWARD — so a reader who arrived here from the orbit or the pill
+     saw a page with no exit on it. Same defect the Profile had and the same fix:
+     a labelled control on the same data-door, grouped left with the wordmark so
+     the forward link keeps the right edge to itself.
   ========================================================= */
   function headerHTML() {
     return '<header class="pf-top">' +
-      '<a class="pf-wordmark" href="#" data-door="menu" aria-label="Main Menu" title="Main Menu">' +
-        '<span class="pf-wordmark__mark" aria-hidden="true">&#9670;</span> Blue&nbsp;Room</a>' +
+      '<span class="st-topleft">' +
+        '<a class="pf-wordmark" href="#" data-door="menu" aria-label="Main Menu" title="Main Menu">' +
+          '<span class="pf-wordmark__mark" aria-hidden="true">&#9670;</span> Blue&nbsp;Room</a>' +
+        '<a class="pf-back pf-back--top" href="#" data-door="menu">&larr; Main Menu</a>' +
+      '</span>' +
       '<a class="st-toplink" href="?dev=profile" data-door="profile">The Reliquary <span aria-hidden="true">&rarr;</span></a>' +
     '</header>';
   }

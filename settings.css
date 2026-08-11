@@ -37,6 +37,10 @@
   transition: color .18s;
 }
 .st-toplink:hover, .st-toplink:focus-visible { color: var(--pf-cream-display); outline: none; }
+/* BR-S310: wordmark + the labelled back travel together on the left, so the one
+   FORWARD link in this header keeps the right edge and the two are never confused.
+   .pf-back / .pf-back--top come from arcana-profile.css, which this page already loads. */
+.st-topleft { display: inline-flex; align-items: baseline; gap: clamp(12px, 2.2vw, 22px); }
 
 /* ---------- page head ---------- */
 .st-head { padding-left: 22px; margin: clamp(6px, 2vh, 18px) 0 clamp(20px, 3.5vh, 34px); }

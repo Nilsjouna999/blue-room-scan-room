@@ -15,12 +15,12 @@
     href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap"
     rel="stylesheet"
   />
-  <link rel="stylesheet" href="styles.css?v=236y" /><!-- version param busts stale caches on live — bump the whole epoch set together. 232: BR-S254 M1 rank reversal (CSS). 233–234: BR-S259 M1 A/B toggle + the SRC-03 sample — app.js and reveal/stage-controller.js changed too, so the JS needed busting as well as the CSS. -->
+  <link rel="stylesheet" href="styles.css?v=236z" /><!-- 236z: BR-S309 the ROOMS field's hover suppression + the ornament channel. version param busts stale caches on live — bump the whole epoch set together. 232: BR-S254 M1 rank reversal (CSS). 233–234: BR-S259 M1 A/B toggle + the SRC-03 sample — app.js and reveal/stage-controller.js changed too, so the JS needed busting as well as the CSS. -->
 
   <link rel="stylesheet" href="reveal/reveal.css?v=236" />
   <link rel="stylesheet" href="arcane.css?v=236" />
-  <link rel="stylesheet" href="arcana-profile.css?v=236c" />
-  <link rel="stylesheet" href="settings.css?v=236" /><!-- BR-S208: Settings + boring page -->
+  <link rel="stylesheet" href="arcana-profile.css?v=236d" /><!-- 236d: BR-S307 the Profile's labelled back -->
+  <link rel="stylesheet" href="settings.css?v=236a" /><!-- BR-S208: Settings + boring page. 236a: BR-S310 the header's left group -->
 
   <link rel="stylesheet" href="ceremony.css?v=236" />
 
@@ -125,15 +125,15 @@
   <script src="arcana-reading.js?v=236"></script>
   <!-- The Profile / Hub (?dev=profile) — the seeker's home: crown, vault, people,
        doors out. Static design surface, mocked commerce. window.BRArcanaProfile. -->
-  <script src="arcana-profile.js?v=236a"></script>
+  <script src="arcana-profile.js?v=236b"></script><!-- 236b: BR-S307 the Profile's labelled back -->
   <!-- The Drawing Room (?dev=drawing-room) — the tarot room. Step 1: free single-
        card draw, cut and filed to the Reliquary. window.BRDrawingRoom. -->
   <script src="drawing-room.js?v=236"></script>
-  <script src="settings.js?v=236"></script>
+  <script src="settings.js?v=236a"></script><!-- 236a: BR-S310 Settings gets a visible back -->
   <!-- The Ceremony (BR-S163) — the forge ceremony on ?dev=ceremony; the builder's
        exact art kept pixel-perfect + brought to life. window.BRCeremony. -->
   <script src="ceremony.js?v=236"></script>
-  <script src="app.js?v=237l"></script><!-- suffixed rather than bumping the shared epoch, which a parallel session owns. 236b: BR-S251 U1 copy pass + the frame node. 236c: BR-S262 the M1→U1 descent glide. 236d: BR-S261 the vitrine header markup. 236e: BR-S264 descent fixes — up-trap, owned curve, symmetric snap. 236i: BR-S269 the panel-switch prime -->
+  <script src="app.js?v=237m"></script><!-- 237m: BR-S307/308/309 — the room's Escape, the U1 route, the ROOMS spring field. suffixed rather than bumping the shared epoch, which a parallel session owns. 236b: BR-S251 U1 copy pass + the frame node. 236c: BR-S262 the M1→U1 descent glide. 236d: BR-S261 the vitrine header markup. 236e: BR-S264 descent fixes — up-trap, owned curve, symmetric snap. 236i: BR-S269 the panel-switch prime -->
 
   <!-- U1 membrane-lines (2026-07-24) — LIVE by default (BR-S228). Runs the U1
        effect on the real #about surface. Kill-switch preserved: ?u1lines=0
