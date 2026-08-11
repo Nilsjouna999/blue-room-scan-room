@@ -1414,10 +1414,20 @@ function renderAbout() {
    Silver develops (M1); gold draws (M2). Copies M1's .menu__inner grid recipe so
    parity is inherited; reuses the existing door / msample / codex idioms. The hero
    is one standing card (the XVII Star) that turns to gold once on arrival. Source
-   order is head → ctrl → stage so keyboard/AT reach the primary act before the
-   monument; grid-areas restore the visual placement. Pure static string (the front
+   order is ctrl → stage → head: arrival focuses .menu__draw-title (MENU_PANELS), so
+   reading forward from the focus point reaches the acts, then the card, then the
+   card's read — head was ahead of the focus target and never reached at all.
+   Grid-areas restore the visual placement. Pure static string (the front
    door never mounts anything). Colour law: #mwGold is the ONE hero metal; the lone
    violet in the room is the word "kept". */
+/* THE STOREFRONT MUST NOT PROMISE WHAT THE ROOM BEHIND IT HAS ALREADY SPENT. The
+   Drawing Room's own landing already says "your first is filed" once the free sitting is
+   cut (drawing-room.js landingHTML / sittingUsed). M2 said "your first free" to everyone,
+   so a returning reader met an offer on the storefront that the very next screen retracts
+   — on the one panel whose differentiating line is "Asked the same, they answer the same".
+   One bit, house try/catch pattern, FAIL-OPEN, read at render: entering the Drawing Room
+   is a full navigation, so the menu is rebuilt on return and the bit is always current. */
+function m2SittingUsed() { try { return localStorage.getItem("br_dr_sitting_used") === "1"; } catch (e) { return false; } }
 function renderWall() {
   return '<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>'
     + '<linearGradient id="mwGold" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#c8ad70"/><stop offset=".55" stop-color="#a2864a"/><stop offset="1" stop-color="#5f471f"/></linearGradient>'
@@ -1425,27 +1435,6 @@ function renderWall() {
     + '</defs></svg>'
     + '<div class="menu__draw">'
     + '<button type="button" class="menu__wall-back" data-annex-back>&larr; Back to the desk</button>'
-    // HEAD — the same front-door grammar as M1
-    + '<header class="menu__draw-head">'
-    /* BR-S321 — WHAT THE CARD BESIDE THIS SAYS. The panel's own words stay above; this
-       block belongs to whatever is currently face up in the stage. Before the deck has
-       loaded it describes the sample that is already there, so the column is never empty
-       and never jumps. */
-    /* BR-S321a — THE CHANGING TEXT NEEDS A FRAME THAT DOES NOT CHANGE. This column now
-       holds only the card's read, and a block that rewrites itself with nothing anchoring
-       it reads as unstable — the panel appears to shift every time you pull. So it is
-       braced: a hairline and a fixed label above (mirroring the cutline over the acts in
-       the left column), the trust line below, and the meaning held at a FIXED four-line
-       height so the box never grows or shrinks between a terse card and a wordy one.
-       Only the words inside move. */
-    + '<span class="menu__draw-cutline menu__draw-cutline--read" aria-hidden="true"></span>'
-    + '<div class="m2read" data-m2-read>'
-    + '<p class="m2read__label">The card in hand</p>'
-    + '<p class="m2read__meta" data-m2-meta>Arcana &middot; XVII &middot; hope</p>'
-    + '<p class="m2read__mean" data-m2-mean>The Star stands for hope, renewal and quiet guidance after difficulty — the calm that follows the storm, and the small light you steer by.</p>'
-    + '</div>'
-    + '<p class="menu__wall-trust">Asked the same, they answer the same.</p>'
-    + '</header>'
     // CTRL — one loud act under the gold cut-line, then a steep ladder (source-first for a11y)
     + '<div class="menu__draw-ctrl">'
     /* BR-S321a — THE MASTHEAD MOVED INTO THIS COLUMN, above the acts. It was sitting in
@@ -1472,10 +1461,10 @@ function renderWall() {
     + '<a class="menu__door menu__door--add menu__door--tarot" href="?dev=drawing-room">'
     + '<span class="menu__door-kicker">By the Draw &middot; Tarot</span>'
     + '<span class="menu__door-name">A Tarot Reading</span>'
-    + '<span class="menu__door-desc">A Sitting — three cards to one question, your first free. Or the Deep Read — five.</span>'
+    + '<span class="menu__door-desc">A Sitting — three cards to one question, ' + (m2SittingUsed() ? 'your first is filed' : 'your first free') + '. Or the Deep Read — five.</span>'
     + '<span class="menu__draw-spine">The Ground · The Crossing · The Root · The Crown · The Turn</span>'
     + '</a>'
-    + '<div class="menu__door menu__door--sample menu__door--birth">'
+    + '<div class="menu__door menu__door--add menu__door--birth">'
     + '<a class="menu__draw-hit" href="?dev=arcane" aria-label="The Birth Reading"></a>'
     + '<span class="menu__door-kicker"><svg class="menu__draw-crown" viewBox="0 0 120 90" aria-hidden="true"><path d="M16 64 L26 28 L45 50 L60 18 L75 50 L94 28 L104 64" fill="none" stroke="url(#mwGold)" stroke-width="4" stroke-linejoin="round"/><path d="M15 64 H105" stroke="url(#mwGold)" stroke-width="3"/><circle cx="60" cy="18" r="5" fill="url(#mwGold)"/></svg> By Birth · Given, not drawn</span>'
     + '<span class="menu__door-name">The Birth Reading</span>'
@@ -1492,6 +1481,27 @@ function renderWall() {
     + '</div>'
     + '<p class="menu__draw-foot"><span class="menu__draw-cuttick" aria-hidden="true"></span> Drawn once. Not reissued.</p>'
     + '</div>'
+    // HEAD — what the card in the stage says, read AFTER the acts that name the room
+    + '<header class="menu__draw-head">'
+    /* BR-S321 — WHAT THE CARD BESIDE THIS SAYS. The panel's own words stay above; this
+       block belongs to whatever is currently face up in the stage. Before the deck has
+       loaded it describes the sample that is already there, so the column is never empty
+       and never jumps. */
+    /* BR-S321a — THE CHANGING TEXT NEEDS A FRAME THAT DOES NOT CHANGE. This column now
+       holds only the card's read, and a block that rewrites itself with nothing anchoring
+       it reads as unstable — the panel appears to shift every time you pull. So it is
+       braced: a hairline and a fixed label above (mirroring the cutline over the acts in
+       the left column), the trust line below, and the meaning held at a FIXED four-line
+       height so the box never grows or shrinks between a terse card and a wordy one.
+       Only the words inside move. */
+    + '<span class="menu__draw-cutline menu__draw-cutline--read" aria-hidden="true"></span>'
+    + '<div class="m2read" data-m2-read>'
+    + '<p class="m2read__label">The card in hand</p>'
+    + '<p class="m2read__meta" data-m2-meta>Arcana &middot; XVII &middot; hope</p>'
+    + '<p class="m2read__mean" data-m2-mean>The Star stands for hope, renewal and quiet guidance after difficulty — the calm that follows the storm, and the small light you steer by.</p>'
+    + '</div>'
+    + '<p class="menu__wall-trust">Asked the same, they answer the same.</p>'
+    + '</header>'
     // STAGE — the standing monument: the XVII Star, turned in gold
     + '<section class="menu__draw-stage">'
     + '<div class="msample__cap"><span class="msample__label">Sample Draw</span></div>'
@@ -1538,38 +1548,36 @@ function renderWall() {
    no question is asked, no token is minted. "Asked the same, they answer the same" is a
    promise about readings, and this asks nothing. */
 let M2_DECK = null, M2_DECK_PENDING = false;
-/* ── BR-S321a — AND IT WAITS FOR AN IDLE MOMENT, WHICH IS NOT A NICETY. ───────
-   The first version fetched on ARRIVAL at M2, hung off menuSettle's transitionend —
-   so a ~170KB JSON.parse landed on the main thread at the exact instant a slide
-   finished, and the next panel switch (M2 → M1, the heaviest transition in the build)
-   ran straight into it. The builder felt it immediately: "m2 to m1 is super laggy."
-   That is a self-inflicted stall, not a mystery: parse is synchronous and blocking, and
-   arrival is the worst possible time to schedule it.
-   So the whole thing is deferred to an idle slot — requestIdleCallback where it exists,
-   a 600ms timer where it does not, which is well past the 640ms slide either way. The
-   deck is for the SECOND thing a reader does on this panel; nothing needs it during the
-   move onto it. Nothing here blocks a transition, and if the browser never goes idle the
-   panel is simply the one it was yesterday. */
-function m2Idle(fn) {
-  if (typeof requestIdleCallback === "function") requestIdleCallback(fn, { timeout: 2500 });
-  else setTimeout(fn, 600);
-}
+/* ── BR-S325 — THE IDLE PIPELINE IS GONE. IT WAS DEFENDING AGAINST 3ms. ──────
+   BR-S321a built a two-stage requestIdleCallback pipeline here — fetch in one idle
+   slot, JSON.parse in a second — with forty lines explaining that a "~170KB
+   JSON.parse landed on the main thread" and caused the builder's "m2 to m1 is super
+   laggy". Every word of that was reasoned. None of it was measured.
+   MEASURED, in the live page, five runs: 169,005 bytes of text; JSON.parse 0.5–1.8ms;
+   the filter+reduce down to 78 cards 1.0ms. Under 3ms all in. At a tenfold low-end
+   phone penalty it is one dropped frame — not a stall anyone could feel, let alone
+   the thing that made a panel switch drag. M2→M1 is heavy because M1 carries ~100% of
+   this build's paint weight, which BR-S276 already measured and wrote down. The parse
+   got blamed for being the newest thing in the frame.
+   This is the THIRD time this repo has shipped a fix by reasoning instead of
+   measuring, and its own memory file says so in as many words. So the ceremony goes
+   and the one part that was always right stays: the deck is not fetched at boot,
+   because 170KB of NETWORK on the front door is a real cost and lazily fetching it
+   is a real saving. That is a bandwidth decision, which is what it should have been
+   called the first time. */
 function m2EnsureDeck(host) {
   if (M2_DECK || M2_DECK_PENDING) { m2ArmPull(host); return; }
   M2_DECK_PENDING = true;
-  m2Idle(function () {
-    fetch("codex-data.json?v=208").then(function (r) { return r.text(); }).then(function (txt) {
-      m2Idle(function () {                                   // the PARSE is the expensive half — give it its own idle slot too
-        try {
-          const codex = JSON.parse(txt);
-          M2_DECK = codex.filter(function (s) { return /tarot|minor arcana/i.test(String(s.system || "")); })
-                         .reduce(function (a, s) { return a.concat(s.entries || []); }, []);
-          if (!M2_DECK.length) M2_DECK = null;
-        } catch (e) { M2_DECK = null; }
-        m2ArmPull(host);
-      });
-    }).catch(function () { M2_DECK_PENDING = false; });      // silent: the sample card stands, the button stays disabled
-  });
+  fetch("codex-data.json?v=208").then(function (r) { return r.text(); }).then(function (txt) {
+    try {
+      const codex = JSON.parse(txt);
+      M2_DECK = codex.filter(function (s) { return /tarot|minor arcana/i.test(String(s.system || "")); })
+                     .reduce(function (a, s) { return a.concat(s.entries || []); }, []);
+      if (!M2_DECK.length) M2_DECK = null;
+    } catch (e) { M2_DECK = null; }
+    if (!M2_DECK) M2_DECK_PENDING = false;   // parse threw or the deck came back empty — unlatch, or the `if (M2_DECK || M2_DECK_PENDING) return` guard short-circuits every later arrival for the life of the page (the network path already resets this)
+    m2ArmPull(host);
+  }).catch(function () { M2_DECK_PENDING = false; });        // silent: the sample card stands, the button stays disabled
 }
 function m2ArmPull(host) {
   const btn = (host || document).querySelector("[data-m2-pull]");
@@ -2532,7 +2540,7 @@ function wireMiniCodex(host) {
   function loadIndex() {
     if (_MINI_INDEX || _miniLoading) { renderResults(input.value); return; }
     _miniLoading = true; renderResults(input.value);
-    fetch("codex-data.json").then(function (r) { return r.json(); }).then(function (data) {
+    fetch("codex-data.json?v=208").then(function (r) { return r.json(); }).then(function (data) {   // SAME URL as the M2 deck (m2EnsureDeck) and drawing-room.js — a different query string is a different HTTP cache entry, and the mini-codex lives on the same page as M2
       const idx = [];
       (data || []).forEach(function (w) { (w.entries || []).forEach(function (en) {
         idx.push({ name: en.name || "", tag: en.tag || "", kw: en.keywords || [], meaning: en.meaning || "",
