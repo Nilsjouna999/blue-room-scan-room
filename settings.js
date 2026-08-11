@@ -114,12 +114,31 @@
     return '<div class="st-seg" role="radiogroup" aria-label="Motion">' + body + '</div>';
   }
 
+  /* ── BR-S337 — THREE NAMED ZONES. ────────────────────────────────────────────
+     The Settings tab was a flat run of three sections with nothing saying what kind
+     of thing each one was, so "Motion" (how the room behaves), "Reset the Shelf"
+     (what this browser is holding) and the free Sitting (what the archive gives away)
+     all sat at the same weight, in the same voice, one after another. They are three
+     different KINDS of setting and the page never said so.
+     Named: The Room · On This Device · The Free Half. The zone carries the h2 and the
+     old section headings step down to h3, so the outline finally matches the page. */
+  function zone(id, mark, name, lede, body) {
+    return '<section class="st-zone" id="' + id + '" aria-labelledby="' + id + '-h">' +
+      '<header class="st-zone__head">' +
+        '<span class="st-zone__mark" aria-hidden="true">' + mark + '</span>' +
+        '<h2 class="st-zone__h" id="' + id + '-h">' + esc(name) + '</h2>' +
+        '<p class="st-zone__lede">' + lede + '</p>' +
+      '</header>' +
+      '<div class="st-zone__body">' + body + '</div>' +
+    '</section>';
+  }
+
   function motionSecHTML() {
     var note = motionAvailable()
       ? "Match device follows your system's reduced-motion setting. Reduced dims the archive's animated reveals — cards turning, the crown's slow glow, sections lighting as you scroll; Full keeps them. Stored on this device only — clearing your browser data returns this to Match device."
       : "Motion cannot be adjusted in this build — the archive is following your system's reduced-motion setting.";
     return '<section class="pf-sec st-sec">' +
-      '<h2 class="pf-sec__h">Motion</h2>' +
+      '<h3 class="pf-sec__h">Motion</h3>' +
       '<p class="pf-lede">Blue Room’s animations can be dimmed here, or left full — whichever reads easier.</p>' +
       motionSegHTML() +
       '<p class="st-note">' + esc(note) + '</p>' +
@@ -131,7 +150,7 @@
      marked aria-disabled (nothing meaningful is aria-hidden). */
   function appearanceSecHTML() {
     return '<section class="pf-sec st-sec">' +
-      '<h2 class="pf-sec__h">Appearance</h2>' +
+      '<h3 class="pf-sec__h">Appearance</h3>' +
       '<p class="pf-lede">The archive is built for one register — dark ground, warm ink. A light register has not been built.</p>' +
       '<div class="st-seg st-seg--locked" role="radiogroup" aria-label="Appearance" aria-disabled="true">' +
         '<span class="st-seg__opt st-seg__opt--locked is-on" role="radio" aria-checked="true" aria-disabled="true" tabindex="-1">Dark &middot; Archive</span>' +
@@ -160,14 +179,17 @@
     '</div>';
   }
 
-  function reliquaryInner(opts) {
+  /* ── BR-S337 — THE FREE HALF IS ITS OWN ZONE. ────────────────────────────────
+     "Restore the free Sitting" was filed under the device's storage controls, next
+     to Reset, because restoring it happens to be a localStorage delete. That is an
+     implementation detail standing in for a meaning: what the reader is doing there
+     is taking back something the archive gives away, not managing storage.
+     Half of Blue Room costs nothing and always will. That is a promise the settings
+     page is a good place to make plainly — and it is the honest place to put the
+     donation, because it is asked for beside what is given, not beside a price. */
+  function freeHalfInner(opts) {
     opts = opts || {};
-    var shelf = lsGet("br_holdings") === "1";
-    var keyed = lsGet("br_has_reading") === "1";
     var sittingUsed = lsGet("br_dr_sitting_used") === "1";
-    var concords = concordKeys().length;
-
-    /* Restore the free Sitting */
     var restoreBtn, restoreDesc;
     if (opts.restored) {
       restoreBtn = '<button type="button" class="st-btn" disabled>Restored</button>';
@@ -179,6 +201,43 @@
       restoreBtn = '<button type="button" class="st-btn" disabled>Nothing to restore</button>';
       restoreDesc = "Your free Sitting is still waiting — nothing to restore.";
     }
+    return '<h3 class="pf-sec__h">Always open, always free</h3>' +
+      '<p class="pf-lede">These are not a trial and they do not expire.</p>' +
+      '<ul class="st-free">' +
+        '<li><b>The Codex</b> — every card, sign, number, rune, trigram and hexagram the archive knows.</li>' +
+        '<li><b>The Pull</b> — one card, cut to a question, as often as you like.</li>' +
+        '<li><b>A Sitting</b> — three cards to one question, once.</li>' +
+        '<li><b>The Free Pull card</b> — a complete card front from your photograph, sealed at the back.</li>' +
+      '</ul>' +
+      ctrlRow("Restore the free Sitting", restoreDesc, restoreBtn, false) +
+      donationHTML();
+  }
+
+  /* THE PASSAGE. Honest by construction: DONATE_URL is empty in this build, so the
+     block renders an inert, stated "no way to give is connected" rather than a button
+     that goes nowhere — the same precedent as the honestly-locked Appearance row. Set
+     the constant to a real address and the block becomes a live door with no other
+     change. A donate button that silently does nothing would be exactly the theatre
+     this page spends six sections promising it does not do. */
+  var DONATE_URL = "";
+  function donationHTML() {
+    var act = DONATE_URL
+      ? '<a class="st-btn st-btn--give" href="' + esc(DONATE_URL) + '" target="_blank" rel="noopener noreferrer">Keep the candle lit</a>'
+      : '<span class="st-give__inert">No way to give is connected in this build.</span>';
+    return '<div class="st-give">' +
+      '<p class="st-give__passage">Blue Room is one person’s archive, kept in the open. The candle stays lit ' +
+        'whether or not anyone pays for it — the Codex does not close, and the free half stays free. ' +
+        'If it has been worth something to you, that is already the whole of it.</p>' +
+      '<div class="st-give__act">' + act + '</div>' +
+    '</div>';
+  }
+
+  function deviceInner(opts) {
+    opts = opts || {};
+    var shelf = lsGet("br_holdings") === "1";
+    var keyed = lsGet("br_has_reading") === "1";
+    var sittingUsed = lsGet("br_dr_sitting_used") === "1";
+    var concords = concordKeys().length;
 
     /* Clear the staged draft (in-memory only) */
     var draft = hasDraft(), draftBtn, draftDesc;
@@ -211,9 +270,10 @@
       ledgerRow("Sealed Concords", concords ? concords + " on file" : "None on file", concords > 0) +
     '</div>';
 
-    return '<h2 class="pf-sec__h">The Shelf</h2>' +
-      '<p class="pf-lede">Everything Blue Room keeps on this device, and the controls to clear it. Nothing here reaches beyond this browser.</p>' +
-      ctrlRow("Restore the free Sitting", restoreDesc, restoreBtn, false) +
+    /* The zone header above this now says "everything Blue Room is holding in this
+       browser, and the controls to clear it" — this section's old lede said the same
+       sentence again, four lines down. One of them had to go and it is the lower one. */
+    return '<h3 class="pf-sec__h">On file, and how to clear it</h3>' +
       ctrlRow("Clear the staged draft", draftDesc, draftBtn, false) +
       ctrlRow("Reset the Shelf",
         "Returns the archive to its first day — the open shelf, the first-reading key, the free Sitting, and every sealed Concord. Nothing is stored anywhere else, so there is nothing else to reset.",
@@ -222,15 +282,17 @@
       ledger;
   }
 
-  function reliquarySecHTML() {
-    return '<section class="pf-sec st-sec" id="st-reliquary">' + reliquaryInner({}) + '</section>';
-  }
-
   function controlsPanelHTML() {
     return '<div class="st-panel" role="tabpanel" id="st-panel-controls" data-tab="controls" aria-labelledby="st-tab-controls" tabindex="0">' +
-      motionSecHTML() +
-      appearanceSecHTML() +
-      reliquarySecHTML() +
+      zone("st-zone-room", "&#9670;", "The Room",
+        "How the archive behaves while you are in it. Kept on this device.",
+        motionSecHTML() + appearanceSecHTML()) +
+      zone("st-zone-device", "&#9671;", "On This Device",
+        "Everything Blue Room is holding in this browser, and the controls to clear it. Nothing here reaches beyond it.",
+        '<section class="pf-sec st-sec" id="st-reliquary">' + deviceInner({}) + "</section>") +
+      zone("st-zone-free", "&#10022;", "The Free Half",
+        "What the archive gives away, and what it asks — which is nothing.",
+        '<section class="pf-sec st-sec" id="st-freehalf">' + freeHalfInner({}) + "</section>") +
     '</div>';
   }
 
@@ -246,8 +308,19 @@
   function romanList(items) { return '<ul class="st-romanlist">' + items.map(function (i) { return '<li>' + i + '</li>'; }).join("") + '</ul>'; }
   function romanItem(mark, text) { return '<b class="st-roman">' + mark + '</b> — ' + text; }
 
+  /* ── BR-S337 — THE LEGAL PAGE GETS AN ADDRESS (ATLAS #12). ───────────────────
+     About & Legal was a client-side tab: it could not be linked to, and a refresh
+     threw the reader back to the controls. For a privacy and legal surface that is a
+     defect, not a style choice — you cannot point anyone at terms you cannot link.
+     Two addresses now, both real and both survive a reload:
+       ?dev=settings&p=legal            the document, from the top
+       ?dev=settings&p=legal#st-doc-privacy   a named section of it
+     The section ids are PREFIXED. `about` was already spoken for — it is U1's hash on
+     the menu (`/#about`, app.js U1_HASH) — and two different pages answering to the
+     same fragment is how a boot-seat starts seating the wrong room. */
+  function docId(key) { return "st-doc-" + key; }
   function docSec(id, tab, title, lede, body) {
-    return '<section class="pf-sec st-doc__sec" id="' + id + '">' +
+    return '<section class="pf-sec st-doc__sec" data-key="' + id + '" id="' + docId(id) + '">' +
       '<span class="pf-sec__h" aria-hidden="true">' + tab + '</span>' +
       '<h2 class="st-doc__title" tabindex="-1">' + title + '</h2>' +
       '<p class="pf-lede st-doc__lede">' + lede + '</p>' +
@@ -363,7 +436,7 @@
 
   function recordPanelHTML() {
     var rail = JUMP.map(function (j, i) {
-      return '<a class="st-jump__link' + (i === 0 ? " is-current" : "") + '" href="#' + j[0] + '" data-target="' + j[0] + '"' +
+      return '<a class="st-jump__link' + (i === 0 ? " is-current" : "") + '" href="#' + docId(j[0]) + '" data-target="' + j[0] + '"' +
         (i === 0 ? ' aria-current="true"' : "") + '>' + j[1] + '</a>';
     }).join("");
     var doc = secAbout() + secHow() + secRules() + secPrivacy() + secLegal() + secCredits();
@@ -385,6 +458,33 @@
     '</div>';
   }
 
+  /* ── BR-S337 — A FOOTER OF STANDING LINKS. ───────────────────────────────────
+     The page ended on two lines of disclaimer and nothing else, so Settings was the
+     one room in the building with no way onward — you either used the header's two
+     doors or you went back. These are the addresses that hold still: the ones that
+     will still mean the same thing in a year. Every one is verified to exist —
+     codex.html, /about/ (U1), ?dev=profile (The Shelf), the public repo, the contact
+     address printed in Credits. Nothing aspirational is listed. */
+  var STANDING = [
+    ["What Blue Room is", "about/", false],
+    ["The Codex", "codex.html", false],
+    ["The Shelf", "?dev=profile", false],
+    ["About &amp; Legal", "?dev=settings&p=legal", false],
+    ["Source", "https://github.com/Nilsjouna999/blue-room-scan-room", true],
+    ["nilsjouna@gmail.com", "mailto:nilsjouna@gmail.com", true]
+  ];
+  function footerHTML() {
+    var links = STANDING.map(function (l) {
+      return '<a class="st-foot__link" href="' + l[1] + '"' +
+        (l[2] ? ' target="_blank" rel="noopener noreferrer"' : "") + ">" + l[0] + "</a>";
+    }).join('<span class="st-foot__dot" aria-hidden="true">&middot;</span>');
+    return '<footer class="pf-foot st-foot">' +
+      '<nav class="st-foot__links" aria-label="Standing links">' + links + "</nav>" +
+      '<p class="st-foot__note">A record kept for the archive itself, not for you.<br>' +
+        'Nothing on this page is medical, legal, or financial counsel.</p>' +
+    "</footer>";
+  }
+
   function render() {
     return '<div class="pf st-page">' +
       headerHTML() +
@@ -396,7 +496,7 @@
         tabsHTML() +
         controlsPanelHTML() +
         recordPanelHTML() +
-        '<footer class="pf-foot">A record kept for the archive itself, not for you.<br>Nothing on this page is medical, legal, or financial counsel.</footer>' +
+        footerHTML() +
       '</div>' +
     '</div>';
   }
@@ -417,6 +517,7 @@
     root.querySelectorAll(".st-panel").forEach(function (pnl) {
       pnl.hidden = pnl.getAttribute("data-tab") !== name;
     });
+    writeURL(name, "");
   }
 
   function selectMotion(root, val, focusOpt) {
@@ -438,18 +539,62 @@
     });
   }
 
-  function gotoSection(root, id) {
-    var el = root.querySelector("#" + id);
+  function gotoSection(root, id, quiet) {
+    var el = root.querySelector("#" + docId(id));
     if (!el) return;
-    el.scrollIntoView({ behavior: prefersReduced() ? "auto" : "smooth", block: "start" });
+    el.scrollIntoView({ behavior: (quiet || prefersReduced()) ? "auto" : "smooth", block: "start" });
     setCurrent(root, id);
+    /* "record" is the PANEL's name; "legal" is what it is called in the URL. Passing the
+       URL word here silently failed the `tab === "record"` test and deleted p=legal from
+       the address on every jump — the exact defect this change exists to fix, reintroduced
+       one function further down. */
+    writeURL("record", id);
     var h = el.querySelector(".st-doc__title");
     if (h) { try { h.focus({ preventScroll: true }); } catch (e) { h.focus(); } }
   }
 
+  /* ── THE URL IS THE BOOT TRUTH. ───────────────────────────────────────────────
+     A view switch that does not rewrite the URL leaves the address describing a page
+     the reader is no longer on — so a refresh silently teleports them. replaceState,
+     not pushState: moving between two tabs of one settings page is not six entries
+     of back-button history, but it IS a different address, and a reload must land
+     where the reader actually is. */
+  function writeURL(tab, sectionKey) {
+    try {
+      var p = new URLSearchParams(location.search);
+      p.set("dev", "settings");
+      if (tab === "record") p.set("p", "legal"); else p.delete("p");
+      var hash = (tab === "record" && sectionKey) ? "#" + docId(sectionKey) : "";
+      history.replaceState(null, "", location.pathname + "?" + p.toString() + hash);
+    } catch (e) {}
+  }
+  /* Read the address back: which panel, and which section of it. */
+  function readURL() {
+    var out = { tab: "controls", section: "" };
+    try {
+      var p = new URLSearchParams(location.search);
+      var want = (p.get("p") || "").toLowerCase();
+      if (want === "legal" || want === "about") out.tab = "record";
+      var h = (location.hash || "").replace(/^#/, "");
+      if (h.indexOf("st-doc-") === 0) {
+        var key = h.slice(7);
+        for (var i = 0; i < JUMP.length; i++) if (JUMP[i][0] === key) { out.section = key; out.tab = "record"; break; }
+      }
+    } catch (e) {}
+    return out;
+  }
+
+  /* BR-S337: the two live sections are in two zones now, and restoring the Sitting
+     changes BOTH (the control in The Free Half, the ledger row in On This Device).
+     Re-render both every time or the ledger tells a stale truth about the thing the
+     reader just changed — which on a page whose whole claim is honesty is the one
+     bug that costs the most. */
   function refreshReliquary(root, opts) {
-    var sec = root.querySelector("#st-reliquary");
-    if (sec) sec.innerHTML = reliquaryInner(opts || {});
+    opts = opts || {};
+    var dev = root.querySelector("#st-reliquary");
+    if (dev) dev.innerHTML = deviceInner(opts);
+    var free = root.querySelector("#st-freehalf");
+    if (free) free.innerHTML = freeHalfInner(opts);
   }
 
   function openConfirm(root, trigger) {
@@ -557,11 +702,15 @@
     if (!("IntersectionObserver" in window)) return;
     var secs = Array.prototype.slice.call(root.querySelectorAll(".st-doc__sec[id]"));
     if (!secs.length) return;
-    var order = secs.map(function (s) { return s.id; });
+    /* BR-S337: keyed by data-key, not by id — the ids carry the st-doc- prefix now and
+       the rail's data-target does not. Reading the DOM id here would silently
+       highlight nothing, which is the quietest possible way for a nav to break. */
+    var order = secs.map(function (s) { return s.getAttribute("data-key"); });
     var visible = {};
     var io = new IntersectionObserver(function (entries) {
       entries.forEach(function (e) {
-        if (e.isIntersecting) visible[e.target.id] = true; else delete visible[e.target.id];
+        var k = e.target.getAttribute("data-key");
+        if (e.isIntersecting) visible[k] = true; else delete visible[k];
       });
       for (var i = 0; i < order.length; i++) {
         if (visible[order[i]]) { setCurrent(root, order[i]); return; }
@@ -576,6 +725,24 @@
     if (!host) return;
     host.innerHTML = render();
     var root = host.firstElementChild;   // the .pf scroller + delegation root
-    if (root) wire(root);
+    if (!root) return;
+    wire(root);
+    /* BR-S337 — SEAT FROM THE ADDRESS. A load carrying ?p=legal opens the document,
+       and a load carrying a section hash lands on that section. `quiet` because an
+       arrival is not a journey: a link should paint where it points, not animate
+       there from the top of a page the reader never saw. */
+    var seat = readURL();
+    if (seat.tab === "record") {
+      selectTab(root, "record", false);
+      if (seat.section) {
+        /* TWO frames, not zero: the panel is unhidden in this same tick, so at the moment
+           selectTab returns the document has no layout yet and scrollIntoView measures a
+           zero-height box and does nothing. Measured — the seat silently no-opped until
+           this was deferred. */
+        requestAnimationFrame(function () {
+          requestAnimationFrame(function () { gotoSection(root, seat.section, true); });
+        });
+      } else writeURL("record", "");
+    }
   };
 })();
