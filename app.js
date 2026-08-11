@@ -2635,7 +2635,10 @@ const _FLATTRAVEL = !/[?&]flat=0/.test(String(location.search || ""));
    matched M2's hero to the LIVE one.  This shows the other answer so the builder can
    pick which deck is canon before the pivot makes M2 the storefront for it. */
 (function () {
-  if (/[?&]m2=white/.test(String(location.search || ""))) document.documentElement.classList.add("m2-parch");
+  /* BR-S306 — parchment is THE DECK now (builder, 2026-08-11), so it is the default and
+     the engraved-star hero keeps the door instead: ?m2=dark. The loser stays one query away,
+     the way ?snap=on and ?glide=native did. */
+  if (!/[?&]m2=dark/.test(String(location.search || ""))) document.documentElement.classList.add("m2-parch");
 })();
 function _travelOn()  { if (_FLATTRAVEL) document.documentElement.classList.add("is-travel"); }
 function _travelOff() { document.documentElement.classList.remove("is-travel"); }

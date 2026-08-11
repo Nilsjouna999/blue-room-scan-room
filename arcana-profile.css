@@ -436,11 +436,25 @@
 .dr-cardbtn:focus-visible { outline: 2px solid var(--pf-gold-lit); outline-offset: 6px; border-radius: 12px; }
 .dr-card { position: relative; width: clamp(170px, 38vw, 210px); aspect-ratio: 120 / 190; transform-style: preserve-3d; transition: transform .7s cubic-bezier(.4, 0, .2, 1); margin: 0 auto; }
 .dr-card.is-revealed { transform: rotateY(180deg); }
+/* BR-S306 — THE DECK IS PARCHMENT. The builder chose white, so the room that actually
+   deals the cards follows its own sample: M2 showed parchment while /tarot/ dealt dark
+   ones, which is the incoherence a first visitor meets between the shelf and the counter.
+   Values are tarot-v2's, unchanged — --parchment, --card-ink #1c150d, accent copper #c98a5e.
+   The BACK stays dark: a deck is dark-backed and light-faced, and the flip is the whole
+   ceremony. Only the FRONT turns. */
 .dr-cardface { position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden; border-radius: 12px; background: linear-gradient(180deg, #111319, #0c0d11); }
+.dr-cardface--front { background: linear-gradient(165deg, #efe9db, #dcd4c2); border: 1px solid rgba(20, 14, 8, .35); }
+/* CSS beats a presentation attribute, so the marks re-point without touching the shared
+   SVG: gold washes out on parchment and drInk is a LIGHT grey that would vanish outright. */
+.dr-cardface--front .dr-plate [stroke] { stroke: #2a2118; }
+.dr-cardface--front .dr-plate text { fill: #c98a5e; }
+.dr-cardface--front .dr-plate circle[fill]:not([fill="none"]) { fill: #c98a5e; }
+.dr-cardface--front .dr-plate rect[stroke]:first-of-type { stroke: #c98a5e; opacity: .75; }
 .dr-cardface--front { transform: rotateY(180deg); box-shadow: 0 14px 34px rgba(0, 0, 0, .5), 0 0 30px rgba(201, 163, 92, .10); }
 .dr-plate { width: 100%; height: 100%; display: block; }
 .dr-plate--rev { transform: rotate(180deg); }
 .dr-cardface__name { position: absolute; bottom: 14px; left: 8px; right: 8px; font-family: var(--pf-serif); font-weight: 600; font-size: 15px; line-height: 1.05; color: var(--pf-cream-display); text-align: center; }
+.dr-cardface--front .dr-cardface__name { color: #1c150d; }   /* BR-S306: ink on parchment */
 .dr-draw__cue { font-family: var(--pf-mono); font-size: 9px; letter-spacing: .2em; text-transform: uppercase; color: var(--pf-meta); text-align: center; }
 
 /* ---- landing: the free pull + the reading doors ---- */
