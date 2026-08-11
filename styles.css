@@ -3644,20 +3644,28 @@ html.m2-parch .m2hero { --bf-ink: #1c150d; --bf-meta: #6a5c45; --bf-rule: rgba(2
 .m2bface .m2face-meta { color: var(--bf-meta); }
 .m2bface .m2face-div { background: var(--bf-rule); }
 .m2bface .m2face-orient { color: var(--bf-meta); }
-/* ── BR-S346 — SIX MARKS, SIX COLOURS. ───────────────────────────────────────
-   Six systems listed in one grey said "here are six of something". Each one is a
-   different tradition with a different temperature, and giving each its own tone
-   is the cheapest way to say that before anyone reads a word of it:
-     sun sign    amber   — the solar one
-     year animal cinnabar— the Chinese register, its own red
-     life path   indigo  — number as ink on paper
-     rune        moss    — cut into wood and stone
-     trigram     teal    — the bagua's water-and-air pairings
-     hexagram    wine    — the oldest and least legible of the six
+/* ── BR-S347 — MATERIALS, NOT COLOURS. ───────────────────────────────────────
+   BR-S346 gave the six marks six hues spread across the wheel at roughly equal
+   saturation, and the builder's read was exact: pride rainbow, fleecy, the wrong
+   product entirely. This wants serious, ancient, set in space.
+   THE FAULT WAS HUE SPREAD, NOT BRIGHTNESS. Six saturated hues at one value always
+   reads as a spectrum — a set, a chart, a flag — because the eye takes the RANGE as
+   the message. Muting all six equally would only have produced a dull rainbow.
+   So they stop being colours and become MATERIALS: pigments and metals an old plate
+   would actually be marked in, ordered as an assay rather than a palette.
+     sun sign    gold leaf   the one bright note in the set
+     year animal cinnabar    red earth, the oldest pigment here
+     life path   iron gall   the ink numbers were written in
+     rune        stone       lichen on cut rock, barely a colour
+     trigram     verdigris   aged copper
+     hexagram    ash         the palest, nearly neutral
+   The chroma ceiling is the whole discipline: only the first two carry real warmth
+   and the rest sit near-neutral, so VALUE does the separating and hue only whispers.
+   That is also where the crisp part comes from — one bright mark among five
+   restrained ones lands, where six bright marks cancel each other out.
    TUNED FOR PARCHMENT FIRST, because parchment is the shipped deck: these are the
-   DARK forms, all measured above 4.5:1 on the cream stock. The dark register keeps
-   its own lighter set, since a colour that reads on cream disappears on ink.
-   Muted throughout — the brief was "visually there", not bright. */
+   DARK forms, all above 4.5:1 on the cream stock. The dark register keeps its own
+   lighter set, since a colour that reads on cream disappears on ink. */
 .m2bface__marks {
   list-style: none; margin: auto 0 0; padding: 0;
   display: grid; gap: 5px;
@@ -3670,15 +3678,19 @@ html.m2-parch .m2hero { --bf-ink: #1c150d; --bf-meta: #6a5c45; --bf-rule: rgba(2
 .m2bface__marks li:nth-child(4) { color: var(--mk-rune); }
 .m2bface__marks li:nth-child(5) { color: var(--mk-trigram); }
 .m2bface__marks li:nth-child(6) { color: var(--mk-hex); }
-/* dark stock (?m2=dark) — lighter forms of the same six */
+/* dark stock (?m2=dark) — lighter forms of the same six materials */
 .m2hero {
-  --mk-sun: #c8a463; --mk-animal: #c07d63; --mk-path: #8090ac;
-  --mk-rune: #92a37c; --mk-trigram: #6fa39e; --mk-hex: #a4808c;
+  --mk-sun: #c6a466; --mk-animal: #ad7962; --mk-path: #78838f;
+  --mk-rune: #8a9184; --mk-trigram: #6e918d; --mk-hex: #9c968c;
 }
 /* parchment — the shipped deck. Darker, all clearing 4.5:1 on #e7e2d7. */
+/* the gold is #775921 and not a step brighter for a measured reason: at 9.5px this
+   is small text, so it owes 4.5:1 on the cream stock. #8a682c — the obvious "dark
+   gold" — measures 3.97 and fails; #775921 measures 5.03. The one bright note in
+   the set is still the brightest of the six, it just had to earn it. */
 html.m2-parch .m2hero {
-  --mk-sun: #8a6a2f; --mk-animal: #8c4a38; --mk-path: #3f5170;
-  --mk-rune: #4e6138; --mk-trigram: #2f6360; --mk-hex: #6b4550;
+  --mk-sun: #775921; --mk-animal: #834f3d; --mk-path: #3a4553;
+  --mk-rune: #55604f; --mk-trigram: #3d6560; --mk-hex: #5f5a52;
 }
 .m2bface__name { color: var(--bf-ink); margin: 14px 0 0; }
 

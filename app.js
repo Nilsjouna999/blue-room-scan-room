@@ -1897,12 +1897,16 @@ const M2_NUMWORD = /^(one|two|three|four|five|six|seven|eight|nine|ten|eleven|tw
    one loud hue in the read column would out-shout the card it belongs to. They are
    here to differentiate, not to decorate.
    The gold stays reserved for the numeral — the accent never takes it. */
+/* BR-S347: pulled down into the same mineral band as the six marks. Only one of
+   these is ever on screen at a time, so they could not rainbow — but a bright
+   modern blue on the Cups read would still have been the wrong century beside a
+   card that is trying to look old. Pigment and metal, not colour. */
 const M2_ELEMENT = [
-  [/wand|fire/i,      "#c08055"],   // burnt amber — heat without a red
-  [/cup|water/i,      "#6f9ab0"],   // slate blue, the colour of deep still water
-  [/sword|air/i,      "#a6b0bb"],   // cold pale steel
-  [/pentacle|earth/i, "#93a06b"],   // moss over soil
-  [/arcana|major/i,   "#b0925a"]    // brass: the majors are the archive's own register
+  [/wand|fire/i,      "#b0764f"],   // burnt sienna — heat without a red
+  [/cup|water/i,      "#5f8296"],   // slate, the colour of deep still water
+  [/sword|air/i,      "#98a1aa"],   // cold pale steel
+  [/pentacle|earth/i, "#87936a"],   // moss over soil
+  [/arcana|major/i,   "#a98d57"]    // brass: the majors are the archive's own register
 ];
 function m2Accent(card) {
   const tag = String((card && card.tag) || "");
