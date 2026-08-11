@@ -2524,11 +2524,29 @@ function _menuRelease(track) {
   setTimeout(go, 80);                                               // BACKSTOP — rAF is starved in a hidden/background tab, and a pin that never lifts is a panel that never arrives.
 }
 
+/* BR-S278 — GET OFF THE ARRIVAL FRAME.  Everything used to land at once, on the single
+   frame the eye is already looking at: the promotion torn down (which destroys the
+   layer and forces a re-raster), the Desk's blends switched back on, and the panels
+   re-collapsed.  Three heavy things on the frame where the motion stops is exactly
+   where a bump is most visible — the travel can be perfect and the ARRIVAL still reads
+   as a knock.  The collapse stays immediate because correctness depends on it (a
+   non-offstage panel is a phantom scrollbar), but the un-promotion and the re-blend are
+   pushed one frame past the stop.  Purely a change of WHEN; nothing looks different at
+   rest.  Guarded by the same token as the release, so a slide that begins inside that
+   frame cannot have its fresh pin stripped by the previous slide's teardown, and
+   backstopped for a tab where rAF never runs.  _menuUnprime is idempotent. */
+function _menuSettleDown(track) {
+  const tok = _menuPrimeTok;
+  const down = () => { if (tok === _menuPrimeTok) _menuUnprime(track); };
+  requestAnimationFrame(down);
+  setTimeout(down, 120);
+}
+
 function menuSettle(track, panels, activeIdx, after) {
   cancelMenuSettle();
   let done = false, t;
   const collapse = () => panels.forEach((p, i) => { if (p && i !== activeIdx) p.classList.add("is-offstage"); });   // ALL non-active panels
-  const fin = () => { if (done) return; done = true; track.removeEventListener("transitionend", onEnd); clearTimeout(t); _menuUnprime(track); collapse(); if (after) after(); };   // BR-S269: drops the promotion, and rescues the pin if rAF never ran (hidden tab)
+  const fin = () => { if (done) return; done = true; track.removeEventListener("transitionend", onEnd); clearTimeout(t); collapse(); if (after) after(); _menuSettleDown(track); };
   const onEnd = (e) => { if (e.target === track && e.propertyName === "transform") fin(); };
   const reduce = window.BRMotion ? window.BRMotion.prefersReduced() : window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   track.addEventListener("transitionend", onEnd);
