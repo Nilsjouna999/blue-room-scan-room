@@ -4688,7 +4688,30 @@ body[data-devnav="1"] .devnav {
   inset: 0; background: none; border: 1px solid currentColor; opacity: .55;
 }
 body[data-view="menu"] ~ .orbitbtn, .orbitbtn { display: inline-flex; }
-html.orbit-open .orbitbtn { color: var(--t-display); border-color: var(--t-meta); }
+/* BR-S297 — THE WAY OUT HAS TO BE VISIBLE ON THE PAPER.  The builder: "button cant be
+   seen its all white."  A real defect and my own: the button is painted in the dark
+   room's tokens (--t-meta ink on --line hairline), and BR-S292 put a bright sheet
+   BEHIND it and BR-S294 raised it ABOVE that sheet to serve as the only way out. Pale
+   ink on pale paper is invisible, and an invisible exit on a map you cannot dismiss by
+   clicking the paper is a trap, not a nav.
+   So while the hub is open the button crosses over to the paper's own palette: the
+   deck's ink, a real hairline, and a faint parchment fill so it reads as a control
+   sitting ON the sheet rather than a ghost behind it. It also says what it now does —
+   the label is swapped to CLOSE by ::after, because the same control changing job
+   should change word. */
+html.orbit-open .orbitbtn {
+  color: #1c150d;
+  border-color: rgba(28, 21, 13, 0.30);
+  background: rgba(255, 255, 255, 0.55);
+}
+html.orbit-open .orbitbtn:hover,
+html.orbit-open .orbitbtn:focus-visible {
+  color: #000; border-color: rgba(28, 21, 13, 0.55); background: rgba(255, 255, 255, 0.85);
+}
+html.orbit-open .orbitbtn__txt { visibility: hidden; position: relative; }
+html.orbit-open .orbitbtn__txt::after {
+  content: "CLOSE"; visibility: visible; position: absolute; left: 0; top: 0; white-space: nowrap;
+}
 
 .orbit {
   position: fixed; inset: 0; z-index: 70;
