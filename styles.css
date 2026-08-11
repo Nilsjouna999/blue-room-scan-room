@@ -3195,17 +3195,30 @@ html.is-travel .card .cardfinish { mix-blend-mode: normal; }
    78 meanings run long, so the block is allowed four lines and the rest of the card
    lives in the Codex, one link away. Clamping is the honest choice here — truncating
    the sentence would leave a card half-explained on the storefront. */
-.m2read { display: grid; gap: 6px; }
+/* ── BR-S340 — THE READ WAS TOO SMALL TO WANT TO READ. ───────────────────────
+   Builder: the right column is "a bit too small and annoying to look at" on both
+   faces. Measured, and it is worse than small: the column is 330px, and at 15px
+   the birth face's meaning ran to FIVE lines inside a box fixed at four — so the
+   card that this panel gives first position to was being cut off mid-sentence on
+   the storefront. Size and clipping, one fix.
+     meaning  15 -> 17px, line-height 1.55 -> 1.6
+     label   8.5 -> 9.5px, meta 9 -> 10.5px  (mono micro-labels, genuinely tiny)
+   THE HEIGHT IS DERIVED, NOT RESTATED. The old rule hard-coded
+   `calc(15px * 1.55 * 4)` beside the font-size it had to agree with, which is two
+   numbers that must be edited together and a comment asking someone to remember.
+   One token set now: change the size and the box follows. */
+.m2read { display: grid; gap: 6px; --m2read-size: 17px; --m2read-lh: 1.6; --m2read-lines: 4; }
 /* the static half of the frame: a label that never changes, over words that always do */
-.m2read__label { font-family: var(--font-mono); font-size: 8.5px; letter-spacing: .22em; text-transform: uppercase; color: var(--t-ghost); margin: 0 0 2px; }
-.m2read__meta { font-family: var(--font-mono); font-size: 9px; letter-spacing: .2em; text-transform: uppercase; color: var(--t-meta); margin: 0; }
+.m2read__label { font-family: var(--font-mono); font-size: 9.5px; letter-spacing: .22em; text-transform: uppercase; color: var(--t-ghost); margin: 0 0 2px; }
+.m2read__meta { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: .2em; text-transform: uppercase; color: var(--t-meta); margin: 0; }
 .m2read__mean {
-  font-family: var(--font-display); font-size: 15px; line-height: 1.55; color: var(--t-body); margin: 0;
+  font-family: var(--font-display); font-size: var(--m2read-size); line-height: var(--m2read-lh);
+  color: var(--t-body); margin: 0;
   display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 4; overflow: hidden;
   /* FIXED at four lines, not merely capped at four. A clamp alone still lets the box
      shrink for a terse card, so the column jumped on every pull — the exact instability
-     the frame is here to remove. 15px x 1.55 x 4. */
-  height: calc(15px * 1.55 * 4);
+     the frame is here to remove. */
+  height: calc(var(--m2read-size) * var(--m2read-lh) * var(--m2read-lines));
 }
 /* mirrors the gold cut-line over the acts in the left column, so the two side columns
    are braced the same way and the card sits between two fixed rules */
@@ -3484,7 +3497,10 @@ html.m2-parch .m2hero { --bf-ink: #1c150d; --bf-meta: #6a5c45; --bf-rule: rgba(2
 .m2flip__opt:focus-visible { outline: 1px solid rgba(233, 229, 220, .38); outline-offset: 2px; }
 /* the birth act takes the same seat as "Pull another" so the column never resizes */
 .menu__draw-pull--birth { display: inline-flex; align-items: center; justify-content: center; text-decoration: none; }
-.menu__draw-pull--birth[hidden] { display: none; }
+/* both acts state their own hidden. `display:inline-flex` above beats the UA's
+   [hidden] rule, and the button is now served hidden too — one of these two is always
+   the wrong one to show, and neither may win by accident. */
+.menu__draw-pull[hidden] { display: none; }
 
 @media (prefers-reduced-motion: reduce) {
   .m2hero.is-turning { animation: none; }

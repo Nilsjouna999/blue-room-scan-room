@@ -1577,17 +1577,20 @@ function renderWall() {
     + '</div>'
     + '<span class="menu__draw-cutline menu__draw-cutline--read" aria-hidden="true"></span>'
     + '<div class="m2read" data-m2-read>'
-    + '<p class="m2read__label">The card in hand</p>'
-    + '<p class="m2read__meta" data-m2-meta>Arcana &middot; XVII &middot; hope</p>'
-    + '<p class="m2read__mean" data-m2-mean>The Star stands for hope, renewal and quiet guidance after difficulty — the calm that follows the storm, and the small light you steer by.</p>'
+    /* BR-S340: the served markup is the BIRTH state, because that is the face the panel
+       opens on. These three lines and the caption below must agree with data-face on the
+       hero — a first paint that disagrees with itself is a flash of the wrong product. */
+    + '<p class="m2read__label">The reading in question</p>'
+    + '<p class="m2read__meta" data-m2-meta>Six marks &middot; one name &middot; by birth</p>'
+    + '<p class="m2read__mean" data-m2-mean>Six marks you were given rather than chose, read together into one crowned name. Nothing is drawn here — each mark is looked up, and read as it stands.</p>'
     + '</div>'
     + '<p class="menu__wall-trust">Asked the same, they answer the same.</p>'
     + '</header>'
     // STAGE — the standing monument: the XVII Star, turned in gold
     + '<section class="menu__draw-stage">'
-    + '<div class="msample__cap"><span class="msample__label">Sample Draw</span></div>'
-    + '<p class="menu__draw-herosub">Seventy-eight cards. One question.</p>'
-    + '<div class="m2hero" data-m2-hero data-face="tarot">'
+    + '<div class="msample__cap"><span class="msample__label">By Birth</span></div>'
+    + '<p class="menu__draw-herosub">Six marks. One name.</p>'
+    + '<div class="m2hero" data-m2-hero data-face="birth">'
     + '<svg class="m2hero__back" viewBox="0 0 120 190" aria-hidden="true" preserveAspectRatio="xMidYMid meet"><rect x="7" y="7" width="106" height="176" rx="7" fill="none" stroke="url(#mwInk)" stroke-width="1"/><rect x="13" y="13" width="94" height="164" rx="5" fill="none" stroke="url(#mwInk)" stroke-width=".5" opacity=".6"/><g stroke="url(#mwInk)" stroke-width=".6" fill="none" opacity=".7"><path d="M60 42 L86 95 L60 148 L34 95 Z"/><path d="M60 64 L74 95 L60 126 L46 95 Z"/><circle cx="60" cy="95" r="4.5"/></g></svg>'
     + '<svg class="m2hero__face" viewBox="0 0 120 190" role="img" aria-label="XVII — The Star" preserveAspectRatio="xMidYMid meet"><rect x="11" y="11" width="98" height="168" rx="5" fill="none" stroke="url(#mwGold)" stroke-width=".6" opacity=".55"/><text x="60" y="30" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9" letter-spacing="2.5" fill="url(#mwGold)">XVII</text><g stroke="url(#mwGold)" fill="none"><circle cx="60" cy="98" r="31" stroke-width=".8" opacity=".5"/><circle cx="60" cy="98" r="23" stroke-width=".6" opacity=".35"/><path d="M60 69 L64.6 86.9 L80.5 77.5 L71.1 93.4 L89 98 L71.1 102.6 L80.5 118.5 L64.6 109.1 L60 127 L55.4 109.1 L39.5 118.5 L48.9 102.6 L31 98 L48.9 93.4 L39.5 77.5 L55.4 86.9 Z" stroke-width=".9" opacity=".8"/><circle class="m2pip-glow" cx="60" cy="98" r="6.5" fill="url(#mwGold)" stroke="none"/><circle cx="60" cy="98" r="3.2" fill="url(#mwGold)" stroke="none"/></g></svg>'
     + '<div class="m2face" aria-hidden="true">'
@@ -1624,18 +1627,22 @@ function renderWall() {
     /* The two faces are two ANSWERS to one question, so they are a radiogroup, not two
        buttons. It sits under the card because it changes what the card is showing —
        the same argument that put "Pull another" here in BR-S321. */
+    /* BR-S340: birth leads — the same order as the doors in the left column. */
     + '<div class="m2flip" role="radiogroup" aria-label="What the card shows" data-m2-flip>'
-    +   '<button type="button" class="m2flip__opt is-on" role="radio" aria-checked="true" tabindex="0" data-m2-face="tarot">Tarot</button>'
-    +   '<button type="button" class="m2flip__opt" role="radio" aria-checked="false" tabindex="-1" data-m2-face="birth">Birth</button>'
+    +   '<button type="button" class="m2flip__opt is-on" role="radio" aria-checked="true" tabindex="0" data-m2-face="birth">Birth</button>'
+    +   '<button type="button" class="m2flip__opt" role="radio" aria-checked="false" tabindex="-1" data-m2-face="tarot">Tarot</button>'
     + '</div>'
     /* BR-S321 — THE CONTROL THAT CHANGES THE CARD SITS UNDER THE CARD. Beside the copy
        it would read as a way to continue; beneath the card it reads as a way to change
        THAT card, which is all it does. Disabled until the deck is actually in hand. */
-    + '<button type="button" class="menu__draw-pull" data-m2-pull disabled>Pull another</button>'
+    /* BR-S340: the pull starts HIDDEN and the birth door starts visible, because birth is
+       the opening face. It also keeps `disabled` — the deck is fetched lazily, so it must
+       not become clickable merely by being unhidden before codex-data.json has landed. */
+    + '<button type="button" class="menu__draw-pull" data-m2-pull disabled hidden>Pull another</button>'
     /* The birth side's equivalent act. "Pull another" is meaningless on a face that is
        not dealt from a deck, so the two swap places with the flip — one act visible at
        a time, in the same seat, so the column never changes height. */
-    + '<a class="menu__draw-pull menu__draw-pull--birth" href="?dev=arcane" data-m2-birthgo hidden>Set your marks</a>'
+    + '<a class="menu__draw-pull menu__draw-pull--birth" href="?dev=arcane" data-m2-birthgo>Set your marks</a>'
     + '<a class="menu__draw-placard" href="codex.html?v=237" data-codex-open><span class="menu__draw-placard-mark" aria-hidden="true">✦</span>The Codex — where every mark is defined &rarr;</a>'
     + '</section>'
     + '<span class="menu__draw-wm" aria-hidden="true"><svg viewBox="0 0 120 190" preserveAspectRatio="xMidYMid meet"><g stroke="url(#mwInk)" fill="none"><circle cx="60" cy="98" r="31" stroke-width=".8"/><circle cx="60" cy="98" r="23" stroke-width=".6"/><path d="M60 69 L64.6 86.9 L80.5 77.5 L71.1 93.4 L89 98 L71.1 102.6 L80.5 118.5 L64.6 109.1 L60 127 L55.4 109.1 L39.5 118.5 L48.9 102.6 L31 98 L48.9 93.4 L39.5 77.5 L55.4 86.9 Z" stroke-width=".9"/></g></svg></span>'
@@ -1722,16 +1729,30 @@ function m2Head(c) {
    children, rather than a JS list of things-to-ignore: a stacked face that is merely
    invisible still swallows the pointer, and an exclusion list is a list you have to
    remember to update the next time a face gains a child. */
-let M2_FACE = "tarot", M2_LAST = null, M2_FLIP_T = null;
+/* BR-S340: the panel OPENS on the birth face. M2 gives the Birth Reading the first
+   door in the left column and then stood a tarot card on the plinth, so the panel
+   argued with itself about what it was selling. The flip runs birth → tarot now, in
+   that order, and the first thing anyone sees agrees with the first thing offered. */
+let M2_FACE = "birth", M2_LAST = null, M2_FLIP_T = null;
 const M2_BIRTH_READ = {
   label: "The reading in question",
   meta: "Six marks · one name · by birth",
-  mean: "A person read by birth through six systems — the sun sign, the year animal, the life path, the rune, the trigram and the hexagram — assembled into one crowned name. The marks are given, not chosen; the room looks each one up and reads what it finds."
+  /* Trimmed from 251 characters to fit the four lines the box actually has. The old
+     one measured FIVE lines at 330px and was being clipped mid-sentence — and the six
+     marks it spent two lines listing are printed on the card beside it anyway. */
+  mean: "Six marks you were given rather than chose, read together into one crowned name. Nothing is drawn here — each mark is looked up, and read as it stands."
 };
 const M2_SAMPLE_READ = {
   label: "The card in hand",
   meta: "Arcana · XVII · hope",
   mean: "The Star stands for hope, renewal and quiet guidance after difficulty — the calm that follows the storm, and the small light you steer by."
+};
+/* The caption and the line under it belong to the FACE, not to the panel. Landing on
+   the birth card under "Sample Draw · Seventy-eight cards. One question." would have
+   been the same self-contradiction one level down. */
+const M2_STAGE_COPY = {
+  tarot: { cap: "Sample Draw", sub: "Seventy-eight cards. One question." },
+  birth: { cap: "By Birth",    sub: "Six marks. One name." }
 };
 function m2WriteRead(root, r) {
   const set = (sel, txt) => { const el = root.querySelector(sel); if (el) el.textContent = txt; };
@@ -1760,6 +1781,14 @@ function m2SetFace(host, which, opts) {
     if (pull) pull.hidden = which === "birth";
     if (go) go.hidden = which !== "birth";
     m2WriteRead(root, which === "birth" ? M2_BIRTH_READ : (M2_LAST || M2_SAMPLE_READ));
+    /* the caption and the herosub travel with the face. The caption keeps "Your Pull"
+       once a card has actually been drawn — it stopped being a sample at that moment
+       (BR-S321) and flipping away and back must not quietly demote it again. */
+    const copy = M2_STAGE_COPY[which] || M2_STAGE_COPY.tarot;
+    const cap = root.querySelector(".menu__draw-stage .msample__label");
+    if (cap) cap.textContent = (which === "tarot" && M2_LAST) ? "Your Pull" : copy.cap;
+    const sub = root.querySelector(".menu__draw-herosub");
+    if (sub) sub.textContent = copy.sub;
   };
   clearTimeout(M2_FLIP_T);
   const reduced = window.BRMotion ? window.BRMotion.prefersReduced()
