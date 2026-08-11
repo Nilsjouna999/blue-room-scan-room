@@ -4650,3 +4650,102 @@ body[data-devnav="1"] .devnav {
   }
 }
 @media (hover: none) { .br-ball-tip { display: none; } }
+
+/* ============================================================================
+   BR-S290 — THE ORBIT: the room-nav button and its overview.
+   Taken from the builder's reference: the whole map present at once, as objects in
+   space rather than a list. Left behind: the ASMR audio, the chrome-ball cursor, the
+   distorting type — that studio's voice, not this room's.
+   COST WHEN CLOSED IS ZERO. The sheet is built on first open and, once built, sits at
+   visibility:hidden with pointer-events:none — no paint, no hit-testing, no layer.
+   will-change is applied only while .is-open, so no backing store is held at rest
+   (the add-then-clear lifecycle from BR-S141).
+   COST WHILE OPEN IS TRANSFORM AND OPACITY ONLY. Each plate's ring position is two
+   custom properties multiplied by one radius inside a single translate, so the whole
+   ring lays out once and animates on the compositor. No backdrop-filter — BR-S270
+   measured what that costs. No blur, no shadow animation, no per-frame JS at all:
+   the stagger is a CSS transition-delay, not a timer.
+   ============================================================================ */
+.orbitbtn {
+  position: fixed; left: clamp(12px, 2.6vw, 40px); bottom: clamp(96px, 11vh, 110px);
+  z-index: 60;
+  display: inline-flex; align-items: center; gap: 9px;
+  padding: 9px 14px 9px 11px;
+  background: none; border: 1px solid var(--line); border-radius: 999px;
+  color: var(--t-meta); cursor: pointer;
+  transition: color 200ms var(--ease-settle, cubic-bezier(.2,.7,.2,1)),
+              border-color 200ms var(--ease-settle, cubic-bezier(.2,.7,.2,1));
+}
+.orbitbtn:hover, .orbitbtn:focus-visible { color: var(--t-display); border-color: var(--t-meta); outline: none; }
+.orbitbtn__txt { font-family: var(--font-mono); font-size: 9px; letter-spacing: .22em; }
+/* the mark IS the concept: a hub with a ring around it, drawn in two dots and a rule */
+.orbitbtn__dots { position: relative; width: 13px; height: 13px; }
+.orbitbtn__dots::before, .orbitbtn__dots::after {
+  content: ""; position: absolute; border-radius: 50%; background: currentColor;
+}
+.orbitbtn__dots::before { inset: 5px; }
+.orbitbtn__dots::after {
+  inset: 0; background: none; border: 1px solid currentColor; opacity: .55;
+}
+body[data-view="menu"] ~ .orbitbtn, .orbitbtn { display: inline-flex; }
+html.orbit-open .orbitbtn { color: var(--t-display); border-color: var(--t-meta); }
+
+.orbit {
+  position: fixed; inset: 0; z-index: 70;
+  visibility: hidden; pointer-events: none;                 /* closed: no paint, no hit-testing */
+}
+.orbit.is-open { visibility: visible; pointer-events: auto; }
+.orbit__scrim {
+  position: absolute; inset: 0; background: rgba(8, 8, 7, 0.82);
+  opacity: 0; transition: opacity 320ms var(--ease-settle, cubic-bezier(.2,.7,.2,1));
+}
+.orbit.is-open .orbit__scrim { opacity: 1; }
+.orbit__field { position: absolute; inset: 0; }
+.orbit__hub {
+  position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+  font-size: 11px; color: var(--t-ghost); opacity: 0;
+  transition: opacity 300ms var(--ease-settle, cubic-bezier(.2,.7,.2,1)) 120ms;
+}
+.orbit.is-open .orbit__hub { opacity: 1; }
+
+/* --orbit-r is the ring radius; the plate's own position is cos/sin baked in at build */
+.orbit__field { --orbit-r: clamp(150px, 27vh, 260px); }
+.orbit__plate {
+  /* centred on its ring point by translate(-50%,-50%) rather than by a negative
+     margin: the margin assumed every plate was the same height, and a two-line label
+     is not, which pushed those plates off the ring by up to 28px. */
+  position: absolute; left: 50%; top: 50%;
+  width: 148px; margin: 0;
+  display: flex; flex-direction: column; align-items: center; gap: 9px;
+  padding: 14px 10px 12px;
+  background: none; border: 0; cursor: pointer; color: var(--t-body);
+  opacity: 0;
+  transform: translate3d(calc(var(--ox) * var(--orbit-r) * 0.34), calc(var(--oy) * var(--orbit-r) * 0.34), 0) translate(-50%, -50%);
+  transition: opacity 340ms var(--ease-settle, cubic-bezier(.2,.7,.2,1)) var(--od, 0ms),
+              transform 460ms var(--ease-settle, cubic-bezier(.2,.7,.2,1)) var(--od, 0ms),
+              color 180ms ease;
+}
+.orbit.is-open .orbit__plate {
+  opacity: 1; will-change: transform;
+  transform: translate3d(calc(var(--ox) * var(--orbit-r)), calc(var(--oy) * var(--orbit-r)), 0) translate(-50%, -50%);
+}
+.orbit__plate:hover, .orbit__plate:focus-visible { color: var(--t-display); outline: none; }
+.orbit.is-open .orbit__plate:hover,
+.orbit.is-open .orbit__plate:focus-visible {
+  transform: translate3d(calc(var(--ox) * var(--orbit-r)), calc(var(--oy) * var(--orbit-r) - 3px), 0) translate(-50%, -50%);
+  transition-delay: 0ms;
+}
+.orbit__mark {
+  width: 34px; height: 46px; border: 1px solid var(--line-strong, rgba(233,229,220,.18));
+  border-radius: 3px; background: linear-gradient(168deg, rgba(233,229,220,.05), rgba(233,229,220,.015));
+  transition: border-color 180ms ease;
+}
+.orbit__plate:hover .orbit__mark, .orbit__plate:focus-visible .orbit__mark { border-color: var(--t-meta); }
+.orbit__label {
+  font-family: var(--font-mono); font-size: 9px; letter-spacing: .16em; text-transform: uppercase;
+  line-height: 1.5; text-align: center;
+}
+@media (prefers-reduced-motion: reduce) {
+  .orbit__scrim, .orbit__hub, .orbit__plate { transition: none; }
+  .orbit__plate { transform: translate3d(calc(var(--ox) * var(--orbit-r)), calc(var(--oy) * var(--orbit-r)), 0) translate(-50%, -50%); }
+}

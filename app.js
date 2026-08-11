@@ -4899,3 +4899,157 @@ render();
   window.addEventListener("resize", stale, { passive: true });
   window.addEventListener("scroll", stale, { passive: true });
 })();
+
+/* ============================================================================
+   BR-S290 — THE ORBIT. A room-nav button, and the overview it opens.
+
+   THE REFERENCE, AND WHAT WAS TAKEN FROM IT. The builder's prototype idea is a
+   portfolio whose work sits as small cards scattered in orbit around the centre of a
+   pale sheet, picked by pointing. What was taken is that SYSTEM — the whole map
+   present at once, as objects in space rather than as a list, near enough to read and
+   far enough apart to choose between. What was deliberately left: the ASMR audio, the
+   chrome-ball cursor, the distorting kinetic type. Those are that studio's voice, not
+   this room's; [[blue-room-design-taste]] is restraint over density and a mark that
+   needs a theory to read is a failure.
+
+   WHY AN ORBIT AND NOT A GRID. A grid says "these are options". An orbit says "these
+   are places, and you are in the middle of them" — which is what Blue Room actually
+   is, and it is the only arrangement where the room you are standing in can hold the
+   centre while every other room is equidistant from it. It is also honest about there
+   being no hierarchy among rooms: no first row, no top-left.
+
+   THE STOPS ARE DERIVED, NEVER LISTED. MENU_PANELS is the horizontal truth and #about
+   is the vertical one, so the orbit reads them at open time. A room added to the
+   ribbon appears here for free; one removed cannot leave a dead plate behind. The
+   Codex and Settings are the two unnumbered pills and are appended as such.
+
+   MOTION. Open is a stagger outward from the centre — 26ms apart, so the ring ARRIVES
+   rather than appearing, which is the whole feel of the reference. Everything moves on
+   transform and opacity only. Hover lifts a plate 3px and lights its rule; nothing
+   scales, nothing glows. Escape closes, the scrim closes, and the plate you pick
+   closes before it travels so the room is never entered through a curtain.
+
+   ?orbit=0 removes the button entirely.
+   ============================================================================ */
+(function () {
+  if (/[?&]orbit=0/.test(String(location.search || ""))) return;
+  var host = document.getElementById("menuView");
+  if (!host || !document.body) return;
+
+  var open = false, sheet = null, btn = null;
+
+  function reduced() {
+    return window.BRMotion ? window.BRMotion.prefersReduced()
+                           : (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+  }
+
+  /* the map, read off the live nav rather than written down twice */
+  function rooms() {
+    var out = [];
+    try {
+      for (var i = 0; i < MENU_PANELS.length; i++) {
+        var p = MENU_PANELS[i], el = host.querySelector(p.sel);
+        if (!el) continue;
+        /* EXISTENCE is derived from MENU_PANELS so a new room appears here for free;
+           the NAME is not, because the panels do not carry one. Scraping the first
+           heading returned the Desk's eyebrow ("◆ BLUE ROOM") and the Reliquary's
+           gated teaser ("Held in conservation") — a room's name is not whatever
+           happens to be the largest text in it. Keyed on the state class, which is
+           the same key the ribbon itself uses, with a derived fallback so an
+           unnamed new panel still gets a plate rather than being dropped. */
+        var NAMES = { "": "The Archive Desk", "is-wall": "The Reading Rooms", "is-reliquary": "The Reliquary" };
+        var key = p.cls || "";
+        out.push({ label: NAMES[key] || ("Room " + (i + 1)), idx: i, kind: "panel" });
+      }
+    } catch (e) {}
+    if (host.querySelector("#about")) out.push({ label: "About Blue Room", idx: 0, kind: "about" });
+    out.push({ label: "The Codex", href: "codex.html?v=237", kind: "link" });
+    out.push({ label: "Settings", href: "?dev=settings", kind: "link" });
+    return out;
+  }
+
+  function build() {
+    var list = rooms(), n = list.length;
+    sheet = document.createElement("div");
+    sheet.className = "orbit";
+    sheet.setAttribute("role", "dialog");
+    sheet.setAttribute("aria-modal", "true");
+    sheet.setAttribute("aria-label", "Rooms");
+    var html = '<div class="orbit__scrim" data-orbit-close></div><div class="orbit__field">'
+             + '<span class="orbit__hub" aria-hidden="true">◆</span>';
+    for (var i = 0; i < n; i++) {
+      /* -90deg puts the first room at the top; the ring is walked clockwise */
+      var a = (i / n) * Math.PI * 2 - Math.PI / 2;
+      html += '<button type="button" class="orbit__plate" data-orbit-go="' + i + '"'
+            + ' style="--ox:' + Math.cos(a).toFixed(4) + '; --oy:' + Math.sin(a).toFixed(4)
+            + '; --od:' + (i * 26) + 'ms">'
+            + '<span class="orbit__mark" aria-hidden="true"></span>'
+            + '<span class="orbit__label">' + list[i].label.replace(/[<>&]/g, "") + "</span>"
+            + "</button>";
+    }
+    html += "</div>";
+    sheet.innerHTML = html;
+    sheet._list = list;
+    document.body.appendChild(sheet);
+    return sheet;
+  }
+
+  function show() {
+    if (open) return;
+    open = true;
+    if (!sheet) build();
+    sheet.classList.add("is-open");
+    document.documentElement.classList.add("orbit-open");
+    btn.setAttribute("aria-expanded", "true");
+    var first = sheet.querySelector(".orbit__plate");
+    if (first) first.focus({ preventScroll: true });
+    document.addEventListener("keydown", onKey, true);
+  }
+
+  function hide() {
+    if (!open) return;
+    open = false;
+    if (sheet) sheet.classList.remove("is-open");
+    document.documentElement.classList.remove("orbit-open");
+    btn.setAttribute("aria-expanded", "false");
+    document.removeEventListener("keydown", onKey, true);
+    btn.focus({ preventScroll: true });
+  }
+
+  function onKey(e) {
+    if (e.key === "Escape") { e.preventDefault(); e.stopPropagation(); hide(); }
+  }
+
+  function go(i) {
+    var r = sheet._list[i];
+    if (!r) return;
+    hide();                                   // close first: never enter a room through a curtain
+    if (r.kind === "link") { location.href = r.href; return; }
+    if (typeof menuSlideTo === "function") menuSlideTo(r.idx, {});
+    if (r.kind === "about") {
+      var a = host.querySelector("#about");
+      if (a) {
+        var y = Math.round(a.getBoundingClientRect().top + window.scrollY);
+        if (typeof _u1GlideTo === "function" && !reduced()) _u1GlideTo(y);
+        else window.scrollTo(0, y);
+      }
+    }
+  }
+
+  btn = document.createElement("button");
+  btn.type = "button";
+  btn.className = "orbitbtn";
+  btn.setAttribute("aria-label", "Show every room");
+  btn.setAttribute("aria-expanded", "false");
+  btn.innerHTML = '<span class="orbitbtn__dots" aria-hidden="true"></span>'
+                + '<span class="orbitbtn__txt">ROOMS</span>';
+  document.body.appendChild(btn);
+  btn.addEventListener("click", function () { open ? hide() : show(); });
+
+  document.addEventListener("click", function (e) {
+    var t = e.target.closest ? e.target.closest("[data-orbit-close],[data-orbit-go]") : null;
+    if (!t) return;
+    if (t.hasAttribute("data-orbit-close")) { hide(); return; }
+    go(parseInt(t.getAttribute("data-orbit-go"), 10));
+  });
+})();
