@@ -101,7 +101,7 @@ const state = { source: 0, treatment: "free", tab: "diagram", view: "menu", draf
      ?dev= keeps working: it is how the dev room reaches everything, and nothing that exists
      today breaks. */
   const dev = q.get("dev") || (typeof window !== "undefined" && window.BR_ROOM) || null;
-  if (["uploaded-result", "uploaded-blocked", "free-scan-sim", "halo-gate", "before-after", "review-map", "proto-cards", "staged-reveal", "menu-reveal", "vault", "arcane", "arcana-reading", "profile", "ceremony", "drawing-room", "settings"].includes(dev)) { state.view = "dev"; state.dev = dev; }
+  if (["uploaded-result", "uploaded-blocked", "free-scan-sim", "halo-gate", "before-after", "review-map", "proto-cards", "staged-reveal", "menu-reveal", "vault", "arcane", "arcana-reading", "profile", "ceremony", "drawing-room", "settings", "roadmap"].includes(dev)) { state.view = "dev"; state.dev = dev; }
   else if (q.has("src") || q.has("t") || q.has("tab")) state.view = "room";
 }
 
@@ -1533,6 +1533,11 @@ function renderWall() {
        door above, and a link repeating the door beside it is two roads to one room. */
     + '<div class="menu__draw-rail">'
     + '<button type="button" class="menu__codex menu__codex--reliq" data-annex-go><span class="menu__codex__mark" aria-hidden="true">◆</span> The Shelf — <em class="menu__draw-kept">kept</em> <span class="menu__codex__arr" aria-hidden="true">→</span></button>'
+    /* BR-S339 — THE DOOR TO WHAT IS NOT BUILT YET. This rail already carries the two
+       standing doors out of M2; the roadmap joins them because the storefront is exactly
+       where "there is more of this coming" is worth saying, and it is the one claim this
+       panel could not make with an object. */
+    + '<a class="menu__codex" href="?dev=roadmap"><span class="menu__codex__mark" aria-hidden="true">◆</span> What&rsquo;s coming <span class="menu__codex__arr" aria-hidden="true">→</span></a>'
     + '<a class="menu__codex" href="?dev=settings"><span class="menu__codex__mark" aria-hidden="true">◆</span> Settings <span class="menu__codex__arr" aria-hidden="true">→</span></a>'
     + '</div>'
     + '<p class="menu__draw-foot"><span class="menu__draw-cuttick" aria-hidden="true"></span> Drawn once. Not reissued.</p>'
@@ -4328,6 +4333,14 @@ function mountDev() {
     else host.innerHTML = '<p style="padding:48px;color:#948f87;text-align:center;font-family:sans-serif">The Settings page failed to load (settings.js).</p>';
     return;
   }
+  if (state.dev === "roadmap") {
+    // BR-S339 — The Roadmap (?dev=roadmap · /roadmap/). Self-contained in roadmap.js
+    // (window.BRRoadmap); this branch hands it the node. Static document, no state.
+    const host = document.getElementById("devView");
+    if (window.BRRoadmap && typeof window.BRRoadmap.mount === "function") window.BRRoadmap.mount(host);
+    else host.innerHTML = '<p style="padding:48px;color:#948f87;text-align:center;font-family:sans-serif">The roadmap failed to load (roadmap.js).</p>';
+    return;
+  }
   if (state.dev === "ceremony") {
     // BR-S163 — the forge ceremony (builder's exact art, pixel-perfect + alive).
     // In ceremony.js (window.BRCeremony); this branch hands it the node.
@@ -5614,6 +5627,11 @@ render();
     } catch (e) {}
     if (host.querySelector("#about")) out.push({ label: "About Blue Room", sub: "What this is", mark: ORBIT_MARKS.about, rank: 4, wing: "house", idx: 0, kind: "about" });
     out.push({ label: "The Codex", sub: "Every mark, defined", mark: AB_EMBLEMS.codex, rank: 1, wing: "work", href: "codex.html?v=237", kind: "link" });
+    /* BR-S339 — THE SEVENTH PLATE. Discovery is this archive's best argument, and it
+       could only be made by the rooms that already exist. The Roadmap is in the HOUSE
+       wing with About and Settings — the building explaining itself — and ranks below
+       About, because what this is comes before what it will be. */
+    out.push({ label: "What's coming", sub: "The roadmap", mark: ORBIT_MARKS.about, rank: 5, wing: "house", href: "?dev=roadmap", kind: "link" });
     out.push({ label: "Settings", sub: "Motion, and what's kept", mark: ORBIT_MARKS.settings, rank: 6, wing: "house", href: "?dev=settings", kind: "link" });
     return out;
   }

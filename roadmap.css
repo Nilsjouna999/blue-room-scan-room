@@ -1,0 +1,83 @@
+/* =============================================================
+   THE ROADMAP (?dev=roadmap · /roadmap/) — the .rm-* addendum only.
+
+   Built on arcana-profile.css's .pf-* document surface, the same way Settings
+   is, and it borrows Settings' header and standing-link classes rather than
+   restating them. It defines no --pf-* token and redefines no .pf-* rule.
+
+   THE INK FALLS LEFT TO RIGHT, and that is the entire information design of
+   this page: three columns whose ink weight drops as the work gets further
+   away, so the priority is legible before a single word is read. It is done
+   with colour and rule opacity only — no size change, no depth, no colour
+   hue shift — because a roadmap where the far column is also SMALLER reads as
+   less important rather than further away, which is a different claim.
+============================================================= */
+
+.rm-page .pf-wrap { width: min(1180px, 94vw); }
+
+/* ---------- head ---------- */
+.rm-head { padding-left: 22px; margin: clamp(6px, 2vh, 18px) 0 clamp(26px, 4.5vh, 46px); }
+.rm-eyebrow {
+  font-family: var(--pf-mono); font-size: 9.5px; font-weight: 500; letter-spacing: .2em;
+  text-transform: uppercase; color: var(--pf-gold); margin: 0 0 10px;
+}
+.rm-title {
+  font-family: var(--pf-serif); font-weight: 600; line-height: 1.04; letter-spacing: .012em;
+  font-size: clamp(32px, 5vw, 52px); color: var(--pf-cream-display); margin: 0;
+}
+.rm-sub {
+  font-family: var(--pf-serif); font-style: italic; font-size: 16.5px; line-height: 1.55;
+  color: var(--pf-meta); margin: 12px 0 0; max-width: 66ch;
+}
+
+/* ---------- the board ---------- */
+.rm-board { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(20px, 3vw, 40px); padding-left: 22px; }
+.rm-col { min-width: 0; }
+.rm-col__head { padding-top: 16px; border-top: 1px solid var(--rm-rule); }
+.rm-col__mark { color: var(--rm-mark); font-size: 11px; }
+.rm-col__h {
+  margin: 6px 0 0; font-family: var(--pf-serif); font-weight: 600; font-size: 23px;
+  letter-spacing: .005em; color: var(--rm-head); line-height: 1.1;
+}
+.rm-col__lede {
+  margin: 8px 0 0; font-family: var(--pf-serif); font-style: italic; font-size: 14px; line-height: 1.5;
+  color: var(--rm-meta);
+}
+.rm-col__list { list-style: none; margin: 20px 0 0; padding: 0; counter-reset: rm; }
+.rm-item { padding: 14px 0; border-top: 1px solid var(--rm-rule); }
+.rm-item:first-child { border-top: 0; padding-top: 4px; }
+.rm-item__t {
+  margin: 0; font-family: var(--pf-serif); font-weight: 600; font-size: 17px; line-height: 1.25;
+  color: var(--rm-head);
+}
+.rm-item__d {
+  margin: 6px 0 0; font-family: var(--pf-ui); font-size: 12.5px; line-height: 1.65; color: var(--rm-body);
+}
+
+/* THE THREE INKS. One token set per column, and nothing else changes between
+   them — same type, same sizes, same rhythm. The near column is the page's full
+   contrast; the middle steps back; the far one is deliberately quiet but stays
+   above the 4.5:1 body-text floor on its description, because "further away" is
+   not a licence to make text nobody can read. */
+.rm-col--bench { --rm-head: var(--pf-cream-display); --rm-body: var(--pf-body); --rm-meta: var(--pf-meta); --rm-rule: var(--pf-line-cut); --rm-mark: var(--pf-gold); }
+.rm-col--drawn { --rm-head: #c5bfb2;                 --rm-body: #a8a49b;      --rm-meta: #928d85;      --rm-rule: var(--pf-line);     --rm-mark: #8d7746; }
+.rm-col--named { --rm-head: #a8a399;                 --rm-body: #99948c;      --rm-meta: #8b8780;      --rm-rule: rgba(233,229,220,.07); --rm-mark: #776a4a; }
+
+/* ---------- foot ---------- */
+.rm-foot { margin-top: clamp(34px, 6vh, 64px); padding: 22px 0 0 22px; border-top: 1px solid var(--pf-line); }
+.rm-foot__line {
+  margin: 0 0 14px; font-family: var(--pf-serif); font-style: italic; font-size: 15px; color: var(--pf-meta);
+}
+.rm-foot__links { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 10px; }
+
+/* ---------- narrow: the board becomes one column, and the ORDER is the ranking ---------- */
+@media (max-width: 900px) {
+  .rm-board { grid-template-columns: 1fr; gap: clamp(26px, 5vh, 40px); }
+  /* stacked, "left to right" no longer says anything — so each column takes its own
+     rule above it and the ink difference does the remaining work. */
+  .rm-col__head { padding-top: 20px; }
+}
+@media (max-width: 560px) {
+  .rm-head, .rm-board, .rm-foot { padding-left: 0; }
+  .rm-foot { padding-left: 0; }
+}
