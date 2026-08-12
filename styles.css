@@ -3706,6 +3706,32 @@ html.m2-parch .m2hero { --bf-ink: #1c150d; --bf-meta: #6a5c45; --bf-rule: rgba(2
 .m2bface__wall--bot { margin: 0 0 auto; }
 .m2bface__wall--bot .m2face-div { margin: 16px 0 13px; }
 .m2bface .m2face-orient { margin: 0; }
+
+/* ── BR-S362 · the nitpick pass on the birth face ─────────────────────────────
+   Four sub-pixel-to-small corrections. Each is individually almost invisible;
+   together they are the difference between "laid out" and "set".
+
+   1. OPTICAL CENTRING. Letter-spacing puts a trailing space after the LAST
+      character too, and that space is inside the line box — so centred tracked
+      text sits half a tracking-unit LEFT of true centre. At .15em on 10px that
+      is 0.75px on the marks, 0.72px on the orient line. text-indent of half the
+      tracking pushes it back. This is why centred all-caps always looks a hair
+      left even when the maths says it is centred.
+   2. THE MASTHEAD IS LIGHTER THAN THE LEDGE. Equal ink over a longer line reads
+      as more ink: the full-width rule at .35 alpha was out-weighing the 132px
+      ledge below it, which inverts the order — the head is metadata, the ledge
+      closes the reading. .22 restores it.
+   3. THE LEDGE RELATES TO WHAT IT CLOSES. 132px against an 82px mark column was
+      a rule sized to the card; 104px is sized to the block it sits under.
+   4. THE LABEL STOPS OUT-SIZING THE SUBJECT. "THE BIRTH READING" was 11px while
+      the six marks — the actual content — were 10px. A label larger than its
+      subject is a hierarchy inversion; 9.5px puts it back under them. */
+.m2bface__marks li { text-indent: .075em; }
+.m2bface .m2face-orient { text-indent: .08em; }
+.m2bface .m2bface__headrule { background: rgba(28, 21, 13, .22); }
+.m2bface .m2bface__wall--bot .m2face-div { max-width: 104px; }
+.m2bface .m2face-meta { font-size: 9.5px; letter-spacing: .14em; }
+.m2bface .m2face-glyph { font-size: 11px; }
 .m2bface .m2face-orient { color: var(--bf-meta); }
 /* ── BR-S347 — MATERIALS, NOT COLOURS. ───────────────────────────────────────
    BR-S346 gave the six marks six hues spread across the wheel at roughly equal
