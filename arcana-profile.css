@@ -128,7 +128,11 @@
 .pf-lede { font-family: var(--pf-serif); font-size: 17.5px; line-height: 1.6; color: var(--pf-body); max-width: 60ch; margin: 2px 0 20px; }
 
 /* Rings — mini-crowns (§3.4) */
-.pf-family { display: flex; flex-wrap: wrap; gap: 14px; }
+/* BR-S374 — `gap` is an INTER-item rule; it does nothing to this box's own top
+   edge, so the dashed add-box stacked its border straight onto the Rings row's
+   hairline — the one place on the page where two drawn edges met with no air.
+   12px is the vault rows' own padding unit, so the box breathes like a row. */
+.pf-family { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 12px; }
 .pf-mini { flex: 0 0 auto; width: 144px; border: 1px solid var(--pf-line-soft); border-radius: 4px; padding: 16px 12px 14px; text-align: center; background: rgba(233,229,220,.018); }
 .pf-mini__label { font-family: var(--pf-serif); font-size: 16px; color: var(--pf-cream); margin: 5px 0 0; line-height: 1.25; }
 .pf-mini__n { font-family: var(--pf-mono); font-size: 10px; letter-spacing: .08em; color: var(--pf-meta); margin: 6px 0 0; }
@@ -266,7 +270,11 @@
 .pf-crownstage {
   position: relative; isolation: isolate;
   display: flex; flex-direction: column; align-items: center; text-align: center;
-  margin: clamp(40px, 8vh, 88px) 0 clamp(44px, 9vh, 96px);
+  /* BR-S374 — the bottom clamp moved to `.pf-shelfline`'s top margin. It was
+     collapsing through the surface onto the line anyway; now the line declares
+     the gap it actually renders. The crownstage is always the last child here
+     (both the crowned and the empty branch), so nothing else loses air. */
+  margin: clamp(40px, 8vh, 88px) 0 0;
   padding: clamp(24px, 5vh, 52px) 0 0;
 }
 /* the pool of light — warm, fades fully to transparent (no box edge, no halation) */
@@ -665,7 +673,16 @@
    division is carried by one rule and one quiet word rather than a heading —
    a heading would make the Shelf a section among sections, and it is not: it is
    the second half of the page. */
-.pf-shelfline { display: flex; align-items: center; gap: 14px; margin: 40px 0 30px; }
+/* BR-S374 — these two numbers used to be DEAD. `40px 0 30px` lost both collapses:
+   above, `.pf-crownstage`'s clamp(44px,9vh,96px) bottom margin collapsed out
+   through the padding-less foot of `.pf-surface`; below, `.pf-sec`'s
+   clamp(32px,5.5vh,52px) won. The rendered air was the neighbours' all along, so
+   an editor tuning the page's most important division saw nothing move.
+   The air is now MOVED onto the line — same rendered gaps to the pixel, but the
+   line owns them, and changing these values changes the page in both directions. */
+.pf-shelfline { display: flex; align-items: center; gap: 14px;
+  margin: clamp(44px, 9vh, 96px) 0 clamp(32px, 5.5vh, 52px); }
+.pf-shelfline + .pf-sec { margin-top: 0; }
 .pf-shelfline__rule { flex: 1; height: 1px; background: var(--pf-line-cut, rgba(201, 163, 92, .22)); }
 .pf-shelfline__lab {
   font-family: var(--font-mono, "IBM Plex Mono", monospace);
@@ -680,4 +697,8 @@
 .pf-vaultrow__k { flex: 0 0 74px; font-family: var(--font-mono, monospace); font-size: 9px;
   font-weight: 500; letter-spacing: .18em; text-transform: uppercase; color: #8c867b; }
 .pf-vaultrow__v { font-family: var(--font-display, serif); font-size: 17px; color: #c8c4bb; }
-.pf-vaultrow--empty .pf-vaultrow__v { color: #7c766c; font-style: italic; }
+/* BR-S374 — the empty state was the page's ONLY sub-AA text: #7c766c at 17px is
+   4.37:1 bare, 4.15:1 under the lamp. It renders "None borne yet." — the first
+   sentence a new visitor reads here. The ghost tier (6.29:1) is the floor
+   nothing on this page goes below; the italic still carries the "not yet". */
+.pf-vaultrow--empty .pf-vaultrow__v { color: var(--pf-ghost, #96918a); font-style: italic; }
