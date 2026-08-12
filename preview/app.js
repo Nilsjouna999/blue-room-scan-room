@@ -2889,7 +2889,12 @@ function renderMenu(reveal) {
       </div>
     </div>
     ${ANNEX_GO}
-    ${ANNEX_DOWNCUE}
+    <!-- BR-S407: ${ANNEX_DOWNCUE} used to live HERE, on the desk, because the desk
+         was home. It is L1 now and it is sealed, so the one visible invitation to
+         go down to U1 was sitting inside a locked room - which is why U1 kept
+         reading as being under L1 no matter how many gates moved to MENU_HOME.
+         Gates decide what the keyboard does; the CUE is what tells a person the
+         way down exists at all. It moved to the wall panel below. -->
     <!-- BR-S400 - THE SEAL OVER L1. The desk stays visible behind it, dimmed: the
          builder's call was a locked room PREVIEW, not a hidden one, so a visitor who
          stumbles left sees the real thing AND sees that it is not open. It covers the
@@ -2918,6 +2923,7 @@ function renderMenu(reveal) {
     <section class="menu__panel menu__panel--wall is-offstage" inert aria-hidden="true" aria-label="The Reading Rooms">
     ${ANNEX_BACK}
     ${RELIQ_GO}
+    ${ANNEX_DOWNCUE}
     ${renderWall()}
     </section>
     <section class="menu__panel menu__panel--reliquary is-offstage" inert aria-hidden="true" aria-label="Your Profile">
