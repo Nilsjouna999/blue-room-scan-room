@@ -71,7 +71,7 @@
 
   /* =========================================================
      HEADER — cloned .pf-top: wordmark (→ Main Menu) + a quiet
-     right link (→ The Shelf). Both carry data-door.
+     right link (→ Your Profile). Both carry data-door.
 
      BR-S310: the wordmark was the ONLY way back, and the one other link in this
      header goes FORWARD — so a reader who arrived here from the orbit or the pill
@@ -86,7 +86,7 @@
           '<span class="pf-wordmark__mark" aria-hidden="true">&#9670;</span> Blue&nbsp;Room</a>' +
         '<a class="pf-back pf-back--top" href="#" data-door="menu">&larr; Main Menu</a>' +
       '</span>' +
-      '<a class="st-toplink" href="?dev=profile" data-door="profile">The Shelf <span aria-hidden="true">&rarr;</span></a>' +
+      '<a class="st-toplink" href="?dev=profile" data-door="profile">Your Profile <span aria-hidden="true">&rarr;</span></a>' +
     '</header>';
   }
 
@@ -152,7 +152,7 @@
     '</section>';
   }
 
-  /* The Shelf — the three real actions + the read-only ledger.
+  /* Your Profile — the three real actions + the read-only ledger.
      Re-rendered in place after Restore / Clear so the ledger stays true;
      opts carries a one-shot confirmation line after an action. */
   function ledgerRow(label, value, set) {
@@ -265,7 +265,7 @@
 
     var ledger = '<div class="st-ledger" aria-label="On file in this browser">' +
       '<p class="st-ledger__h">On file, right now</p>' +
-      ledgerRow("The Shelf", shelf ? "Open" : "Closed", shelf) +
+      ledgerRow("Your Profile", shelf ? "Open" : "Closed", shelf) +   /* BR-S387: the link goes to the PAGE; the Shelf is the region inside it */
       ledgerRow("First-reading key", keyed ? "Turned" : "Not yet turned", keyed) +
       ledgerRow("Free Sitting", sittingUsed ? "Used" : "Available", sittingUsed) +
       ledgerRow("Sealed Concords", concords ? concords + " on file" : "None on file", concords > 0) +
@@ -499,12 +499,12 @@
      one room in the building with no way onward — you either used the header's two
      doors or you went back. These are the addresses that hold still: the ones that
      will still mean the same thing in a year. Every one is verified to exist —
-     codex.html, /about/ (U1), ?dev=profile (The Shelf), the public repo, the contact
+     codex.html, /about/ (U1), ?dev=profile (Your Profile), the public repo, the contact
      address printed in Credits. Nothing aspirational is listed. */
   var STANDING = [
     ["What Blue Room is", "about/", false],
     ["The Codex", "codex.html", false],
-    ["The Shelf", "?dev=profile", false],
+    ["Your Profile", "?dev=profile", false],
     ["About &amp; Legal", "?dev=settings&p=legal", false],
     /* BR-S347: the Source link and the mailto are gone from here for the reasons
        set out in Credits — a repository address is an invitation to redeploy, and

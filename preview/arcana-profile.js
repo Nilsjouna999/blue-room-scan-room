@@ -56,7 +56,19 @@
     avatar: "S",
     birth: "1 January 2000",
     place: "—",
-    crown_record: {
+    /* BR-S387 — READINGS ARE A LIST, and `crown_record` is a POINTER INTO IT.
+       It used to be one bare object with one reading_id, an `is_current: true` that
+       nothing read and nothing could be current AGAINST, and a count that implied
+       siblings the page had no way to hold. Several readings is the ordinary state of
+       a returning customer, so that shape scheduled a restructure of hero + Vault +
+       Showcase rather than an append — and left the next backend engineer to either
+       honour a flag nothing consumes or delete a field they cannot tell is
+       load-bearing.
+       Now: `readings` is the collection, `current_reading` names which one the crown
+       and the hero speak for, and crownRecord() resolves the pointer. A second
+       reading is one push. Nothing on the page changes today, which is the point —
+       the shape is correct BEFORE there is data to break. */
+    readings: [{
       reading_id: "BR-3F9A2C",
       name: "The Twice-Kindled Giver",
       spine: "Aries · Snake · Life Path 7",
@@ -69,8 +81,9 @@
          (BR-ARCANA-HANDOFF-PROFILE-HUB-AND-DIAGRAMS.md:73). The old caption read
          "3 gems set — one for each reading it holds" beside a Vault printing one
          crown, so the largest object on the page contradicted the row below it. */
-      result_count: 6, created_at: "2026-07-09", is_current: true
-    },
+      result_count: 6, created_at: "2026-07-09"
+    }],
+    current_reading: "BR-3F9A2C",   // which of `readings` the crown and the hero speak for
     /* BR-S382: these two comments were both false. The Vault holds crowns AND rings,
        and `rings` below is the real field the row reads — the sentence used to be
        hardcoded. `vault_slots` is the minted register's reserve, and the Shelf is the
@@ -110,8 +123,21 @@
   function held() {
     try { return localStorage.getItem("br_holdings") === "1"; } catch (e) { return false; }
   }
-  // the one accessor every branch reads — null when nothing is held.
-  function crownRecord() { return held() ? SEEKER.crown_record : null; }
+  /* The one accessor every branch reads — null when nothing is held. BR-S387: it now
+     RESOLVES THE POINTER rather than returning a lone object. `current_reading` names
+     one of `readings`; falling back to the first keeps the page honest if the pointer
+     is ever stale, because a hero with no record is a blank page and a hero with the
+     wrong record is a lie. */
+  function crownRecord() {
+    if (!held()) return null;
+    var list = SEEKER.readings || [];
+    for (var i = 0; i < list.length; i++) {
+      if (list[i].reading_id === SEEKER.current_reading) return list[i];
+    }
+    return list[0] || null;
+  }
+  // How many readings this seeker holds — the question the old shape could not answer.
+  function readingCount() { return held() ? (SEEKER.readings || []).length : 0; }
 
   /* The Codex door, taken from app.js's room registry rather than restated here.
      window.BR_ROOMS is published by app.js (BR-S366); the literal below is only for
@@ -295,9 +321,16 @@
        announces it, and the word appears exactly once, as the name of the drawer
        it is. A place you find by having something in it. */
     var c = crownRecord(), worn = c && c.result_count > 0;
+    /* BR-S387: the Crowns row is the first place the readings LIST becomes visible.
+       With one it reads as it always did; the second reading appends rather than
+       rewriting anything, which is the whole reason the pointer exists. */
+    var n = readingCount();
+    var crownsV = esc(c && c.name ? c.name : "one, unnamed")
+      + (n > 1 ? ' <span class="pf-vaultrow__and">and ' + (n - 1) +
+                 (n === 2 ? ' other' : ' others') + '</span>' : '');
     var crowns = worn
       ? '<div class="pf-vaultrow"><span class="pf-vaultrow__k">Crowns</span>' +
-          '<span class="pf-vaultrow__v">' + esc(c.name || "one, unnamed") + '</span></div>'
+          '<span class="pf-vaultrow__v">' + crownsV + '</span></div>'
       : '<div class="pf-vaultrow pf-vaultrow--empty"><span class="pf-vaultrow__k">Crowns</span>' +
           '<span class="pf-vaultrow__v">None borne yet.</span></div>';
     /* BR-S382: this row was one hardcoded sentence that declared itself empty without
@@ -358,8 +391,16 @@
     var readOpts = held()
       ? SEEKER.reading_results.map(function (o) { return pickOpt(id, o); }).join("")
       : '<p class="pf-pickempty">No results yet — draw a reading first.</p>';
+    /* BR-S387: the minted options were emitted BARE while the reading options sit in
+       `.pf-pickmenu__grid`, which is the only source of the 5px gap between rows — and
+       the sibling rule `.pf-pickmenu__grid + .pf-pickmenu__h` keys off that wrapper
+       too. Latent today, because mintOpts is a styled <p>; the day minting ships, the
+       second half of every picker loses its gap and two lists in one menu stop looking
+       like one list. The empty <p> stays OUTSIDE the grid — it is a sentence, not a row. */
     var mintOpts = SEEKER.minted_cards.length
-      ? SEEKER.minted_cards.map(function (o) { return pickOpt(id, o); }).join("")
+      ? '<div class="pf-pickmenu__grid">' +
+          SEEKER.minted_cards.map(function (o) { return pickOpt(id, o); }).join("") +
+        '</div>'
       : '<p class="pf-pickempty">No minted cards yet — minting is not open.</p>';
     /* BR-S386: a slot could be CHANGED but never emptied. `chosen` had exactly one
        writer and nothing ever restored null, and showcaseHTML renders only the FIRST
@@ -475,17 +516,33 @@
       headerHTML() +
       '<div class="pf-wrap">' +
         surfaceHTML() +
-        /* BR-S372 — THE LINE. Above it is who you are; everything below it is your
-           Shelf. One rule and one quiet word, because the division is the whole
-           idea and it does not need a heading to carry it. */
-        '<div class="pf-shelfline" role="separator" aria-label="Your Shelf">' +
-          '<span class="pf-shelfline__rule" aria-hidden="true"></span>' +
-          '<span class="pf-shelfline__lab">Your Shelf</span>' +
-          '<span class="pf-shelfline__rule" aria-hidden="true"></span>' +
-        '</div>' +
-        vaultHTML() +
-        mintedHTML() +
-        showcaseHTML() +
+        /* BR-S372 — THE LINE. Above it is who you are; below it is your Shelf. One
+           rule and one quiet word, because the division is the whole idea and does
+           not need a heading to carry it.
+
+           BR-S387 — AND THE SHELF NOW ENDS SOMEWHERE. The line opened a claim that
+           nothing ever closed: vault, minted, showcase, friends, the exit doors AND
+           the referral programme all fell under it, and roomsHTML()'s own comment
+           assumed the opposite. It carried role="separator" aria-label="Your Shelf",
+           so the boundary announced to assistive tech was wrong by four sections —
+           and for a new visitor the doors and the referral are the ONLY populated
+           things beneath the label, which makes it read as false at exactly the
+           moment the page is emptiest.
+           The Shelf is what you KEEP: the Vault, the minted register, the Showcase.
+           Friends is a register of people, the doors are the way out, and the
+           referral is a programme — none of them is something you hold, so they sit
+           after it. A real <section> closes the claim; the line is now that
+           section's own decoration rather than a separator floating in the page. */
+        '<section class="pf-shelf" aria-label="Your Shelf">' +
+          '<div class="pf-shelfline" aria-hidden="true">' +
+            '<span class="pf-shelfline__rule"></span>' +
+            '<span class="pf-shelfline__lab">Your Shelf</span>' +
+            '<span class="pf-shelfline__rule"></span>' +
+          '</div>' +
+          vaultHTML() +
+          mintedHTML() +
+          showcaseHTML() +
+        '</section>' +
         friendsHTML() +
         roomsHTML() +
         referralHTML() +

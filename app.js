@@ -4806,7 +4806,7 @@ function renderReviewMap() {
         card("share", "?dev=before-after&src=2", "?dev=before-after&src=2", "Before / After · Ice Field", "second source"),
       ])}
       ${group("Archive surface", [
-        card("share", "?dev=vault", "?dev=vault", "The Shelf", "saved minted cards · revisit moments · reopen readings · QR access"),
+        card("share", "?dev=vault", "?dev=vault", "Minted cards", "saved minted cards · revisit moments · reopen readings · QR access"),   // BR-S387: one referent per name
       ])}
       ${group("Dev mock", [
         card("mock", "?dev=halo-gate", "?dev=halo-gate", "Halo Gate mock", "sealed card-back gate · not payment, not analysis"),
@@ -5047,8 +5047,13 @@ function renderVault() {
         <a class="pf-back" href="#" data-view-to="menu">&larr; Back to the menu</a>
 
         <div class="pf-vaulthead">
-          <span class="pf-vaulteyebrow">Blue Room Archive&nbsp;&nbsp;·&nbsp;&nbsp;The Shelf</span>
-          <h1 class="pf-vaulttitle">The Shelf</h1>
+          <!-- BR-S387: this page was titled "The Shelf" while ?dev=profile's lower half
+               carries the same name and settings.js linked a third thing by it — one
+               word, three referents, two URLs. The Shelf is the region inside your
+               Profile that holds what you keep. THIS surface is the minted register,
+               which is also what its own next line has always said it holds. -->
+          <span class="pf-vaulteyebrow">Blue Room Archive&nbsp;&nbsp;·&nbsp;&nbsp;Minted cards</span>
+          <h1 class="pf-vaulttitle">Minted cards</h1>
           <p class="pf-vaultintro">Saved minted cards are filed here.</p>
         </div>
 

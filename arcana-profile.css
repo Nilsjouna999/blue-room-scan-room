@@ -97,7 +97,10 @@
 .pf-mini--add.pf-paid:hover, .pf-mini--add.pf-paid:focus-visible { border-color: var(--pf-violet); color: #bda6e4; }
 .pf-mini--add.pf-paid .pf-mini__plus, .pf-mini--add.pf-paid .pf-mini__n { color: var(--pf-violet-lit); }
 
-/* ---------- shared in-body door bar — every door speaks one language ---------- */
+/* ---------- THE REFERRAL BAR ----------
+   BR-S387: this was headed "shared in-body door bar — every door speaks one language",
+   which invites an editor to change it believing every door follows. All seven uses
+   are inside referralHTML(). The rooms use `.pf-roomdoor`; that is the shared one. */
 .pf-doorbar {
   display: flex; align-items: center; gap: 16px; width: 100%; text-decoration: none; text-align: left; cursor: pointer;
   border: 1px solid var(--pf-line); border-radius: 6px; padding: 16px 20px;
@@ -108,7 +111,13 @@
 .pf-doorbar--referral { margin-top: clamp(32px, 5.5vh, 52px); }
 .pf-doorbar__seal { width: 34px; height: 34px; color: var(--pf-gold); flex: none; }
 .pf-doorbar__txt { flex: 1; }
-.pf-doorbar__t { font-family: var(--pf-serif); font-weight: 600; font-size: 21px; color: var(--pf-cream-display); line-height: 1.1; display: block; }
+/* BR-S387 — ONE DOOR LEVEL. This was 21px/600 against room doors at 18px/400 and the
+   identity chip at 19px/600: the loudest door label on the page belonged to the one
+   door that goes nowhere. referralHTML() says "not open yet" and its handler answers
+   "(Mocked.)". Worse in the empty state, where the crowned name is gated off entirely
+   — "Share Blue Room" was then the biggest door label a new visitor saw, on their own
+   profile. Doors now all speak at 18px/400; the step above is reserved for identity. */
+.pf-doorbar__t { font-family: var(--pf-serif); font-weight: 400; font-size: 18px; color: var(--pf-cream-display); line-height: 1.1; display: block; }
 .pf-doorbar__s { font-family: var(--pf-mono); font-size: 9.5px; letter-spacing: .06em; color: var(--pf-meta); margin-top: 5px; display: block; }
 .pf-doorbar__arr { margin-left: auto; color: var(--pf-gold); font-size: 18px; transition: transform .18s; }
 .pf-doorbar:hover .pf-doorbar__arr, .pf-doorbar:focus-visible .pf-doorbar__arr { transform: translateX(3px); }
@@ -746,6 +755,9 @@
 .pf-vaultrow__k { flex: 0 0 74px; font-family: var(--pf-mono); font-size: 9px;
   font-weight: 500; letter-spacing: .18em; text-transform: uppercase; color: var(--pf-meta); }
 .pf-vaultrow__v { font-family: var(--pf-serif); font-size: 17px; color: var(--pf-body); }
+/* BR-S387: "and 2 others" is a count, not a name — it stands off the crowned name it
+   follows rather than reading as part of it. */
+.pf-vaultrow__and { font-style: italic; color: var(--pf-ghost); }
 /* BR-S374 — the empty state was the page's ONLY sub-AA text: #7c766c at 17px is
    4.37:1 bare, 4.15:1 under the lamp. It renders "None borne yet." — the first
    sentence a new visitor reads here. The ghost tier (6.29:1) is the floor
