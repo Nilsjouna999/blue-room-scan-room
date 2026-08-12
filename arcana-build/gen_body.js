@@ -17,7 +17,22 @@
   // authored keyword-colour lexicon: each perk tinted by its semantic family
   function keysHTML(kws){return kws&&kws.length?'<ul class="keys">'+kws.map(function(k){return '<li style="color:'+(KWC[String(k).toLowerCase()]||"#9c9790")+'">'+esc(k)+'</li>'}).join("")+'</ul>':""}
   function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
-  function hash(s){var h=2166136261,i;for(i=0;i<s.length;i++){h^=s.charCodeAt(i);h=(h*16777619)>>>0}return h>>>0}
+  /* BR-S373 — THE SAME BROKEN MULTIPLY BR-S314 FIXED IN THE TAROT ROOM, still live
+     here. `h * 16777619` is a FLOAT multiply: for h near 2^32 the product reaches
+     ~2^56, past the 2^53 where doubles hold every integer, so the low bits are
+     ROUNDED AWAY before `>>> 0` ever sees them. drawing-room.js:40 documents it in
+     full and fixed it there; the birth reading and the name engine were never
+     back-ported, so three of the six marks this product SELLS have been drawn from
+     a hash whose low bits are noise.
+     MEASURED over 10,608 synthetic seeds, trigram (hash % 8):
+        broken   Heaven 71.6%  Earth 15.6%  ...  Thunder 0.9%   spread 78x
+        Math.imul  low 12.1%   high 12.9%                        spread 1.06x
+     Rune (24) and hexagram (64) come off the same hash and were skewed the same way.
+     THIS CHANGES EVERY EXISTING SEED, and it has to — the old marks were computed
+     with the broken multiply. Nothing is filed to a server and commerce is mock, so
+     the cost is that an old ?seed= link now replays different marks. Landing it
+     BEFORE any of those marks is stored or drawn is the whole reason it goes first. */
+  function hash(s){var h=2166136261,i;for(i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)>>>0}return h>>>0}
   function pick(l,s){return l&&l.length?l[hash(s)%l.length]:null}
   function deac(s){return String(s).normalize("NFD").replace(/[̀-ͯ]/g,"")}
   function slugify(s){return deac(String(s)).toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"")||"x"}
@@ -424,7 +439,20 @@
   function concordURL(a,b){return "#/c/"+encSeed(a)+"/"+encSeed(b)}
   // order-independent pair key from the two normalized half-seeds (norm strips ~, so join on |)
   function normHalf(s){var p=String(s).split("~");return norm(p[1]||"")+"~"+(+p[2]||0)+"~"+(+p[3]||0)+"~"+(+p[4]||0)}
-  function pairKey(a,b){var x=normHalf(a),y=normHalf(b);return "br_concord~"+(x<y?x+"|"+y:y+"|"+x)}
+  /* BR-S373 — THE KEY WAS TWO PEOPLE'S NAMES AND BIRTH DATES, IN PLAINTEXT.
+     normHalf() returns "name~y~m~d", so a sealed Concord wrote a localStorage key
+     reading br_concord~ada lovelace~1815~12~10|charles babbage~1791~12~26 — two
+     real identities, in the clear, on every device that sealed one. It is the same
+     class of leak BR-S347 and BR-S364 spent a day removing from the site and the
+     docs, still shipping in storage. Any script on the origin can enumerate
+     localStorage keys; the value was never the exposure, the KEY was.
+     The pair is now hashed. The identity is still perfectly matched (same two
+     people, same order-independent pairing, same 32-bit hash the rest of the file
+     uses) and nothing about the feature changes, but the key no longer says who.
+     NOT REVERSIBLE, and deliberately so: an existing sealed concord will not be
+     found under the new key and simply reads as unsealed. Losing a mock seal is
+     the correct price for not carrying two people's birth dates in a key. */
+  function pairKey(a,b){var x=normHalf(a),y=normHalf(b);return "br_concord~"+hash(x<y?x+"|"+y:y+"|"+x).toString(36)}
   function concordStanding(a,b){try{return localStorage.getItem(pairKey(a,b))}catch(e){return null}}
 
   // the bond — each relation rendered separately in tradition-voice; NO aggregate.

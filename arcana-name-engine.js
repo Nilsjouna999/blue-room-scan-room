@@ -145,7 +145,7 @@
      never to vary output between views of the same reading */
   function hash(str) {
     var h = 2166136261, i;
-    for (i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = (h * 16777619) >>> 0; }
+    for (i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619) >>> 0;   /* BR-S373: 32-bit multiply. The float form rounds the low bits away past 2^53 — see arcana-build/gen_body.js and drawing-room.js:40. */ }
     return h >>> 0;
   }
 
