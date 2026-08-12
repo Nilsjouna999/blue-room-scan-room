@@ -282,6 +282,45 @@ copy. They will drift.
 
 ## 9. THE RANKED I§UE LIST
 
+> ## ★ STATUS — CLOSED, BR-S374 → BR-S388 (2026-08-12)
+>
+> **All 27 are accounted for: 26 fixed, 1 withdrawn as a false finding.**
+> Verified by re-reading the source for each entry's own signature, not by trusting
+> the commit log — an intermediate tally in that run said "4 remaining" and was wrong
+> in the safe direction, which is exactly why the audit was re-run against the files.
+>
+> | Fixed in | Entries |
+> |---|---|
+> | BR-S374 | 10, 17, 19 |
+> | BR-S375 | 2, 27 |
+> | BR-S382 | 5, 11, 23, 24, 25 |
+> | BR-S384 | 3, 4, 7, 16, 18 |
+> | BR-S386 | 9, 13, 14, 15, 21 |
+> | BR-S387 | 1, 6, 8, 12, 22 |
+> | BR-S388 | 20 |
+> | **withdrawn** | **26 — false; `.dr-tier--paid` is live in `drawing-room.js`** |
+>
+> **Two divergences from the prescribed fixes, both deliberate and both reversible:**
+> - **#3** kept the violet and removed only the price. Stripping the violet as well
+>   makes the law inconsistent three sections down, because "Read for someone" is also
+>   a paid door and wears the same mark — the hub would then have one paid control
+>   announced and one disguised. Violet marks a door onto a purchase; the PRICE was
+>   what did the selling.
+> - **#20** moved only the 30 `.pf-*` rules. The 16 `.dr-*` rules in the same
+>   stylesheet belong to the Drawing Room, which is the very confusion that made #26
+>   false.
+>
+> **What the fixing found that the audit did not:** #26 was wrong (a stylesheet is not
+> owned by the script sharing its name); the four false colour-law comments in #4 were
+> compounding, because that law is audited by READING them; and a new control added
+> while fixing #9 shipped with no handler — defect #21 verbatim, reintroduced three
+> fixes later and caught only by pressing it in a browser.
+>
+> §10 (the questions the redesign must answer) is untouched by any of this. This list
+> was the page's defects, not its design.
+
+
+
 *(filled from a 9-lens read-only audit, each finding adversarially verified
 against the source before it was allowed to count — see the section below.)*
 
