@@ -7,14 +7,24 @@
      UNDERGROUND — the content sections, each an open L-bracket ledger panel
        (spine + gold top-rule + folder-tab heading), clearly contained.
 
-   Static design surface — mock data, no backend, no payment. Commerce lives in
-   the Birth Reading, not here: the hub is DOORS to every room (Main Menu, Arcana
-   Room, Codex, Vault) + free "Open this reading" portals. No hub-side price,
-   modal, or violet remains.
+   Static design surface — mock data, no backend, no payment.
 
-   Canon: near-black archive, Cormorant + IBM Plex Mono, four-register colour law
-   (gold + warm-grey here; violet reserved for commerce, absent by design).
-   Exposes window.BRArcanaProfile.
+   BR-S384 — THE COLOUR LAW, AS IT ACTUALLY IS. These lines used to say "No hub-side
+   price, modal, or violet remains" and "violet reserved for commerce, absent by
+   design". Both were false and had been for some time: the empty crown shipped
+   "$4.99", `vaultHTML()` emits `pf-paid` on every single visit, and the token is
+   consumed at four places in the stylesheet. The four-register law is AUDITED BY
+   READING THESE COMMENTS, so a false one does not merely mislead — it stops the next
+   reviewer looking, or invites them to strip a register the CSS calls intentional.
+
+   The rule, stated once and true:
+     · NO PRICE ON THE HUB. Figures live in the room that charges them. The empty
+       crown is now a plain door; the $4.99 it used to quote is in the Birth Reading.
+     · VIOLET MARKS A DOOR THAT LEADS SOMEWHERE PAID. It is a warning, not a sale —
+       the two controls wearing it (the empty crown's door, "Read for someone") both
+       open onto a purchase, and saying so quietly is the opposite of a dark pattern.
+   Canon otherwise: near-black archive, Cormorant + IBM Plex Mono, gold for the one
+   gold object. Exposes window.BRArcanaProfile.
 ============================================================= */
 (function () {
   "use strict";
@@ -102,6 +112,17 @@
   }
   // the one accessor every branch reads — null when nothing is held.
   function crownRecord() { return held() ? SEEKER.crown_record : null; }
+
+  /* The Codex door, taken from app.js's room registry rather than restated here.
+     window.BR_ROOMS is published by app.js (BR-S366); the literal below is only for
+     the standalone preview, where app.js never loads. See the door handler. */
+  function codexHref() {
+    var rooms = (typeof window !== "undefined" && window.BR_ROOMS) || [];
+    for (var i = 0; i < rooms.length; i++) {
+      if (rooms[i] && rooms[i].key === "codex" && rooms[i].href) return rooms[i].href;
+    }
+    return "codex.html";
+  }
 
   /* ---- glyphs ---- */
   var VSEAL = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true"><path d="M12 2.5 L20 7 L20 17 L12 21.5 L4 17 L4 7 Z"/><circle cx="12" cy="11" r="2.1"/><path d="M12 13.1 L12 16.4"/></svg>';
@@ -233,7 +254,11 @@
         '</button>' +
         '<div class="pf-crownstage__cap">' +
           '<p class="pf-prov">A crown is earned by taking a reading — a gem set for every mark it draws.</p>' +
-          '<a class="pf-openreading pf-openreading--lg pf-paid" href="#" data-draw="self" data-intent="new">Draw your Birth Reading &middot; $4.99 &rarr;</a>' +
+          /* BR-S384: the figure is gone. This was the one visitor who has bought
+             nothing being shown a price tag on their own profile — and the room it
+             opens states the same price on arrival, so nothing is hidden by dropping
+             it. The violet stays: it marks a door onto a purchase. */
+          '<a class="pf-openreading pf-openreading--lg pf-paid" href="#" data-draw="self" data-intent="new">Draw your Birth Reading &rarr;</a>' +
         '</div></div>';
     }
 
@@ -461,7 +486,14 @@
         ev.preventDefault();
         var d = el.getAttribute("data-door");
         if (d === "menu") { if (inApp()) location.href = location.pathname; else note(root, "Returns to the main menu. (Inert in preview.)"); }
-        else if (d === "codex") { if (inApp()) location.href = "codex.html?v=237"; else note(root, "Opens the Codex. (Inert in preview.)"); }   // BR-S272: the ONE codex link that shipped un-busted — every other caller carries ?v=
+        /* BR-S384: this read "codex.html?v=237" while every other caller in app.js was
+           126 versions ahead, so a visitor entering the Codex FROM THEIR OWN HUB could
+           be served a cached build older than the one any other door opens. It now
+           takes the href off the room registry app.js already publishes, which is the
+           only fix that cannot go stale again — one bump updates every caller at once.
+           The literal stays as a fallback for the standalone preview, where app.js is
+           not loaded and window.BR_ROOMS does not exist. */
+        else if (d === "codex") { if (inApp()) location.href = codexHref(); else note(root, "Opens the Codex. (Inert in preview.)"); }
         else if (d === "arcane") toInput("", "Opens the Birth Reading. (Inert in preview.)");
         else if (d === "drawing-room") { if (inApp()) location.href = "?dev=drawing-room"; else note(root, "Opens the Drawing Room — the tarot room. (Inert in preview.)"); }
         else if (d === "ceremony") { if (inApp()) location.href = "?dev=ceremony"; else note(root, "Opens the Ceremony — the arcana forge. (Inert in preview.)"); }

@@ -27,7 +27,10 @@
   --pf-body: #b1ada4;
   --pf-meta: #9c9790;
   --pf-ghost: #96918a;
-  --pf-violet: #8a6fb0;                        /* commerce register — defined, unused here */
+  /* BR-S384: was commented "defined, unused here" while four rules below consume it
+     and vaultHTML() emits pf-paid on every visit. Violet marks a door that leads
+     somewhere paid — a warning, not a sale. Prices themselves live in the room. */
+  --pf-violet: #8a6fb0;                        /* commerce register — the paid-door mark */
   --pf-violet-lit: #a487c8;
   --pf-violet-line: rgba(138, 111, 176, 0.4);
   --pf-serif: "Cormorant Garamond", "Iowan Old Style", "Palatino Linotype", Georgia, serif;
@@ -126,6 +129,12 @@
 .pf-sec__h { position: absolute; top: 0; left: 14px; transform: translateY(-50%); z-index: 1; display: inline-flex; align-items: center; gap: 10px; margin: 0; padding: 3px 12px; background: var(--pf-tab-bg); border: 1px solid var(--pf-line); border-radius: 4px; font-family: var(--pf-mono); font-size: 9.5px; font-weight: 500; letter-spacing: .22em; text-transform: uppercase; color: var(--pf-gold); }
 .pf-sec__note { font-family: var(--pf-mono); font-size: 8.5px; letter-spacing: .16em; text-transform: uppercase; color: var(--pf-ghost); }
 .pf-lede { font-family: var(--pf-serif); font-size: 17.5px; line-height: 1.6; color: var(--pf-body); max-width: 60ch; margin: 2px 0 20px; }
+/* BR-S384: Minted is the one section that renders a lede with NO body, so its 20px
+   bottom margin had nothing to push against and nothing to collapse into — .pf-sec's
+   left padding blocks collapse — and the section closed 20px lower than every other.
+   The emptiest section looked like the one with its content clipped out. This covers
+   every future conditionally-empty section too. */
+.pf-lede:last-child { margin-bottom: 0; }
 
 /* BR-S382 — the Vault's "read for someone" control and, when they exist, ring
    mini-crowns beside it. Was headed "Rings (§3.4)", a name this section has not had
@@ -690,10 +699,17 @@
   margin: clamp(44px, 9vh, 96px) 0 clamp(32px, 5.5vh, 52px); }
 .pf-shelfline + .pf-sec { margin-top: 0; }
 .pf-shelfline__rule { flex: 1; height: 1px; background: var(--pf-line-cut, rgba(201, 163, 92, .22)); }
+/* BR-S384 — YOUR SHELF is a label, not the gold object. It was `--pf-gold-lit`, the
+   only statically gold text left after the gold-law block demoted nine classes to
+   `--pf-meta` — brighter than `--pf-gold`, and otherwise the FOCUS-RING colour, so a
+   static element wore focus permanently. Both this file and the JS call it "one quiet
+   word" while the paint made it the loudest word on the page, sitting directly under
+   the crown the header calls the ONE gold object. The rule carries the division; the
+   word only has to name it. */
 .pf-shelfline__lab {
   font-family: var(--pf-mono);
   font-size: 9px; font-weight: 500; letter-spacing: .26em; text-transform: uppercase;
-  color: var(--pf-gold-lit); white-space: nowrap;
+  color: var(--pf-meta); white-space: nowrap;
 }
 /* the Vault is a drawer, not a display: two rows, ruled, quiet. Its name is
    never advertised — nothing links here, and the word appears once.
