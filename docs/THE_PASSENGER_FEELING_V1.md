@@ -288,6 +288,109 @@ Each delivers a standalone page with the real profile content in the frame, the
 kingdom above the line, blurred living sides, a reduced-motion still, and one
 line on which law it found hardest to hold.
 
+
+---
+
+## 10. THE KINGDOM IS MADE OF YOUR READINGS — the mapping
+
+**This supersedes the recommendation in §9.** I argued the world should grow with
+your holdings but never map to them, to keep it from becoming a dashboard. The
+builder overruled it: the world should be **linked** to reading results, rings,
+tarot and the card mint.
+
+They are right, and my worry was aimed at the wrong thing. The danger was never
+*mapping* — it was **labelling**. A world genuinely built out of your own marks is
+far better than a world that merely grows; it is the difference between a kingdom
+and a progress bar. The single discipline that keeps it a margin rather than an
+infographic is:
+
+> **Linked, never labelled.** Nothing out there is named, captioned, hovered,
+> counted or explained. You may work out over months that the mountains are yours
+> because your trigram is Mountain. Nobody tells you. The plain words stay on the
+> shelf below the line, where they already are.
+
+### ★ THE DATA IS ALREADY THERE, AND IT IS ALREADY A LANDSCAPE
+
+Every birth reading derives six marks (`arcana-reading.js:53-58`). Look at what
+the eight trigrams actually are:
+
+> **Heaven · Earth · Thunder · Water · Mountain · Wind · Fire · Lake**
+
+Those are not abstractions. **They are terrain.** Every reader already has one,
+assigned by the I Ching half of their own reading.
+
+And the twelve year animals are **Rat, Ox, Tiger, Rabbit, Dragon, Snake, Horse,
+Goat, Monkey, Rooster, Dog, Pig** — literally the "bitty animals" in the builder's
+sketch, already computed, already personal.
+
+No new data has to be invented. The kingdom can be assembled entirely from marks
+the reading already produces.
+
+### THE MAPPING
+
+| Your mark / holding | What it is in the kingdom | Why |
+|---|---|---|
+| **Trigram** (Heaven/Earth/Thunder/Water/Mountain/Wind/Fire/Lake) | **THE LAND.** Your terrain. | Eight trigrams, eight landscapes. It is already a place-word. |
+| **Year animal** (12) | **THE CREATURE** that lives there. | The bitty animal, and it is already yours. |
+| **Sun sign** (12) | **THE SKY** — the constellation overhead. | A sun sign is literally a region of sky. |
+| **Life path** (1–9) | **HOW MANY.** Lights, towers, roofs — the settlement's size. | The one mark that is already a number. |
+| **Rune** | **A STANDING STONE** set in the ground. | A rune is a carved mark. Put it in the earth. |
+| **Hexagram** ("the situation as change — a moment in motion") | **THE WEATHER.** | The reading's own definition says it is the changing one. Let it be what moves. |
+| **Rings** (a reading made for someone close) | **A NEIGHBOUR** — another dwelling, another light across the water. | A ring is a person. The kingdom gains people. |
+| **Tarot draws** | **THE SKY'S EVENTS** — what passes overhead tonight. | Drawn once, filed where it fell: a moment, not a structure. |
+| **Minted cards** | **MONUMENTS** — a thing you made, standing in the land. | A minted card is an object. Objects stand. |
+| **The Codex** | the library, if it is ever needed | last, and only if the world is thin without it |
+
+### ★ AND THIS ANSWERS THE PAYWALL
+
+`PROFILE_REDESIGN_BRIEF_V1` §9c: the populated profile is behind $4.99, so every
+non-paying visitor's page is permanently the empty state. The mapping fixes it,
+because the marks arrive in a natural order and the free ones come first:
+
+```
+   free tarot pull        ->  you get a SKY.  something passes overhead.
+   (free, unlimited, live today)
+
+   the birth reading      ->  the LAND arrives. terrain, creature, stone,
+   ($4.99)                    constellation, weather, and how many lights.
+
+   rings                  ->  NEIGHBOURS appear.
+   minted cards           ->  MONUMENTS stand in it.
+```
+
+A visitor who has paid nothing and drawn one free card **still has a sky**. That
+is not an empty state, it is dusk before anything is built — and it makes the
+first free action in the building do visible work on their own page. It also
+gives the Drawing Room a reason to exist upstream of the Birth Reading rather than
+beside it.
+
+### WHAT THIS CONSTRAINS
+
+- **The kingdom cannot be hand-drawn art.** It has to be assembled from parts —
+  8 terrains x 12 creatures x 12 skies x 9 sizes x weather. That is a system, not
+  an illustration, and every attempt in the fleet must be built that way from the
+  first sketch.
+- **It must be legible at "bitty" size.** A Mountain and a Lake have to differ at
+  40px. This is a silhouette problem, and it is the hardest craft in the idea.
+- **It must not become a legend.** No key, no hover, no "your trigram is Mountain"
+  caption anywhere near it. §9's plain semantics stay below the line.
+- **Two people must not get the same kingdom.** 8 x 12 x 12 x 9 = 10,368 base
+  combinations before weather, rings and monuments. That is enough.
+- **Nothing may finish in view** (L2). The creature crosses. The weather passes.
+  The neighbour's light is on or it is not. Nothing arrives while you watch.
+
+### WHAT THE FLEET NOW ATTEMPTS
+
+The six worlds in §9 stand, but each must now render **the same seeded reading**
+so they can be compared like for like — proposed fixture: **Mountain · Snake ·
+Aries · Life Path 7 · Gebo**, which is the sample profile's own data.
+
+Each attempt delivers: the profile content in the frame, the kingdom above the
+line built from those five marks, blurred living sides, the reduced-motion still,
+one line on which law it found hardest — and **one alternate render** with a
+different set (say **Lake · Horse · Pisces · Life Path 3 · Ansuz**) to prove the
+system is a system and not one nice picture.
+
 ---
 
 ## 7. HOW A PROPOSAL WILL BE JUDGED
