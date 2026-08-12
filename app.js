@@ -1185,6 +1185,56 @@ function syncCodexBall() {
   dock.style.display = show ? "" : "none";
 }
 
+/* BR-S377 — THE FLIP: dev Blue Room ⇄ public Blue Room, standing in the same place.
+   The public build is this same app with rooms cut (build_public.py) written to dist/,
+   so the two sites differ by ONE path segment. The only thing a flip has to preserve is
+   where you were — the room, its query and its hash — so that is all this touches.
+
+   The site root is read off app.js's own <script src>, NOT off <base> or the pathname:
+   the route stubs (/reading/, /about/…) carry <base href="../">, which resolves to "/"
+   on the dev side and "/dist/" on the public side. Anchoring on the script means the
+   same code answers correctly from either side and from any room. Same origin, so
+   localStorage rides along and br_holdings does not reset under the builder.
+
+   NOT a launch surface. When public moves to its own origin (BUILD_PUBLIC_SPEC_V1),
+   this becomes a plain cross-site link and the public half should be cut — one entry
+   in build_public.py's CUT list, because a static site can only hide what it never
+   copies. */
+function brBuildSides() {
+  var src = "", i, ss = document.scripts;
+  for (i = 0; i < ss.length; i++) if (/\/app\.js(\?|$)/.test(ss[i].src)) { src = ss[i].src; break; }
+  if (!src) return null;
+  var root = new URL(src).pathname.replace(/app\.js.*$/, "");   // "/" or "/dist/"
+  var onPublic = /(^|\/)dist\/$/.test(root);
+  var devRoot = onPublic ? root.replace(/dist\/$/, "") : root;
+  var rest = location.pathname.indexOf(root) === 0 ? location.pathname.slice(root.length) : "";
+  return {
+    onPublic: onPublic,
+    dev: devRoot + rest + location.search + location.hash,
+    pub: devRoot + "dist/" + rest + location.search + location.hash
+  };
+}
+function syncBuildFlip() {
+  var s = brBuildSides();
+  if (!s) return;
+  var el = document.getElementById("brBuildFlip");
+  if (!el) {
+    el = document.createElement("div");
+    el.id = "brBuildFlip";
+    document.body.appendChild(el);
+  }
+  // The side you are ON is stated, not linked; the other side is the control. One
+  // clickable half means the flip can never be mistaken for a two-state form.
+  el.innerHTML =
+    '<span class="br-flip__lab" aria-hidden="true">BUILD</span>' +
+    '<a class="br-flip__side' + (s.onPublic ? '' : ' is-on') + '" href="' + s.dev + '"' +
+      (s.onPublic ? '' : ' aria-current="page"') + '>dev</a>' +
+    '<span class="br-flip__sep" aria-hidden="true">⇄</span>' +
+    '<a class="br-flip__side' + (s.onPublic ? ' is-on' : '') + '" href="' + s.pub + '"' +
+      (s.onPublic ? ' aria-current="page"' : '') + '>public</a>';
+  el.setAttribute("aria-label", "Build: " + (s.onPublic ? "public" : "dev") + " — flip to the other, same page");
+}
+
 /* BR-S266 — ONE PLACE THAT KEEPS THE ADDRESS BAR HONEST.
    The URL is this app's boot truth (`?dev=` is parsed at load to decide what mounts),
    so any disagreement between the URL and what is on screen comes back as a "random"
@@ -5775,6 +5825,7 @@ try {
 } catch (e) {}
 
 mountMenu();
+syncBuildFlip();   // BR-S377 — the dev⇄public flip, once, on every room
 renderSourceToggle();
 /* DEV NAV: fill + reveal the dev rail only behind ?devnav=1; sets the
    body attribute the CSS gates on. Inert (display:none) on any clean URL. */
