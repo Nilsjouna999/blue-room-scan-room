@@ -1729,10 +1729,12 @@ function renderWall() {
        its text are wrapped as ONE wall, because the free space has to distribute
        around the pair — a rule that floats on its own drifts away from the line it
        belongs to the moment the card's height changes. */
-    +   '<div class="m2bface__wall m2bface__wall--top">'
-    +     '<div class="m2face-div"></div>'
-    +     '<div class="m2face-name m2bface__name">The Crowned Name</div>'
-    +   '</div>'
+    /* BR-S360 — the upper line belongs to the HEADER, not to the name. Floating between
+       them it was a third thing; ruled edge to edge directly under the head it closes
+       the masthead, and the card gains its top edge. The name then opens the field
+       rather than being introduced by a line of its own. */
+    +   '<div class="m2face-div m2bface__headrule"></div>'
+    +   '<div class="m2face-name m2bface__name">The Crowned Name</div>'
     +   '<ul class="m2bface__marks">'
     +     ['Sun sign', 'Year animal', 'Life path', 'Rune', 'Trigram', 'Hexagram']
             .map(function (m) { return '<li>' + m + '</li>'; }).join('')

@@ -3692,13 +3692,18 @@ html.m2-parch .m2hero { --bf-ink: #1c150d; --bf-meta: #6a5c45; --bf-rule: rgba(2
    "BY BIRTH ALONE" (95px) at the bottom — measured 98px vs 59px, two ledges of different
    widths, which is the one thing this layout cannot have. Stretched, both resolve
    against the card. */
+/* BR-S360: the masthead rule. Edge to edge, so it reads as the head's own bottom border
+   rather than a centred ornament floating under it — a 132px rule under a full-width
+   header leaves the header text hanging past both ends of its own line.
+   The `.m2bface` qualifier is not decoration: `.m2bface .m2face-div` above sets the
+   62%/132px ledge at two-class specificity, so a bare `.m2bface__headrule` loses to it
+   and the masthead renders as a ledge. */
+.m2bface .m2bface__headrule { width: 100%; max-width: none; margin: 10px 0 0; }
 .m2bface__wall { width: 100%; display: flex; flex-direction: column; align-items: center; }
 /* The two auto margins that distribute the card's free space now live on the WALLS, so
    each rule travels with the line it belongs to. On its own a rule drifts off its text
    the moment the card's height changes. */
-.m2bface__wall--top { margin: auto 0 0; }
 .m2bface__wall--bot { margin: 0 0 auto; }
-.m2bface__wall--top .m2face-div { margin: 0 0 11px; }
 .m2bface__wall--bot .m2face-div { margin: 16px 0 13px; }
 .m2bface .m2face-orient { margin: 0; }
 .m2bface .m2face-orient { color: var(--bf-meta); }
@@ -3762,9 +3767,11 @@ html.m2-parch .m2hero {
   --mk-sun: #6b4c14; --mk-animal: #74402c; --mk-path: #313d4c;
   --mk-rune: #465241; --mk-trigram: #315854; --mk-hex: #514c44;
 }
-/* BR-S359: the `margin-top: auto` moved up to .m2bface__wall--top — the name no longer
-   pushes itself off the header, its wall does, so the rule above it comes along. */
-.m2bface__name { color: var(--bf-ink); margin: 0; }
+/* BR-S360: the name carries the upper auto margin again — with the rule gone to the
+   masthead there is no pair left to keep together, so the wrapper the rule needed
+   (BR-S359) went with it. The bottom wall stays: its rule and its line still travel
+   as one. */
+.m2bface__name { color: var(--bf-ink); margin: auto 0 0; }
 
 /* the face control — two answers to one question, in the panel's quiet register */
 .m2flip { display: inline-flex; gap: 2px; margin-top: 10px; padding: 3px; border: 1px solid var(--line-faint, rgba(233,229,220,.12)); border-radius: 999px; }
@@ -4155,10 +4162,18 @@ html.m2-parch .m2hero {
 }
 .gateblock__errs li::before { content: "▢"; position: absolute; left: 0; color: var(--t-ghost); }
 
-/* .vqr__svg — sole survivor of the old standalone Vault (?dev=vault) CSS: the rest
-   of the .vault__*/.vcard/.vcoll/.vcrop/.vqr/.vread/.vabout block died when BR-S185
-   ported the Vault to pf-* markup; removed BR-S202. Still emitted by vaultQR()
-   (app.js) into .pf-access__qr, so the fill colour + sizing must persist. */
+/* .vqr__svg -- sole survivor of the old standalone Vault (?dev=vault) CSS. The rest
+   of that block (.vault__ .vcard .vcoll .vcrop .vqr .vread .vabout) died when
+   BR-S185 ported the Vault to pf- markup; removed BR-S202. Still emitted by
+   vaultQR() (app.js) into .pf-access__qr, so the fill colour and sizing persist.
+
+   THE STAR-SLASH TRAP, found BR-S360. This list was written as a slash-separated
+   run and one entry ended in a star. A star immediately followed by a slash CLOSES
+   A CSS COMMENT -- so the comment ended three lines early, the remaining prose was
+   parsed as a selector, and that selector swallowed the .vqr__svg rule below it.
+   The QR sizing had been silently dead ever since. Never let a star sit directly
+   before a slash inside a CSS comment; separate the names with spaces, as above.
+   Same family as the backtick-in-a-template-literal trap that took app.js down. */
 .vqr__svg { width: 100%; height: 100%; color: var(--silver-dim); display: block; transition: color 200ms ease; }
 
 /* =============================================================
