@@ -245,7 +245,7 @@ Anything proposed must satisfy these. They are decided.
 
 ---
 
-## 8. THE BIGGEST ISSUES, stated plainly
+## 8. THE BIGGEST I§UES, stated plainly
 
 These are the ones a redesign must solve. The full ranked list is §9.
 
@@ -280,7 +280,7 @@ copy. They will drift.
 
 ---
 
-## 9. THE RANKED ISSUE LIST
+## 9. THE RANKED I§UE LIST
 
 *(filled from a 9-lens read-only audit, each finding adversarially verified
 against the source before it was allowed to count — see the section below.)*
@@ -303,7 +303,7 @@ against the source before it was allowed to count — see the section below.)*
 The no-crown branch renders `>Draw your Birth Reading &middot; $4.99 &rarr;</a>` with `class="pf-crownbtn pf-crownbtn--empty pf-paid"`, and `.pf-crown-empty` is painted `border: 1px dashed var(--pf-violet-line)`. · `arcana-profile.js:204,209`; `arcana-profile.css:83,92` · The one visitor who has bought nothing is the only one shown a price tag on their own profile, and the reserved fourth register appears exactly where the page swears it is absent. Directly contradicts `arcana-profile.js:326`, "Commerce is not shown on the hub — price lives in the room." M2 already removed price lines from doors on that principle. · **Fix:** make the empty crown a plain warm-grey door into the Birth Reading; let the figure live in the room behind it.
 
 **4. Four comments in two files deny the violet and the price that ship** [colour · high]
-`arcana-profile.js:12-16` ("No hub-side price, modal, or violet remains" / "violet reserved for commerce, absent by design") and `arcana-profile.css:30` (`--pf-violet: #8a6fb0; /* commerce register — defined, unused here */`) are false: the token is consumed at css:91, 94, 149, and `vaultHTML()` **unconditionally** emits `class="pf-mini pf-mini--add pf-paid"` (`js:224`) on every visit. `css:13` and `css:89` state the opposite of `css:30`, so the two files disagree about the page's most load-bearing colour rule. · `arcana-profile.js:12`; `arcana-profile.css:30` · The four-register law is audited by reading these comments; the next reviewer stops looking, or strips a register the CSS header calls intentional. · **Fix:** decide whether the hub legitimately carries a paid control, then make exactly one comment authoritative and delete the other three.
+`arcana-profile.js:12-16` ("No hub-side price, modal, or violet remains" / "violet reserved for commerce, absent by design") and `arcana-profile.css:30` (`--pf-violet: #8a6fb0; /* commerce register — defined, unused here */`) are false: the token is consumed at css:91, 94, 149, and `vaultHTML()` **unconditionally** emits `class="pf-mini pf-mini--add pf-paid"` (`js:224`) on every visit. `css:13` and `css:89` state the opposite of `css:30`, so the two files disagree about the page's most load-bearing colour rule. · `arcana-profile.js:12`; `arcana-profile.css:30` · The four-register law is audited by reading these comments; the next reviewer stops looking, or strips a register the C§ header calls intentional. · **Fix:** decide whether the hub legitimately carries a paid control, then make exactly one comment authoritative and delete the other three.
 
 **5. The crown says it holds three readings; there is one** [copy · high]
 `'<p class="pf-prov">' + gems + ' gems set — one for each reading it holds.</p>'` where `gems = c.result_count` — a field *inside* one reading record (one `reading_id`, one `created_at`). Repeated in the aria-label `"Crown holding " + gems + " readings"` (`:195`) and in the empty-state promise (`:208`). · `arcana-profile.js:195,198,208` · The largest object on the page announces three readings while the Vault below prints one crown and the Showcase says "your reading", singular. The count will not move when the visitor takes their second reading — the mechanic reads as broken. Canon (`docs/BR-ARCANA-HANDOFF-PROFILE-HUB-AND-DIAGRAMS.md:73`) specifies "this crown holds N results". · **Fix:** say one per *mark drawn*, and make caption, aria-label and empty-state promise agree.
@@ -354,7 +354,7 @@ The no-crown branch renders `>Draw your Birth Reading &middot; $4.99 &rarr;</a>`
 8 / 8.5 / 9 / 9.5 / 10 / 10.5 / 11px plus a stray 15px, across .04–.28em. The concrete failure: `.pf-friend__crown` (9px/.12em) and `.pf-friend__vis` (10px/.08em) are adjacent siblings in the same `<a>` — identical family, case and colour, differing by 1px and .04em — and BR-S180's `.pf-friend__n { flex: 0 1 auto; }` removed the gap that used to hide it. · `arcana-profile.css:197` · Differences this small carry no rank, so it is pure noise; every new element added as the page fills invents a ninth value because there is no ladder to snap to. · **Fix:** three named steps (label / meta / micro), one tracking each, as tokens beside `--pf-mono`.
 
 **21. The minted card is a `<div>` in a full button costume with no handler** [interaction · high]
-`return '<div class="pf-card">…'` — no `data-*`, no `tabindex`, no `role` — while css:154-156 give it `cursor: pointer`, a gold `:hover` border and `:active { transform: translateY(1px) }`. The delegated handler matches eight `data-*` hooks, none of them present. · `arcana-profile.js:256` · Invisible today (`minted_cards: []`), which means the failure arrives on the exact day the section fills: the first minted card presses down and does nothing, and is keyboard-inaccessible. `.pf-card:focus-visible` is permanently dead CSS. Every sibling control (`pf-slot`, `pf-mini--add`) is a real `<button>` with a hook, so an editor will assume this one is too. · **Fix:** a real `<button>`/`<a>` with an action and an accessible name, or strip the costume.
+`return '<div class="pf-card">…'` — no `data-*`, no `tabindex`, no `role` — while css:154-156 give it `cursor: pointer`, a gold `:hover` border and `:active { transform: translateY(1px) }`. The delegated handler matches eight `data-*` hooks, none of them present. · `arcana-profile.js:256` · Invisible today (`minted_cards: []`), which means the failure arrives on the exact day the section fills: the first minted card presses down and does nothing, and is keyboard-inaccessible. `.pf-card:focus-visible` is permanently dead C§. Every sibling control (`pf-slot`, `pf-mini--add`) is a real `<button>` with a hook, so an editor will assume this one is too. · **Fix:** a real `<button>`/`<a>` with an action and an accessible name, or strip the costume.
 
 **22. Minted options escape the pick menu's only spacing rule** [structure · high]
 `'<div class="pf-pickmenu__h">Minted cards</div>' + mintOpts +` — emitted bare, while the reading options are wrapped in `.pf-pickmenu__grid`, the sole source of the 5px column gap. · `arcana-profile.js:284` · Latent: today `mintOpts` is a styled `<p>`. The day minting ships, the second half of every picker loses its gap and the two lists in one menu stop looking like one list. The sibling rule `.pf-pickmenu__grid + .pf-pickmenu__h { margin-top: 14px }` keys off the wrapper too. · **Fix:** wrap `mintOpts` in the same grid; keep the empty `<p>` outside.
@@ -362,14 +362,14 @@ The no-crown branch renders `>Draw your Birth Reading &middot; $4.99 &rarr;</a>`
 **23. `.pf-vault` does not belong to The Vault** [naming · medium]
 `/* the vault */` heads `.pf-vault`/`.pf-cards`/`.pf-card*` (css:151-163) — consumed only by `mintedHTML()`. The real Vault uses `.pf-vaultbox`/`.pf-vaultrow` (css:677-683). · `arcana-profile.css:151` · An editor told to "style the Vault" greps `vault`, hits this comment first, and edits the *adjacent* Minted section — a mistake that will look plausible on screen. It also collides with the real Vault's namespace and breaks the file's own stated rule that "Vault" appears exactly once (js:239-240). · **Fix:** rename to the minted register; reserve `pf-vault*` for the Vault.
 
-**24. The Vault section and its CSS are still labelled "Rings", against a dead spec section** [naming · medium]
+**24. The Vault section and its C§ are still labelled "Rings", against a dead spec section** [naming · medium]
 `/* ---------- Rings — family + friend crowns (§3.4) ---------- */` heads `vaultHTML()`, which returns `section("The Vault", …)` with two rows and a paid picker; `arcana-profile.css:130` repeats it. Also stale in the same cluster: js:56-57, "Rings section is only the 'read for someone' box now (no example rings)" and "The Shelf is minted-card slots only … (real vault not built)" — both now false. · `arcana-profile.js:216` · The section carries two competing names in source and a third on screen, and `§3.4` points at a spec that no longer describes what renders. · **Fix:** retitle both comments; drop or re-point the spec numbers.
 
 **25. The newest block invents five colours outside the token set** [system · medium]
 `… text-transform: uppercase; color: #8c867b; }` plus `#c8c4bb`, `#7c766c` and two raw border rgba()s. Its structural peer `.pf-card__k` uses `var(--pf-ghost)` at the same .18em, and css:344 later retunes that whole class *through the token*. · `arcana-profile.css:677-683` · The palette exists so a colour can be retuned in one place — three passes have done exactly that. These five values are invisible to that mechanism, which is how the sub-AA grey in #10 got in. Measured, they extend the ramp: `#8c867b` L*56.1 and `#7c766c` L*49.9 sit below `--pf-ghost` L*60.4, and `#c8c4bb` L*79.2 is a fourth cream. The same lines also reach for `var(--font-mono, …)` instead of `--pf-mono` — they resolve, but confirm the block was written against a different vocabulary than the file it lives in. · **Fix:** map all five onto tokens; if a tier is genuinely missing, add it at the top, not as a literal 660 lines down.
 
 **26. The removed modal left its violet stylesheet behind** [system · low]
-`.dr-tier--paid` / `.dr-cut--paid` and the comment "PAID cut — the mock settle (BR-S190): violet price on the button (pf-paid register)" match no markup — no `dr-` string exists anywhere in `arcana-profile.js`. · `arcana-profile.css:520-537` · 18 lines of dead violet CSS that make the violet audit harder and imply a component that no longer exists. · **Fix:** delete.
+`.dr-tier--paid` / `.dr-cut--paid` and the comment "PAID cut — the mock settle (BR-S190): violet price on the button (pf-paid register)" match no markup — no `dr-` string exists anywhere in `arcana-profile.js`. · `arcana-profile.css:520-537` · 18 lines of dead violet C§ that make the violet audit harder and imply a component that no longer exists. · **Fix:** delete.
 
 **27. `br_holdings` is written by the M3 toggle and read by nobody** [system · medium]
 `try { st === "profile" ? localStorage.setItem("br_holdings", "1") : localStorage.removeItem("br_holdings"); } catch (_) {}` (`app.js:2367`), and `ledgerRow("The Shelf", shelf ? "Open" : "Closed", shelf)` (`settings.js:268`) — but `arcana-profile.js` never reads the key and renders every section unconditionally. · `app.js:2367`; `settings.js:268`; `arcana-profile.js:359-380` · "Preview as: No account" can never show the no-account profile — the builder has a control that *implies* the fix for finding #2 and it does nothing. Settings can report the Shelf "Closed" about a shelf the visitor is currently reading. · **Fix:** make the profile read `br_holdings` — it is the empty-state switch, already half-built.
@@ -383,6 +383,125 @@ The no-crown branch renders `>Draw your Birth Reading &middot; $4.99 &rarr;</a>`
 **2. The default state of the page is unrunnable, so it is unreviewed.** `SEEKER` is a filled literal nothing can vary; the empty branch — which holds the page's only price, its only hero violet, its dimmest text and its only "None borne yet" — cannot be looked at. Everything drifting in this list drifts *there*. *Principle: every state the product ships must be renderable on demand; a branch you cannot open is a branch you are not designing.*
 
 **3. Each section was built in its own vocabulary instead of the page's.** New blocks invent greys outside the palette, sizes outside the mono ladder, class prefixes that collide with existing sections, markup that skips the wrapper its siblings use, and mock fields (`result_count`, `is_current`, `vault_slots`) that describe collections the render can only answer in the singular. The page has a grammar — tokens, a door level, `--empty` modifiers, `data-*`-hooked buttons, a section spacing unit — and additions are not snapping to it. *Principle: a new section must be assembled only from named rungs — a colour token, a type step, a door level, a row idiom, a data shape — and any literal it needs becomes a rung first.*
+
+
+---
+
+## 9b. AN OUTSIDE CRITIQUE, AND WHAT MEASUREMENT SAYS ABOUT IT
+
+A second opinion was taken from GPT, **judging from a screenshot only** - it could
+not reach the repository, so it never saw the code, the empty branch, or the
+reasons behind anything. That limit matters twice below, once in its favour.
+
+It is sharper than §9 on exactly the axes §9 missed, because §9 was run as a
+defect hunt - every finding needed a verbatim quote and a line number, and design
+judgements do not have line numbers. **Read §9 as the cleanup list and §9b as
+the design critique.** Where the two agree independently, confidence is high.
+
+### Its scores
+
+| Area | Score |
+|---|---|
+| Brand and atmosphere | 9/10 |
+| Visual composition | 7/10 |
+| Readability / accessibility | 4/10 |
+| Interaction clarity | 4/10 |
+| Perceived completeness | 5/10 |
+
+> "Beautiful foundation, but clarity and legibility need to catch up with the art
+> direction." - "reads more like a beautiful prototype than a confident, usable
+> product page."
+
+### What it praised
+
+Restrained black / ivory / gold reads archival and mystical - "The Twice-Kindled
+Giver" is a memorable focal point - typography, fine borders and ceremonial labels
+form a cohesive system - the narrow central column feels like opening a private
+record rather than browsing a dashboard - Shelf / Showcase / Friends / Rooms imply
+a larger world worth having.
+
+### Its eight problems, each checked against the source
+
+**1. Readability is too low.** - **Right, but the diagnosis needs correcting.**
+It blames contrast. Measured, contrast mostly passes: `--pf-body` **8.80:1**,
+`--pf-meta` **6.79:1**, `--pf-ghost` **6.29:1**, `--pf-gold` **5.67:1**,
+`--pf-gold-lit` **7.90:1**. Exactly one literal fails - `#7c766c` at **4.37:1**
+(§9 #10). The real cause is **size and tracking, not ratio**: the mono register
+runs **8 / 8.5 / 9 / 9.5 / 10 / 10.5 / 11px at .04-.28em** (§9 #20). Uppercase
+mono at 9px with .2em tracking is hard to read at any contrast.
+- Raising contrast alone would not fix this, and would cost the page its restraint.
+
+**2. The primary action is buried.** - **Confirmed, and starker than stated.**
+`.pf-openreading--lg` is **10.5px** mono. The crowned name above it is
+`clamp(30px, 4.6vw, 46px)`. The crown is `clamp(160px, 24vw, 210px)`.
+**The page's primary call to action is its smallest type.** §4 also notes the
+crown performs the same act, so there are two controls for one thing and the
+larger one is undeclared.
+
+**3. Too much empty vertical space in the hero; cut 30-40%.** - **Confirmed.**
+`.pf-crownstage` carries `margin-bottom: clamp(44px, 9vh, 96px)` beneath a 210px
+crown, so the shelf line starts far down the first viewport.
+
+**4. The terminology needs plain-language glosses.** - **Right, and it collides
+with a house rule already on the books.** Blue Room's own law is that
+front-facing copy says what a visitor GETS. The roadmap research the builder
+commissioned says the same: keep the metaphor in the chrome, keep the semantics
+plain, and pair the mystical name with a plain gloss the first time. Its
+suggestions are usable as written:
+"Crown - your profile title" - "Ring - a reading made for someone close" -
+"Minted card - a saved card from a completed reading".
+
+**5. Too many unfinished states at once.** - **Confirmed, and UNDERSTATED**, for a
+reason GPT could not know: it judged the FILLED state. The empty branch, which is
+what a real first visitor gets, cannot be rendered at all (§9 #2), and it is
+worse - no crown, no crowned name, and the page's only price. Its fix (hide
+unavailable modules, or gather them into one deliberate "Coming later" area) is
+the single most useful proposal in this document.
+
+**6. Some content looks like test data.** - **True, deliberate, and still a
+problem.** "A friend", "Another" and "1 January 2000" are BR-S347 privacy
+placeholders: those fields held real people's names and birth dates on a public
+page. The tension is real - neutral samples read as unfinished.
+- The answer is NOT plausible fake people. It is that a designed empty state
+  beats any placeholder record, which is GPT's own point 5.
+
+**7. Desktop underuses the screen; widen to 640-720px.** - **Right, and it found a
+bug.** `.pf-wrap` is declared **twice**: `min(760px, 92vw)` at
+`arcana-profile.css:59` and `min(620px, 92vw)` at `:247`. The later wins, so the
+live column is **620px** - narrower than either author intended. Two owners of one
+truth, again.
+
+**8. Clickable vs disabled is ambiguous.** - **Confirmed twice over.** "Share Blue
+Room" says "not open yet" and its handler returns "(Mocked.)" - and §9 #8
+measured it as the **loudest door label on the page** (21px/600 against room doors
+at 18px/400). The page's biggest door goes nowhere.
+
+### The hierarchy it proposes
+
+1. Identity - seeker, title, one-sentence description
+2. Primary action - "Open the reading"
+3. Shelf - saved readings and relationships
+4. Showcase - **only after something is featured**
+5. Friends
+6. Explore the Rooms
+7. Share, and footer
+
+Close to the current order, with two real changes: **a one-sentence description of
+what a reading contains**, which this page has never had, and **conditional
+sections** - nothing renders until it holds something. Both follow from §9's
+second root cause.
+
+### What GPT could not see, and therefore missed
+
+- the empty branch (§9 #2) - its problem 5 is worse than it knew
+- eleven source comments that contradict the code beside them (§9 root cause 1)
+- the violet and the $4.99 shipping in the empty hero, against the page's own
+  stated law (§9 #3, #4)
+- that a Showcase slot can be filled but never emptied (§9 #9)
+- that the minted card is a `div` in a button costume with no handler (§9 #21)
+
+**Neither read is sufficient alone.** §9 knows what is broken; §9b knows what is
+wrong. A redesign needs both.
 
 ---
 
@@ -407,6 +526,13 @@ The no-crown branch renders `>Draw your Birth Reading &middot; $4.99 &rarr;</a>`
    be a page nobody finds.
 8. **Should "Games for a table" and the Workshop appear here at all?** Their unit
    is a group and a tool, not a person's holdings.
+9. **What is the one sentence that says what a reading contains?** The page has
+   never had it, and both critiques arrive at it independently (§9b hierarchy 1).
+10. **Does a section render before it holds anything?** If the answer is no, most
+    of §8A dissolves - and the "Coming later" gathering in §9b problem 5 becomes
+    the only place an unbuilt thing is named.
+11. **How is the mono register made readable without losing restraint?** It is a
+    size-and-tracking problem, not a contrast one - see §9b problem 1.
 
 ---
 
