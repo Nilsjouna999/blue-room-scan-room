@@ -3002,7 +3002,14 @@ html.is-travel .card .cardfinish { mix-blend-mode: normal; }
    BR-S203 — THE PROCESSION: "About Blue Room" (the vertical scroll-depth below the desk).
    Hidden whenever the menu is off the desk (wall slide / reveal fullview).
 ============================================================ */
-.menu.is-wall #about, .menu.is-reliquary #about, .menurev.is-fullview #about { display: none; }   /* BR-S204: About hides on slide 3 too */
+/* ★ BR-S409 — THE ACTUAL REASON U1 WAS NOT UNDER M1, after three fixes that were
+   each real and none of which was this. U1 is #about, and this line HID it on the
+   wall - which BR-S400 made HOME. So the vertical depth was hidden on the front
+   page and visible only on the sealed desk, which is precisely what the builder
+   reported four times while I kept verifying gates, seats and cues.
+   The rule itself was always right: U1 hangs off HOME and off nothing else. Only
+   the name of home changed, and this line still named the old one. */
+.menu.is-l1 #about, .menu.is-reliquary #about, .menurev.is-fullview #about { display: none; }
 
 /* the desk down-cue — a quiet centred hint to scroll into the About surface */
 .menu__downcue { position: absolute; left: 50%; bottom: clamp(18px, 4vh, 34px); transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 3px; text-decoration: none; color: var(--t-meta); transition: color 160ms ease; }
