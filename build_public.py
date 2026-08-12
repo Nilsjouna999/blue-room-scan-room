@@ -52,10 +52,10 @@ COPY_FILES = [
     "codex.html",
     # stylesheets
     "styles.css", "arcane.css", "arcana-profile.css", "arcana-reading.css",
-    "settings.css", "roadmap.css", "u1-plates.css",
+    "settings.css", "roadmap.css",
     # scripts
     "data.js", "scan-contract.js", "arcane.js", "arcana-reading.js", "arcana-profile.js",
-    "drawing-room.js", "settings.js", "roadmap.js", "app.js", "u1-membrane.js",
+    "drawing-room.js", "settings.js", "roadmap.js", "app.js",
     # data banks — arcana-reading.js fetches these three at runtime
     "codex-data.json",
     "arcana-build/kb_compact.json", "arcana-build/practical.json",

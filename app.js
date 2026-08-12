@@ -1336,90 +1336,239 @@ const AB_EMBLEMS = {
   tarot: '<svg class="about__emblem-svg" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="7" y="12" width="13" height="20" rx="2" opacity=".42" transform="rotate(-12 13.5 22)"/><rect x="20" y="12" width="13" height="20" rx="2" opacity=".42" transform="rotate(12 26.5 22)"/><rect x="13.5" y="9.5" width="13" height="21" rx="2"/><path d="M20 15 L23.5 20 L20 25 L16.5 20 Z" stroke-width=".75"/></svg>',
   arcana: '<svg class="about__emblem-svg" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6.5 29 L7.8 13 L14.5 19.5 L20 8 L25.5 19.5 L32.2 13 L33.5 29 Z"/><path d="M8.6 24.8 H31.4" stroke-width=".75" opacity=".5"/><circle cx="13.5" cy="27" r=".9" stroke-width=".75" opacity=".5"/><circle cx="20" cy="27" r=".9" stroke-width=".75" opacity=".5"/><circle cx="26.5" cy="27" r=".9" stroke-width=".75" opacity=".5"/></svg>',
   mint: '<svg class="about__emblem-svg" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="7.5" width="22" height="25" rx="2.2"/><path d="M10 26 L15 20 L19 24 L25 16.5 L30 22" stroke-width=".75" opacity=".5"/><circle cx="15.5" cy="15" r="2.4" stroke-width=".75" opacity=".5"/><path d="M6 6 L8 8 M34 6 L32 8 M6 34 L8 32 M34 34 L32 32" stroke-width=".75" opacity=".4"/></svg>',
+  /* BR-S366: The Shelf joined the open rooms and had no emblem, which left an
+     empty slot and floated its card's text a line high. The reliquary vault,
+     in the same hand as the other four. */
+  shelf: '<svg class="about__emblem-svg" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.5 30 V17.5 C9.5 11.7 14.2 7 20 7 C25.8 7 30.5 11.7 30.5 17.5 V30 Z"/><path d="M7 30 H33"/><path d="M20 15.5 L22.6 20 L20 24.5 L17.4 20 Z" stroke-width=".75" opacity=".55"/><path d="M13 33 V30 M27 33 V30" stroke-width=".75" opacity=".4"/></svg>',
   unlit: '<svg class="about__emblem-svg" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="20" cy="20" r="11"/><path d="M20 16.5 L23 20 L20 23.5 L17 20 Z" stroke-width=".75" opacity=".5"/><path d="M20 7 V4.7 M20 33 V35.3 M7 20 H4.7 M33 20 H35.3" stroke-width=".75" opacity=".4"/></svg>'
 };
-function aboutNugget(o) {
-  return '<li class="about__nugget' + (o.cls ? ' ' + o.cls : '') + '" data-side="' + o.side + '" data-nug="' + o.key + '">'
-    + '<span class="about__ord" aria-hidden="true">' + o.ord + '</span>'
-    + '<div class="about__plate">'
-    +   '<span class="about__frame" aria-hidden="true"></span>'   /* BR-S251: the photographed frame, hover-only (u1-plates.css) */
-    +   '<span class="about__emblem" aria-hidden="true">' + AB_EMBLEMS[o.key] + '</span>'
-    +   '<p class="about__name">' + o.name + '</p>'
-    +   '<span class="about__rule" aria-hidden="true"></span>'
-    +   '<p class="about__line">' + o.line + '</p>'
-    +   '<p class="about__micro">' + o.micro + '</p>'
-    +   (o.door || '')
-    + '</div></li>';
+/* ═══════════════════════════════════════════════════════════════════════════
+   THE ROOM REGISTRY — one entry per thing Blue Room has or will have.
+
+   THIS LIST IS THE ONLY PLACE A ROOM'S STATE IS WRITTEN DOWN. U1 and the
+   Roadmap are both VIEWS over it; neither owns a copy. That is not tidiness,
+   it is the fix for a bug that was live: U1 counted "Five rooms" including
+   The Card Mint and gave it a door, while the Roadmap said "nothing reads a
+   photograph yet" — two pages, two answers, same room. One list cannot
+   disagree with itself.
+
+   MOVING A THING IS A ONE-WORD CHANGE. Edit `state` and everything follows:
+   which section it appears in, which sentence it uses, whether it gets a
+   price and a door, and the counts in the header. Nothing else is touched.
+
+     state: "open"   finished and unlocked — renders as a door
+            "bench"  being made now
+            "drawn"  designed, the room does not exist
+            "named"  an intention, no design and no promise
+
+   EVERY ENTRY CARRIES TWO SENTENCES, written together, up front:
+     now   what it is, once it is open
+     soon  what it will be, while it is not
+   So flipping the state flips the wording too, and the copy for a room's
+   opening day is written on the day the room is planned — not scrambled for
+   at the moment it ships, which is how a page ends up describing a hole.
+
+   THE ORDER IS SHIP ORDER. Within a state, first is nearest.
+   ═══════════════════════════════════════════════════════════════════════════ */
+const ROOMS = [
+  { key: "codex", state: "open", free: true, name: "The Codex",
+    now: "222 entries across ten systems. Every card, sign, rune and hexagram the rooms read from.",
+    soon: "Every mark the rooms read from, gathered and defined in one place.",
+    cost: "Free &middot; no account", cta: "Open the Codex", href: "codex.html?v=363" },
+
+  { key: "tarot", state: "open", free: true, name: "Tarot Divination",
+    now: "Three cards for a Sitting, five for the Deep Read, cut from the full 78 and filed where each fell.",
+    soon: "A deck cut properly, and every card filed where it fell.",
+    cost: "First sitting free &middot; to $2.99", cta: "Cut the deck", href: "?dev=drawing-room" },
+
+  { key: "arcana", state: "open", free: false, name: "The Birth Reading",
+    now: "Six marks from a name and birth date: astrology, the Chinese year, numerology, runes, the I Ching &mdash; each with a record.",
+    soon: "Six marks read from nothing but a name and a birth date.",
+    cost: "$4.99 &middot; $7.99 for two", cta: "Give a name and date", href: "?dev=arcane" },
+
+  { key: "shelf", state: "open", free: true, name: "The Shelf",
+    now: "Everything you have drawn, kept where you can find it again.",
+    soon: "One place that holds everything you have drawn.",
+    cost: "Free &middot; this browser only", cta: "Open the Shelf", href: "?dev=profile" },
+
+  /* THE CARD MINT IS "drawn", NOT "open", AND THAT IS THE CORRECTION.
+     U1 used to give this a door beside the three working rooms. The card is
+     real — you can see one on the desk — but nothing reads a photograph yet,
+     which is what the Roadmap has said all along. One list, one answer. */
+  { key: "mint", state: "drawn", free: true, name: "The Card Mint",
+    now: "One card from one photograph. The room develops what is already in it, then keeps it a page.",
+    soon: "The card is already made &mdash; you can see one on the desk. What is missing is the room that reads a picture of your own.",
+    cost: "Free &middot; or the paid Halo Mint", cta: "See a card develop", href: "?view=room" },
+
+  { key: "pay", state: "bench", name: "Paying for a reading",
+    now: "Pay once for a reading. Nothing of yours is kept on file.",
+    soon: "The prices on the doors become real. One reading, one payment, and nothing of yours kept on file.",
+    cost: "", cta: "", href: "" },
+
+  { key: "keep", state: "bench", name: "A reading that waits for you",
+    now: "Close the page; the reading is still there when you come back.",
+    soon: "Close the page and find the reading again where you left it, in the state you left it.",
+    cost: "", cta: "", href: "" },
+
+  { key: "deal", state: "bench", name: "The whole dealing",
+    now: "The deck shuffles, cuts, and the cards come down onto the table.",
+    soon: "The deck shuffles, cuts, and the cards come down onto the table where you can watch them land.",
+    cost: "", cta: "", href: "" },
+
+  { key: "unlock", state: "drawn", name: "The Codex, opened by your reading",
+    now: "Every mark in your reading opens further: read again for love, for friendship, for the hard years.",
+    soon: "Buy a reading and every mark in it opens further: the same six read again for love, for friendship, for the hard years, for the small particulars.",
+    cost: "", cta: "", href: "" },
+
+  { key: "name", state: "drawn", name: "A name that follows you",
+    now: "One name, and everything you keep travels with it.",
+    soon: "One name, and everything you have kept travels with it &mdash; to another browser, another room, another year.",
+    cost: "", cta: "", href: "" },
+
+  { key: "share", state: "drawn", name: "A reading you can show someone",
+    now: "One page you can hand to one person.",
+    soon: "One page you can hand to one person, without handing them everything else you have kept.",
+    cost: "", cta: "", href: "" },
+
+  { key: "table", state: "named", name: "Readings for a table",
+    now: "A reading that belongs to everyone sitting around it.",
+    soon: "Something to put in the middle of a room with people around it, where the reading belongs to everyone sitting there rather than to one of them.",
+    cost: "", cta: "", href: "" },
+
+  { key: "two", state: "named", name: "Everything about two people",
+    now: "Love, and the readings that only mean anything between two.",
+    soon: "Love, and the readings that only mean anything between two, gathered into one wing instead of scattered through the building.",
+    cost: "", cta: "", href: "" },
+
+  { key: "unlit", state: "named", name: "The Unlit Room",
+    now: "",
+    soon: "Something is taking shape here, still too dim to name. The candle has not reached it yet.",
+    cost: "", cta: "", href: "" }
+];
+
+/* The three horizons, in ship order. `chip` carries a SHAPE as well as a word,
+   because ink weight alone is colour, and status must never be colour alone. */
+const U1_HORIZONS = [
+  { state: "bench", mark: "&#9670;", name: "On the bench", chip: "&#9682; In build",
+    lede: "Being made now. The last things between here and a first day open." },
+  { state: "drawn", mark: "&#9671;", name: "Drawn up", chip: "&#9675; Planned",
+    lede: "Designed and waiting. These exist on paper; the room they belong to does not." },
+  { state: "named", mark: "&#10022;", name: "Named only", chip: "&#10022; Exploring",
+    lede: "An intention, written down so it is not lost. No design, and no promise." }
+];
+
+/* The Roadmap reads THIS list, not a copy of it. roadmap.js loads before app.js
+   but only renders at mount, by which time this binding exists. Exposed on window
+   because a top-level const is not a property of it. */
+window.BR_ROOMS = ROOMS;
+window.BR_HORIZONS = U1_HORIZONS;
+
+const U1_ROMAN = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X"];
+
+function u1Open() { return ROOMS.filter(function (r) { return r.state === "open"; }); }
+
+/* An open room renders as a DOOR: emblem, name, what it is, what it costs, and
+   the way in. The emblems are BR-S251's and they survive the redesign — they are
+   keyed on the same `key` the registry uses, so a room that opens finds its own
+   mark without anyone wiring it up. */
+function u1Door(o, i) {
+  return '<li class="u1door" data-room="' + o.key + '">'
+    + '<div class="u1door__top">'
+    +   '<span class="u1door__ord" aria-hidden="true">' + (U1_ROMAN[i] || (i + 1)) + '</span>'
+    +   '<span class="u1chip u1chip--open"><span aria-hidden="true">&#9679;</span> Open now</span>'
+    + '</div>'
+    + '<span class="u1door__emblem" aria-hidden="true">' + (AB_EMBLEMS[o.key] || "") + '</span>'
+    + '<p class="u1door__name">' + o.name + '</p>'
+    + '<p class="u1door__line">' + o.now + '</p>'
+    + '<p class="u1door__cost">' + o.cost + '</p>'
+    + (o.href ? '<a class="u1door__go" href="' + o.href + '">' + o.cta + ' &rarr;</a>' : '')
+    + '</li>';
 }
-function renderAbout() {
-  const N = [
-    /* BR-S251 — the copy pass. A 14-specialist read found the tone was never the
-       problem: the most ornate plate (V) read cleanly for every cold reader,
-       because it was the only one not hiding a number behind a poetic word.
-       So the voice stays and the FACTS arrive. Two live errors are fixed here:
-       the old Tarot line claimed "what falls is read and filed", which is false
-       for the Pull (a showcase, not filed), and "six systems" miscounted — a
-       hexagram IS two trigrams, so it is six MARKS from five traditions.
-       The micro slot now has ONE job on all five plates: the terms stamp,
-       cost first. No two doors share a CTA, and each names the first act —
-       the Birth Reading's states its INPUT, which is how the plate answers
-       "does this want my photo?" without spending a word on the negative.
-       Lines are held under ~110 chars: 31ch of Cormorant buys ~38 characters,
-       so three lines is the plaque's real ceiling. */
-    { key: 'codex', ord: 'I', side: 'left', cls: 'is-free', name: 'The Codex',
-      line: '222 entries across ten systems. Every card, sign, rune and hexagram the rooms read from.', micro: 'Free · no account',
-      door: '<a class="about__door" href="codex.html?v=363">Open the Codex &rarr;</a>' },
-    { key: 'tarot', ord: 'II', side: 'right', cls: '', name: 'Tarot Divination',
-      line: 'Three cards for a Sitting, five for the Deep Read, cut from the full 78 and filed where each fell.', micro: 'First sitting free · to $2.99',
-      door: '<a class="about__door" href="?dev=drawing-room">Cut the deck &rarr;</a>' },
-    { key: 'arcana', ord: 'III', side: 'left', cls: 'is-paid', name: 'The Birth Reading',
-      line: 'Six marks from a name and birth date: astrology, the Chinese year, numerology, runes, the I Ching — each with a record.', micro: '$4.99 · $7.99 for two',
-      door: '<a class="about__door" href="?dev=arcane">Give a name and date &rarr;</a>' },
-    { key: 'mint', ord: 'IV', side: 'right', cls: 'is-free', name: 'The Card Mint',
-      line: 'One card from one photograph. The room develops what is already in it, then keeps it a page.', micro: 'Free · or the paid Halo Mint',
-      door: '<button type="button" class="about__door" data-view-to="room">See a card develop &rarr;</button>' },
-    { key: 'unlit', ord: 'V', side: 'center', cls: 'about__nugget--unlit', name: 'The Unlit Room',
-      line: 'A fifth room, unbuilt. Nothing to read here yet; the candle has not reached this end of the hall.', micro: 'Not yet open · no date',
-      door: '' }
-  ];
-  return '<section id="about" class="about" aria-label="About Blue Room">'
-    + '<header class="about__intro">'
-    +   '<p class="about__eyebrow"><span class="about__eyemark" aria-hidden="true">◆</span> BLUE ROOM</p>'
-    /* BR-S261 — THE VITRINE LABEL. The header is now a museum tombstone label
-       for the whole archive: accession stamp, title, one-line identification,
-       technical line, sill. Everything is flush left on ONE datum, and that
-       datum is the rail's own left edge, so the header's left edge and plate I's
-       border are the same x.
-       "We hold the candle." is gone: it was atmosphere with no referent, and it
-       was split across two halves staggered ±58px with a 21deg hairline between
-       them that measured 1.40:1 — not a glyph, and invisible in practice.
-       The second lede is gone too: 24% of the header's light, zero product
-       facts, and it asserted knowledge of the reader's own ignorance.
-       The spec line teaches the COLOUR LAW above plate I, so every gold and
-       violet mark down the rail is already decoded when the reader meets it. It
-       is written sentence-case and uppercased in CSS, so a screen reader says
-       words rather than spelling initials. */
-    +   '<h2 class="about__headline" aria-label="Everything read here is yours to keep.">'
-    +     '<span class="about__hx" aria-hidden="true">Everything read here</span>'
-    +     '<span class="about__hx" aria-hidden="true">is yours to keep.</span></h2>'
-    +   '<div class="about__lede">'
-    +     '<p class="about__ident">The archive draws tarot and birth readings, develops a card from a photograph, and&nbsp;files&nbsp;each one on a page of its own.</p>'
-    +   '</div>'
-    +   '<p class="about__spec">'
-    +     '<span>Five rooms</span><span class="about__spec-d" aria-hidden="true">·</span>'
-    +     '<span class="about__spec-free">Three free to enter</span><span class="about__spec-d" aria-hidden="true">·</span>'
-    +     '<span class="about__spec-paid">One paid</span><span class="about__spec-d" aria-hidden="true">·</span>'
-    +     '<span>One unlit</span></p>'
-    +   '<span class="about__sill" aria-hidden="true">'
-    +     '<span class="about__sill-line"></span><span class="about__sill-span">I &ndash; V</span></span>'
+
+function u1Column(h) {
+  var items = ROOMS.filter(function (r) { return r.state === h.state; }).map(function (r) {
+    return '<li class="u1item"><p class="u1item__t">' + r.name + '</p>'
+         + '<p class="u1item__d">' + r.soon + '</p></li>';
+  }).join('');
+  return '<section class="u1col u1col--' + h.state + '" aria-labelledby="u1h-' + h.state + '">'
+    + '<header class="u1col__head">'
+    +   '<span class="u1col__mark" aria-hidden="true">' + h.mark + '</span>'
+    +   '<h3 class="u1col__h" id="u1h-' + h.state + '">' + h.name + '</h3>'
+    +   '<span class="u1chip u1chip--' + h.state + '">' + h.chip + '</span>'
     + '</header>'
-    + '<ol class="about__rail">' + N.map(aboutNugget).join('') + '</ol>'
-    + '<footer class="about__close">'
-    +   '<span class="about__wick about__wick--close" aria-hidden="true"></span>'
-    +   '<span class="about__seal" aria-hidden="true">◆</span>'
-    +   '<p class="about__foot">One archive. Every door kept.</p>'
+    + '<p class="u1col__lede">' + h.lede + '</p>'
+    + '<ol class="u1col__list">' + items + '</ol>'
+  + '</section>';
+}
+
+/* ═══ U1 — WHAT IS OPEN, AND WHAT IS STILL BEING MADE ═══════════════════════
+   BR-S366. Replaces the five-plate rail (BR-S251). The builder's read of the
+   old page: it was a reminder list, and every item on the forward half defined
+   itself by what was MISSING — nine of ten sentences described a hole, which is
+   what made an honest page read like a defect log.
+
+   TWO CORRECTIONS, and the structure follows from them.
+   1. The page now says what is OPEN before it says what is not. That was the
+      whole of what it never did: the one surface a stranger opens to ask "is
+      any of this real" answered only in negatives.
+   2. Every forward sentence points at the destination instead of the gap.
+      "Close the page and find the reading again where you left it" is exactly
+      as true as "today a reading lasts as long as the page stays open", and it
+      is the same fact aimed the other way.
+
+   The old design (the photographed-sheet stencil plates and the membrane lines)
+   is retired, not deleted — parked/ holds both, with a note on reviving them.
+   ═════════════════════════════════════════════════════════════════════════ */
+function renderAbout() {
+  var open = u1Open();
+  /* `free` is a FIELD, not a guess. Sniffing the display string got this wrong:
+     Tarot reads "First sitting free - to $2.99", which is free to enter and does
+     not begin with the word, so the header called it paid. A fact the page states
+     must be stored, never parsed back out of the sentence that states it. */
+  var free = open.filter(function (r) { return r.free; }).length;
+  var coming = ROOMS.length - open.length;
+
+  return '<section id="about" class="about u1" aria-label="What Blue Room is, and what is coming">'
+    + '<header class="u1head">'
+    +   '<p class="u1head__eyebrow"><span class="u1head__mark" aria-hidden="true">&#9670;</span> BLUE ROOM</p>'
+    +   '<h2 class="u1head__title">Everything read here<br>is yours to keep.</h2>'
+    +   '<p class="u1head__ident">The archive draws tarot and birth readings, develops a card from a photograph, '
+    +     'and&nbsp;files&nbsp;each one on a page of its own.</p>'
+    /* The count line is DERIVED from the registry, so it can never disagree with
+       the doors beneath it. The old header said "Five rooms" in a hardcoded
+       string while the rail rendered a different set. */
+    +   '<p class="u1head__spec">'
+    +     '<span>' + open.length + ' rooms open</span><span class="u1head__d" aria-hidden="true">&middot;</span>'
+    +     '<span class="u1head__free">' + free + ' free to enter</span><span class="u1head__d" aria-hidden="true">&middot;</span>'
+    +     '<span class="u1head__paid">' + (open.length - free) + ' paid</span><span class="u1head__d" aria-hidden="true">&middot;</span>'
+    +     '<span>' + coming + ' still to come</span></p>'
+    + '</header>'
+
+    + '<section class="u1sect u1sect--open" aria-labelledby="u1-open">'
+    +   '<div class="u1sect__head">'
+    +     '<span class="u1sect__mark" aria-hidden="true">&#9679;</span>'
+    +     '<h3 class="u1sect__t" id="u1-open">Open today</h3>'
+    +   '</div>'
+    +   '<p class="u1sect__lede">Finished, unlocked, and free where it says free. '
+    +     'This is the whole of what exists right now.</p>'
+    +   '<ol class="u1doors">' + open.map(u1Door).join('') + '</ol>'
+    + '</section>'
+
+    + '<section class="u1sect u1sect--made" aria-labelledby="u1-made">'
+    +   '<div class="u1sect__head">'
+    +     '<span class="u1sect__mark u1sect__mark--quiet" aria-hidden="true">&#9671;</span>'
+    +     '<h3 class="u1sect__t" id="u1-made">What is still being made</h3>'
+    +   '</div>'
+    +   '<p class="u1sect__lede">In the order it is being made, nearest first. '
+    +     'Nothing here carries a date, because no date here would be true.</p>'
+    +   '<div class="u1board">' + U1_HORIZONS.map(u1Column).join('') + '</div>'
+    + '</section>'
+
+    + '<footer class="u1foot">'
+    +   '<p class="u1foot__line">One archive. Every door kept.</p>'
+    +   '<span class="u1foot__seal" aria-hidden="true">&#9670;</span>'
     + '</footer>'
-    + '</section>';
+  + '</section>';
 }
 
 /* The wall itself — a pure static template (no state variance). Specimen geometry is

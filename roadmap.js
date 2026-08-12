@@ -31,54 +31,26 @@
     });
   }
 
-  /* THE BOARD. Ordered by ship-order, left to right. Each item is a title and one
-     line saying what it actually is — never what it will feel like. */
-  var BOARD = [
-    {
-      key: "bench",
-      mark: "&#9670;",
-      name: "On the bench",
-      lede: "Being made now. These are the last things between here and a first day open.",
-      items: [
-        ["Buying a reading",
-         "Every price here is a preview. Nothing is charged yet, and the paid readings open without asking you for anything."],
-        ["A reading you can come back to",
-         "Today a reading lasts as long as the page stays open. Next it becomes something you close, and find again where you left it."],
-        ["The whole dealing",
-         "The deck shuffles and cuts. Watching the cards actually come down onto the table is the part still being made."]
-      ]
-    },
-    {
-      key: "drawn",
-      mark: "&#9671;",
-      name: "Drawn up",
-      lede: "Designed and waiting. These exist on paper — the room they belong to does not.",
-      items: [
-        ["Your photograph, as a card",
-         "The card itself is finished — you can see one on the desk. What is missing is the part that looks at your picture, so nothing reads a photograph yet."],
-        ["The Codex, opened by your reading",
-         "Buy a reading and every mark in it opens further: the same six marks read again for love, for friendship, for the hard years, for the small particulars."],
-        ["A name that follows you",
-         "There is no sign-up here. Until there is, everything you keep lives in this one browser and cannot travel with you."],
-        ["A reading you can show someone",
-         "One page you can hand to one person, without handing them everything else you have kept."]
-      ]
-    },
-    {
-      key: "named",
-      mark: "&#10022;",
-      name: "Named only",
-      lede: "An intention, written down so it is not lost. No design, no date, and no promise.",
-      items: [
-        ["Readings for a table",
-         "Something to put in the middle of a room with people around it, where the reading belongs to everyone sitting there rather than to one of them."],
-        ["Everything about two people",
-         "Love, and the readings that only mean anything between two — gathered into one wing instead of scattered through the building."],
-        ["The Unlit Room",
-         "Something is taking shape here, still too dim to name. The candle has not reached it yet."]
-      ]
-    }
-  ];
+  /* BR-S366 — THE BOARD IS NO LONGER WRITTEN HERE.
+
+     It used to be a second copy of the same facts, and the copies drifted: this
+     file said "nothing reads a photograph yet" while U1 gave The Card Mint a
+     door and counted it among five open rooms. Two pages, two answers, one room.
+
+     Now both read app.js's ROOMS registry. Moving a thing between states is one
+     word there and both surfaces follow. If the registry is somehow missing, the
+     page renders its columns empty rather than inventing a plan. */
+  function board() {
+    var rooms = window.BR_ROOMS || [];
+    var hz = window.BR_HORIZONS || [];
+    return hz.map(function (h) {
+      return {
+        key: h.state, mark: h.mark, name: h.name, lede: h.lede,
+        items: rooms.filter(function (r) { return r.state === h.state; })
+                    .map(function (r) { return [r.name, r.soon]; })
+      };
+    });
+  }
 
   function columnHTML(col) {
     var items = col.items.map(function (it) {
@@ -126,13 +98,13 @@
             'being made, in the order it is being made — three states, nearest first. Nothing here carries a date, ' +
             'because no date here would be true.</p>' +
         "</header>" +
-        '<div class="rm-board">' + BOARD.map(columnHTML).join("") + "</div>" +
+        '<div class="rm-board">' + board().map(columnHTML).join("") + "</div>" +
         '<footer class="rm-foot">' +
           '<p class="rm-foot__line">What is finished is already open, and free where it says it is free.</p>' +
           '<nav class="rm-foot__links" aria-label="Where to go instead">' +
             '<a class="st-foot__link" href="./#rooms">The Reading Rooms</a>' +
             '<span class="st-foot__dot" aria-hidden="true">&middot;</span>' +
-            '<a class="st-foot__link" href="codex.html?v=237">The Codex</a>' +
+            '<a class="st-foot__link" href="codex.html?v=363">The Codex</a>' +
             '<span class="st-foot__dot" aria-hidden="true">&middot;</span>' +
             '<a class="st-foot__link" href="about/">What Blue Room is</a>' +
             '<span class="st-foot__dot" aria-hidden="true">&middot;</span>' +

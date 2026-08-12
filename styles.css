@@ -5600,3 +5600,181 @@ html.orbit-wings .orbit__field { --orbit-rx: clamp(200px, 25.5vw, 368px); --orbi
      draw a circle through the mark */
   .orbit .orbit__plate--prime::after { display: none; }
 }
+
+/* ============================================================================
+   U1 — WHAT IS OPEN, AND WHAT IS STILL BEING MADE          BR-S366
+
+   Replaces the .about__ rail (BR-S251). The markup is emitted by renderAbout()
+   from the ROOMS registry in app.js; nothing here knows what state a room is in
+   except through the class the registry produced.
+
+   THE OLD .about__ BLOCK ABOVE IS NOW DEAD and is left for a dedicated sweep
+   rather than removed blind — this file has already lost one rule to a comment
+   that closed early (BR-S360), and a 100-line delete is exactly where that
+   happens again.
+
+   STATUS IS NEVER COLOUR ALONE. Every chip carries a SHAPE and a WORD as well
+   as its ink (WCAG 1.4.1), and the columns lighten left to right so priority is
+   readable without reading — but the lightening is decoration on top of the
+   label, never the label itself.
+   ========================================================================== */
+.u1 { max-width: min(1180px, 94vw); margin: 0 auto; padding: 30px 0 40px; }
+
+.u1head__eyebrow { font-family: var(--font-mono); font-size: 9.5px; font-weight: 500;
+  letter-spacing: .26em; text-transform: uppercase; color: var(--muted); margin: 0 0 14px; }
+.u1head__mark { color: var(--gold, #c9a35c); }
+.u1head__title { font-family: var(--font-display); font-size: clamp(30px, 3.4vw, 46px);
+  font-weight: 600; line-height: 1.04; letter-spacing: -.01em; color: var(--t-display, #e9e5dc);
+  margin: 0 0 16px; }
+.u1head__ident { font-family: var(--font-display); font-size: 21px; line-height: 1.5;
+  color: var(--silver, #c8c4bb); margin: 0 0 12px; max-width: 34em; }
+.u1head__spec { font-family: var(--font-mono); font-size: 9.5px; letter-spacing: .16em;
+  text-transform: uppercase; color: var(--muted); margin: 0; }
+.u1head__d { color: #4a463f; margin: 0 8px; }
+.u1head__free { color: #7f9a86; }
+.u1head__paid { color: #8a72c4; }
+
+.u1sect { margin-top: 40px; padding-top: 40px; border-top: 1px solid rgba(233, 229, 220, .13); }
+.u1sect__head { display: flex; align-items: baseline; gap: 12px; margin: 0 0 6px; }
+.u1sect__mark { font-size: 12px; color: var(--gold, #c9a35c); }
+.u1sect__mark--quiet { color: var(--muted); }
+.u1sect__t { font-family: var(--font-mono); font-size: 10px; font-weight: 500;
+  letter-spacing: .22em; text-transform: uppercase; color: var(--t-display, #e9e5dc); margin: 0; }
+.u1sect__lede { font-family: var(--font-display); font-size: 18px; line-height: 1.5;
+  color: var(--muted); margin: 0 0 22px; max-width: 44em; }
+
+/* the doors. auto-fit so a room that opens just joins the row — and per-card
+   borders rather than a painted container, so an incomplete last row leaves no
+   visible holes however many rooms there are. */
+.u1doors { list-style: none; margin: 0; padding: 0;
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(248px, 1fr)); gap: 14px; }
+.u1door { background: #0d0e11; border: 1px solid rgba(233, 229, 220, .11);
+  padding: 18px 20px 18px; display: flex; flex-direction: column; gap: 9px; min-height: 224px; }
+.u1door__top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.u1door__ord { font-family: var(--font-mono); font-size: 9px; letter-spacing: .2em; color: #5d584f; }
+.u1door__emblem { display: block; width: 30px; height: 30px; color: var(--gold, #c9a35c); opacity: .75; }
+.u1door__emblem svg { width: 100%; height: 100%; display: block; }
+.u1door__name { font-family: var(--font-display); font-size: 23px; line-height: 1.12;
+  color: var(--t-display, #e9e5dc); margin: 0; }
+.u1door__line { font-family: var(--font-display); font-size: 17px; line-height: 1.45;
+  color: var(--muted); margin: 0; flex: 1; }
+.u1door__cost { font-family: var(--font-mono); font-size: 9px; letter-spacing: .13em;
+  text-transform: uppercase; color: #6f6a61; margin: 0; }
+.u1door__go { font-family: var(--font-mono); font-size: 9.5px; letter-spacing: .14em;
+  text-transform: uppercase; color: var(--silver, #c8c4bb); text-decoration: none;
+  border-bottom: 1px solid rgba(200, 196, 187, .3); padding-bottom: 2px; align-self: flex-start;
+  transition: color 180ms ease, border-color 180ms ease; }
+.u1door__go:hover { color: var(--t-display, #e9e5dc); border-bottom-color: rgba(233, 229, 220, .7); }
+
+.u1chip { display: inline-flex; align-items: center; gap: 6px; font-family: var(--font-mono);
+  font-size: 8.5px; font-weight: 500; letter-spacing: .18em; text-transform: uppercase;
+  border: 1px solid; border-radius: 2px; padding: 3px 7px 2px; white-space: nowrap; }
+.u1chip--open  { color: #8fae99; border-color: rgba(143, 174, 153, .42); }
+.u1chip--bench { color: #c9a35c; border-color: rgba(201, 163, 92, .40); }
+.u1chip--drawn { color: #9a94b8; border-color: rgba(154, 148, 184, .34); }
+.u1chip--named { color: #7c766c; border-color: rgba(124, 118, 108, .30); }
+
+.u1board { display: grid; grid-template-columns: repeat(3, 1fr); gap: 38px; }
+.u1col__head { display: flex; align-items: baseline; gap: 9px; margin: 0 0 4px; flex-wrap: wrap; }
+.u1col__mark { font-size: 11px; }
+.u1col__h { font-family: var(--font-mono); font-size: 10px; font-weight: 500;
+  letter-spacing: .2em; text-transform: uppercase; margin: 0; }
+.u1col__lede { font-family: var(--font-display); font-size: 16.5px; line-height: 1.45;
+  margin: 0 0 20px; min-height: 74px; }
+.u1col__list { list-style: none; margin: 0; padding: 0; display: grid; gap: 24px; }
+.u1item__t { font-family: var(--font-display); font-size: 20px; line-height: 1.18; margin: 0 0 4px; }
+.u1item__d { font-family: var(--font-display); font-size: 16.5px; line-height: 1.45; margin: 0; }
+
+.u1col--bench .u1col__mark { color: #c9a35c; }
+.u1col--bench .u1col__h { color: var(--t-display, #e9e5dc); }
+.u1col--bench .u1col__lede, .u1col--bench .u1item__d { color: var(--muted); }
+.u1col--bench .u1item__t { color: #dcd7cd; }
+.u1col--drawn .u1col__mark { color: #9a94b8; }
+.u1col--drawn .u1col__h { color: var(--silver, #c8c4bb); }
+.u1col--drawn .u1col__lede, .u1col--drawn .u1item__d { color: #7c766c; }
+.u1col--drawn .u1item__t { color: #bdb8ae; }
+.u1col--named .u1col__mark { color: #6f6a61; }
+.u1col--named .u1col__h { color: #9b968d; }
+.u1col--named .u1col__lede, .u1col--named .u1item__d { color: #6b665e; }
+.u1col--named .u1item__t { color: #96918a; }
+
+.u1foot { margin-top: 48px; padding-top: 22px; border-top: 1px solid rgba(233, 229, 220, .10);
+  display: flex; align-items: center; gap: 12px; }
+.u1foot__line { font-family: var(--font-display); font-size: 17px; color: #7c766c; margin: 0; }
+.u1foot__seal { color: var(--gold, #c9a35c); font-size: 11px; opacity: .8; }
+
+@media (max-width: 900px) {
+  .u1board { grid-template-columns: 1fr; gap: 34px; }
+  .u1col__lede { min-height: 0; }
+}
+
+/* ── BR-S367 · TWO REGISTERS ON ONE PAGE ──────────────────────────────────────
+   The builder's read, and it is the right one: the page should not be written in
+   one voice. What is OPEN is finished and should feel pressed and solid. What is
+   COMING is a notebook — ideas as they are actually formed here, written down in
+   the working. So the lower half stops pretending to be a product grid and owns
+   being a scribble, and the contrast between the two halves does the work that a
+   status label alone was doing.
+
+   The rule that keeps this honest: the scribble is a MATERIAL, never a hedge. It
+   is set with the same care as the finished half — the hand margin is on a datum,
+   the italic is large enough to read, and every colour still clears 4.5:1. A note
+   that looks careless reads as a plan that is careless.
+   ────────────────────────────────────────────────────────────────────────────── */
+
+/* ── FINISHED. A door is a pressed plate, not a bordered div. ─────────────── */
+.u1door {
+  background:
+    linear-gradient(168deg, rgba(233, 229, 220, .045) 0%, rgba(233, 229, 220, 0) 46%),
+    linear-gradient(#101216, #0c0d10);
+  border: 1px solid rgba(233, 229, 220, .16);
+  box-shadow:
+    inset 0 1px 0 rgba(233, 229, 220, .07),          /* the lit top edge */
+    inset 0 -1px 0 rgba(0, 0, 0, .5),                /* the shadowed sill */
+    0 1px 0 rgba(0, 0, 0, .45);
+  position: relative;
+}
+/* the engraved inner line — what makes a plate read as stock rather than a box */
+.u1door::after {
+  content: ""; position: absolute; inset: 5px; pointer-events: none;
+  border: 1px solid rgba(233, 229, 220, .05);
+}
+.u1door__ord { color: #6d675c; }
+.u1door__emblem { opacity: .9; filter: drop-shadow(0 1px 0 rgba(0, 0, 0, .6)); }
+.u1door__name { text-shadow: 0 1px 0 rgba(0, 0, 0, .55); }
+.u1door__cost { color: #78726a; }
+/* the open chip stays a hard-edged stamp: the finished half is stamped, the
+   coming half is annotated, and the two never borrow each other's form */
+.u1chip--open { background: rgba(143, 174, 153, .07); }
+
+/* ── THE NOTEBOOK. Everything below the second rule. ──────────────────────── */
+/* the hand margin: one ruled line per column, on the same datum as the text it
+   holds. Fading at both ends so it reads as drawn, not as a table border. */
+.u1sect--made .u1col { position: relative; padding-left: 20px; }
+.u1sect--made .u1col::before {
+  content: ""; position: absolute; left: 0; top: 4px; bottom: 6px; width: 1px;
+  background: linear-gradient(rgba(233, 229, 220, 0), rgba(233, 229, 220, .16) 8%,
+              rgba(233, 229, 220, .16) 88%, rgba(233, 229, 220, 0));
+}
+/* the horizon label is a pencil annotation, so its chip loses the box the open
+   stamp keeps — same information, a different hand */
+.u1sect--made .u1chip {
+  border: 0; padding: 0; font-family: var(--font-display); font-style: italic;
+  font-size: 14px; font-weight: 500; letter-spacing: .01em; text-transform: none;
+}
+.u1col__lede { font-style: italic; }
+/* the item body is handwriting; the title stays upright so the eye can still
+   scan the list. 16.5px italic is the floor at which this stays comfortable */
+.u1item__d { font-style: italic; }
+.u1item { position: relative; }
+/* a struck-in margin tick beside each note, the mark you make next to a line you
+   mean to come back to */
+.u1item::before {
+  content: ""; position: absolute; left: -20px; top: .62em; width: 7px; height: 1px;
+  background: currentColor; opacity: .28;
+}
+.u1col--bench .u1item::before { opacity: .5; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .u1door__go { transition: color 180ms ease, border-color 180ms ease; }
+}
