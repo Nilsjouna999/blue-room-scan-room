@@ -1461,12 +1461,23 @@ const ROOMS = [
     soon: "Buy a reading and every mark in it opens further: the same six read again for love, for friendship, for the hard years, for the small particulars.",
     cost: "", cta: "", href: "" },
 
-  { key: "name", state: "drawn", name: "Your shelf, on any screen",
+  /* BR-S380 — THESE TWO ARE THE PRODUCT, NOT NEWS ABOUT IT. The builder's read:
+     by the time either exists it is simply what Blue Room IS. Both are plumbing —
+     one is your things surviving a device, the other is a link — and the registry
+     already has the right answer for plumbing three entries up: `internal`. "A
+     reading that waits for you" (persistence) is internal; "Your shelf, on any
+     screen" is the SAME FACT across two devices and was public. That was the
+     inconsistency, and it cost the forward list twice: a stranger reading it was
+     told, in the two calmest sentences on the page, that nothing they keep
+     survives and nothing they get can be shown to anyone.
+     They stay in the registry because the work is real and still has to be done.
+     They come off the page because "we will have accounts" is not an attraction. */
+  { key: "name", state: "drawn", internal: true, name: "Your shelf, on any screen",
     now: "Everything you have kept, on whatever you are holding.",
     soon: "What you keep lives in this one browser today. Next it follows you &mdash; another screen, another room, another year.",
     cost: "", cta: "", href: "" },
 
-  { key: "share", state: "drawn", name: "A reading you can show someone",
+  { key: "share", state: "drawn", internal: true, name: "A reading you can show someone",
     now: "One page you can hand to one person.",
     soon: "One page you can hand to one person, without handing them everything else you have kept.",
     cost: "", cta: "", href: "" },
@@ -1493,9 +1504,17 @@ const ROOMS = [
     soon: "Social games for people in a room together: drinking games, and a deck of deep questions to put down in the middle. The unit is the group, not the reader.",
     cost: "", cta: "", href: "" },
 
-  { key: "two", state: "named", name: "Everything about two people",
-    now: "Love, and the readings that only mean anything between two.",
-    soon: "Love, and the readings that only mean anything between two, gathered into one wing instead of scattered through the building.",
+  /* BR-S380 — LOVE. The builder's note: the space is not well defined YET, and the
+     line should still read better than it did. Those are not in conflict — the old
+     copy ("the readings that only mean anything between two… gathered into one wing
+     instead of scattered through the building") was weak because it described a
+     FILING JOB, not a thing anyone wants. What is certain here is not the shape, it
+     is that this belongs to the building. So the line says exactly that, and says
+     the shape is unsettled out loud rather than dressing a guess up as a plan —
+     which is what BR-S379 had to undo one entry above. */
+  { key: "two", state: "named", name: "Love",
+    now: "What these rooms already read about two people, in one place instead of scattered through the others.",
+    soon: "Love runs through every room here and lives in none of them. The shape is not settled; that it gets a room of its own is.",
     cost: "", cta: "", href: "" },
 
   { key: "unlit", state: "named", name: "The Unlit Room",
