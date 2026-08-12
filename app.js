@@ -1494,7 +1494,13 @@ const ROOMS = [
     now: "One card from one photograph. The room develops what is already in it, then keeps it a page.",
     soon: "The card is already made &mdash; you can see one on the desk. What is missing is the room that reads a picture of your own.",
     leak: "m1",   // the desk's live sample, not a picture of it — see u1Column
-    leakAlt: "A detail of the card on the desk &mdash; open the room where it is",
+    /* BR-S399 — the second frame: the SAME card developed. Regenerate it with
+       `?src=03&t=shiny`, crop the card's ledger — it is a rendered state, not a
+       photograph, so nothing in the app can hand it over live the way m1Source()
+       hands over the first. The filename carries what it is a picture OF, so a
+       future change to M1's sample makes the staleness visible rather than silent. */
+    leakNext: "assets/leak/m1-developed.webp",
+    leakAlt: "A detail of the card on the desk. Press the right edge to see it developed.",
     cost: "Free &middot; or the paid Halo Mint", cta: "See a card develop", href: "?view=room" },
 
   { key: "pay", state: "bench", internal: true, name: "Paying for a reading",
@@ -2006,6 +2012,61 @@ function wireVision() {
    threshold already draws: looking is free, always; keeping is what opens a door.
    One stack, so the board stays three tracks wide whether or not the second box is
    there — a fourth column would break a grid built for three. */
+/* BR-S399 — THE FOUND FRAGMENT, and the only three things it does.
+   Press its RIGHT EDGE and it turns to the next frame; press anywhere else on it, or
+   anywhere else at all, and it puts itself away. Escape does the same, because a
+   keyboard has no edges to click. It never leaves its place in the column and it never
+   grows past its own size — the builder's rule was "not full screen, nor button
+   working, only viewing", so it navigates nowhere and opens nothing.
+
+   Delegated on `document` rather than bound to the node, because U1 re-renders on
+   every menu mount and a bound handler would be talking to a fragment that no longer
+   exists. Nothing is cached; every lookup happens at event time. */
+function wireU1Leak() {
+  function close(el) {
+    if (!el) return;
+    el.classList.remove("is-open");
+    el.querySelectorAll(".u1leak__f").forEach(function (img, i) { img.hidden = i !== 0; });
+  }
+  function closeAll(except) {
+    document.querySelectorAll(".u1leak.is-open").forEach(function (el) {
+      if (el !== except) close(el);
+    });
+  }
+  document.addEventListener("click", function (e) {
+    var el = e.target.closest && e.target.closest(".u1leak");
+    if (!el) { closeAll(null); return; }
+    closeAll(el);
+    var frames = el.querySelectorAll(".u1leak__f");
+    if (!el.classList.contains("is-open")) { el.classList.add("is-open"); return; }
+    // the right EDGE turns the page; the rest of it closes, like the page around it
+    var r = el.getBoundingClientRect();
+    if (frames.length > 1 && (e.clientX - r.left) / r.width > 0.58) {
+      var cur = 0;
+      frames.forEach(function (f, i) { if (!f.hidden) cur = i; });
+      var next = (cur + 1) % frames.length;
+      frames.forEach(function (f, i) { f.hidden = i !== next; });
+      return;
+    }
+    close(el);
+  }, true);
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape") closeAll(null);
+    if (e.key !== "ArrowRight" && e.key !== "Enter" && e.key !== " ") return;
+    var el = document.activeElement;
+    if (!el || !el.classList || !el.classList.contains("u1leak")) return;
+    var frames = el.querySelectorAll(".u1leak__f");
+    if (!el.classList.contains("is-open")) { el.classList.add("is-open"); e.preventDefault(); return; }
+    if (e.key === "ArrowRight" && frames.length > 1) {
+      var cur = 0;
+      frames.forEach(function (f, i) { if (!f.hidden) cur = i; });
+      var next = (cur + 1) % frames.length;
+      frames.forEach(function (f, i) { f.hidden = i !== next; });
+      e.preventDefault();
+    }
+  });
+}
+
 function u1Aside() {
   /* BR-S383 — ONE BOX, NOT TWO. It shipped as a pair, and the builder asked the
      question that ends it: why two? Both opened the SAME room — `?dev=vision` and
@@ -2053,11 +2114,21 @@ function u1Column(h) {
       leakSrc = m1 && m1.file;
       if (m1 && m1.photoTuning && m1.photoTuning.pos) leakPos = m1.photoTuning.pos;
     }
-    var leak = (leakSrc && r.href)
-      ? '<a class="u1leak" href="' + r.href + '" aria-label="' + (r.leakAlt || r.name) + '">'
+    /* BR-S399 — VIEWING ONLY. It was an <a> into the room; the builder's correction was
+       "not full screen, nor button working — only viewing". So it navigates nowhere and
+       opens nothing: a peephole that stays exactly where it is, at exactly its size.
+       A <button> for the keyboard and the screen reader, but it does not act like one —
+       pressing the right edge turns to the next frame, anything else puts it away. */
+    var leak = leakSrc
+      ? '<button type="button" class="u1leak" aria-label="' + (r.leakAlt || r.name) + '">'
         + '<img class="u1leak__f" src="' + leakSrc + '" alt="" loading="lazy" '
         +   'decoding="async" style="object-position:' + leakPos + '">'
-        + '</a>'
+        + (r.leakNext
+            ? '<img class="u1leak__f u1leak__f--next" src="' + r.leakNext + '" alt="" '
+              + 'loading="lazy" decoding="async" hidden>'
+              + '<span class="u1leak__turn" aria-hidden="true"></span>'
+            : '')
+        + '</button>'
       : '';
     return '<li class="u1item"><p class="u1item__t">' + r.name + '</p>'
          + '<p class="u1item__d">' + r.soon + '</p>' + leak + '</li>';
@@ -6324,6 +6395,7 @@ try {
 
 mountMenu();
 syncBuildFlip();   // BR-S377 — the dev⇄public flip, once, on every room
+wireU1Leak();      // BR-S399 — the found fragment, viewing only
 renderSourceToggle();
 /* DEV NAV: fill + reveal the dev rail only behind ?devnav=1; sets the
    body attribute the CSS gates on. Inert (display:none) on any clean URL. */

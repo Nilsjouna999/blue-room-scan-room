@@ -5827,7 +5827,25 @@ html.orbit-wings .orbit__field { --orbit-rx: clamp(200px, 25.5vw, 368px); --orbi
    `object-fit` do the framing and sliced "BR-003-FSH-0001" to "BR-003-FS", which reads
    as a bug rather than a crop. Where a picture is cut is a decision, and it belongs in
    the file that makes the picture. */
-.u1leak { display: inline-block; margin-top: 12px; border-radius: 2px; line-height: 0; }
+/* BR-S399: a <button> that must not look or behave like one — no fill, no padding, no
+   label. Open, it lights and grows a LITTLE (62 → 108px) so it can be read; it never
+   leaves the column and never goes full screen. Width is the only geometry that moves,
+   and the entries below shift by the difference — 30px once, on a deliberate press,
+   which is a different thing from a page that jumps at you. */
+.u1leak { display: inline-block; margin-top: 12px; border-radius: 2px; line-height: 0;
+  padding: 0; border: 0; background: none; cursor: pointer; }
+.u1leak__f--next { display: block; }
+.u1leak__f[hidden] { display: none; }   /* explicit display beats [hidden] — BR-S381/385/395 */
+/* the turn-target, drawn only while open: a hairline down the right edge saying where
+   the next frame lives. Never a chevron — the fragment is not a carousel. */
+.u1leak__turn { display: none; }
+.u1leak.is-open { position: relative; }
+.u1leak.is-open .u1leak__turn {
+  display: block; position: absolute; top: 6px; right: 0; bottom: 6px; width: 42%;
+  border-right: 1px solid rgba(201, 163, 92, .55);
+  pointer-events: none;
+}
+.u1leak.is-open .u1leak__f { width: 108px; opacity: 1; filter: none; border-color: var(--gold, #c9a35c); }
 .u1leak__f {
   display: block; width: 62px; aspect-ratio: 3 / 2; height: auto;
   object-fit: cover; border-radius: 2px;
