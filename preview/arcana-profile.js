@@ -51,10 +51,21 @@
       name: "The Twice-Kindled Giver",
       spine: "Aries · Snake · Life Path 7",
       inputs_provided: ["name", "birth date", "birthplace"],
-      result_count: 3, created_at: "2026-07-09", is_current: true
+      /* BR-S382: was 3, which matched nothing. The Birth Reading draws SIX marks
+         (astrology, the Chinese year, numerology, runes, the I Ching, and the
+         hexagram) — the number the ROOMS registry and the room itself both say. A
+         crown's gems are its reading's DEPTH, not a tally of readings: canon is
+         "ornamentation scales with depth of the reading"
+         (BR-ARCANA-HANDOFF-PROFILE-HUB-AND-DIAGRAMS.md:73). The old caption read
+         "3 gems set — one for each reading it holds" beside a Vault printing one
+         crown, so the largest object on the page contradicted the row below it. */
+      result_count: 6, created_at: "2026-07-09", is_current: true
     },
-    // Rings section is only the "read for someone" box now (no example rings).
-    // The Shelf is minted-card slots only — empty until minting is live (real vault not built).
+    /* BR-S382: these two comments were both false. The Vault holds crowns AND rings,
+       and `rings` below is the real field the row reads — the sentence used to be
+       hardcoded. `vault_slots` is the minted register's reserve, and the Shelf is the
+       whole page, not the minted section (BR-S353). */
+    rings: [],          // earned by reading for someone close; none set on the mock
     vault_slots: 4,
     // What the Showcase can feature: the seeker's OWN reading results, and minted cards.
     reading_results: [
@@ -205,10 +216,13 @@
     if (taken) {
       crown = '<div class="pf-crownstage">' +
         '<button type="button" class="pf-crownbtn" data-open-reading="' + esc(c.reading_id) + '" aria-label="Open your Birth Reading">' +
-          crownSVG(points, gems, { cls: "pf-crown-svg", aria: "Crown holding " + gems + " readings" }) +
+          /* BR-S382: "readings", here and in the caption below, was the page's own
+             largest object contradicting the Vault row beneath it — one crown, one
+             reading, and a count of three. Gems are the reading's MARKS. */
+          crownSVG(points, gems, { cls: "pf-crown-svg", aria: "Crown holding " + gems + " marks" }) +
         '</button>' +
         '<div class="pf-crownstage__cap">' +
-          '<p class="pf-prov">' + gems + ' gems set — one for each reading it holds.</p>' +
+          '<p class="pf-prov">' + gems + ' gems set — one for each mark this reading drew.</p>' +
           '<p class="pf-crownstage__filed">Filed ' + esc(fmtDate(c.created_at)) + ' &middot; ' + esc(c.reading_id) + '</p>' +
           '<a class="pf-openreading pf-openreading--lg" href="#" data-open-reading="' + esc(c.reading_id) + '">Open this reading &rarr;</a>' +
         '</div></div>';
@@ -218,7 +232,7 @@
           '<span class="pf-crown-empty">No crown yet<br>draw a reading</span>' +
         '</button>' +
         '<div class="pf-crownstage__cap">' +
-          '<p class="pf-prov">A crown is earned by taking a reading — it gains a gem for each reading it holds.</p>' +
+          '<p class="pf-prov">A crown is earned by taking a reading — a gem set for every mark it draws.</p>' +
           '<a class="pf-openreading pf-openreading--lg pf-paid" href="#" data-draw="self" data-intent="new">Draw your Birth Reading &middot; $4.99 &rarr;</a>' +
         '</div></div>';
     }
@@ -226,7 +240,11 @@
     return '<section class="pf-surface">' + id + crownname + crown + '</section>';
   }
 
-  /* ---------- Rings — family + friend crowns (§3.4) ---------- */
+  /* ---------- The Vault — crowns, rings, and the door to read for someone ----------
+     BR-S382: this heading said "Rings — family + friend crowns (§3.4)" over a function
+     that returns section("The Vault", …). The section carried two competing names in
+     source and a third on screen, and §3.4 points at a spec paragraph that no longer
+     describes what renders here. One name, no spec number. */
   var RELATIONS = ["Mother", "Father", "Sister", "Brother", "Grandmother", "Grandfather", "Aunt", "Uncle", "Cousin", "Partner", "Child", "Friend"];
 
   function vaultHTML() {
@@ -257,8 +275,18 @@
           '<span class="pf-vaultrow__v">' + esc(c.name || "one, unnamed") + '</span></div>'
       : '<div class="pf-vaultrow pf-vaultrow--empty"><span class="pf-vaultrow__k">Crowns</span>' +
           '<span class="pf-vaultrow__v">None borne yet.</span></div>';
-    var ringrow = '<div class="pf-vaultrow"><span class="pf-vaultrow__k">Rings</span>' +
-        '<span class="pf-vaultrow__v">A ring is earned by reading for someone close &mdash; none set yet.</span></div>';
+    /* BR-S382: this row was one hardcoded sentence that declared itself empty without
+       the class that STYLES empty — so in the same box the Crowns empty state rendered
+       dim italic and the Rings empty state rendered full-weight roman: the emptier row
+       was the louder one. It now branches off a real array exactly the way Crowns
+       branches off the crown record, which also means the first ring that is ever set
+       will not leave the row still insisting none are. */
+    var rings = (held() && SEEKER.rings) ? SEEKER.rings : [];
+    var ringrow = rings.length
+      ? '<div class="pf-vaultrow"><span class="pf-vaultrow__k">Rings</span>' +
+          '<span class="pf-vaultrow__v">' + esc(rings.map(function (r) { return r.name; }).join(", ")) + '</span></div>'
+      : '<div class="pf-vaultrow pf-vaultrow--empty"><span class="pf-vaultrow__k">Rings</span>' +
+          '<span class="pf-vaultrow__v">None set yet &mdash; a ring is earned by reading for someone close.</span></div>';
     return section("The Vault", null, null,
       '<div class="pf-vaultbox">' + crowns + ringrow +
         '<div class="pf-family">' + add + '</div></div>');
@@ -271,7 +299,9 @@
         '<span class="pf-card__n">' + esc(m.name) + '</span></span></div>';
     }).join("");
     // Empty state is one calm line (the lede) — no ghost slots. Cards appear when minting is live.
-    var body = cards ? '<div class="pf-vault"><div class="pf-cards">' + cards + '</div></div>' : "";
+    // BR-S382: .pf-vault renamed .pf-minted — it was never the Vault's, only this
+    // section's, and it shadowed the real Vault's namespace 500 lines away.
+    var body = cards ? '<div class="pf-minted"><div class="pf-cards">' + cards + '</div></div>' : "";
     /* BR-S353: this section was called "The Shelf" while settings.js names the WHOLE
        page The Shelf and reports it Open — so following "The Shelf →" landed on a
        section of that name saying it was not open. The page keeps the name; the

@@ -368,6 +368,17 @@ The no-crown branch renders `>Draw your Birth Reading &middot; $4.99 &rarr;</a>`
 **25. The newest block invents five colours outside the token set** [system · medium]
 `… text-transform: uppercase; color: #8c867b; }` plus `#c8c4bb`, `#7c766c` and two raw border rgba()s. Its structural peer `.pf-card__k` uses `var(--pf-ghost)` at the same .18em, and css:344 later retunes that whole class *through the token*. · `arcana-profile.css:677-683` · The palette exists so a colour can be retuned in one place — three passes have done exactly that. These five values are invisible to that mechanism, which is how the sub-AA grey in #10 got in. Measured, they extend the ramp: `#8c867b` L*56.1 and `#7c766c` L*49.9 sit below `--pf-ghost` L*60.4, and `#c8c4bb` L*79.2 is a fourth cream. The same lines also reach for `var(--font-mono, …)` instead of `--pf-mono` — they resolve, but confirm the block was written against a different vocabulary than the file it lives in. · **Fix:** map all five onto tokens; if a tier is genuinely missing, add it at the top, not as a literal 660 lines down.
 
+**26. ~~The removed modal left its violet stylesheet behind~~ — FALSE FINDING (BR-S382)** [system · low]
+
+> **This one is wrong and must not be acted on.** `.dr-tier--paid` and `.dr-cut--paid`
+> are LIVE: `drawing-room.js` emits both — see `tierDoor()`, which writes
+> `class="dr-tier dr-tier--paid"` on a paid door, and the matching cut markup beside
+> it. The original check grepped only `arcana-profile.js`, concluded "no `dr-` string
+> exists anywhere", and read a stylesheet's scope as its owner's. Deleting these 18
+> lines would strip the Drawing Room's paid tier of its violet.
+> **The lesson generalises:** a stylesheet is not owned by the script that shares its
+> name. Search every emitter before calling C§ dead. Original text follows.
+
 **26. The removed modal left its violet stylesheet behind** [system · low]
 `.dr-tier--paid` / `.dr-cut--paid` and the comment "PAID cut — the mock settle (BR-S190): violet price on the button (pf-paid register)" match no markup — no `dr-` string exists anywhere in `arcana-profile.js`. · `arcana-profile.css:520-537` · 18 lines of dead violet C§ that make the violet audit harder and imply a component that no longer exists. · **Fix:** delete.
 

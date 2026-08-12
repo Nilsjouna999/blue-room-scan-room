@@ -127,7 +127,9 @@
 .pf-sec__note { font-family: var(--pf-mono); font-size: 8.5px; letter-spacing: .16em; text-transform: uppercase; color: var(--pf-ghost); }
 .pf-lede { font-family: var(--pf-serif); font-size: 17.5px; line-height: 1.6; color: var(--pf-body); max-width: 60ch; margin: 2px 0 20px; }
 
-/* Rings — mini-crowns (§3.4) */
+/* BR-S382 — the Vault's "read for someone" control and, when they exist, ring
+   mini-crowns beside it. Was headed "Rings (§3.4)", a name this section has not had
+   since BR-S372 and a spec paragraph that no longer describes it. */
 /* BR-S374 — `gap` is an INTER-item rule; it does nothing to this box's own top
    edge, so the dashed add-box stacked its border straight onto the Rings row's
    hairline — the one place on the page where two drawn edges met with no air.
@@ -152,8 +154,12 @@
 .pf-relopt { text-align: left; background: none; border: 1px solid var(--pf-line); border-radius: 5px; padding: 9px 12px; cursor: pointer; font-family: var(--pf-serif); font-size: 15px; color: var(--pf-cream); transition: border-color .15s, background .15s, color .15s; }
 .pf-relopt:hover, .pf-relopt:focus-visible { border-color: var(--pf-violet); color: var(--pf-violet-lit); background: rgba(138,111,176,.08); outline: none; }
 
-/* the vault */
-.pf-vault { display: grid; grid-template-columns: 1fr; gap: 16px; }
+/* BR-S382 — THE MINTED REGISTER, not the Vault. This comment said "the vault" and
+   headed a class only `mintedHTML()` consumes; the real Vault is `.pf-vaultbox` /
+   `.pf-vaultrow` 500 lines down. An editor told to style the Vault greps `vault`,
+   hits this first, and edits the ADJACENT section — a mistake that looks plausible on
+   screen. Renamed so `pf-vault*` belongs to one thing. */
+.pf-minted { display: grid; grid-template-columns: 1fr; gap: 16px; }
 .pf-cards { display: flex; gap: 14px; overflow-x: auto; padding: 2px 2px 10px; }
 .pf-card { position: relative; flex: 0 0 auto; width: 134px; aspect-ratio: 3 / 4.3; border: 1px solid var(--pf-line); border-radius: 9px; overflow: hidden; display: flex; flex-direction: column; text-align: left; cursor: pointer; background: linear-gradient(180deg, #101217, #0b0c10); transition: border-color .18s, transform .08s, box-shadow .22s; }
 .pf-card:hover, .pf-card:focus-visible { border-color: var(--pf-gold); box-shadow: 0 12px 30px rgba(0,0,0,.45); outline: none; }
@@ -685,18 +691,26 @@
 .pf-shelfline + .pf-sec { margin-top: 0; }
 .pf-shelfline__rule { flex: 1; height: 1px; background: var(--pf-line-cut, rgba(201, 163, 92, .22)); }
 .pf-shelfline__lab {
-  font-family: var(--font-mono, "IBM Plex Mono", monospace);
+  font-family: var(--pf-mono);
   font-size: 9px; font-weight: 500; letter-spacing: .26em; text-transform: uppercase;
-  color: var(--pf-gold-lit, #c9a35c); white-space: nowrap;
+  color: var(--pf-gold-lit); white-space: nowrap;
 }
 /* the Vault is a drawer, not a display: two rows, ruled, quiet. Its name is
-   never advertised — nothing links here, and the word appears once. */
-.pf-vaultbox { border: 1px solid rgba(233, 229, 220, .10); border-radius: 3px; padding: 2px 16px 14px; }
+   never advertised — nothing links here, and the word appears once.
+
+   BR-S382 — THIS BLOCK NOW SPEAKS THE FILE'S OWN VOCABULARY. It was written with
+   five raw literals and two raw rgba()s, plus `var(--font-mono, …)` where the rest
+   of the file says `--pf-mono`. Measured, the literals were not even on the ramp:
+   #8c867b L*56.1 and #7c766c L*49.9 sat BELOW --pf-ghost L*60.4, and #c8c4bb L*79.2
+   was a fourth cream. The palette exists so a colour can be retuned in one place —
+   three passes have done exactly that — and values invisible to that mechanism are
+   how the sub-AA grey of BR-S374 got in. Every one now resolves through a token. */
+.pf-vaultbox { border: 1px solid var(--pf-line); border-radius: 3px; padding: 2px 16px 14px; }
 .pf-vaultrow { display: flex; gap: 18px; align-items: baseline; padding: 12px 0;
-  border-bottom: 1px solid rgba(233, 229, 220, .07); }
-.pf-vaultrow__k { flex: 0 0 74px; font-family: var(--font-mono, monospace); font-size: 9px;
-  font-weight: 500; letter-spacing: .18em; text-transform: uppercase; color: #8c867b; }
-.pf-vaultrow__v { font-family: var(--font-display, serif); font-size: 17px; color: #c8c4bb; }
+  border-bottom: 1px solid var(--pf-line-soft); }
+.pf-vaultrow__k { flex: 0 0 74px; font-family: var(--pf-mono); font-size: 9px;
+  font-weight: 500; letter-spacing: .18em; text-transform: uppercase; color: var(--pf-meta); }
+.pf-vaultrow__v { font-family: var(--pf-serif); font-size: 17px; color: var(--pf-body); }
 /* BR-S374 — the empty state was the page's ONLY sub-AA text: #7c766c at 17px is
    4.37:1 bare, 4.15:1 under the lamp. It renders "None borne yet." — the first
    sentence a new visitor reads here. The ghost tier (6.29:1) is the floor
