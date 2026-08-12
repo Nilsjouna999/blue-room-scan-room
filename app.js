@@ -1723,13 +1723,24 @@ function renderWall() {
        The builder's read, and it is the truer sentence: the name is what the six
        ASSEMBLE INTO, so it opens; the six are the evidence; "by birth alone" closes on
        how they were come by. Stacked above the name they read as a menu you pick from. */
-    +   '<div class="m2face-name m2bface__name">The Crowned Name</div>'
+    /* BR-S359 — TWO WALLS AND A SPAN. Each closing statement gets a rule ABOVE it, so
+       the name and the orient line become matched ledges and the six marks read as
+       something strung between them rather than a list that trails off. The rule and
+       its text are wrapped as ONE wall, because the free space has to distribute
+       around the pair — a rule that floats on its own drifts away from the line it
+       belongs to the moment the card's height changes. */
+    +   '<div class="m2bface__wall m2bface__wall--top">'
+    +     '<div class="m2face-div"></div>'
+    +     '<div class="m2face-name m2bface__name">The Crowned Name</div>'
+    +   '</div>'
     +   '<ul class="m2bface__marks">'
     +     ['Sun sign', 'Year animal', 'Life path', 'Rune', 'Trigram', 'Hexagram']
             .map(function (m) { return '<li>' + m + '</li>'; }).join('')
     +   '</ul>'
-    +   '<div class="m2face-div"></div>'
-    +   '<div class="m2face-orient">By birth alone</div>'
+    +   '<div class="m2bface__wall m2bface__wall--bot">'
+    +     '<div class="m2face-div"></div>'
+    +     '<div class="m2face-orient">By birth alone</div>'
+    +   '</div>'
     +   '<span class="m2tick tl"></span><span class="m2tick br"></span>'
     + '</div>'
     + '<span class="m2hero__name" data-m2-heroname>The Star</span>'
