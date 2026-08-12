@@ -1694,18 +1694,37 @@ function renderVision() {
      are three plain numbers and "another", and none of them is preselected.
      Disabled for the same reason POST_TARGET is: no payment runs anywhere in this
      build, and a give button that quietly does nothing is worse than one that says so. */
+  /* BR-S385 — the amounts are TOGGLES, not a submit. Choosing one opens the letter and
+     the continue; choosing the same one again closes both and leaves nothing selected.
+     That second half is the point: a donation flow you can back out of by pressing the
+     same thing you pressed to enter it never traps anyone, and it is what makes the
+     line at the foot of this block true in behaviour and not only in words. */
   var coins = DONATE.map(function (d) {
-    return '<button type="button" class="visgive__amt" disabled>' + d + '</button>';
-  }).join('') + '<button type="button" class="visgive__amt visgive__amt--other" disabled>another</button>';
+    return '<button type="button" class="visgive__amt" data-amt="' + d + '" aria-pressed="false" '
+      + 'aria-expanded="false" aria-controls="giveMore">' + d + '</button>';
+  }).join('') + '<button type="button" class="visgive__amt visgive__amt--other" data-amt="other" '
+      + 'aria-pressed="false" aria-expanded="false" aria-controls="giveMore">another</button>';
 
   var give = '<section class="visgive" id="give">'
     + '<h2 class="vis__h">Leave something</h2>'
     + '<p class="vis__lede">Nothing here is locked behind this. What is free stays free, '
     +   'and what costs says so on its own door. This is for someone who had it spare '
     +   'and wanted to &mdash; no other reason, and no reason needed.</p>'
-    + '<div class="visgive__row">' + coins + '</div>'
+    + '<div class="visgive__row" role="group" aria-label="Choose an amount">' + coins + '</div>'
+    /* Hidden until an amount is chosen, and hidden again the moment it is un-chosen.
+       The letter is OPTIONAL and says so in its own label, not in a note underneath. */
+    + '<div class="visgive__more" id="giveMore" hidden>'
+    +   '<label class="vispost__lab" for="giveLetter">A letter with it '
+    +     '<span class="vispost__opt">optional &mdash; nobody needs a reason</span></label>'
+    +   '<textarea class="vispost__ta" id="giveLetter" rows="4" '
+    +     'placeholder="Anything you want to say. Or nothing."></textarea>'
+    +   '<div class="vispost__foot">'
+    +     '<button type="button" class="vispost__send" disabled>Continue &rarr;</button>'
+    +     '<p class="vispost__note">Not connected yet &mdash; no payment runs anywhere in '
+    +       'this build. Press the amount again to put it back.</p>'
+    +   '</div>'
+    + '</div>'
     + '<p class="visgive__law">If it is over your means even slightly, we don&rsquo;t want it.</p>'
-    + '<p class="vispost__note">Not connected yet &mdash; no payment runs anywhere in this build.</p>'
   + '</section>';
 
   return '<div class="vis">'
@@ -1730,6 +1749,74 @@ function wireVision() {
     e.preventDefault();
     location.href = "about/";          // U1 — the ledger this page sits beside
   });
+  /* BR-S385 — the amount toggles. One delegated listener on the row; the same press
+     that opens the letter closes it, and closing clears the choice rather than leaving
+     an invisible one selected. The letter's text is deliberately KEPT across a re-open
+     of the same amount — someone who mis-clicks should not lose what they wrote — but
+     is cleared when the block is closed outright, because a closed block that still
+     holds your words is not closed. */
+  var row = host.querySelector(".visgive__row");
+  var more = host.querySelector("#giveMore");
+  if (row && more) row.addEventListener("click", function (e) {
+    var b = e.target.closest("[data-amt]");
+    if (!b) return;
+    var wasOn = b.getAttribute("aria-pressed") === "true";
+    row.querySelectorAll("[data-amt]").forEach(function (x) {
+      x.classList.remove("is-on");
+      x.setAttribute("aria-pressed", "false");
+      x.setAttribute("aria-expanded", "false");
+    });
+    if (wasOn) {                       // pressing the chosen amount again puts it back
+      more.hidden = true;
+      var ta = more.querySelector("textarea");
+      if (ta) ta.value = "";
+      return;
+    }
+    b.classList.add("is-on");
+    b.setAttribute("aria-pressed", "true");
+    b.setAttribute("aria-expanded", "true");
+    more.hidden = false;
+  });
+
+  /* BR-S385 — CLICKING AWAY PUTS IT BACK TOO. Anywhere that is not another amount and
+     not the letter or its Continue closes the block and clears the choice, so the
+     block can always be left by doing nothing in particular. Escape does the same,
+     because a keyboard user has no "sides" to click.
+
+     ★ ONE DELIBERATE ASYMMETRY, easy to reverse: clicking away does NOT wipe the
+     letter, while pressing the chosen amount again does. Pressing the amount again is
+     an explicit "no, put it back"; a stray click on the page background is not, and
+     losing a written letter to one would be its own small cruelty on a block whose
+     whole argument is that nobody is being pushed. Reopening the same amount finds
+     the words still there.
+
+     The listener is on `document` and must not outlive this mount — mountDev replaces
+     devView's innerHTML, which detaches these nodes without firing anything. It
+     removes itself the first time it wakes up detached. */
+  function closeGive() {
+    if (!more || more.hidden) return;
+    more.hidden = true;
+    row.querySelectorAll("[data-amt]").forEach(function (x) {
+      x.classList.remove("is-on");
+      x.setAttribute("aria-pressed", "false");
+      x.setAttribute("aria-expanded", "false");
+    });
+  }
+  function onAway(e) {
+    if (!document.body.contains(more)) {          // this mount is gone; so is this listener
+      document.removeEventListener("click", onAway, true);
+      document.removeEventListener("keydown", onEsc, true);
+      return;
+    }
+    if (e.target.closest && (e.target.closest(".visgive__row") || e.target.closest("#giveMore"))) return;
+    closeGive();
+  }
+  function onEsc(e) { if (e.key === "Escape") closeGive(); }
+  if (row && more) {
+    document.addEventListener("click", onAway, true);
+    document.addEventListener("keydown", onEsc, true);
+  }
+
   var form = host.querySelector(".vispost");
   if (!form || form.tagName !== "FORM") return;
   // Nothing may be submitted while POST_TARGET is null — belt as well as `disabled`.

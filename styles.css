@@ -5908,8 +5908,14 @@ html.orbit-wings .orbit__field { --orbit-rx: clamp(200px, 25.5vw, 368px); --orbi
   transition: border-color .18s ease;
 }
 .visgive__amt--other { font-style: italic; font-size: 15.5px; color: #8c867b; }
-.visgive__amt:hover:not(:disabled) { border-color: var(--gold, #c9a35c); }
+.visgive__amt:hover, .visgive__amt:focus-visible { border-color: rgba(220, 215, 203, .34); outline: none; }
+/* BR-S385: the chosen amount is marked, not filled — a filled swatch would read as a
+   pricing table's "recommended". It also has to look PRESSABLE AGAIN, because pressing
+   it again is how you leave. */
+.visgive__amt.is-on { border-color: var(--gold, #c9a35c); color: var(--gold-lit, #c9a35c); }
 .visgive__amt:disabled { cursor: not-allowed; opacity: .4; }
+.visgive__more { margin-bottom: 24px; }
+.visgive__more[hidden] { display: none; }   /* .vispost__ta sets display:block — BR-S381 */
 .visgive__law {
   font-family: var(--font-display, serif); font-size: 19px; line-height: 1.5;
   color: var(--t-display, #e9e5dc); margin: 0 0 14px; max-width: 46ch;
