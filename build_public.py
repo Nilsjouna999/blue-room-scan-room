@@ -37,6 +37,20 @@ CUT_ROOMS = ["uploaded-result", "uploaded-blocked", "free-scan-sim", "halo-gate"
              "before-after", "review-map", "proto-cards", "staged-reveal", "menu-reveal",
              "vault", "ceremony"]
 
+# BR-S376 — THE PROFILE GATE, public build only.
+# The Profile is a members' page: M3 shows the sealed "Held in conservation" niche until
+# a reading is kept (renderReliquaryTeaser / renderReliquaryOpen, chosen by hasHoldings()).
+# But "profile" is a plain entry in the ?dev= resolver, so typing the URL walks straight
+# past that door. The DEV app keeps it open on purpose — the builder works in both states
+# and needs to see them. The PUBLIC app must not, so the guard is added here, at build
+# time, rather than as a runtime flag that would also lock the builder out.
+# Sends the visitor to the sealed niche itself (#reliquary is M3's hash, app.js:3333),
+# not to a dead end — the door and the route then tell the same story.
+PROFILE_MOUNT = ('    if (window.BRArcanaProfile && typeof window.BRArcanaProfile.mount '
+                 '=== "function") window.BRArcanaProfile.mount(host);')
+PROFILE_GUARD = ('    // Public build: the Profile opens only once something is kept.\n'
+                 '    if (!hasHoldings()) { location.replace("./#reliquary"); return; }\n')
+
 # Top-level functions reachable ONLY from a cut branch. Verified one call site each, all
 # inside a removed branch — re-verify with `grep -c` before adding to this list.
 CUT_FUNCTIONS = ["renderProtoCards", "renderVault", "wireVault", "renderReviewMap",
@@ -198,6 +212,20 @@ def transform_app(src, report):
         src = src.replace(dead, live)
         assert dead not in src and live in src
         report.append("dead link re-pointed: %s" % live[live.index("?dev="):].split('"')[0])
+
+    # 2a-iii. the Profile gate (see PROFILE_GUARD). Fails the build rather than shipping
+    # an ungated members' page, on the same principle as the resolver above.
+    if PROFILE_MOUNT not in src:
+        sys.exit("build_public: the ?dev=profile mount line no longer matches, so the "
+                 "Profile gate cannot be placed. This would ship the members' page to "
+                 "anyone who types the URL, so it fails instead. Re-anchor PROFILE_MOUNT "
+                 "against the current app.js.")
+    if "function hasHoldings(" not in src:
+        sys.exit("build_public: hasHoldings() is gone from app.js — the Profile gate has "
+                 "nothing to ask. Re-anchor the gate against whatever replaced it.")
+    src = src.replace(PROFILE_MOUNT, PROFILE_GUARD + PROFILE_MOUNT, 1)
+    assert 'location.replace("./#reliquary")' in src
+    report.append("gate added: ?dev=profile now requires holdings (public build only)")
 
     # 2b. mountDev's uploaded-scan fallthrough, now unreachable
     if MOUNTDEV_TAIL not in src:
