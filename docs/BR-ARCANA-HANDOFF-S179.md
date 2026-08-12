@@ -16,7 +16,7 @@ page. Modules load via `<script>` in `index.html` and expose `window.BR*` global
 **The Reliquary — profile/hub (`?dev=profile`, `arcana-profile.js` + `.css`)** — the account home:
 - Top-to-bottom: **identity name + crown (ONE left-aligned block above the Rings)** → Rings →
   Vault → Showcase → Friends → Referral.
-- **Identity name** = "Antton Aikio" in **white with an animated black "oil/ink" edge** that
+- **Identity name** = "The Seeker" in **white with an animated black "oil/ink" edge** that
   ripples around the letters (SVG filter `#pfOil`, rim-only displacement; reduced-motion → plain
   white). The old "Twice-Kindled Founder" nitrogen headline was scrapped earlier and is gone.
 - **Crown** = the reading button (placeholder forged-SVG; final art from GPT later). Its spine
@@ -36,7 +36,7 @@ page. Modules load via `<script>` in `index.html` and expose `window.BR*` global
   Essence · Gifts · Strengths & Shadow · Hardships · In love · Compatibility · Origin ·
   Attributions · Correspondences · Deeper · Contested + the Soul-Signature Bloom / Wu Xing /
   decan / numerology diagrams). Record pages are hash-routed (`#/e/key/slug/seed`).
-- **Reads `?seed=birth~name~y~m~d`** (default with no seed = Antton Aikio, 9 Apr 2001, Inari →
+- **Reads `?seed=birth~name~y~m~d`** (default with no seed = The Seeker, 1 Jan 2000 →
   Aries · Snake · Life Path 7 · Emperor → "The Twice-Kindled Founder").
 - Header has **"← Profile"** (→ `?dev=profile`) + "Blue Room · Arcana" + "Draw again".
 - **GENERATED** by `python arcana-build/build_inapp.py` from `arcana-build/gen_body.js` +
@@ -90,7 +90,7 @@ the line). See `docs/DESIGN_TOKENS.md`, `docs/GOLDEN_NUGGETS.md`.
   the existing button slot. The "rubies = readings held" counting is real; the art is not final.
 - **Real Vault**: minted-card slots are empty placeholders. When minting is live, cards populate
   the slots and become choosable in the Showcase picker (the "Minted cards" group is already wired).
-- **Accounts/backend**: none yet. The intake lock (`localStorage`) and the profile mock (Antton) are
+- **Accounts/backend**: none yet. The intake lock (`localStorage`) and the profile mock (a sample identity) are
   per-browser stand-ins. Wire real auth + the "who the reading is for" (self/family/friend → crown/ring)
   when a backend exists.
 - **Friend option** in the intake is a single choice (no sub-picker like Family) — add one if wanted.
@@ -106,7 +106,7 @@ the line). See `docs/DESIGN_TOKENS.md`, `docs/GOLDEN_NUGGETS.md`.
 ```
 414580b S171  The Reliquary — profile-first hub restructure + sophistication pass
 51b0e12 S172  finish the arcana-reading replacement — remove scrapped "Armor Received"
-2e1223a S173  menu → Reliquary door; reading = Antton's canonical birth reading
+2e1223a S173  menu → Reliquary door; reading = the canonical sample birth reading
 d8e8df6 S174  port the FULL arcana reading in-app — record pages + "read more"
 aecb45d S175  intake builds the reading from real input; de-wire orphaned name engine
 071fb5c S176  profile restructure — crown above rings; cleaner rings/vault/showcase

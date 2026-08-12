@@ -9,7 +9,7 @@
 **The product.** Blue Room Arcana is a divination *reading* experience. A cinematic ceremony (a witch reads, a crow carries the commission, a forger forges a **crown**, it is consecrated) hands off to a **reading page**: a person's draw across up to 8 systems (sun sign, year animal, life path, tarot draw + counsel, rune, trigram, hexagram), crowned by an assembled **name** (e.g. *The Twice-Kindled Founder*). Every draw opens a **record page** — an *accession* of that draw in this reading, not a generic encyclopedia entry.
 
 **Live artifact (self-contained, shareable):** `https://claude.ai/code/artifact/f6c3fa45-cb5d-436e-9b40-5a2a47703221`
-It currently opens on a real birth reading — **Antton Aikio, 9 April 2001, Inari** → Aries · Snake · Life Path 7 → *The Twice-Kindled Founder*.
+It currently opens on a real birth reading — **The Seeker, 1 January 2000** (the neutral sample identity -- BR-S347 replaced a real one here).
 
 **What is built and working:**
 - Reading page (birth-derived: sun from date, animal from year, life path from digit-sum; the rest seeded from name+date). "Draw again" rolls a random one.

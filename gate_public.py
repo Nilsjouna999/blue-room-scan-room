@@ -43,6 +43,13 @@ SHIP_EXT = (".html", ".js", ".css", ".json", ".svg", ".txt", ".webmanifest")
 # there; in --audit it keeps the workshop's own notes from drowning the real findings.
 SKIP_DIRS = {".git", ".claude", "node_modules", "docs", "arcana-build", "dist", "__pycache__"}
 
+# The identity sweep walks everything except what is not text or not ours. It does NOT
+# skip docs/ — see scan()'s docstring. arcana-build/ comes off this list too: BR-S364
+# found that build_public.py copies three JSON banks out of it into dist/, so a tree the
+# gate never opened was shipping.
+ALWAYS_SKIP = {".git", ".claude", "node_modules", "__pycache__", "dist"}
+SCAN_EXT = SHIP_EXT + (".md", ".py")
+
 # The denylist is made of the strings it bans, so scanning it reports itself. It is
 # gitignored and never copied, so its presence in a tree is not a leak — but if it ever
 # turned up inside dist/ that WOULD be one, so the copy step must refuse it, not this.
@@ -110,18 +117,50 @@ def _identity_checks():
         s = raw.strip()
         if not s or s.startswith("#"):
             continue
-        out.append(("identity", re.compile(re.escape(s), re.I),
+        out.append(("identity", _identity_pattern(s),
                     "a real identity string (%d chars, from gate_identity.txt)" % len(s), None))
     return out, path, True
 
 
-def scan(target, checks):
-    """Every hit in the tree, as (relpath, lineno, check_id, why, the matched text)."""
+def _identity_pattern(s):
+    """A literal identity string, matched through any separator a URL or slug can use.
+
+    BR-S364: the first version matched the literal only, and missed the builder's real
+    name in docs/ATLAS.md because that file carried the URL-ENCODED form — a working
+    seed which, pasted into the running site, opens the real person's reading. A space
+    in a name is a space, a %20, a +, an underscore, a hyphen, or nothing at all,
+    depending on who wrote the link. All of them are the same leak.
+
+    (This docstring names no example on purpose. The first draft of it spelled the
+    encoded form out, and the gate promptly flagged its own source file — a denylist
+    that quotes what it bans publishes what it bans.)
+    """
+    parts = [re.escape(p) for p in s.split()]
+    sep = r"(?:\s|%20|\+|_|-|\.)*"
+    return re.compile(sep.join(parts), re.I)
+
+
+def scan(target, checks, everywhere=False):
+    """Every hit in the tree, as (relpath, lineno, check_id, why, the matched text).
+
+    `everywhere` drops SKIP_DIRS and the extension filter. BR-S364: the identity check
+    must run with it. The structural checks are about what reaches dist/, so skipping
+    docs/ is right for them — a spec that names a dev route is not a leak. Identity is
+    about what is PUBLISHED, and the workshop repo is public, so a real name in
+    docs/ATLAS.md is exactly as exposed as one in app.js. Skipping docs/ for both is
+    why this gate reported clean over a tree that still carried the builder's name,
+    birth date and home town in four files.
+    """
     hits = []
     for dirpath, dirnames, filenames in os.walk(target):
-        dirnames[:] = [d for d in dirnames if d not in SKIP_DIRS]
+        dirnames[:] = [d for d in dirnames
+                       if d not in (ALWAYS_SKIP if everywhere else SKIP_DIRS)]
         for fn in sorted(filenames):
-            if not fn.lower().endswith(SHIP_EXT) or fn in SKIP_FILES:
+            if fn in SKIP_FILES:
+                continue
+            if not everywhere and not fn.lower().endswith(SHIP_EXT):
+                continue
+            if everywhere and not fn.lower().endswith(SCAN_EXT):
                 continue
             full = os.path.join(dirpath, fn)
             rel = os.path.relpath(full, target).replace("\\", "/")
@@ -202,7 +241,10 @@ def main(argv):
         print("  Create it, or pass --no-identity to say out loud that you are skipping it.")
         return 2
 
-    hits = scan(target, checks) + scan_prototypes(target, os.path.abspath(target) == ROOT)
+    # Two sweeps, two threat models. Structural over what ships; identity over everything.
+    hits = scan(target, CHECKS) + scan_prototypes(target, os.path.abspath(target) == ROOT)
+    if ident:
+        hits += scan(target, ident, everywhere=True)
 
     label = "the workshop tree" if audit else target
     print("gate_public: %d checks over %s" % (len(checks) + 1, label))
