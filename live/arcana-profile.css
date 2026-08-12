@@ -35,6 +35,29 @@
   --pf-violet-line: rgba(138, 111, 176, 0.4);
   --pf-serif: "Cormorant Garamond", "Iowan Old Style", "Palatino Linotype", Georgia, serif;
   --pf-mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+
+  /* BR-S388 — THE MONO LADDER. This register was 8 sizes (8 / 8.5 / 9 / 9.5 / 10 /
+     10.5 / 11, plus a stray 15) across TWELVE trackings (.04–.28em) over 30 rules —
+     not a scale, just every value anyone ever needed. Differences that small carry no
+     rank, so they are pure noise, and every element added as the page fills invented a
+     ninth value because there was no ladder to snap to. The named failure:
+     `.pf-friend__crown` (9px/.12em) and `.pf-friend__vis` (10px/.08em) are adjacent
+     siblings in one <a> — same family, case and colour, 1px and .04em apart — and
+     BR-S180 removed the gap that used to hide it.
+
+     THREE STEPS, and the tracking belongs to the step because small caps need more
+     air the smaller they get:
+       micro  the quietest keys and chips
+       label  section labels, row keys — the bulk of the page
+       meta   the readable step: links, spines, the handle
+
+     MONO THAT IS A SENTENCE is not in the ladder's tracking: prose set at .2em is
+     unreadable. It takes a step's SIZE and one shared prose tracking, so it still
+     snaps to the ladder without being typeset as a label. */
+  --pf-mono-micro: 8.5px;   --pf-mono-micro-trk: .2em;
+  --pf-mono-label: 9.5px;   --pf-mono-label-trk: .16em;
+  --pf-mono-meta:  10.5px;  --pf-mono-meta-trk:  .1em;
+  --pf-mono-prose-trk: .04em;
   --pf-ui: system-ui, -apple-system, "Segoe UI", sans-serif;
 
   position: fixed; inset: 0; z-index: 30;
@@ -75,7 +98,7 @@
 /* the identity name — white, with a black oil/ink edge rippling around the letters */
 .pf-id__name { font-family: var(--pf-serif); font-weight: 600; font-size: clamp(26px, 3.4vw, 38px); line-height: 1.05; letter-spacing: .012em; color: #f4f3ef; filter: url(#pfOil); }
 @media (prefers-reduced-motion: reduce) { .pf-id__name { filter: none; } }
-.pf-id__handle { font-family: var(--pf-mono); font-size: 11px; letter-spacing: .14em; color: var(--pf-meta); margin-top: 4px; }
+.pf-id__handle { font-family: var(--pf-mono); font-size: var(--pf-mono-meta); letter-spacing: var(--pf-mono-prose-trk); color: var(--pf-meta); margin-top: 4px; }
 .pf-id__born { color: var(--pf-ghost); letter-spacing: .1em; }
 
 /* the Crown — the reading button (staged centrally by .pf-crownstage, see below) */
@@ -83,7 +106,7 @@
 .pf-crownbtn:hover, .pf-crownbtn:focus-visible { border-color: var(--pf-line); background: rgba(162,134,74,.035); outline: none; }
 .pf-crown-svg { width: clamp(104px, 17vw, 148px); height: auto; filter: drop-shadow(0 10px 14px rgba(0,0,0,.5)) drop-shadow(0 4px 12px rgba(162,134,74,.13)) drop-shadow(0 0 10px rgba(162,134,74,.09)); }
 .pf-crownbtn:hover .pf-crown-svg { filter: drop-shadow(0 10px 14px rgba(0,0,0,.5)) drop-shadow(0 4px 14px rgba(162,134,74,.2)) drop-shadow(0 0 12px rgba(162,134,74,.15)); }
-.pf-crown-empty { width: clamp(140px, 24vw, 180px); aspect-ratio: 1 / .62; display: grid; place-items: center; border: 1px dashed var(--pf-violet-line); border-radius: 4px; color: var(--pf-violet-lit); font-family: var(--pf-mono); font-size: 9px; letter-spacing: .2em; text-transform: uppercase; text-align: center; line-height: 1.9; padding: 12px; }
+.pf-crown-empty { width: clamp(140px, 24vw, 180px); aspect-ratio: 1 / .62; display: grid; place-items: center; border: 1px dashed var(--pf-violet-line); border-radius: 4px; color: var(--pf-violet-lit); font-family: var(--pf-mono); font-size: var(--pf-mono-label); letter-spacing: var(--pf-mono-label-trk); text-transform: uppercase; text-align: center; line-height: 1.9; padding: 12px; }
 /* the reading's provenance line under the crown */
 .pf-prov { font-family: var(--pf-serif); font-style: italic; font-size: 14.5px; color: var(--pf-meta); margin: 0; max-width: 40ch; line-height: 1.5; }
 .pf-openreading--lg { padding: 10px 22px; font-size: 10.5px; letter-spacing: .18em; border: 1px solid var(--pf-line-cut); border-radius: 999px; }
@@ -118,12 +141,12 @@
    — "Share Blue Room" was then the biggest door label a new visitor saw, on their own
    profile. Doors now all speak at 18px/400; the step above is reserved for identity. */
 .pf-doorbar__t { font-family: var(--pf-serif); font-weight: 400; font-size: 18px; color: var(--pf-cream-display); line-height: 1.1; display: block; }
-.pf-doorbar__s { font-family: var(--pf-mono); font-size: 9.5px; letter-spacing: .06em; color: var(--pf-meta); margin-top: 5px; display: block; }
+.pf-doorbar__s { font-family: var(--pf-mono); font-size: var(--pf-mono-label); letter-spacing: var(--pf-mono-prose-trk); color: var(--pf-meta); margin-top: 5px; display: block; }
 .pf-doorbar__arr { margin-left: auto; color: var(--pf-gold); font-size: 18px; transition: transform .18s; }
 .pf-doorbar:hover .pf-doorbar__arr, .pf-doorbar:focus-visible .pf-doorbar__arr { transform: translateX(3px); }
 
 /* open-this-reading (free, gold) + redraw (a quiet gold door, price lives in the Arcana Room) */
-.pf-openreading { background: none; border: 0; cursor: pointer; padding: 6px 2px; text-decoration: none; font-family: var(--pf-mono); font-size: 10px; font-weight: 500; letter-spacing: .16em; text-transform: uppercase; color: var(--pf-gold); border-bottom: 1px solid var(--pf-line); transition: color .18s, border-color .18s; }
+.pf-openreading { background: none; border: 0; cursor: pointer; padding: 6px 2px; text-decoration: none; font-family: var(--pf-mono); font-size: var(--pf-mono-meta); font-weight: 500; letter-spacing: var(--pf-mono-meta-trk); text-transform: uppercase; color: var(--pf-gold); border-bottom: 1px solid var(--pf-line); transition: color .18s, border-color .18s; }
 .pf-openreading:hover, .pf-openreading:focus-visible { color: var(--pf-gold-lit); border-color: var(--pf-gold); outline: none; }
 
 /* ---------- UNDERGROUND — sections as open L-bracket ledger panels ---------- */
@@ -135,8 +158,8 @@
 .pf-sec::before { content: ""; position: absolute; left: -1px; top: 0; width: min(58%, 340px); height: 1px; background: linear-gradient(to right, var(--pf-line-cut) 0%, var(--pf-line) 42%, transparent 100%); }
 .pf-sec::after { content: ""; position: absolute; left: -1px; bottom: 0; width: 38px; height: 1px; background: linear-gradient(to right, rgba(201,163,92,.25), transparent); }
 /* folder-tab heading — an opaque chip straddling the elbow, knocking a clean gap in the top-rule */
-.pf-sec__h { position: absolute; top: 0; left: 14px; transform: translateY(-50%); z-index: 1; display: inline-flex; align-items: center; gap: 10px; margin: 0; padding: 3px 12px; background: var(--pf-tab-bg); border: 1px solid var(--pf-line); border-radius: 4px; font-family: var(--pf-mono); font-size: 9.5px; font-weight: 500; letter-spacing: .22em; text-transform: uppercase; color: var(--pf-gold); }
-.pf-sec__note { font-family: var(--pf-mono); font-size: 8.5px; letter-spacing: .16em; text-transform: uppercase; color: var(--pf-ghost); }
+.pf-sec__h { position: absolute; top: 0; left: 14px; transform: translateY(-50%); z-index: 1; display: inline-flex; align-items: center; gap: 10px; margin: 0; padding: 3px 12px; background: var(--pf-tab-bg); border: 1px solid var(--pf-line); border-radius: 4px; font-family: var(--pf-mono); font-size: var(--pf-mono-label); font-weight: 500; letter-spacing: var(--pf-mono-label-trk); text-transform: uppercase; color: var(--pf-gold); }
+.pf-sec__note { font-family: var(--pf-mono); font-size: var(--pf-mono-micro); letter-spacing: var(--pf-mono-micro-trk); text-transform: uppercase; color: var(--pf-ghost); }
 .pf-lede { font-family: var(--pf-serif); font-size: 17.5px; line-height: 1.6; color: var(--pf-body); max-width: 60ch; margin: 2px 0 20px; }
 /* BR-S384: Minted is the one section that renders a lede with NO body, so its 20px
    bottom margin had nothing to push against and nothing to collapse into — .pf-sec's
@@ -155,7 +178,7 @@
 .pf-family { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 12px; }
 .pf-mini { flex: 0 0 auto; width: 144px; border: 1px solid var(--pf-line-soft); border-radius: 4px; padding: 16px 12px 14px; text-align: center; background: rgba(233,229,220,.018); }
 .pf-mini__label { font-family: var(--pf-serif); font-size: 16px; color: var(--pf-cream); margin: 5px 0 0; line-height: 1.25; }
-.pf-mini__n { font-family: var(--pf-mono); font-size: 10px; letter-spacing: .08em; color: var(--pf-meta); margin: 6px 0 0; }
+.pf-mini__n { font-family: var(--pf-mono); font-size: var(--pf-mono-meta); letter-spacing: var(--pf-mono-prose-trk); color: var(--pf-meta); margin: 6px 0 0; }
 .pf-mini--add { min-height: 128px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; color: var(--pf-ghost); cursor: pointer; border-style: dashed; background: none; }
 .pf-mini--add:hover, .pf-mini--add:focus-visible { color: var(--pf-gold-lit); border-color: var(--pf-gold); outline: none; }
 .pf-mini__plus { font-size: 20px; line-height: 1; color: var(--pf-gold); }
@@ -167,7 +190,7 @@
 .pf-mini--add-wrap .pf-mini--add { width: 100%; }
 .pf-relmenu { position: absolute; left: 0; top: calc(100% + 8px); z-index: 20; width: 264px; padding: 13px; background: #131117; border: 1px solid var(--pf-violet-line); border-radius: 8px; box-shadow: 0 16px 40px rgba(0,0,0,.55); }
 .pf-relmenu[hidden] { display: none; }
-.pf-relmenu__h { font-family: var(--pf-mono); font-size: 9px; letter-spacing: .16em; text-transform: uppercase; color: var(--pf-meta); margin: 0 0 11px; }
+.pf-relmenu__h { font-family: var(--pf-mono); font-size: var(--pf-mono-label); letter-spacing: var(--pf-mono-label-trk); text-transform: uppercase; color: var(--pf-meta); margin: 0 0 11px; }
 .pf-relmenu__grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
 .pf-relopt { text-align: left; background: none; border: 1px solid var(--pf-line); border-radius: 5px; padding: 9px 12px; cursor: pointer; font-family: var(--pf-serif); font-size: 15px; color: var(--pf-cream); transition: border-color .15s, background .15s, color .15s; }
 .pf-relopt:hover, .pf-relopt:focus-visible { border-color: var(--pf-violet); color: var(--pf-violet-lit); background: rgba(138,111,176,.08); outline: none; }
@@ -187,7 +210,7 @@
 .pf-card__art svg { width: 32px; height: 32px; color: var(--pf-gold); opacity: .32; }
 .pf-card:hover .pf-card__art svg { opacity: .5; }
 .pf-card__cap { padding: 9px 11px 11px; }
-.pf-card__k { display: block; font-family: var(--pf-mono); font-size: 8px; letter-spacing: .18em; text-transform: uppercase; color: var(--pf-ghost); }
+.pf-card__k { display: block; font-family: var(--pf-mono); font-size: var(--pf-mono-micro); letter-spacing: var(--pf-mono-micro-trk); text-transform: uppercase; color: var(--pf-ghost); }
 .pf-card__n { display: block; font-family: var(--pf-serif); font-size: 15px; color: var(--pf-cream); line-height: 1.15; margin-top: 3px; }
 
 /* showcase — choosable slots: feature a reading result or a minted card */
@@ -197,17 +220,17 @@
 .pf-slot--empty { align-items: center; justify-content: center; gap: 7px; text-align: center; border: 1px dashed var(--pf-line); background: rgba(233,229,220,.012); color: var(--pf-ghost); }
 .pf-slot--empty:hover, .pf-slot--empty:focus-visible { border-color: var(--pf-gold); color: var(--pf-gold-lit); outline: none; }
 .pf-slot__plus { font-size: 22px; line-height: 1; color: var(--pf-gold); }
-.pf-slot__hint { font-family: var(--pf-mono); font-size: 9px; letter-spacing: .12em; text-transform: uppercase; line-height: 1.7; }
+.pf-slot__hint { font-family: var(--pf-mono); font-size: var(--pf-mono-label); letter-spacing: var(--pf-mono-label-trk); text-transform: uppercase; line-height: 1.7; }
 .pf-slot--filled { border: 1px solid var(--pf-line); background: rgba(233,229,220,.02); }
 .pf-slot--filled:hover, .pf-slot--filled:focus-visible { border-color: var(--pf-gold); outline: none; }
-.pf-slot__kind { font-family: var(--pf-mono); font-size: 8px; letter-spacing: .2em; text-transform: uppercase; color: var(--pf-gold); }
+.pf-slot__kind { font-family: var(--pf-mono); font-size: var(--pf-mono-micro); letter-spacing: var(--pf-mono-micro-trk); text-transform: uppercase; color: var(--pf-gold); }
 .pf-slot__t { font-family: var(--pf-serif); font-size: 19px; color: var(--pf-cream); line-height: 1.15; margin-top: 4px; text-align: left; }
-.pf-slot__change { font-family: var(--pf-mono); font-size: 8.5px; letter-spacing: .12em; text-transform: uppercase; color: var(--pf-meta); margin-top: auto; padding-top: 12px; }
+.pf-slot__change { font-family: var(--pf-mono); font-size: var(--pf-mono-micro); letter-spacing: var(--pf-mono-micro-trk); text-transform: uppercase; color: var(--pf-meta); margin-top: auto; padding-top: 12px; }
 
 /* the pick menu — choose a reading result or a minted card */
 .pf-pickmenu { position: absolute; left: 0; right: 0; top: calc(100% + 8px); z-index: 20; padding: 13px; background: #131117; border: 1px solid var(--pf-line); border-radius: 8px; box-shadow: 0 16px 40px rgba(0,0,0,.55); }
 .pf-pickmenu[hidden] { display: none; }
-.pf-pickmenu__h { font-family: var(--pf-mono); font-size: 9px; letter-spacing: .16em; text-transform: uppercase; color: var(--pf-meta); margin: 0 0 9px; }
+.pf-pickmenu__h { font-family: var(--pf-mono); font-size: var(--pf-mono-label); letter-spacing: var(--pf-mono-label-trk); text-transform: uppercase; color: var(--pf-meta); margin: 0 0 9px; }
 .pf-pickmenu__grid + .pf-pickmenu__h { margin-top: 14px; }
 /* BR-S386 — the way back out of a filled slot. Deliberately the quietest thing in the
    menu and set apart by a rule: it is not a fourth option to feature, it is the
@@ -223,9 +246,9 @@
 .pf-pickmenu__grid { display: flex; flex-direction: column; gap: 5px; }
 .pf-pickopt { display: flex; align-items: baseline; gap: 10px; text-align: left; background: none; border: 1px solid var(--pf-line-soft); border-radius: 5px; padding: 8px 11px; cursor: pointer; transition: border-color .15s, background .15s; }
 .pf-pickopt:hover, .pf-pickopt:focus-visible { border-color: var(--pf-gold); background: rgba(201,163,92,.06); outline: none; }
-.pf-pickopt__k { font-family: var(--pf-mono); font-size: 8px; letter-spacing: .14em; text-transform: uppercase; color: var(--pf-gold); flex: none; min-width: 64px; }
+.pf-pickopt__k { font-family: var(--pf-mono); font-size: var(--pf-mono-micro); letter-spacing: var(--pf-mono-micro-trk); text-transform: uppercase; color: var(--pf-gold); flex: none; min-width: 64px; }
 .pf-pickopt__n { font-family: var(--pf-serif); font-size: 15px; color: var(--pf-cream); }
-.pf-pickempty { font-family: var(--pf-mono); font-size: 9px; letter-spacing: .04em; color: var(--pf-ghost); margin: 0; line-height: 1.6; }
+.pf-pickempty { font-family: var(--pf-mono); font-size: var(--pf-mono-label); letter-spacing: var(--pf-mono-prose-trk); color: var(--pf-ghost); margin: 0; line-height: 1.6; }
 
 /* friends */
 .pf-friends { display: flex; flex-direction: column; }
@@ -241,13 +264,13 @@
 .pf-friend:hover .pf-friend__n, .pf-friend:focus-visible .pf-friend__n { color: var(--pf-cream-display); }
 .pf-friend__av { width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--pf-line); display: grid; place-items: center; font-family: var(--pf-serif); font-size: 16px; color: var(--pf-gold); flex: none; }
 .pf-friend__n { font-family: var(--pf-serif); font-size: 18px; color: var(--pf-cream); flex: 1; }
-.pf-friend__crown { font-family: var(--pf-mono); font-size: 9px; letter-spacing: .12em; text-transform: uppercase; color: var(--pf-meta); }
-.pf-friend__vis { font-family: var(--pf-mono); font-size: 10px; letter-spacing: .08em; text-transform: uppercase; color: var(--pf-meta); }
-.pf-addfriend { margin: 16px 0 0; background: none; border: 1px solid var(--pf-line); border-radius: 3px; padding: 9px 16px; cursor: pointer; font-family: var(--pf-mono); font-size: 9.5px; letter-spacing: .16em; text-transform: uppercase; color: var(--pf-meta); transition: border-color .18s, color .18s; }
+.pf-friend__crown { font-family: var(--pf-mono); font-size: var(--pf-mono-label); letter-spacing: var(--pf-mono-label-trk); text-transform: uppercase; color: var(--pf-meta); }
+.pf-friend__vis { font-family: var(--pf-mono); font-size: var(--pf-mono-micro); letter-spacing: var(--pf-mono-micro-trk); text-transform: uppercase; color: var(--pf-meta); }
+.pf-addfriend { margin: 16px 0 0; background: none; border: 1px solid var(--pf-line); border-radius: 3px; padding: 9px 16px; cursor: pointer; font-family: var(--pf-mono); font-size: var(--pf-mono-label); letter-spacing: var(--pf-mono-label-trk); text-transform: uppercase; color: var(--pf-meta); transition: border-color .18s, color .18s; }
 .pf-addfriend:hover, .pf-addfriend:focus-visible { border-color: var(--pf-gold); color: var(--pf-gold-lit); outline: none; }
 
 /* footer — bedrock */
-.pf-foot { margin: clamp(44px, 8vh, 72px) 0 0; padding-top: 24px; border-top: 1px solid var(--pf-line-soft); font-family: var(--pf-mono); font-size: 9px; letter-spacing: .1em; color: var(--pf-ghost); line-height: 1.9; text-align: center; }
+.pf-foot { margin: clamp(44px, 8vh, 72px) 0 0; padding-top: 24px; border-top: 1px solid var(--pf-line-soft); font-family: var(--pf-mono); font-size: var(--pf-mono-label); letter-spacing: var(--pf-mono-prose-trk); color: var(--pf-ghost); line-height: 1.9; text-align: center; }
 
 /* ============================================================
    BR-S180 EASY BATCH — append-only overrides (leaves the praised
@@ -262,7 +285,7 @@
 .pf-id__name { font-size: clamp(30px, 4.6vw, 46px); margin: 0; }
 .pf-id__bearer { font-family: var(--pf-serif); font-weight: 600; font-size: 19px; line-height: 1.12; color: var(--pf-cream-display); }
 .pf-crownname { padding-left: 23px; margin: clamp(14px, 2.6vh, 22px) 0 0; }
-.pf-crownname__spine { font-family: var(--pf-mono); font-size: 10px; letter-spacing: .2em; text-transform: uppercase; color: var(--pf-meta); margin: 9px 0 0; }
+.pf-crownname__spine { font-family: var(--pf-mono); font-size: var(--pf-mono-meta); letter-spacing: var(--pf-mono-meta-trk); text-transform: uppercase; color: var(--pf-meta); margin: 9px 0 0; }
 
 /* 2 — gold law: saturated gold pulled off wayfinding → warm-grey.
    Crown SVG, hairline section rules, and the focus ring KEEP their gold. */
@@ -357,7 +380,7 @@
 .pf-roomdoor:hover, .pf-roomdoor:focus-visible { background: rgba(233, 229, 220, .02); outline: none; }
 .pf-roomdoor__n { font-family: var(--pf-serif); font-size: 18px; color: var(--pf-cream); flex: none; }
 .pf-roomdoor:hover .pf-roomdoor__n, .pf-roomdoor:focus-visible .pf-roomdoor__n { color: var(--pf-cream-display); }
-.pf-roomdoor__d { font-family: var(--pf-mono); font-size: 9.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--pf-meta); }
+.pf-roomdoor__d { font-family: var(--pf-mono); font-size: var(--pf-mono-label); letter-spacing: var(--pf-mono-label-trk); text-transform: uppercase; color: var(--pf-meta); }
 .pf-roomdoor__arr { margin-left: auto; color: var(--pf-meta); font-size: 15px; transition: transform .18s; }
 .pf-roomdoor:hover .pf-roomdoor__arr, .pf-roomdoor:focus-visible .pf-roomdoor__arr { transform: translateX(3px); }
 
@@ -387,7 +410,7 @@
 
 /* the dated museum label under the crown — the second thing worth pausing on */
 .pf-crownstage__filed {
-  font-family: var(--pf-mono); font-size: 9.5px; letter-spacing: .16em; text-transform: uppercase;
+  font-family: var(--pf-mono); font-size: var(--pf-mono-label); letter-spacing: var(--pf-mono-label-trk); text-transform: uppercase;
   color: var(--pf-meta); margin: 10px 0 0;
 }
 
@@ -402,14 +425,14 @@
    Vault-specific .pf-* additions only; the rest reuses profile classes
    (.pf-wrap / .pf-sec / .pf-crownstage__cap / .pf-prov / .pf-openreading).
 ============================================================ */
-.pf-back { display: inline-block; margin: 0 0 clamp(16px, 3.5vh, 30px); font-family: var(--pf-mono); font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: var(--pf-meta); text-decoration: none; transition: color .18s; }
+.pf-back { display: inline-block; margin: 0 0 clamp(16px, 3.5vh, 30px); font-family: var(--pf-mono); font-size: var(--pf-mono-meta); letter-spacing: var(--pf-mono-meta-trk); text-transform: uppercase; color: var(--pf-meta); text-decoration: none; transition: color .18s; }
 .pf-back:hover, .pf-back:focus-visible { color: var(--pf-cream-display); outline: none; }
 /* BR-S307: the same control seated in the sticky masthead — no block margin, so it
    sits on the wordmark's baseline row instead of pushing the header open. */
 .pf-back--top { margin: 0; }
 
 .pf-vaulthead { text-align: center; }
-.pf-vaulteyebrow { font-family: var(--pf-mono); font-size: 9.5px; letter-spacing: .28em; text-transform: uppercase; color: var(--pf-meta); }
+.pf-vaulteyebrow { font-family: var(--pf-mono); font-size: var(--pf-mono-label); letter-spacing: var(--pf-mono-label-trk); text-transform: uppercase; color: var(--pf-meta); }
 .pf-vaulttitle { font-family: var(--pf-serif); font-weight: 600; font-size: clamp(30px, 4.6vw, 46px); line-height: 1.05; letter-spacing: .01em; color: var(--pf-cream-display); margin: 8px 0 0; }
 .pf-vaultintro { font-family: var(--pf-serif); font-size: 15px; color: var(--pf-body); margin: 12px 0 0; }
 
@@ -458,8 +481,8 @@
 .pf-access { display: flex; flex-direction: column; align-items: center; gap: 5px; margin: 16px 0 0; }
 .pf-access__qr { width: 88px; height: 88px; color: var(--pf-meta); opacity: .85; }
 .pf-access__qr svg { width: 100%; height: 100%; display: block; }
-.pf-access__id { font-family: var(--pf-mono); font-size: 10px; letter-spacing: .16em; color: var(--pf-meta); }
-.pf-access__cta { font-family: var(--pf-mono); font-size: 8.5px; letter-spacing: .2em; text-transform: uppercase; color: var(--pf-ghost); }
+.pf-access__id { font-family: var(--pf-mono); font-size: var(--pf-mono-meta); letter-spacing: var(--pf-mono-prose-trk); color: var(--pf-meta); }
+.pf-access__cta { font-family: var(--pf-mono); font-size: var(--pf-mono-micro); letter-spacing: var(--pf-mono-micro-trk); text-transform: uppercase; color: var(--pf-ghost); }
 
 /* SAVED MINTS — the profile's friend-row idiom */
 .pf-mintlist { display: flex; flex-direction: column; }
@@ -472,9 +495,13 @@
 .pf-mintrow--empty { opacity: .5; }
 .pf-mintrow__thumb { width: 34px; height: 34px; border-radius: 5px; overflow: hidden; flex: none; border: 1px solid var(--pf-line); display: grid; place-items: center; background: rgba(233, 229, 220, .02); }
 .pf-mintrow__thumb img, .pf-mintrow__img { width: 100%; height: 100%; object-fit: cover; display: block; }
+/* BR-S388: the one mono size deliberately OUTSIDE the ladder, and the only 15px in the
+   register. It sets a single placeholder glyph inside an empty thumbnail box — a mark
+   sized to its box, not type carrying rank — so snapping it to `meta` would shrink a
+   drawn element to make a type scale tidy. Named here so it reads as a decision. */
 .pf-mintrow__thumb--empty { border-style: dashed; color: var(--pf-ghost); font-family: var(--pf-mono); font-size: 15px; }
 .pf-mintrow__n { font-family: var(--pf-serif); font-size: 17px; color: var(--pf-cream); flex: 0 1 auto; }
-.pf-mintrow__id { font-family: var(--pf-mono); font-size: 9px; letter-spacing: .1em; text-transform: uppercase; color: var(--pf-meta); margin-left: auto; }
+.pf-mintrow__id { font-family: var(--pf-mono); font-size: var(--pf-mono-label); letter-spacing: var(--pf-mono-label-trk); text-transform: uppercase; color: var(--pf-meta); margin-left: auto; }
 
 /* ============================================================
    BR-S189 — THE DRAWING ROOM (?dev=drawing-room): the tarot room —
@@ -736,7 +763,7 @@
    word only has to name it. */
 .pf-shelfline__lab {
   font-family: var(--pf-mono);
-  font-size: 9px; font-weight: 500; letter-spacing: .26em; text-transform: uppercase;
+  font-size: var(--pf-mono-label); font-weight: 500; letter-spacing: var(--pf-mono-label-trk); text-transform: uppercase;
   color: var(--pf-meta); white-space: nowrap;
 }
 /* the Vault is a drawer, not a display: two rows, ruled, quiet. Its name is
@@ -752,8 +779,8 @@
 .pf-vaultbox { border: 1px solid var(--pf-line); border-radius: 3px; padding: 2px 16px 14px; }
 .pf-vaultrow { display: flex; gap: 18px; align-items: baseline; padding: 12px 0;
   border-bottom: 1px solid var(--pf-line-soft); }
-.pf-vaultrow__k { flex: 0 0 74px; font-family: var(--pf-mono); font-size: 9px;
-  font-weight: 500; letter-spacing: .18em; text-transform: uppercase; color: var(--pf-meta); }
+.pf-vaultrow__k { flex: 0 0 74px; font-family: var(--pf-mono); font-size: var(--pf-mono-label);
+  font-weight: 500; letter-spacing: var(--pf-mono-label-trk); text-transform: uppercase; color: var(--pf-meta); }
 .pf-vaultrow__v { font-family: var(--pf-serif); font-size: 17px; color: var(--pf-body); }
 /* BR-S387: "and 2 others" is a count, not a name — it stands off the crowned name it
    follows rather than reading as part of it. */
