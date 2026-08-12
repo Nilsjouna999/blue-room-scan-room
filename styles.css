@@ -3679,7 +3679,11 @@ html.m2-parch .m2hero { --bf-ink: #1c150d; --bf-meta: #6a5c45; --bf-rule: rgba(2
   border-radius: inherit;
 }
 .m2bface .m2face-meta { color: var(--bf-meta); }
-.m2bface .m2face-div { background: var(--bf-rule); }
+/* BR-S358: with the marks 12px apart, the shared 8px rule margin left "BY BIRTH ALONE"
+   closer to HEXAGRAM than the marks are to each other — so it read as a seventh mark.
+   The closing line has to sit further off the stack than the stack sits off itself.
+   Scoped to the birth face; the tarot face's rule keeps its own spacing. */
+.m2bface .m2face-div { background: var(--bf-rule); margin: 16px 0 13px; }
 .m2bface .m2face-orient { color: var(--bf-meta); }
 /* ── BR-S347 — MATERIALS, NOT COLOURS. ───────────────────────────────────────
    BR-S346 gave the six marks six hues spread across the wheel at roughly equal
@@ -3707,11 +3711,16 @@ html.m2-parch .m2hero { --bf-ink: #1c150d; --bf-meta: #6a5c45; --bf-rule: rgba(2
    THEM off the header moves to the name (below). The four-part group name -> marks ->
    rule -> orient now travels as one block, which is what lets the auto space sit above
    it and the orient's own `0 0 auto` sit below it. */
+/* BR-S358: SIX ENTRIES, NOT SIX STRIPES. At 5px apart the marks bundled into one block
+   and the block is what read as a flag — the eye never got to a single mark, it got a
+   band of colour. 12px apart, a size up, and each one stands alone; the hues stop being
+   a pattern and go back to being six materials. Solitude is bought with space here, not
+   with furniture: no rules, no numerals, and the stack keeps the card's centre axis. */
 .m2bface__marks {
-  list-style: none; margin: 12px 0 0; padding: 0;
-  display: grid; gap: 5px;
-  font-family: var(--font-mono); font-size: 9.5px; font-weight: 500;
-  letter-spacing: .13em; text-transform: uppercase; color: var(--bf-meta);
+  list-style: none; margin: 16px 0 0; padding: 0;
+  display: grid; gap: 12px;
+  font-family: var(--font-mono); font-size: 10px; font-weight: 500;
+  letter-spacing: .15em; text-transform: uppercase; color: var(--bf-meta);
 }
 .m2bface__marks li:nth-child(1) { color: var(--mk-sun); }
 .m2bface__marks li:nth-child(2) { color: var(--mk-animal); }
@@ -3724,14 +3733,17 @@ html.m2-parch .m2hero { --bf-ink: #1c150d; --bf-meta: #6a5c45; --bf-rule: rgba(2
   --mk-sun: #c6a466; --mk-animal: #ad7962; --mk-path: #78838f;
   --mk-rune: #8a9184; --mk-trigram: #6e918d; --mk-hex: #9c968c;
 }
-/* parchment — the shipped deck. Darker, all clearing 4.5:1 on #e7e2d7. */
-/* the gold is #775921 and not a step brighter for a measured reason: at 9.5px this
-   is small text, so it owes 4.5:1 on the cream stock. #8a682c — the obvious "dark
-   gold" — measures 3.97 and fails; #775921 measures 5.03. The one bright note in
-   the set is still the brightest of the six, it just had to earn it. */
+/* parchment — the shipped deck. BR-S358 pushes the six from TINT to PIGMENT: same six
+   hues, same identities, but laid down solid instead of washed. The builder's read was
+   that the colours were "not defined solid enough" and so read as a flag — a tint is a
+   wash of colour, and six washes side by side are a spectrum; six pigments are six
+   materials. Every one goes DARKER, so the whole set gains contrast rather than
+   spending it: the floor rises 5.03:1 -> 6.09:1 on #e7e2d7, comfortably past the 4.5
+   this small text owes. (The old note here warned that #8a682c measures 3.97 and fails
+   — going deeper never has that problem, which is why this direction was the safe one.) */
 html.m2-parch .m2hero {
-  --mk-sun: #775921; --mk-animal: #834f3d; --mk-path: #3a4553;
-  --mk-rune: #55604f; --mk-trigram: #3d6560; --mk-hex: #5f5a52;
+  --mk-sun: #6b4c14; --mk-animal: #74402c; --mk-path: #313d4c;
+  --mk-rune: #465241; --mk-trigram: #315854; --mk-hex: #514c44;
 }
 .m2bface__name { color: var(--bf-ink); margin: auto 0 0; }
 
