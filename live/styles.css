@@ -5819,19 +5819,26 @@ html.orbit-wings .orbit__field { --orbit-rx: clamp(200px, 25.5vw, 368px); --orbi
    working room in the column beside it. The fragments are cropped, never scaled down
    whole: a shrunken card reads as a screenshot of a feature, a fragment reads as an
    object only partly visible from here. Nothing animates but opacity. */
-/* All three assets are cut to 3:2 at source, so the row is even and CSS never clips a
-   fragment mid-word — the first pass let object-fit slice "BR-003-FSH-0001" to
-   "BR-003-FS", which reads as a bug rather than as a crop. Where the picture is cut is
-   a decision, and it belongs in the file that makes the picture. */
-.u1leak { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 14px; }
+/* BR-S398 — ONE FRAGMENT, AND IT IS THE DOOR. Small enough to be FOUND rather than
+   shown: 62px in a column of prose, dim, unlabelled, sharing the entry's own left
+   margin so it reads as part of the item and not as an image block. It brightens on
+   its own hover — not the item's — because a thing you find should answer to being
+   touched, not to being passed. The asset is cut to 3:2 at source; the first pass let
+   `object-fit` do the framing and sliced "BR-003-FSH-0001" to "BR-003-FS", which reads
+   as a bug rather than a crop. Where a picture is cut is a decision, and it belongs in
+   the file that makes the picture. */
+.u1leak { display: inline-block; margin-top: 12px; border-radius: 2px; line-height: 0; }
 .u1leak__f {
-  display: block; width: 100%; aspect-ratio: 3 / 2; height: auto;
+  display: block; width: 62px; aspect-ratio: 3 / 2; height: auto;
   object-fit: cover; border-radius: 2px;
   border: 1px solid rgba(220, 215, 203, .10);
-  opacity: .42; filter: saturate(.72);
-  transition: opacity .22s ease;
+  opacity: .34; filter: saturate(.68);
+  transition: opacity .22s ease, border-color .22s ease;
 }
-.u1item:hover .u1leak__f, .u1item:focus-within .u1leak__f { opacity: .82; }
+.u1leak:hover .u1leak__f, .u1leak:focus-visible .u1leak__f {
+  opacity: .92; border-color: var(--gold, #c9a35c);
+}
+.u1leak:focus-visible { outline: none; }
 @media (prefers-reduced-motion: reduce) { .u1leak__f { transition: none; } }
 
 /* BR-S381 — THE THIRD TRACK: two boxes beside the horizons, and the room they open.

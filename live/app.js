@@ -1436,18 +1436,21 @@ const ROOMS = [
      U1 used to give this a door beside the three working rooms. The card is
      real — you can see one on the desk — but nothing reads a photograph yet,
      which is what the Roadmap has said all along. One list, one answer. */
-  /* BR-S397 — THE LEAK. Three crops of the sample card, under this entry and no other.
-     The forward list is the one place on the site that can only describe, and the Card
-     Mint is the one entry where description is the weakest possible move: its whole
-     claim is "the card is already made". Showing three fragments of it proves that in
-     a way a sentence cannot, and they are crops rather than a thumbnail on purpose —
-     a shrunken card reads as a screenshot of a feature, while a fragment reads as a
-     thing that exists and is only partly visible from here. Which is exactly true. */
+  /* BR-S397/398 — THE LEAK, AS A DOOR RATHER THAN A DISPLAY. It shipped as a strip of
+     three crops and the builder's correction was immediate: it should be a small
+     button they MAY FIND. That is the house rule the Vault already follows — "a place
+     you find by having something in it" — and a row of pictures in the quiet forward
+     column was the opposite of it, outranking every working room in the column beside.
+     So: ONE fragment, thumbnail-sized, and it is the control itself. A leak in the
+     literal sense — a corner of a thing that exists, showing through a page that can
+     otherwise only describe — and pressing it opens the room where the whole card is.
+     No expansion, so nothing below it ever moves; the reward for finding it is the
+     room, not more pictures. */
   { key: "mint", state: "drawn", free: true, name: "The Card Mint",
     now: "One card from one photograph. The room develops what is already in it, then keeps it a page.",
     soon: "The card is already made &mdash; you can see one on the desk. What is missing is the room that reads a picture of your own.",
-    leak: ["assets/leak/mint-1.webp", "assets/leak/mint-2.webp", "assets/leak/mint-3.webp"],
-    leakAlt: "Three details of a finished Blue Room card: the photograph, the frame reading, and the edition line.",
+    leak: "m1",   // the desk's live sample, not a picture of it — see u1Column
+    leakAlt: "A detail of the card on the desk &mdash; open the room where it is",
     cost: "Free &middot; or the paid Halo Mint", cta: "See a card develop", href: "?view=room" },
 
   { key: "pay", state: "bench", internal: true, name: "Paying for a reading",
@@ -1695,16 +1698,27 @@ function u1Column(h) {
   var rows = u1Public().filter(function (r) { return r.state === h.state; });
   if (!rows.length) return "";   /* a horizon with nothing in it is not a heading */
   var items = rows.map(function (r) {
-    /* BR-S397: an entry may carry a `leak` — a few crops of the thing it is describing.
-       Lazy and async-decoded because this sits below the fold on a page whose job is
-       to load fast and say what is real; and one alt for the strip rather than three,
-       because they are three views of one object, not three objects. */
-    var leak = r.leak && r.leak.length
-      ? '<span class="u1leak" role="img" aria-label="' + (r.leakAlt || "") + '">'
-        + r.leak.map(function (src) {
-            return '<img class="u1leak__f" src="' + src + '" alt="" loading="lazy" decoding="async">';
-          }).join('')
-        + '</span>'
+    /* BR-S398: an entry may carry a `leak` — ONE fragment of the thing it describes,
+       and the fragment is the door. It is an <a>, not a decorated <span>, because it
+       is a way into a room: tabbable, openable in a new tab, announced as a link.
+       ★ `leak: "m1"` reads the DESK'S OWN SOURCE, not a picture of it. A baked crop
+       would be a screenshot that goes quietly stale the day M1_SRC_INDEX changes —
+       the exact drift BR-S259 built m1Source() to end, where four places quoted a
+       hardcoded "SRC-01" at a desk showing SRC-03. This leaks whatever the desk is
+       actually showing, and it follows the desk without anyone remembering to.
+       The focal point comes from the source's own photoTuning, so the fragment is
+       cropped where its photograph wants to be cropped. */
+    var leakSrc = r.leak, leakPos = "50% 45%";
+    if (r.leak === "m1") {
+      var m1 = (typeof m1Source === "function") ? m1Source() : null;
+      leakSrc = m1 && m1.file;
+      if (m1 && m1.photoTuning && m1.photoTuning.pos) leakPos = m1.photoTuning.pos;
+    }
+    var leak = (leakSrc && r.href)
+      ? '<a class="u1leak" href="' + r.href + '" aria-label="' + (r.leakAlt || r.name) + '">'
+        + '<img class="u1leak__f" src="' + leakSrc + '" alt="" loading="lazy" '
+        +   'decoding="async" style="object-position:' + leakPos + '">'
+        + '</a>'
       : '';
     return '<li class="u1item"><p class="u1item__t">' + r.name + '</p>'
          + '<p class="u1item__d">' + r.soon + '</p>' + leak + '</li>';
