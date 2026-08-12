@@ -659,3 +659,25 @@
 @media (prefers-reduced-motion: reduce) {
   .pf * { transition: none !important; }
 }
+
+/* BR-S372 — THE SHELF LINE, and the Vault drawer beneath it.
+   Above the line is who you are. Everything below it is your Shelf, and the
+   division is carried by one rule and one quiet word rather than a heading —
+   a heading would make the Shelf a section among sections, and it is not: it is
+   the second half of the page. */
+.pf-shelfline { display: flex; align-items: center; gap: 14px; margin: 40px 0 30px; }
+.pf-shelfline__rule { flex: 1; height: 1px; background: var(--pf-line-cut, rgba(201, 163, 92, .22)); }
+.pf-shelfline__lab {
+  font-family: var(--font-mono, "IBM Plex Mono", monospace);
+  font-size: 9px; font-weight: 500; letter-spacing: .26em; text-transform: uppercase;
+  color: var(--pf-gold-lit, #c9a35c); white-space: nowrap;
+}
+/* the Vault is a drawer, not a display: two rows, ruled, quiet. Its name is
+   never advertised — nothing links here, and the word appears once. */
+.pf-vaultbox { border: 1px solid rgba(233, 229, 220, .10); border-radius: 3px; padding: 2px 16px 14px; }
+.pf-vaultrow { display: flex; gap: 18px; align-items: baseline; padding: 12px 0;
+  border-bottom: 1px solid rgba(233, 229, 220, .07); }
+.pf-vaultrow__k { flex: 0 0 74px; font-family: var(--font-mono, monospace); font-size: 9px;
+  font-weight: 500; letter-spacing: .18em; text-transform: uppercase; color: #8c867b; }
+.pf-vaultrow__v { font-family: var(--font-display, serif); font-size: 17px; color: #c8c4bb; }
+.pf-vaultrow--empty .pf-vaultrow__v { color: #7c766c; font-style: italic; }

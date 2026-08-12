@@ -216,7 +216,7 @@
   /* ---------- Rings — family + friend crowns (§3.4) ---------- */
   var RELATIONS = ["Mother", "Father", "Sister", "Brother", "Grandmother", "Grandfather", "Aunt", "Uncle", "Cousin", "Partner", "Child", "Friend"];
 
-  function ringsHTML() {
+  function vaultHTML() {
     var relOpts = RELATIONS.map(function (r) {
       return '<button type="button" class="pf-relopt" role="menuitem" data-rel-choice="' + esc(r) + '">' + esc(r) + '</button>';
     }).join("");
@@ -230,12 +230,28 @@
         '<div class="pf-relmenu__h">Who is this reading for?</div>' +
         '<div class="pf-relmenu__grid">' + relOpts + '</div>' +
       '</div></div>';
-    return section("Rings", null,
-      "A ring is earned by reading for someone close — none set yet.",
-      '<div class="pf-family">' + add + '</div>');
+    /* BR-S372 — THE VAULT. The builder's structure, said plainly: your profile is
+       the page, everything below the line is your Shelf, and the Vault is the
+       section of it that holds the crowns and the rings. Rings had a section of
+       their own and crowns had none — the crown sat in the header as a button and
+       was nowhere on the shelf as a THING YOU HOLD, which is what it is.
+       The name is deliberately not marketed anywhere: no door leads here, nothing
+       announces it, and the word appears exactly once, as the name of the drawer
+       it is. A place you find by having something in it. */
+    var c = SEEKER.crown_record, worn = c && c.result_count > 0;
+    var crowns = worn
+      ? '<div class="pf-vaultrow"><span class="pf-vaultrow__k">Crowns</span>' +
+          '<span class="pf-vaultrow__v">' + esc(c.name || "one, unnamed") + '</span></div>'
+      : '<div class="pf-vaultrow pf-vaultrow--empty"><span class="pf-vaultrow__k">Crowns</span>' +
+          '<span class="pf-vaultrow__v">None borne yet.</span></div>';
+    var ringrow = '<div class="pf-vaultrow"><span class="pf-vaultrow__k">Rings</span>' +
+        '<span class="pf-vaultrow__v">A ring is earned by reading for someone close &mdash; none set yet.</span></div>';
+    return section("The Vault", null, null,
+      '<div class="pf-vaultbox">' + crowns + ringrow +
+        '<div class="pf-family">' + add + '</div></div>');
   }
 
-  function vaultHTML() {
+  function mintedHTML() {
     var cards = SEEKER.minted_cards.map(function (m) {
       return '<div class="pf-card"><span class="pf-card__art" aria-hidden="true">' + VSEAL + '</span>' +
         '<span class="pf-card__cap"><span class="pf-card__k">' + esc(m.kind) + '</span>' +
@@ -345,8 +361,16 @@
       headerHTML() +
       '<div class="pf-wrap">' +
         surfaceHTML() +
-        ringsHTML() +
+        /* BR-S372 — THE LINE. Above it is who you are; everything below it is your
+           Shelf. One rule and one quiet word, because the division is the whole
+           idea and it does not need a heading to carry it. */
+        '<div class="pf-shelfline" role="separator" aria-label="Your Shelf">' +
+          '<span class="pf-shelfline__rule" aria-hidden="true"></span>' +
+          '<span class="pf-shelfline__lab">Your Shelf</span>' +
+          '<span class="pf-shelfline__rule" aria-hidden="true"></span>' +
+        '</div>' +
         vaultHTML() +
+        mintedHTML() +
         showcaseHTML() +
         friendsHTML() +
         roomsHTML() +
