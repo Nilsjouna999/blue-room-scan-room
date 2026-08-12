@@ -79,6 +79,19 @@
     ]
   };
 
+  /* ---- WHAT THIS VISITOR ACTUALLY HOLDS ----
+     BR-S375: the switch already existed and this page never read it. `br_holdings`
+     is written by the M3 preview toggle and by `?holdings=1|0` (app.js:3338, 5772),
+     and `SEEKER.crown_record` was served unconditionally — so the page always drew
+     the OWNER's view, and the empty branch, which carries the only price on the
+     page and is what every non-paying visitor sees, had never once rendered.
+     Default is EMPTY, because that is what a stranger holds. */
+  function held() {
+    try { return localStorage.getItem("br_holdings") === "1"; } catch (e) { return false; }
+  }
+  // the one accessor every branch reads — null when nothing is held.
+  function crownRecord() { return held() ? SEEKER.crown_record : null; }
+
   /* ---- glyphs ---- */
   var VSEAL = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true"><path d="M12 2.5 L20 7 L20 17 L12 21.5 L4 17 L4 7 Z"/><circle cx="12" cy="11" r="2.1"/><path d="M12 13.1 L12 16.4"/></svg>';
   var SHARE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true"><circle cx="6" cy="12" r="2.4"/><circle cx="18" cy="6" r="2.4"/><circle cx="18" cy="18" r="2.4"/><path d="M8.2 10.9 L15.8 7.1 M8.2 13.1 L15.8 16.9"/></svg>';
@@ -163,7 +176,7 @@
 
   /* ---------- the hero — identity name + crown, LEFT-aligned, above the Rings ---------- */
   function surfaceHTML() {
-    var c = SEEKER.crown_record, taken = c && c.result_count > 0;
+    var c = crownRecord(), taken = c && c.result_count > 0;
     var points = 3 + (c ? c.inputs_provided.length : 0), gems = c ? c.result_count : 0;
 
     var id = '<div class="pf-id">' +
@@ -238,7 +251,7 @@
        The name is deliberately not marketed anywhere: no door leads here, nothing
        announces it, and the word appears exactly once, as the name of the drawer
        it is. A place you find by having something in it. */
-    var c = SEEKER.crown_record, worn = c && c.result_count > 0;
+    var c = crownRecord(), worn = c && c.result_count > 0;
     var crowns = worn
       ? '<div class="pf-vaultrow"><span class="pf-vaultrow__k">Crowns</span>' +
           '<span class="pf-vaultrow__v">' + esc(c.name || "one, unnamed") + '</span></div>'
@@ -274,7 +287,12 @@
       '<span class="pf-pickopt__k">' + esc(o.kind) + '</span><span class="pf-pickopt__n">' + esc(o.name) + '</span></button>';
   }
   function pickMenu(id) {
-    var readOpts = SEEKER.reading_results.map(function (o) { return pickOpt(id, o); }).join("");
+    /* BR-S375: you cannot feature a result you do not hold. Unheld, this listed
+       the mock's five marks to a visitor who owns none — and picking one filled
+       a Showcase slot with someone else's reading. Mirrors the minted empty line. */
+    var readOpts = held()
+      ? SEEKER.reading_results.map(function (o) { return pickOpt(id, o); }).join("")
+      : '<p class="pf-pickempty">No results yet — draw a reading first.</p>';
     var mintOpts = SEEKER.minted_cards.length
       ? SEEKER.minted_cards.map(function (o) { return pickOpt(id, o); }).join("")
       : '<p class="pf-pickempty">No minted cards yet — minting is not open.</p>';
