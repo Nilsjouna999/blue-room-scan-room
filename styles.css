@@ -3739,7 +3739,7 @@ html.m2-parch .m2hero { --bf-ink: #1c150d; --bf-meta: #6a5c45; --bf-rule: rgba(2
    a pattern and go back to being six materials. Solitude is bought with space here, not
    with furniture: no rules, no numerals, and the stack keeps the card's centre axis. */
 .m2bface__marks {
-  list-style: none; margin: 16px 0 0; padding: 0;
+  list-style: none; margin: 26px 0 0; padding: 0;   /* BR-S361: 16 -> 26, see .m2bface__name */
   display: grid; gap: 12px;
   font-family: var(--font-mono); font-size: 10px; font-weight: 500;
   letter-spacing: .15em; text-transform: uppercase; color: var(--bf-meta);
@@ -3771,7 +3771,14 @@ html.m2-parch .m2hero {
    masthead there is no pair left to keep together, so the wrapper the rule needed
    (BR-S359) went with it. The bottom wall stays: its rule and its line still travel
    as one. */
-.m2bface__name { color: var(--bf-ink); margin: auto 0 0; }
+/* BR-S361: the name separates from the marks by MASS, not by another line — the card
+   already carries two rules and a third would be furniture. At 25px against 10px marks
+   the size contrast does the work a rule would have done, and the name gains the
+   gravity of the thing the six assemble into rather than being the same weight as
+   them, six lines higher. The air below it moves 16 -> 26 to match.
+   Scoped to the birth face: `.m2face-name` stays 20px for the tarot face, which sets
+   real card names and has an `.is-long` step-down this static string never needs. */
+.m2bface__name { color: var(--bf-ink); margin: auto 0 0; font-size: 25px; }
 
 /* the face control — two answers to one question, in the panel's quiet register */
 .m2flip { display: inline-flex; gap: 2px; margin-top: 10px; padding: 3px; border: 1px solid var(--line-faint, rgba(233,229,220,.12)); border-radius: 999px; }
