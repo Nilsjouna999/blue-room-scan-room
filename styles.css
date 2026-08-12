@@ -6150,11 +6150,32 @@ html.orbit-wings .orbit__field { --orbit-rx: clamp(200px, 25.5vw, 368px); --orbi
    toward where the press would take you, and the only bright thing is the single
    hairline on the way back — which grows rather than glows. Dark is this page's
    material; the effect should be made of it. */
-.l1seal__half--l { left: 0; cursor: default;
-  background: linear-gradient(to right, rgba(0, 0, 0, .55), transparent 74%); }
-.l1seal__half--r { right: 0; cursor: pointer;
-  background: linear-gradient(to left, rgba(0, 0, 0, .58), transparent 74%); }
-.l1seal__half:hover { opacity: 1; }
+/* ★ BR-S406 — WHY THE LAST ONE FELT IFFY, AND IT WAS NOT THE COLOUR.
+   Two faults, both of them the kind that read as "cheap" without being nameable:
+   1. A HARD 50/50 SEAM. Two gradients meeting at an invisible midline means one
+      snaps off and the other snaps on as the pointer crosses it. The eye reads a
+      SWITCH, not a response — and a switch in the middle of nowhere is the single
+      most common tell of an effect that was assembled rather than designed.
+   2. BANDING. A large, soft, low-alpha gradient over a near-black ground is exactly
+      where 8-bit displays fall apart: the ramp steps visibly, and the steps move
+      when the opacity animates.
+   The fix is ONE layer instead of two, moved by TRANSFORM instead of faded by
+   opacity. A single wide radial shadow sits behind everything and LEANS toward the
+   side you are on — continuous across the midline because it is one object, and
+   band-free because a translated layer is composited, never re-ramped. The halves
+   keep their cursors and their hit areas and stop drawing anything at all. */
+.l1seal__half { background: none; opacity: 1; }
+.l1seal__half--l { left: 0; cursor: default; }
+.l1seal__half--r { right: 0; cursor: pointer; }
+.l1seal__lean {
+  position: absolute; inset: -12% -22%; z-index: 0; pointer-events: none;
+  background: radial-gradient(58% 70% at 50% 50%, rgba(0, 0, 0, .62), transparent 72%);
+  transform: translateX(0) scale(1.02);
+  transition: transform 420ms cubic-bezier(.2, .7, .2, 1);
+  will-change: transform;
+}
+.l1seal__half--l:hover ~ .l1seal__lean { transform: translateX(-16%) scale(1.02); }
+.l1seal__half--r:hover ~ .l1seal__lean { transform: translateX(16%) scale(1.02); }
 /* the way back earns a hairline as well as a wash; the edge does not, because there is
    nothing on the other side of it yet */
 /* the way back keeps one hairline, and it GROWS from the centre rather than fading up
@@ -6166,7 +6187,7 @@ html.orbit-wings .orbit__field { --orbit-rx: clamp(200px, 25.5vw, 368px); --orbi
   transition: top 320ms cubic-bezier(.2, .7, .2, 1), bottom 320ms cubic-bezier(.2, .7, .2, 1);
 }
 .l1seal__half--r:hover::after { top: 12%; bottom: 12%; }
-@media (prefers-reduced-motion: reduce) { .l1seal__half, .l1seal__half--r::after { transition: none; } }
+@media (prefers-reduced-motion: reduce) { .l1seal__lean, .l1seal__half--r::after { transition: none; } }
 
 /* BR-S401 — THE EDGE TUG. Left of L1 is where L2 will be. Until it exists, the track
    gives a little and comes back — the answer a drawer gives at its stop. Transform

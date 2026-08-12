@@ -1490,7 +1490,13 @@ const ROOMS = [
      otherwise only describe — and pressing it opens the room where the whole card is.
      No expansion, so nothing below it ever moves; the reward for finding it is the
      room, not more pictures. */
-  { key: "mint", state: "drawn", free: true, name: "The Card Mint",
+  /* BR-S406 - "The Card Mint" became THE FORGE. The builder: it "should be easier to
+     understand under forge or building room or something". Mint is the industry's
+     word, not a person's - it names a process nobody outside this has performed. A
+     forge is a place where a thing is made, and everyone already knows what happens
+     in one. It fits the house pattern (The Drawing Room, The Codex, The Vault) and
+     does not collide with The Workshop, a real separate entry that holds the wheels. */
+  { key: "mint", state: "drawn", free: true, name: "The Forge",
     now: "One card from one photograph. The room develops what is already in it, then keeps it a page.",
     soon: "The card is already made &mdash; you can see one on the desk. What is missing is the room that reads a picture of your own.",
     leak: "m1",   // the desk's live sample, not a picture of it — see u1Column
@@ -2895,10 +2901,11 @@ function renderMenu(reveal) {
            pressed. Left is the edge (no L2 yet); right is the way back. -->
       <span class="l1seal__half l1seal__half--l" aria-hidden="true"></span>
       <span class="l1seal__half l1seal__half--r" aria-hidden="true"></span>
+      <span class="l1seal__lean" aria-hidden="true"></span>
       <div class="l1seal__box">
         <span class="l1seal__mark" aria-hidden="true">&#9670;</span>
         <p class="l1seal__k">Not open yet</p>
-        <h2 class="l1seal__t" tabindex="-1">The Card Mint</h2>
+        <h2 class="l1seal__t" tabindex="-1">The Forge</h2>
         <!-- BR-S404: was "the card is already made". The builder: "photo is already
              a card" is the better slogan - and it is the desk's own thesis standing
              right behind this seal, the claim the whole product is built on. The seal
