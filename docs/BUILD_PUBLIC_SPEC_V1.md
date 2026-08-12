@@ -168,7 +168,12 @@ otherwise have removed.
 ## 8. Order of work
 
 1. the fixture split + neutral fallbacks *(half done — BR-S347 shipped the fallbacks)*
-2. the gate, as a standalone script — **useful before the build exists**
+2. the gate, as a standalone script — **useful before the build exists** *(DONE — BR-S355,
+   `gate_public.py`. `--selftest` proves every pattern fires; `--audit` gates the workshop
+   tree and today returns **135 hits across 5 checks** — that list is what step 3 must
+   strip. The identity strings live in gitignored `gate_identity.txt`; without it the gate
+   exits 2 rather than passing a weaker check. Identity hits on the tracked tree: **zero**,
+   which is BR-S347 verified rather than asserted.)*
 3. `build_public.py` steps 1–5
 4. wire the gate in as step 6, plus the pre-push hook
 5. sandbox: serve `dist/` locally and walk it
