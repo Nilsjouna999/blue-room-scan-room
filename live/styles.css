@@ -5056,7 +5056,8 @@ body[data-devnav="1"] .devnav {
 }
 
 #brCodexDock {
-  position: fixed; right: 18px; bottom: 18px; z-index: 40;
+  /* BR-S401: lifted so ROOMS can sit beneath it — one right-hand column, not two docks. */
+  position: fixed; right: 18px; bottom: clamp(124px, 15vh, 150px); z-index: 40;
   display: flex; flex-direction: column; align-items: center;
   gap: 9px;                        /* the pair reads as ONE object */
 }
@@ -5203,8 +5204,14 @@ body[data-devnav="1"] .devnav {
    measured what that costs. No blur, no shadow animation, no per-frame JS at all:
    the stagger is a CSS transition-delay, not a timer.
    ============================================================================ */
+/* BR-S401 — ROOMS moves under the Codex orbs, on the RIGHT. It sat alone in the
+   bottom-left while the two orbs sat bottom-right, so the page carried two separate
+   floating docks that never spoke to each other. One stack: the orbs, then ROOMS
+   beneath them, reading top-to-bottom as one column of ways out. The right offset is
+   the orb dock's own 18px, so the two align on their right edge rather than
+   approximately; the bottom clears the build flip. */
 .orbitbtn {
-  position: fixed; left: clamp(12px, 2.6vw, 40px); bottom: clamp(96px, 11vh, 110px);
+  position: fixed; right: 18px; left: auto; bottom: clamp(74px, 9vh, 96px);
   z-index: 80;   /* BR-S294: ABOVE the sheet — it is the way out as well as the way in */
   display: inline-flex; align-items: center; gap: 9px;
   padding: 9px 14px 9px 11px;
@@ -6061,5 +6068,39 @@ html.orbit-wings .orbit__field { --orbit-rx: clamp(200px, 25.5vw, 368px); --orbi
 }
 .l1seal__back {
   font-family: var(--font-mono, monospace); font-size: 9px; letter-spacing: .18em;
-  text-transform: uppercase; color: #6f6a61; margin: 0;
+  text-transform: uppercase; color: #8c867b; margin: 0;
+}
+/* BR-S401: the right half of the seal is the way back, so it says so with the cursor
+   before it says so in words. The left half stays a plain arrow — you are allowed to
+   simply stand there and look at the desk. */
+.l1seal { cursor: default; }
+.l1seal__box { position: relative; z-index: 1; }
+
+/* the right half of L1's seal, drawn only as a cursor affordance — no ink, because a
+   visible hotspot would turn a quiet locked room into a control panel. */
+.l1seal::after {
+  content: ""; position: absolute; top: 0; right: 0; bottom: 0; width: 50%;
+  cursor: pointer;
+}
+
+/* BR-S401 — THE EDGE TUG. Left of L1 is where L2 will be. Until it exists, the track
+   gives a little and comes back — the answer a drawer gives at its stop. Transform
+   only, one class, 480ms, and a hairline that surfaces on the left edge for the
+   duration: something IS over there, it is just not built. Under reduced motion the
+   track holds still and only the hairline answers, so the reply survives without the
+   movement. */
+.menu.is-l1.is-edgeL .menu__track {
+  transform: translateX(15px);
+  transition: transform 480ms cubic-bezier(.28, 1.30, .38, 1);
+}
+.menu.is-edgeL::before {
+  content: ""; position: fixed; left: 0; top: 0; bottom: 0; width: 1px; z-index: 8;
+  background: linear-gradient(transparent, rgba(201, 163, 92, .5), transparent);
+  animation: brEdgeMark 480ms ease-out;
+  pointer-events: none;
+}
+@keyframes brEdgeMark { 0% { opacity: 0 } 30% { opacity: 1 } 100% { opacity: 0 } }
+@media (prefers-reduced-motion: reduce) {
+  .menu.is-l1.is-edgeL .menu__track { transform: translateX(0); transition: none; }
+  .menu.is-edgeL::before { animation: none; opacity: .85; }
 }

@@ -1709,6 +1709,40 @@ var POST_KINDS = [
    Delegated on `document` rather than bound to the node, because U1 re-renders on
    every menu mount and a bound handler would be talking to a fragment that no longer
    exists. Nothing is cached; every lookup happens at event time. */
+/* ★ BR-S401 — WHY M1→L1 LAGGED, AND IT IS NOT THE SLIDE. The desk used to be the boot
+   panel, so its sample photograph was fetched and decoded before anyone could press
+   anything. It is offstage at boot now, so the image was not requested until the
+   moment the panel came on stage — the first left-press paid a network fetch AND a
+   decode inside the 640ms transform, which is exactly what a stutter is made of.
+   One idle image warm fixes the cause. It is deliberately NOT a panel prime: leaving
+   the desk un-offstaged would give it a layout box for the whole session, and BR-S269
+   already measured that re-collapsing it throws the raster away again anyway. */
+function warmL1() {
+  var go = function () {
+    try {
+      var src = (typeof m1Source === "function") && m1Source();
+      if (src && src.file) { var img = new Image(); img.decoding = "async"; img.src = src.file; }
+    } catch (e) {}
+  };
+  if (window.requestIdleCallback) window.requestIdleCallback(go, { timeout: 2500 });
+  else setTimeout(go, 1200);
+}
+
+/* BR-S401 — the builder's ask: on L1, the right half of the screen takes you back.
+   It matches the room's own last line ("press right to go back") and the fragment's
+   right-edge gesture two pages away, so "right means forward, out of here" is one
+   idea used twice rather than two conventions. Delegated on the seal, which already
+   covers the panel and already takes the pointer. */
+function wireL1Back() {
+  document.addEventListener("click", function (e) {
+    var seal = e.target.closest && e.target.closest(".l1seal");
+    if (!seal) return;
+    var r = seal.getBoundingClientRect();
+    if ((e.clientX - r.left) / r.width < 0.5) return;   // left half: stay and look
+    menuSlideTo(MENU_HOME, {});
+  });
+}
+
 function wireU1Leak() {
   function close(el) {
     if (!el) return;
@@ -3848,6 +3882,19 @@ function menuSettle(track, panels, activeIdx, after) {
   _menuSettle = { cancel() { done = true; track.removeEventListener("transitionend", onEnd); clearTimeout(t); } };
 }
 
+/* BR-S401 - the tug: one class and a timer. Named `is-edgeL` and not `is-edge`
+   because the RIGHT end behaves differently (it falls through to the browser), and a
+   shared name would invite someone to reuse this there by mistake. */
+let _edgeTug = null;
+function menuEdgeTug(host) {
+  if (!host) return;
+  host.classList.remove("is-edgeL");
+  void host.offsetWidth;                       // restart it if it is already running
+  host.classList.add("is-edgeL");
+  clearTimeout(_edgeTug);
+  _edgeTug = setTimeout(function () { host.classList.remove("is-edgeL"); }, 480);
+}
+
 function menuEsc(e) {
   if (e.key !== "Escape") return;
   if (_cxOpen) return;                                   // BR-S205: the Codex aperture owns Escape while open
@@ -3861,6 +3908,17 @@ function menuEsc(e) {
 
 function menuHistory(target, cur, opts) {
   if (opts.seed) { _menuPushed = 0; return; }
+  /* ★ BR-S401 — AN ADDRESSLESS PANEL TAKES NO HISTORY, and this was the bug the
+     builder hit as "sends to a random room / pushes back". L1 has no URL (hash: null),
+     but this function still ran its normal step: going LEFT into it took the
+     `target < cur` branch, found _menuPushed > 0 and called history.back() — whose
+     popstate ran menuPopstate, which asked _hashIndex() where it should be, got
+     MENU_HOME because no hash matched, and slid the visitor straight back out of the
+     room they had just stepped into. Stepping OUT of L1 then pushed an entry for a
+     place that was already behind them.
+     A panel with no address cannot be a history state, so any step into or out of one
+     is a pure stage move and touches nothing. */
+  if (MENU_PANELS[target].hash === null || MENU_PANELS[cur].hash === null) return;
   if (opts.viaHistory) {                                // popstate already moved the URL — adjust our push-count directionally
     if (target < cur) _menuPushed = Math.max(0, _menuPushed - (cur - target));   // BR-S234: correct by the real index delta (each synthetic push = one panel step), not a fixed ±1
     else if (target > cur) _menuPushed += (target - cur);
@@ -4119,7 +4177,13 @@ document.addEventListener("keydown", function (e) {
   const k = e.key;
   if (k === "ArrowRight" || k === "ArrowLeft") {
     const to = _menuIndex(host) + (k === "ArrowRight" ? 1 : -1);
-    if (to < 0 || to >= MENU_PANELS.length) return;                 // at either end: let the key fall through untouched
+    /* BR-S401 - THE EDGE. Left of L1 is where L2 goes when there is an L2. There is
+       not one, so the wall answers instead of nothing answering: the track tugs a few
+       pixels and comes back, the way a drawer tells you it has reached its stop. It
+       implies a place without promising one, and it is a REPLY rather than a dead key -
+       the builder's ask was that it not be unsatisfying. */
+    if (to < 0) { e.preventDefault(); menuEdgeTug(host); return; }
+    if (to >= MENU_PANELS.length) return;                           // right end: falls through
     e.preventDefault();
     menuSlideTo(to, {});
   } else if (k === "ArrowDown" || k === "ArrowUp") {
@@ -5529,6 +5593,8 @@ try {
 
 mountMenu();
 wireU1Leak();      // BR-S399 — the found fragment, viewing only
+warmL1();          // BR-S401 — the desk is no longer the boot panel; warm what it needs
+wireL1Back();      // BR-S401 — the right half of the seal is the way back
 renderSourceToggle();
 /* DEV NAV: fill + reveal the dev rail only behind ?devnav=1; sets the
    body attribute the CSS gates on. Inert (display:none) on any clean URL. */
