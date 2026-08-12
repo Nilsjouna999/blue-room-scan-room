@@ -1298,7 +1298,7 @@ const ANNEX_DOWNCUE =
    (the .menu__go mobile hide), where the wall-rail pill / text back carry the nav. */
 const RELIQ_GO =
   '<div class="menu__go menu__go--reliq">'
-  + '<span class="menu__go-cap" aria-hidden="true">The Shelf</span>'
+  + '<span class="menu__go-cap" aria-hidden="true">Your Profile</span>'
   + '<button type="button" class="menu__go-btn" data-annex-go aria-label="Open the Shelf">' + ANNEX_ARROW + '</button>'
   + '</div>';
 const RELIQ_BACK =
@@ -1386,6 +1386,15 @@ const AB_EMBLEMS = {
    THE ORDER IS SHIP ORDER. Within a state, first is nearest.
    ═══════════════════════════════════════════════════════════════════════════ */
 const ROOMS = [
+  /* BR-S371 — THE PROFILE LEADS. The builder's call, and it is about frequency
+     rather than importance: the Codex is the deepest room and the Profile is the
+     one a returning visitor opens most, so it takes door I. The Shelf is not a
+     room beside it — the Shelf is INSIDE it, which is why this entry names the
+     Profile and mentions the Shelf in its line rather than the other way round. */
+  { key: "shelf", state: "open", free: true, name: "Your Profile",
+    now: "Your own page in the archive. The Shelf inside it holds every reading you have drawn.",
+    soon: "A page of your own, holding everything you have drawn.",
+    cost: "Free &middot; this browser only", cta: "Open your Profile", href: "?dev=profile" },
   { key: "codex", state: "open", free: true, name: "The Codex",
     now: "222 entries across ten systems. Every card, sign, rune and hexagram the rooms read from.",
     soon: "Every mark the rooms read from, gathered and defined in one place.",
@@ -1401,10 +1410,6 @@ const ROOMS = [
     soon: "Six marks read from nothing but a name and a birth date.",
     cost: "$4.99 &middot; $7.99 for two", cta: "Give a name and date", href: "?dev=arcane" },
 
-  { key: "shelf", state: "open", free: true, name: "The Shelf",
-    now: "Everything you have drawn, kept where you can find it again.",
-    soon: "One place that holds everything you have drawn.",
-    cost: "Free &middot; this browser only", cta: "Open the Shelf", href: "?dev=profile" },
 
   /* THE CARD MINT IS "drawn", NOT "open", AND THAT IS THE CORRECTION.
      U1 used to give this a door beside the three working rooms. The card is
@@ -1808,7 +1813,7 @@ function renderWall() {
     /* BR-S321: the "Deeper draws" link retired — its whole sentence is now the tarot
        door above, and a link repeating the door beside it is two roads to one room. */
     + '<div class="menu__draw-rail">'
-    + '<button type="button" class="menu__codex menu__codex--reliq" data-annex-go><span class="menu__codex__mark" aria-hidden="true">◆</span> The Shelf — <em class="menu__draw-kept">kept</em> <span class="menu__codex__arr" aria-hidden="true">→</span></button>'
+    + '<button type="button" class="menu__codex menu__codex--reliq" data-annex-go><span class="menu__codex__mark" aria-hidden="true">◆</span> Your Profile — <em class="menu__draw-kept">kept</em> <span class="menu__codex__arr" aria-hidden="true">→</span></button>'
     /* BR-S339 — THE DOOR TO WHAT IS NOT BUILT YET. This rail already carries the two
        standing doors out of M2; the roadmap joins them because the storefront is exactly
        where "there is more of this coming" is worth saying, and it is the one claim this
@@ -2310,12 +2315,12 @@ function wireM2Turn(host) {
 function renderReliquaryTeaser() {
   return '<div class="menu__reliq menu__reliq--sealed">'
     + '<button type="button" class="menu__reliq-navback" data-annex-back>&larr; Back to the Reading Rooms</button>'
-    + '<p class="menu__reliq-eyebrow"><span class="menu__reliq-eyemark" aria-hidden="true">◆</span> THE SHELF</p>'
+    + '<p class="menu__reliq-eyebrow"><span class="menu__reliq-eyemark" aria-hidden="true">◆</span> YOUR PROFILE</p>'
     + '<div class="menu__reliq-niche">'
     +   '<span class="menu__reliq-emblem" aria-hidden="true">' + RELIQ_SEAL_SVG + '</span>'
     +   '<h2 class="menu__reliq-title" tabindex="-1">Held in conservation</h2>'
     +   '<span class="menu__reliq-rule" aria-hidden="true"></span>'
-    +   '<p class="menu__reliq-line">The Shelf is where the archive keeps what has been filed. Nothing is filed here yet — so the shelf stays sealed.</p>'
+    +   '<p class="menu__reliq-line">Your profile is your own page in the archive: the Shelf inside it keeps what has been filed. Nothing is filed yet — so it stays sealed.</p>'
     +   '<p class="menu__reliq-how">It opens the moment a reading is drawn and kept. Looking is free, always; keeping is what fills the shelf.</p>'
     +   '<a class="menu__reliq-door" href="?dev=arcane">Draw a Birth Reading — the form is free &rarr;</a>'
     + '</div>'
@@ -2326,13 +2331,13 @@ function renderReliquaryTeaser() {
 function renderReliquaryOpen() {
   return '<div class="menu__reliq menu__reliq--open">'
     + '<button type="button" class="menu__reliq-navback" data-annex-back>&larr; Back to the Reading Rooms</button>'
-    + '<p class="menu__reliq-eyebrow"><span class="menu__reliq-eyemark" aria-hidden="true">◆</span> THE SHELF</p>'
+    + '<p class="menu__reliq-eyebrow"><span class="menu__reliq-eyemark" aria-hidden="true">◆</span> YOUR PROFILE</p>'
     + '<div class="menu__reliq-niche">'
     +   '<span class="menu__reliq-emblem menu__reliq-emblem--lit" aria-hidden="true">' + RELIQ_SEAL_SVG + '</span>'
     +   '<h2 class="menu__reliq-title" tabindex="-1">The shelf is yours</h2>'
     +   '<span class="menu__reliq-rule" aria-hidden="true"></span>'
     +   '<p class="menu__reliq-line">What has been kept is held here — the crowned name, the rings, the cards.</p>'
-    +   '<a class="menu__reliq-door menu__reliq-door--enter" href="?dev=profile">Open the Shelf &rarr;</a>'
+    +   '<a class="menu__reliq-door menu__reliq-door--enter" href="?dev=profile">Open your Profile &rarr;</a>'
     + '</div>'
     + '<p class="menu__reliq-foot">Filed &amp; sealed · Blue Room Archive</p>'
     + reliqPreviewToggle(true)
@@ -2527,7 +2532,7 @@ function renderMenu(reveal) {
     ${RELIQ_GO}
     ${renderWall()}
     </section>
-    <section class="menu__panel menu__panel--reliquary is-offstage" inert aria-hidden="true" aria-label="The Shelf">
+    <section class="menu__panel menu__panel--reliquary is-offstage" inert aria-hidden="true" aria-label="Your Profile">
     ${RELIQ_BACK}
     ${renderReliquary(held)}
     </section>
@@ -3642,7 +3647,7 @@ function wireMenuAnnex(host) {                                      // KEEP the 
 }
 
 /* BR-S243 — KEYBOARD NAVIGATION (the first, easiest pass).
-   ← / →  step the horizontal panels: Desk ⇄ The Reading Rooms ⇄ The Shelf.
+   ← / →  step the horizontal panels: Desk ⇄ The Reading Rooms ⇄ Your Profile.
    ↓ / ↑  walk the DESK's vertical depth as CHECKPOINTS — the desk itself, the
           About intro, then each of the five plates in turn, then the close. One
           press = one stop, so the page always settles ON a box, never between two.
@@ -6084,7 +6089,7 @@ render();
            happens to be the largest text in it. Keyed on the state class, which is
            the same key the ribbon itself uses, with a derived fallback so an
            unnamed new panel still gets a plate rather than being dropped. */
-        var NAMES = { "": "The Archive Desk", "is-wall": "The Reading Rooms", "is-reliquary": "The Shelf" };
+        var NAMES = { "": "The Archive Desk", "is-wall": "The Reading Rooms", "is-reliquary": "Your Profile" };
         /* BR-S293 — MEANING. A name alone tells you what a room is CALLED, not what it
            is for, and half of these names are not self-evident to a first visitor. One
            line each, in the room's own voice, no jargon. */

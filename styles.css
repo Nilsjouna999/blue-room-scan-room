@@ -9,7 +9,7 @@
   /* Sand text ramp — the ONE canonical warm neutral ramp, 5 named tiers
      (Base-Hex + Warm-Ramp Lock v1; DESIGN_TOKENS). Warm archive greys, no
      pure white. The cool --vault-* alternative is killed — never implemented. */
-  --t-display: #e9e5dc;
+  --t-display: #dcd7cb;   /* BR-S371: was #e9e5dc. Same hue (40deg) and the same warm off-white flavour, four points less light: L* 91 -> 87. The brightest ink in the room was doing the work of a highlight rather than a text colour, and on a #0a0b0d ground it still clears 14:1. */
   --t-primary: #d7d3ca;
   --t-body: #b1ada4;   /* pass 2: lifted for readability */
   --t-meta: #948f87;   /* pass 2: quiet but readable */
@@ -5723,21 +5723,30 @@ html.orbit-wings .orbit__field { --orbit-rx: clamp(200px, 25.5vw, 368px); --orbi
    ────────────────────────────────────────────────────────────────────────────── */
 
 /* ── FINISHED. A door is a pressed plate, not a bordered div. ─────────────── */
-.u1door {
+/* ── THE PLATE. One material, wherever a finished room is offered. ──────────
+   BR-S371: the ROOMS panel's door tiles and U1's open doors are the same object
+   said twice — a room you can walk into, now. So they are one rule with two
+   selectors rather than two rules that drift, which is the fault this whole
+   registry pass exists to stop. Anything that becomes a door later joins this
+   list and inherits the material for free. */
+.u1door,
+#menuView .menu__door {
   background:
-    linear-gradient(168deg, rgba(233, 229, 220, .045) 0%, rgba(233, 229, 220, 0) 46%),
+    linear-gradient(168deg, rgba(220, 215, 203, .045) 0%, rgba(220, 215, 203, 0) 46%),
     linear-gradient(#101216, #0c0d10);
-  border: 1px solid rgba(233, 229, 220, .16);
+  border: 1px solid rgba(220, 215, 203, .16);
   box-shadow:
-    inset 0 1px 0 rgba(233, 229, 220, .07),          /* the lit top edge */
+    inset 0 1px 0 rgba(220, 215, 203, .07),          /* the lit top edge */
     inset 0 -1px 0 rgba(0, 0, 0, .5),                /* the shadowed sill */
     0 1px 0 rgba(0, 0, 0, .45);
   position: relative;
 }
 /* the engraved inner line — what makes a plate read as stock rather than a box */
-.u1door::after {
+.u1door::after,
+#menuView .menu__door::after {
   content: ""; position: absolute; inset: 5px; pointer-events: none;
-  border: 1px solid rgba(233, 229, 220, .05);
+  border: 1px solid rgba(220, 215, 203, .05);
+  border-radius: inherit;
 }
 .u1door__ord { color: #6d675c; }
 .u1door__emblem { opacity: .9; filter: drop-shadow(0 1px 0 rgba(0, 0, 0, .6)); }
@@ -5786,3 +5795,19 @@ html.orbit-wings .orbit__field { --orbit-rx: clamp(200px, 25.5vw, 368px); --orbi
    lines to twice the length the three-column one reads at. */
 .u1board[data-cols="1"] { grid-template-columns: minmax(0, 380px); }
 .u1board[data-cols="2"] { grid-template-columns: repeat(2, minmax(0, 1fr)); max-width: 790px; }
+
+/* BR-S371: THE PROFILE DOOR CARRIES MORE WEIGHT THAN ITS NEIGHBOURS.
+   The builder's reason is frequency, not hierarchy: this is the door a returning
+   visitor opens most, and it was sitting in a rail of three identical pills with
+   Settings. It keeps the rail's shape — three pills still read as one group — but
+   gains a lit edge, a brighter ink and more room to hit. The other two are
+   unchanged, so the difference is legible without a legend. */
+#menuView .menu__codex--reliq {
+  border-color: rgba(220, 215, 203, .30);
+  background: linear-gradient(rgba(220, 215, 203, .05), rgba(220, 215, 203, .015));
+  box-shadow: inset 0 1px 0 rgba(220, 215, 203, .07);
+  color: var(--t-display);
+  padding-block: 11px;          /* a taller hit target on the door most often used */
+}
+#menuView .menu__codex--reliq .menu__codex__mark { color: var(--gold, #c9a35c); }
+#menuView .menu__codex--reliq:hover { border-color: rgba(220, 215, 203, .5); }
