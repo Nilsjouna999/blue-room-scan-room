@@ -31,7 +31,7 @@ ROOT = os.path.dirname(os.path.abspath(__file__))
 # The five rooms the public site is allowed to resolve, plus the three the spec lists as
 # reachable-but-unaddressed. Everything else in app.js's 17 is CUT. This is the whole
 # security model: a ?dev= value not on this list is a leak wherever it appears.
-PUBLIC_ROOMS = ["drawing-room", "arcane", "arcana-reading", "settings", "roadmap", "profile"]
+PUBLIC_ROOMS = ["drawing-room", "arcane", "arcana-reading", "settings", "profile"]
 
 # The neutral identities that SHIP. A birth~ seed naming anyone else is real personal data.
 SAMPLE_NAMES = ["the seeker", "the companion"]

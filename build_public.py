@@ -30,7 +30,7 @@ DIST = os.path.join(ROOT, "dist")
 
 # The rooms the public app is allowed to resolve. Written INTO the app — not a runtime
 # check a URL can walk around.
-PUBLIC_ROOMS = ["drawing-room", "arcane", "arcana-reading", "settings", "roadmap", "profile"]
+PUBLIC_ROOMS = ["drawing-room", "arcane", "arcana-reading", "settings", "profile"]
 
 # The rooms cut from the resolver, and whose mountDev branches are deleted.
 CUT_ROOMS = ["uploaded-result", "uploaded-blocked", "free-scan-sim", "halo-gate",
@@ -52,10 +52,10 @@ COPY_FILES = [
     "codex.html",
     # stylesheets
     "styles.css", "arcane.css", "arcana-profile.css", "arcana-reading.css",
-    "settings.css", "roadmap.css",
+    "settings.css",
     # scripts
     "data.js", "scan-contract.js", "arcane.js", "arcana-reading.js", "arcana-profile.js",
-    "drawing-room.js", "settings.js", "roadmap.js", "app.js",
+    "drawing-room.js", "settings.js", "app.js",
     # data banks — arcana-reading.js fetches these three at runtime
     "codex-data.json",
     "arcana-build/kb_compact.json", "arcana-build/practical.json",

@@ -30,10 +30,12 @@ ROUTES = [
     # boots the ordinary menu and app.js seats it at the U1 stop. The room the public
     # roadmap points at gets the address a person would actually type.
     ("about",    "about",          "U1 -- what Blue Room is"),
-    # BR-S339: the roadmap IS a room (?dev=roadmap resolves it), so unlike /about/ this
-    # stub names a real dev room and mountDev renders it. The address exists because a
-    # roadmap is the one page people link to from outside the building.
-    ("roadmap",  "roadmap",        "The Roadmap -- what is coming, in three states"),
+    # BR-S369: /roadmap/ boots U1, because U1 IS the roadmap now. The separate room
+    # rendered the same two columns from the same registry with a different title and
+    # no doors -- one page wearing two names. The address survives (it is the one people
+    # link to from outside), it just resolves to the page that actually answers it, and
+    # a visitor who came for "what is coming" meets what is already open on the way.
+    ("roadmap",  "about",          "U1 -- what is open, and what is still being made"),
 ]
 
 ROOT = os.path.dirname(os.path.abspath(__file__))

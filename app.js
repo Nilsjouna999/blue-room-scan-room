@@ -101,7 +101,7 @@ const state = { source: 0, treatment: "free", tab: "diagram", view: "menu", draf
      ?dev= keeps working: it is how the dev room reaches everything, and nothing that exists
      today breaks. */
   const dev = q.get("dev") || (typeof window !== "undefined" && window.BR_ROOM) || null;
-  if (["uploaded-result", "uploaded-blocked", "free-scan-sim", "halo-gate", "before-after", "review-map", "proto-cards", "staged-reveal", "menu-reveal", "vault", "arcane", "arcana-reading", "profile", "ceremony", "drawing-room", "settings", "roadmap"].includes(dev)) { state.view = "dev"; state.dev = dev; }
+  if (["uploaded-result", "uploaded-blocked", "free-scan-sim", "halo-gate", "before-after", "review-map", "proto-cards", "staged-reveal", "menu-reveal", "vault", "arcane", "arcana-reading", "profile", "ceremony", "drawing-room", "settings"].includes(dev)) { state.view = "dev"; state.dev = dev; }
   else if (q.has("src") || q.has("t") || q.has("tab")) state.view = "room";
 }
 
@@ -1445,9 +1445,19 @@ const ROOMS = [
     soon: "One page you can hand to one person, without handing them everything else you have kept.",
     cost: "", cta: "", href: "" },
 
-  { key: "table", state: "named", name: "Readings for a table",
-    now: "A reading that belongs to everyone sitting around it.",
-    soon: "Something to put in the middle of a room with people around it, where the reading belongs to everyone sitting there rather than to one of them.",
+  /* BR-S370 — THE WORKSHOP. The wheels are real: compass-wheel, two fortune
+     wheels and the orbit test are built and sitting at the root, reachable by
+     anyone who knows the filename and by nobody else. "Drawn up" is the honest
+     state — these exist, the room they belong to does not, which is exactly
+     what that column says. */
+  { key: "tools", state: "drawn", name: "The Workshop",
+    now: "Small tools, free to play with &mdash; wheels to spin, things to turn, nothing to sign up for.",
+    soon: "The wheels are built and have nowhere to live. Next they get a bench of their own, free and open, with no reading required.",
+    cost: "Free &middot; nothing to sign", cta: "Open the Workshop", href: "" },
+
+  { key: "table", state: "named", name: "Games for a table",
+    now: "Games the whole table plays &mdash; the bottle, the question, the dare drawn from a deck.",
+    soon: "Something to put in the middle of a room with people around it &mdash; the bottle, the question, the round that goes on until someone folds. The unit is the table, not the reader.",
     cost: "", cta: "", href: "" },
 
   { key: "two", state: "named", name: "Everything about two people",
@@ -1803,7 +1813,7 @@ function renderWall() {
        standing doors out of M2; the roadmap joins them because the storefront is exactly
        where "there is more of this coming" is worth saying, and it is the one claim this
        panel could not make with an object. */
-    + '<a class="menu__codex" href="?dev=roadmap"><span class="menu__codex__mark" aria-hidden="true">◆</span> What&rsquo;s coming <span class="menu__codex__arr" aria-hidden="true">→</span></a>'
+    + '<a class="menu__codex" href="roadmap/"><span class="menu__codex__mark" aria-hidden="true">◆</span> What&rsquo;s coming <span class="menu__codex__arr" aria-hidden="true">→</span></a>'
     + '<a class="menu__codex" href="?dev=settings"><span class="menu__codex__mark" aria-hidden="true">◆</span> Settings <span class="menu__codex__arr" aria-hidden="true">→</span></a>'
     + '</div>'
     + '<p class="menu__draw-foot"><span class="menu__draw-cuttick" aria-hidden="true"></span> Drawn once. Not reissued.</p>'
@@ -4790,14 +4800,6 @@ function mountDev() {
     else host.innerHTML = '<p style="padding:48px;color:#948f87;text-align:center;font-family:sans-serif">The Settings page failed to load (settings.js).</p>';
     return;
   }
-  if (state.dev === "roadmap") {
-    // BR-S339 — The Roadmap (?dev=roadmap · /roadmap/). Self-contained in roadmap.js
-    // (window.BRRoadmap); this branch hands it the node. Static document, no state.
-    const host = document.getElementById("devView");
-    if (window.BRRoadmap && typeof window.BRRoadmap.mount === "function") window.BRRoadmap.mount(host);
-    else host.innerHTML = '<p style="padding:48px;color:#948f87;text-align:center;font-family:sans-serif">The roadmap failed to load (roadmap.js).</p>';
-    return;
-  }
   if (state.dev === "ceremony") {
     // BR-S163 — the forge ceremony (builder's exact art, pixel-perfect + alive).
     // In ceremony.js (window.BRCeremony); this branch hands it the node.
@@ -6108,7 +6110,7 @@ render();
        could only be made by the rooms that already exist. The Roadmap is in the HOUSE
        wing with About and Settings — the building explaining itself — and ranks below
        About, because what this is comes before what it will be. */
-    out.push({ label: "What's coming", sub: "The roadmap", mark: ORBIT_MARKS.about, rank: 5, wing: "house", href: "?dev=roadmap", kind: "link" });
+    out.push({ label: "What's coming", sub: "The roadmap", mark: ORBIT_MARKS.about, rank: 5, wing: "house", href: "roadmap/", kind: "link" });
     out.push({ label: "Settings", sub: "Motion, and what's kept", mark: ORBIT_MARKS.settings, rank: 6, wing: "house", href: "?dev=settings", kind: "link" });
     return out;
   }

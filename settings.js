@@ -509,7 +509,7 @@
     /* BR-S347: the Source link and the mailto are gone from here for the reasons
        set out in Credits — a repository address is an invitation to redeploy, and
        a personal inbox is not a standing link. */
-    ["What's coming", "?dev=roadmap", false]
+    ["What's coming", "roadmap/", false]
   ];
   function footerHTML() {
     var links = STANDING.map(function (l) {
