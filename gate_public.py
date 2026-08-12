@@ -67,7 +67,12 @@ PROTOTYPE_FILES = [
 def _dev_route_pattern():
     """Any ?dev= or BR_ROOM naming a room outside PUBLIC_ROOMS."""
     ok = "|".join(re.escape(r) for r in PUBLIC_ROOMS)
-    return re.compile(r'(?:\?dev=|BR_ROOM\s*=\s*["\'])(?!(?:%s)\b)([a-z0-9-]+)' % ok, re.I)
+    # BR-S364: the terminator is (?![a-z0-9-]) and NOT \b. A word boundary is satisfied
+    # by a hyphen, so `?dev=arcane-vault` matched the allow-listed `arcane` and the gate
+    # called a private room public. Nothing in the tree exploits it today — so the gate
+    # has been printing the right answer for the wrong reason — but this repo names rooms
+    # with hyphens, and the next one built off a public prefix would ship unreported.
+    return re.compile(r'(?:\?dev=|BR_ROOM\s*=\s*["\'])(?!(?:%s)(?![a-z0-9-]))([a-z0-9-]+)' % ok, re.I)
 
 
 def _birth_seed_pattern():
@@ -80,7 +85,8 @@ def _birth_seed_pattern():
 CHECKS = [
     ("dev-route", _dev_route_pattern(),
      "a dev room outside the public list",
-     '<a href="?dev=Halo-Gate">'),
+     # deliberately a HYPHENATED suffix on a public prefix — the \b bug's exact shape
+     '<a href="?dev=Arcane-Vault">'),
     ("birth-data", _birth_seed_pattern(),
      "a birth seed naming someone who is not a sample identity",
      'seed=birth~Real Person~1988~3~4'),
@@ -140,8 +146,15 @@ def _identity_pattern(s):
     return re.compile(sep.join(parts), re.I)
 
 
-def scan(target, checks, everywhere=False):
+def scan(target, checks, everywhere=False, audit=True, tally=None):
     """Every hit in the tree, as (relpath, lineno, check_id, why, the matched text).
+
+    `audit` is False when gating a real OUTPUT tree, and then SKIP_DIRS does not apply
+    at all. BR-S364: that list was applied unconditionally, so the three JSON banks
+    build_public.py copies into dist/arcana-build/ were exempt from EVERY check — 31 of
+    34 shippable files scanned, and the banner printed only a check count, so a clean
+    verdict looked identical either way. SKIP_DIRS is an --audit convenience for keeping
+    the workshop's own notes out of the report; it is not a security boundary.
 
     `everywhere` drops SKIP_DIRS and the extension filter. BR-S364: the identity check
     must run with it. The structural checks are about what reaches dist/, so skipping
@@ -152,9 +165,10 @@ def scan(target, checks, everywhere=False):
     birth date and home town in four files.
     """
     hits = []
+    scanned = [0]
     for dirpath, dirnames, filenames in os.walk(target):
         dirnames[:] = [d for d in dirnames
-                       if d not in (ALWAYS_SKIP if everywhere else SKIP_DIRS)]
+                       if d not in (ALWAYS_SKIP if everywhere or not audit else SKIP_DIRS)]
         for fn in sorted(filenames):
             if fn in SKIP_FILES:
                 continue
@@ -169,11 +183,14 @@ def scan(target, checks, everywhere=False):
             except (IOError, OSError) as e:
                 hits.append((rel, 0, "unreadable", "could not be read, so could not be cleared: %s" % e, ""))
                 continue
+            scanned[0] += 1
             for lineno, line in enumerate(text.splitlines(), 1):
                 for cid, pat, why, _ in checks:
                     m = pat.search(line)
                     if m:
                         hits.append((rel, lineno, cid, why, m.group(0)[:70]))
+    if tally is not None:
+        tally.append(scanned[0])
     return hits
 
 
@@ -242,12 +259,19 @@ def main(argv):
         return 2
 
     # Two sweeps, two threat models. Structural over what ships; identity over everything.
-    hits = scan(target, CHECKS) + scan_prototypes(target, os.path.abspath(target) == ROOT)
+    seen_struct, seen_ident = [], []
+    hits = scan(target, CHECKS, audit=audit, tally=seen_struct)
+    hits += scan_prototypes(target, os.path.abspath(target) == ROOT)
     if ident:
-        hits += scan(target, ident, everywhere=True)
+        hits += scan(target, ident, everywhere=True, tally=seen_ident)
 
     label = "the workshop tree" if audit else target
+    # BR-S364: the FILE COUNT is printed because os.walk pruning is invisible by
+    # construction — a gate that skipped three files prints the same CLEAN as one that
+    # skipped none. A number that drops is the only visible trace a blind spot leaves.
     print("gate_public: %d checks over %s" % (len(checks) + 1, label))
+    print("  files scanned: %d structural, %d identity"
+          % (seen_struct[0] if seen_struct else 0, seen_ident[0] if seen_ident else 0))
     print("  identity strings: %s" % ("%d loaded" % len(ident) if ipresent else "SKIPPED (--no-identity)"))
 
     if not hits:
