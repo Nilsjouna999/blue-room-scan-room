@@ -5812,6 +5812,28 @@ html.orbit-wings .orbit__field { --orbit-rx: clamp(200px, 25.5vw, 368px); --orbi
 #menuView .menu__codex--reliq .menu__codex__mark { color: var(--gold, #c9a35c); }
 #menuView .menu__codex--reliq:hover { border-color: rgba(220, 215, 203, .5); }
 
+/* BR-S397 — THE LEAK STRIP. Three crops of a card that already exists, under the one
+   forward entry whose claim is that it already exists.
+   The strip is DIM AT REST and comes up on hover of the whole item, because the
+   forward column is a quiet list and a bright picture in it would outrank every
+   working room in the column beside it. The fragments are cropped, never scaled down
+   whole: a shrunken card reads as a screenshot of a feature, a fragment reads as an
+   object only partly visible from here. Nothing animates but opacity. */
+/* All three assets are cut to 3:2 at source, so the row is even and CSS never clips a
+   fragment mid-word — the first pass let object-fit slice "BR-003-FSH-0001" to
+   "BR-003-FS", which reads as a bug rather than as a crop. Where the picture is cut is
+   a decision, and it belongs in the file that makes the picture. */
+.u1leak { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 14px; }
+.u1leak__f {
+  display: block; width: 100%; aspect-ratio: 3 / 2; height: auto;
+  object-fit: cover; border-radius: 2px;
+  border: 1px solid rgba(220, 215, 203, .10);
+  opacity: .42; filter: saturate(.72);
+  transition: opacity .22s ease;
+}
+.u1item:hover .u1leak__f, .u1item:focus-within .u1leak__f { opacity: .82; }
+@media (prefers-reduced-motion: reduce) { .u1leak__f { transition: none; } }
+
 /* BR-S381 — THE THIRD TRACK: two boxes beside the horizons, and the room they open.
    A horizon column is a bare list on a ruled spine. These are BORDERED — that single
    difference is what stops "your idea" reading as a planned feature. Same row, same

@@ -1480,9 +1480,18 @@ const ROOMS = [
      U1 used to give this a door beside the three working rooms. The card is
      real — you can see one on the desk — but nothing reads a photograph yet,
      which is what the Roadmap has said all along. One list, one answer. */
+  /* BR-S397 — THE LEAK. Three crops of the sample card, under this entry and no other.
+     The forward list is the one place on the site that can only describe, and the Card
+     Mint is the one entry where description is the weakest possible move: its whole
+     claim is "the card is already made". Showing three fragments of it proves that in
+     a way a sentence cannot, and they are crops rather than a thumbnail on purpose —
+     a shrunken card reads as a screenshot of a feature, while a fragment reads as a
+     thing that exists and is only partly visible from here. Which is exactly true. */
   { key: "mint", state: "drawn", free: true, name: "The Card Mint",
     now: "One card from one photograph. The room develops what is already in it, then keeps it a page.",
     soon: "The card is already made &mdash; you can see one on the desk. What is missing is the room that reads a picture of your own.",
+    leak: ["assets/leak/mint-1.webp", "assets/leak/mint-2.webp", "assets/leak/mint-3.webp"],
+    leakAlt: "Three details of a finished Blue Room card: the photograph, the frame reading, and the edition line.",
     cost: "Free &middot; or the paid Halo Mint", cta: "See a card develop", href: "?view=room" },
 
   { key: "pay", state: "bench", internal: true, name: "Paying for a reading",
@@ -2025,8 +2034,19 @@ function u1Column(h) {
   var rows = u1Public().filter(function (r) { return r.state === h.state; });
   if (!rows.length) return "";   /* a horizon with nothing in it is not a heading */
   var items = rows.map(function (r) {
+    /* BR-S397: an entry may carry a `leak` — a few crops of the thing it is describing.
+       Lazy and async-decoded because this sits below the fold on a page whose job is
+       to load fast and say what is real; and one alt for the strip rather than three,
+       because they are three views of one object, not three objects. */
+    var leak = r.leak && r.leak.length
+      ? '<span class="u1leak" role="img" aria-label="' + (r.leakAlt || "") + '">'
+        + r.leak.map(function (src) {
+            return '<img class="u1leak__f" src="' + src + '" alt="" loading="lazy" decoding="async">';
+          }).join('')
+        + '</span>'
+      : '';
     return '<li class="u1item"><p class="u1item__t">' + r.name + '</p>'
-         + '<p class="u1item__d">' + r.soon + '</p></li>';
+         + '<p class="u1item__d">' + r.soon + '</p>' + leak + '</li>';
   }).join('');
   return '<section class="u1col u1col--' + h.state + '" aria-labelledby="u1h-' + h.state + '">'
     + '<header class="u1col__head">'
