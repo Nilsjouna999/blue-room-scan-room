@@ -5856,6 +5856,21 @@ html.orbit-wings .orbit__field { --orbit-rx: clamp(200px, 25.5vw, 368px); --orbi
 .vis__lede { font-family: var(--font-display, serif); font-size: 16.5px; font-style: italic; line-height: 1.6; color: #8c867b; margin: 0 0 22px; max-width: 56ch; }
 .vis__p { font-family: var(--font-display, serif); font-size: 17.5px; line-height: 1.68; color: #c8c4bb; margin: 0 0 18px; max-width: 62ch; }
 .vis__p--empty { color: #8c867b; font-style: italic; }
+/* BR-S393 — the three divisions. Quiet on purpose: a rule, a gold word and a whispered
+   gloss. They exist to tell a reader WHEN each paragraph is true — now, or later, or
+   always — not to chunk the page into cards. Generous air above, almost none below, so
+   each one belongs to the paragraph it opens rather than floating between two. */
+.vis__mark {
+  display: flex; align-items: baseline; gap: 10px;
+  margin: 52px 0 18px; padding-top: 15px;
+  border-top: 1px solid rgba(220, 215, 203, .10);
+}
+.vis__mark:first-child { margin-top: 0; padding-top: 0; border-top: 0; }
+.vis__mark__k {
+  font-family: var(--font-mono, monospace); font-size: 9px; letter-spacing: .22em;
+  text-transform: uppercase; color: var(--gold, #c9a35c); white-space: nowrap;
+}
+.vis__mark__s { font-family: var(--font-display, serif); font-style: italic; font-size: 14.5px; color: #8c867b; }
 /* the one emphasised clause carries the founding rule — italic, and brought up to the
    display tier so it reads as the sentence the rest of the page is built on */
 .vis__p em { font-style: italic; color: var(--t-display, #e9e5dc); }
@@ -5875,7 +5890,8 @@ html.orbit-wings .orbit__field { --orbit-rx: clamp(200px, 25.5vw, 368px); --orbi
 .vispost__kt { display: block; font-family: var(--font-display, serif); font-size: 16px; color: var(--t-display, #e9e5dc); margin-bottom: 3px; }
 .vispost__kd { display: block; font-family: var(--font-display, serif); font-size: 13.5px; font-style: italic; line-height: 1.45; color: #8c867b; }
 .vispost__lab { display: block; font-family: var(--font-mono, monospace); font-size: 9px; letter-spacing: .16em; text-transform: uppercase; color: #8c867b; margin: 0 0 7px; }
-.vispost__opt { text-transform: none; letter-spacing: .04em; font-style: italic; color: #6f6a61; }
+/* BR-S393: #6f6a61 measured 3.67:1 — the worst on the page. #8c867b is 5.45:1. */
+.vispost__opt { text-transform: none; letter-spacing: .04em; font-style: italic; color: #8c867b; }
 .vispost__in, .vispost__ta {
   display: block; width: 100%; margin: 0 0 20px; padding: 11px 12px;
   border: 1px solid rgba(220, 215, 203, .14); border-radius: 3px;
@@ -5896,7 +5912,9 @@ html.orbit-wings .orbit__field { --orbit-rx: clamp(200px, 25.5vw, 368px); --orbi
   font-family: var(--font-mono, monospace); font-size: 10px; letter-spacing: .18em; text-transform: uppercase;
 }
 .vispost__send:disabled { cursor: not-allowed; opacity: .38; }
-.vispost__note { font-family: var(--font-display, serif); font-size: 14px; font-style: italic; color: #7c766c; margin: 0; flex: 1 1 240px; }
+/* BR-S393: was #7c766c — 4.37:1, the exact literal that was defect #10 on the
+   Profile, reused here three weeks later. Measured, not guessed. #96918a is 6.29:1. */
+.vispost__note { font-family: var(--font-display, serif); font-size: 14px; font-style: italic; color: #96918a; margin: 0; flex: 1 1 240px; }
 .vispost--sealed .vis__lede { margin-bottom: 0; }
 
 /* BR-S383 — LEAVING SOMETHING. The amounts are deliberately the QUIETEST controls on

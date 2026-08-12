@@ -1582,6 +1582,8 @@ function u1Door(o, i) {
    ROOMS, a price that is not on a door, or a mechanic nobody has decided.
    Read it as a first pass at the shape, not as final wording. */
 var VISION = [
+  { label: "The archive", sub: "what Blue Room is" },
+
   "Blue Room is an archive that reads things. A photograph, a name and a birth date, " +
   "a deck cut on a table &mdash; each one goes in, and what comes back is a record: " +
   "named, dated, filed, and yours.",
@@ -1589,7 +1591,13 @@ var VISION = [
   "The first rule is the one everything else is built on. <em>Everything read here is " +
   "yours to keep.</em> Looking is free and stays free. What costs money says so on its " +
   "own door, once, in plain figures. Nothing here is built to make you come back &mdash; " +
-  "if you never open it again, the record is still yours, and it is still true.",
+  /* BR-S393: "and it is still true" claimed objective truth for astrology, runes and
+     tarot — a claim this site's own footer explicitly declines to make ("a reflective
+     record, for insight, not instruction"). "Still there" keeps the whole point,
+     which was permanence and ownership, and claims nothing about the cosmos. */
+  "if you never open it again, the record is still there, and it is still yours.",
+
+  { label: "Open now", sub: "what can be entered today" },
 
   "It is made of rooms rather than features. A room has a name, a door, and one thing " +
   "it does. The Codex holds every mark the archive can read. The Drawing Room cuts " +
@@ -1597,15 +1605,23 @@ var VISION = [
   "find a room again without being told twice, and every way in is a way back out. " +
   "When something new is built it becomes a place, not another item in a list.",
 
-  "The six marks come from six systems people have been reading for a very long time " +
-  "&mdash; astrology, the Chinese year, numerology, the runes, the I Ching. Blue Room " +
-  "does not rank them, blend them into one answer, or apologise for them. It reads each " +
-  "one properly, on its own terms, and files what it finds beside the others.",
+  /* BR-S393: this said "six marks come from SIX systems" and then listed five. There
+     are five — the I Ching gives two of the six, the hexagram and the trigram. A
+     wrong count in the paragraph that explains the method costs more than a typo.
+     "properly" also went: it implies one canonical reading, which is exactly the
+     authority this page should not claim. "On its own terms" says the true thing. */
+  "The six marks are drawn from five systems people have been reading for a very long " +
+  "time &mdash; astrology, the Chinese year, numerology, the runes, and the I Ching, " +
+  "which gives two. Blue Room does not rank them, blend them into one answer, or " +
+  "apologise for them. It reads each one on its own terms and files what it finds " +
+  "beside the others.",
 
   "What you keep gathers into a place of your own. A profile here is not a settings " +
   "page; it is your page in the archive, and the Shelf inside it holds everything you " +
   "have drawn. A crown gains a gem for every mark. Read for someone close and you earn " +
   "a ring. The archive grows by being used, and the part of it that is yours grows with it.",
+
+  { label: "Further on", sub: "what is being made" },
 
   "Further on, the readings stop being a list and become ground. Your trigram is the " +
   "land. Your year animal walks on it. Your sun sign is the sky over it, and your rune " +

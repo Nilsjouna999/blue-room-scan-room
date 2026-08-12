@@ -82,7 +82,14 @@
 .pf-wordmark:hover, .pf-wordmark:focus-visible { color: var(--pf-crown); outline: none; }
 
 /* ---------- shell ---------- */
-.pf-wrap { width: min(760px, 92vw); margin: 0 auto; padding: clamp(14px, 3vh, 30px) 0 16vh; }
+/* BR-S392 — ONE DECLARATION. `.pf-wrap` was declared twice, 760px here and 620px 230
+   lines below; same specificity, so the later one silently won and this width had not
+   been the column's width for a long time. An editor tuning the page's measure would
+   have changed the number that does nothing — the same class of dead control as the
+   Shelf line's inert margins (BR-S374). The intimate 620 column is the live decision;
+   it is stated once, here, where the wrap is defined. Named in the Turning World's
+   answer sheet as P1, because the world is laid out against this measure. */
+.pf-wrap { width: min(620px, 92vw); margin: 0 auto; padding: clamp(14px, 3vh, 30px) 0 16vh; }
 
 /* ---------- ABOVE GROUND — the surface-world box ---------- */
 .pf-surface {
@@ -314,7 +321,7 @@
 
 /* 3 + 4 — intimate column, and a fine static grain on the ground (rendered once,
    under content, kills banding + gives the void a paper tooth). Not animated. */
-.pf-wrap { width: min(620px, 92vw); position: relative; z-index: 1; }
+.pf-wrap { position: relative; z-index: 1; }   /* BR-S392: width lives once, at the definition */
 .pf::before {
   content: ""; position: fixed; inset: 0; z-index: 0; pointer-events: none;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
