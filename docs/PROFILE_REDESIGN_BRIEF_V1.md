@@ -503,6 +503,147 @@ second root cause.
 **Neither read is sufficient alone.** §9 knows what is broken; §9b knows what is
 wrong. A redesign needs both.
 
+
+---
+
+## 9c. THE DWELLING RESEARCH - what it unlocks, and where it collides with Blue Room
+
+A second, much larger outside document (GPT, commissioned by the builder) on making
+the profile **magnetic, cosy and dwellable**. It is the strongest of the three
+reads and the only one that supplies a *vocabulary* rather than a defect list.
+It was written without repository access, so the four collisions below are things
+it could not have known.
+
+### What it contributes that nothing else had
+
+- **Empty-and-calm vs empty-and-desolate.** The distinction the whole page turns
+  on. Emptiness reads as calm when it is *enclosed, warm and intentional*; as
+  desolate when *exposed, cold and accidental*. Blue Room's near-black is the raw
+  material of refuge, but a hairline column stranded in a dark field delivers
+  exposure, not refuge (Appleton's prospect-refuge; Alexander's Pattern 159/179).
+- **Silhouettes, not sentences.** An unfilled slot creates *desire* when it reads
+  as an earnable, already-underway set and *despair* when it reads as vaporware.
+  Same pixels, opposite effect. This is the single most actionable idea in any of
+  the three critiques.
+- **Never start at 0-of-N.** Seed the account. The coffee-card field experiment
+  (Kivetz, Urminsky & Zheng 2006) is the citation; the practice is Basecamp's
+  sample project, Dropbox's starter PDF, Evernote's first note.
+- **The IKEA effect, with its own kill-switch.** Labour raises valuation *only when
+  it completes*; abandoned or half-finished work destroys the effect. A second,
+  independent argument against a page of empty slots.
+- **Design the page for the tenth visit, not the first.** A profile becomes a
+  place through repeated low-pressure return.
+- **The ethical line, drawn precisely.** Memory, ritual, craft and meaning are
+  legitimate return mechanics; streaks, FOMO, variable-ratio loops and
+  social-comparison are not - and would contradict this page's own footer.
+
+### THE FINDING IT UNLOCKS BUT DOES NOT STATE
+
+Its first and highest-priority recommendation is *"seed every new account: one
+real reading filed and auto-featured on day one; the shelf opens at 1-of-N,
+never 0-of-N."*
+
+**That is impossible as written, and the reason is the most important structural
+fact about this page.**
+
+A Birth Reading costs **$4.99** (`arcane.js:439`). It also requires the visitor's
+own name and birth date, so it cannot be pre-filled by anyone. Therefore:
+
+> **The populated profile is behind a paywall.** Every non-paying visitor's
+> profile is permanently the empty state - the branch that cannot be rendered
+> (§9 #2), that carries the page's only price and its only violet (§9 #3), and
+> that reads as five simultaneous absences. It is not an onboarding gap. It is the
+> product's front door for everyone who has not bought.
+
+**But the seed exists, in another room.** The Drawing Room's **Pull is free and
+unlimited** and its first **Sitting is free** (`drawing-room.js:5,7,224`). So the
+mechanism has to change, not the principle:
+
+- day one is seeded by a **free tarot draw**, not a paid birth reading
+- the crown is then the *second* thing you earn, not the first
+- which means the hero of this page - the crown, the crowned name, and the whole
+  "above ground" surface - **is currently built around the one object a new
+  visitor cannot have**
+
+That reframes the redesign. It is not "fix the empty state". It is *what is this
+page's hero for someone who has drawn one free card?*
+
+### FOUR COLLISIONS WITH DECIDED CANON
+
+The brief must not adopt these silently. Each is a real conflict with something
+the builder settled, in some cases hours before this research arrived.
+
+**1. Tabs vs the line.** It calls a horizontal rule labelled "YOUR SHELF" *"a
+smell that two pages are hiding inside one"* and proposes header + tabs
+(Shelf / Readings / Friends / Rooms). The builder **decided the line** in BR-S372,
+deliberately, as the page's only structural division. Both positions are coherent:
+tabs scale and end the doom-scroll; the line is one page that never asks you to
+choose. This is a genuine fork and it is the builder's call, not the research's.
+
+**2. A daily draw vs "drawn once, not reissued."** It recommends a daily card as
+the return ritual. The Drawing Room's stated law is that a deck is cut once and
+what falls is filed where it fell - the panel's own line is *"Drawn once. Not
+reissued."* A daily card is a different product with a different promise. The
+compatible version is a daily *reading of what you already hold* (an "on this
+day", a mark re-read) rather than a new draw.
+
+**3. Guestbook, visiting, seeded presence - all need a backend.** There are no
+accounts, no server, no storage beyond one browser's localStorage. Every social
+primitive it proposes is correctly identified as "later", but the brief should be
+explicit: these are downstream of accounts, which is state `drawn` in the room
+registry.
+
+**4. Decorating vs restraint.** "Decorating drives dwelling" is well-evidenced and
+it argues for constrained customisation (a curated palette of inks and frames).
+Blue Room's design doctrine is *restraint over density* and its front door was
+deliberately stripped of a tier ladder. Constrained customisation is compatible;
+"a room you decorate" may not be. Worth deciding before it is designed.
+
+### TWO THINGS IT GOT WRONG, both from judging a screenshot
+
+- **"The repeating ROOMS pill (x3, sticky)"** - `app.js` builds the orbit button
+  **once**. Three appearances in one tall capture are the sticky element caught
+  three times by the screenshot, not three pills. Its §11 recommendation to
+  "cut the repetition" is aimed at a bug that does not exist.
+- **"Pure black causes halation; switch to a warm near-black around #121212"** -
+  Blue Room's ground is already `#0a0b0d`, deliberately not `#000`. The advice is
+  already taken.
+
+Its contrast warning is likewise already measured: see §9b problem 1 - the
+tokens mostly pass, and the real fault is size and tracking.
+
+### THIRD INDEPENDENT HIT ON "MINT"
+
+*"In 2026, 'mint' reads as crypto/NFT to a large share of users... either rename
+the mechanic or make the copy explicitly about personal craft."*
+
+This is now the **third** independent source to flag it - the roadmap research,
+the screenshot critique's implication, and this. Blue Room says Mint on the front
+door, on the card, on the serial, and in a section title. It is a product
+vocabulary decision, and three-for-three is as clear a signal as this brief will
+produce.
+
+### THE FIVE PRINCIPLES it proposes, worth adopting as arbiters
+
+> Quiet but never dead · Every absence is an invitation · Reward return, never
+> punish absence · Decorate within the system · The page is a hub, not a display case
+
+The second is the one that would change the most code today.
+
+### THE ORDER I would actually take it in
+
+1. **Answer the paywall question first.** Everything else is downstream of what a
+   non-paying visitor's profile is *for*.
+2. **Make the empty branch renderable** (§9 #2). It cannot be designed while it
+   cannot be seen, and `br_holdings` is already the switch (§9 #27).
+3. **Silhouettes and invitations** in place of every "none yet" - the cheapest
+   change with the largest effect, and it needs no backend.
+4. **Hide the unshipped sections** rather than rendering them as dead states.
+5. **Enclose the column** - a frame, and a measure closer to 700px than the 620px
+   two conflicting declarations currently produce (§9b problem 7).
+6. Living element and ritual, in the compatible form (memory, not a new draw).
+7. Tabs and social only after 1-6, and only if the builder overrides the line.
+
 ---
 
 ## 10. THE QUESTIONS THE REDESIGN MUST ANSWER
@@ -533,6 +674,12 @@ wrong. A redesign needs both.
     the only place an unbuilt thing is named.
 11. **How is the mono register made readable without losing restraint?** It is a
     size-and-tracking problem, not a contrast one - see §9b problem 1.
+12. **What is this page for someone who has not paid?** The crown, the crowned
+    name and the whole hero require a $4.99 reading. See §9c.
+13. **The line or tabs?** §9c argues the line is a smell; BR-S372 decided it
+    deliberately. A real fork, and the builder's call.
+14. **Is Blue Room a room you decorate?** Constrained customisation is
+    well-evidenced and may still be the wrong product.
 
 ---
 
