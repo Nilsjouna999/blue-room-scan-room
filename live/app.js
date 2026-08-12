@@ -2835,6 +2835,11 @@ function renderMenu(reveal) {
          panel and takes the pointer, which is what stops the desk's own controls from
          selling a card nothing can mint yet. -->
     <div class="l1seal">
+      <!-- BR-S403: two REAL halves, not pseudo-elements - a pseudo cannot answer to
+           :hover on its own, and each side needs to say what it does before it is
+           pressed. Left is the edge (no L2 yet); right is the way back. -->
+      <span class="l1seal__half l1seal__half--l" aria-hidden="true"></span>
+      <span class="l1seal__half l1seal__half--r" aria-hidden="true"></span>
       <div class="l1seal__box">
         <span class="l1seal__mark" aria-hidden="true">&#9670;</span>
         <p class="l1seal__k">Not open yet</p>
