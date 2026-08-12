@@ -1525,9 +1525,16 @@ const ROOMS = [
     soon: "The wheels are built and have nowhere to live. Next they get a bench of their own, free and open, with no reading required.",
     cost: "Free &middot; nothing to sign", cta: "Open the Workshop", href: "" },
 
-  { key: "table", state: "named", name: "Games for a table",
-    now: "Games the whole table plays &mdash; the bottle, the question, the dare drawn from a deck.",
-    soon: "Something to put in the middle of a room with people around it &mdash; the bottle, the question, the round that goes on until someone folds. The unit is the table, not the reader.",
+  /* BR-S379 — THE BUILDER'S OWN WORDS. This entry read "Games for a table" and
+     described "the bottle, the question, the dare drawn from a deck… the round
+     that goes on until someone folds" — none of which was ever said. The three
+     things named are SOCIAL GAMES, DRINKING GAMES and a DEEP QUESTIONS DECK, and
+     a "named only" entry is an intention written down so it is not lost: the one
+     job it has is to still be the intention when it is read back. Inventing a
+     shape for it is the one way to fail at that. */
+  { key: "table", state: "named", name: "Social games",
+    now: "Drinking games, and a deck of deep questions &mdash; played by a group, not read by one person.",
+    soon: "Social games for people in a room together: drinking games, and a deck of deep questions to put down in the middle. The unit is the group, not the reader.",
     cost: "", cta: "", href: "" },
 
   { key: "two", state: "named", name: "Everything about two people",
