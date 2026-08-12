@@ -155,6 +155,139 @@ rather than weather.
   window* rather than in the world — the strongest possible statement of "you are
   inside and dry."
 
+
+---
+
+## 9. THE KINGDOM ABOVE THE LINE — the sharpened form
+
+The builder's second pass turns the ambient world into **structure**, and it is
+much stronger than a background:
+
+```
+   ABOVE THE LINE      the KINGDOM — a small living world.
+                       village, castles, animals. bitty. slowly turning.
+   ─── THE LINE ───    the threshold. ground level.
+   BELOW THE LINE      UNDERGROUND — the shelf, the vault, what you hold.
+                       archival. still. solid.
+   THE SIDES           blurred, and a little alive.
+```
+
+### ★ THIS IS ALREADY IN THE SOURCE. It was declared and never drawn.
+
+`arcana-profile.js:5-7`, the file's own header, written long before this
+conversation:
+
+> "ABOVE GROUND — a self-contained *surface world* box: the crown-monument, its
+> bearer, and a gold **Kingdom-Threshold** horizon sealing its base.
+> UNDERGROUND — the content sections…"
+
+And `arcana-profile.css:6`:
+
+> "…rising out of the floor, sealed at its base by a gold **Kingdom-Threshold**
+> horizon."
+
+The page has described itself as a kingdom above ground and an archive below it
+**from the beginning**. What shipped was the vocabulary without the world: a
+horizon rule, and nothing on the other side of it. The line added in BR-S372 —
+labelled YOUR SHELF — *is* that threshold, built again by hand without either of
+us noticing the name was already there.
+
+So this is not a new direction. It is the page's own latent design, finally drawn.
+
+### WHY A KINGDOM, AND NOT JUST A WORLD
+
+**A crown with no kingdom is a hat.** The profile's hero is a forged crown whose
+points are the inputs you gave and whose gems are the readings it holds — and it
+rules nothing. Give it territory and three things resolve at once:
+
+1. **The crown earns its size.** It stops being an ornament above a list and
+   becomes the seat of something.
+2. **Accumulation becomes visible without a number.** "Never start at 0-of-N"
+   (`PROFILE_REDESIGN_BRIEF_V1` §9c) becomes literal and kind: a new visitor has a
+   *small settlement*, not a set of empty slots. It grows. Nobody is told it is
+   1-of-12.
+3. **The tenth visit differs from the first** by itself — the thing the dwelling
+   research says nothing else on the page achieves.
+
+### ★ THE REFERENCE THAT RESOLVES THE CUTE PROBLEM: MARGINALIA
+
+The obvious risk is that a tiny village with animals reads as a game and fights
+the archival gravity of everything below the line. There is a precedent that
+dissolves it completely.
+
+**Medieval illuminated manuscripts put tiny living scenes in the margins of the
+most solemn text there was.** Drolleries: rabbits, knights, snails, villages,
+whole small dramas, drawn at the edges of a page whose body was scripture. The
+form is not decoration bolted onto seriousness — it is a thousand-year-old
+convention for exactly this: *a grave record with a living margin.*
+
+That is the register. Not a game world. Not an aquarium. **A margin, illuminated.**
+Bitty is correct. The smaller and finer the figures, the more it reads as an
+illuminated archive and the less as a toy — and "bitty" is the builder's own word.
+
+Adjacent forms worth pointing the fleet at: a **map cartouche** (the little scenes
+map-makers drew in the corners), a **diorama under glass**, an **orrery**, a
+**reliquary's carved base**, and the **predella** — the strip of small narrative
+panels beneath an altarpiece, which is *literally* a living band below a solemn
+image.
+
+### HOW THE EIGHT LAWS APPLY, and which two get strained
+
+- **L1 passenger, not driver** — holds, and matters more here. The kingdom must not
+  react to the cursor. No hovering a cottage to learn what it is.
+- **L2 weather, not events** — strained. A village is more eventful than drifting
+  motes. Nothing may *finish* in view: no arrivals, no completions, no creature
+  that reaches a destination while you watch. Things cross and continue.
+- **L3 behind, not on** — becomes the sides. Blurred, slower, dimmer: the kingdom
+  continues past the frame and out of focus. This is the sketch's green horizon
+  crossing the full width.
+- **L4 no perceptible loop** — hardest law here. A rotating world returns. Either
+  it turns slowly enough that a session never sees a full revolution, or what
+  populates it drifts so the same face is never quite the same.
+- **L5 the content always wins** — the kingdom sits ABOVE the reading, which is
+  the safest possible place for it. Nothing crosses the threshold downward.
+- **L6 costs nothing · L7 reduced motion · L8 indifferent** — unchanged. The still
+  frame of a kingdom is a map, and a map is still a place.
+
+### ★ THE ONE DECISION THIS FORCES
+
+**Does the kingdom REPRESENT your holdings, or is it weather?**
+
+- *Weather:* the same world for everyone, atmosphere only. Cheap, safe, and it
+  throws away the best thing about the idea.
+- *Representation:* one building per reading, a figure per ring, a beast per
+  mark. Magnificent — and it becomes a dashboard with a legend to decode, which
+  is the opposite of a margin.
+
+**My reading: it should GROW with your holdings but never MAP to them.** More
+readings means a larger settlement — a roof appears, a road extends, another
+light comes on at dusk — with no legend, no labels, no tooltip, and no way to
+count. The plain semantics stay on the shelf below the line, where they already
+are and where they belong. The kingdom is the *felt* version of the same fact.
+
+That keeps the collectible payoff (the tenth visit is visibly bigger) without
+turning the hero into an infographic, and it obeys the house rule the roadmap
+research already set: metaphor in the chrome, plain language in the semantics.
+
+### WHAT THE FLEET SHOULD ATTEMPT NOW
+
+Not "several ambient backgrounds". Several **kingdoms**, differing on purpose:
+
+1. **The illuminated margin** — drolleries at the frame's edge, gold-leaf register.
+2. **The turning model** — a slow orrery/globe: the settlement rotates past.
+3. **The far shore** — a fixed horizon, the sketch's line, with weather and
+   distant traffic crossing it.
+4. **The predella** — a narrow lit band directly above the threshold, all of it
+   small, the rest dark.
+5. **The submerged kingdom** — the builder's water and fish, with the village
+   *below* the surface and the threshold as the waterline.
+6. **The lantern's throw** — almost nothing visible except what one light reaches;
+   the kingdom implied rather than shown.
+
+Each delivers a standalone page with the real profile content in the frame, the
+kingdom above the line, blurred living sides, a reduced-motion still, and one
+line on which law it found hardest to hold.
+
 ---
 
 ## 7. HOW A PROPOSAL WILL BE JUDGED
