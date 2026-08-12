@@ -200,6 +200,17 @@
 .pf-pickmenu[hidden] { display: none; }
 .pf-pickmenu__h { font-family: var(--pf-mono); font-size: 9px; letter-spacing: .16em; text-transform: uppercase; color: var(--pf-meta); margin: 0 0 9px; }
 .pf-pickmenu__grid + .pf-pickmenu__h { margin-top: 14px; }
+/* BR-S386 — the way back out of a filled slot. Deliberately the quietest thing in the
+   menu and set apart by a rule: it is not a fourth option to feature, it is the
+   undo. It only exists on a slot that has something in it. */
+.pf-pickclear {
+  display: block; width: 100%; margin-top: 12px; padding-top: 11px;
+  border: 0; border-top: 1px solid var(--pf-line-soft); background: none;
+  text-align: left; cursor: pointer;
+  font-family: var(--pf-serif); font-style: italic; font-size: 14.5px; color: var(--pf-ghost);
+  transition: color .15s;
+}
+.pf-pickclear:hover, .pf-pickclear:focus-visible { color: var(--pf-cream); }
 .pf-pickmenu__grid { display: flex; flex-direction: column; gap: 5px; }
 .pf-pickopt { display: flex; align-items: baseline; gap: 10px; text-align: left; background: none; border: 1px solid var(--pf-line-soft); border-radius: 5px; padding: 8px 11px; cursor: pointer; transition: border-color .15s, background .15s; }
 .pf-pickopt:hover, .pf-pickopt:focus-visible { border-color: var(--pf-gold); background: rgba(201,163,92,.06); outline: none; }
@@ -211,6 +222,14 @@
 .pf-friends { display: flex; flex-direction: column; }
 .pf-friend { display: flex; align-items: center; gap: 14px; padding: 13px 0; border-bottom: 1px solid var(--pf-line-soft); text-decoration: none; color: inherit; }
 .pf-friend:last-of-type { border-bottom: 0; }
+/* BR-S386 — the page's only inert clickable rows. `.pf-roomdoor` lifts a background
+   and brightens its name; the lede here promises "Open a friend to see their profile"
+   and the row gave no sign it could be opened. Matched to the room door, minus its
+   arrow, which these do not have. Note: NO `outline: none` — the neighbours carry it
+   and should not; focus is handled page-wide at .pf :focus-visible. */
+.pf-friend { transition: background .18s ease; }
+.pf-friend:hover, .pf-friend:focus-visible { background: rgba(233, 229, 220, .02); }
+.pf-friend:hover .pf-friend__n, .pf-friend:focus-visible .pf-friend__n { color: var(--pf-cream-display); }
 .pf-friend__av { width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--pf-line); display: grid; place-items: center; font-family: var(--pf-serif); font-size: 16px; color: var(--pf-gold); flex: none; }
 .pf-friend__n { font-family: var(--pf-serif); font-size: 18px; color: var(--pf-cream); flex: 1; }
 .pf-friend__crown { font-family: var(--pf-mono); font-size: 9px; letter-spacing: .12em; text-transform: uppercase; color: var(--pf-meta); }

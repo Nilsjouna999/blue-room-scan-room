@@ -274,15 +274,15 @@
 
   function vaultHTML() {
     var relOpts = RELATIONS.map(function (r) {
-      return '<button type="button" class="pf-relopt" role="menuitem" data-rel-choice="' + esc(r) + '">' + esc(r) + '</button>';
+      return '<button type="button" class="pf-relopt" data-rel-choice="' + esc(r) + '">' + esc(r) + '</button>';
     }).join("");
     var add = '<div class="pf-mini--add-wrap">' +
-      '<button type="button" class="pf-mini pf-mini--add pf-paid" data-relpick aria-haspopup="menu" aria-expanded="false">' +
+      '<button type="button" class="pf-mini pf-mini--add pf-paid" data-relpick aria-haspopup="true" aria-expanded="false">' +
         '<span class="pf-mini__plus" aria-hidden="true">+</span>' +
         '<div class="pf-mini__label">Read for<br>someone</div>' +
         '<div class="pf-mini__n">choose who &rarr;</div>' +
       '</button>' +
-      '<div class="pf-relmenu" role="menu" aria-label="Who is this reading for" hidden>' +
+      '<div class="pf-relmenu" aria-label="Who is this reading for" hidden>' +
         '<div class="pf-relmenu__h">Who is this reading for?</div>' +
         '<div class="pf-relmenu__grid">' + relOpts + '</div>' +
       '</div></div>';
@@ -318,10 +318,20 @@
   }
 
   function mintedHTML() {
+    /* BR-S386: this was a <div> in a full button costume — cursor:pointer, a gold
+       :hover border, :active { translateY(1px) } — with no data hook, no tabindex and
+       no role, while the delegated handler matches eight data-* attributes and none of
+       them was here. `.pf-card:focus-visible` was permanently dead CSS. It is
+       invisible today only because minted_cards is empty, which means the failure was
+       scheduled to arrive on the exact day the section fills: the first minted card a
+       visitor ever sees presses down and does nothing. Every sibling control on this
+       page (pf-slot, pf-mini--add) is a real <button> with a hook, so the next editor
+       would reasonably assume this one was too. */
     var cards = SEEKER.minted_cards.map(function (m) {
-      return '<div class="pf-card"><span class="pf-card__art" aria-hidden="true">' + VSEAL + '</span>' +
+      return '<button type="button" class="pf-card" data-action="view-card" data-name="' + esc(m.name) + '">' +
+        '<span class="pf-card__art" aria-hidden="true">' + VSEAL + '</span>' +
         '<span class="pf-card__cap"><span class="pf-card__k">' + esc(m.kind) + '</span>' +
-        '<span class="pf-card__n">' + esc(m.name) + '</span></span></div>';
+        '<span class="pf-card__n">' + esc(m.name) + '</span></span></button>';
     }).join("");
     // Empty state is one calm line (the lede) — no ghost slots. Cards appear when minting is live.
     // BR-S382: .pf-vault renamed .pf-minted — it was never the Vault's, only this
@@ -338,10 +348,10 @@
   }
 
   function pickOpt(id, o) {
-    return '<button type="button" class="pf-pickopt" role="menuitem" data-show-choose="' + id + '" data-ck="' + esc(o.kind) + '" data-cn="' + esc(o.name) + '">' +
+    return '<button type="button" class="pf-pickopt" data-show-choose="' + id + '" data-ck="' + esc(o.kind) + '" data-cn="' + esc(o.name) + '">' +
       '<span class="pf-pickopt__k">' + esc(o.kind) + '</span><span class="pf-pickopt__n">' + esc(o.name) + '</span></button>';
   }
-  function pickMenu(id) {
+  function pickMenu(id, filled) {
     /* BR-S375: you cannot feature a result you do not hold. Unheld, this listed
        the mock's five marks to a visitor who owns none — and picking one filled
        a Showcase slot with someone else's reading. Mirrors the minted empty line. */
@@ -351,10 +361,22 @@
     var mintOpts = SEEKER.minted_cards.length
       ? SEEKER.minted_cards.map(function (o) { return pickOpt(id, o); }).join("")
       : '<p class="pf-pickempty">No minted cards yet — minting is not open.</p>';
-    return '<div class="pf-pickmenu" role="menu" aria-label="Choose what to feature" hidden>' +
+    /* BR-S386: a slot could be CHANGED but never emptied. `chosen` had exactly one
+       writer and nothing ever restored null, and showcaseHTML renders only the FIRST
+       unfilled slot — so filling three made the invite vanish for good and the calm
+       empty state this whole section is built around became unreachable in three
+       clicks. The only escape was a reload, which wipes everything: undiscoverable
+       now, an outright trap the day state persists. Offered only on a filled slot,
+       because there is nothing to take back out of an empty one. */
+    var clear = filled
+      ? '<button type="button" class="pf-pickclear" data-show-clear="' + id + '">' +
+          'Leave this slot empty' +
+        '</button>'
+      : "";
+    return '<div class="pf-pickmenu" aria-label="Choose what to feature" hidden>' +
       '<div class="pf-pickmenu__h">From your reading</div>' +
       '<div class="pf-pickmenu__grid">' + readOpts + '</div>' +
-      '<div class="pf-pickmenu__h">Minted cards</div>' + mintOpts +
+      '<div class="pf-pickmenu__h">Minted cards</div>' + mintOpts + clear +
     '</div>';
   }
   function showcaseHTML() {
@@ -362,23 +384,42 @@
     // empty boxes (the Vault's own subtraction discipline, applied here too).
     var out = SEEKER.showcase.filter(function (s) { return s.chosen; }).map(function (s) {
       return '<div class="pf-slotwrap" data-slot="' + s.id + '">' +
-        '<button type="button" class="pf-slot pf-slot--filled" data-showpick="' + s.id + '" aria-haspopup="menu" aria-expanded="false">' +
+        '<button type="button" class="pf-slot pf-slot--filled" data-showpick="' + s.id + '" aria-haspopup="true" aria-expanded="false">' +
           '<span class="pf-slot__kind">' + esc(s.chosen.kind) + '</span>' +
           '<span class="pf-slot__t">' + esc(s.chosen.name) + '</span>' +
           '<span class="pf-slot__change">change &rsaquo;</span></button>' +
-        pickMenu(s.id) + '</div>';
+        pickMenu(s.id, true) + '</div>';
     });
     var next = SEEKER.showcase.filter(function (s) { return !s.chosen; })[0];
     if (next) {
       out.push('<div class="pf-slotwrap" data-slot="' + next.id + '">' +
-        '<button type="button" class="pf-slot pf-slot--empty" data-showpick="' + next.id + '" aria-haspopup="menu" aria-expanded="false">' +
+        '<button type="button" class="pf-slot pf-slot--empty" data-showpick="' + next.id + '" aria-haspopup="true" aria-expanded="false">' +
           '<span class="pf-slot__plus" aria-hidden="true">+</span>' +
           '<span class="pf-slot__hint">Feature a result<br>or a minted card</span></button>' +
-        pickMenu(next.id) + '</div>');
+        pickMenu(next.id, false) + '</div>');
     }
     return section("Showcase", null,
       "Feature what you choose — a result from your reading, or a minted card. Choose a slot to fill it.",
       '<div class="pf-show">' + out.join("") + '</div>');
+  }
+
+  /* BR-S386 — re-render the Showcase and KEEP THE KEYBOARD IN PLACE. The section is
+     replaced wholesale, so the button that was focused no longer exists; without this
+     the browser falls back to <body>. Preference order: the slot just acted on, then
+     the invite slot (where a filling visitor is going next), then the section itself.
+     `preventScroll` because the eye is already here — moving the page as well as the
+     focus is the jolt this is meant to remove. */
+  function redrawShowcase(fromEl, sid) {
+    var sec = fromEl.closest(".pf-sec");
+    if (!sec) return;
+    var tmp = document.createElement("div");
+    tmp.innerHTML = showcaseHTML();
+    var fresh = tmp.firstChild;
+    sec.replaceWith(fresh);
+    var back = fresh.querySelector('[data-showpick="' + sid + '"]')
+            || fresh.querySelector(".pf-slot--empty")
+            || fresh.querySelector("[data-showpick]");
+    if (back) { try { back.focus({ preventScroll: true }); } catch (e) { back.focus(); } }
   }
 
   function friendsHTML() {
@@ -479,7 +520,12 @@
     }
 
     root.addEventListener("click", function (ev) {
-      var el = ev.target.closest("[data-door],[data-draw],[data-open-reading],[data-showpick],[data-show-choose],[data-action],[data-relpick],[data-rel-choice]");
+      /* BR-S386: `[data-show-clear]` is in this list, and leaving it out is how a
+         control ends up in a button costume with no handler — the very defect #21
+         describes, which I reproduced here and caught only by pressing the thing.
+         ANY new data-* hook must be added here or it silently falls through to the
+         close-all branch below and looks like a dead button. */
+      var el = ev.target.closest("[data-door],[data-draw],[data-open-reading],[data-showpick],[data-show-choose],[data-show-clear],[data-action],[data-relpick],[data-rel-choice]");
       if (!el) { closeMenus(null); return; }
 
       if (el.hasAttribute("data-door")) {
@@ -547,15 +593,23 @@
         el.setAttribute("aria-expanded", String(willOpen));
         return;
       }
-      // a result/card chosen → set it in that slot, re-render the Showcase section
-      if (el.hasAttribute("data-show-choose")) {
+      /* BR-S386 — a result/card chosen, or the slot cleared. Both re-render the
+         Showcase, and both used to destroy the button the visitor had just pressed
+         and leave focus on <body>: a keyboard visitor tabbed several controls deep,
+         picked, and restarted from the top of the document — three times over to fill
+         the showcase. redrawShowcase() puts focus back where the eye already is.
+         The old code also re-rendered unconditionally, even when `slot` was undefined. */
+      if (el.hasAttribute("data-show-choose") || el.hasAttribute("data-show-clear")) {
         ev.preventDefault();
-        var sid = el.getAttribute("data-show-choose");
+        var clearing = el.hasAttribute("data-show-clear");
+        var sid = el.getAttribute(clearing ? "data-show-clear" : "data-show-choose");
         var slot = SEEKER.showcase.filter(function (x) { return x.id === sid; })[0];
-        if (slot) slot.chosen = { kind: el.getAttribute("data-ck"), name: el.getAttribute("data-cn") };
+        if (!slot) { closeMenus(null); return; }
+        slot.chosen = clearing
+          ? null
+          : { kind: el.getAttribute("data-ck"), name: el.getAttribute("data-cn") };
         closeMenus(null);
-        var sec = el.closest(".pf-sec");
-        if (sec) { var tmp = document.createElement("div"); tmp.innerHTML = showcaseHTML(); sec.replaceWith(tmp.firstChild); }
+        redrawShowcase(el, sid);
         return;
       }
 
@@ -565,6 +619,8 @@
         var m = {
           "add-friend": "Add a friend by handle. (Mocked in this prototype.)",
           "view-friend": "Opening " + (el.getAttribute("data-name") || "a friend") + "'s profile — you would see only what their showcase permits. (Mocked.)",
+          // BR-S386: the minted card is a real control now, so it needs a real answer.
+          "view-card": "Opening " + (el.getAttribute("data-name") || "this card") + " — the minted card's own page. (Minting is not open yet.)",
           "referral": "The referral programme lives on its own surface, reserved here as a door. (Mocked.)"
         }[a];
         if (m) note(root, m);
