@@ -1719,11 +1719,15 @@ function renderWall() {
     + '<div class="m2bface" aria-hidden="true">'
     +   '<div class="m2face-head"><span class="m2face-meta">THE BIRTH READING</span>'
     +   '<span class="m2face-glyph">&#10022;</span></div>'
+    /* BR-S357 — the six marks sit BETWEEN the name and the orient line, not above both.
+       The builder's read, and it is the truer sentence: the name is what the six
+       ASSEMBLE INTO, so it opens; the six are the evidence; "by birth alone" closes on
+       how they were come by. Stacked above the name they read as a menu you pick from. */
+    +   '<div class="m2face-name m2bface__name">The Crowned Name</div>'
     +   '<ul class="m2bface__marks">'
     +     ['Sun sign', 'Year animal', 'Life path', 'Rune', 'Trigram', 'Hexagram']
             .map(function (m) { return '<li>' + m + '</li>'; }).join('')
     +   '</ul>'
-    +   '<div class="m2face-name m2bface__name">The Crowned Name</div>'
     +   '<div class="m2face-div"></div>'
     +   '<div class="m2face-orient">By birth alone</div>'
     +   '<span class="m2tick tl"></span><span class="m2tick br"></span>'
