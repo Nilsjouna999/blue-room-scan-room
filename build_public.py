@@ -1,0 +1,360 @@
+# BLUE ROOM — THE PUBLIC BUILD
+#
+# Generates dist/ — the site the public sees — from this workshop repo.
+# Spec: docs/BUILD_PUBLIC_SPEC_V1.md.  Gate: gate_public.py (step 6, run at the end).
+#
+# THE ONE IDEA. This is a static site, so the only way to not ship a file is to not copy
+# it. Everything here is an ALLOW-LIST: a file that nobody named is invisible to the
+# build. A new prototype dropped at the repo root does not reach dist/ by default, which
+# is the correct direction to fail in.
+#
+# WHAT IT DOES TO app.js. Three anchored edits, each asserted:
+#   1. the ?dev= resolver array is rewritten to the public rooms, so a cut room no longer
+#      RESOLVES — typing ?dev=vault lands on the menu. This is the actual lock.
+#   2. the mountDev branches for cut rooms are removed by brace-matching from their exact
+#      `if (state.dev === "x") {` anchor.
+#   3. the four render functions those branches were the only callers of are removed the
+#      same way, so their markup and their ?dev= links go too.
+# Anything more entangled (the devnav rail, the uploaded-scan harness) is LEFT IN and the
+# gate reports it. A build that quietly half-removes something is worse than one that
+# tells you what it could not reach.
+#
+# USAGE
+#   python build_public.py            build dist/, then gate it
+#   python build_public.py --no-gate  build only (for debugging a failing gate)
+
+import io, os, re, shutil, subprocess, sys
+
+ROOT = os.path.dirname(os.path.abspath(__file__))
+DIST = os.path.join(ROOT, "dist")
+
+# The rooms the public app is allowed to resolve. Written INTO the app — not a runtime
+# check a URL can walk around.
+PUBLIC_ROOMS = ["drawing-room", "arcane", "arcana-reading", "settings", "roadmap", "profile"]
+
+# The rooms cut from the resolver, and whose mountDev branches are deleted.
+CUT_ROOMS = ["uploaded-result", "uploaded-blocked", "free-scan-sim", "halo-gate",
+             "before-after", "review-map", "proto-cards", "staged-reveal", "menu-reveal",
+             "vault", "ceremony"]
+
+# Top-level functions reachable ONLY from a cut branch. Verified one call site each, all
+# inside a removed branch — re-verify with `grep -c` before adding to this list.
+CUT_FUNCTIONS = ["renderProtoCards", "renderVault", "wireVault", "renderReviewMap",
+                 "renderBeforeAfter", "renderHaloGateMock", "renderUploadedScanResultDev"]
+
+# mountDev's tail is the fallthrough for ?dev=uploaded-result / uploaded-blocked. With
+# both rooms cut it is unreachable, but it is a STATEMENT rather than an if-block, so the
+# branch remover cannot see it. Anchored and asserted like everything else.
+MOUNTDEV_TAIL = '  const result = state.dev === "uploaded-blocked"'
+
+# The files the public site is made of. Nothing is copied by pattern.
+COPY_FILES = [
+    "codex.html",
+    # stylesheets
+    "styles.css", "arcane.css", "arcana-profile.css", "arcana-reading.css",
+    "settings.css", "roadmap.css", "u1-plates.css",
+    # scripts
+    "data.js", "scan-contract.js", "arcane.js", "arcana-reading.js", "arcana-profile.js",
+    "drawing-room.js", "settings.js", "roadmap.js", "app.js", "u1-membrane.js",
+    # data banks — arcana-reading.js fetches these three at runtime
+    "codex-data.json",
+    "arcana-build/kb_compact.json", "arcana-build/practical.json",
+    "arcana-build/kwcolor.json",
+    # reveal/ SHIPS. It looks like a dev surface — it was built for ?dev=staged-reveal —
+    # but BR-S150 promoted the develop ceremony to the LIVE menu entrance, and
+    # renderMenu's wireMenuReveal calls window.BRReveal. Cutting it silently kills the
+    # front door's entrance. Only the two ?dev= routes onto it are cut.
+    "reveal/reveal.css", "reveal/readings.data.js", "reveal/arrow-button.js",
+    "reveal/card-frame.js", "reveal/reading-panel.js", "reveal/warning-modal.js",
+    "reveal/stage-controller.js",
+]
+
+# <head>/<body> lines pulled out of index.html: the surfaces those files serve are cut.
+STRIP_TAGS = ["ceremony.css", "ceremony.js"]
+
+# Links into a room this build removed. Deleting the LISTENER leaves a button that looks
+# alive and does nothing, which is worse than a dead link — so these are re-pointed at the
+# nearest public room, not cut. (from, to) pairs, both asserted present/absent.
+DEAD_LINK_REWRITES = [
+    # The menu entrance's right-edge handoff went to the example Vault (?dev=vault, cut).
+    # The Shelf it was an example OF is the Profile, which ships — so the button keeps its
+    # meaning instead of losing its handler.
+    ('if (fwd) fwd.addEventListener("click", function () { location.href = "?dev=vault"; });',
+     'if (fwd) fwd.addEventListener("click", function () { location.href = "?dev=profile"; });'),
+]
+
+# Emitted by build_routes.py's ROUTES; re-emitted here against dist/index.html.
+sys.path.insert(0, ROOT)
+
+
+def _match_block(src, start):
+    """End index of the {...} block whose first { is at or after `start`. Brace-matched,
+    with string and comment literals skipped — a naive counter trips on a { inside a
+    template literal, and app.js is full of markup strings."""
+    i = src.index("{", start)
+    depth, n = 0, len(src)
+    while i < n:
+        c = src[i]
+        if c in "\"'`":
+            q, i = c, i + 1
+            while i < n:
+                if src[i] == "\\":
+                    i += 2
+                    continue
+                if src[i] == q:
+                    break
+                i += 1
+        elif c == "/" and i + 1 < n and src[i + 1] == "/":
+            i = src.find("\n", i)
+            if i < 0:
+                return n
+        elif c == "/" and i + 1 < n and src[i + 1] == "*":
+            i = src.find("*/", i) + 1
+        elif c == "{":
+            depth += 1
+        elif c == "}":
+            depth -= 1
+            if depth == 0:
+                return i + 1
+        i += 1
+    raise ValueError("unbalanced braces from offset %d" % start)
+
+
+def _code_only(src):
+    """`src` with comments blanked, so a function name mentioned in app.js's own
+    table-of-contents header is not mistaken for a call that would throw."""
+    out, i, n = [], 0, len(src)
+    while i < n:
+        c = src[i]
+        if c in "\"'`":
+            q, j = c, i + 1
+            while j < n:
+                if src[j] == "\\":
+                    j += 2
+                    continue
+                if src[j] == q:
+                    break
+                j += 1
+            out.append(src[i:j + 1])
+            i = j + 1
+        elif c == "/" and i + 1 < n and src[i + 1] == "/":
+            j = src.find("\n", i)
+            j = n if j < 0 else j
+            out.append("\n" * src.count("\n", i, j))
+            i = j
+        elif c == "/" and i + 1 < n and src[i + 1] == "*":
+            j = src.find("*/", i)
+            j = n if j < 0 else j + 2
+            out.append("\n" * src.count("\n", i, j))
+            i = j
+        else:
+            out.append(c)
+            i += 1
+    return "".join(out)
+
+
+def transform_app(src, report):
+    # 1. the resolver — the lock
+    m = re.search(r'if \(\[("(?:[a-z-]+)"(?:,\s*"[a-z-]+")+)\]\.includes\(dev\)\)', src)
+    if not m:
+        sys.exit("build_public: app.js's ?dev= resolver array no longer matches. It is the "
+                 "whole security model, so this fails rather than shipping an unlocked app. "
+                 "Re-anchor the regex here against the current app.js line.")
+    old = m.group(1)
+    new = ", ".join('"%s"' % r for r in PUBLIC_ROOMS)
+    src = src[:m.start(1)] + new + src[m.end(1):]
+    report.append("resolver: %d rooms -> %d" % (old.count(",") + 1, len(PUBLIC_ROOMS)))
+
+    # 2. the mountDev branches for cut rooms
+    for room in CUT_ROOMS:
+        anchor = 'if (state.dev === "%s")' % room
+        while anchor in src:
+            i = src.index(anchor)
+            j = _match_block(src, i)
+            line_start = src.rfind("\n", 0, i) + 1
+            src = src[:line_start] + src[j + 1:]
+            report.append("branch removed: ?dev=%s" % room)
+
+    # 2a. one-line guards on a cut room — `if (state.dev === "vault" && ...) doThing();`
+    # is a statement, not a block, so the brace matcher above cannot see it. NOTE: `grep`
+    # calls app.js a binary file and stops early, which hid this line; the removals here
+    # are found by reading the file, never by grepping it.
+    kept = []
+    for line in src.splitlines(True):
+        code = _code_only(line).strip()
+        hit = next((r for r in CUT_ROOMS if 'state.dev === "%s"' % r in code), None)
+        if hit and code.endswith((";", "}")) and not code.startswith("const"):
+            report.append("guard removed: one-line %s check" % hit)
+            continue
+        kept.append(line)
+    src = "".join(kept)
+
+    # 2a-ii. links into a room this build removed, re-pointed at a public one
+    for dead, live in DEAD_LINK_REWRITES:
+        if dead not in src:
+            sys.exit("build_public: a DEAD_LINK_REWRITES anchor is no longer in app.js:\n"
+                     "    %s\nEither it was fixed upstream (drop the pair) or it was "
+                     "reworded (re-anchor it)." % dead[:90])
+        src = src.replace(dead, live)
+        assert dead not in src and live in src
+        report.append("dead link re-pointed: %s" % live[live.index("?dev="):].split('"')[0])
+
+    # 2b. mountDev's uploaded-scan fallthrough, now unreachable
+    if MOUNTDEV_TAIL not in src:
+        sys.exit("build_public: mountDev's uploaded-scan tail no longer starts with the "
+                 "anchored line. Re-anchor MOUNTDEV_TAIL against the current app.js.")
+    i = src.index(MOUNTDEV_TAIL)
+    end = src.index("renderUploadedScanResultDev(result);", i)
+    end = src.index("\n", end) + 1
+    src = src[:i] + "  // The uploaded-scan harness is not part of the public build.\n" + src[end:]
+    report.append("branch removed: mountDev's uploaded-scan fallthrough")
+
+    # 3. the functions those branches were the only callers of
+    for fn in CUT_FUNCTIONS:
+        anchor = "function %s(" % fn
+        if anchor not in src:
+            sys.exit("build_public: %s is not in app.js — the cut list is stale." % fn)
+        i = src.index(anchor)
+        j = _match_block(src, i)
+        line_start = src.rfind("\n", 0, i) + 1
+        src = src[:line_start] + src[j + 1:]
+        report.append("function removed: %s()" % fn)
+        # A leftover mention in a COMMENT is prose, not a call. A leftover mention in code
+        # is a ReferenceError waiting on the live site, so that one is fatal.
+        live = [ln for ln in _code_only(src).splitlines() if re.search(r"\b%s\b" % fn, ln)]
+        if live:
+            sys.exit("build_public: %s still has %d live reference(s) after removal — it "
+                     "would throw at runtime:\n    %s" % (fn, len(live), live[0].strip()[:90]))
+
+    # the asserts that make a bad build fail here rather than on the live site
+    for room in CUT_ROOMS:
+        assert 'state.dev === "%s"' % room not in src, room
+    assert '"%s"' % PUBLIC_ROOMS[0] in src
+    for room in CUT_ROOMS:
+        assert '"%s", "' % room not in src.split("includes(dev)")[0][-400:], room
+    return src
+
+
+def transform_index(src, report):
+    # Match the href/src VALUE, never the whole line: styles.css's cache-bust comment
+    # mentions reveal/stage-controller.js, and a substring test drops the site's main
+    # stylesheet on the strength of a footnote.
+    out = []
+    for line in src.splitlines(True):
+        ref = re.search(r'(?:src|href)="([^"]+)"', line)
+        if ref and any(t in ref.group(1) for t in STRIP_TAGS):
+            report.append("index.html: dropped %s" % ref.group(1))
+            continue
+        out.append(line)
+    src = "".join(out)
+
+    # the dev-nav rail's markup. The rail is JS-gated, but an empty <nav> in the public
+    # page is a signpost to a door that should not be visible at all.
+    src = re.sub(r'[ \t]*<!-- DEV NAV.*?-->\s*<nav class="devnav".*?</nav>\n', "",
+                 src, flags=re.S)
+    assert 'class="devnav"' not in src, "the dev-nav markup survived the strip"
+    report.append("index.html: dev-nav rail removed")
+
+    # assert on what the page actually LOADS, not on what its comments mention
+    loaded = re.findall(r'(?:src|href)="([^"]+)"', src)
+    for t in STRIP_TAGS:
+        assert not any(t in u for u in loaded), t
+    return src
+
+
+def copy_tracked_assets(report):
+    out = subprocess.check_output(["git", "ls-files", "assets"], cwd=ROOT)
+    files = [f for f in out.decode("utf-8").splitlines() if f.strip()]
+    for rel in files:
+        src = os.path.join(ROOT, rel)
+        if not os.path.isfile(src):
+            continue
+        dst = os.path.join(DIST, rel)
+        d = os.path.dirname(dst)
+        if not os.path.isdir(d):
+            os.makedirs(d)
+        shutil.copy2(src, dst)
+    report.append("assets: %d tracked files copied (untracked scratch never reaches dist/)" % len(files))
+    return len(files)
+
+
+def emit_routes(report):
+    """build_routes.py's ROUTES, re-emitted against dist/index.html. Imported rather than
+    re-listed, so a route added there is not silently missing from the public build."""
+    from build_routes import ROUTES
+    src = io.open(os.path.join(DIST, "index.html"), encoding="utf-8").read()
+    for path, room, _label in ROUTES:
+        if room not in PUBLIC_ROOMS and room != "about":
+            report.append("route SKIPPED: /%s/ names the cut room %s" % (path, room))
+            continue
+        out = src.replace("<head>", '<head>\n  <base href="../" />', 1)
+        out = out.replace('<script src="data.js',
+                          '<!-- GENERATED by build_public.py -- do not edit. -->\n'
+                          '  <script>window.BR_ROOM = "%s";</script>\n'
+                          '  <script src="data.js' % room, 1)
+        assert "?dev=" not in out.split("</head>")[0], path
+        d = os.path.join(DIST, path)
+        if not os.path.isdir(d):
+            os.makedirs(d)
+        io.open(os.path.join(d, "index.html"), "w", encoding="utf-8", newline="").write(out)
+        report.append("route: /%s/ -> %s" % (path, room))
+
+
+def build():
+    report = []
+    if os.path.isdir(DIST):
+        shutil.rmtree(DIST)
+    os.makedirs(DIST)
+
+    src_bytes = 0
+    for rel in COPY_FILES:
+        src = os.path.join(ROOT, rel)
+        if not os.path.isfile(src):
+            sys.exit("build_public: %s is on the copy list but not in the repo." % rel)
+        dst = os.path.join(DIST, rel)
+        d = os.path.dirname(dst)
+        if d and not os.path.isdir(d):
+            os.makedirs(d)
+        if rel == "app.js":
+            text = io.open(src, encoding="utf-8").read()
+            before = len(text)
+            text = transform_app(text, report)
+            io.open(dst, "w", encoding="utf-8", newline="").write(text)
+            report.append("app.js: %d -> %d bytes (-%d)" % (before, len(text), before - len(text)))
+        else:
+            shutil.copy2(src, dst)
+        src_bytes += os.path.getsize(dst)
+
+    idx = io.open(os.path.join(ROOT, "index.html"), encoding="utf-8").read()
+    io.open(os.path.join(DIST, "index.html"), "w", encoding="utf-8", newline="").write(
+        transform_index(idx, report))
+
+    copy_tracked_assets(report)
+    emit_routes(report)
+
+    # what was CUT — step 7 of the spec. A build that silently drops something is the same
+    # class of problem as one that silently ships something.
+    tracked = subprocess.check_output(["git", "ls-files"], cwd=ROOT).decode("utf-8").splitlines()
+    shippable = [f for f in tracked
+                 if f.endswith((".html", ".js", ".css", ".json"))
+                 and not f.startswith(("docs/", ".claude"))]
+    shipped = set(COPY_FILES) | {"index.html"} | {r + "/index.html" for r in ("tarot", "reading", "about", "roadmap")}
+    cut = sorted(f for f in shippable if f not in shipped)
+
+    print("build_public: dist/ built")
+    for line in report:
+        print("  " + line)
+    print("")
+    print("CUT — %d tracked files the public build does not copy:" % len(cut))
+    for f in cut:
+        print("    " + f)
+    return cut
+
+
+if __name__ == "__main__":
+    build()
+    if "--no-gate" in sys.argv[1:]:
+        print("\n--no-gate: dist/ is NOT cleared for deploy.")
+        sys.exit(0)
+    print("")
+    sys.exit(subprocess.call([sys.executable, os.path.join(ROOT, "gate_public.py")], cwd=ROOT))

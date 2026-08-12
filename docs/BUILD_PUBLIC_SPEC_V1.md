@@ -147,6 +147,26 @@ one that silently ships something.
 
 ---
 
+## 6b. The copy is workshop copy — it must be rewritten before launch
+
+Added BR-S356, on the builder's note. The build ships the front door's real words, and
+those words were written for a workshop. The M1 doors currently read:
+
+> **ADD YOUR PHOTO** — "Stage your image as a local draft. The scan engine isn't
+> connected yet — nothing reads it."
+> **VIEW SAMPLE CARD** — "See the sample card in its room — **SRC-03**. A sample, not
+> your photo."
+
+Three problems, and they are the LANGUAGE LAW from the last session in miniature: a
+public visitor is told what is *unfinished* ("isn't connected yet"), what is *internal*
+("SRC-03" is a fixture id), and what they are *not* getting ("a sample, not your photo").
+The photo Card is a roadmap product now — so this door should either say what the sample
+IS, or not be the front door's second door at all.
+
+**This is not a gate check.** No regex catches "honest but provisional". It is a pass a
+person makes over every shipped surface — desk, tarot, reading, roadmap, settings, the
+Shelf — before the first public deploy, and it belongs in the same sequence as payment.
+
 ## 7. The one thing that breaks
 
 **Removing M1 orphans U1.** U1 is a section of the long desk page and `/about/` boots the
@@ -174,7 +194,19 @@ otherwise have removed.
    strip. The identity strings live in gitignored `gate_identity.txt`; without it the gate
    exits 2 rather than passing a weaker check. Identity hits on the tracked tree: **zero**,
    which is BR-S347 verified rather than asserted.)*
-3. `build_public.py` steps 1–5
-4. wire the gate in as step 6, plus the pre-push hook
+3. `build_public.py` steps 1–5 *(DONE — BR-S356. `python build_public.py` writes dist/
+   and runs the gate. app.js 396k→363k: the resolver cut to 6 rooms, 9 mountDev branches,
+   7 dev-only render functions, the uploaded-scan fallthrough. 20 tracked files not
+   copied, listed on every run. **reveal/ SHIPS** — it looks like a dev surface but
+   BR-S150 promoted it to the live menu entrance; cutting it kills the front door.)*
+4. wire the gate in as step 6 *(DONE — it runs automatically; `--no-gate` to skip)*, plus
+   the pre-push hook *(still to do)*.
+   ★ **The gate still FAILS on dist/ — 99 hits, and that is the honest state.** What the
+   build could not safely reach: the **dev-nav rail** (`?devnav=1` still works — the
+   DEVNAV const is threaded through ~38 sites), the **M1 A/B toggle** (4 sites), the
+   **tuning parameters** `?m2= ?tilt= ?orbit= ?rv= &lab=` in app.js/styles.css/data.js,
+   and dev-route strings surviving in comments. None of them resolve a cut ROOM — the
+   lock holds — but each is a control or a signpost that should not ship.
+5b. the copy pass (§6b)
 5. sandbox: serve `dist/` locally and walk it
 6. deploy target + make the workshop repo private
