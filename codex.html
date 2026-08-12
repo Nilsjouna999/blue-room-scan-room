@@ -1598,6 +1598,7 @@ W.requestAnimationFrame(function(){ route(h); });
 W.addEventListener('load',function(){ route(h); },{once:true});
 })();
 var API='https://api.dictionaryapi.dev/api/v2/entries/en/';
+var API2='https://en.wiktionary.org/api/rest_v1/page/definition/';
 var dqEl=D.getElementById('dq'), ctrl=null, lookupT=0, curWord='', cacheK=[], cacheV={}, CAP=20;
 function cget(w){ if(!cacheV[w]) return null;
 var j=cacheK.indexOf(w); if(j>=0){ cacheK.splice(j,1); cacheK.push(w); } return cacheV[w]; }
@@ -1647,6 +1648,31 @@ if(defs.length) out.blocks.push({pos:m.partOfSpeech||'',defs:defs});
 }
 return out;
 }
+function detag(s){
+s=String(s==null?'':s).replace(/<[^>]*>/g,'');
+s=s.replace(/&nbsp;/g,' ').replace(/&lt;/g,'<').replace(/&gt;/g,'>')
+.replace(/&quot;/g,'"').replace(/&#0?39;/g,"'").replace(/&amp;/g,'&');
+return s.replace(/\s+/g,' ').replace(/^\s+|\s+$/g,'');
+}
+function shape2(js,w){
+var en=(js&&js.en)||[], out={word:w,phon:'',blocks:[]}, k,j,q,t;
+for(k=0;k<en.length&&out.blocks.length<3;k++){
+var m=en[k]||{}, ds=m.definitions||[], defs=[];
+for(q=0;q<ds.length&&defs.length<2;q++){ t=detag(ds[q]&&ds[q].definition); if(t) defs.push(t); }
+if(defs.length) out.blocks.push({pos:String(m.partOfSpeech||'').toLowerCase(),defs:defs});
+}
+return out;
+}
+function askSrc(base,shaper,w,c){
+return W.fetch(base+encodeURIComponent(w),c?{signal:c.signal}:{}).then(function(r){
+if(r.status===404) return {state:'notfound'};
+if(!r.ok) return {state:'unreachable'};
+return r.json().then(function(js){
+var e=shaper(js,w);
+return (e&&e.blocks&&e.blocks.length)?{state:'ok',english:e}:{state:'notfound'};
+},function(){ return {state:'unreachable'}; });
+},function(){ return {state:'unreachable'}; });
+}
 function regHTML(mo){
 if(mo.state==='wait') return '<p class="slip-none">Looking up “'+esc(mo.word)+'”.</p>';
 if(mo.state==='notfound') return '<p class="slip-none">No English definition found for “'+esc(mo.word)+'”.</p>';
@@ -1659,7 +1685,7 @@ h+='<p class="slip-pos">'+esc(e.blocks[j].pos)+'</p>';
 for(q=0;q<e.blocks[j].defs.length;q++)
 h+='<p class="slip-def"><b>'+(q+1)+'.</b>'+esc(e.blocks[j].defs[q])+'</p>';
 }
-return h+'<p class="slip-src">Free Dictionary · English</p>';
+return h+'<p class="slip-src">'+(mo.src==='wik'?'Wiktionary · English':'Free Dictionary · English')+'</p>';
 }
 function slipPaint(mo){
 var cx=mo.codex,list='',j;
@@ -1713,7 +1739,7 @@ if(lookupT){ clearTimeout(lookupT); lookupT=0; }
 curWord=w; curMark=null; kind='slip';
 var mo={word:w,codex:matchesWord(w,3),back:opts.back||null,state:'wait',english:null};
 var hit=cget(w);
-if(hit){ mo.state=hit.state; mo.english=hit.english; }
+if(hit){ mo.state=hit.state; mo.english=hit.english; mo.src=hit.src; }
 slipPaint(mo);
 lec.style.setProperty('--vx-h', BRC.SLIPH+'px');
 slipEmber(mo); ring=null;
@@ -1723,19 +1749,20 @@ if(hit) return;
 if(!W.fetch){ mo.state='unreachable'; patchReg(mo); return; }
 ctrl=(W.AbortController?new W.AbortController():null);
 var myCtrl=ctrl;
-if(myCtrl) lookupT=W.setTimeout(function(){ try{ myCtrl.abort(); }catch(e){} },6000);
-W.fetch(API+encodeURIComponent(w),ctrl?{signal:ctrl.signal}:{})
-.then(function(r){
-if(r.status===404) return {state:'notfound'};
-if(!r.ok) return {state:'unreachable'};
-return r.json().then(function(js){ return {state:'ok',english:shape(js,w)}; },
-function(){ return {state:'unreachable'}; });
+if(myCtrl) lookupT=W.setTimeout(function(){ try{ myCtrl.abort(); }catch(e){} },9000);
+askSrc(API2,shape2,w,ctrl)
+.then(function(out){
+if(out.state==='ok'){ out.src='wik'; return out; }
+return askSrc(API,shape,w,ctrl).then(function(alt){
+if(alt.state==='ok') return alt;
+return out.state==='notfound'?out:alt;
+});
 })
 .then(function(out){
 if(lookupT){ clearTimeout(lookupT); lookupT=0; }
 if(out.state==='ok'||out.state==='notfound') cput(w,out);
 if(curWord!==w) return;
-mo.state=out.state; mo.english=out.english;
+mo.state=out.state; mo.english=out.english; mo.src=out.src;
 patchReg(mo);
 if(out.state==='ok'&&out.english&&out.english.phon){
 var ph=lec.querySelector('.ws-phon'); if(ph) ph.textContent=out.english.phon;

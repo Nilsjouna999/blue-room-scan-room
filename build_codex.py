@@ -2947,7 +2947,21 @@ W.addEventListener('hashchange',function(){ route(location.hash.slice(1)); });
 JS_DICT = r"""
 /* ---------- 13 - K2.  The dictionary answers on the vessel, in a second register.
    No network work ever happens except on Enter or a double-click. ---------- */
+/* BR-S363 - THE ENGLISH REGISTER GETS A SECOND SOURCE.
+   MEASURED FAULT: api.dictionaryapi.dev fails roughly half the time WHEN THE REQUEST
+   CARRIES AN Origin HEADER - which every cross-origin browser fetch does, and curl does
+   not.  Four probes without Origin returned 200 200 200 200; four with it returned
+   502 502 200 200.  So the API looks healthy from a terminal and is a coin-flip from
+   the page, and the browser reports it as a CORS error (a Cloudflare 502 error page
+   carries no Access-Control-Allow-Origin) which hides the real 502 underneath.
+   Nothing here was broken - the dependency was.
+   Wiktionary's REST endpoint answered 3/3 with Origin set and sends
+   access-control-allow-origin: *, so it becomes the fallback rather than the primary:
+   dictionaryapi.dev returns better-shaped, shorter definitions, so the normal case
+   should still be its words.  The slip only says "couldn't reach the dictionary" when
+   BOTH have failed. */
 var API='https://api.dictionaryapi.dev/api/v2/entries/en/';
+var API2='https://en.wiktionary.org/api/rest_v1/page/definition/';
 var dqEl=D.getElementById('dq'), ctrl=null, lookupT=0, curWord='', cacheK=[], cacheV={}, CAP=20;
 function cget(w){ if(!cacheV[w]) return null;
   var j=cacheK.indexOf(w); if(j>=0){ cacheK.splice(j,1); cacheK.push(w); } return cacheV[w]; }
@@ -3007,6 +3021,37 @@ function shape(js,w){
   }
   return out;
 }
+/* Wiktionary ships its definitions as parsed HTML - links, usage-label spans, entities.
+   The register escapes everything it prints, so an untouched definition would render as
+   visible markup.  Strip to text before it ever reaches esc(). */
+function detag(s){
+  s=String(s==null?'':s).replace(/<[^>]*>/g,'');
+  s=s.replace(/&nbsp;/g,' ').replace(/&lt;/g,'<').replace(/&gt;/g,'>')
+     .replace(/&quot;/g,'"').replace(/&#0?39;/g,"'").replace(/&amp;/g,'&');
+  return s.replace(/\s+/g,' ').replace(/^\s+|\s+$/g,'');
+}
+function shape2(js,w){
+  var en=(js&&js.en)||[], out={word:w,phon:'',blocks:[]}, k,j,q,t;
+  for(k=0;k<en.length&&out.blocks.length<3;k++){
+    var m=en[k]||{}, ds=m.definitions||[], defs=[];
+    for(q=0;q<ds.length&&defs.length<2;q++){ t=detag(ds[q]&&ds[q].definition); if(t) defs.push(t); }
+    if(defs.length) out.blocks.push({pos:String(m.partOfSpeech||'').toLowerCase(),defs:defs});
+  }
+  return out;
+}
+/* One shape for both sources.  A rejected fetch (network down, CORS, or our own
+   abort) resolves to 'unreachable' rather than throwing, so the caller can try the
+   other source instead of falling straight into the catch. */
+function askSrc(base,shaper,w,c){
+  return W.fetch(base+encodeURIComponent(w),c?{signal:c.signal}:{}).then(function(r){
+    if(r.status===404) return {state:'notfound'};
+    if(!r.ok) return {state:'unreachable'};
+    return r.json().then(function(js){
+      var e=shaper(js,w);
+      return (e&&e.blocks&&e.blocks.length)?{state:'ok',english:e}:{state:'notfound'};
+    },function(){ return {state:'unreachable'}; });
+  },function(){ return {state:'unreachable'}; });
+}
 function regHTML(mo){
   if(mo.state==='wait') return '<p class="slip-none">Looking up “'+esc(mo.word)+'”.</p>';
   if(mo.state==='notfound') return '<p class="slip-none">No English definition found for “'+esc(mo.word)+'”.</p>';
@@ -3019,7 +3064,7 @@ function regHTML(mo){
     for(q=0;q<e.blocks[j].defs.length;q++)
       h+='<p class="slip-def"><b>'+(q+1)+'.</b>'+esc(e.blocks[j].defs[q])+'</p>';
   }
-  return h+'<p class="slip-src">Free Dictionary · English</p>';
+  return h+'<p class="slip-src">'+(mo.src==='wik'?'Wiktionary · English':'Free Dictionary · English')+'</p>';
 }
 function slipPaint(mo){
   var cx=mo.codex,list='',j;
@@ -3084,7 +3129,7 @@ function slip(word,opts){
   curWord=w; curMark=null; kind='slip';
   var mo={word:w,codex:matchesWord(w,3),back:opts.back||null,state:'wait',english:null};
   var hit=cget(w);
-  if(hit){ mo.state=hit.state; mo.english=hit.english; }
+  if(hit){ mo.state=hit.state; mo.english=hit.english; mo.src=hit.src; }
   slipPaint(mo);
   lec.style.setProperty('--vx-h', BRC.SLIPH+'px');
   slipEmber(mo); ring=null;
@@ -3100,19 +3145,32 @@ function slip(word,opts){
      same AbortController and lands on the SAME unreachable copy a real network
      failure gets. */
   var myCtrl=ctrl;
-  if(myCtrl) lookupT=W.setTimeout(function(){ try{ myCtrl.abort(); }catch(e){} },6000);
-  W.fetch(API+encodeURIComponent(w),ctrl?{signal:ctrl.signal}:{})
-    .then(function(r){
-      if(r.status===404) return {state:'notfound'};
-      if(!r.ok) return {state:'unreachable'};
-      return r.json().then(function(js){ return {state:'ok',english:shape(js,w)}; },
-                           function(){ return {state:'unreachable'}; });
+  /* 6s covered ONE request.  Two sources need a wider floor or the fallback would be
+     aborted before it could answer; 9s still guarantees "Looking up..." is never
+     permanent, which is the property that timeout exists to hold. */
+  if(myCtrl) lookupT=W.setTimeout(function(){ try{ myCtrl.abort(); }catch(e){} },9000);
+  /* WIKTIONARY LEADS.  It was written as the fallback and measured into the lead:
+     from the page, dictionaryapi.dev did not answer ONCE across a full test run, so
+     asking it first bought nothing but a failed request, a doubled wait, and a
+     console full of CORS errors on every single lookup.  It stays as the second
+     source in case Wiktionary ever falters, and it will quietly take the lead back
+     the day it starts answering - nothing here has to change for that. */
+  askSrc(API2,shape2,w,ctrl)
+    .then(function(out){
+      if(out.state==='ok'){ out.src='wik'; return out; }
+      /* Fall through on ANY miss, 404 included: one extra lookup for a word nobody
+         could define costs a request nobody is waiting on. */
+      return askSrc(API,shape,w,ctrl).then(function(alt){
+        if(alt.state==='ok') return alt;
+        /* both failed: a notfound from either beats a network excuse */
+        return out.state==='notfound'?out:alt;
+      });
     })
     .then(function(out){
       if(lookupT){ clearTimeout(lookupT); lookupT=0; }
       if(out.state==='ok'||out.state==='notfound') cput(w,out);
       if(curWord!==w) return;
-      mo.state=out.state; mo.english=out.english;
+      mo.state=out.state; mo.english=out.english; mo.src=out.src;
       patchReg(mo);
       if(out.state==='ok'&&out.english&&out.english.phon){
         var ph=lec.querySelector('.ws-phon'); if(ph) ph.textContent=out.english.phon;
