@@ -5812,3 +5812,78 @@ html.orbit-wings .orbit__field { --orbit-rx: clamp(200px, 25.5vw, 368px); --orbi
 #menuView .menu__codex--reliq .menu__codex__mark { color: var(--gold, #c9a35c); }
 #menuView .menu__codex--reliq:hover { border-color: rgba(220, 215, 203, .5); }
 
+/* BR-S381 — THE THIRD TRACK: two boxes beside the horizons, and the room they open.
+   A horizon column is a bare list on a ruled spine. These are BORDERED — that single
+   difference is what stops "your idea" reading as a planned feature. Same row, same
+   width, different kind of object. */
+.u1aside { display: flex; flex-direction: column; gap: 14px; }
+.u1box {
+  display: block; text-decoration: none;
+  padding: 16px 16px 14px; border-radius: 4px;
+  border: 1px solid rgba(220, 215, 203, .12);
+  background: linear-gradient(rgba(220, 215, 203, .028), rgba(220, 215, 203, .008));
+  transition: border-color .2s ease, background .2s ease;   /* never box-shadow — BR-S141 */
+}
+.u1box:hover, .u1box:focus-visible { border-color: rgba(220, 215, 203, .30); outline: none; }
+.u1box__k {
+  display: block; font-family: var(--font-mono, monospace);
+  font-size: 8.5px; letter-spacing: .2em; text-transform: uppercase;
+  color: var(--gold, #c9a35c); margin-bottom: 9px;
+}
+.u1box__t { font-family: var(--font-display, serif); font-size: 19px; color: var(--t-display, #e9e5dc); margin: 0 0 6px; }
+.u1box__d { font-family: var(--font-display, serif); font-size: 15px; font-style: italic; line-height: 1.5; color: #8c867b; margin: 0 0 12px; }
+.u1box__go { font-family: var(--font-mono, monospace); font-size: 9px; letter-spacing: .16em; text-transform: uppercase; color: #b9b3a8; }
+.u1box:hover .u1box__go { color: var(--gold-lit, #c9a35c); }
+/* the gated one is the quieter of the two: it is a door for people already inside */
+.u1box--post { background: none; border-style: dashed; }
+.u1box--post .u1box__k { color: #8c867b; }
+
+/* ---- the vision room (?dev=vision) ---- */
+.vis { max-width: 720px; margin: 0 auto; padding: 40px 22px 96px; text-align: left; }
+.vis__top { margin-bottom: 44px; }
+.vis__back { font-family: var(--font-mono, monospace); font-size: 9px; letter-spacing: .16em; text-transform: uppercase; color: #8c867b; text-decoration: none; }
+.vis__back:hover { color: var(--t-display, #e9e5dc); }
+.vis__eyebrow { font-family: var(--font-mono, monospace); font-size: 9px; letter-spacing: .24em; text-transform: uppercase; color: var(--gold, #c9a35c); margin: 0 0 14px; }
+.vis__h1 { font-family: var(--font-display, serif); font-size: clamp(30px, 4.4vw, 44px); font-weight: 400; color: var(--t-display, #e9e5dc); margin: 0 0 26px; line-height: 1.1; }
+.vis__h { font-family: var(--font-display, serif); font-size: 24px; font-weight: 400; color: var(--t-display, #e9e5dc); margin: 0 0 8px; }
+.vis__lede { font-family: var(--font-display, serif); font-size: 16.5px; font-style: italic; line-height: 1.6; color: #8c867b; margin: 0 0 22px; max-width: 56ch; }
+.vis__p { font-family: var(--font-display, serif); font-size: 17.5px; line-height: 1.68; color: #c8c4bb; margin: 0 0 18px; max-width: 62ch; }
+.vis__p--empty { color: #8c867b; font-style: italic; }
+.vis__body { margin-bottom: 64px; }
+
+.vispost { border-top: 1px solid rgba(220, 215, 203, .10); padding-top: 34px; display: block; }
+.vispost__kinds { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 10px; margin-bottom: 26px; }
+.vispost__kind {
+  text-align: left; padding: 12px 13px; border-radius: 4px; cursor: pointer;
+  border: 1px solid rgba(220, 215, 203, .12); background: none;
+  transition: border-color .18s ease, background .18s ease;
+}
+.vispost__kind:hover { border-color: rgba(220, 215, 203, .26); }
+.vispost__kind.is-on { border-color: var(--gold, #c9a35c); background: rgba(201, 163, 92, .05); }
+.vispost__kt { display: block; font-family: var(--font-display, serif); font-size: 16px; color: var(--t-display, #e9e5dc); margin-bottom: 3px; }
+.vispost__kd { display: block; font-family: var(--font-display, serif); font-size: 13.5px; font-style: italic; line-height: 1.45; color: #8c867b; }
+.vispost__lab { display: block; font-family: var(--font-mono, monospace); font-size: 9px; letter-spacing: .16em; text-transform: uppercase; color: #8c867b; margin: 0 0 7px; }
+.vispost__opt { text-transform: none; letter-spacing: .04em; font-style: italic; color: #6f6a61; }
+.vispost__in, .vispost__ta {
+  display: block; width: 100%; margin: 0 0 20px; padding: 11px 12px;
+  border: 1px solid rgba(220, 215, 203, .14); border-radius: 3px;
+  background: rgba(10, 11, 13, .6); color: var(--t-display, #e9e5dc);
+  font-family: var(--font-display, serif); font-size: 16px; line-height: 1.5;
+}
+/* `hidden` is a UA rule (`display: none`) and the two rules above set `display: block`
+   at class specificity, which beats it — so "Where were you?" rendered for an idea and
+   a tip as well as a bug. Class+attribute wins it back. Anything given an explicit
+   display MUST restate its own hidden case; that is the whole trap. */
+.vispost__lab[hidden], .vispost__in[hidden], .vispost__ta[hidden] { display: none; }
+.vispost__in:focus, .vispost__ta:focus { outline: none; border-color: var(--gold, #c9a35c); }
+.vispost__ta { resize: vertical; }
+.vispost__foot { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; }
+.vispost__send {
+  padding: 10px 20px; border-radius: 3px; cursor: pointer;
+  border: 1px solid rgba(220, 215, 203, .22); background: none; color: var(--t-display, #e9e5dc);
+  font-family: var(--font-mono, monospace); font-size: 10px; letter-spacing: .18em; text-transform: uppercase;
+}
+.vispost__send:disabled { cursor: not-allowed; opacity: .38; }
+.vispost__note { font-family: var(--font-display, serif); font-size: 14px; font-style: italic; color: #7c766c; margin: 0; flex: 1 1 240px; }
+.vispost--sealed .vis__lede { margin-bottom: 0; }
+

@@ -101,7 +101,7 @@ const state = { source: 0, treatment: "free", tab: "diagram", view: "menu", draf
      ?dev= keeps working: it is how the dev room reaches everything, and nothing that exists
      today breaks. */
   const dev = q.get("dev") || (typeof window !== "undefined" && window.BR_ROOM) || null;
-  if (["uploaded-result", "uploaded-blocked", "free-scan-sim", "halo-gate", "before-after", "review-map", "proto-cards", "staged-reveal", "menu-reveal", "vault", "arcane", "arcana-reading", "profile", "ceremony", "drawing-room", "settings"].includes(dev)) { state.view = "dev"; state.dev = dev; }
+  if (["uploaded-result", "uploaded-blocked", "free-scan-sim", "halo-gate", "before-after", "review-map", "proto-cards", "staged-reveal", "menu-reveal", "vault", "arcane", "arcana-reading", "profile", "ceremony", "drawing-room", "settings", "vision"].includes(dev)) { state.view = "dev"; state.dev = dev; }
   else if (q.has("src") || q.has("t") || q.has("tab")) state.view = "room";
 }
 
@@ -1609,6 +1609,150 @@ function u1Door(o, i) {
     + '</li>';
 }
 
+/* BR-S381 — THE VISION, IN THE BUILDER'S WORDS OR NOT AT ALL.
+   This array is the page's first section and it is EMPTY ON PURPOSE. U1 is a ledger
+   and can be written from the registry, because the registry is fact. A vision is an
+   argument, and there is exactly one person who can make it. Two entries in that same
+   registry had to be rewritten today (BR-S379, BR-S380) because I had supplied words
+   nobody said — on a page whose whole subject is what this is FOR, that failure mode
+   is not a rough draft, it is a lie with a headline.
+   Fill this with one string per paragraph and the section renders itself. While it is
+   empty the room stays out of the public builds — see the note in build_public.py. */
+var VISION = [];
+
+/* Where a submission is meant to land. Null until the builder names it — a form that
+   silently goes nowhere is the same class of thing as invented copy. The control is
+   BUILT and visible, and it says out loud that it is not connected yet, rather than
+   accepting a stranger's words into a void. */
+var POST_TARGET = null;
+
+var POST_KINDS = [
+  { key: "idea", t: "An idea",  d: "A room, a game, a deck &mdash; something you would want to find here." },
+  { key: "tip",  t: "A tip",    d: "Something that would read better, land harder, or sit somewhere else." },
+  { key: "bug",  t: "A bug",    d: "Something broken. Where you were and what happened is most of the fix." }
+];
+
+function renderVision() {
+  var body = VISION.length
+    ? VISION.map(function (p) { return '<p class="vis__p">' + p + '</p>'; }).join('')
+    : '<p class="vis__p vis__p--empty">Not written yet. This is the one page that cannot be '
+      + 'assembled from the registry, and it is the builder&rsquo;s to write.</p>';
+
+  var kinds = POST_KINDS.map(function (k, i) {
+    return '<button type="button" class="vispost__kind' + (i === 0 ? ' is-on' : '') + '" '
+      + 'data-kind="' + k.key + '" aria-pressed="' + (i === 0) + '">'
+      + '<span class="vispost__kt">' + k.t + '</span>'
+      + '<span class="vispost__kd">' + k.d + '</span></button>';
+  }).join('');
+
+  /* The post half is for someone who has kept something — the same line the M3
+     threshold draws. A stranger reads the vision and is told plainly what opens the
+     other half, rather than finding a control that refuses them. */
+  var post = hasHoldings()
+    ? '<form class="vispost" id="post" novalidate>'
+      +   '<h2 class="vis__h">Send something back</h2>'
+      +   '<p class="vis__lede">One of three things. Pick which, because a bug wants a '
+      +     'different question than an idea does.</p>'
+      +   '<div class="vispost__kinds" role="group" aria-label="What kind of thing is this">' + kinds + '</div>'
+      +   '<label class="vispost__lab" for="postWhere" data-for="bug">Where were you?</label>'
+      +   '<input class="vispost__in" id="postWhere" type="text" data-for="bug" '
+      +     'placeholder="the page, or what you had just done">'
+      +   '<label class="vispost__lab" for="postBody"><span data-lab="idea">What is missing?</span>'
+      +     '<span data-lab="tip" hidden>What would you change?</span>'
+      +     '<span data-lab="bug" hidden>What happened?</span></label>'
+      +   '<textarea class="vispost__ta" id="postBody" rows="5" '
+      +     'placeholder="Plainly, in your own words."></textarea>'
+      +   '<label class="vispost__lab" for="postBack">A way back to you <span class="vispost__opt">optional</span></label>'
+      +   '<input class="vispost__in" id="postBack" type="text" placeholder="only if you want an answer">'
+      +   '<div class="vispost__foot">'
+      +     '<button type="submit" class="vispost__send" disabled>Send &rarr;</button>'
+      +     '<p class="vispost__note">Not connected yet &mdash; there is nowhere for this to '
+      +       'land until one is chosen. The form is here so the shape is settled first.</p>'
+      +   '</div>'
+      + '</form>'
+    : '<section class="vispost vispost--sealed" id="post">'
+      +   '<h2 class="vis__h">Send something back</h2>'
+      +   '<p class="vis__lede">Ideas, tips and bug reports come from people who keep '
+      +     'something here. Draw a reading and this opens &mdash; reading the vision '
+      +     'stays free, always.</p>'
+      + '</section>';
+
+  return '<div class="vis">'
+    + '<header class="vis__top">'
+    +   '<a class="vis__back" href="?dev=about-back" data-vision-back>&larr; What is open, and what is being made</a>'
+    + '</header>'
+    + '<section class="vis__body">'
+    +   '<p class="vis__eyebrow"><span aria-hidden="true">&#9670;</span> Blue Room</p>'
+    +   '<h1 class="vis__h1">What this is for</h1>'
+    +   body
+    + '</section>'
+    + post
+  + '</div>';
+}
+
+function wireVision() {
+  var host = document.getElementById("devView");
+  if (!host) return;
+  var back = host.querySelector("[data-vision-back]");
+  if (back) back.addEventListener("click", function (e) {
+    e.preventDefault();
+    location.href = "about/";          // U1 — the ledger this page sits beside
+  });
+  var form = host.querySelector(".vispost");
+  if (!form || form.tagName !== "FORM") return;
+  // Nothing may be submitted while POST_TARGET is null — belt as well as `disabled`.
+  form.addEventListener("submit", function (e) { e.preventDefault(); });
+  form.addEventListener("click", function (e) {
+    var b = e.target.closest("[data-kind]");
+    if (!b) return;
+    var kind = b.getAttribute("data-kind");
+    form.querySelectorAll("[data-kind]").forEach(function (x) {
+      var on = x === b;
+      x.classList.toggle("is-on", on);
+      x.setAttribute("aria-pressed", String(on));
+    });
+    // "Where were you?" is a bug's question and nobody else's.
+    form.querySelectorAll('[data-for="bug"]').forEach(function (x) { x.hidden = kind !== "bug"; });
+    form.querySelectorAll("[data-lab]").forEach(function (x) { x.hidden = x.getAttribute("data-lab") !== kind; });
+  });
+  form.querySelectorAll('[data-for="bug"]').forEach(function (x) { x.hidden = true; });
+}
+
+/* BR-S381 — THE THIRD TRACK. Two boxes, not a horizon.
+   The three horizons are states of OUR work — bench, drawn, named. What sits beside
+   them is the reader's, so it must not wear the same grammar: no ordinal, no chip, no
+   ledger tick. A bordered box in the same row reads as a different KIND of thing,
+   which is the whole point — otherwise "your idea" starts looking like something we
+   have committed to build.
+
+   THE VISION BOX IS PUBLIC. Anyone may read where this is going.
+   THE IDEA / TIP / BUG BOX IS NOT. It appears only for someone who has kept
+   something (hasHoldings) — the builder's call, and it is the same line the M3
+   threshold already draws: looking is free, always; keeping is what opens a door.
+   One stack, so the board stays three tracks wide whether or not the second box is
+   there — a fourth column would break a grid built for three. */
+function u1Aside() {
+  var post = hasHoldings()
+    ? '<a class="u1box u1box--post" href="?dev=vision#post">'
+      +   '<span class="u1box__k" aria-hidden="true">&#9671; Yours</span>'
+      +   '<p class="u1box__t">An idea, a tip, a bug</p>'
+      +   '<p class="u1box__d">Something missing, something broken, or something you '
+      +     'would want to find here. It reaches the bench.</p>'
+      +   '<span class="u1box__go">Write it down &rarr;</span>'
+      + '</a>'
+    : "";
+  return '<aside class="u1aside" aria-label="Blue Room, beyond this list">'
+    + '<a class="u1box u1box--vision" href="?dev=vision">'
+    +   '<span class="u1box__k" aria-hidden="true">&#9670; The whole of it</span>'
+    +   '<p class="u1box__t">What Blue Room is for</p>'
+    +   '<p class="u1box__d">This page is the ledger &mdash; what is open and what is '
+    +     'being made. The reason any of it exists is next door.</p>'
+    +   '<span class="u1box__go">Read the vision &rarr;</span>'
+    + '</a>'
+    + post
+  + '</aside>';
+}
+
 function u1Column(h) {
   var rows = u1Public().filter(function (r) { return r.state === h.state; });
   if (!rows.length) return "";   /* a horizon with nothing in it is not a heading */
@@ -1692,6 +1836,7 @@ function renderAbout() {
      bench column empties itself the day the last launch blocker is paid. */
   +   (function () {
         var cols = U1_HORIZONS.map(u1Column).filter(function (h) { return h; });
+        cols.push(u1Aside());
         return '<div class="u1board" data-cols="' + cols.length + '">' + cols.join('') + '</div>';
       })()
     + '</section>'
@@ -4878,6 +5023,11 @@ function mountDev() {
     const host = document.getElementById("devView");
     if (window.BRArcanaProfile && typeof window.BRArcanaProfile.mount === "function") window.BRArcanaProfile.mount(host);
     else host.innerHTML = '<p style="padding:48px;color:#948f87;text-align:center;font-family:sans-serif">The profile failed to load (arcana-profile.js).</p>';
+    return;
+  }
+  if (state.dev === "vision") {
+    document.getElementById("devView").innerHTML = renderVision();
+    wireVision();
     return;
   }
   if (state.dev === "drawing-room") {

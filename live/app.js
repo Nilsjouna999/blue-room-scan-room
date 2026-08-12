@@ -1565,6 +1565,45 @@ function u1Door(o, i) {
     + '</li>';
 }
 
+/* BR-S381 — THE VISION, IN THE BUILDER'S WORDS OR NOT AT ALL.
+   This array is the page's first section and it is EMPTY ON PURPOSE. U1 is a ledger
+   and can be written from the registry, because the registry is fact. A vision is an
+   argument, and there is exactly one person who can make it. Two entries in that same
+   registry had to be rewritten today (BR-S379, BR-S380) because I had supplied words
+   nobody said — on a page whose whole subject is what this is FOR, that failure mode
+   is not a rough draft, it is a lie with a headline.
+   Fill this with one string per paragraph and the section renders itself. While it is
+   empty the room stays out of the public builds — see the note in build_public.py. */
+var VISION = [];
+
+/* Where a submission is meant to land. Null until the builder names it — a form that
+   silently goes nowhere is the same class of thing as invented copy. The control is
+   BUILT and visible, and it says out loud that it is not connected yet, rather than
+   accepting a stranger's words into a void. */
+var POST_TARGET = null;
+
+var POST_KINDS = [
+  { key: "idea", t: "An idea",  d: "A room, a game, a deck &mdash; something you would want to find here." },
+  { key: "tip",  t: "A tip",    d: "Something that would read better, land harder, or sit somewhere else." },
+  { key: "bug",  t: "A bug",    d: "Something broken. Where you were and what happened is most of the fix." }
+];
+
+
+
+/* BR-S381 — THE THIRD TRACK. Two boxes, not a horizon.
+   The three horizons are states of OUR work — bench, drawn, named. What sits beside
+   them is the reader's, so it must not wear the same grammar: no ordinal, no chip, no
+   ledger tick. A bordered box in the same row reads as a different KIND of thing,
+   which is the whole point — otherwise "your idea" starts looking like something we
+   have committed to build.
+
+   THE VISION BOX IS PUBLIC. Anyone may read where this is going.
+   THE IDEA / TIP / BUG BOX IS NOT. It appears only for someone who has kept
+   something (hasHoldings) — the builder's call, and it is the same line the M3
+   threshold already draws: looking is free, always; keeping is what opens a door.
+   One stack, so the board stays three tracks wide whether or not the second box is
+   there — a fourth column would break a grid built for three. */
+
 function u1Column(h) {
   var rows = u1Public().filter(function (r) { return r.state === h.state; });
   if (!rows.length) return "";   /* a horizon with nothing in it is not a heading */

@@ -44,9 +44,19 @@ DIST = os.path.join(ROOT, "preview")
 PUBLIC_ROOMS = ["drawing-room", "arcane", "arcana-reading", "settings", "profile"]
 
 # The rooms cut from the resolver, and whose mountDev branches are deleted.
+# BR-S381: "vision" joins this list, and it is the one entry here that is expected to
+# LEAVE it. The room is built and the U1 boxes point at it, but its first section — the
+# vision itself — is empty until the builder writes it, and a public page headed "What
+# this is for" that answers "not written yet" is worse than no page. It ships the day
+# VISION has paragraphs in it: delete it here, add it to PUBLIC_ROOMS, drop u1Aside and
+# the two render functions from the cut lists below.
 CUT_ROOMS = ["uploaded-result", "uploaded-blocked", "free-scan-sim", "halo-gate",
              "before-after", "review-map", "proto-cards", "staged-reveal", "menu-reveal",
-             "vault", "ceremony"]
+             "vault", "ceremony", "vision"]
+
+# The U1 boxes that open that room. Cut with it, or the public roadmap grows a third
+# track whose two doors both fall through to the menu.
+ASIDE_CALL = "        cols.push(u1Aside());\n"
 
 # BR-S376 — THE PROFILE GATE, public build only.
 # The Profile is a members' page: M3 shows the sealed "Held in conservation" niche until
@@ -74,7 +84,8 @@ FLIP_CSS_LAST = "@media (max-width: 560px) { #brBuildFlip"
 # Top-level functions reachable ONLY from a cut branch. Verified one call site each, all
 # inside a removed branch — re-verify with `grep -c` before adding to this list.
 CUT_FUNCTIONS = ["renderProtoCards", "renderVault", "wireVault", "renderReviewMap",
-                 "renderBeforeAfter", "renderHaloGateMock", "renderUploadedScanResultDev"]
+                 "renderBeforeAfter", "renderHaloGateMock", "renderUploadedScanResultDev",
+                 "renderVision", "wireVision", "u1Aside"]
 
 # mountDev's tail is the fallthrough for ?dev=uploaded-result / uploaded-blocked. With
 # both rooms cut it is unreachable, but it is a STATEMENT rather than an if-block, so the
@@ -302,6 +313,15 @@ def transform_app(src, report, keep_flip=True):
     end = src.index("\n", end) + 1
     src = src[:i] + "  // The uploaded-scan harness is not part of the public build.\n" + src[end:]
     report.append("branch removed: mountDev's uploaded-scan fallthrough")
+
+    # 2c. the U1 aside's CALL, before its function is cut below — otherwise the "no live
+    # reference survives" check fires on a call site this build meant to remove.
+    if ASIDE_CALL not in src:
+        sys.exit("build_public: the u1Aside() call in renderAbout no longer matches. It "
+                 "would leave the public roadmap with a third track opening a room this "
+                 "build removes. Re-anchor ASIDE_CALL against the current app.js.")
+    src = src.replace(ASIDE_CALL, "")
+    report.append("U1: the vision / idea boxes removed with the room they open")
 
     # 3. the functions those branches were the only callers of
     for fn in CUT_FUNCTIONS:
