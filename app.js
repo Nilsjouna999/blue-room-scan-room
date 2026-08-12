@@ -1700,7 +1700,13 @@ var DONATE = ["$2", "$5", "$10"];
 
 var POST_KINDS = [
   { key: "idea", t: "An idea",  d: "A room, a game, a deck &mdash; something you would want to find here." },
-  { key: "tip",  t: "A tip",    d: "Something that would read better, land harder, or sit somewhere else." },
+  /* BR-S394: was "A tip". Renamed because a donation block now sits directly beneath
+     this picker, where "tip" means money — one word for two unrelated acts on one
+     screen. "A change" also separates it from "An idea" on the axis that actually
+     divides them: an idea is something that does not exist yet, a change is something
+     that does and should be different. The body label already asked "What would you
+     change?", so the control now matches the question it opens. */
+  { key: "tip",  t: "A change", d: "Something here that would read better, work better, or sit somewhere else." },
   { key: "bug",  t: "A bug",    d: "Something broken. Where you were and what happened is most of the fix." }
 ];
 
@@ -1756,7 +1762,7 @@ function renderVision() {
       + '</form>'
     : '<section class="vispost vispost--sealed" id="post">'
       +   '<h2 class="vis__h">Send something back</h2>'
-      +   '<p class="vis__lede">Ideas, tips and bug reports come from people who keep '
+      +   '<p class="vis__lede">Ideas, changes and bug reports come from people who keep '
       +     'something here. Draw a reading and this opens &mdash; reading the vision '
       +     'stays free, always.</p>'
       + '</section>';
@@ -1940,7 +1946,7 @@ function u1Aside() {
      not multiply. */
   var post = hasHoldings()
     ? '<a class="u1box__more" href="?dev=vision#post">'
-      +   'Or send back an idea, a tip or a bug &rarr;'
+      +   'Or send back an idea, a change or a bug &rarr;'
       + '</a>'
     : "";
   return '<aside class="u1aside" aria-label="Blue Room, beyond this list">'

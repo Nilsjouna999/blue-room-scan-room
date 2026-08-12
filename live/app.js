@@ -1656,7 +1656,13 @@ var DONATE = ["$2", "$5", "$10"];
 
 var POST_KINDS = [
   { key: "idea", t: "An idea",  d: "A room, a game, a deck &mdash; something you would want to find here." },
-  { key: "tip",  t: "A tip",    d: "Something that would read better, land harder, or sit somewhere else." },
+  /* BR-S394: was "A tip". Renamed because a donation block now sits directly beneath
+     this picker, where "tip" means money — one word for two unrelated acts on one
+     screen. "A change" also separates it from "An idea" on the axis that actually
+     divides them: an idea is something that does not exist yet, a change is something
+     that does and should be different. The body label already asked "What would you
+     change?", so the control now matches the question it opens. */
+  { key: "tip",  t: "A change", d: "Something here that would read better, work better, or sit somewhere else." },
   { key: "bug",  t: "A bug",    d: "Something broken. Where you were and what happened is most of the fix." }
 ];
 
