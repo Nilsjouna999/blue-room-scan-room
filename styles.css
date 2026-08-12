@@ -5778,3 +5778,11 @@ html.orbit-wings .orbit__field { --orbit-rx: clamp(200px, 25.5vw, 368px); --orbi
 @media (prefers-reduced-motion: no-preference) {
   .u1door__go { transition: color 180ms ease, border-color 180ms ease; }
 }
+
+/* BR-S368: the board's tracks follow the columns that actually rendered — an
+   empty horizon does not render a heading, and a three-track grid holding two
+   columns leaves a hole where the third used to be. The measure is capped at a
+   third of the column either way, so a two-column board does not stretch its
+   lines to twice the length the three-column one reads at. */
+.u1board[data-cols="1"] { grid-template-columns: minmax(0, 380px); }
+.u1board[data-cols="2"] { grid-template-columns: repeat(2, minmax(0, 1fr)); max-width: 790px; }

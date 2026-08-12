@@ -1368,6 +1368,21 @@ const AB_EMBLEMS = {
    opening day is written on the day the room is planned — not scrambled for
    at the moment it ships, which is how a page ends up describing a hole.
 
+   ★ WHAT EARNS A PLACE ON THE PUBLIC HALF — three questions, all three yes.
+     1. Would a visitor WANT it? Not: does the building need it to stand up.
+     2. Will it still be missing on the first day open? A launch blocker is not
+        a plan, it is a debt, and by the time anyone reads the page it is paid.
+     3. Is it a room or a product, rather than craft or plumbing?
+   Three items failed and carry `internal: true`. They stay in this list because
+   they are real work and the list is the whole truth — they simply never render
+   on a customer surface:
+     · "Paying for a reading"        plumbing, and done at launch  (1, 2)
+     · "A reading that waits for you"  a defect being fixed, not a feature (1, 2)
+     · "The whole dealing"           craft polish on a room that already works (1, 3)
+   Telling a visitor you are building the ability to take their money, or that
+   readings do not survive a closed tab yet, answers a question nobody asked and
+   volunteers a doubt. The old page did that three times in its nearest column.
+
    THE ORDER IS SHIP ORDER. Within a state, first is nearest.
    ═══════════════════════════════════════════════════════════════════════════ */
 const ROOMS = [
@@ -1400,17 +1415,17 @@ const ROOMS = [
     soon: "The card is already made &mdash; you can see one on the desk. What is missing is the room that reads a picture of your own.",
     cost: "Free &middot; or the paid Halo Mint", cta: "See a card develop", href: "?view=room" },
 
-  { key: "pay", state: "bench", name: "Paying for a reading",
+  { key: "pay", state: "bench", internal: true, name: "Paying for a reading",
     now: "Pay once for a reading. Nothing of yours is kept on file.",
     soon: "The prices on the doors become real. One reading, one payment, and nothing of yours kept on file.",
     cost: "", cta: "", href: "" },
 
-  { key: "keep", state: "bench", name: "A reading that waits for you",
+  { key: "keep", state: "bench", internal: true, name: "A reading that waits for you",
     now: "Close the page; the reading is still there when you come back.",
     soon: "Close the page and find the reading again where you left it, in the state you left it.",
     cost: "", cta: "", href: "" },
 
-  { key: "deal", state: "bench", name: "The whole dealing",
+  { key: "deal", state: "bench", internal: true, name: "The whole dealing",
     now: "The deck shuffles, cuts, and the cards come down onto the table.",
     soon: "The deck shuffles, cuts, and the cards come down onto the table where you can watch them land.",
     cost: "", cta: "", href: "" },
@@ -1420,9 +1435,9 @@ const ROOMS = [
     soon: "Buy a reading and every mark in it opens further: the same six read again for love, for friendship, for the hard years, for the small particulars.",
     cost: "", cta: "", href: "" },
 
-  { key: "name", state: "drawn", name: "A name that follows you",
-    now: "One name, and everything you keep travels with it.",
-    soon: "One name, and everything you have kept travels with it &mdash; to another browser, another room, another year.",
+  { key: "name", state: "drawn", name: "Your shelf, on any screen",
+    now: "Everything you have kept, on whatever you are holding.",
+    soon: "What you keep lives in this one browser today. Next it follows you &mdash; another screen, another room, another year.",
     cost: "", cta: "", href: "" },
 
   { key: "share", state: "drawn", name: "A reading you can show someone",
@@ -1465,7 +1480,10 @@ window.BR_HORIZONS = U1_HORIZONS;
 
 const U1_ROMAN = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X"];
 
-function u1Open() { return ROOMS.filter(function (r) { return r.state === "open"; }); }
+/* Every public view reads through this. `internal` work is real and stays in the
+   registry; it just never reaches a page a visitor sees. */
+function u1Public() { return ROOMS.filter(function (r) { return !r.internal; }); }
+function u1Open() { return u1Public().filter(function (r) { return r.state === "open"; }); }
 
 /* An open room renders as a DOOR: emblem, name, what it is, what it costs, and
    the way in. The emblems are BR-S251's and they survive the redesign — they are
@@ -1486,7 +1504,9 @@ function u1Door(o, i) {
 }
 
 function u1Column(h) {
-  var items = ROOMS.filter(function (r) { return r.state === h.state; }).map(function (r) {
+  var rows = u1Public().filter(function (r) { return r.state === h.state; });
+  if (!rows.length) return "";   /* a horizon with nothing in it is not a heading */
+  var items = rows.map(function (r) {
     return '<li class="u1item"><p class="u1item__t">' + r.name + '</p>'
          + '<p class="u1item__d">' + r.soon + '</p></li>';
   }).join('');
@@ -1526,7 +1546,7 @@ function renderAbout() {
      not begin with the word, so the header called it paid. A fact the page states
      must be stored, never parsed back out of the sentence that states it. */
   var free = open.filter(function (r) { return r.free; }).length;
-  var coming = ROOMS.length - open.length;
+  var coming = u1Public().length - open.length;
 
   return '<section id="about" class="about u1" aria-label="What Blue Room is, and what is coming">'
     + '<header class="u1head">'
@@ -1561,7 +1581,13 @@ function renderAbout() {
     +   '</div>'
     +   '<p class="u1sect__lede">In the order it is being made, nearest first. '
     +     'Nothing here carries a date, because no date here would be true.</p>'
-    +   '<div class="u1board">' + U1_HORIZONS.map(u1Column).join('') + '</div>'
+    /* The track count follows how many horizons actually rendered. A three-track grid
+     holding two columns leaves a visible hole where a third used to be, and the
+     bench column empties itself the day the last launch blocker is paid. */
+  +   (function () {
+        var cols = U1_HORIZONS.map(u1Column).filter(function (h) { return h; });
+        return '<div class="u1board" data-cols="' + cols.length + '">' + cols.join('') + '</div>';
+      })()
     + '</section>'
 
     + '<footer class="u1foot">'
