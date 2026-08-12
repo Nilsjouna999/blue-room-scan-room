@@ -41,7 +41,12 @@ SHIP_EXT = (".html", ".js", ".css", ".json", ".svg", ".txt", ".webmanifest")
 
 # Trees that are not the site. In dist/ none of these exist, so this list costs nothing
 # there; in --audit it keeps the workshop's own notes from drowning the real findings.
-SKIP_DIRS = {".git", ".claude", "node_modules", "docs", "arcana-build", "dist", "__pycache__"}
+# BR-S378: preview/ and live/ join dist/ here. They are BUILD OUTPUT that now lives in
+# the repo, so an --audit of the workshop would otherwise scan the site three extra times
+# and report every finding four times over. Each output is gated on its own by
+# build_public.py, with --target, so nothing goes unchecked by being skipped here.
+SKIP_DIRS = {".git", ".claude", "node_modules", "docs", "arcana-build",
+             "dist", "preview", "live", "__pycache__"}
 
 # The identity sweep walks everything except what is not text or not ours. It does NOT
 # skip docs/ — see scan()'s docstring. arcana-build/ comes off this list too: BR-S364

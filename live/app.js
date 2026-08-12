@@ -101,7 +101,7 @@ const state = { source: 0, treatment: "free", tab: "diagram", view: "menu", draf
      ?dev= keeps working: it is how the dev room reaches everything, and nothing that exists
      today breaks. */
   const dev = q.get("dev") || (typeof window !== "undefined" && window.BR_ROOM) || null;
-  if (["uploaded-result", "uploaded-blocked", "free-scan-sim", "halo-gate", "before-after", "review-map", "proto-cards", "staged-reveal", "menu-reveal", "vault", "arcane", "arcana-reading", "profile", "ceremony", "drawing-room", "settings"].includes(dev)) { state.view = "dev"; state.dev = dev; }
+  if (["drawing-room", "arcane", "arcana-reading", "settings", "profile"].includes(dev)) { state.view = "dev"; state.dev = dev; }
   else if (q.has("src") || q.has("t") || q.has("tab")) state.view = "room";
 }
 
@@ -1205,50 +1205,6 @@ function syncCodexBall() {
    same public build with the flip cut out, which is the only one a launch would keep.
    Order here is the order in the pill, and each entry's `seg` is the single path
    segment that distinguishes it. */
-var BR_BUILDS = [
-  { key: "dev",     seg: "" },
-  { key: "preview", seg: "preview/" },
-  { key: "live",    seg: "live/" }
-];
-function brBuildSides() {
-  var src = "", i, ss = document.scripts;
-  for (i = 0; i < ss.length; i++) if (/\/app\.js(\?|$)/.test(ss[i].src)) { src = ss[i].src; break; }
-  if (!src) return null;
-  var root = new URL(src).pathname.replace(/app\.js.*$/, "");   // "/", "/preview/", "/live/"
-  var here = "dev", devRoot = root, seg;
-  for (i = 1; i < BR_BUILDS.length; i++) {
-    seg = BR_BUILDS[i].seg;
-    if (root.slice(-seg.length) === seg) { here = BR_BUILDS[i].key; devRoot = root.slice(0, -seg.length); break; }
-  }
-  var rest = location.pathname.indexOf(root) === 0 ? location.pathname.slice(root.length) : "";
-  var tail = rest + location.search + location.hash;
-  return {
-    here: here,
-    links: BR_BUILDS.map(function (b) { return { key: b.key, href: devRoot + b.seg + tail }; })
-  };
-}
-function syncBuildFlip() {
-  var s = brBuildSides();
-  if (!s) return;
-  var el = document.getElementById("brBuildFlip");
-  if (!el) {
-    el = document.createElement("div");
-    el.id = "brBuildFlip";
-    document.body.appendChild(el);
-  }
-  // The side you are ON is stated, not linked; the others are the controls. Nothing
-  // clickable points at where you already are, so the pill can never be mistaken for
-  // a form with a selected option.
-  var html = '<span class="br-flip__lab" aria-hidden="true">BUILD</span>';
-  s.links.forEach(function (b, i) {
-    if (i) html += '<span class="br-flip__sep" aria-hidden="true">·</span>';
-    var on = b.key === s.here;
-    html += '<a class="br-flip__side' + (on ? ' is-on' : '') + '" href="' + b.href + '"' +
-      (on ? ' aria-current="page"' : '') + '>' + b.key + '</a>';
-  });
-  el.innerHTML = html;
-  el.setAttribute("aria-label", "Build: " + s.here + " — the others open the same page in that build");
-}
 
 /* BR-S266 — ONE PLACE THAT KEEPS THE ADDRESS BAR HONEST.
    The URL is this app's boot truth (`?dev=` is parsed at load to decide what mounts),
@@ -3377,7 +3333,7 @@ function wireMenuReveal(host) {
   /* BR-S151: the right-edge mirror of Back — hands off to the example Vault (its only route,
      a full reload; the vault's own back returns to a clean menu). */
   const fwd = host.querySelector(".menurev__fwdbtn");
-  if (fwd) fwd.addEventListener("click", function () { location.href = "?dev=vault"; });
+  if (fwd) fwd.addEventListener("click", function () { location.href = "?dev=profile"; });
 }
 
 /* ── BR-S204: the horizontal menu ribbon (desk 0 ↔ wall 1 ↔ reliquary 2) ────
@@ -4482,48 +4438,6 @@ function renderBlockedScan(b, actionsHtml) {
    A DEV-ONLY, categorized index of the current desktop surfaces so they can be
    reviewed without guessing routes. Gated by ?dev (customers never reach it).
    Plain <a> links to the REAL existing routes — invents nothing. Not product UI. */
-function renderReviewMap() {
-  const BADGE = { real: "REAL", share: "SHARE", mock: "MOCK", harness: "HARNESS" };
-  const card = (kind, href, route, name, desc) =>
-    `<a class="rmap__card rmap__card--${kind}" href="${href}">
-      <div class="rmap__cardtop"><span class="rmap__name">${esc(name)}</span><span class="rmap__badge rmap__badge--${kind}">${BADGE[kind]}</span></div>
-      <p class="rmap__desc">${esc(desc)}</p>
-      <div class="rmap__cardfoot"><code class="rmap__route">${esc(route)}</code><span class="rmap__open">Open →</span></div>
-    </a>`;
-  const group = (kind, cards) =>
-    `<section class="rmap__group"><h2 class="rmap__kind">${esc(kind)}</h2><div class="rmap__cards">${cards.join("")}</div></section>`;
-  return `
-    <div class="rmap">
-      <header class="rmap__head">
-        <span class="rmap__devtag">DEV REVIEW · not a product surface</span>
-        <h1 class="rmap__title">BLUE ROOM — desktop review map</h1>
-        <p class="rmap__note">A local map for walking the current desktop spine. Dev-only (needs <b>?dev</b>) — customers never see it. Each card opens a real route.</p>
-      </header>
-      ${group("Real product surface", [
-        card("real", "index.html", "/", "Menu — two-door fork", "the entrance · Free Pull + Develop doors"),
-        card("real", "?src=1&t=free", "?src=1&t=free", "Free Pull · Driver (SRC-01)", "complete card front + reading + 7-plate dossier"),
-        card("real", "?src=2&t=free", "?src=2&t=free", "Free Pull · Ice Field (SRC-02)", "complete card front · second source"),
-        card("real", "?src=1&t=shiny", "?src=1&t=shiny", "Developed / Halo · Driver", "sealed back opened in-place · price only at develop-intent"),
-        card("real", "?src=2&t=shiny", "?src=2&t=shiny", "Developed / Halo · Ice Field", "developed · second source"),
-      ])}
-      ${group("Share / capture view", [
-        card("share", "?dev=before-after", "?dev=before-after", "Before / After · Driver", "the photograph → the same frame, filed as a card"),
-        card("share", "?dev=before-after&src=2", "?dev=before-after&src=2", "Before / After · Ice Field", "second source"),
-      ])}
-      ${group("Archive surface", [
-        card("share", "?dev=vault", "?dev=vault", "The Shelf", "saved minted cards · revisit moments · reopen readings · QR access"),
-      ])}
-      ${group("Dev mock", [
-        card("mock", "?dev=halo-gate", "?dev=halo-gate", "Halo Gate mock", "sealed card-back gate · not payment, not analysis"),
-        card("mock", "?dev=free-scan-sim", "?dev=free-scan-sim", "Free scan sim", "Free Pull mock fixture"),
-      ])}
-      ${group("Validation harness", [
-        card("harness", "?dev=uploaded-result", "?dev=uploaded-result", "Uploaded result · valid", "scan-contract valid fixture render"),
-        card("harness", "?dev=uploaded-blocked", "?dev=uploaded-blocked", "Uploaded blocked · invalid", "scan-contract rejection / safe blocked state"),
-      ])}
-      <footer class="rmap__foot">Append <b>?devnav=1</b> to any route for the dev state-jumper rail. <b>?t=mint</b> is the internal Lab. · The card is the artifact — Blue Room reads the photograph, never the person.</footer>
-    </div>`;
-}
 
 /* ---------- BR-S074: before/after share view (dev/capture surface) ----------
    A screenshot-clean composition — the source PHOTOGRAPH develops into the CARD,
@@ -4532,37 +4446,6 @@ function renderReviewMap() {
    ?dev=before-after (sample sources only; ?src toggles). Artifact language only —
    no score / rank / value / public 0-100 / person reading. The card reuses the
    master renderCard (bands only). */
-function renderBeforeAfter() {
-  const src = SOURCES[state.source];
-  const c = src.card;
-  return `
-    <div class="ba">
-      <header class="ba__head">
-        <span class="ba__mark">◆ BLUE ROOM</span>
-        <p class="ba__thesis">Every photo is already a card. Blue Room develops it.</p>
-        <p class="ba__line">The room reads the photograph — frame, light, gesture — never the person.</p>
-      </header>
-      <div class="ba__stage">
-        <figure class="ba__before" data-imgwrap style="--pos:${esc(src.photoTuning.pos)};">
-          ${imgOrPlaceholder(src.file, "ba__img")}
-          <figcaption class="ba__tag">The photograph</figcaption>
-        </figure>
-        <div class="ba__seam" aria-hidden="true">
-          <span class="ba__arrow">→</span>
-          <span class="ba__verb">developed</span>
-        </div>
-        <div class="ba__after">
-          ${renderCard(src, "shiny")}
-          <span class="ba__tag ba__tag--after">The same frame, filed as a card</span>
-        </div>
-      </div>
-      <footer class="ba__foot">
-        <span class="ba__id">${esc(c.title)} &nbsp;·&nbsp; ${esc(c.archetype)}</span>
-        <span class="ba__serial">${esc(c.serial)}</span>
-        <span class="ba__honest">Capture surface · sample. The archetype is a photo role, not a person type. Tier bands read the photograph, not a person — never a ranking between cards.</span>
-      </footer>
-    </div>`;
-}
 
 /* ---------- DEV PROTOTYPE CARDS (?dev=proto-cards) — BR-S101 ----------
    Three LOCAL prototype cards from the builder's own photos (assets/source-03/04/05.jpg,
@@ -4600,32 +4483,6 @@ const PROTO_CARDS = [
       stats: { presence: 76, frame: 70, signal: 78, visualImpact: 80 } } },
 ];
 
-function renderProtoCards() {
-  const row = (src) => `
-    <section class="proto__row">
-      <div class="proto__rowhead">
-        <span class="proto__name">${esc(src.card.title)}</span>
-        <span class="proto__file">SRC-${pad2(src.no)} · local · ${esc(src.capture.code)}</span>
-      </div>
-      <div class="proto__pair">
-        <div class="proto__cell"><span class="proto__state">FREE PULL</span><div class="proto__card">${renderCard(src, "free")}</div></div>
-        <div class="proto__cell"><span class="proto__state">HALO MINT · DEVELOPED</span><div class="proto__card">${renderCard(src, "shiny")}</div></div>
-      </div>
-    </section>`;
-  return `
-    <div class="proto">
-      <header class="proto__head">
-        <span class="proto__devtag">DEV · PROTOTYPE CARDS — not a product surface</span>
-        <h1 class="proto__title">Prototype cards — local photos, front only</h1>
-        <p class="proto__note">Three local photos rendered through the master card in Free + Halo, to judge the card design and the restored halo across varied images. Front only — no reading or dossier authored. Local-only (gitignored); reads the photograph as artifact, never the person.</p>
-      </header>
-      ${PROTO_CARDS.map(row).join("")}
-      <footer class="proto__foot">
-        <button type="button" class="draft__back" data-view-to="menu">Main menu</button>
-        <button type="button" class="draft__sample" data-view-to="room">Sample scan room</button>
-      </footer>
-    </div>`;
-}
 
 /* ============================================================
    THE SHELF (?dev=vault) — BR-S144
@@ -4727,107 +4584,11 @@ function vaultState(m) { return String(m.state || "").toLowerCase().replace(/(^|
    squiggles) is cut. Reuses .pf-* classes + --pf-* vars (both stylesheets load
    globally); the bespoke .vault__* CSS in styles.css was removed in BR-S202
    (only .vqr__svg survives, still emitted by vaultQR). */
-function renderVault() {
-  const m = VAULT_MINTS[0];
-  const goldCrop = '<span class="pf-vcrop pf-vcrop--tl"></span><span class="pf-vcrop pf-vcrop--tr"></span><span class="pf-vcrop pf-vcrop--bl"></span><span class="pf-vcrop pf-vcrop--br"></span>';
 
-  /* SAVED MINTS — a quiet ledger in the profile's friend-row idiom. BR-S156: only
-     Checkpoint Wave is a live control; other moments are static filed cues. */
-  const rows = VAULT_MINTS.map((mt, i) => {
-    const inner =
-      `<span class="pf-mintrow__thumb">${imgOrPlaceholder(mt.thumb, "pf-mintrow__img")}</span>` +
-      `<span class="pf-mintrow__n">${esc(mt.label)}</span>` +
-      `<span class="pf-mintrow__id">${esc(mt.id)}</span>`;
-    return i === 0
-      ? `<button type="button" class="pf-mintrow pf-mintrow--sel" data-vault-select="0" aria-pressed="true">${inner}</button>`
-      : `<div class="pf-mintrow pf-mintrow--cue">${inner}</div>`;
-  }).join("") +
-    `<div class="pf-mintrow pf-mintrow--empty" aria-hidden="true">` +
-      `<span class="pf-mintrow__thumb pf-mintrow__thumb--empty">+</span>` +
-      `<span class="pf-mintrow__n">New mint</span><span class="pf-mintrow__id">appears here</span></div>`;
-
-  return `
-    <div class="pf pf--vault" data-vault>
-      <div class="pf-wrap">
-        <a class="pf-back" href="#" data-view-to="menu">&larr; Back to the menu</a>
-
-        <div class="pf-vaulthead">
-          <span class="pf-vaulteyebrow">Blue Room Archive&nbsp;&nbsp;·&nbsp;&nbsp;The Shelf</span>
-          <h1 class="pf-vaulttitle">The Shelf</h1>
-          <p class="pf-vaultintro">Saved minted cards are filed here.</p>
-        </div>
-
-        <div class="pf-vaultstage">
-          <div class="pf-vaultcard">${goldCrop}<div class="pf-vaultcard__inner" data-vault-card>${renderCard(m.src, "shiny")}</div></div>
-          <div class="pf-crownstage__cap">
-            <p class="pf-prov" data-vault-cardcap>${esc(vaultState(m))}</p>
-            <p class="pf-crownstage__filed">${VAULT_LOCK} <span data-vault-provtext>Filed ${esc(m.filed.split(" · ")[0])} &rarr; Sealed &rarr; Recorded</span></p>
-            <div class="pf-access">
-              <div class="pf-access__qr" data-vault-qr>${vaultQR(m.id)}</div>
-              <span class="pf-access__id" data-vault-qrid>${esc(m.id)}</span>
-              <span class="pf-access__cta">scan to access</span>
-            </div>
-            <a class="pf-openreading pf-openreading--lg" href="#" data-vault-openreading>Open this reading &rarr;</a>
-          </div>
-        </div>
-
-        <section class="pf-sec">
-          <h2 class="pf-sec__h">Saved Mints<span class="pf-sec__note">example data</span></h2>
-          <p class="pf-lede">Your saved mints — choose one to bring it forward.</p>
-          <div class="pf-mintlist">${rows}</div>
-        </section>
-      </div>
-    </div>`;
-}
-
-function wireVault() {
-  const root = document.querySelector(".pf--vault");
-  if (!root) return;
-  let sel = 0;
-  const $ = (s) => root.querySelector(s);
-  const cardSlot = $("[data-vault-card]"), qrSlot = $("[data-vault-qr]"), qrId = $("[data-vault-qrid]"),
-    cardCap = $("[data-vault-cardcap]"), cardProv = $("[data-vault-provtext]");
-
-  function selectMint(i) {
-    if (i < 0 || i >= VAULT_MINTS.length || i === sel) return;
-    sel = i;
-    const m = VAULT_MINTS[i];
-    if (cardSlot) cardSlot.innerHTML = renderCard(m.src, "shiny");
-    if (cardCap) cardCap.textContent = vaultState(m);
-    if (cardProv) cardProv.textContent = `Filed ${m.filed.split(" · ")[0]} → Sealed → Recorded`;
-    if (qrSlot) qrSlot.innerHTML = vaultQR(m.id);
-    if (qrId) qrId.textContent = m.id;
-    root.querySelectorAll("[data-vault-select]").forEach((b) => {
-      const on = Number(b.dataset.vaultSelect) === i;
-      b.classList.toggle("pf-mintrow--sel", on);
-      b.setAttribute("aria-pressed", on ? "true" : "false");
-    });
-  }
-
-  root.addEventListener("click", (e) => {
-    const tile = e.target.closest("[data-vault-select]");
-    if (tile) { selectMint(Number(tile.dataset.vaultSelect)); return; }
-    if (e.target.closest("[data-vault-openreading]")) {
-      /* Reopen the selected mint's Stats & Readings. TODO: a per-mint reading
-         store. For now route to the canonical developed reading reveal (the real
-         Stats & Readings surface) — non-breaking, reuses an existing route. */
-      location.href = "?dev=staged-reveal&rv=developed";
-    }
-  });
-}
 
 function mountDev() {
   const C = window.BlueRoomScanContract;
   const F = (C && C.DEV_FIXTURES) || {};
-  if (state.dev === "proto-cards") {
-    document.getElementById("devView").innerHTML = renderProtoCards();
-    return;
-  }
-  if (state.dev === "vault") {
-    document.getElementById("devView").innerHTML = renderVault();
-    wireVault();
-    return;
-  }
   if (state.dev === "arcane") {
     // BR-S159 — The Arcana Intake ("The Setting of Marks"). Self-contained in
     // arcane.js (window.BRArcane); this branch only hands it the mount node.
@@ -4850,6 +4611,8 @@ function mountDev() {
     // In arcana-profile.js (window.BRArcanaProfile); this branch hands it the node.
     // Static design surface — mock data, mocked commerce (no backend/payment).
     const host = document.getElementById("devView");
+    // Public build: the Profile opens only once something is kept.
+    if (!hasHoldings()) { location.replace("./#reliquary"); return; }
     if (window.BRArcanaProfile && typeof window.BRArcanaProfile.mount === "function") window.BRArcanaProfile.mount(host);
     else host.innerHTML = '<p style="padding:48px;color:#948f87;text-align:center;font-family:sans-serif">The profile failed to load (arcana-profile.js).</p>';
     return;
@@ -4870,308 +4633,9 @@ function mountDev() {
     else host.innerHTML = '<p style="padding:48px;color:#948f87;text-align:center;font-family:sans-serif">The Settings page failed to load (settings.js).</p>';
     return;
   }
-  if (state.dev === "ceremony") {
-    // BR-S163 — the forge ceremony (builder's exact art, pixel-perfect + alive).
-    // In ceremony.js (window.BRCeremony); this branch hands it the node.
-    const host = document.getElementById("devView");
-    if (window.BRCeremony && typeof window.BRCeremony.mount === "function") window.BRCeremony.mount(host);
-    else host.innerHTML = '<p style="padding:48px;color:#948f87;text-align:center;font-family:sans-serif">The ceremony failed to load (ceremony.js).</p>';
-    return;
-  }
-  if (state.dev === "staged-reveal") {
-    // BR-S124 — isolated staged-reveal surface. Self-contained units in
-    // /reveal (window.BRReveal); this branch only hands it the mount node.
-    const host = document.getElementById("devView");
-    if (window.BRReveal && typeof window.BRReveal.mount === "function") window.BRReveal.mount(host);
-    else host.innerHTML = '<p style="padding:48px;color:#948f87;text-align:center;font-family:sans-serif">Staged reveal failed to load (reveal/*.js).</p>';
-    return;
-  }
-  if (state.dev === "menu-reveal") {
-    // PREVIEW: the REAL menu grid (the sacred .menu__inner — byte-identical start frame),
-    // hosted on a non-view-gated .menurev wrapper (the .menu class is display:none in dev).
-    // The sample card slot hosts the staged reveal (menustage): card develops in place,
-    // the read slides in on the right, "see deeper" promotes to a fullview. Live menu UNTOUCHED.
-    const host = document.getElementById("devView");
-    host.innerHTML =
-      '<div class="menurev">' +
-        '<div class="menu__inner">' +
-          '<header class="menu__head">' +
-            '<h1 class="menu__brand"><span class="menu__mark">◆</span> BLUE ROOM</h1>' +
-            '<p class="menu__thesis">Every photo is already a card. The room develops it.</p>' +
-            '<p class="menu__trust">Image-as-artifact scan — it reads frame, gesture and signal, never the person.</p>' +
-          '</header>' +
-          '<section class="menu__stage menu__stage--reveal">' +
-            '<div class="msample__cap"><span class="msample__label">Sample Scan</span><span class="msample__type">SRC-01 · Archive</span></div>' +
-            '<p class="menurev__note">◆ Example · Showcase</p>' +
-            '<div class="menurev__mount"></div>' +
-          '</section>' +
-          '<div class="menu__controls">' +
-            '<span class="menu__rule" aria-hidden="true"></span>' +
-            '<p class="msample__seal">The front is complete. The same card has a sealed back.</p>' +
-            '<div class="menu__doors">' +
-              '<button type="button" class="menu__door menu__door--add" data-draft-pick><span class="menu__door-kicker">Your Photo</span><span class="menu__door-name">Add your photo</span><span class="menu__door-desc">Stage your image as a local draft. The scan engine isn\'t connected yet — nothing reads it.</span></button>' +
-              '<button type="button" class="menu__door menu__door--sample" data-view-to="room"><span class="menu__door-kicker">Sample</span><span class="menu__door-name">View sample card</span><span class="menu__door-desc">See the sample card in its room — SRC-01. A sample, not your photo.</span></button>' +
-            '</div>' +
-            '<p class="menu__foot">One sample · SRC-01 · Driver.</p>' +
-          '</div>' +
-        '</div>' +
-        '<button type="button" class="menurev__back" aria-label="Return to the menu">← Back to the menu</button>' +
-        MENUREV_FWD_ARROW +
-      '</div>';
-    const mountEl = host.querySelector(".menurev__mount");
-    if (mountEl && window.BRReveal && typeof window.BRReveal.mount === "function") {
-      function _escBack(e) {   // BR-S134 M6: Esc returns from the fullview takeover
-        if (e.key === "Escape") {
-          e.preventDefault();
-          document.removeEventListener("keydown", _escBack, true);
-          if (rev && rev.toFree) rev.toFree();
-        }
-      }
-      const rev = window.BRReveal.mount(mountEl, {
-        menustage: true,
-        onFullview: function () {
-          const m = host.querySelector(".menurev");
-          if (m) { m.classList.add("is-fullview"); m.classList.remove("is-vaultready"); }   // BR-S156: vault hand-off closed until the read settles
-          document.addEventListener("keydown", _escBack, true);
-        },
-        onReadSettled: function () {
-          const m = host.querySelector(".menurev");
-          if (m) m.classList.add("is-vaultready");   // BR-S156: reading fully drawn → release the arrow
-        },
-        onBack: function () {
-          const m = host.querySelector(".menurev");
-          if (m) { m.classList.remove("is-fullview"); m.classList.remove("is-vaultready"); }
-          document.removeEventListener("keydown", _escBack, true);
-        },
-      });
-      const back = host.querySelector(".menurev__back");
-      if (back) back.addEventListener("click", function () { if (rev && rev.toFree) rev.toFree(); });
-      const fwd = host.querySelector(".menurev__fwdbtn");
-      if (fwd) fwd.addEventListener("click", function () { location.href = "?dev=vault"; });
-    }
-    return;
-  }
-  if (state.dev === "review-map") {
-    document.getElementById("devView").innerHTML = renderReviewMap();
-    return;
-  }
-  if (state.dev === "before-after") {
-    document.getElementById("devView").innerHTML = renderBeforeAfter();
-    return;
-  }
-  if (state.dev === "halo-gate") {
-    document.getElementById("devView").innerHTML = renderHaloGateMock();
-    return;
-  }
-  if (state.dev === "free-scan-sim") {
-    const simFixture = F.validFreeSimulationResult || F.validDevRendererResult;
-    document.getElementById("devView").innerHTML = renderUploadedScanResultDev(simFixture, { mode: "free-scan-sim" });
-    return;
-  }
-  const result = state.dev === "uploaded-blocked"
-    ? F.invalidAttractivenessResult
-    : (F.validDevRendererResult || F.validMinimalFutureResult);
-  document.getElementById("devView").innerHTML = renderUploadedScanResultDev(result);
+  // The uploaded-scan harness is not part of the public build.
 }
 
-function renderUploadedScanResultDev(result, opts) {
-  opts = opts || {};
-  const sim = opts.mode === "free-scan-sim"; // Free Scan Simulation route
-  const C = window.BlueRoomScanContract;
-  if (!C || typeof C.validateUploadedScanResult !== "function") {
-    return `<div class="dev"><p class="uploadeddev__tag">◆ DEV HARNESS — scan-contract.js not loaded</p></div>`;
-  }
-  const v = C.validateUploadedScanResult(result);
-
-  /* invalid fixture → the safe blocked state (no card / stats / oracle).
-     The dev route has no local draft, so it supplies harness-scoped return
-     actions (room / menu) instead of the draft-oriented defaults. */
-  if (!v.ok) {
-    const blocked = C.createBlockedScanState("dev harness · fixture failed validation", v.errors);
-    const devActions = `
-        <div class="gateactions">
-          <button type="button" class="draft__sample" data-view-to="room">Enter sample scan room</button>
-          <button type="button" class="draft__back" data-view-to="menu">Main menu</button>
-        </div>`;
-    return `
-      <div class="dev">
-        <p class="uploadeddev__tag uploadeddev__tag--block">◆ ${sim ? "DEV SIMULATION · NOT REAL ANALYSIS · BLOCKED FIXTURE" : "DEV HARNESS · NOT USER SCAN · BLOCKED FIXTURE"}</p>
-        ${renderBlockedScan(blocked, devActions)}
-      </div>`;
-  }
-
-  /* Free Pull Layout Mock v1 — the ?dev=free-scan-sim route renders the
-     validated fixture as ONE landscape collectible artifact (split slab),
-     not the debug stack. The uploaded-result / uploaded-blocked routes keep
-     the original layout below, untouched. */
-  if (sim) return renderFreePullMock(result);
-
-  const r = result;
-  const a = r.artifact || {};
-  const src = r.source || {};
-  const fv = (r.stats && r.stats.freeVisible) || {};
-  const hx = (r.stats && r.stats.haloExtended) || {};
-  const rd = r.readings || {};
-  const sf = r.safetyFlags || {};
-  const gate = r.gate || {};
-
-  /* INTENTIONAL (dev harness only): the ?dev=uploaded-result renderer keeps the
-     legacy Presence/Frame/Signal/Charge + Visual Impact labels and 0-100 numbers
-     to exercise the legacy render path. Artifact Language Stabilization v1 does
-     NOT migrate this strictly-dev, "NOT USER SCAN" route (see DECISION_LOG
-     2026-06-13). The sample room and ?dev=free-scan-sim use artifact-safe tier
-     bands instead. */
-  const stat = (name, val) =>
-    `<div class="uploadeddev__stat"><span class="uploadeddev__statname">${esc(name)}</span><span class="uploadeddev__statval">${val == null ? "—" : esc(String(val))}</span></div>`;
-  const ext = (label, o) =>
-    o && typeof o === "object"
-      ? `<div class="uploadeddev__stat"><span class="uploadeddev__statname">${esc(label)}</span><span class="uploadeddev__statval">${esc(String(o.value))}${o.label ? " · " + esc(o.label) : ""}</span></div>`
-      : "";
-
-  /* tier row — public tier band + a 5-segment bar; NO exact 0–100 number. */
-  const tierRow = (s) => {
-    const bars = Math.max(0, Math.min(5, Number(s.bars) || 0));
-    const meter = `<span class="uploadeddev__tbon">${"▰".repeat(bars)}</span><span class="uploadeddev__tboff">${"▱".repeat(5 - bars)}</span>`;
-    return `<div class="uploadeddev__tier"><span class="uploadeddev__tname">${esc(s.label)}</span><span class="uploadeddev__tband">${esc(s.tier)}</span><span class="uploadeddev__tbar" aria-hidden="true">${meter}</span></div>`;
-  };
-  const statsBlock = Array.isArray(r.publicStats) && r.publicStats.length
-    ? `<div class="uploadeddev__plate">
-         <div class="uploadeddev__head">Public stats · tier bands</div>
-         <div class="uploadeddev__tiers">${r.publicStats.map(tierRow).join("")}</div>
-         ${sim ? `<p class="uploadeddev__sealed">Halo Mint develops the deeper read — sealed in this Free preview (dev).</p>` : ""}
-         <p class="uploadeddev__cap">tier bands of the image artifact — not exact scores, not the person</p>
-       </div>`
-    : `<div class="uploadeddev__plate">
-         <div class="uploadeddev__head">Visible stats</div>
-         <div class="uploadeddev__stats">${stat("Presence", fv.presence)}${stat("Frame", fv.frame)}${stat("Signal", fv.signal)}${stat("Charge", fv.charge)}</div>
-         ${sim
-           ? `<p class="uploadeddev__sealed">Halo Mint develops the deeper read — sealed in this Free preview (dev).</p>`
-           : (hx.loreDensity || hx.fitCoherence || hx.stanceRead || hx.visualImpact
-             ? `<div class="uploadeddev__head uploadeddev__head--sub">Extended stats</div>
-                <div class="uploadeddev__stats">${ext("Lore Density", hx.loreDensity)}${ext("Fit Coherence", hx.fitCoherence)}${ext("Stance Read", hx.stanceRead)}${ext("Visual Impact", hx.visualImpact)}</div>`
-             : "")}
-         <p class="uploadeddev__cap">presentation scores of the image artifact — not the person</p>
-       </div>`;
-
-  const readingsBlock = rd.freeSummary || rd.haloDossier || rd.oracle
-    ? `<div class="uploadeddev__plate">
-         <div class="uploadeddev__head">Readings</div>
-         ${rd.freeSummary ? `<p class="uploadeddev__read"><b>Free</b> — ${esc(rd.freeSummary)}</p>` : ""}
-         ${rd.haloDossier ? `<p class="uploadeddev__read"><b>Halo</b> — ${esc(rd.haloDossier)}</p>` : ""}
-         ${rd.oracle ? `<p class="uploadeddev__read uploadeddev__read--oracle">“${esc(rd.oracle)}”</p>` : ""}
-       </div>`
-    : "";
-
-  const eb = Array.isArray(r.evidenceBoard) ? r.evidenceBoard : [];
-  const grounded = eb.some((e) => e.observedCue || e.artifactEffect);
-  const receiptsBlock = eb.length
-    ? `<div class="uploadeddev__plate">
-         <div class="uploadeddev__head">${grounded ? "Grounded receipts" : "Evidence board"}</div>
-         ${eb
-           .map((e) =>
-             e.observedCue || e.artifactEffect
-               ? `<div class="uploadeddev__receipt">
-           <div class="uploadeddev__rectop"><span class="uploadeddev__lens">${esc(e.lens)} Lens</span><span class="uploadeddev__conf">${esc(e.confidence)}</span></div>
-           <p class="uploadeddev__ground">${esc(e.observedCue || e.observation)} <span class="uploadeddev__arrow">→</span> ${esc(e.artifactEffect || e.effect)}</p>
-         </div>`
-               : `<div class="uploadeddev__receipt">
-           <div class="uploadeddev__rectop"><span class="uploadeddev__lens">${esc(e.lens)}</span><span class="uploadeddev__effect">${esc(e.effect)}</span><span class="uploadeddev__conf">${esc(e.confidence)}</span></div>
-           <p class="uploadeddev__obs">${esc(e.observation)}</p>
-           <span class="uploadeddev__rcue">cue · ${esc(e.visibleCue)}</span>
-         </div>`)
-           .join("")}
-       </div>`
-    : "";
-
-  const flagsBlock = `
-    <div class="uploadeddev__plate">
-      <div class="uploadeddev__head">Safety flags &amp; schema</div>
-      <div class="uploadeddev__flags">${Object.keys(sf)
-        .map((k) => `<span class="uploadeddev__flag">${esc(k)}: ${sf[k] === false ? "false ✓" : esc(String(sf[k]))}</span>`)
-        .join("")}</div>
-      <dl class="uploadeddev__meta">
-        <div><dt>kind</dt><dd>${esc(r.kind)}</dd></div>
-        <div><dt>schemaVersion</dt><dd>${esc(r.schemaVersion)}</dd></div>
-        <div><dt>status</dt><dd>${esc(r.status)}</dd></div>
-        <div><dt>route</dt><dd>${esc(gate.route || "—")} · ${esc(gate.scanStatus || "—")}</dd></div>
-        ${r.confidence ? `<div><dt>confidence</dt><dd>${esc(String(r.confidence.overall))} · ${esc(r.confidence.band || "")}</dd></div>` : ""}
-      </dl>
-    </div>`;
-
-  /* CARD_LOGIC_V1 surfaces (rendered only when the fixture carries them, so
-     the uploaded-result harness is unaffected). Image-only; no numbers. */
-  const scopeBlock = r.scopeLine ? `<p class="uploadeddev__scope">◆ &nbsp;${esc(r.scopeLine)}</p>` : "";
-
-  const sealedBlock = r.sealedStat
-    ? `<div class="uploadeddev__plate">
-         <div class="uploadeddev__head">Sealed stat</div>
-         <p class="uploadeddev__seallabel">${esc(r.sealedStat.label || "—")}<span class="uploadeddev__sealreason">${esc(r.sealedStat.reasonType || "")}</span><span class="uploadeddev__seallock">SEALED</span></p>
-         ${r.sealedStat.teaser ? `<p class="uploadeddev__read">${esc(r.sealedStat.teaser)}</p>` : ""}
-       </div>`
-    : "";
-
-  const rarityBlock = r.rarity
-    ? `<div class="uploadeddev__plate">
-         <div class="uploadeddev__head">Rarity</div>
-         <p class="uploadeddev__rarity"><span class="uploadeddev__rband">${esc(r.rarity.band || "—")}</span>${r.rarity.print ? `<span class="uploadeddev__rprint">${esc(r.rarity.print)}</span>` : ""}</p>
-         ${r.rarity.reason ? `<p class="uploadeddev__read">${esc(r.rarity.reason)}</p>` : ""}
-         ${r.rarity.qualityNeutral ? `<p class="uploadeddev__cap">${esc(r.rarity.qualityNeutral)}</p>` : ""}
-       </div>`
-    : "";
-
-  const rm = r.reframeMap;
-  const reframeBlock = rm
-    ? `<div class="uploadeddev__plate">
-         <div class="uploadeddev__head">Reframe Map · image changes only</div>
-         ${rm.current ? `<p class="uploadeddev__read"><b>Now</b> — ${esc(rm.current)}</p>` : ""}
-         ${Array.isArray(rm.whyThisCard) && rm.whyThisCard.length ? `<ul class="uploadeddev__why">${rm.whyThisCard.map((w) => `<li>${esc(w)}</li>`).join("")}</ul>` : ""}
-         ${Array.isArray(rm.levers) ? rm.levers.map((l) => `
-         <div class="uploadeddev__lever"><span class="uploadeddev__levlabel">${esc(l.label || "")}</span><p class="uploadeddev__levchange">${esc(l.change || "")}</p><span class="uploadeddev__leveffect">${esc(l.effect || "")}</span></div>`).join("") : ""}
-         ${Array.isArray(rm.setupCard) && rm.setupCard.length ? `<div class="uploadeddev__setup"><span class="uploadeddev__head uploadeddev__head--sub">Setup card · re-shoot, re-scan</span><ol>${rm.setupCard.map((s) => `<li>${esc(s)}</li>`).join("")}</ol></div>` : ""}
-       </div>`
-    : "";
-
-  /* Free Scan Simulation chrome: a triple-labelled banner + a STATIC
-     stepper (no progress bar implying real processing). Each step also
-     carries one of the DEV SIMULATION / NOT REAL ANALYSIS / NOT USER SCAN
-     labels. The preview below is a VALIDATED fixture, never a user scan. */
-  const simHead = sim
-    ? `
-      <p class="uploadeddev__tag uploadeddev__tag--sim">◆ DEV SIMULATION · NOT REAL ANALYSIS · NOT USER SCAN</p>
-      <p class="freesim__heading">FREE SCAN SIMULATION · DEV ONLY · NOT REAL ANALYSIS</p>
-      <ol class="freesim__steps">
-        <li class="freesim__step"><span class="freesim__num">1</span><div class="freesim__body"><b>Local draft staged</b><span>No real image analysis. <em>DEV SIMULATION</em></span></div></li>
-        <li class="freesim__step"><span class="freesim__num">2</span><div class="freesim__body"><b>Scan development simulated</b><span>Contract validator runs against the fixture only. <em>NOT REAL ANALYSIS</em></span></div></li>
-        <li class="freesim__step freesim__step--now"><span class="freesim__num">3</span><div class="freesim__body"><b>Free result preview</b><span>Validated fixture render below. <em>NOT USER SCAN</em></span></div></li>
-      </ol>`
-    : "";
-
-  return `
-    <div class="dev uploadeddev">
-      ${sim ? simHead : `<p class="uploadeddev__tag">◆ DEV HARNESS · NOT USER SCAN · VALIDATED FIXTURE</p>`}
-
-      <article class="uploadeddev__card">
-        <header class="uploadeddev__cardhead">
-          <span class="uploadeddev__house">◆ ${sim ? "BLUE ROOM · FREE SCAN (DEV SIM)" : "BLUE ROOM ARCHIVE · UPLOADED (DEV)"}</span>
-          <span class="uploadeddev__state">${sim ? "DEV SIM" : "DEV HARNESS"}</span>
-        </header>
-        <h2 class="uploadeddev__title">${esc(a.title || "—")}</h2>
-        <p class="uploadeddev__arch">◆ &nbsp;${esc(a.archetypeClass || "—")} &nbsp;· ${esc(a.rarity || "—")} · ${esc(a.editionLabel || "—")}</p>
-        <p class="uploadeddev__file">${esc(src.fileType || "IMG")} · ${esc(src.fileSize || "—")} · ${esc(src.fileLabel || "—")}</p>
-      </article>
-
-      ${scopeBlock}${statsBlock}${readingsBlock}${receiptsBlock}${sealedBlock}${rarityBlock}${reframeBlock}${flagsBlock}
-
-      <div class="gateactions">
-        <button type="button" class="draft__sample" data-view-to="room">Enter sample scan room</button>
-        <button type="button" class="draft__back" data-view-to="menu">Main menu</button>
-      </div>
-
-      <p class="uploadeddev__foot">${sim
-        ? "DEV SIMULATION · NOT REAL ANALYSIS · NOT USER SCAN · no AI · no user photo analyzed"
-        : "DEV HARNESS · generated from BlueRoomScanContract.DEV_FIXTURES · not a real scan · no AI · no user photo analyzed"}</p>
-    </div>`;
-}
 
 /* ---------- Free Pull Layout Mock v1 (dev sim route only) ----------
    Renders the ?dev=free-scan-sim fixture as ONE landscape collectible
@@ -5326,71 +4790,6 @@ function renderFreePullMock(result) {
    card front; Halo is the sealed back, not a hidden score. Left = sealed
    card-back slab; right = dossier gate panel. The "Open Halo Dossier" CTA is
    permanently disabled (no payment / no unlock exists). */
-function renderHaloGateMock() {
-  /* material identity reused from the sample (a dev stand-in), so the sealed
-     back carries the same restrained material weld/shimmer as the Free front. */
-  const s0 = (typeof SOURCES !== "undefined" && SOURCES[0]) ? SOURCES[0] : null;
-  const halo = (s0 && s0.halo) || { a: "#c98a5e", b: "#8b7bff", c: "#e8b27d", material: "Warm Glass Copper" };
-
-  /* qualitative sealed-back rows — categories, never counts or named modules
-     (Halo Gate Boundary Lock v1 §C allowed list). */
-  const sealRows = ["Production notes sealed", "Variant routes sealed", "Back face archived · conservation seal intact"]
-    .map((t) => `<div class="halogate__sealrow"><span class="halogate__sealmark" aria-hidden="true">◇</span>${esc(t)}</div>`)
-    .join("");
-
-  return `
-    <div class="dev halogate">
-      <div class="fprail halogate__rail">
-        <span class="fprail__dot" aria-hidden="true"></span>
-        <span class="fprail__txt">DEV MOCK · NOT PAYMENT · NOT REAL ANALYSIS</span>
-        <span class="fprail__id">HALO GATE · DEV</span>
-      </div>
-
-      <article class="halogate__card" data-material="${esc(halo.material)}"
-        style="--halo-a:${esc(halo.a)}; --halo-b:${esc(halo.b)}; --halo-c:${esc(halo.c)};">
-        <span class="halogate__weld" aria-hidden="true"></span>
-        <div class="halogate__grid">
-
-          <figure class="halogate__back" aria-label="Sealed card back">
-            <span class="halogate__backgrain" aria-hidden="true"></span>
-            <span class="halogate__shimmer" aria-hidden="true"></span>
-            <span class="halogate__backhouse">◆ BLUE ROOM ARCHIVE</span>
-            <span class="halogate__seal" aria-hidden="true">◈<span class="halogate__sealring"></span></span>
-            <figcaption class="halogate__backcap">
-              <span class="halogate__backtitle">BACK FACE · ARCHIVED</span>
-              <span class="halogate__backid">DOSSIER LAYER · HELD IN CONSERVATION</span>
-            </figcaption>
-          </figure>
-
-          <div class="halogate__panel">
-            <header class="halogate__head">
-              <span class="halogate__kicker">◆ HALO DOSSIER</span>
-              <h2 class="halogate__title">THE BACK OF THIS CARD IS SEALED</h2>
-              <p class="halogate__sub">The Free Pull is yours. The back is still closed.</p>
-            </header>
-
-            <div class="halogate__seals">${sealRows}</div>
-
-            <p class="halogate__complete">The Free Pull card front is complete. Halo opens the sealed back of the same card — added depth, not a hidden result.</p>
-
-            <div class="halogate__cta">
-              <button type="button" class="halogate__open" disabled aria-disabled="true">Open Halo Dossier · dev mock — no payment</button>
-              <button type="button" class="halogate__keep" data-view-to="room">Keep Free Pull</button>
-            </div>
-
-            <p class="halogate__scope">◆ &nbsp;This reads the image artifact — frame, light, styling, setting, gesture — not the person.</p>
-          </div>
-        </div>
-      </article>
-
-      <div class="gateactions">
-        <button type="button" class="draft__sample" data-view-to="room">Enter sample scan room</button>
-        <button type="button" class="draft__back" data-view-to="menu">Main menu</button>
-      </div>
-
-      <p class="halogate__foot">DEV MOCK · NOT PAYMENT · NOT REAL ANALYSIS · no AI · no user photo analyzed · Free Pull stays complete; Halo is the sealed back, not a hidden score.</p>
-    </div>`;
-}
 
 /* ---------- render + wiring ---------- */
 
@@ -5840,7 +5239,6 @@ try {
 } catch (e) {}
 
 mountMenu();
-syncBuildFlip();   // BR-S377 — the dev⇄public flip, once, on every room
 renderSourceToggle();
 /* DEV NAV: fill + reveal the dev rail only behind ?devnav=1; sets the
    body attribute the CSS gates on. Inert (display:none) on any clean URL. */
@@ -5878,7 +5276,6 @@ if (state.view === "dev") mountDev();
    iterating on the Vault with refreshes still works — that is the escape hatch.
    Deliberately vault-only: settings / profile / drawing-room / arcane are places you work
    in and SHOULD survive a refresh. */
-if (state.dev === "vault" && !DEVNAV) _devUrlStrip();
 render();
 
 /* ============================================================================

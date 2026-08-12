@@ -1,0 +1,426 @@
+/* =============================================================
+   THE ARCANA INTAKE — "The Setting of Marks" (BR-S159)
+   Ported from the builder's high-fidelity blueprint
+   (design_handoff_arcana_intake). Isolated dev route (?dev=arcane);
+   all styling scoped under .arcane. Two signature behaviours live in
+   arcane.js: the CROWN BLUEPRINT (inks in as marks are typed) and the
+   FORGING CEREMONY (a stepped paper-cutout animation on "Draw the
+   reading"). The arcane reading carries NO photo-read safety walls.
+   Uses the global Sand/line/font tokens; adds only a scoped room bg.
+============================================================= */
+.arcane {
+  --ac-bg-room: radial-gradient(110% 80% at 50% -10%, #161411 0%, var(--ink-900) 55%, var(--ink-950) 100%);
+  position: fixed; inset: 0; z-index: 30; overflow-y: auto; overflow-x: hidden;
+  background: var(--ac-bg-room);
+  font-family: var(--font-ui);
+  display: flex; flex-direction: column; align-items: center;
+  padding: 52px 24px 96px; box-sizing: border-box;
+}
+
+.ac-back {
+  position: fixed; top: 40px; left: 48px; z-index: 4;
+  font-family: var(--font-ui); font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase;
+  color: var(--t-meta); background: none; border: 0; cursor: pointer; padding: 6px 2px;
+  text-decoration: none; transition: color 0.2s ease;
+}
+.ac-back:hover { color: var(--t-display); }
+
+/* the crown blueprint slot (338×422) — glow layer + the inked SVG */
+.ac-crown { position: relative; width: 338px; height: 422px; margin-bottom: 2px; display: flex; align-items: center; justify-content: center; }
+.ac-crown-glow { position: absolute; inset: -8%; opacity: 0; transition: opacity 1s cubic-bezier(.2,.7,.2,1); pointer-events: none; filter: blur(36px); }
+.ac-crown-svg { width: 100%; height: 100%; overflow: visible; position: relative; }
+
+/* the form column */
+.ac-form { width: 100%; max-width: 456px; }
+.ac-head { text-align: center; margin-bottom: 46px; }
+.ac-title { font-family: var(--font-display); font-weight: 600; font-size: 42px; letter-spacing: 0.005em; color: var(--t-display); margin: 0 0 14px; line-height: 1.02; }
+.ac-sub { font-family: var(--font-display); font-style: italic; font-size: 18.5px; color: var(--t-meta); margin: 0; line-height: 1.4; }
+
+/* the marks — bare inscribed lines, not a form */
+.ac-mark { display: block; margin-bottom: 24px; }
+.ac-mark__label { display: flex; align-items: baseline; flex-wrap: wrap; gap: 0 10px; font-family: var(--font-ui); font-size: 10px; font-weight: 500; letter-spacing: 0.22em; text-transform: uppercase; color: var(--t-ghost); margin-bottom: 9px; }
+/* BR-S330 — the plain word, permanently beside the evocative one. Lower case and
+   untracked so it reads as a translation rather than a second label, and quiet enough
+   that a reader who does not need it sees one line, not two. It replaces a placeholder
+   that vanished the moment anyone typed into the field it was explaining. */
+.ac-mark__plain { font-family: var(--font-mono); font-size: 9px; font-weight: 400; letter-spacing: 0.04em; text-transform: none; color: var(--t-meta); opacity: .8; }
+.ac-mark__field {
+  width: 100%; box-sizing: border-box; background: transparent; border: none; border-bottom: 1px solid var(--line);
+  padding: 7px 2px; color: var(--t-primary); font-family: var(--font-display); font-size: 19px; outline: none;
+  transition: border-color 0.25s ease, color 0.25s ease;
+}
+.ac-mark__field::placeholder { color: var(--t-ghost); font-style: italic; opacity: 0.72; }
+.ac-mark__field:focus { border-color: var(--line-strong); color: var(--t-display); }
+
+/* ── BR-S334 — THE READY ANSWERS (date and hour). ───────────────────────────
+   These are selects, and a select is the one control a browser will happily
+   render as a grey pill from 1996 in the middle of a drafting sheet. So the
+   chrome is taken off (`appearance:none`) and the field's own inscribed-line
+   look is put back on: same border-bottom, same display serif at 19px, same
+   focus behaviour — the slots read as the same object as the text marks, just
+   with the answers already laid out. The chevron is a background gradient
+   rather than a glyph so nothing has to be positioned against the text. */
+.ac-slots { display: flex; align-items: flex-end; gap: 10px; }
+.ac-slot {
+  flex: 1 1 0; min-width: 0; box-sizing: border-box;
+  -webkit-appearance: none; -moz-appearance: none; appearance: none;
+  background: transparent; border: none; border-bottom: 1px solid var(--line); border-radius: 0;
+  padding: 7px 18px 7px 2px; color: var(--t-primary);
+  font-family: var(--font-display); font-size: 19px; line-height: 1.2; outline: none; cursor: pointer;
+  background-image: linear-gradient(45deg, transparent 50%, var(--t-ghost) 50%), linear-gradient(135deg, var(--t-ghost) 50%, transparent 50%);
+  background-position: right 7px center, right 2px center;
+  background-size: 5px 5px, 5px 5px;
+  background-repeat: no-repeat;
+  transition: border-color 0.25s ease, color 0.25s ease;
+}
+.ac-slot:focus { border-color: var(--line-strong); color: var(--t-display); }
+/* The placeholder option is the unset state — italic and ghosted, exactly like a
+   text mark's placeholder, so an unanswered slot looks unanswered. `:invalid` is
+   not used: these carry no `required`, and the guard lives in JS where the message
+   can say which mark is missing. */
+.ac-slot:has(option[value=""]:checked) { color: var(--t-ghost); font-style: italic; }
+.ac-slot option { color: var(--t-primary); font-style: normal; background: var(--bg-deep, #14140f); }
+.ac-slot:disabled { opacity: 0.4; cursor: default; }
+/* the day is narrower than the month, and the year narrower than both */
+.ac-slot--d { flex: 0 1 22%; }
+.ac-slot--y { flex: 0 1 30%; }
+.ac-slots--time { justify-content: flex-start; }
+.ac-slots--time .ac-slot { flex: 0 1 84px; }
+.ac-slots__sep { font-family: var(--font-display); font-size: 19px; color: var(--t-ghost); padding-bottom: 7px; }
+
+/* "I don't know the hour" — an ANSWER, not an absence. It sits under the slots in
+   the plain register, the same voice as the gloss beside the label. */
+.ac-unknown { display: inline-flex; align-items: center; gap: 7px; margin-top: 9px; cursor: pointer;
+  font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.04em; color: var(--t-meta); opacity: .8; }
+.ac-unknown:hover { opacity: 1; }
+/* A default checkbox is a bright grey chip from another operating system, and it was
+   the only bought-in object on a hand-drawn sheet. Drawn instead: an empty square that
+   takes a moss tick, matching the crown's accent — the same ink everything else here
+   is set in. The tick is a rotated two-sided border, so there is no glyph to load and
+   nothing to align against a font. */
+.ac-unknown__box {
+  -webkit-appearance: none; -moz-appearance: none; appearance: none;
+  position: relative; flex: 0 0 auto; width: 12px; height: 12px; margin: 0;
+  background: transparent; border: 1px solid var(--line-strong); border-radius: 1px; cursor: pointer;
+  transition: border-color 0.2s ease;
+}
+.ac-unknown__box:hover, .ac-unknown__box:focus-visible { border-color: var(--t-meta); }
+.ac-unknown__box:checked::after {
+  content: ""; position: absolute; left: 3px; top: 0px; width: 4px; height: 8px;
+  border: solid #7e937f; border-width: 0 1.5px 1.5px 0; transform: rotate(42deg);
+}
+[data-mark-group="hour"].is-unknown .ac-slots { opacity: 0.4; }
+
+/* who is it for? — self / a family or friend crown / someone new */
+.ac-forwhom { margin: 0 0 34px; text-align: center; }
+.ac-forwhom__label { display: block; font-family: var(--font-ui); font-size: 10px; font-weight: 500; letter-spacing: 0.22em; text-transform: uppercase; color: var(--t-ghost); margin-bottom: 14px; }
+.ac-forwhom__opts { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+.ac-forwhom__chip {
+  display: inline-flex; flex-direction: column; align-items: center; gap: 2px; cursor: pointer;
+  background: none; border: 1px solid var(--line, rgba(201,163,92,0.16)); border-radius: 999px; padding: 8px 16px;
+  font-family: var(--font-ui); font-size: 11px; letter-spacing: 0.05em; color: var(--t-meta);
+  transition: border-color 0.18s ease, color 0.18s ease, background 0.18s ease;
+}
+.ac-forwhom__chip:hover { border-color: var(--gold, #c9a35c); color: var(--t-display); }
+.ac-forwhom__chip[aria-checked="true"] { border-color: var(--gold, #c9a35c); color: var(--t-display); background: rgba(201,163,92,0.06); }
+.ac-forwhom__sub { font-family: var(--font-ui); font-size: 9.5px; letter-spacing: .05em; color: var(--t-ghost); }
+.ac-forwhom__chip[aria-checked="true"] .ac-forwhom__sub { color: var(--gold, #c9a35c); }
+/* locked chips — Family/Friend, until the first personal reading is done */
+.ac-forwhom__chip.is-locked { border-style: dashed; border-color: rgba(201,163,92,0.1); color: var(--t-ghost); cursor: not-allowed; opacity: .6; }
+.ac-forwhom__chip.is-locked:hover { border-color: rgba(201,163,92,0.1); color: var(--t-ghost); background: none; }
+/* the dull line beneath — what it is + when it unlocks */
+.ac-forwhom__note { font-family: var(--font-ui); font-size: 11.5px; letter-spacing: .05em; color: var(--t-ghost); margin: 16px auto 0; max-width: 46ch; line-height: 1.6; }
+
+/* ── BR-S335 — THE CONCORD, BESIDE THE QUESTION IT ANSWERS. ──────────────────
+   The row is a flex line holding the radiogroup and then the Concord, so the four
+   chips read as one row of choices while only three of them are in the group. The
+   hairline between is the whole argument made visually: same row, different kind of
+   thing. It collapses to a horizontal rule when the row wraps, because a vertical
+   1px line between stacked chips reads as damage. */
+.ac-forwhom__row { display: flex; flex-wrap: wrap; align-items: stretch; justify-content: center; gap: 10px; }
+.ac-forwhom__or { flex: 0 0 auto; width: 1px; align-self: stretch; background: var(--line, rgba(233, 229, 220, 0.12)); }
+/* THE <a> TRAP (see the note in arcane.js): this class had only ever dressed a
+   <button>, so it never said `color` or `text-decoration`. Both are stated here. */
+.ac-forwhom__chip--concord {
+  color: var(--t-meta); text-decoration: none;
+  border-style: dashed; border-color: rgba(164, 135, 200, 0.34);
+  justify-content: center;
+}
+.ac-forwhom__chip--concord:hover, .ac-forwhom__chip--concord:focus-visible {
+  color: var(--t-display); border-color: #a487c8; background: rgba(164, 135, 200, 0.07); text-decoration: none; outline: none;
+}
+.ac-forwhom__chip--concord:focus-visible { outline: 1px solid rgba(233, 229, 220, 0.34); outline-offset: 3px; }
+.ac-forwhom__chip--concord strong { font-weight: 600; color: var(--t-primary); }
+.ac-forwhom__chip--concord:hover strong { color: var(--t-display); }
+/* violet on the price only — the one commerce register, spent on the one word that is
+   actually commerce. Dashed, not solid, so it never competes with the chosen chip's gold. */
+.ac-forwhom__price { color: #a487c8; font-variant-numeric: tabular-nums; }
+.ac-forwhom__note--concord { margin-top: 12px; }
+.ac-forwhom__note--concord strong { font-weight: 600; color: var(--t-body); }
+.ac-forwhom__note--concord em { font-style: italic; color: var(--t-body); }
+@media (max-width: 560px) {
+  .ac-forwhom__row { flex-direction: column; align-items: stretch; }
+  .ac-forwhom__or { width: auto; height: 1px; align-self: auto; margin: 2px 0; }
+}
+/* the family-member picker (opens when Family is chosen, once unlocked) */
+.ac-fammenu { display: flex; flex-wrap: wrap; justify-content: center; gap: 7px; margin: 16px auto 0; max-width: 480px; }
+.ac-fammenu[hidden] { display: none; }
+.ac-famopt { cursor: pointer; background: none; border: 1px solid var(--line, rgba(201,163,92,0.16)); border-radius: 999px; padding: 7px 14px; font-family: var(--font-display); font-size: 15px; color: var(--t-body); transition: border-color .16s ease, color .16s ease, background .16s ease; }
+.ac-famopt:hover, .ac-famopt:focus-visible { border-color: var(--gold, #c9a35c); color: var(--t-display); background: rgba(201,163,92,0.06); outline: none; }
+
+/* redraw context — the original crown is ripped; a wary, violet-edged notice */
+.ac-redraw-banner { margin: 0 0 30px; padding: 12px 16px; border: 1px solid rgba(138,111,176,0.4); border-radius: 6px; background: rgba(138,111,176,0.08); font-family: var(--font-display); font-size: 15px; line-height: 1.5; color: var(--t-body); text-align: center; }
+.ac-redraw-banner[hidden] { display: none; }
+.ac-redraw-banner__mark { color: #a487c8; margin-right: 4px; }
+
+.ac-rule { height: 1px; background: var(--line); margin: 16px 0 28px; }
+
+/* the closing flourish */
+.ac-cta { text-align: center; }
+/* the $4.99 price on the draw button — the commerce register (violet) */
+.ac-draw__price { color: #a487c8; font-variant-numeric: tabular-nums; margin-left: 5px; }
+/* ── BR-S332 — THE PAID ACTION LOOKS LIKE AN ACTION. ─────────────────────────
+   This button was `background: transparent; border: none` — so the one control on the
+   page that takes $4.99 had LESS visual shape than the free for-whom radio chips above
+   it, which carry a 1px border. Its pill padding and 999px radius were already here and
+   rendering invisible; they only needed something to draw. A neutral hairline and the
+   faintest fill, both from the existing family — no gold, which is reserved for what is
+   kept, and no violet, which belongs to the price span alone.
+   AND IT PRESSES. There was no :active anywhere on the page: the single most consequential
+   click in the room reported nothing back. 90ms, one step darker and a hair down — a
+   button that answers the finger, not a bounce. */
+.ac-draw {
+  font-family: var(--font-ui); font-size: 11px; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--t-meta); background: rgba(233, 229, 220, 0.03);
+  border: 1px solid var(--line-strong); border-radius: 999px; padding: 11px 24px; cursor: pointer;
+  transition: color 0.16s ease, background 0.16s ease, border-color 0.16s ease, transform 0.09s ease;
+}
+.ac-draw:hover { color: var(--silver); background: rgba(233, 229, 220, 0.06); border-color: var(--silver-dim); }
+.ac-draw:active { background: rgba(233, 229, 220, 0.09); transform: translateY(1px); }
+@media (prefers-reduced-motion: reduce) { .ac-draw:active { transform: none; } }
+.ac-hope { font-family: var(--font-display); font-style: italic; font-size: 13.5px; color: var(--t-ghost); margin: 18px 0 0; }
+.ac-notice { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.18em; color: var(--t-ghost); margin: 14px 0 0; min-height: 14px; }
+
+/* ---- THE GIFT (BR-S199): recipient banner, the "send as a gift" link, the deed composer ---- */
+.ac-giftbanner { margin: 0 0 30px; padding: 12px 16px; border: 1px solid rgba(138,111,176,0.4); border-radius: 6px; background: rgba(138,111,176,0.08); font-family: var(--font-display); font-size: 15px; line-height: 1.5; color: var(--t-body); text-align: center; }
+.ac-giftbanner__mark { color: #a487c8; margin-right: 4px; }
+/* ── BR-S336 — THE GIFT DOOR. ────────────────────────────────────────────────
+   Given its own zone behind a hairline, because it is a SECOND ACT and not a
+   footer link: the same price, a different thing to do. It is deliberately not a
+   button — the draw is the act of this room and nothing here may compete with it —
+   so it takes the room's display voice at reading size instead of button chrome.
+   Violet lives on the price and on the hover, which is the register the rest of
+   the room spends on commerce and nowhere else. */
+.ac-giftlink {
+  display: inline-flex; align-items: flex-start; gap: 10px;
+  margin-top: 26px; padding-top: 20px; max-width: 46ch;
+  border-top: 1px solid var(--line, rgba(233, 229, 220, 0.12));
+  color: var(--t-body); text-decoration: none; text-align: left;
+  transition: color 0.18s ease;
+}
+.ac-giftlink__mark { color: var(--t-ghost); font-size: 12px; line-height: 1.5; transition: color 0.18s ease; }
+.ac-giftlink__body { display: block; }
+.ac-giftlink__line { display: block; font-family: var(--font-display); font-size: 16px; line-height: 1.35; }
+.ac-giftlink__line strong { font-weight: 600; color: var(--t-primary); transition: color 0.18s ease; }
+/* the arrow travels on hover — the only motion in the block, and it points at the door */
+.ac-giftlink__arr { display: inline-block; margin-left: 7px; transition: transform 0.18s ease; }
+.ac-giftlink__sub {
+  display: block; margin-top: 3px;
+  font-family: var(--font-ui); font-size: 10.5px; letter-spacing: .05em; color: var(--t-ghost); line-height: 1.6;
+}
+.ac-giftlink__price { color: #a487c8; font-variant-numeric: tabular-nums; }
+.ac-giftlink:hover, .ac-giftlink:focus-visible { color: var(--t-primary); text-decoration: none; outline: none; }
+.ac-giftlink:hover .ac-giftlink__mark, .ac-giftlink:focus-visible .ac-giftlink__mark { color: #a487c8; }
+.ac-giftlink:hover .ac-giftlink__line strong, .ac-giftlink:focus-visible .ac-giftlink__line strong { color: var(--t-display); }
+.ac-giftlink:hover .ac-giftlink__arr { transform: translateX(4px); }
+.ac-giftlink:focus-visible { outline: 1px solid rgba(233, 229, 220, 0.34); outline-offset: 4px; border-radius: 2px; }
+@media (prefers-reduced-motion: reduce) { .ac-giftlink__arr { transition: none; } .ac-giftlink:hover .ac-giftlink__arr { transform: none; } }
+.ac-mocknote { font-family: var(--font-mono); font-size: 8.5px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--t-ghost); margin: 12px 0 0; }
+
+/* BR-S329 — CLEAR THE FIXED DOCK. Measured at 375x812: the ROOMS button is fixed at
+   12-97 x 684-716 and the last control in this room landed at 688-716, so it was
+   UNCLICKABLE on a phone — the same class of defect as BR-S301, arriving from a floating
+   element rather than a sibling. Anything that can end up at the bottom of this column
+   needs room to scroll past the dock, so the room reserves it. (The Concord link that
+   originally tripped this has moved to the for-whom row in BR-S335; the reservation
+   stays, because the gift link and the notice can still land there.) */
+.arcane .ac-form { padding-bottom: 96px; }
+.ac-gift-send.is-settled { color: var(--gold, #c9a35c); }
+.ac-gift-send.is-settled .ac-draw__price { color: var(--gold, #c9a35c); }
+.ac-deed { text-align: center; }
+.ac-deed__title { font-family: var(--font-ui); font-size: 12px; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; color: var(--gold, #c9a35c); margin: 0 0 10px; }
+.ac-deed__line { font-family: var(--font-display); font-style: italic; font-size: 15px; color: var(--t-body); margin: 0 0 18px; }
+.ac-deed__link { width: 100%; max-width: 460px; background: rgba(233,229,220,0.03); border: 1px solid var(--line); border-radius: 6px; padding: 10px 12px; font-family: var(--font-mono); font-size: 11px; color: var(--silver); text-align: center; }
+.ac-deed__link:focus { outline: none; border-color: var(--gold, #c9a35c); }
+.ac-deed__copy { margin-top: 14px; border: 1px solid rgba(138,111,176,0.4) !important; border-radius: 999px; padding: 9px 20px !important; color: #a487c8 !important; }
+.ac-deed__copy:hover { color: #bda6e4 !important; border-color: #8a6fb0 !important; }
+.ac-deed__note { font-family: var(--font-display); font-style: italic; font-size: 13px; color: var(--t-ghost); margin: 16px auto 0; max-width: 44ch; }
+
+/* ---- THE FORGING CEREMONY (overlay) ---- */
+/* ── BR-S332 — THE HANDOFF BREATHES. ────────────────────────────────────────
+   `ceremonyHost.hidden = false` against `display:none` is a CUT: the page you were
+   typing on is replaced by the forge between one frame and the next. That is the most
+   important transition in the room — the moment the marks become a reading — and it was
+   the only one with no motion on it at all. A 220ms fade is enough; the ceremony has
+   its own opening beat and does not need help, it just needs to not arrive as a jolt.
+   Opacity only, enumerated, never transition:all. */
+.ac-ceremony { position: fixed; inset: 0; z-index: 60; opacity: 1; transition: opacity 220ms cubic-bezier(.2,.7,.2,1); }
+.ac-ceremony[hidden] { display: none; }
+.ac-ceremony.is-arriving { opacity: 0; }
+@media (prefers-reduced-motion: reduce) { .ac-ceremony { transition: none; } }
+.ac-forge {
+  position: relative; width: 100%; height: 100%; min-height: 560px; background: var(--ac-bg-room);
+  overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding-bottom: 110px; box-sizing: border-box; font-family: var(--font-ui);
+}
+.ac-forge__svg { width: min(1150px, 96vw); max-height: 78vh; }
+
+.ac-forge__caps { position: absolute; left: 0; right: 0; bottom: 28px; display: flex; flex-direction: column; align-items: center; gap: 9px; pointer-events: none; }
+.ac-forge__cap { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.26em; color: var(--t-body); }
+.ac-forge__sub { font-family: var(--font-display); font-style: italic; font-size: 15px; color: var(--t-ghost); text-align: center; white-space: nowrap; }
+.ac-forge__count { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.2em; color: var(--t-ghost); min-height: 14px; }
+
+.ac-forge__end { display: flex; flex-direction: column; align-items: center; gap: 10px; pointer-events: auto; margin-top: 4px; }
+.ac-forge__end[hidden] { display: none; }
+.ac-forge__endbtns { display: flex; gap: 14px; align-items: center; }
+.ac-forge__endnote { font-family: var(--font-display); font-style: italic; font-size: 13px; color: var(--t-ghost); text-align: center; white-space: nowrap; }
+
+.ac-btn { font-family: var(--font-ui); font-size: 11px; font-weight: 500; letter-spacing: 0.16em; text-transform: uppercase; padding: 9px 18px; border-radius: 999px; cursor: pointer; transition: color 0.16s ease, border-color 0.16s ease; }
+.ac-btn--secondary { color: var(--t-body); background: transparent; border: 1px solid var(--line-strong); }
+.ac-btn--secondary:hover { color: var(--t-display); border-color: var(--t-meta); }
+.ac-btn--ghost { color: var(--t-meta); background: transparent; border: none; }
+.ac-btn--ghost:hover { color: var(--silver); }
+
+.ac-forge__skip { position: absolute; right: 36px; bottom: 32px; background: transparent; border: none; cursor: pointer; font-family: var(--font-ui); font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--t-ghost); padding: 8px; transition: color 0.16s ease; }
+.ac-forge__skip:hover { color: var(--t-body); }
+.ac-forge__skip[hidden] { display: none; }
+
+/* reduced motion — the crown inks instantly; the ceremony jumps to its sealed end (arcane.js) */
+@media (prefers-reduced-motion: reduce) {
+  .ac-crown-svg [data-ink] { transition: none !important; }
+  .ac-crown-glow { transition: none !important; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   BR-S333 — THE DESK.  Winner of a six-layout design pass, judged on
+   composition, feel and buildability, then specified against the real file.
+
+   WHAT IT CHANGES: the page stops being a 456px column adrift in a 1440px room
+   (68.3% of the width was empty) and becomes a two-zone desk — a drafting sheet
+   held still on the left with the crown inked on it, the marks written beside it
+   on the right. Measured against today: field one moves from y=757 to y=254, the
+   $4.99 button from y=1201 to y=738 — above the fold at 900px, so the scroll
+   required to reach the act you came for goes from 301px to zero.
+
+   MARKUP CHANGES: NONE. .ac-crown and .ac-form are already flat siblings of
+   .arcane (arcane.js:338-339), and the only other children — .ac-back and
+   .ac-ceremony — are position:fixed and therefore out of grid flow. The grid
+   goes onto .arcane itself. No wrapper, no JS, no change to DEFS, no change to
+   tab order.
+
+   Appended at the end of the file on purpose: source order does every override,
+   so there is no !important anywhere and nothing above this line is edited.
+   Three blocks, each independently revertible.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── STEP 1 — THE SHEET ─────────────────────────────────────────────────────
+   The crown was 338x422 of transparent ink floating on the room. It is a
+   DRAFTING SHEET — it already carries crop-marks in its own four corners (the
+   "seal" strokes in buildCrownInner) — so it is given the paper those marks are
+   cut into, and the marks finally have something to be cut into.
+   THE LIFT IS A box-shadow ON THE MOUNT, never filter:drop-shadow on the SVG:
+   that SVG is stroke-only with no fills, so a drop-shadow would smear every
+   individual stroke rather than lift a sheet.
+   FLUID, WHICH FIXES A REAL BUG: at 375px the fixed 338px overflowed the 327px
+   content box by 11px and .arcane's overflow-x:hidden simply cut the crown off. */
+.ac-crown {
+  width: min(100%, 260px);
+  height: auto;
+  aspect-ratio: 460 / 558;
+  padding: 22px;
+  box-sizing: border-box;
+  margin-bottom: 10px;
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  background: rgba(233, 229, 220, 0.018);
+  box-shadow: 0 22px 44px -20px rgba(0, 0, 0, 0.55);
+  transform: rotate(-1.4deg);
+}
+/* the sheet has a visible edge now, so the fixed back button can no longer be
+   allowed to land on it. It has ALWAYS overlapped the crown's top 10px — that
+   was invisible while the crown was transparent ink and becomes obvious the
+   moment it gets a border. A fix riding in, not a new cost. */
+.arcane { padding-top: 84px; }
+
+/* ── STEP 2 — THE PAIRED MARKS ─────────────────────────────────────────────
+   .ac-marks has never had a rule of its own. The day and the hour are ONE fact
+   asked in two boxes, so from 1180px up they share a line.
+   Done with :nth-child on the DOM that already exists — DEFS is untouched, no
+   markup changes, so tab order is byte-for-byte what it is today.
+   Scoped with `>` so the lone .ac-mark in the gift composer, which is NOT inside
+   .ac-marks, keeps its own margin. */
+.ac-marks { display: grid; grid-template-columns: 1fr; column-gap: 24px; row-gap: 24px; }
+.ac-marks > .ac-mark { margin-bottom: 0; }
+@media (min-width: 1180px) {
+  .ac-marks { grid-template-columns: 1fr 1fr; }
+  .ac-marks > .ac-mark:nth-child(1),   /* the name       */
+  .ac-marks > .ac-mark:nth-child(4),   /* the birthplace */
+  .ac-marks > .ac-mark:nth-child(5) {  /* the question   */
+    grid-column: 1 / -1;
+  }
+  /* auto-placement then sets the day and the hour side by side */
+}
+
+/* ── STEP 3 — THE DESK ─────────────────────────────────────────────────────
+   :has(.ac-crown) scopes the desk OFF the gift composer, which renders
+   .arcane > .ac-form with NO crown and would otherwise be shoved into column 4
+   beside an empty 460px hole. */
+@media (min-width: 1180px) {
+  .arcane:has(.ac-crown) {
+    display: grid;
+    grid-template-columns: 1fr 460px 88px minmax(360px, 692px) 1fr;
+    column-gap: 0;
+    align-items: start;   /* LOAD-BEARING: the default `stretch` fills the row
+                             with the crown and leaves sticky no travel at all */
+    padding-top: 92px;
+  }
+  .arcane:has(.ac-crown) > .ac-crown {
+    grid-column: 2;
+    position: sticky;
+    top: 92px;            /* = padding-top, so the sheet is dead still for the
+                             whole of the scroll rather than drifting to a stop */
+    width: 460px;
+    height: 558px;
+    aspect-ratio: auto;   /* the explicit w+h supersede step 1's ratio */
+    padding: 32px;
+    margin: 0;
+  }
+  .arcane:has(.ac-crown) > .ac-form {
+    grid-column: 4;
+    max-width: none;      /* the 456px cap would strangle a 692px column back
+                             down to exactly today's layout, silently */
+  }
+
+  /* a desk is written on from its left edge, not from a centre line */
+  .arcane:has(.ac-crown) .ac-head,
+  .arcane:has(.ac-crown) .ac-forwhom,
+  .arcane:has(.ac-crown) .ac-cta,
+  .arcane:has(.ac-crown) .ac-redraw-banner,
+  .arcane:has(.ac-crown) .ac-giftbanner    { text-align: left; }
+  .arcane:has(.ac-crown) .ac-head          { margin-bottom: 34px; }
+  .arcane:has(.ac-crown) .ac-sub           { max-width: 46ch; }   /* 692px of 17px italic runs ~110ch */
+  .arcane:has(.ac-crown) .ac-forwhom       { margin-bottom: 24px; }
+  .arcane:has(.ac-crown) .ac-forwhom__opts { justify-content: flex-start; }
+  .arcane:has(.ac-crown) .ac-forwhom__note { margin-left: 0; }
+  .arcane:has(.ac-crown) .ac-fammenu       { justify-content: flex-start; margin-left: 0; }
+  /* BR-S335: the desk writes from its left edge, and the row now holds the group AND
+     the Concord — so the row is what has to start left, not just the group inside it. */
+  .arcane:has(.ac-crown) .ac-forwhom__row  { justify-content: flex-start; }
+}
+
+/* the mobile counterpart to the desk's tightening — gives back 22 of the 32px
+   step 1 spent on back-button clearance */
+@media (max-width: 1179px) {
+  .ac-head    { margin-bottom: 34px; }
+  .ac-forwhom { margin-bottom: 24px; }
+}

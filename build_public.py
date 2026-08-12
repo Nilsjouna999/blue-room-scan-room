@@ -26,7 +26,18 @@
 import io, os, re, shutil, subprocess, sys
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
-DIST = os.path.join(ROOT, "dist")
+
+# BR-S378 — TWO PUBLIC OUTPUTS, not one. Same transform, one difference: `preview/`
+# keeps the dev⇄preview⇄live flip so the builder can compare the three standing in the
+# same place, and `live/` has it cut out, because a launch site must not carry a
+# labelled door into the workshop. Both sit beside the dev site rather than replacing
+# it, so the three are three URLs on one Pages deploy. They are BUILD OUTPUT that is
+# committed on purpose — a static host can only serve what is in the repo.
+# (folder, keeps the flip)
+VARIANTS = [("preview", True), ("live", False)]
+
+# Set per variant by build(); every helper writes through it.
+DIST = os.path.join(ROOT, "preview")
 
 # The rooms the public app is allowed to resolve. Written INTO the app — not a runtime
 # check a URL can walk around.
@@ -50,6 +61,15 @@ PROFILE_MOUNT = ('    if (window.BRArcanaProfile && typeof window.BRArcanaProfil
                  '=== "function") window.BRArcanaProfile.mount(host);')
 PROFILE_GUARD = ('    // Public build: the Profile opens only once something is kept.\n'
                  '    if (!hasHoldings()) { location.replace("./#reliquary"); return; }\n')
+
+# BR-S378 — the flip, cut from `live/` only. The call goes first and the functions after,
+# so the removal is checked by the same "no live reference survives" rule as every other
+# cut. The CSS block goes too: it would be inert with no element to style, but shipping
+# the rules for a control that does not exist is a signpost to a door.
+FLIP_CALL = "syncBuildFlip();   // BR-S377 — the dev⇄public flip, once, on every room\n"
+FLIP_FUNCTIONS = ["brBuildSides", "syncBuildFlip"]
+FLIP_CSS_OPEN = "/* BR-S377 — THE BUILD FLIP"
+FLIP_CSS_LAST = "@media (max-width: 560px) { #brBuildFlip"
 
 # Top-level functions reachable ONLY from a cut branch. Verified one call site each, all
 # inside a removed branch — re-verify with `grep -c` before adding to this list.
@@ -167,7 +187,53 @@ def _code_only(src):
     return "".join(out)
 
 
-def transform_app(src, report):
+def cut_flip(src, report):
+    """Remove the build flip — `live/` only. Anchored and asserted like every other cut:
+    a flip that survived into the launch site would be a labelled door into the workshop,
+    so a missed anchor fails the build instead."""
+    if FLIP_CALL not in src:
+        sys.exit("build_public: the syncBuildFlip() boot call no longer matches, so the "
+                 "flip cannot be cut from live/. That would ship a door into the dev "
+                 "build. Re-anchor FLIP_CALL against the current app.js.")
+    src = src.replace(FLIP_CALL, "")
+    i = src.find("var BR_BUILDS = [")
+    if i < 0:
+        sys.exit("build_public: BR_BUILDS is gone from app.js — re-anchor the flip cut.")
+    src = src[:i] + src[src.index("];", i) + 3:]
+    for fn in FLIP_FUNCTIONS:
+        anchor = "function %s(" % fn
+        if anchor not in src:
+            sys.exit("build_public: %s() is gone from app.js — re-anchor the flip cut." % fn)
+        j = src.index(anchor)
+        end = _match_block(src, j)
+        line_start = src.rfind("\n", 0, j) + 1
+        src = src[:line_start] + src[end + 1:]
+    live = [ln for ln in _code_only(src).splitlines()
+            if re.search(r"\b(brBuildSides|syncBuildFlip|BR_BUILDS|brBuildFlip)\b", ln)]
+    if live:
+        sys.exit("build_public: the flip still has %d live reference(s) in live/:\n    %s"
+                 % (len(live), live[0].strip()[:90]))
+    report.append("flip removed: dev/preview/live pill is not in this build")
+    return src
+
+
+def transform_styles(src, report, keep_flip):
+    """styles.css is copied verbatim for `preview/`; for `live/` the flip's rules go too."""
+    if keep_flip:
+        return src
+    i = src.find(FLIP_CSS_OPEN)
+    j = src.find(FLIP_CSS_LAST)
+    if i < 0 or j < i:
+        sys.exit("build_public: the #brBuildFlip CSS block no longer matches its anchors. "
+                 "Re-anchor FLIP_CSS_OPEN / FLIP_CSS_LAST against the current styles.css.")
+    end = src.index("\n", j) + 1
+    src = src[:i] + src[end:]
+    assert "brBuildFlip" not in src and "br-flip__" not in src
+    report.append("styles.css: the flip's rules removed with it")
+    return src
+
+
+def transform_app(src, report, keep_flip=True):
     # 1. the resolver — the lock
     m = re.search(r'if \(\[("(?:[a-z-]+)"(?:,\s*"[a-z-]+")+)\]\.includes\(dev\)\)', src)
     if not m:
@@ -254,6 +320,10 @@ def transform_app(src, report):
             sys.exit("build_public: %s still has %d live reference(s) after removal — it "
                      "would throw at runtime:\n    %s" % (fn, len(live), live[0].strip()[:90]))
 
+    # 4. the flip — kept in preview/, cut from live/
+    if not keep_flip:
+        src = cut_flip(src, report)
+
     # the asserts that make a bad build fail here rather than on the live site
     for room in CUT_ROOMS:
         assert 'state.dev === "%s"' % room not in src, room
@@ -328,7 +398,9 @@ def emit_routes(report):
         report.append("route: /%s/ -> %s" % (path, room))
 
 
-def build():
+def build(folder="preview", keep_flip=True):
+    global DIST
+    DIST = os.path.join(ROOT, folder)
     report = []
     if os.path.isdir(DIST):
         shutil.rmtree(DIST)
@@ -346,9 +418,12 @@ def build():
         if rel == "app.js":
             text = io.open(src, encoding="utf-8").read()
             before = len(text)
-            text = transform_app(text, report)
+            text = transform_app(text, report, keep_flip)
             io.open(dst, "w", encoding="utf-8", newline="").write(text)
             report.append("app.js: %d -> %d bytes (-%d)" % (before, len(text), before - len(text)))
+        elif rel == "styles.css":
+            text = transform_styles(io.open(src, encoding="utf-8").read(), report, keep_flip)
+            io.open(dst, "w", encoding="utf-8", newline="").write(text)
         else:
             shutil.copy2(src, dst)
         src_bytes += os.path.getsize(dst)
@@ -369,7 +444,7 @@ def build():
     shipped = set(COPY_FILES) | {"index.html"} | {r + "/index.html" for r in ("tarot", "reading", "about", "roadmap")}
     cut = sorted(f for f in shippable if f not in shipped)
 
-    print("build_public: dist/ built")
+    print("build_public: %s/ built" % folder)
     for line in report:
         print("  " + line)
     print("")
@@ -380,9 +455,18 @@ def build():
 
 
 if __name__ == "__main__":
-    build()
+    for _folder, _keep in VARIANTS:
+        build(_folder, _keep)
+        print("")
     if "--no-gate" in sys.argv[1:]:
-        print("\n--no-gate: dist/ is NOT cleared for deploy.")
+        print("--no-gate: neither output is cleared for deploy.")
         sys.exit(0)
-    print("")
-    sys.exit(subprocess.call([sys.executable, os.path.join(ROOT, "gate_public.py")], cwd=ROOT))
+    # Every output is gated on its own. live/ is the one a launch would serve, but a leak
+    # in preview/ is still a leak on the same public host, so neither gets a pass.
+    _rc = 0
+    for _folder, _keep in VARIANTS:
+        print("gate: %s/" % _folder)
+        _rc |= subprocess.call([sys.executable, os.path.join(ROOT, "gate_public.py"),
+                                "--target", os.path.join(ROOT, _folder)], cwd=ROOT)
+        print("")
+    sys.exit(_rc)

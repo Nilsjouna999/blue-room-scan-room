@@ -1,0 +1,1790 @@
+/* =====================================================================
+   BLUE ROOM — Staged Card Reveal (BR-S124)
+   Self-contained surface. Hosted on ?dev=staged-reveal. Everything is
+   scoped under .reveal-stage so it cannot leak into the live room/card.
+   TOKENS + MOTION are mapped onto the EXISTING design system (no fresh
+   palette) so the surface stays coherent with the rest of Blue Room.
+   Animate ONLY transform / opacity (+ box-shadow for the pulse). Never
+   width/height/top/left/margin — those reflow and stutter.
+   ===================================================================== */
+
+.reveal-stage {
+  /* --- colour: spec name -> existing system value --------------------- */
+  --rv-room:           var(--ink-950, #0a0b0d);          /* the paper */
+  --rv-room-2:         var(--ink-900, #100f0c);
+  --rv-ink:            var(--t-display, #e9e5dc);         /* warm off-white */
+  --rv-ink-2:          var(--t-primary, #d7d3ca);
+  --rv-ink-dim:        var(--t-meta, #948f87);            /* labels/captions */
+  --rv-ink-ghost:      var(--t-ghost, #6e6b63);
+  --rv-rule:           var(--line, rgba(233, 229, 220, 0.12));
+  --rv-rule-faint:     var(--line-faint, rgba(233, 229, 220, 0.07));
+  --rv-grey-arrow:     var(--t-meta, #948f87);
+  --rv-grey-arrow-hov: var(--t-primary, #d7d3ca);
+  --rv-halo:           var(--violet, #8b7bff);            /* the deeper purple */
+  --rv-halo-glow:      color-mix(in srgb, var(--violet, #8b7bff) 30%, transparent);
+
+  /* --- motion --------------------------------------------------------- */
+  --rv-ease:           cubic-bezier(0.2, 0.7, 0.2, 1);    /* the house easing — slow arcs, pip-ignite */
+  --rv-ease-draw:      cubic-bezier(0.25, 0.46, 0.45, 0.94); /* organic hand-drawn stroke draw-on */
+  --rv-ease-soft:      cubic-bezier(0.4, 0, 0.2, 1);      /* the develop WIPE + wet-meniscus sweep ONLY */
+  --rv-ease-snap:      cubic-bezier(0.16, 1, 0.3, 1);     /* BR-S141: authority snap — lock + stamp */
+  --rv-ease-seal:      cubic-bezier(0.22, 0.61, 0.36, 1); /* BR-S141: dry clear-coat seal — nucleus + sweep */
+  --rv-dur-develop:    820ms;
+  --rv-dur-row:        70ms;                              /* per-row stagger */
+  --rv-dur-write:      1100ms;
+  --rv-stagger:        460ms;                            /* FREE (<=4 modules) per-module write-in stagger */
+
+  /* --- card size: ONE source for EVERY reveal/tutorial route (BR-S142) -----
+     standalone (?dev=staged-reveal) == in-menu (?dev=menu-reveal) == fullview,
+     so the tutorial card never changes size by route (was a hidden drift: a
+     hard 360px standalone vs 430+zoom in-menu). 430+zoom (not a flat 396px
+     width) mirrors .msample__card exactly — zoom scales the whole artifact so
+     the chrome proportions match (the zoom-not-width-squeeze law). This is the
+     "reveal tutorial" boat; the live ROOM crown (--card-w 500) is a SEPARATE,
+     intentionally larger boat and is untouched. */
+  --rv-card-w:         430px;
+  --rv-card-zoom:      0.92;
+
+  position: relative;
+  min-height: 100vh;
+  overflow-x: clip;                       /* decorative halo bloom never makes a page scrollbar */
+  padding: clamp(28px, 5vh, 64px) clamp(16px, 4vw, 48px) 96px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background:
+    radial-gradient(120% 90% at 50% -10%, var(--rv-room-2) 0%, var(--rv-room) 62%);
+  color: var(--rv-ink-2);
+  font-family: var(--font-ui, "Inter", sans-serif);
+}
+
+/* ---- header ---------------------------------------------------------- */
+.reveal-stage__head {
+  text-align: center;
+  margin-bottom: clamp(20px, 4vh, 40px);
+}
+.reveal-stage__devtag {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.22em;
+  color: var(--rv-ink-ghost);
+  text-transform: uppercase;
+  margin-bottom: 14px;
+}
+.reveal-stage__brand {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(22px, 4vw, 30px);
+  letter-spacing: 0.08em;
+  color: var(--rv-ink);
+  margin: 0;
+}
+.reveal-stage__thesis {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: clamp(13px, 2.4vw, 15px);
+  color: var(--rv-ink-dim);
+  margin: 6px 0 0;
+}
+
+/* ---- the stage: card (+ arrow) on the left, reading on the right ------ */
+.reveal-stage__body {
+  display: flex;
+  gap: clamp(24px, 5vw, 64px);
+  align-items: flex-start;
+  justify-content: center;
+  width: 100%;
+  max-width: 1040px;
+}
+.reveal-stage__cardcol {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 22px;
+  flex: 0 0 auto;
+}
+
+/* =====================================================================
+   UNIT 1/4 — ArrowButton  (grey | purple variant)
+   props: variant, disabled · emits: onClick
+   Owns: bent-right shape, hover (darken + more present), purple pulse/glow
+   ===================================================================== */
+.rv-arrow {
+  --c: var(--rv-grey-arrow);
+  appearance: none;
+  border: 1px solid var(--rv-rule);
+  background: color-mix(in srgb, var(--rv-room-2) 70%, transparent);
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  color: var(--c);
+  transition:
+    transform 200ms var(--rv-ease),
+    border-color 200ms var(--rv-ease),
+    color 200ms var(--rv-ease),
+    box-shadow 200ms var(--rv-ease),
+    opacity 240ms var(--rv-ease);
+  will-change: transform;
+}
+.rv-arrow__svg {
+  width: 26px;
+  height: 26px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: transform 200ms var(--rv-ease);
+}
+.rv-arrow:hover:not([aria-disabled="true"]),
+.rv-arrow:focus-visible {
+  transform: scale(1.06);
+  color: var(--rv-grey-arrow-hov);
+  border-color: var(--rv-rule);
+  background: color-mix(in srgb, var(--rv-room-2) 92%, transparent);
+}
+.rv-arrow:hover:not([aria-disabled="true"]) .rv-arrow__svg { transform: translateX(2px); }
+.rv-arrow:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--rv-ink) 55%, transparent);
+  outline-offset: 3px;
+}
+.rv-arrow:active:not([aria-disabled="true"]) { transform: scale(0.97); }
+
+.rv-arrow[aria-disabled="true"] {
+  opacity: 0.32;
+  cursor: default;
+  pointer-events: none;
+}
+
+/* purple variant — the quiet offer (only after the free read settles) */
+.rv-arrow[data-variant="purple"] {
+  --c: var(--rv-halo);
+  border-color: color-mix(in srgb, var(--rv-halo) 55%, var(--rv-rule));
+  color: var(--rv-halo);
+  animation: rv-arrow-pulse 2.8s var(--rv-ease) infinite;
+}
+.rv-arrow[data-variant="purple"]:hover,
+.rv-arrow[data-variant="purple"]:focus-visible {
+  animation-play-state: paused;          /* pause the pulse on hover — no nag */
+  color: var(--rv-ink);
+  border-color: var(--rv-halo);
+  box-shadow: 0 0 0 1px var(--rv-halo-glow), 0 8px 30px var(--rv-halo-glow);
+}
+/* rare faint sparkle, low amplitude */
+.rv-arrow[data-variant="purple"]::after {
+  content: "";
+  position: absolute;
+  width: 4px; height: 4px;
+  border-radius: 50%;
+  background: var(--rv-halo);
+  top: 10px; right: 12px;
+  opacity: 0;
+  animation: rv-arrow-spark 4.4s ease-in-out infinite;
+}
+@keyframes rv-arrow-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--rv-halo) 0%, transparent); }
+  50%      { box-shadow: 0 0 0 5px color-mix(in srgb, var(--rv-halo) 12%, transparent), 0 6px 26px var(--rv-halo-glow); }
+}
+@keyframes rv-arrow-spark {
+  0%, 86%, 100% { opacity: 0; transform: scale(0.6); }
+  92%           { opacity: 0.85; transform: scale(1); }
+}
+.rv-arrow.is-gone {
+  opacity: 0;
+  transform: scale(0.9);
+  pointer-events: none;
+}
+.rv-arrow__cap {
+  display: block;
+  margin-top: 9px;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--rv-ink-ghost);
+  text-align: center;
+  transition: opacity 200ms var(--rv-ease);
+}
+
+/* =====================================================================
+   UNIT 2/6 — CardFrame  (photo | free | halo)
+   Fixed-aspect box. Layers stacked in ONE grid cell -> identical box in
+   every state; crossfade by opacity only (zero layout shift). Reuses the
+   real renderCard() for free + halo (the crown is the crown).
+   ===================================================================== */
+.rv-cardframe {
+  position: relative;
+  display: grid;
+  width: var(--rv-card-w);                /* BR-S142: ONE tutorial-card size for every reveal route (was a hard 360px standalone vs 430+zoom in-menu — a route-dependent drift). The inner card (min(--card-w,100%)) fills it. */
+  zoom: var(--rv-card-zoom);              /* scale the whole artifact (== .msample__card) so standalone matches the in-menu card pixel-for-pixel */
+  isolation: isolate;
+}
+.rv-layer {
+  grid-area: 1 / 1;                       /* every layer fills the same cell */
+  min-width: 0;
+  opacity: 0;
+  transition: opacity var(--rv-dur-develop) var(--rv-ease),
+              transform var(--rv-dur-develop) var(--rv-ease);
+  transform: scale(0.992);
+  pointer-events: none;
+}
+.rv-layer > .card { width: 100%; animation: none; }   /* kill the card-in pop; we drive the crossfade */
+.rv-layer.is-shown {
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+}
+/* photo state: a full-card-sized raw plate that "develops" into the card */
+.rv-layer--photo { z-index: 1; }
+.rv-photoplate {
+  height: 100%;
+  border-radius: var(--card-radius, 12px);
+  overflow: hidden;
+  background: var(--ink-850, #11100d);
+  box-shadow: 0 44px 90px rgba(0, 0, 0, 0.62), 0 10px 28px rgba(0, 0, 0, 0.5);
+  position: relative;
+}
+/* BR-S259 BUGFIX — the raw plate's image must not SIZE the card.
+   This img was in flow with `height: 100%` inside an auto-height parent, so the
+   100% resolved to auto and the image's INTRINSIC aspect drove the layout. All
+   three .rv-layer siblings share one grid cell (grid-area 1/1), so whichever is
+   tallest sizes the track — and a PORTRAIT source made this layer the tallest:
+   SRC-03 is 1868x4000, so at the 430px frame width it demanded
+   430 x (4000/1868) = 921px, x zoom .92 = 847px of track against a 662px card.
+   That inflated .reveal-stage--menustage 662 -> 847, .menu__inner 693 -> 909, and
+   pushed the desk past the 900px fold — visible as the sample caption landing
+   below the viewport. It never showed with SRC-01 (1630x1024 landscape → 270px,
+   comfortably under the card) which is why it sat here undetected.
+   Taking the img out of flow fixes it at the root: the rendered box is identical
+   (inset 0 + cover == 100%/100% + cover), it simply stops contributing intrinsic
+   size. .rv-photoplate is already position:relative, so this needs nothing else.
+   NOT scoped to M1 — any portrait source would break ?dev=staged-reveal and the
+   fullview takeover in exactly the same way. */
+.rv-photoplate img {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+  display: block;
+  filter: saturate(0.86) contrast(0.96) brightness(0.9);
+}
+.rv-photoplate::after {                   /* developer-fluid wash over the raw photo */
+  content: "";
+  position: absolute; inset: 0;
+  background: linear-gradient(180deg, rgba(10,11,13,0.28), rgba(10,11,13,0.5));
+  mix-blend-mode: multiply;
+}
+.rv-layer--free { z-index: 2; }
+.rv-layer--halo { z-index: 3; clip-path: inset(-60px); }  /* -60px keeps the halo glow visible; the develop wipe animates within this */
+
+/* BR-S254 — the idle that isn't. CardFrame builds a FULL shiny card in the halo
+   layer and parks it at opacity:0 until the develop runs (card-frame.js:34).
+   opacity:0 does NOT stop a CSS animation, so on the entrance page two infinite
+   loops have been running behind an invisible layer since load:
+     halo-breathe 5s   (styles.css:1096) on .card__halo — which also carries
+                        filter: blur(6px), so every tick repaints a blurred layer
+     twinkle 2.8s      (styles.css:1109) on .card__sparkles — 7 radial gradients
+   NOT holo-spin: `.rv-layer > .card { animation: none }` (line 235 above) already
+   kills the edge conic in every reveal route — equal specificity, and reveal.css
+   loads after styles.css, so it wins. Verified on the live page: the shiny card
+   computes animation-name "none" while its two children ran at iter=Infinity.
+   Re-arms itself — the layer gains .is-shown the instant the develop starts, so
+   the breathe now begins from frame 0 WITH the ceremony instead of mid-cycle. */
+.rv-layer--halo:not(.is-shown) .card[data-treatment="shiny"] .card__halo,
+.rv-layer--halo:not(.is-shown) .card[data-treatment="shiny"] .card__sparkles {
+  animation: none;
+}
+
+/* BR-S143: kill the develop SEAM (free card taller than halo). In the narrow
+   reveal card (~396px) the mint-strip's serial is squeezed between the state
+   pill and the right cluster, and the FREE state pill ("FREE PULL EDITION") is
+   wider than HALO's ("HALO MINT") — so the free serial wrapped to ~5 lines vs
+   halo's ~2, making the free card ~36px TALLER. During the wipe that overhang
+   poked out below the developing halo. Fix: give the serial its OWN full-width
+   row (state + right stay on row one), so BOTH treatments render a single
+   serial line and the two layers are the SAME height — the wipe lands clean.
+   Reveal-scoped: the live 500px card is already equal-height (free==mint, the
+   serial fits in 2 lines for both) and is deliberately untouched. */
+.rv-cardframe .mintstrip { flex-wrap: wrap; row-gap: 6px; }
+.rv-cardframe .mintstrip__serial { order: 1; flex: 1 0 100%; text-align: center; }
+
+/* THE DEVELOP (free -> halo): the minted card wipes in top->bottom over the free
+   card beneath; a developer bar rides the reveal edge. Compositor-cheap
+   (clip-path + transform + opacity only). */
+.rv-cardframe.is-developing .rv-layer--free { opacity: 1; transition: none; }
+.rv-cardframe.is-developing .rv-layer--halo {
+  opacity: 1;
+  transition: none;
+  animation:
+    rv-develop-wipe 2400ms var(--rv-ease-soft) forwards,   /* the wet seam — slow steady sweep; UNCHANGED (must finish before pips ignite) */
+    rv-halo-tonal   3550ms var(--rv-ease)      forwards;   /* BR-S135: 3000->3550ms; fix crest meets the ignition climax */
+  will-change: clip-path, filter;
+}
+/* TONAL RISE / FIXER — pale + flat in the developer, blooming to true colour as the
+   fixer takes hold, a brief over-saturation swell at 84% before locking to 1/1/1.
+   (one filter writer only — two filter animations on one element clobber). */
+@keyframes rv-halo-tonal {
+  0%   { filter: brightness(1.32) contrast(0.52) saturate(0.28); }  /* deep in the developer — ghost / latent */
+  22%  { filter: brightness(1.24) contrast(0.62) saturate(0.42); }  /* image just beginning to surface */
+  48%  { filter: brightness(1.13) contrast(0.82) saturate(0.70); }  /* milky mid-tones firming up */
+  72%  { filter: brightness(1.05) contrast(0.96) saturate(0.92); }  /* colour blooms toward true */
+  88%  { filter: brightness(1.08) contrast(1.04) saturate(1.08); }  /* the fix crest — locking, brief over-rich */
+  100% { filter: brightness(1)    contrast(1)    saturate(1); }     /* fixed / true — resting minted card */
+}
+/* HALO-FIX BLOOM — a brief violet glow swell at the last beat as the print "fixes",
+   on a dedicated ::after so it never repaints the card interior or touches `filter`.
+   Inside the -60px glow clip; box-shadow STATIC, only opacity + transform animate.
+   Resting opacity 0 = the settled look is the card's own halo (freeze-safe). */
+.rv-cardframe.is-developing .rv-layer--halo::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  border-radius: var(--card-radius, 12px);
+  box-shadow:
+    0 0 0 1px var(--rv-halo-glow),
+    0 0 44px 8px var(--rv-halo-glow);                      /* BR-S134 M1: 34px 6px -> 44px 8px */
+  opacity: 0;
+  animation: rv-fix-bloom 3550ms var(--rv-ease) forwards;  /* BR-S135: 3000->3550ms; swell crest lands ~2911-3195ms, in step with final igniting columns */
+}
+@keyframes rv-fix-bloom {
+  0%, 64% { opacity: 0;    transform: scale(0.990); }  /* dormant — the image is still surfacing */
+  82%     { opacity: 0.55; transform: scale(0.997); }  /* glow begins to build as colour blooms */
+  90%     { opacity: 0.95; transform: scale(1.004); }  /* the swell — the moment the print LOCKS */
+  100%    { opacity: 0;    transform: scale(1); }      /* releases — resting halo is the card's own */
+}
+@keyframes rv-develop-wipe {
+  from { clip-path: inset(-60px -60px calc(100% + 60px) -60px); }   /* clipped to the top — height-agnostic */
+  to   { clip-path: inset(-60px); }                      /* fully developed, glow included */
+}
+
+/* ====================================================================
+   M2 (BR-S134) — FRAME-READING PIP FILL · row-by-row, left->right.
+   Lit pips on the HALO layer surface one row at a time (top first),
+   left->right within a row, as the card develops. Trigger is SCOPED to
+   .rv-cardframe.is-developing .rv-layer--halo so it NEVER fires on a plain
+   renderCard() re-render or the live-room .card.is-developing, and never
+   touches the free layer's already-visible pips. Stagger from inline --r
+   (row 0-3) + --c (col 0-4) baked in renderCard(). Worst case 3*150+4*55=
+   670ms start, completes 1030ms — inside the 3000ms develop, before the
+   ~2400ms seam. GPU-only (opacity+transform). Freeze-safe: the 100% frame
+   == the resting .fr__pip.is-on. rotate(45deg) RE-STATED every stop (the
+   pip rests at transform:rotate(45deg); animating scale alone would un-rotate). */
+/* BR-S135: VERTICAL COLUMN-SCAN IGNITION — replaces BR-S134 row-major fade.
+   A scan passes LEFT->RIGHT through the 5 pip COLUMNS (--c 0-4). Within each
+   column the 4 stat rows ignite TOP->BOTTOM (--r 0-3) on a tight 42ms stagger;
+   a 99ms pause separates columns (col stride 225ms = 3×42ms row-span + 99ms gap).
+   Each lit pip is a COLD ARCHIVE DIAMOND (pale, desaturated, compressed at 0.92)
+   that FLASHES overbright ~1-2 frames (brightness 1.90, scale 1.18), BLOOMS a
+   small drop-shadow halo, then RETRACTS and RESOLVES into its own minted material
+   (brass ramp / violet / gold — set by .fr__pip--p1..p5 CSS, never hardcoded here).
+   Scale arc: 0.92 -> 1.18 -> 0.98 -> 1.04 -> 1.00 (brief exact sequence).
+   Base offset 2100ms: the wipe (2400ms, top->bottom) reveals the ledger ~1776-2160ms,
+   so cold diamonds are VISIBLE first, THEN the scan ignites.
+   Last pip (c4,r3): 2100 + 4×225 + 3×42 + 360 = 3486ms — under the 3550ms gate (no cut-off).
+   GPU-only: opacity + transform(rotate/scale) + filter(brightness/saturate/drop-shadow).
+   drop-shadow composites OVER the pip's own resting box-shadow (p4/p5 material glow
+   untouched); rv-halo-tonal writes filter on the ANCESTOR .rv-layer--halo (no clobber).
+   rotate(45deg) RE-STATED at every stop. 100% == resting .fr__pip.is-on (freeze-safe).
+   Scope: .rv-cardframe.is-developing .rv-layer--halo .fr__pip.is-on — NEVER the live
+   room .card, never a plain renderCard(), never the free layer, never empty pips. */
+@keyframes rv-pip-ignite {
+  /* BR-S141 PERF: drop-shadow() stripped (per-frame alpha-blur on 16-20 concurrent
+     glints; a sub-px halo on a 14px diamond is invisible-grade). Brightness+scale
+     punch — the FELT part — kept verbatim. */
+  /* COLD ARCHIVE DIAMOND — material present but pale, flat, low-energy, compressed */
+  0%   { opacity: 0.42; transform: rotate(45deg) scale(0.92);
+         filter: brightness(0.62) saturate(0.60); }
+  /* IMPACT FLASH — 1-2 frame overbright peak + scale punch */
+  16%  { opacity: 1;    transform: rotate(45deg) scale(1.18);
+         filter: brightness(1.90) saturate(1.16); }
+  /* COMPRESS-BACK through the brief's dip */
+  30%  { opacity: 1;    transform: rotate(45deg) scale(0.98);
+         filter: brightness(1.42) saturate(1.08); }
+  /* SETTLE micro-overshoot */
+  54%  { opacity: 1;    transform: rotate(45deg) scale(1.04);
+         filter: brightness(1.10) saturate(1.02); }
+  /* RESOLVED / TRUE — == resting .fr__pip.is-on (true material, scale 1) */
+  100% { opacity: 1;    transform: rotate(45deg) scale(1);
+         filter: brightness(1) saturate(1); }
+}
+.rv-cardframe.is-developing .rv-layer--halo .fr__pip.is-on {
+  animation: rv-pip-ignite 360ms var(--rv-ease, cubic-bezier(0.2, 0.7, 0.2, 1)) both;
+  /* COLUMN-dominant scan: --c (0-4) is the slow L->R axis (225ms stride =
+     126ms row-span + 99ms pause); --r (0-3) the tight top->bottom stagger (42ms).
+     Base 2100ms so the cold pips show first under the wipe. */
+  animation-delay: calc(2100ms + var(--c, 0) * 225ms + var(--r, 0) * 42ms);
+  /* BR-S141 PERF: will-change REMOVED — 16-20 persistent promotions hold backing
+     stores for the whole develop + defeat the hint. A 360ms filter anim does not
+     need it; the RM block (animation:none) already neutralises this rule. */
+}
+
+/* =====================================================================
+   BR-S136 — HALO FINALIZATION MOTION v2  ·  authorize -> coat -> seal
+   Fires at t=0 == final pip land (~3486ms into the develop). A SEPARATE
+   class .rv-cardframe.is-finalizing drives it (added by the controller at
+   t=0, removed ~900ms later). .is-developing / ddur(3550ms) / tonal /
+   fix-bloom / pip-ignite are UNTOUCHED.
+   ALL selectors scoped to .rv-cardframe.is-finalizing .rv-layer--halo so
+   the LIVE ROOM card and a plain renderCard() are NEVER affected.
+   ONE moving overlay (.rv-seal, injected into .card__plate) + short pseudo
+   glints. Every 100% frame == the resting minted card (freeze-safe).
+   ===================================================================== */
+
+/* restrained phosphor/spectral blue tokens (NOT neon cyan) */
+.rv-cardframe.is-finalizing .rv-layer--halo {
+  --fin-core:  rgba(190, 220, 255, 0.70);
+  --fin-bloom: rgba(90, 145, 255, 0.32);
+  --fin-after: rgba(90, 145, 255, 0.08);
+}
+
+/* ---- 0-95ms · FINAL PIP IMPACT — ONLY the JS-tagged last pip (c4,r3) ----
+   Restrained: 1 -> 1.09 -> 0.985 -> 1.00, 1-2 frame overbright, tiny halo.
+   NOT a casino 1.16 pop; the 19 other pips are untouched. rotate(45deg)
+   re-stated every stop (the pip rests rotated). 100% == resting material. */
+@keyframes rv-final-pip {       /* BR-S141 PERF: drop-shadow stripped; scale+brightness impact kept */
+  0%   { transform: rotate(45deg) scale(1);     filter: brightness(1)    saturate(1); }
+  22%  { transform: rotate(45deg) scale(1.09);  filter: brightness(1.46) saturate(1.10); }
+  55%  { transform: rotate(45deg) scale(0.985); filter: brightness(1.12) saturate(1.03); }
+  100% { transform: rotate(45deg) scale(1);     filter: brightness(1)    saturate(1); }
+}
+.rv-cardframe.is-finalizing .rv-layer--halo .fr__pip.is-on.is-final-pip {
+  animation: rv-final-pip 95ms var(--rv-ease-snap) both;
+  /* will-change is JS-managed (rvCatchPromote) only during the ritual window */
+}
+
+/* ---- 60-125ms · MICRO CARD LOCK · tactile acknowledge, no white flash ----
+   On .card__plate (NOT .rv-layer--halo — its filter is owned by rv-halo-tonal). */
+@keyframes rv-final-lock {
+  0%   { transform: scale(1);     filter: brightness(1)     contrast(1); }
+  50%  { transform: scale(1.004); filter: brightness(1.035) contrast(1.025); }
+  100% { transform: scale(1);     filter: brightness(1)     contrast(1); }
+}
+.rv-cardframe.is-finalizing .rv-layer--halo .card__plate {
+  /* BR-S141 STRIKE: was 65ms@60ms (a 35ms twitch ON the impact). Now 75ms@150ms —
+     a ~55ms breath after the pip lands, so the card is felt to ACKNOWLEDGE the
+     impact, not flinch with it. Named snap easing. */
+  animation: rv-final-lock 75ms var(--rv-ease-snap) 150ms both;
+  will-change: transform, filter;
+}
+
+/* ---- 125-360ms · BLUE ARCHIVE STAMP · localized to .card__house ONLY ----
+   DUPLICATE-LABEL ::after re-states the string; blue lives ONLY in text-shadow
+   + -webkit-text-stroke (lights the ◆ + letter EDGES) — never a rectangle.
+   position:relative scoped HERE only so the live header layout is untouched. */
+.rv-cardframe.is-finalizing .rv-layer--halo .card__house {
+  position: relative;
+  transform-origin: left center;
+  /* BR-S141 STRIKE: delay 125 -> 210 so authorize lands AFTER the lock acknowledge
+     (impact 0-95 -> breath -> lock 150-225 -> stamp 210-445) = three felt blows. */
+  animation: rv-stamp-label 235ms var(--rv-ease-snap) 210ms both;
+  will-change: transform, filter;
+}
+.rv-cardframe.is-finalizing .rv-layer--halo .card__house::after {
+  content: "◆ BLUE ROOM ARCHIVE";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  white-space: nowrap;
+  color: inherit;
+  -webkit-text-stroke: 0px var(--fin-core);
+  text-shadow: 0 0 0 var(--fin-bloom);
+  opacity: 0;
+  mix-blend-mode: screen;
+  animation: rv-stamp-charge 235ms var(--rv-ease-snap) 210ms both;  /* BR-S141: delay 125 -> 210 (matches the label) */
+  will-change: opacity, text-shadow;
+}
+@keyframes rv-stamp-charge {
+  0%   { opacity: 0;    -webkit-text-stroke-width: 0px;
+         text-shadow: 0 0 0px var(--fin-bloom); }
+  22%  { opacity: 0.22; -webkit-text-stroke-width: 0.25px;
+         text-shadow: 0 0 1px var(--fin-core), 0 0 4px var(--fin-bloom); }
+  47%  { opacity: 1;    -webkit-text-stroke-width: 0.6px;
+         text-shadow:
+           0 0 1px var(--fin-core),
+           0 0 3px var(--fin-core),
+           0 0 9px var(--fin-bloom),
+           0 0 16px var(--fin-bloom); }
+  72%  { opacity: 0.4;  -webkit-text-stroke-width: 0.2px;
+         text-shadow: 0 0 2px var(--fin-after), 0 0 6px var(--fin-after); }
+  100% { opacity: 0;    -webkit-text-stroke-width: 0px;
+         text-shadow: 0 0 1px var(--fin-after); }
+}
+@keyframes rv-stamp-label {
+  0%   { filter: brightness(1);    transform: scale(1); }
+  22%  { filter: brightness(1.08); transform: scale(1.006); }
+  47%  { filter: brightness(1.22); transform: scale(1.012); }
+  100% { filter: brightness(1);    transform: scale(1.000); }
+}
+
+/* =====================================================================
+   THE SEAL OVERLAY (.rv-seal) — injected into .card__plate by the
+   controller at t=0; NOT in renderCard() output (live room byte-clean).
+   .card__plate overflow:hidden + 11px radius HARD-CLIPS it to the card
+   SURFACE (never the -60px halo bleed). pointer-events:none. Rests opacity:0.
+   z-index:7 sits above .cardfinish(5) + .cardqr(6) regardless of DOM order.
+   ===================================================================== */
+.rv-cardframe.is-finalizing .rv-layer--halo .card__plate > .rv-seal {
+  position: absolute;
+  top: -30%; left: -30%;
+  width: 160%; height: 160%;
+  z-index: 7;
+  pointer-events: none;
+  opacity: 0;
+  /* BR-S141 SCAN COHERENCE: violet-cored via color-mix(--rv-halo) so the seal reads
+     as the SAME halo light, hardened/specular — rhyming with the violet meniscus
+     (SCAN #1), not a foreign casino-blue. White-biased core keeps it a bright pass. */
+  background: linear-gradient(115deg,
+    transparent 38%,
+    color-mix(in srgb, var(--rv-halo) 22%, transparent) 43%,
+    color-mix(in srgb, #fff 60%, var(--rv-halo)) 47%,
+    color-mix(in srgb, #fff 90%, var(--rv-halo)) 50%,
+    color-mix(in srgb, #fff 60%, var(--rv-halo)) 54%,
+    color-mix(in srgb, var(--rv-halo) 18%, transparent) 58%,
+    transparent 63%);
+  mix-blend-mode: screen;
+  transform: translate3d(-46%, -46%, 0);
+}
+
+/* ---- 300-390ms · POINT -> LINE RELEASE (nucleus, ::before on .rv-seal) ----
+   Anchor top:23%/left:20% inside the 160% sheet maps to ~7% of plate height
+   (the .card__head strip where the ◆ archive mark sits) — VERIFY in headless
+   Chrome and nudge ±2% so the point ignites ON the mark. */
+.rv-cardframe.is-finalizing .rv-layer--halo .card__plate > .rv-seal::before {
+  content: "";
+  position: absolute;
+  top: 22%; left: 24%;   /* BR-S137: measured onto the archive mark (plate ~8%/5%) */
+  width: 14px; height: 14px;
+  margin: -7px 0 0 -7px;
+  border-radius: 50%;
+  background: radial-gradient(circle,
+    rgba(235,232,255,0.95) 0%,
+    color-mix(in srgb, #fff 55%, var(--rv-halo)) 40%,
+    transparent 72%);   /* BR-S141: rhymes with the violet-cored seal */
+  mix-blend-mode: screen;
+  opacity: 0;
+  transform: scale(0.2);
+  transform-origin: 50% 50%;
+}
+.rv-cardframe.is-finalizing .rv-layer--halo .card__plate > .rv-seal.is-releasing::before {
+  animation: rv-seal-nucleus 90ms var(--rv-ease-seal) forwards;
+}
+@keyframes rv-seal-nucleus {
+  0%   { opacity: 0;   transform: scale(0.18) scaleX(1); }
+  40%  { opacity: 1;   transform: scale(0.55) scaleX(1); }
+  100% { opacity: 0.4; transform: scale(0.7) scaleX(9) rotate(25deg); }
+}
+
+/* ---- 340-820ms · HALO SEAL PASS · the single moving overlay ---- */
+.rv-cardframe.is-finalizing .rv-layer--halo .card__plate > .rv-seal.is-sealing {
+  /* BR-S141: 480 -> 560ms and BOTH sweep + fade on --rv-ease-seal (was sweep=curve /
+     fade=linear, a physics mismatch). The band now DECELERATES into the card — a
+     deliberate seal landing, not a flick. */
+  animation:
+    rv-seal-sweep 560ms var(--rv-ease-seal) forwards,
+    rv-seal-fade  560ms var(--rv-ease-seal) forwards;
+}
+@keyframes rv-seal-sweep {
+  0%   { transform: translate3d(-46%, -46%, 0); }
+  100% { transform: translate3d( 46%,  46%, 0); }
+}
+@keyframes rv-seal-fade {
+  0%   { opacity: 0; }
+  20%  { opacity: 1; }   /* band fully laid down as it crosses */
+  76%  { opacity: 1; }   /* HELD through the deceleration — the deliberate coat */
+  100% { opacity: 0; }   /* thins only on the final settle */
+}
+
+/* =====================================================================
+   §2 MATERIAL HIERARCHY — short pseudo/filter glints fired as the band
+   reaches each zone (CSS animation-delays follow the sweep path:
+   border -> title -> photo -> pips -> [barcode MATTE] -> edition).
+   Each 100% == neutral (freeze-safe). The barcode stays MATTE.
+   ===================================================================== */
+
+/* 1 · CORNER TRIMS — sharp metallic glint (RESTRAINED +13% per spec, ~110ms) */
+@keyframes rv-catch-metal {       /* BR-S141: drop-shadow stripped, +1% to compensate */
+  0%   { filter: brightness(1); }
+  40%  { filter: brightness(1.14); }
+  100% { filter: brightness(1); }
+}
+.rv-cardframe.is-finalizing .rv-layer--halo .corner {
+  animation: rv-catch-metal 110ms var(--rv-ease-snap) both;
+  /* will-change JS-managed (rvCatchPromote) only during the window */
+}
+/* BR-S141 CASCADE: re-keyed to the seal band (opens FIN+460, spans ~FIN+460..1020),
+   so each zone glints as the band crosses it TL -> BR — a wipe-lit cascade, not the
+   old FIN+360-760 simultaneous swarm. */
+.rv-cardframe.is-finalizing .rv-layer--halo .corner--tl { animation-delay: 500ms; }
+.rv-cardframe.is-finalizing .rv-layer--halo .corner--tr { animation-delay: 620ms; }
+.rv-cardframe.is-finalizing .rv-layer--halo .corner--bl { animation-delay: 820ms; }
+.rv-cardframe.is-finalizing .rv-layer--halo .corner--br { animation-delay: 940ms; }
+
+/* 2 · TITLE FOIL — bright catch (+8-10%, ~120ms) */
+@keyframes rv-catch-foil {        /* BR-S141: drop-shadow stripped */
+  0%   { filter: brightness(1); }
+  45%  { filter: brightness(1.11); }
+  100% { filter: brightness(1); }
+}
+.rv-cardframe.is-finalizing .rv-layer--halo .titleblock__title {
+  animation: rv-catch-foil 120ms var(--rv-ease-snap) 540ms both;
+}
+.rv-cardframe.is-finalizing .rv-layer--halo .titleblock__archetype {
+  animation: rv-catch-foil 120ms var(--rv-ease-snap) 580ms both;
+}
+
+/* 3 · PHOTO LAMINATE — broad soft gloss (+5% bright / +3% sat, ~180ms) */
+@keyframes rv-catch-laminate {
+  0%   { filter: brightness(1)    saturate(1); }
+  50%  { filter: brightness(1.05) saturate(1.03); }
+  100% { filter: brightness(1)    saturate(1); }
+}
+.rv-cardframe.is-finalizing .rv-layer--halo .photo {
+  /* BR-S141: easing outlier --rv-ease-soft -> --rv-ease (the catch family); delay 500 -> 640 (cascade) */
+  animation: rv-catch-laminate 180ms var(--rv-ease) 640ms both;
+}
+
+/* 4 · PIP GRID — tiny per-pip catch (+6%, ~80ms), staggered by column along the
+   sweep (reuses inline --c/--r). EXCLUDES the final pip (it had its own impact). */
+@keyframes rv-catch-pip {
+  0%   { filter: brightness(1); }
+  45%  { filter: brightness(1.06); }
+  100% { filter: brightness(1); }
+}
+.rv-cardframe.is-finalizing .rv-layer--halo .fr__pip.is-on:not(.is-final-pip) {
+  animation: rv-catch-pip 80ms var(--rv-ease) both;
+  /* BR-S141 PRIME LAG CUT: base 560->720, stride 26/8 -> 40/10. The 19 pips now span
+     ~720-990ms (~190ms) not ~128ms; at 80ms each, peak overlap caps at ~2-3 (was ~13).
+     will-change dropped (JS-managed). */
+  animation-delay: calc(720ms + var(--c, 0) * 40ms + var(--r, 0) * 10ms);
+}
+
+/* 5 · BARCODE — MATTE. +2.5% brightness ONLY, linear, NO specular, NO drop-shadow.
+   Proof the materials differ. (No glint pseudo is added to it.) */
+@keyframes rv-catch-matte {
+  0%   { filter: brightness(1); }
+  50%  { filter: brightness(1.025); }
+  100% { filter: brightness(1); }
+}
+.rv-cardframe.is-finalizing .rv-layer--halo .barcode {
+  animation: rv-catch-matte 90ms linear 880ms both;   /* BR-S141: cascade delay 700 -> 880 (matte, linear kept) */
+}
+
+/* 6 · EDITION PLATE — final metallic close (+10%, tiny hold, ~200ms) — last note */
+@keyframes rv-catch-plate {       /* BR-S141: drop-shadow stripped */
+  0%   { filter: brightness(1); }
+  40%  { filter: brightness(1.11); }
+  62%  { filter: brightness(1.09); }
+  100% { filter: brightness(1); }
+}
+.rv-cardframe.is-finalizing .rv-layer--halo .mintstrip__state {
+  animation: rv-catch-plate 200ms var(--rv-ease) 1000ms both;   /* BR-S141: cascade delay 760 -> 1000 (band exits BR; the final close note, ends FIN+1200) */
+}
+
+/* ---- FINAL SETTLED STATE (900ms+) — subtly richer, sealed, NOT neon ----
+   Applied by the controller (persists after .is-finalizing removes). Static
+   filter (not an animation) so a frozen end-state is correct. */
+.rv-cardframe .rv-layer--halo.rv-halo-settled .card__plate {
+  filter: contrast(1.02) saturate(1.01);
+}
+
+/* =====================================================================
+   REPEAT VARIANT — compressed ~360ms (restrained pip + blue stamp + short
+   micro-sheen + settle, NO long seal pass). Controller adds .is-fin-repeat
+   alongside .is-finalizing. Overrides the long timings.
+   ===================================================================== */
+.rv-cardframe.is-finalizing.is-fin-repeat .rv-layer--halo .card__house,
+.rv-cardframe.is-finalizing.is-fin-repeat .rv-layer--halo .card__house::after {
+  animation-duration: 160ms; animation-delay: 60ms;
+}
+.rv-cardframe.is-finalizing.is-fin-repeat .rv-layer--halo .card__plate > .rv-seal::before {
+  animation: none; opacity: 0;
+}
+.rv-cardframe.is-finalizing.is-fin-repeat .rv-layer--halo .card__plate > .rv-seal.is-sealing {
+  animation: rv-seal-sweep 200ms var(--rv-ease-seal) forwards,
+             rv-seal-fade  200ms var(--rv-ease-seal) forwards;   /* BR-S141: named curve, unified (was curve/linear) */
+}
+.rv-cardframe.is-finalizing.is-fin-repeat .rv-layer--halo .corner,
+.rv-cardframe.is-finalizing.is-fin-repeat .rv-layer--halo .titleblock__title,
+.rv-cardframe.is-finalizing.is-fin-repeat .rv-layer--halo .titleblock__archetype,
+.rv-cardframe.is-finalizing.is-fin-repeat .rv-layer--halo .photo,
+.rv-cardframe.is-finalizing.is-fin-repeat .rv-layer--halo .fr__pip.is-on:not(.is-final-pip),
+.rv-cardframe.is-finalizing.is-fin-repeat .rv-layer--halo .barcode,
+.rv-cardframe.is-finalizing.is-fin-repeat .rv-layer--halo .mintstrip__state {
+  animation: none !important;
+}
+
+/* RM tint keyframe (used by the prefers-reduced-motion block below) */
+@keyframes rv-stamp-charge-rm {
+  0%   { opacity: 0;    text-shadow: 0 0 0 var(--fin-bloom); }
+  50%  { opacity: 0.18; text-shadow: 0 0 6px var(--fin-bloom); }
+  100% { opacity: 0;    text-shadow: 0 0 0 var(--fin-after); }
+}
+
+/* ====================================================================
+   PHOTO -> FREE  ·  "Print Rising from the Bath"  ·  standalone opening
+   only (?dev=staged-reveal); the menu starts already on FREE. 3 beats / 1180ms:
+     1) the print RISES — bottom-anchored clip bloom (lands ~62%, --rv-ease)
+     2) the print FIXES — exposure/contrast/saturate washed-out -> true
+        (back-loaded on --rv-ease-soft, settles last)
+     3) the BATH recedes — dims+desaturates+softens+sinks, fluid drains off
+   GPU-only: clip-path / filter / transform / opacity. Zero layout shift.
+   Resting `.rv-layer--free.is-shown` is the finished look, so a frozen
+   timeline ends correct (visibility never gated on the entrance animation). */
+.rv-cardframe.is-developing-photo .rv-layer--free {
+  opacity: 1;
+  transform: none;
+  transition: none;
+  transform-origin: 50% 100%;            /* lifted from the tray, bottom-anchored */
+  animation:
+    rv-print-rise 1180ms var(--rv-ease)      forwards,
+    rv-print-fix  1180ms var(--rv-ease-soft) forwards;
+}
+.rv-cardframe.is-developing-photo .rv-layer--photo {
+  opacity: 1;
+  transition: none;
+  animation: rv-bath-sink 1180ms var(--rv-ease-soft) forwards;
+}
+.rv-cardframe.is-developing-photo .rv-photoplate::after {
+  /* the existing developer-fluid wash literally DRAINS off (no new DOM) */
+  animation: rv-bath-drain 1180ms var(--rv-ease-soft) forwards;
+}
+/* the print climbs out of the bath — bottom-anchored clip bloom. End = inset(0). */
+@keyframes rv-print-rise {
+  from { clip-path: inset(0 0 100% 0); }   /* still submerged — nothing showing */
+  62%  { clip-path: inset(0 0 0 0); }      /* fully up by 62% — the rise LANDS */
+  to   { clip-path: inset(0 0 0 0); }      /* holds; resting look */
+}
+/* exposure/focus FIX — surfaces milky/overexposed, then locks to true tone.
+   NO blur on the hero. Back-loaded so the fix completes LAST. */
+@keyframes rv-print-fix {
+  0%   { filter: brightness(1.34) contrast(0.62) saturate(0.30); }  /* washed-out */
+  62%  { filter: brightness(1.12) contrast(0.90) saturate(0.82); }
+  to   { filter: brightness(1)    contrast(1)    saturate(1); }     /* fixed / true */
+}
+/* the bath sinks beneath the rising print: dims, desaturates, softens, recedes.
+   blur lives ONLY here (covered layer, dropped at end) — never on the hero. */
+@keyframes rv-bath-sink {
+  from { filter: saturate(0.86) contrast(0.96) brightness(0.90) blur(0px); transform: scale(1); }
+  to   { filter: saturate(0.30) contrast(0.92) brightness(0.60) blur(3px); transform: scale(0.988); }
+}
+/* developer fluid drains off the plate (the EXISTING ::after wash) */
+@keyframes rv-bath-drain {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+
+/* WET MENISCUS — the wipe's leading edge reads as a glossy wet develop seam: a
+   developer-fluid BODY (glow pooling above the wet line) + a bright near-white
+   CREST lip welded to its lower edge (surface tension). Rides the wipe with
+   translateY + a scaleY squash + opacity on --rv-ease-soft. This carries the
+   "feathered wet edge" read — the freeze+glow-safe alternative to a layer mask
+   (a border-box mask on the halo layer would kill the -60px glow + freeze blank). */
+.rv-scanline {
+  position: absolute;
+  left: -3%; right: -3%;
+  top: 0;
+  height: 30%;
+  z-index: 6;
+  pointer-events: none;
+  opacity: 0;
+  transform-origin: center top;
+  /* developer-fluid BODY: richer pool above the wet line, fading up (BR-S134 M1) */
+  background: linear-gradient(180deg,
+    transparent 0%,
+    color-mix(in srgb, var(--rv-halo) 18%, transparent) 44%,
+    color-mix(in srgb, var(--rv-halo) 52%, transparent) 74%,
+    color-mix(in srgb, var(--rv-halo) 72%, transparent) 94%,
+    transparent 100%);
+  mix-blend-mode: screen;
+}
+/* CREST — the bright wet lip itself (surface tension), brighter near-white core. STATIC. */
+.rv-scanline::before {
+  content: "";
+  position: absolute;
+  left: 0; right: 0;
+  bottom: 6%;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    color-mix(in srgb, #fff 78%, var(--rv-halo)) 18%,
+    color-mix(in srgb, #fff 94%, var(--rv-halo)) 50%,
+    color-mix(in srgb, #fff 78%, var(--rv-halo)) 82%,
+    transparent 100%);
+  filter: blur(0.4px);
+  opacity: 0.96;
+  mix-blend-mode: screen;
+}
+.rv-cardframe.is-developing .rv-scanline {
+  animation: rv-meniscus 2400ms var(--rv-ease-soft) 1;         /* BR-S134 M1: rides the slower wipe (was 1500ms) */
+}
+@keyframes rv-meniscus {
+  0%   { opacity: 0; transform: translateY(-40%) scaleY(0.86); }
+  12%  { opacity: 1; transform: translateY(-20%) scaleY(1); }     /* fluid gathers, lip swells in */
+  86%  { opacity: 1; transform: translateY(286%) scaleY(1); }
+  100% { opacity: 0; transform: translateY(320%) scaleY(1.12); }  /* trails + thins exiting the bottom */
+}
+
+/* =====================================================================
+   UNIT 3/7 — ReadingPanel  (reserved | developed)
+   Renders straight on the room surface — NO card/border of its own.
+   The write-in ripples top->bottom; each row = a rule that draws (scaleX)
+   + text that fades up. Emits onWriteInComplete on the last row.
+   ===================================================================== */
+.rv-read {
+  flex: 1 1 340px;
+  min-width: 0;
+  max-width: 440px;
+  padding-top: 6px;
+}
+.rv-read__headline {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(24px, 4vw, 30px);
+  letter-spacing: 0.01em;
+  color: var(--rv-ink);
+  margin: 0 0 4px;
+  line-height: 1.05;
+}
+.rv-read__engine {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--rv-ink-ghost);
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 20px;
+}
+.rv-read__engine .rv-dot {
+  width: 5px; height: 5px; border-radius: 50%;
+  background: var(--rv-ink-dim);
+}
+.rv-read[data-engine="halo"] .rv-read__engine .rv-dot { background: var(--rv-halo); }
+
+/* a write-in row */
+.rv-row {
+  position: relative;
+  padding: 11px 0 12px;
+  opacity: 0;
+}
+.rv-row.is-writing {
+  animation: rv-row-text 420ms var(--rv-ease) forwards;
+  animation-delay: calc(var(--i, 0) * var(--rv-dur-row));
+}
+.rv-row__rule {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 1px;
+  background: var(--rv-rule);
+  transform: scaleX(0);
+  transform-origin: left center;
+}
+.rv-row.is-writing .rv-row__rule {
+  animation: rv-rule-draw 480ms var(--rv-ease) forwards;
+  animation-delay: calc(var(--i, 0) * var(--rv-dur-row));
+}
+.rv-row__label {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--rv-ink-dim);
+}
+.rv-row__val {
+  font-family: var(--font-display);
+  font-size: 16px;
+  color: var(--rv-ink-2);
+  margin-top: 3px;
+  line-height: 1.32;
+}
+.rv-row__val--note {
+  font-style: italic;
+  color: var(--rv-ink);
+}
+.rv-row__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+}
+
+/* the four ◆ core meters — persist across the swap, recolor grey->purple */
+.rv-meters { margin: 4px 0 2px; }
+.rv-meter {
+  display: grid;
+  grid-template-columns: 16px 1fr auto;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 0;
+  opacity: 0;
+}
+.rv-meter.is-writing {
+  animation: rv-row-text 420ms var(--rv-ease) forwards;
+  animation-delay: calc(var(--i, 0) * var(--rv-dur-row));
+}
+.rv-meter__glyph {
+  font-size: 11px;
+  color: var(--rv-ink-ghost);
+  transition: color 520ms var(--rv-ease), text-shadow 520ms var(--rv-ease);
+}
+.rv-meter__name {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--rv-ink-dim);
+}
+.rv-meter__right { display: inline-flex; align-items: center; gap: 9px; justify-self: end; }
+.rv-meter__pips { display: inline-flex; gap: 4px; }
+.rv-pip {
+  width: 7px; height: 7px;
+  transform: rotate(45deg);
+  border: 1px solid var(--rv-rule);
+  background: transparent;
+  transition: background 520ms var(--rv-ease), border-color 520ms var(--rv-ease), box-shadow 520ms var(--rv-ease);
+}
+.rv-pip.is-on { background: var(--rv-ink-dim); border-color: var(--rv-ink-dim); }
+.rv-meter__tag {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  color: var(--rv-ink-dim);
+  text-transform: uppercase;
+}
+/* developed (halo) recolor — the meters charge purple + gain the ◆ glow */
+.rv-read[data-engine="halo"] .rv-meter__glyph {
+  color: var(--rv-halo);
+  text-shadow: 0 0 8px var(--rv-halo-glow);
+}
+.rv-read[data-engine="halo"] .rv-pip.is-on {
+  background: var(--rv-halo);
+  border-color: var(--rv-halo);
+  box-shadow: 0 0 6px var(--rv-halo-glow);
+}
+.rv-read[data-engine="halo"] .rv-meter__tag { color: color-mix(in srgb, var(--rv-halo) 70%, var(--rv-ink)); }
+
+/* the below-card dossier — reserved (scribbled) vs developed (ink) */
+.rv-dossier { margin-top: 22px; }
+.rv-dossier__seam {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--rv-ink-ghost);
+  margin-bottom: 14px;
+  display: flex; align-items: center; gap: 10px;
+}
+.rv-dossier__seam::after {
+  content: ""; flex: 1; height: 1px; background: var(--rv-rule-faint);
+}
+.rv-slot { padding: 9px 0; opacity: 0; }
+.rv-slot.is-writing {
+  animation: rv-row-text 420ms var(--rv-ease) forwards;
+  animation-delay: calc(var(--i, 0) * var(--rv-dur-row));
+}
+.rv-slot__name {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--rv-ink-dim);
+}
+/* reserved: scribbled placeholder + a hand-drawn underline that draws on */
+.rv-slot--reserved .rv-slot__body {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 14px;
+  color: var(--rv-ink-ghost);
+  margin-top: 3px;
+}
+.rv-scribble {
+  display: block;
+  width: 100%;
+  height: 12px;
+  margin-top: 5px;
+  overflow: visible;
+}
+.rv-scribble path {
+  fill: none;
+  stroke: var(--rv-ink-ghost);
+  stroke-width: 1.4;
+  stroke-linecap: round;
+  stroke-dasharray: var(--len, 200);
+  stroke-dashoffset: var(--len, 200);
+}
+.rv-slot.is-writing .rv-scribble path {
+  animation: rv-ink-draw 620ms var(--rv-ease) forwards;
+  animation-delay: calc(var(--i, 0) * var(--rv-dur-row) + 120ms);
+}
+.rv-slot__tap {
+  display: inline-block;
+  margin-top: 6px;
+  font-family: var(--font-mono);
+  font-size: 8.5px;
+  letter-spacing: 0.22em;
+  color: var(--rv-halo);
+  text-transform: uppercase;
+  opacity: 0.78;
+}
+/* developed: written ink */
+.rv-slot--developed .rv-slot__body {
+  font-family: var(--font-display);
+  font-size: 15px;
+  color: var(--rv-ink-2);
+  margin-top: 3px;
+  line-height: 1.36;
+}
+.rv-slot--developed .rv-slot__body em {
+  font-style: italic;
+  color: var(--rv-ink);
+}
+.rv-slot__metric {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--rv-halo);
+  letter-spacing: 0.04em;
+}
+
+.rv-read__close {
+  margin-top: 22px;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 14px;
+  color: var(--rv-ink-dim);
+  opacity: 0;
+}
+.rv-read__close.is-writing {
+  animation: rv-row-text 520ms var(--rv-ease) forwards;
+  animation-delay: calc(var(--i, 0) * var(--rv-dur-row));
+}
+
+/* =====================================================================
+   UNIT 5 — WarningModal  (body-level, escapes overflow)
+   ===================================================================== */
+.rv-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 950;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  /* BR-S136: the container no longer fades its OWN opacity — the backdrop + panel
+     animate themselves, so the backdrop-filter blur can RAMP cleanly (an opacity-
+     animating ancestor made backdrop-filter snap = the old "sharp/odd" feel). */
+  opacity: 1;
+  visibility: hidden;
+  pointer-events: none;
+  transition: visibility 0s linear 480ms;   /* stay visible through the fade-out, then hide */
+}
+.rv-modal.is-open { visibility: visible; pointer-events: auto; transition: visibility 0s; }
+.rv-modal__backdrop {
+  position: absolute; inset: 0;
+  /* rest: clear + unblurred; the defocus GROWS in (soft settle), not a hard slab */
+  background: rgba(8, 9, 11, 0);
+  backdrop-filter: blur(0px);
+  -webkit-backdrop-filter: blur(0px);
+  opacity: 0;
+  transition: background 480ms var(--rv-ease-soft, cubic-bezier(0.4, 0, 0.2, 1)),
+              opacity 480ms var(--rv-ease-soft, cubic-bezier(0.4, 0, 0.2, 1)),
+              backdrop-filter 480ms var(--rv-ease-soft, cubic-bezier(0.4, 0, 0.2, 1)),
+              -webkit-backdrop-filter 480ms var(--rv-ease-soft, cubic-bezier(0.4, 0, 0.2, 1));
+}
+.rv-modal.is-open .rv-modal__backdrop {
+  background: rgba(8, 9, 11, 0.5);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  opacity: 1;
+}
+.rv-modal__panel {
+  position: relative;
+  width: min(420px, 92vw);
+  background: linear-gradient(180deg, var(--ink-800, #151310), var(--ink-900, #100f0c));
+  border: 1px solid var(--line, rgba(233, 229, 220, 0.12));
+  border-radius: 14px;
+  padding: 30px 30px 24px;
+  box-shadow: 0 40px 90px rgba(0, 0, 0, 0.6);
+  transform: scale(0.965);
+  opacity: 0;
+  transition: transform 420ms var(--rv-ease-soft, cubic-bezier(0.4, 0, 0.2, 1)) 40ms,
+              opacity 360ms var(--rv-ease-soft, cubic-bezier(0.4, 0, 0.2, 1)) 40ms;
+  color: var(--t-primary, #d7d3ca);
+}
+.rv-modal.is-open .rv-modal__panel { transform: scale(1); opacity: 1; }
+.rv-modal__kicker {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--violet, #8b7bff);
+  margin: 0 0 12px;
+}
+.rv-modal__body {
+  font-family: var(--font-display);
+  font-size: 17px;
+  line-height: 1.5;
+  color: var(--t-display, #e9e5dc);
+  margin: 0 0 24px;
+}
+.rv-modal__row { display: flex; gap: 12px; justify-content: flex-end; flex-wrap: wrap; }
+.rv-btn {
+  appearance: none;
+  font-family: var(--font-ui, "Inter", sans-serif);
+  font-size: 13px;
+  letter-spacing: 0.01em;
+  padding: 10px 20px;
+  border-radius: 9px;
+  cursor: pointer;
+  transition: transform 160ms var(--rv-ease, cubic-bezier(0.2,0.7,0.2,1)),
+              background 160ms ease, border-color 160ms ease, color 160ms ease;
+}
+.rv-btn:focus-visible { outline: 2px solid color-mix(in srgb, var(--t-display, #e9e5dc) 55%, transparent); outline-offset: 2px; }
+.rv-btn:active { transform: scale(0.98); }
+/* "Alright" — the easy, visually-default choice (stay; free is complete) */
+.rv-btn--default {
+  background: var(--t-display, #e9e5dc);
+  border: 1px solid var(--t-display, #e9e5dc);
+  color: var(--ink-950, #0a0b0d);
+  font-weight: 600;
+}
+.rv-btn--default:hover { background: #fff; }
+/* "No — let me see" — the quieter, deliberate choice (proceed to Halo) */
+.rv-btn--quiet {
+  background: transparent;
+  border: 1px solid var(--line-strong, rgba(233, 229, 220, 0.2));
+  color: var(--t-meta, #948f87);
+}
+.rv-btn--quiet:hover { color: var(--t-primary, #d7d3ca); border-color: var(--violet, #8b7bff); }
+
+/* =====================================================================
+   keyframes (shared)
+   ===================================================================== */
+@keyframes rv-row-text {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes rv-rule-draw {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+@keyframes rv-ink-draw {
+  to { stroke-dashoffset: 0; }
+}
+
+/* =====================================================================
+   responsive — below ~900px the reading reflows BELOW the card
+   ===================================================================== */
+@media (max-width: 900px) {
+  .reveal-stage__body { flex-direction: column; align-items: center; }
+  .rv-read { max-width: min(440px, 92vw); width: 100%; }
+}
+@media (max-width: 430px) {
+  /* shrink the crown card as one unit so its fixed internal layout never
+     squeezes or overflows on a phone (layout-aware zoom; the proto pattern) */
+  .reveal-stage__cardcol { zoom: 0.82; }
+}
+
+/* =====================================================================
+   reduced motion — instant crossfades, no stagger, no pulse, never hide
+   ===================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  .reveal-stage *,
+  .reveal-stage *::before,
+  .reveal-stage *::after {
+    animation-duration: 0.001ms !important;
+    animation-delay: 0ms !important;
+    transition-duration: 0.001ms !important;
+  }
+  .rv-layer { transition: none !important; transform: none !important; }
+  /* photo->free develop snaps to the finished free card; bath + drain neutralised */
+  .rv-cardframe.is-developing-photo .rv-layer--free {
+    animation: none !important;
+    clip-path: inset(0) !important;        /* fully risen — the resting free card */
+    filter: none !important;               /* true tone */
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  .rv-cardframe.is-developing-photo .rv-layer--photo { animation: none !important; filter: none !important; }
+  .rv-cardframe.is-developing-photo .rv-photoplate::after { animation: none !important; }
+  .rv-row, .rv-meter, .rv-slot, .rv-read__close { opacity: 1 !important; transform: none !important; }
+  .rv-row__rule { transform: scaleX(1) !important; }
+  .rv-scribble path { stroke-dashoffset: 0 !important; }
+  .rv-arrow[data-variant="purple"] { animation: none !important; }
+  .rv-arrow[data-variant="purple"]::after { display: none; }
+  .rv-scanline { display: none; }
+  .rv-modal, .rv-modal__panel, .rv-modal__backdrop { transition: none !important; }
+}
+
+/* =====================================================================
+   BR-S125 — Sketchbook readings + hand-drawn arrow + 3-slot layout
+   The readings became a hand-drawn "archive sketchbook"; the stage is
+   re-laid as card · arrow (lower-middle) · readings. These rules come
+   AFTER the originals on purpose (they supersede the old row/meter/slot
+   reading styling, the round-button arrow, and the 2-slot body).
+   ===================================================================== */
+
+.reveal-stage__body {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: center;
+  gap: clamp(8px, 2vw, 30px);
+  width: 100%;
+  max-width: 1180px;
+}
+.rv-cardslot { flex: 0 0 auto; }
+.rv-arrowslot {
+  flex: 0 0 auto;
+  align-self: center;
+  transform: translateY(78px);            /* a touch below the card's centre */
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+}
+.rv-readslot { flex: 0 0 auto; width: min(560px, 44vw); min-width: 0; }
+
+/* BR-S129 — the cinematic develop: card + arrow glide LEFT and the read scribbles
+   in on the right. Reserved-width readslot, so the slide is pure transform (GPU). */
+.rv-stagemain { display: flex; flex-direction: row; align-items: flex-start; flex: 0 0 auto; transition: transform 820ms var(--rv-ease); will-change: transform; }
+.reveal-stage:not(.is-reading) .rv-stagemain { transform: translateX(min(290px, 21vw)); }  /* centred before the read */
+.reveal-stage.is-reading .rv-stagemain { transform: translateX(0); }                        /* slid to the left */
+.rv-readslot { transition: opacity 640ms var(--rv-ease) 220ms, transform 780ms var(--rv-ease) 220ms; }
+.reveal-stage:not(.is-reading) .rv-readslot { opacity: 0; transform: translateX(28px); }
+.reveal-stage.is-reading .rv-readslot { opacity: 1; transform: translateX(0); }
+
+/* embedded in the menu's sample-card slot — vertical stack, no own chrome,
+   single-column readings (the "sample card develops in place" mode) */
+.reveal-stage--embedded { min-height: 0; padding: 0; background: none; overflow-x: visible; align-items: stretch; }
+.reveal-stage--embedded .reveal-stage__body { flex-direction: column; align-items: center; gap: 18px; max-width: 100%; }
+.reveal-stage--embedded .rv-stagemain { flex-direction: column; align-items: center; transform: none !important; }
+.reveal-stage--embedded .rv-arrowslot { transform: none; align-self: center; }
+.reveal-stage--embedded .rv-readslot { width: 100%; opacity: 1 !important; transform: none !important; }
+.reveal-stage--embedded .rv-read { max-width: 100%; }
+.reveal-stage--embedded .rv-read__headline { font-size: clamp(22px, 3vw, 28px); }
+.reveal-stage--embedded .rv-grid--halo { grid-template-columns: 1fr; max-width: 372px; }
+
+/* ?dev=menu-reveal — the REAL menu grid hosts the staged reveal. .menurev
+   replicates the .menu container (the .menu class is display:none in dev view);
+   the sample-card slot becomes the menustage reveal. ONE base colour = the body's
+   gradient (the reveal paints NO background of its own). */
+.menurev { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 34px 24px; position: relative; }
+.menurev .menu__inner { width: min(1180px, 92vw); }      /* the sacred grid + the original width */
+.menu__stage--reveal { position: relative; }
+.menurev__mount { display: contents; }                   /* the reveal-stage IS the stage-cell content */
+
+/* menustage: the card lives in the menu's 1fr stage cell, sized + positioned
+   like the original sample card; the read reserves space on its right + slides in. */
+.reveal-stage--menustage {
+  --rv-read-w: clamp(280px, 30vw, 324px);
+  --rv-slide-gap: clamp(14px, 1.6vw, 24px);
+  min-height: 0; padding: 0; background: none; align-items: stretch; width: 100%;
+}
+.reveal-stage--menustage .reveal-stage__body { justify-content: center; gap: var(--rv-slide-gap); max-width: 100%; margin: 0; }
+/* BR-S142: the card width/zoom now come from --rv-card-w / --rv-card-zoom on
+   .reveal-stage (== .msample__card) — menustage, fullview and standalone are
+   ONE size from ONE source, so no per-route override is needed here. */
+.reveal-stage--menustage .rv-readslot { flex: 0 0 auto; width: var(--rv-read-w); min-width: 0; }
+.reveal-stage--menustage .rv-stagemain { position: relative; transition: transform 820ms var(--rv-ease); will-change: transform; }
+/* REST: card centred in the stage cell (matches the original); slides left when the read opens */
+.reveal-stage--menustage:not(.is-reading) .rv-stagemain { transform: translateX(calc((var(--rv-read-w) + var(--rv-slide-gap)) / 2)); }
+.reveal-stage--menustage.is-reading .rv-stagemain { transform: translateX(0); }
+.reveal-stage--menustage .rv-readslot { transition: opacity 820ms var(--rv-ease) 220ms, transform 820ms var(--rv-ease) 220ms; }
+.reveal-stage--menustage:not(.is-reading) .rv-readslot { opacity: 0; transform: translateX(22px); }
+.reveal-stage--menustage.is-reading .rv-readslot { opacity: 1; transform: translateX(0); }
+/* BR-S132 — the arrow nestles at the card's RIGHT edge, vertically centred, pointing
+   into the read (was: stamped centred below the card with a caption underneath). It rides
+   .rv-stagemain (absolute within it), so it slides left with the card and lands in the
+   card->read seam. Caption dropped on the menu — the gesture carries the affordance. */
+.reveal-stage--menustage .rv-arrowslot { position: absolute; left: 100%; top: 50%; bottom: auto; transform: translateY(-50%); margin-left: 2px; z-index: 7; }
+.reveal-stage--menustage .rv-arrow__svg { width: 56px; height: 56px; }
+.reveal-stage--menustage .rv-arrow__cap { display: none; }
+/* the menu seam is only ~24px, so the read clears a left lane: the arrow nestles in it,
+   pointing INTO the read, instead of landing on top of the first module. */
+.reveal-stage--menustage.is-reading .rv-read { padding-left: 52px; }
+
+/* =====================================================================
+   BR-S254 — THE ENTRANCE CARD GOES UNDER GLASS (M1 resting state only)
+   ---------------------------------------------------------------------
+   THE MEASURED PROBLEM. The card was NOT brighter than the left column: the
+   card's chrome and the column both sit at L*8.28, and the card's whole bottom
+   half (title, signal note, FRAME READING, mint strip, serial) is LESS visually
+   dense than the column — 1.56x vs 1.79x. What shouted was ~20,800px of blown
+   side glass out the passenger window: 1.4% of the page carrying 16.35% of its
+   light when blurred, at 11.3x the page average, with the page's blurred peak
+   sitting inside it at 3.5x the brightest thing on the left.
+   WHY WE DO NOT DARKEN THE BOARD. Measured counter-test: multiplying the card's
+   plate by 0.5 buys 2% of hierarchy and makes the photograph's LOCAL pop 310%
+   worse, because a darker plate sits BEHIND the picture and raises its contrast
+   against its own surround. Treating the frame amplifies the disease.
+   WHY GLASS IS THE RIGHT INSTRUMENT. source-over compositing is an affine
+   contraction toward the pane's colour: out = C*a + in*(1-a). A pane is therefore
+   SELF-TARGETING — it takes proportionally from whatever is brightest. Measured on
+   the real pixels, a pane graded onto the photograph costs it 7.0x what it costs
+   the card's chrome. The pane physically CANNOT strip the card's craft, because
+   the craft is dark and glass only taxes light. That is doctrine ("strong-without
+   is not remove") satisfied by physics rather than by discipline.
+   NOTHING IS REMOVED. The board gradient, the paper-fibre feTurbulence, the
+   top light-lip, the vignette, the corner ticks, the deboss, the grain/tone/scrim
+   layers and the photograph's own pixels are all untouched and all at full
+   strength. The glass lifts to 40% on hover or keyboard focus.
+   SCOPING. .reveal-stage--menustage is emitted only by stage-controller.js:39 when
+   opts.menustage, from app.js (live M1) and ?dev=menu-reveal. M2, the vault, the
+   drawing room and the standalone reveal never carry it. The three state guards
+   are load-bearing, not defensive: the SAME node is promoted into the see-deeper
+   takeover (line 1300 below) and carries .is-reading / .is-developing /
+   .is-finalizing — none of those may be watched through tint.
+   ===================================================================== */
+
+/* --- 3a · THE PRINT CEILING — a top the highlights cannot print past.
+   `darken` is a per-channel min, so it can only ever pull values DOWN; it
+   provably cannot murk a shadow, and it never touches the photo's own pixels.
+   .photo has isolation:isolate (styles.css:461) so the blend is contained inside
+   the photo and cannot reach the plate, and overflow:hidden + radius 5px clip the
+   pseudo for free. .photo::after is unclaimed repo-wide.
+
+   BR-S259 — RETUNED AND DELIBERATELY SOURCE-AGNOSTIC. The first version was
+   hand-fitted to SRC-01's one blown car window (an off-centre radial at 38%/48%).
+   When the desk moved to SRC-03 "Shore Dispatch" that fit was simply wrong:
+   measured on the live crop, SRC-03 is bright at BOTH x-edges with a dark subject
+   in the middle (column means left→right 141,121,119,74,55,59,59,128,150,142) and
+   **18.8%** of it sits above Y190 versus SRC-01's 3.5% — a broadly bright frame,
+   not a localised hot spot.
+   So this is now a SYMMETRIC centre-out ceiling: permissive over the middle where
+   a subject sits, firm at the edges and corners where sky, water and pale ground
+   collect. It is not fitted to any one photograph, which also settles a real
+   objection raised against the per-photo approach — a user's own photo will
+   eventually land in this slot and there is no data.js row to carry a tuning for
+   it. The ceiling is a property of the SLOT, not of the sample.
+   MEASURED on SRC-03, simulated then rendered: mean Y 105→91, p99 217→158,
+   max 237→170, pixels above Y190 18.8%→0.0, while the subject band only moves
+   65→62 and the face region 54→48. It costs the flanks, not the person. */
+.menurev:not(.is-fullview) .reveal-stage--menustage
+  .card[data-treatment="free"] .photo::after {
+  content: "";
+  position: absolute; inset: 0;
+  z-index: 2; pointer-events: none;
+  background: radial-gradient(78% 92% at 50% 50%,
+      #8f897c   0%,   /* the knee — Y~137, well above any subject; passes them through */
+      #837d71  45%,
+      #6a6459  72%,
+      #514c43 100%);  /* the rim — Y~76; this is where sky and pale ground get capped */
+  mix-blend-mode: darken;
+  opacity: 0.66;
+}
+/* MANDATORY COMPANION, not a nicety. .photo__meta (styles.css:567) and
+   .photo__tag (styles.css:584) are ALREADY z-index:2, and ::after is last in tree
+   order, so at equal z the ceiling paints OVER them — that is "BR-SCN 01 · 4:5",
+   "REC 2026-06-18" and the CANDID / DRV chip, all of which are live legible text.
+   .photo__hairline is z-auto and would also fall under the ceiling, which would
+   eat half of 3c below. */
+.menurev:not(.is-fullview) .reveal-stage--menustage .card[data-treatment="free"] .photo__meta,
+.menurev:not(.is-fullview) .reveal-stage--menustage .card[data-treatment="free"] .photo__tag,
+.menurev:not(.is-fullview) .reveal-stage--menustage .card[data-treatment="free"] .photo__hairline {
+  z-index: 3;
+}
+/* OPACITY FLOOR AND CEILING: 0.62–0.68. Above ~0.72 the bright flanks collapse
+   into flat pale slabs — the fjord loses its horizon, water and ridgeline, and the
+   gravel shore loses its texture. Both sources name that scenery in their own copy
+   (SRC-03's provenance is "Shore-side field record, overcast session, fjord
+   locale"), so flattening it deletes what the card claims to show. The rule holds
+   whatever photo is in the slot: cap the highlights, never erase the scene. */
+
+/* --- 3b · THE PANE — one sheet of the room's own black, weighted to the window,
+   with a single raking sheen.
+   .rv-cardframe is display:grid with .rv-layer at grid-area 1/1 (lines 226-234),
+   so grid-area:1/1 gives the pseudo pixel-exact registration with the card with
+   zero positioning. margin:1px keeps it INSIDE the card's own 1px bezel ring, so
+   the border gradient and the top light-lip survive at full strength.
+   THE SHEEN IS NOT DECORATION — it is what converts "the card got dimmer" (the
+   failure mode) into "the card is under glass" (preciousness). Tint takes the
+   attention; the sheen hands back the object. Ship both or neither.
+   104deg deliberately CROSSES the plate's own upper-left gleam
+   (styles.css:829, radial at 28% 18%); a specular running WITH it fuses and just
+   reads as "the gradient got weird".
+   THE PANE IS WARM ON PURPOSE — rgba(16,15,12) is --ink-900, the room's own black.
+   A cold "museum glass" slate drags the card's warm graphite hue off-axis and
+   lifts the field enough to draw a visible rectangle on the page.
+   NO mix-blend-mode and NO backdrop-filter anywhere here: on a backdrop this dark
+   source-over and screen differ by under 1 part in 255, and source-over avoids the
+   WebKit blend/backdrop-inside-zoom class of bug entirely — which matters, because
+   .rv-cardframe carries BOTH zoom:0.92 AND isolation:isolate, under a
+   .rv-stagemain that is transformed with will-change. */
+.menurev:not(.is-fullview)
+  .reveal-stage--menustage:not(.is-reading)
+  .rv-cardframe:not(.is-developing):not(.is-developing-photo):not(.is-finalizing)::after {
+  content: "";
+  grid-area: 1 / 1;
+  z-index: 4;
+  pointer-events: none;
+  margin: 1px;
+  border-radius: calc(var(--card-radius, 12px) - 1px);
+  background:
+    /* the raking sheen — painted on top (first layer in a background list wins) */
+    linear-gradient(104deg,
+      transparent               26%,
+      rgba(233, 229, 220, 0.026) 41%,
+      rgba(233, 229, 220, 0.055) 45%,
+      rgba(233, 229, 220, 0.020) 52%,
+      transparent               70%),
+    /* THE PANE, shaped to the card's ACTUAL bands — measured on the live card, not
+       estimated. As a fraction of card height:
+         4.0– 5.8%  .card__house — "◆ BLUE ROOM ARCHIVE" / "ARCHIVE EDITION"
+         7.3–46.4%  the photograph  <-- the only band that needs taxing
+        46.4–100%   title, archline, signal note, FRAME READING, mint strip, serial
+       First pass ramped from .14 at 0% to .42 at 9%, which put ~.30 alpha across
+       the nameplate at 5% — visibly dimming the card's own name, which is the
+       "makes it look broken rather than quieter" failure mode. The ramp now stays
+       flat and low until 6%, climbs inside the photo's own top edge, and is spent
+       by the time the title block starts. */
+    linear-gradient(180deg,
+      rgba(16, 15, 12, 0.05)   0%,
+      rgba(16, 15, 12, 0.06)   6%,    /* the nameplate keeps its light */
+      rgba(16, 15, 12, 0.40)  10%,
+      rgba(16, 15, 12, 0.44)  28%,    /* the photograph */
+      rgba(16, 15, 12, 0.40)  43%,
+      rgba(16, 15, 12, 0.14)  49%,    /* spent by the title block */
+      rgba(16, 15, 12, 0.05)  62%,
+      rgba(16, 15, 12, 0.03)  78%,
+      rgba(16, 15, 12, 0.02) 100%);   /* reading rows, mint strip, serial: ~untouched */
+  transition: opacity 260ms var(--rv-ease);
+}
+/* MANDATORY. .card computes corner-shape:bevel on this build (styles.css:421-424,
+   @supports-gated). A round pane over a bevelled card shows four bright mismatched
+   corner slivers — a visible defect, not a subtlety. */
+@supports (corner-shape: bevel) {
+  .menurev:not(.is-fullview)
+    .reveal-stage--menustage:not(.is-reading)
+    .rv-cardframe:not(.is-developing):not(.is-developing-photo):not(.is-finalizing)::after { corner-shape: bevel; }
+}
+/* the glass clears when you lean in — opacity only, so compositor-only */
+.menurev:not(.is-fullview) .reveal-stage--menustage .rv-cardframe:hover::after,
+.menurev:not(.is-fullview) .reveal-stage--menustage .rv-cardframe:focus-within::after { opacity: 0.40; }
+@media (prefers-reduced-motion: reduce) {
+  .menurev:not(.is-fullview) .reveal-stage--menustage .rv-cardframe::after { transition: none; }
+}
+/* SHEEN BUDGET (chrome baseline L*8.45): .030 is a whisper and may not register as
+   glass at all; .045 safe; .055 SHIPPED — reads as glass, invisible as an object;
+   .080 assertive; .110 FAILS, the streak becomes its own magnet. Hard cap .07.
+   Check the 1.4%-wide core at devicePixelRatio 2 — a gradient core that thin is
+   exactly the sort of thing that band-steps on a 2x panel. */
+
+/* --- 3c · DISSOLVE THE RECTANGLE — the photograph stops being a lit window cut
+   through the board and becomes an emulsion coated onto it. This is the literal
+   answer to "engrave it deeper or inside the surface", taken from the photo side.
+   Hosted on .photo__hairline, which already exists at inset:0 / radius 5 /
+   pointer-events:none and carries NO box-shadow (styles.css:553-558) — so this
+   ADDS and the border is TUNED, never deleted.
+   rgba(16,15,12) is the measured board tone immediately around the picture, so the
+   edge dissolves into the card rather than into an invented dark.
+   Best risk profile in the set: pure inset box-shadow. No mask, no blend, no
+   filter, no new compositing layer, no repaint cost, photo pixels untouched.
+   HARD DEPENDENCY: ships with 3a's z-index:3 companion above, or the print
+   ceiling paints over this and mutes it. */
+.menurev:not(.is-fullview) .reveal-stage--menustage
+  .card[data-treatment="free"] .photo__hairline {
+  border-color: rgba(233, 229, 220, 0.035);
+  box-shadow:
+    inset 0 0  0 1px rgba(16, 15, 12, 0.50),
+    inset 0 0 14px 5px rgba(16, 15, 12, 0.52),
+    inset 0 0 26px 2px rgba(16, 15, 12, 0.30);
+}
+
+/* --- BR-S254 · SEAT IT — the card sits down on the wall instead of hovering.
+   The old free-treatment shadow (styles.css:822) was
+     0 2px 0 .55, 0 44px 90px .62, 0 10px 28px .5
+   and a 44px-offset / 90px-blur term is literally the CSS for "this object is
+   floating 44px above the page". That is the one thing in the whole audit you can
+   see directly rather than measure. The contact line (0 2px 0) is KEPT — it is what
+   says the card is resting ON something rather than printed INTO it.
+   FLOOR ~24px of throw: below that it stops reading as seated and starts reading as
+   a sticker, which crosses from "quieter" into "worse".
+   NO lateral offset. Commit 2 puts the room's light BESIDE the card (x384), not
+   above it, so a directional shadow here would be decoration justified by a theory
+   rather than by the light actually in the room.
+   .rv-photoplate (line ~248) duplicates the OLD shadow value literally rather than
+   by reference, so it is mirrored here — otherwise a re-run develop ceremony
+   flashes the original float for a frame mid-morph. */
+.menurev:not(.is-fullview) .reveal-stage--menustage .card[data-treatment="free"] {
+  box-shadow:
+    0 2px  0    rgba(0, 0, 0, 0.55),
+    0 28px 62px rgba(0, 0, 0, 0.58),
+    0 7px  18px rgba(0, 0, 0, 0.46);
+}
+.menurev:not(.is-fullview) .reveal-stage--menustage .rv-photoplate {
+  box-shadow:
+    0 28px 62px rgba(0, 0, 0, 0.58),
+    0 7px  18px rgba(0, 0, 0, 0.46);
+}
+/* NOTE ON THE NO-JS FALLBACK: when reveal is unavailable app.js mounts
+   .msample__card instead of .menurev__mount, and that node has no
+   .reveal-stage--menustage and no .rv-cardframe — so it keeps today's floating
+   shadow AND gets no glass. That is deliberate: a seated card with no pane would
+   be a third, incoherent state. The fallback stays exactly as it shipped. */
+
+/* ═════════════════════════════════════════════════════════════════════════════
+   BR-S259 — VARIANT A, THE CARD SIDE  (see styles.css for the left-column side)
+   Restores the card exactly as it shipped before BR-S254: floating, unglassed,
+   the photograph untreated. These live HERE rather than in styles.css because
+   the rules they undo are in this file, and this file loads second — same-file
+   ordering plus ID+class specificity means no !important.
+   ═════════════════════════════════════════════════════════════════════════════ */
+/* the 44px float comes back */
+#menuView.is-m1a .reveal-stage--menustage .card[data-treatment="free"] {
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.55), 0 44px 90px rgba(0, 0, 0, 0.62), 0 10px 28px rgba(0, 0, 0, 0.5);
+}
+#menuView.is-m1a .reveal-stage--menustage .rv-photoplate {
+  box-shadow: 0 44px 90px rgba(0, 0, 0, 0.62), 0 10px 28px rgba(0, 0, 0, 0.5);
+}
+/* the glass and the print ceiling are simply not built. `content: none` on a
+   pseudo-element removes it from the box tree entirely — nothing paints, nothing
+   composites, so variant A carries no cost from machinery it does not use. */
+#menuView.is-m1a .reveal-stage--menustage .rv-cardframe::after { content: none; }
+#menuView.is-m1a .reveal-stage--menustage .card[data-treatment="free"] .photo::after { content: none; }
+/* the photograph's hard bright edge returns, and the three chips drop back to the
+   z-index they had before the ceiling forced them up */
+#menuView.is-m1a .reveal-stage--menustage .card[data-treatment="free"] .photo__hairline {
+  border-color: rgba(255, 255, 255, 0.08);
+  box-shadow: none;
+}
+#menuView.is-m1a .reveal-stage--menustage .card[data-treatment="free"] .photo__meta,
+#menuView.is-m1a .reveal-stage--menustage .card[data-treatment="free"] .photo__tag,
+#menuView.is-m1a .reveal-stage--menustage .card[data-treatment="free"] .photo__hairline { z-index: 2; }
+
+/* FULLVIEW takeover (see-deeper → halo): the stage cell promotes to a fixed
+   full-bleed layer; the menu chrome steps aside. */
+.menurev.is-fullview .menu__head,
+.menurev.is-fullview .menu__controls { opacity: 0; transform: translateX(-40px); pointer-events: none; transition: opacity 600ms var(--rv-ease), transform 720ms var(--rv-ease); }
+/* BR-S152 — the fullview reads as a SHOWCASE STAGE, not a real page: a spotlit centre over a
+   scrim-dark perimeter (deep radial + a heavy inset vignette). Content sits above the vignette. */
+.menurev.is-fullview .menu__stage--reveal { position: fixed; inset: 0; z-index: 40; display: grid; place-items: center; padding: clamp(28px, 5vh, 64px); background: radial-gradient(96% 72% at 50% 40%, var(--rv-room-2) 0%, var(--rv-room) 40%, #060708 78%, #030405 100%); box-shadow: inset 0 0 clamp(120px, 19vw, 380px) clamp(60px, 9vw, 150px) rgba(0, 0, 0, 0.94); animation: rv-fullview-in 420ms var(--rv-ease) forwards; }
+@keyframes rv-fullview-in { from { opacity: 0; } to { opacity: 1; } }
+.menurev.is-fullview .reveal-stage--menustage { --rv-read-w: min(560px, 44vw); }
+/* BR-S134 M3 / BR-S142: the card never grows on see-deeper — width/zoom come from
+   the single --rv-card-w / --rv-card-zoom token, so fullview == menu == standalone. */
+.menurev.is-fullview .reveal-stage--menustage .reveal-stage__body { max-width: 1180px; }
+
+/* BACK affordance — fades in once the takeover settles */
+.menurev__back { position: fixed; top: clamp(20px, 4vh, 40px); left: clamp(20px, 4vw, 44px); z-index: 50; font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--t-meta); background: none; border: none; cursor: pointer; padding: 8px 4px; opacity: 0; pointer-events: none; visibility: hidden; transition: opacity 400ms var(--rv-ease) 360ms, color 160ms ease, visibility 0s linear 760ms; }
+.menurev.is-fullview .menurev__back { opacity: 1; pointer-events: auto; visibility: visible; transition: opacity 400ms var(--rv-ease) 360ms, color 160ms ease, visibility 0s linear 0s; }
+.menurev__back:hover { color: var(--t-display); }
+
+/* BR-S152 — the to-the-Vault forward affordance = the reveal's OWN purple hand-drawn arrow
+   (same glyph + neon as the "see deeper" arrows), fixed at the right edge and vertically
+   centred. The wrapper owns the fixed position so the inner .rv-arrow keeps its own
+   scale/breathe transforms. Only appears in the fullview takeover. */
+/* BR-S156 — the vault hand-off waits for the READING: it appears only once the Stats &
+   Readings have fully scribbled in (`is-vaultready`, set from the read's completion), not
+   while the panel is still blank. Delay trimmed — the gate itself is the wait now. */
+.menurev__fwd { position: fixed; top: 50%; right: clamp(12px, 2.6vw, 40px); transform: translateY(-50%); z-index: 50; display: flex; flex-direction: column; align-items: center; gap: 2px; opacity: 0; pointer-events: none; visibility: hidden; transition: opacity 300ms var(--rv-ease), visibility 0s linear 320ms; }
+.menurev.is-fullview.is-vaultready .menurev__fwd { opacity: 1; pointer-events: auto; visibility: visible; transition: opacity 460ms var(--rv-ease) 80ms, visibility 0s linear 0s; }
+.menurev__fwd .rv-arrow { padding: 6px; }
+.menurev__fwd .rv-arrow__svg { width: 62px; height: 62px; }
+.menurev__fwd-cap { font-family: var(--font-mono); font-size: 8.5px; letter-spacing: 0.2em; text-transform: uppercase; color: color-mix(in srgb, var(--rv-halo) 80%, var(--rv-ink)); pointer-events: none; }
+
+/* BR-S152 — EXAMPLE / SHOWCASE banner (bolder than the old whisper eyebrow, by builder
+   direction): a violet-tinted pill badge flowing under the Sample-Scan cap — reads overtly as a
+   showcase label, ties to the purple arrow. Only in the fullview takeover. */
+.menurev__note { display: none; }
+.menurev.is-fullview .menurev__note { display: inline-block; justify-self: center; margin: 11px 0 0; padding: 5px 17px 6px; font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.26em; text-transform: uppercase; color: var(--t-primary); background: color-mix(in srgb, var(--rv-halo) 15%, transparent); border: 1px solid color-mix(in srgb, var(--rv-halo) 38%, transparent); border-radius: 999px; white-space: nowrap; pointer-events: none; opacity: 0; animation: rv-fullview-in 400ms var(--rv-ease) 380ms forwards; }
+
+/* reduced-motion: land the banner + arrow visible, no staged fade */
+@media (prefers-reduced-motion: reduce) {
+  .menurev.is-fullview .menurev__note { animation: none; opacity: 1; }
+  .menurev__fwd { transition: opacity 200ms ease; }
+}
+
+/* the arrow — bare hand-drawn glyph, no button chrome (your prototype) */
+.rv-arrow {
+  background: none; border: none; border-radius: 0;
+  width: auto; height: auto; padding: 10px;
+  color: var(--rv-ink-dim);                 /* dim at rest; brightens on hover */
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.55));
+  transition: transform 200ms var(--rv-ease), color 200ms var(--rv-ease),
+              filter 240ms var(--rv-ease), opacity 240ms var(--rv-ease);
+}
+.rv-arrow__svg { width: 86px; height: 86px; overflow: visible; display: block; fill: none; stroke: currentColor; }
+.rv-arrow__out { stroke-width: 2.1; stroke-linecap: round; stroke-linejoin: round; }
+.rv-arrow__h { stroke-width: 1.3; stroke-linecap: round; opacity: 0.5; }
+.rv-arrow:hover:not([aria-disabled="true"]), .rv-arrow:focus-visible { transform: scale(1.06); color: var(--rv-ink); }
+.rv-arrow:focus-visible { outline: 2px solid color-mix(in srgb, var(--rv-ink) 78%, transparent); outline-offset: 4px; }
+.rv-arrow:active:not([aria-disabled="true"]) { transform: scale(0.97); }
+.rv-arrow[aria-disabled="true"] { opacity: 0.3; pointer-events: none; }
+.rv-arrow[aria-disabled="true"]:focus-visible { outline: none; }   /* BR-S134 M6: no ring on a truly-disabled arrow */
+.rv-arrow.is-gone { opacity: 0; transform: scale(0.9); pointer-events: none; }
+
+/* purple-neon variant — the first "see deeper" offer, before the modal */
+.rv-arrow[data-variant="purple"] {
+  color: var(--rv-halo);
+  filter: drop-shadow(0 0 5px var(--rv-halo-glow)) drop-shadow(0 0 13px var(--rv-halo-glow));
+  animation: rv-arrow-breathe 2.8s var(--rv-ease) infinite;
+}
+.rv-arrow[data-variant="purple"] .rv-arrow__h { opacity: 0.78; }
+.rv-arrow[data-variant="purple"]:hover, .rv-arrow[data-variant="purple"]:focus-visible {
+  animation-play-state: paused;
+  color: #b9a6ff;
+  filter: drop-shadow(0 0 7px var(--rv-halo)) drop-shadow(0 0 20px var(--rv-halo-glow));
+}
+@keyframes rv-arrow-breathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.045); } }
+
+/* readings panel ---------------------------------------------------- */
+.rv-read { flex: 1 1 auto; max-width: 748px; width: 100%; margin: 0 auto; padding-top: 2px; text-align: left; }
+.rv-read[data-engine="halo"] { --rv-stagger: 360ms; }       /* HALO (8 modules) — tighter so the longer read doesn't drag */
+.rv-read__headline {
+  font-family: var(--font-display); font-weight: 500; font-style: italic;
+  font-size: clamp(26px, 4vw, 34px); letter-spacing: 0.01em;
+  color: var(--rv-ink); text-align: center; margin: 0;
+}
+.rv-read__flourish { display: flex; justify-content: center; margin: 2px 0 26px; }
+.rv-read__flourish .rv-sketch { width: 120px; height: 12px; color: var(--rv-ink-dim); }
+.rv-read__flourish .rv-sketch .d { stroke-dashoffset: 0; }  /* freeze-safe default: fully drawn if .is-writing never fires */
+.is-writing .rv-read__flourish .rv-sketch .d { stroke-dashoffset: 100; animation: rv-draw 0.85s var(--rv-ease-draw) forwards; animation-delay: calc(var(--i, 0) * var(--rv-stagger, 460ms) + 170ms + var(--di, 0) * 60ms); }  /* but DRAW in-sequence when the read writes in */
+
+.rv-subhead { grid-column: 1 / -1; display: flex; flex-direction: column; gap: 3px; margin-bottom: 4px; }
+.rv-subhead__t { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.24em; text-transform: uppercase; color: var(--rv-ink-dim); }
+.rv-subhead--halo .rv-subhead__t { color: color-mix(in srgb, var(--rv-halo) 78%, var(--rv-ink)); }
+.rv-subline { width: 184px; height: 8px; color: var(--rv-rule); }
+.rv-subhead--halo .rv-subline { color: color-mix(in srgb, var(--rv-halo) 45%, var(--rv-rule)); }
+
+.rv-grid { display: grid; gap: 32px 50px; }
+.rv-grid--free { grid-template-columns: 1fr; max-width: 372px; margin: 0 auto; }
+.rv-grid--halo { grid-template-columns: 1fr 1fr; max-width: 728px; margin: 0 auto; }
+.rv-mod--wide { grid-column: 1 / -1; }
+
+.rv-mod__hd { display: flex; align-items: baseline; gap: 8px; border-bottom: 1px solid var(--rv-rule-faint); padding-bottom: 6px; }
+.rv-mod__num { font-family: var(--font-mono); font-size: 10px; color: var(--rv-ink-ghost); }
+.rv-mod__title { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--rv-ink-dim); }
+.rv-mod__body { display: flex; align-items: center; gap: 16px; padding-top: 12px; }
+.rv-mod--stats .rv-mod__body, .rv-mod--oracle .rv-mod__body { display: block; }
+.rv-mod__art { flex: 0 0 auto; color: var(--rv-ink); }
+.rv-sketch { display: block; height: 92px; width: auto; overflow: visible; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+.rv-sketch .a { color: var(--rv-halo); }
+.rv-mod__art--frame .rv-sketch { height: 120px; }
+.rv-mod__art--mint { display: flex; align-items: center; gap: 12px; }
+.rv-mod__art--oracle { width: 100%; }
+.rv-mod__art--oracle .rv-sketch { height: 50px; }
+.rv-mod__art--photo { flex: 0 0 auto; }
+.rv-photoframe { position: relative; display: block; width: 124px; }
+.rv-photoframe img { width: 100%; display: block; aspect-ratio: var(--photo-ratio, 16 / 10); object-fit: cover; filter: saturate(0.92) contrast(0.97) brightness(0.96); border-radius: 1px; }
+.rv-photoframe__marks { position: absolute; inset: -5px; width: calc(100% + 10px); height: calc(100% + 10px); color: var(--rv-ink); pointer-events: none; }
+.rv-signal { position: relative; }
+.rv-signal .rv-sketch { height: 46px; }
+.rv-peak { position: absolute; right: 2px; top: 48%; transform: translateY(-50%); font-family: var(--font-mono); font-size: 8px; letter-spacing: 0.14em; color: var(--rv-halo); }
+
+.rv-mod__cap { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.rv-cap__l { font-family: var(--font-display); font-style: italic; font-size: 15.5px; color: var(--rv-ink-2); line-height: 1.28; }
+.rv-cap__l--sub { font-size: 13.5px; color: var(--rv-ink-dim); }
+.rv-cap__l--gap { margin-top: 10px; }
+.rv-cap__em { font-style: italic; font-size: 17px; color: var(--rv-ink); }
+.rv-mod__cap--leaders { gap: 1px; }
+
+.rv-stats { display: flex; flex-direction: column; gap: 9px; }
+.rv-stat { display: flex; align-items: center; justify-content: space-between; gap: 14px; }
+.rv-stat__k { font-family: var(--font-display); font-style: italic; font-size: 14px; color: var(--rv-ink-2); }
+.rv-stat__p { display: inline-flex; gap: 5px; }
+.rv-pip { width: 7px; height: 7px; transform: rotate(45deg); border: 1px solid var(--rv-rule); }
+.rv-pip.on { background: var(--rv-ink-dim); border-color: var(--rv-ink-dim); }
+
+.rv-mintbox { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em; color: var(--rv-ink-2); border: 1px solid var(--rv-rule); padding: 4px 9px; white-space: nowrap; }
+.rv-oracle { font-family: var(--font-display); font-style: italic; font-size: 16px; line-height: 1.45; color: var(--rv-ink); margin: 12px 0 0; max-width: 300px; }
+
+/* draw-on: sketch strokes draw, labels fade — sequenced per module.
+   Slow + deliberate: a moment per module (210ms), each sketch drawing its
+   strokes 54ms apart over 0.7s, the label settling after. It has a mood. */
+.rv-sketch .d { stroke-dasharray: 100; stroke-dashoffset: 100; }
+.rv-read__top, .rv-mod__hd, .rv-mod__cap, .rv-oracle, .rv-mintbox, .rv-peak, .rv-stat, .rv-subhead__t, .rv-photoframe img { opacity: 0; }
+.rv-read__top.is-writing,
+.rv-mod.is-writing .rv-mod__hd,
+.rv-subhead.is-writing .rv-subhead__t { animation: rv-fade 0.5s var(--rv-ease) forwards; animation-delay: calc(var(--i, 0) * var(--rv-stagger, 460ms)); }
+.is-writing .rv-sketch .d { animation: rv-draw 0.85s var(--rv-ease-draw) forwards; animation-delay: calc(var(--i, 0) * var(--rv-stagger, 460ms) + 170ms + var(--di, 0) * 60ms); }
+.rv-mod.is-writing .rv-mod__cap,
+.rv-mod.is-writing .rv-oracle,
+.rv-mod.is-writing .rv-mintbox { animation: rv-fade 0.6s var(--rv-ease) forwards; animation-delay: calc(var(--i, 0) * var(--rv-stagger, 460ms) + 1050ms); }
+.rv-mod.is-writing .rv-peak,
+.rv-mod.is-writing .rv-stat,
+.rv-mod.is-writing .rv-photoframe img { animation: rv-settle 0.6s var(--rv-ease) forwards; animation-delay: calc(var(--i, 0) * var(--rv-stagger, 460ms) + 1050ms); }
+@keyframes rv-draw { to { stroke-dashoffset: 0; } }
+@keyframes rv-fade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+@keyframes rv-settle { from { opacity: 0; transform: translateY(3px); } to { opacity: 1; transform: none; } }  /* K3 — half the travel of rv-fade so pips/peak/photo don't jump */
+
+@media (max-width: 900px) {
+  .reveal-stage__body { flex-direction: column; align-items: center; }
+  .rv-cardslot { order: 1; overflow-x: clip; }   /* contain the card's decorative shimmer/halo bleed on phones */
+  .rv-arrowslot { order: 2; transform: none; }
+  .rv-readslot { order: 3; width: 100%; }
+  .rv-read { max-width: 94vw; }
+  .rv-grid--halo { grid-template-columns: 1fr; max-width: 372px; }  /* stack the 6 halo modules on narrow screens */
+}
+@media (max-width: 430px) { .rv-cardslot { zoom: 0.82; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .rv-sketch .d { stroke-dashoffset: 0 !important; }
+  .rv-read__top, .rv-mod__hd, .rv-mod__cap, .rv-oracle, .rv-mintbox, .rv-peak, .rv-stat, .rv-subhead__t, .rv-photoframe img { opacity: 1 !important; transform: none !important; }
+  .rv-cardframe.is-developing .rv-layer--halo {
+    animation: none !important;
+    clip-path: inset(-60px) !important;                         /* PRESERVE the halo glow */
+    filter: brightness(1) contrast(1) saturate(1) !important;   /* fixed / true tone */
+  }
+  .rv-cardframe.is-developing .rv-layer--halo::after { animation: none !important; opacity: 0 !important; }
+  .rv-cardframe.is-developing .rv-scanline { animation: none !important; }
+  .rv-cardframe.is-developing .rv-layer--halo .fr__pip.is-on {   /* BR-S135: pips seated instantly */
+    animation: none !important;
+    animation-delay: 0ms !important;
+    opacity: 1 !important;
+    transform: rotate(45deg) !important;       /* preserve the seated-diamond rotation */
+    filter: none !important;                   /* BR-S135 NEW: kill ignition flash/bloom — true material at rest */
+  }
+  /* BR-S136 — finalization RM fallback: 180-220ms, no travel, no overscale */
+  .rv-cardframe.is-finalizing .rv-layer--halo .card__plate,
+  .rv-cardframe.is-finalizing .rv-layer--halo .corner,
+  .rv-cardframe.is-finalizing .rv-layer--halo .titleblock__title,
+  .rv-cardframe.is-finalizing .rv-layer--halo .titleblock__archetype,
+  .rv-cardframe.is-finalizing .rv-layer--halo .photo,
+  .rv-cardframe.is-finalizing .rv-layer--halo .barcode,
+  .rv-cardframe.is-finalizing .rv-layer--halo .mintstrip__state {
+    animation: none !important; transform: none !important; filter: none !important;
+  }
+  .rv-cardframe.is-finalizing .rv-layer--halo .fr__pip.is-on,
+  .rv-cardframe.is-finalizing .rv-layer--halo .fr__pip.is-on.is-final-pip {
+    animation: none !important; opacity: 1 !important;
+    transform: rotate(45deg) !important; filter: none !important;
+  }
+  .rv-cardframe.is-finalizing .rv-layer--halo .card__plate > .rv-seal,
+  .rv-cardframe.is-finalizing .rv-layer--halo .card__plate > .rv-seal::before {
+    animation: none !important; opacity: 0 !important; transform: none !important;
+  }
+  .rv-cardframe.is-finalizing .rv-layer--halo .card__house {
+    animation: none !important; transform: none !important; filter: none !important;
+  }
+  .rv-cardframe.is-finalizing .rv-layer--halo .card__house::after {
+    -webkit-text-stroke-width: 0px !important;
+    animation: rv-stamp-charge-rm 200ms linear both !important;
+  }
+  .rv-cardframe .rv-layer--halo.rv-halo-settled .card__plate {
+    filter: contrast(1.02) saturate(1.01);
+  }
+  .reveal-stage--menustage .rv-arrow:hover:not([aria-disabled="true"]),
+  .reveal-stage--menustage .rv-arrow:focus-visible { transition: none !important; }   /* BR-S134 M4 */
+  .rv-stagemain, .rv-readslot { transition: none !important; transform: none !important; }
+  .rv-readslot { opacity: 1 !important; }
+  .rv-arrow[data-variant="purple"] { animation: none !important; }
+}
+
+/* =====================================================================
+   M4 (BR-S134) — ARROW HITBOX == the visible glyph, in every state.
+   ROOT CAUSE (measured): after the slide the read panel z-stacked OVER the
+   arrow — the arrowslot's z-index:7 is trapped in .rv-stagemain's transform
+   stacking context, and .rv-readslot is a LATER flex sibling, so it painted
+   on top and ate clicks on the arrow's right half. Fix: lift stagemain above
+   the readslot. PLUS tighten the box so the breathe/hover peak can't overhang
+   (no drift: transform-origin pinned). BR-S132 placement is untouched. */
+.reveal-stage--menustage .rv-stagemain { z-index: 2; }   /* the arrow rides above the read seam */
+.reveal-stage--menustage .rv-readslot  { z-index: 1; }
+.rv-arrow { transform-origin: center; }
+.rv-arrow { padding: 4px; }                               /* standalone: encloses the 1.06 hover peak */
+.reveal-stage--menustage .rv-arrow { padding: 2px; }      /* menustage 56px glyph: tight box */
+.reveal-stage--menustage .rv-arrow:hover:not([aria-disabled="true"]),
+.reveal-stage--menustage .rv-arrow:focus-visible { transform: scale(1.035); }  /* peak stays inside the box */

@@ -1,0 +1,704 @@
+/* =============================================================
+   THE PROFILE / HUB (?dev=profile)
+
+   Two zones on a near-black archive ground:
+   ABOVE GROUND — a self-contained "surface world": a borderless warm ground-panel
+     rising out of the floor, sealed at its base by a gold Kingdom-Threshold horizon.
+   UNDERGROUND — content sections as open L-bracket ledger panels (spine + gold
+     top-rule + folder-tab heading), clearly contained, flat, nothing lifted.
+
+   Colour law: "crown + hairline ink" — the crown SVG is the ONE gold object; the hairline
+   section rules/spines stay as low-alpha warm ink; saturated gold is pulled off wayfinding
+   (doors, tabs, labels, CTAs, the '+') to warm-grey. Focus ring stays gold (canon). NO pure
+   white. Violet reserved for commerce — the one paid register (the Rings "read for someone").
+============================================================= */
+
+.pf {
+  --pf-gold: #a2864a;          /* muted antique gold — dimmed from #c9a35c (too bright) */
+  --pf-gold-lit: #c0a05d;
+  --pf-cream: #e9e5dc;
+  --pf-cream-display: #dcd6c9;
+  --pf-crown: #e0dacd;
+  --pf-room: #0a0b0d;
+  --pf-tab-bg: #0c0d11;                       /* folder-tab chip — one hair above the floor */
+  --pf-line: rgba(201, 163, 92, 0.13);
+  --pf-line-soft: rgba(201, 163, 92, 0.07);
+  --pf-line-cut: rgba(201, 163, 92, 0.22);    /* section spine + top-rule start */
+  --pf-body: #b1ada4;
+  --pf-meta: #9c9790;
+  --pf-ghost: #96918a;
+  --pf-violet: #8a6fb0;                        /* commerce register — defined, unused here */
+  --pf-violet-lit: #a487c8;
+  --pf-violet-line: rgba(138, 111, 176, 0.4);
+  --pf-serif: "Cormorant Garamond", "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+  --pf-mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+  --pf-ui: system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  position: fixed; inset: 0; z-index: 30;
+  overflow-y: auto; overflow-x: hidden;
+  background: radial-gradient(120% 66% at 50% 0%, #15110b 0%, #0a0b0d 56%, #070607 100%);
+  color: var(--pf-body); font-family: var(--pf-ui); -webkit-font-smoothing: antialiased;
+}
+.pf *, .pf *::before, .pf *::after { box-sizing: border-box; }
+.pf :focus-visible { outline: 2px solid var(--pf-gold-lit); outline-offset: 3px; }
+.pf-defs { position: absolute; }
+
+/* ---------- masthead — room doors (above the surface box) ---------- */
+.pf-top {
+  position: sticky; top: 0; z-index: 14;
+  display: flex; align-items: center; justify-content: space-between; gap: 18px; flex-wrap: wrap;
+  padding: 17px clamp(16px, 4vw, 46px) 13px;
+  background: linear-gradient(to bottom, rgba(10,11,13,.98), rgba(10,11,13,.55) 72%, rgba(10,11,13,0));
+  backdrop-filter: blur(2px);
+}
+.pf-wordmark { display: inline-flex; align-items: baseline; gap: 9px; text-decoration: none; font-family: var(--pf-serif); font-weight: 600; font-size: 20px; letter-spacing: .015em; color: var(--pf-cream-display); transition: color .18s; }
+.pf-wordmark__mark { color: var(--pf-gold); font-size: 12px; transform: translateY(-1px); }
+.pf-wordmark:hover, .pf-wordmark:focus-visible { color: var(--pf-crown); outline: none; }
+
+/* ---------- shell ---------- */
+.pf-wrap { width: min(760px, 92vw); margin: 0 auto; padding: clamp(14px, 3vh, 30px) 0 16vh; }
+
+/* ---------- ABOVE GROUND — the surface-world box ---------- */
+.pf-surface {
+  position: relative; isolation: isolate; text-align: left;
+  margin: clamp(10px, 2.5vh, 22px) auto 0;
+  padding: clamp(16px, 3vh, 28px) 0 0;
+}
+
+/* identity — a quiet LEFT header, name starting at the section column edge */
+.pf-id { display: flex; align-items: center; gap: 14px; padding-left: 23px; }
+.pf-id__av { width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--pf-line); display: grid; place-items: center; font-family: var(--pf-serif); font-weight: 600; font-size: 21px; color: var(--pf-gold); flex: none; background: rgba(162,134,74,.06); }
+.pf-id__txt { display: flex; flex-direction: column; }
+/* the identity name — white, with a black oil/ink edge rippling around the letters */
+.pf-id__name { font-family: var(--pf-serif); font-weight: 600; font-size: clamp(26px, 3.4vw, 38px); line-height: 1.05; letter-spacing: .012em; color: #f4f3ef; filter: url(#pfOil); }
+@media (prefers-reduced-motion: reduce) { .pf-id__name { filter: none; } }
+.pf-id__handle { font-family: var(--pf-mono); font-size: 11px; letter-spacing: .14em; color: var(--pf-meta); margin-top: 4px; }
+.pf-id__born { color: var(--pf-ghost); letter-spacing: .1em; }
+
+/* the Crown — the reading button (staged centrally by .pf-crownstage, see below) */
+.pf-crownbtn { display: inline-flex; flex: none; background: none; border: 1px solid transparent; border-radius: 12px; padding: 8px; cursor: pointer; transition: border-color .18s, background .18s; }
+.pf-crownbtn:hover, .pf-crownbtn:focus-visible { border-color: var(--pf-line); background: rgba(162,134,74,.035); outline: none; }
+.pf-crown-svg { width: clamp(104px, 17vw, 148px); height: auto; filter: drop-shadow(0 10px 14px rgba(0,0,0,.5)) drop-shadow(0 4px 12px rgba(162,134,74,.13)) drop-shadow(0 0 10px rgba(162,134,74,.09)); }
+.pf-crownbtn:hover .pf-crown-svg { filter: drop-shadow(0 10px 14px rgba(0,0,0,.5)) drop-shadow(0 4px 14px rgba(162,134,74,.2)) drop-shadow(0 0 12px rgba(162,134,74,.15)); }
+.pf-crown-empty { width: clamp(140px, 24vw, 180px); aspect-ratio: 1 / .62; display: grid; place-items: center; border: 1px dashed var(--pf-violet-line); border-radius: 4px; color: var(--pf-violet-lit); font-family: var(--pf-mono); font-size: 9px; letter-spacing: .2em; text-transform: uppercase; text-align: center; line-height: 1.9; padding: 12px; }
+/* the reading's provenance line under the crown */
+.pf-prov { font-family: var(--pf-serif); font-style: italic; font-size: 14.5px; color: var(--pf-meta); margin: 0; max-width: 40ch; line-height: 1.5; }
+.pf-openreading--lg { padding: 10px 22px; font-size: 10.5px; letter-spacing: .18em; border: 1px solid var(--pf-line-cut); border-radius: 999px; }
+.pf-openreading--lg:hover, .pf-openreading--lg:focus-visible { border-color: var(--pf-gold); }
+
+/* PAID register — violet, the one commerce colour; every control that leads to paid content */
+.pf-openreading.pf-paid { color: var(--pf-violet-lit); border-color: var(--pf-violet-line); }
+.pf-openreading.pf-paid:hover, .pf-openreading.pf-paid:focus-visible { border-color: var(--pf-violet); color: #bda6e4; }
+.pf-crownbtn--empty:hover, .pf-crownbtn--empty:focus-visible { border-color: transparent; background: rgba(138,111,176,.06); }
+.pf-mini--add.pf-paid { color: var(--pf-violet-lit); border-color: var(--pf-violet-line); }
+.pf-mini--add.pf-paid:hover, .pf-mini--add.pf-paid:focus-visible { border-color: var(--pf-violet); color: #bda6e4; }
+.pf-mini--add.pf-paid .pf-mini__plus, .pf-mini--add.pf-paid .pf-mini__n { color: var(--pf-violet-lit); }
+
+/* ---------- shared in-body door bar — every door speaks one language ---------- */
+.pf-doorbar {
+  display: flex; align-items: center; gap: 16px; width: 100%; text-decoration: none; text-align: left; cursor: pointer;
+  border: 1px solid var(--pf-line); border-radius: 6px; padding: 16px 20px;
+  background: linear-gradient(180deg, rgba(233,229,220,.014), transparent 60%);
+  transition: border-color .18s, background .18s;
+}
+.pf-doorbar:hover, .pf-doorbar:focus-visible { border-color: var(--pf-gold); background: rgba(201,163,92,.05); outline: none; }
+.pf-doorbar--referral { margin-top: clamp(32px, 5.5vh, 52px); }
+.pf-doorbar__seal { width: 34px; height: 34px; color: var(--pf-gold); flex: none; }
+.pf-doorbar__txt { flex: 1; }
+.pf-doorbar__t { font-family: var(--pf-serif); font-weight: 600; font-size: 21px; color: var(--pf-cream-display); line-height: 1.1; display: block; }
+.pf-doorbar__s { font-family: var(--pf-mono); font-size: 9.5px; letter-spacing: .06em; color: var(--pf-meta); margin-top: 5px; display: block; }
+.pf-doorbar__arr { margin-left: auto; color: var(--pf-gold); font-size: 18px; transition: transform .18s; }
+.pf-doorbar:hover .pf-doorbar__arr, .pf-doorbar:focus-visible .pf-doorbar__arr { transform: translateX(3px); }
+
+/* open-this-reading (free, gold) + redraw (a quiet gold door, price lives in the Arcana Room) */
+.pf-openreading { background: none; border: 0; cursor: pointer; padding: 6px 2px; text-decoration: none; font-family: var(--pf-mono); font-size: 10px; font-weight: 500; letter-spacing: .16em; text-transform: uppercase; color: var(--pf-gold); border-bottom: 1px solid var(--pf-line); transition: color .18s, border-color .18s; }
+.pf-openreading:hover, .pf-openreading:focus-visible { color: var(--pf-gold-lit); border-color: var(--pf-gold); outline: none; }
+
+/* ---------- UNDERGROUND — sections as open L-bracket ledger panels ---------- */
+.pf-sec {
+  position: relative; margin: clamp(32px, 5.5vh, 52px) 0 0; padding: 30px 0 24px 22px;
+  border-left: 1px solid var(--pf-line-cut);
+  background: linear-gradient(to right, rgba(233,229,220,.020) 0%, rgba(233,229,220,.007) 30%, transparent 62%);
+}
+.pf-sec::before { content: ""; position: absolute; left: -1px; top: 0; width: min(58%, 340px); height: 1px; background: linear-gradient(to right, var(--pf-line-cut) 0%, var(--pf-line) 42%, transparent 100%); }
+.pf-sec::after { content: ""; position: absolute; left: -1px; bottom: 0; width: 38px; height: 1px; background: linear-gradient(to right, rgba(201,163,92,.25), transparent); }
+/* folder-tab heading — an opaque chip straddling the elbow, knocking a clean gap in the top-rule */
+.pf-sec__h { position: absolute; top: 0; left: 14px; transform: translateY(-50%); z-index: 1; display: inline-flex; align-items: center; gap: 10px; margin: 0; padding: 3px 12px; background: var(--pf-tab-bg); border: 1px solid var(--pf-line); border-radius: 4px; font-family: var(--pf-mono); font-size: 9.5px; font-weight: 500; letter-spacing: .22em; text-transform: uppercase; color: var(--pf-gold); }
+.pf-sec__note { font-family: var(--pf-mono); font-size: 8.5px; letter-spacing: .16em; text-transform: uppercase; color: var(--pf-ghost); }
+.pf-lede { font-family: var(--pf-serif); font-size: 17.5px; line-height: 1.6; color: var(--pf-body); max-width: 60ch; margin: 2px 0 20px; }
+
+/* Rings — mini-crowns (§3.4) */
+/* BR-S374 — `gap` is an INTER-item rule; it does nothing to this box's own top
+   edge, so the dashed add-box stacked its border straight onto the Rings row's
+   hairline — the one place on the page where two drawn edges met with no air.
+   12px is the vault rows' own padding unit, so the box breathes like a row. */
+.pf-family { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 12px; }
+.pf-mini { flex: 0 0 auto; width: 144px; border: 1px solid var(--pf-line-soft); border-radius: 4px; padding: 16px 12px 14px; text-align: center; background: rgba(233,229,220,.018); }
+.pf-mini__label { font-family: var(--pf-serif); font-size: 16px; color: var(--pf-cream); margin: 5px 0 0; line-height: 1.25; }
+.pf-mini__n { font-family: var(--pf-mono); font-size: 10px; letter-spacing: .08em; color: var(--pf-meta); margin: 6px 0 0; }
+.pf-mini--add { min-height: 128px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; color: var(--pf-ghost); cursor: pointer; border-style: dashed; background: none; }
+.pf-mini--add:hover, .pf-mini--add:focus-visible { color: var(--pf-gold-lit); border-color: var(--pf-gold); outline: none; }
+.pf-mini__plus { font-size: 20px; line-height: 1; color: var(--pf-gold); }
+.pf-mini--add .pf-mini__label { color: inherit; }
+.pf-mini--add .pf-mini__n { color: var(--pf-ghost); }
+
+/* "Read for someone" → the family-tree relation picker (paid, violet) */
+.pf-mini--add-wrap { position: relative; width: 144px; flex: 0 0 auto; display: flex; }
+.pf-mini--add-wrap .pf-mini--add { width: 100%; }
+.pf-relmenu { position: absolute; left: 0; top: calc(100% + 8px); z-index: 20; width: 264px; padding: 13px; background: #131117; border: 1px solid var(--pf-violet-line); border-radius: 8px; box-shadow: 0 16px 40px rgba(0,0,0,.55); }
+.pf-relmenu[hidden] { display: none; }
+.pf-relmenu__h { font-family: var(--pf-mono); font-size: 9px; letter-spacing: .16em; text-transform: uppercase; color: var(--pf-meta); margin: 0 0 11px; }
+.pf-relmenu__grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.pf-relopt { text-align: left; background: none; border: 1px solid var(--pf-line); border-radius: 5px; padding: 9px 12px; cursor: pointer; font-family: var(--pf-serif); font-size: 15px; color: var(--pf-cream); transition: border-color .15s, background .15s, color .15s; }
+.pf-relopt:hover, .pf-relopt:focus-visible { border-color: var(--pf-violet); color: var(--pf-violet-lit); background: rgba(138,111,176,.08); outline: none; }
+
+/* the vault */
+.pf-vault { display: grid; grid-template-columns: 1fr; gap: 16px; }
+.pf-cards { display: flex; gap: 14px; overflow-x: auto; padding: 2px 2px 10px; }
+.pf-card { position: relative; flex: 0 0 auto; width: 134px; aspect-ratio: 3 / 4.3; border: 1px solid var(--pf-line); border-radius: 9px; overflow: hidden; display: flex; flex-direction: column; text-align: left; cursor: pointer; background: linear-gradient(180deg, #101217, #0b0c10); transition: border-color .18s, transform .08s, box-shadow .22s; }
+.pf-card:hover, .pf-card:focus-visible { border-color: var(--pf-gold); box-shadow: 0 12px 30px rgba(0,0,0,.45); outline: none; }
+.pf-card:active { transform: translateY(1px); }
+/* the art plate — where the mint image sits; ghosted seal placeholder for now */
+.pf-card__art { flex: 1; display: grid; place-items: center; border-bottom: 1px solid var(--pf-line-soft); background: radial-gradient(120% 80% at 50% 22%, rgba(162,134,74,.12), rgba(10,11,13,0) 68%), linear-gradient(158deg, rgba(162,134,74,.07), rgba(10,11,13,0) 60%); }
+.pf-card__art svg { width: 32px; height: 32px; color: var(--pf-gold); opacity: .32; }
+.pf-card:hover .pf-card__art svg { opacity: .5; }
+.pf-card__cap { padding: 9px 11px 11px; }
+.pf-card__k { display: block; font-family: var(--pf-mono); font-size: 8px; letter-spacing: .18em; text-transform: uppercase; color: var(--pf-ghost); }
+.pf-card__n { display: block; font-family: var(--pf-serif); font-size: 15px; color: var(--pf-cream); line-height: 1.15; margin-top: 3px; }
+
+/* showcase — choosable slots: feature a reading result or a minted card */
+.pf-show { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px; }
+.pf-slotwrap { position: relative; }
+.pf-slot { width: 100%; min-height: 120px; display: flex; flex-direction: column; cursor: pointer; border-radius: 6px; padding: 16px 14px; transition: border-color .18s, background .18s, color .18s; }
+.pf-slot--empty { align-items: center; justify-content: center; gap: 7px; text-align: center; border: 1px dashed var(--pf-line); background: rgba(233,229,220,.012); color: var(--pf-ghost); }
+.pf-slot--empty:hover, .pf-slot--empty:focus-visible { border-color: var(--pf-gold); color: var(--pf-gold-lit); outline: none; }
+.pf-slot__plus { font-size: 22px; line-height: 1; color: var(--pf-gold); }
+.pf-slot__hint { font-family: var(--pf-mono); font-size: 9px; letter-spacing: .12em; text-transform: uppercase; line-height: 1.7; }
+.pf-slot--filled { border: 1px solid var(--pf-line); background: rgba(233,229,220,.02); }
+.pf-slot--filled:hover, .pf-slot--filled:focus-visible { border-color: var(--pf-gold); outline: none; }
+.pf-slot__kind { font-family: var(--pf-mono); font-size: 8px; letter-spacing: .2em; text-transform: uppercase; color: var(--pf-gold); }
+.pf-slot__t { font-family: var(--pf-serif); font-size: 19px; color: var(--pf-cream); line-height: 1.15; margin-top: 4px; text-align: left; }
+.pf-slot__change { font-family: var(--pf-mono); font-size: 8.5px; letter-spacing: .12em; text-transform: uppercase; color: var(--pf-meta); margin-top: auto; padding-top: 12px; }
+
+/* the pick menu — choose a reading result or a minted card */
+.pf-pickmenu { position: absolute; left: 0; right: 0; top: calc(100% + 8px); z-index: 20; padding: 13px; background: #131117; border: 1px solid var(--pf-line); border-radius: 8px; box-shadow: 0 16px 40px rgba(0,0,0,.55); }
+.pf-pickmenu[hidden] { display: none; }
+.pf-pickmenu__h { font-family: var(--pf-mono); font-size: 9px; letter-spacing: .16em; text-transform: uppercase; color: var(--pf-meta); margin: 0 0 9px; }
+.pf-pickmenu__grid + .pf-pickmenu__h { margin-top: 14px; }
+.pf-pickmenu__grid { display: flex; flex-direction: column; gap: 5px; }
+.pf-pickopt { display: flex; align-items: baseline; gap: 10px; text-align: left; background: none; border: 1px solid var(--pf-line-soft); border-radius: 5px; padding: 8px 11px; cursor: pointer; transition: border-color .15s, background .15s; }
+.pf-pickopt:hover, .pf-pickopt:focus-visible { border-color: var(--pf-gold); background: rgba(201,163,92,.06); outline: none; }
+.pf-pickopt__k { font-family: var(--pf-mono); font-size: 8px; letter-spacing: .14em; text-transform: uppercase; color: var(--pf-gold); flex: none; min-width: 64px; }
+.pf-pickopt__n { font-family: var(--pf-serif); font-size: 15px; color: var(--pf-cream); }
+.pf-pickempty { font-family: var(--pf-mono); font-size: 9px; letter-spacing: .04em; color: var(--pf-ghost); margin: 0; line-height: 1.6; }
+
+/* friends */
+.pf-friends { display: flex; flex-direction: column; }
+.pf-friend { display: flex; align-items: center; gap: 14px; padding: 13px 0; border-bottom: 1px solid var(--pf-line-soft); text-decoration: none; color: inherit; }
+.pf-friend:last-of-type { border-bottom: 0; }
+.pf-friend__av { width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--pf-line); display: grid; place-items: center; font-family: var(--pf-serif); font-size: 16px; color: var(--pf-gold); flex: none; }
+.pf-friend__n { font-family: var(--pf-serif); font-size: 18px; color: var(--pf-cream); flex: 1; }
+.pf-friend__crown { font-family: var(--pf-mono); font-size: 9px; letter-spacing: .12em; text-transform: uppercase; color: var(--pf-meta); }
+.pf-friend__vis { font-family: var(--pf-mono); font-size: 10px; letter-spacing: .08em; text-transform: uppercase; color: var(--pf-meta); }
+.pf-addfriend { margin: 16px 0 0; background: none; border: 1px solid var(--pf-line); border-radius: 3px; padding: 9px 16px; cursor: pointer; font-family: var(--pf-mono); font-size: 9.5px; letter-spacing: .16em; text-transform: uppercase; color: var(--pf-meta); transition: border-color .18s, color .18s; }
+.pf-addfriend:hover, .pf-addfriend:focus-visible { border-color: var(--pf-gold); color: var(--pf-gold-lit); outline: none; }
+
+/* footer — bedrock */
+.pf-foot { margin: clamp(44px, 8vh, 72px) 0 0; padding-top: 24px; border-top: 1px solid var(--pf-line-soft); font-family: var(--pf-mono); font-size: 9px; letter-spacing: .1em; color: var(--pf-ghost); line-height: 1.9; text-align: center; }
+
+/* ============================================================
+   BR-S180 EASY BATCH — append-only overrides (leaves the praised
+   section rules + crown untouched; specificity keeps the paid violet).
+   1) the assembled name as hero  2) gold law "crown + hairline ink"
+   3) intimate 620px column  4) ground grain  5) friends-row fix
+   6) small-text contrast lift
+============================================================ */
+
+/* 1 — the assembled name is the artifact: the largest type, oil-edge treatment.
+   The bearer's real name + the spine that composed it drop to quiet provenance. */
+.pf-id__name { font-size: clamp(30px, 4.6vw, 46px); margin: 0; }
+.pf-id__bearer { font-family: var(--pf-serif); font-weight: 600; font-size: 19px; line-height: 1.12; color: var(--pf-cream-display); }
+.pf-crownname { padding-left: 23px; margin: clamp(14px, 2.6vh, 22px) 0 0; }
+.pf-crownname__spine { font-family: var(--pf-mono); font-size: 10px; letter-spacing: .2em; text-transform: uppercase; color: var(--pf-meta); margin: 9px 0 0; }
+
+/* 2 — gold law: saturated gold pulled off wayfinding → warm-grey.
+   Crown SVG, hairline section rules, and the focus ring KEEP their gold. */
+.pf-wordmark__mark,
+.pf-doorbar__seal, .pf-doorbar__arr,
+.pf-sec__h,
+.pf-openreading,
+.pf-mini__plus, .pf-slot__plus, .pf-slot__kind,
+.pf-pickopt__k,
+.pf-friend__av { color: var(--pf-meta); }
+.pf-id__av { color: var(--pf-cream-display); }
+.pf-openreading:hover, .pf-openreading:focus-visible,
+.pf-mini--add:hover, .pf-mini--add:focus-visible,
+.pf-slot--empty:hover, .pf-slot--empty:focus-visible,
+.pf-addfriend:hover, .pf-addfriend:focus-visible { color: var(--pf-cream-display); }
+.pf-doorbar:hover, .pf-doorbar:focus-visible,
+.pf-openreading--lg:hover, .pf-openreading--lg:focus-visible,
+.pf-slot--empty:hover, .pf-slot--empty:focus-visible,
+.pf-slot--filled:hover, .pf-slot--filled:focus-visible,
+.pf-pickopt:hover, .pf-pickopt:focus-visible,
+.pf-mini--add:hover, .pf-mini--add:focus-visible,
+.pf-addfriend:hover, .pf-addfriend:focus-visible,
+.pf-card:hover, .pf-card:focus-visible { border-color: var(--pf-line-cut); }
+.pf-doorbar:hover, .pf-doorbar:focus-visible,
+.pf-pickopt:hover, .pf-pickopt:focus-visible { background: rgba(233, 229, 220, .03); }
+
+/* 3 + 4 — intimate column, and a fine static grain on the ground (rendered once,
+   under content, kills banding + gives the void a paper tooth). Not animated. */
+.pf-wrap { width: min(620px, 92vw); position: relative; z-index: 1; }
+.pf::before {
+  content: ""; position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+  opacity: .05; mix-blend-mode: soft-light;
+}
+
+/* 5 — friends row: the crown-epithet rides beside the name instead of the far edge */
+.pf-friend__n { flex: 0 1 auto; }
+
+/* 6 — lift instructive small text off the dim ghost tier */
+.pf-slot__hint { color: var(--pf-meta); }
+.pf-foot { color: var(--pf-meta); }
+
+/* ============================================================
+   BR-S181 — the crown gets its own centered band: a single-object
+   museum display (warm pool of light + lit-object shadow stack),
+   enlarged, generous air above/below, caption below, nothing beside.
+============================================================ */
+.pf-crownstage {
+  position: relative; isolation: isolate;
+  display: flex; flex-direction: column; align-items: center; text-align: center;
+  /* BR-S374 — the bottom clamp moved to `.pf-shelfline`'s top margin. It was
+     collapsing through the surface onto the line anyway; now the line declares
+     the gap it actually renders. The crownstage is always the last child here
+     (both the crowned and the empty branch), so nothing else loses air. */
+  margin: clamp(40px, 8vh, 88px) 0 0;
+  padding: clamp(24px, 5vh, 52px) 0 0;
+}
+/* the pool of light — warm, fades fully to transparent (no box edge, no halation) */
+.pf-crownstage::before {
+  content: ""; position: absolute; z-index: -1; pointer-events: none;
+  left: 50%; top: 46%; transform: translate(-50%, -50%);
+  width: min(440px, 96%); height: 330px;
+  background: radial-gradient(ellipse at center, rgba(201, 163, 92, .11) 0%, rgba(201, 163, 92, .045) 38%, transparent 68%);
+}
+/* enlarged centerpiece + lit-object shadow stack (contact + warm glow + soft halo) */
+.pf-crownstage .pf-crown-svg {
+  width: clamp(160px, 24vw, 210px);
+  filter: drop-shadow(0 14px 10px rgba(0, 0, 0, .5)) drop-shadow(0 6px 22px rgba(201, 163, 92, .22)) drop-shadow(0 0 40px rgba(201, 163, 92, .10));
+}
+.pf-crownstage .pf-crownbtn:hover .pf-crown-svg,
+.pf-crownstage .pf-crownbtn:focus-visible .pf-crown-svg {
+  filter: drop-shadow(0 14px 10px rgba(0, 0, 0, .5)) drop-shadow(0 6px 24px rgba(201, 163, 92, .30)) drop-shadow(0 0 46px rgba(201, 163, 92, .15));
+}
+/* caption below the crown, centered — nothing sits beside the object */
+.pf-crownstage__cap { margin-top: clamp(16px, 2.6vh, 26px); }
+.pf-crownstage__cap .pf-prov { max-width: 42ch; margin: 0 auto; text-align: center; }
+.pf-crownstage__cap .pf-openreading { display: inline-block; margin-top: 14px; }
+
+/* ============================================================
+   BR-S182 — "The Rooms": the hub's doors block (a labelled door per
+   room + deadpan descriptor), plus incised (letterpress) dividers.
+============================================================ */
+.pf-rooms { display: flex; flex-direction: column; }
+.pf-roomdoor {
+  display: flex; align-items: baseline; gap: 14px; padding: 13px 2px;
+  text-decoration: none; color: inherit; cursor: pointer;
+  border-bottom: 1px solid var(--pf-line-soft);
+  box-shadow: 0 1px 0 rgba(224, 218, 205, .025);   /* incised lip — a groove, not a drawn line */
+  transition: background .18s;
+}
+.pf-roomdoor:last-of-type { border-bottom: 0; box-shadow: none; }
+.pf-roomdoor:hover, .pf-roomdoor:focus-visible { background: rgba(233, 229, 220, .02); outline: none; }
+.pf-roomdoor__n { font-family: var(--pf-serif); font-size: 18px; color: var(--pf-cream); flex: none; }
+.pf-roomdoor:hover .pf-roomdoor__n, .pf-roomdoor:focus-visible .pf-roomdoor__n { color: var(--pf-cream-display); }
+.pf-roomdoor__d { font-family: var(--pf-mono); font-size: 9.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--pf-meta); }
+.pf-roomdoor__arr { margin-left: auto; color: var(--pf-meta); font-size: 15px; transition: transform .18s; }
+.pf-roomdoor:hover .pf-roomdoor__arr, .pf-roomdoor:focus-visible .pf-roomdoor__arr { transform: translateX(3px); }
+
+/* incised dividers elsewhere — a whisper of highlight below the hairline = a cut groove */
+.pf-friend { box-shadow: 0 1px 0 rgba(224, 218, 205, .022); }
+.pf-friend:last-of-type { box-shadow: none; }
+
+/* ============================================================
+   BR-S184 ELEVATION — "one lamp, one room": the crown lights the
+   whole column with a warm falloff, and its pool breathes; plus the
+   dated museum label, last contrast lifts, and a high-contrast opt-out.
+============================================================ */
+
+/* the room lamp — one soft warm pool anchored at the crown, falling off down
+   the column so the ledger sits in residual warmth then recedes to archive-dark.
+   Sits above the ground + grain, below content. */
+.pf-wrap::before {
+  content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  background: radial-gradient(130% 52% at 50% 15%, rgba(201, 163, 92, .065) 0%, rgba(201, 163, 92, .02) 42%, transparent 70%);
+}
+
+/* the crown's pool breathes — a candle-slow swell, never a pulse (motion-safe) */
+@keyframes pfBreath { 0%, 100% { opacity: .82; } 50% { opacity: 1; } }
+@media (prefers-reduced-motion: no-preference) {
+  .pf-crownstage::before { animation: pfBreath 12s ease-in-out infinite; }
+}
+
+/* the dated museum label under the crown — the second thing worth pausing on */
+.pf-crownstage__filed {
+  font-family: var(--pf-mono); font-size: 9.5px; letter-spacing: .16em; text-transform: uppercase;
+  color: var(--pf-meta); margin: 10px 0 0;
+}
+
+/* contrast — lift the last small labels off the dim ghost tier */
+.pf-sec__note, .pf-card__k { color: var(--pf-meta); }
+
+/* honour high-contrast mode — drop the animated ink rim on the name */
+@media (prefers-contrast: more) { .pf-id__name { filter: none; } }
+
+/* ============================================================
+   BR-S185 — THE SHELF ported into the profile's museum language.
+   Vault-specific .pf-* additions only; the rest reuses profile classes
+   (.pf-wrap / .pf-sec / .pf-crownstage__cap / .pf-prov / .pf-openreading).
+============================================================ */
+.pf-back { display: inline-block; margin: 0 0 clamp(16px, 3.5vh, 30px); font-family: var(--pf-mono); font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: var(--pf-meta); text-decoration: none; transition: color .18s; }
+.pf-back:hover, .pf-back:focus-visible { color: var(--pf-cream-display); outline: none; }
+/* BR-S307: the same control seated in the sticky masthead — no block margin, so it
+   sits on the wordmark's baseline row instead of pushing the header open. */
+.pf-back--top { margin: 0; }
+
+.pf-vaulthead { text-align: center; }
+.pf-vaulteyebrow { font-family: var(--pf-mono); font-size: 9.5px; letter-spacing: .28em; text-transform: uppercase; color: var(--pf-meta); }
+.pf-vaulttitle { font-family: var(--pf-serif); font-weight: 600; font-size: clamp(30px, 4.6vw, 46px); line-height: 1.05; letter-spacing: .01em; color: var(--pf-cream-display); margin: 8px 0 0; }
+.pf-vaultintro { font-family: var(--pf-serif); font-size: 15px; color: var(--pf-body); margin: 12px 0 0; }
+
+/* the mint enshrined in a light pool — the crownstage form, sized for a portrait card */
+.pf-vaultstage {
+  position: relative; isolation: isolate;
+  display: flex; flex-direction: column; align-items: center; text-align: center;
+  margin: clamp(30px, 6vh, 64px) 0 clamp(38px, 8vh, 78px); padding: clamp(20px, 4vh, 42px) 0 0;
+}
+.pf-vaultstage::before {
+  content: ""; position: absolute; z-index: -1; pointer-events: none;
+  left: 50%; top: 44%; transform: translate(-50%, -50%);
+  width: min(460px, 100%); height: 110%;
+  background: radial-gradient(ellipse 62% 54% at 50% 42%, rgba(201, 163, 92, .10) 0%, rgba(201, 163, 92, .04) 40%, transparent 70%);
+}
+@media (prefers-reduced-motion: no-preference) { .pf-vaultstage::before { animation: pfBreath 12s ease-in-out infinite; } }
+
+/* BR-S265 — SCALE THE CARD, DO NOT SQUEEZE IT.
+   This was `max-width: min(340px, 86vw)` on a card that declares `--card-w: 500px`
+   (the room-crown tier). A max-width only narrows the BOX: every fixed-px piece of
+   chrome inside keeps its 500px-crown size, so the card rendered 340 wide while its
+   title stayed 32px and .card__plate kept 26px of padding — measured live. The card
+   read wrong-proportioned rather than smaller, which is the "wrong dimension" as
+   reported.
+   styles.css already states the rule this broke, on .msample__card: "Render the card
+   at a known-good natural width, then scale the whole artifact down proportionally
+   with zoom so it keeps the room card's exact proportions (a width-only squeeze
+   distorts the fixed chrome)." So: same instrument here. 500 x 0.68 = 340 rendered,
+   identical footprint to before, correct proportions inside it.
+   zoom (not transform:scale) deliberately — it collapses the layout box, so the
+   surrounding composition and the gold vitrine brackets still measure the real
+   rendered size and need no compensation. */
+.pf-vaultcard { position: relative; width: fit-content; max-width: 100%; margin: 0 auto; }
+.pf-vaultcard__inner { position: relative; z-index: 1; width: 500px; zoom: 0.68; }
+/* narrow: keep the same proportions, just less of them (86vw at 500px natural) */
+@media (max-width: 620px) { .pf-vaultcard__inner { zoom: 0.52; } }
+@media (max-width: 420px) { .pf-vaultcard__inner { zoom: 0.44; } }
+/* faint gold vitrine brackets — the one retained museum motif */
+.pf-vcrop { position: absolute; width: 14px; height: 14px; border: 1px solid var(--pf-line-cut); z-index: 2; pointer-events: none; }
+.pf-vcrop--tl { top: -9px; left: -9px; border-right: 0; border-bottom: 0; }
+.pf-vcrop--tr { top: -9px; right: -9px; border-left: 0; border-bottom: 0; }
+.pf-vcrop--bl { bottom: -9px; left: -9px; border-right: 0; border-top: 0; }
+.pf-vcrop--br { bottom: -9px; right: -9px; border-left: 0; border-top: 0; }
+
+/* the quiet access micro-stack — no box, no header tab */
+.pf-access { display: flex; flex-direction: column; align-items: center; gap: 5px; margin: 16px 0 0; }
+.pf-access__qr { width: 88px; height: 88px; color: var(--pf-meta); opacity: .85; }
+.pf-access__qr svg { width: 100%; height: 100%; display: block; }
+.pf-access__id { font-family: var(--pf-mono); font-size: 10px; letter-spacing: .16em; color: var(--pf-meta); }
+.pf-access__cta { font-family: var(--pf-mono); font-size: 8.5px; letter-spacing: .2em; text-transform: uppercase; color: var(--pf-ghost); }
+
+/* SAVED MINTS — the profile's friend-row idiom */
+.pf-mintlist { display: flex; flex-direction: column; }
+.pf-mintrow { position: relative; display: flex; align-items: center; gap: 14px; width: 100%; padding: 12px 2px; text-align: left; background: none; border: 0; border-bottom: 1px solid var(--pf-line-soft); box-shadow: 0 1px 0 rgba(224, 218, 205, .022); color: inherit; cursor: default; }
+.pf-mintrow:last-of-type { border-bottom: 0; box-shadow: none; }
+.pf-mintrow--sel { cursor: pointer; }
+.pf-mintrow--sel::before { content: ""; position: absolute; left: -6px; top: 24%; bottom: 24%; width: 2px; background: var(--pf-gold); border-radius: 1px; }
+.pf-mintrow--sel:focus-visible { outline: 2px solid var(--pf-gold-lit); outline-offset: 3px; }
+.pf-mintrow--cue { opacity: .6; }
+.pf-mintrow--empty { opacity: .5; }
+.pf-mintrow__thumb { width: 34px; height: 34px; border-radius: 5px; overflow: hidden; flex: none; border: 1px solid var(--pf-line); display: grid; place-items: center; background: rgba(233, 229, 220, .02); }
+.pf-mintrow__thumb img, .pf-mintrow__img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.pf-mintrow__thumb--empty { border-style: dashed; color: var(--pf-ghost); font-family: var(--pf-mono); font-size: 15px; }
+.pf-mintrow__n { font-family: var(--pf-serif); font-size: 17px; color: var(--pf-cream); flex: 0 1 auto; }
+.pf-mintrow__id { font-family: var(--pf-mono); font-size: 9px; letter-spacing: .1em; text-transform: uppercase; color: var(--pf-meta); margin-left: auto; }
+
+/* ============================================================
+   BR-S189 — THE DRAWING ROOM (?dev=drawing-room): the tarot room —
+   the free single-card PULL, the free 3-card SITTING, the paid 5-card
+   DEEP READ; positions + orientation, filing stamp, binding, hallmark, credo.
+============================================================ */
+.dr-fineprint { font-family: var(--pf-mono); font-size: 9.5px; letter-spacing: .06em; color: var(--pf-ghost); line-height: 1.7; margin: 14px auto 0; max-width: 48ch; }
+.dr-stage { margin: clamp(28px, 5vh, 54px) 0 0; }
+.dr-loading { font-family: var(--pf-mono); font-size: 11px; letter-spacing: .1em; color: var(--pf-meta); text-align: center; }
+
+/* the flip card (shared by pull + spread) */
+.dr-cardbtn { background: none; border: 0; padding: 0; cursor: pointer; perspective: 1200px; }
+/* BR-S317: a turned card keeps its button so the DOM identity the ceremony depends on
+   survives the turn — but it is no longer a control, and it must stop offering itself
+   as one. Still focusable on purpose: removing it from the tab order mid-reading would
+   move the ground under a keyboard reader who has just turned it. */
+.dr-cardbtn[aria-disabled="true"] { cursor: default; }
+.dr-cardbtn:focus-visible { outline: 2px solid var(--pf-gold-lit); outline-offset: 6px; border-radius: 12px; }
+.dr-card { position: relative; width: clamp(170px, 38vw, 210px); aspect-ratio: 120 / 190; transform-style: preserve-3d; transition: transform .7s cubic-bezier(.4, 0, .2, 1); margin: 0 auto; }
+.dr-card.is-revealed { transform: rotateY(180deg); }
+/* BR-S306 — THE DECK IS PARCHMENT. The builder chose white, so the room that actually
+   deals the cards follows its own sample: M2 showed parchment while /tarot/ dealt dark
+   ones, which is the incoherence a first visitor meets between the shelf and the counter.
+   Values are tarot-v2's, unchanged — --parchment, --card-ink #1c150d, accent copper #c98a5e.
+   The BACK stays dark: a deck is dark-backed and light-faced, and the flip is the whole
+   ceremony. Only the FRONT turns. */
+.dr-cardface { position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden; border-radius: 12px; background: linear-gradient(180deg, #111319, #0c0d11); }
+.dr-cardface--front { background: linear-gradient(165deg, #efe9db, #dcd4c2); border: 1px solid rgba(20, 14, 8, .35); }
+.dr-cardface--front { transform: rotateY(180deg); box-shadow: 0 14px 34px rgba(0, 0, 0, .5), 0 0 30px rgba(201, 163, 92, .10); }
+.dr-plate { width: 100%; height: 100%; display: block; }
+
+/* ── BR-S316 — THE REAL FACE, THIRD INSTANCE. ─────────────────────────────────
+   The front is no longer an engraved plate re-tinted for parchment; it is the same
+   TYPOGRAPHIC face M1/M2's sample card has carried since BR-S289, which was itself
+   reproduced from tarot-v2 band for band. Values below are that spec, translated
+   only in their token names (--pf-* here, --font-* there) — the sizes, letter
+   spacings, inks and the 26x1 rule are unchanged, so the three instances cannot
+   drift apart by anybody editing one of them.
+   The four re-tint overrides that used to point the SVG's gold and grey at
+   parchment went with the SVG, along with .dr-plate--rev (the art no longer spins;
+   the orientation line speaks) and .dr-cardface__name (the name is IN the face now
+   — a caption under a card that already says its name read as a label on a label). */
+.dr-face {
+  position: absolute; inset: 0; border-radius: inherit;
+  display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
+  padding: 14px 12px; text-align: center; color: #1c150d;
+}
+.dr-face__head { width: 100%; display: flex; align-items: center; justify-content: space-between; }
+.dr-face__meta { font-family: var(--pf-mono); font-weight: 600; font-size: 11px; letter-spacing: .12em; color: #5c503c; white-space: nowrap; }
+.dr-face__glyph { font-family: var(--pf-serif); font-weight: 700; font-size: 13px; line-height: 1; color: #c98a5e; }
+.dr-face__name { margin: auto 0 0; font-family: var(--pf-serif); font-weight: 600; font-size: 20px; line-height: 1.05; color: #1c150d; }
+.dr-face__name.is-long { font-size: 17px; }   /* 13+ characters, per tarot-v2's own is-long threshold */
+.dr-face__div { width: 26px; height: 1px; background: rgba(28, 21, 13, .35); margin: 8px 0; }
+.dr-face__orient { margin: 0 0 auto; font-family: var(--pf-mono); font-weight: 600; font-size: 9px; letter-spacing: .16em; text-transform: uppercase; color: #6a5c45; }
+.dr-face__gloss { display: block; margin-top: 3px; font-size: 8px; letter-spacing: .1em; text-transform: none; font-style: italic; color: #8a7a60; }
+.dr-tick { position: absolute; width: 10px; height: 10px; border-color: rgba(28, 21, 13, .5); }
+.dr-tick--tl { left: 9px; top: 9px; border-left: 1.5px solid; border-top: 1.5px solid; }
+.dr-tick--br { right: 9px; bottom: 9px; border-right: 1.5px solid; border-bottom: 1.5px solid; }
+/* the spread deals smaller cards than the pull, so the face steps down with them */
+.dr-spread .dr-face { padding: 10px 9px; }
+.dr-spread .dr-face__meta { font-size: 8.5px; letter-spacing: .1em; }
+.dr-spread .dr-face__glyph { font-size: 11px; }
+.dr-spread .dr-face__name { font-size: 15px; }
+.dr-spread .dr-face__name.is-long { font-size: 13px; }
+.dr-spread .dr-face__orient { font-size: 8px; }
+.dr-spread .dr-face__gloss { font-size: 7.5px; }
+.dr-spread .dr-tick { width: 8px; height: 8px; }
+.dr-spread .dr-tick--tl { left: 7px; top: 7px; }
+.dr-spread .dr-tick--br { right: 7px; bottom: 7px; }
+/* BR-S316 — the element goes when the card cannot hold it. At 375px the spread
+   deals 96px cards and "PENTACLES · EARTH" wrapped to two lines in the header row —
+   which no bounding-box check catches, because wrapped text still fits its box.
+   The suit alone is the part that identifies the card; the element is the part a
+   small card can afford to lose. Majors are already short enough to keep whole. */
+@media (max-width: 620px) {
+  .dr-spread .dr-face__el { display: none; }
+}
+.dr-draw__cue { font-family: var(--pf-mono); font-size: 9px; letter-spacing: .2em; text-transform: uppercase; color: var(--pf-meta); text-align: center; }
+
+/* ---- landing: the free pull + the reading doors ---- */
+.dr-landing { display: flex; flex-direction: column; align-items: center; gap: clamp(34px, 7vh, 66px); }
+/* BR-S321: the .dr-pull block was removed with the pull itself — the free draw now
+   lives on M2's hero, where a visitor meets it before opening this door. Its
+   card-left / words-right arrangement went with it; see .menu__draw in styles.css. */
+.dr-tiers { width: 100%; display: flex; flex-direction: column; gap: 12px; }
+.dr-tiers__label { font-family: var(--pf-mono); font-size: 9px; letter-spacing: .18em; text-transform: uppercase; color: var(--pf-meta); text-align: center; margin: 0 0 4px; }
+.dr-tier { display: flex; align-items: baseline; gap: 12px; padding: 16px 18px; text-decoration: none; color: inherit; cursor: pointer; border: 1px solid var(--pf-line); border-radius: 7px; background: linear-gradient(180deg, rgba(233, 229, 220, .014), transparent 60%); transition: border-color .18s, background .18s; }
+.dr-tier:hover, .dr-tier:focus-visible { border-color: var(--pf-line-cut); background: rgba(233, 229, 220, .03); outline: none; }
+.dr-tier__n { font-family: var(--pf-serif); font-size: 20px; color: var(--pf-cream); flex: none; }
+.dr-tier__cards { font-family: var(--pf-mono); font-size: 9px; letter-spacing: .12em; text-transform: uppercase; color: var(--pf-meta); }
+.dr-tier__sub { font-family: var(--pf-serif); font-style: italic; font-size: 14px; color: var(--pf-meta); }
+.dr-tier__arr { margin-left: auto; color: var(--pf-meta); font-size: 15px; transition: transform .18s; }
+.dr-tier:hover .dr-tier__arr, .dr-tier:focus-visible .dr-tier__arr { transform: translateX(3px); }
+.dr-tier--paid { border-color: var(--pf-violet-line); }
+.dr-tier--paid:hover, .dr-tier--paid:focus-visible { border-color: var(--pf-violet); background: rgba(138, 111, 176, .06); }
+.dr-tier--paid .dr-tier__cards, .dr-tier--paid .dr-tier__arr { color: var(--pf-violet-lit); }
+
+/* ---- intake ---- */
+.dr-intake { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 16px; }
+.dr-intake__which { font-family: var(--pf-mono); font-size: 9.5px; letter-spacing: .18em; text-transform: uppercase; color: var(--pf-gold); opacity: .85; margin: 0; }
+.dr-field { display: block; width: min(420px, 100%); text-align: left; }
+.dr-field__label { display: block; font-family: var(--pf-mono); font-size: 9.5px; letter-spacing: .16em; text-transform: uppercase; color: var(--pf-meta); margin: 0 0 8px; }
+.dr-field__opt { color: var(--pf-ghost); }
+.dr-field__in { width: 100%; background: rgba(233, 229, 220, .02); border: 0; border-bottom: 1px solid var(--pf-line); border-radius: 0; padding: 9px 2px; font-family: var(--pf-serif); font-style: italic; font-size: 17px; color: var(--pf-cream); }
+.dr-field__in::placeholder { color: var(--pf-ghost); font-style: italic; }
+.dr-field__in:focus { outline: none; border-bottom-color: var(--pf-gold); }
+.dr-cut { background: none; border: 1px solid var(--pf-line-cut); border-radius: 999px; padding: 12px 30px; cursor: pointer; font-family: var(--pf-mono); font-size: 10.5px; font-weight: 500; letter-spacing: .2em; text-transform: uppercase; color: var(--pf-cream-display); transition: border-color .2s, color .2s; }
+.dr-cut:hover, .dr-cut:focus-visible { border-color: var(--pf-gold); color: var(--pf-gold-lit); outline: none; }
+/* PAID cut — the mock settle (BR-S190): violet price on the button (pf-paid register); on press it settles violet→gold, then the cut runs */
+.dr-cut--paid { border-color: var(--pf-violet-line); color: var(--pf-violet-lit); }
+.dr-cut--paid:hover, .dr-cut--paid:focus-visible { border-color: var(--pf-violet); color: #bda6e4; }
+.dr-cut--paid.is-settled, .dr-cut--paid.is-settled:hover { border-color: var(--pf-gold); color: var(--pf-gold-lit); transition: border-color .45s ease, color .45s ease; cursor: default; }
+.dr-mocknote { font-family: var(--pf-mono); font-size: 8.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--pf-ghost); margin: 0; }
+.dr-cut__note { font-family: var(--pf-serif); font-style: italic; font-size: 14px; color: var(--pf-meta); margin: 0; }
+.dr-intake__back { font-family: var(--pf-mono); font-size: 9px; letter-spacing: .14em; text-transform: uppercase; color: var(--pf-meta); text-decoration: none; margin-top: 6px; }
+.dr-intake__back:hover, .dr-intake__back:focus-visible { color: var(--pf-cream-display); outline: none; }
+
+/* ---- the reading: the spread + per-card reads + the filed close ---- */
+/* BR-S318: .dr-reading removed — .dr-flow is the reading's container now and carries
+   the identical declaration. Nothing in the shipped tree applies the old class. */
+/* BR-S317: the tail became a real element so it can be re-rendered on its own without
+   touching the card subtree. display:contents keeps it out of the layout entirely — its
+   children stay direct flex items of .dr-reading, so the gap, centring and .dr-filed's
+   own width all behave exactly as they did when they were siblings. */
+.dr-tail { display: contents; }
+/* BR-S318: the flow shell replaces .dr-reading as the reading's container and inherits
+   its layout exactly; the intake and reads regions are contents-transparent for the same
+   reason the tail is — they are regions to refill, not boxes to lay out. */
+.dr-flow { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 22px; width: 100%; }
+/* .dr-intake and .dr-reads KEEP their own flex layout — .dr-intake carries a 16px gap
+   that is not the flow's 22px, and making either contents-transparent would hand its
+   children the wrong rhythm. They only need to survive being emptied, and an emptied
+   flex box still claims a gap it no longer earns, so it stands down when it holds
+   nothing. (.dr-tail is different: its children were always siblings of the reading.) */
+.dr-intake:empty, .dr-reads:empty { display: none; }
+
+/* ── BR-S318 — THE DECK. ──────────────────────────────────────────────────────
+   Seven layers, offset and alternately tilted, each a shade darker than the one above,
+   with the printed back on top and a soft pool of light beneath. Sizes follow the
+   spread's own card so the pile and the cards it deals are visibly the same object.
+   It sits inside the ceremony subtree, so the riffle, the cut and the deal all act on
+   these exact nodes rather than rebuilding them. */
+.dr-ceremony { position: relative; display: flex; flex-direction: column; align-items: center; gap: 22px; width: 100%; }
+.dr-deck { position: relative; width: clamp(112px, 24vw, 150px); aspect-ratio: 120 / 190; margin: 4px auto 2px; }
+.dr-deck__glow {
+  position: absolute; left: 50%; top: 50%; width: 300%; height: 220%;
+  transform: translate(-50%, -50%); pointer-events: none; z-index: 0;
+  background: radial-gradient(circle, rgba(150, 112, 74, .09), transparent 66%);
+}
+.dr-deck__body, .dr-deck__top { position: absolute; inset: 0; }
+.dr-deck__layer {
+  position: absolute; inset: 0; border-radius: 12px;
+  border: 1px solid rgba(10, 8, 5, .55);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, .5);
+}
+.dr-deck__top { z-index: 8; border-radius: 12px; overflow: hidden; background: linear-gradient(180deg, #111319, #0c0d11); border: 1px solid rgba(10, 8, 5, .55); box-shadow: 0 20px 40px rgba(0, 0, 0, .5); }
+.dr-deck__top .dr-plate { width: 100%; height: 100%; }
+/* ── BR-S319 — THE RIFFLE. ────────────────────────────────────────────────────
+   Two animations over the same 820ms, and the difference between them is the effect:
+   the STACK jitters through six stops with a slight vertical squash (scaleY .965-.99),
+   while the TOP card flicks harder, further and out of step (up to 17px and 8deg). One
+   curve on both and the pile reads as a single block wobbling; offset like this it
+   reads as many cards moving against each other.
+   Keyframes and easing are tarot-v2's verbatim. This is a feel that was tuned once,
+   and re-tuning it by eye in a preview pane that cannot run it would be vandalism.
+   `both` fill so the pile is left exactly where it started — the deck a reader cuts is
+   the deck they were shown. */
+.dr-deck.is-riffling .dr-deck__body { animation: drRiffle .8s cubic-bezier(.3, .7, .2, 1) both; }
+.dr-deck.is-riffling .dr-deck__top { animation: drRifTop .8s cubic-bezier(.3, .7, .2, 1) both; }
+@keyframes drRiffle {
+  0%   { transform: translate(0, 0) rotate(0) scaleY(1); }
+  12%  { transform: translate(-11px, 6px) rotate(-4deg) scaleY(.965); }
+  28%  { transform: translate(9px, -5px) rotate(3deg) scaleY(.98); }
+  44%  { transform: translate(-7px, 4px) rotate(-3deg) scaleY(.97); }
+  60%  { transform: translate(11px, -6px) rotate(4deg) scaleY(.985); }
+  78%  { transform: translate(-5px, 3px) rotate(-2deg) scaleY(.99); }
+  100% { transform: translate(0, 0) rotate(0) scaleY(1); }
+}
+@keyframes drRifTop {
+  0%   { transform: translate(0, 0) rotate(0); }
+  12%  { transform: translate(-17px, -13px) rotate(-8deg); }
+  40%  { transform: translate(14px, -9px) rotate(7deg); }
+  68%  { transform: translate(-9px, -5px) rotate(-4deg); }
+  100% { transform: translate(0, 0) rotate(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .dr-deck.is-riffling .dr-deck__body, .dr-deck.is-riffling .dr-deck__top { animation: none; }
+}
+/* the escape stays visible through the mix and stops being operable — an exit that
+   vanishes mid-ceremony is worse than one that waits 820ms */
+.dr-ceremony[data-dr-phase="shuffling"] ~ .dr-intake .dr-intake__back { pointer-events: none; opacity: .45; }
+
+/* the pile is the thing you are about to cut; once the cards are down it has done its
+   job and leaves, rather than sitting beside the reading as a second deck. */
+.dr-ceremony[data-dr-phase="dealt"] .dr-deck,
+.dr-ceremony[data-dr-phase="revealing"] .dr-deck,
+.dr-ceremony[data-dr-phase="complete"] .dr-deck { display: none; }
+.dr-reading__matter { font-family: var(--pf-serif); font-style: italic; font-size: 15px; color: var(--pf-meta); margin: 0; }
+.dr-spread { display: flex; flex-wrap: wrap; justify-content: center; gap: 16px 14px; }
+.dr-slot { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.dr-slot__pos { font-family: var(--pf-mono); font-size: 8px; letter-spacing: .16em; text-transform: uppercase; color: var(--pf-meta); }
+.dr-slot.is-shown .dr-slot__pos { color: var(--pf-gold); opacity: .85; }
+.dr-spread .dr-card { width: clamp(96px, 21vw, 132px); }
+.dr-spread--5 .dr-card { width: clamp(80px, 16vw, 110px); }
+/* BR-S316: .dr-spread .dr-cardface__name removed with the caption it sized — the
+   spread's face steps down through the .dr-spread .dr-face__* rules above instead. */
+.dr-reads { display: flex; flex-direction: column; gap: 22px; width: 100%; max-width: 48ch; }
+.dr-read { text-align: left; }
+.dr-read__pos { font-family: var(--pf-mono); font-size: 9px; letter-spacing: .16em; text-transform: uppercase; color: var(--pf-gold); margin: 0; }
+.dr-read__posn { color: var(--pf-meta); }
+.dr-read__name { font-family: var(--pf-serif); font-weight: 600; font-size: 22px; color: var(--pf-cream-display); line-height: 1.1; margin: 5px 0 0; }
+.dr-read__orient { font-family: var(--pf-mono); font-size: 8.5px; letter-spacing: .16em; text-transform: uppercase; color: var(--pf-meta); margin-left: 10px; vertical-align: middle; }
+.dr-read__mean { font-family: var(--pf-serif); font-size: 15.5px; line-height: 1.6; color: var(--pf-body); margin: 8px 0 0; }
+.dr-read__frame { font-family: var(--pf-serif); font-style: italic; font-size: 14px; color: var(--pf-meta); margin: 0; max-width: 46ch; }
+
+.dr-filed { display: flex; flex-direction: column; align-items: center; gap: 14px; width: min(460px, 100%); margin-top: 6px; padding-top: 24px; border-top: 1px solid var(--pf-line-soft); box-shadow: 0 1px 0 rgba(224, 218, 205, .02); }
+.dr-binding { font-family: var(--pf-serif); font-size: 17px; line-height: 1.55; color: var(--pf-cream); margin: 0; max-width: 46ch; }
+.dr-stamp { display: flex; align-items: center; gap: 10px; }
+.dr-hallmark { width: 22px; height: 22px; color: var(--pf-meta); flex: none; }
+.dr-filed__line { font-family: var(--pf-mono); font-size: 9.5px; letter-spacing: .12em; text-transform: uppercase; color: var(--pf-meta); margin: 0; }
+.dr-credo { font-family: var(--pf-mono); font-size: 8.5px; letter-spacing: .18em; text-transform: uppercase; color: var(--pf-ghost); margin: 0; }
+
+/* sr-only live region (screen-reader announcements) */
+.dr-live { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+@media (prefers-reduced-motion: reduce) { .dr-card { transition: none; } }
+
+@media (max-width: 620px) {
+  .pf-top { gap: 10px 14px; }
+  .pf-mini { width: calc(50% - 7px); }
+  .pf-show { grid-template-columns: 1fr; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pf * { transition: none !important; }
+}
+
+/* BR-S372 — THE SHELF LINE, and the Vault drawer beneath it.
+   Above the line is who you are. Everything below it is your Shelf, and the
+   division is carried by one rule and one quiet word rather than a heading —
+   a heading would make the Shelf a section among sections, and it is not: it is
+   the second half of the page. */
+/* BR-S374 — these two numbers used to be DEAD. `40px 0 30px` lost both collapses:
+   above, `.pf-crownstage`'s clamp(44px,9vh,96px) bottom margin collapsed out
+   through the padding-less foot of `.pf-surface`; below, `.pf-sec`'s
+   clamp(32px,5.5vh,52px) won. The rendered air was the neighbours' all along, so
+   an editor tuning the page's most important division saw nothing move.
+   The air is now MOVED onto the line — same rendered gaps to the pixel, but the
+   line owns them, and changing these values changes the page in both directions. */
+.pf-shelfline { display: flex; align-items: center; gap: 14px;
+  margin: clamp(44px, 9vh, 96px) 0 clamp(32px, 5.5vh, 52px); }
+.pf-shelfline + .pf-sec { margin-top: 0; }
+.pf-shelfline__rule { flex: 1; height: 1px; background: var(--pf-line-cut, rgba(201, 163, 92, .22)); }
+.pf-shelfline__lab {
+  font-family: var(--font-mono, "IBM Plex Mono", monospace);
+  font-size: 9px; font-weight: 500; letter-spacing: .26em; text-transform: uppercase;
+  color: var(--pf-gold-lit, #c9a35c); white-space: nowrap;
+}
+/* the Vault is a drawer, not a display: two rows, ruled, quiet. Its name is
+   never advertised — nothing links here, and the word appears once. */
+.pf-vaultbox { border: 1px solid rgba(233, 229, 220, .10); border-radius: 3px; padding: 2px 16px 14px; }
+.pf-vaultrow { display: flex; gap: 18px; align-items: baseline; padding: 12px 0;
+  border-bottom: 1px solid rgba(233, 229, 220, .07); }
+.pf-vaultrow__k { flex: 0 0 74px; font-family: var(--font-mono, monospace); font-size: 9px;
+  font-weight: 500; letter-spacing: .18em; text-transform: uppercase; color: #8c867b; }
+.pf-vaultrow__v { font-family: var(--font-display, serif); font-size: 17px; color: #c8c4bb; }
+/* BR-S374 — the empty state was the page's ONLY sub-AA text: #7c766c at 17px is
+   4.37:1 bare, 4.15:1 under the lamp. It renders "None borne yet." — the first
+   sentence a new visitor reads here. The ghost tier (6.29:1) is the floor
+   nothing on this page goes below; the italic still carries the "not yet". */
+.pf-vaultrow--empty .pf-vaultrow__v { color: var(--pf-ghost, #96918a); font-style: italic; }
