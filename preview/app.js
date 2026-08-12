@@ -1626,6 +1626,12 @@ var VISION = [];
    accepting a stranger's words into a void. */
 var POST_TARGET = null;
 
+/* Three plain numbers, none of them preselected and none of them named a tier. The
+   prices that DO exist on this site are $4.99 and $7.99, so these sit below the
+   cheapest thing you can buy — a donation that costs more than the product would be
+   a nudge, and this block is the opposite of one. */
+var DONATE = ["$2", "$5", "$10"];
+
 var POST_KINDS = [
   { key: "idea", t: "An idea",  d: "A room, a game, a deck &mdash; something you would want to find here." },
   { key: "tip",  t: "A tip",    d: "Something that would read better, land harder, or sit somewhere else." },

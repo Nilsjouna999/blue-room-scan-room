@@ -5832,11 +5832,18 @@ html.orbit-wings .orbit__field { --orbit-rx: clamp(200px, 25.5vw, 368px); --orbi
 }
 .u1box__t { font-family: var(--font-display, serif); font-size: 19px; color: var(--t-display, #e9e5dc); margin: 0 0 6px; }
 .u1box__d { font-family: var(--font-display, serif); font-size: 15px; font-style: italic; line-height: 1.5; color: #8c867b; margin: 0 0 12px; }
-.u1box__go { font-family: var(--font-mono, monospace); font-size: 9px; letter-spacing: .16em; text-transform: uppercase; color: #b9b3a8; }
-.u1box:hover .u1box__go { color: var(--gold-lit, #c9a35c); }
-/* the gated one is the quieter of the two: it is a door for people already inside */
-.u1box--post { background: none; border-style: dashed; }
-.u1box--post .u1box__k { color: #8c867b; }
+/* BR-S383: the box is no longer the link — it holds them, because there can now be
+   two doors inside one box. The primary keeps its weight; the second is a rule-topped
+   afterline that only exists for someone already inside, so it must not compete. */
+.u1box__go { display: block; font-family: var(--font-mono, monospace); font-size: 9px; letter-spacing: .16em; text-transform: uppercase; color: #b9b3a8; text-decoration: none; }
+.u1box__go:hover, .u1box__go:focus-visible { color: var(--gold-lit, #c9a35c); outline: none; }
+.u1box__more {
+  display: block; margin-top: 13px; padding-top: 12px;
+  border-top: 1px solid rgba(220, 215, 203, .09);
+  font-family: var(--font-display, serif); font-size: 14.5px; font-style: italic;
+  color: #8c867b; text-decoration: none;
+}
+.u1box__more:hover, .u1box__more:focus-visible { color: var(--t-display, #e9e5dc); outline: none; }
 
 /* ---- the vision room (?dev=vision) ---- */
 .vis { max-width: 720px; margin: 0 auto; padding: 40px 22px 96px; text-align: left; }
@@ -5886,6 +5893,27 @@ html.orbit-wings .orbit__field { --orbit-rx: clamp(200px, 25.5vw, 368px); --orbi
 .vispost__send:disabled { cursor: not-allowed; opacity: .38; }
 .vispost__note { font-family: var(--font-display, serif); font-size: 14px; font-style: italic; color: #7c766c; margin: 0; flex: 1 1 240px; }
 .vispost--sealed .vis__lede { margin-bottom: 0; }
+
+/* BR-S383 — LEAVING SOMETHING. The amounts are deliberately the QUIETEST controls on
+   the page: no fill, no gold, nothing preselected. A donation row that looks like a
+   pricing table is a nudge, and the builder's line at the foot of this block only
+   reads as true if nothing above it is pushing. That line gets the weight instead —
+   it is the one sentence here set larger than its lede. */
+.visgive { border-top: 1px solid rgba(220, 215, 203, .10); padding-top: 34px; margin-top: 52px; }
+.visgive__row { display: flex; flex-wrap: wrap; gap: 10px; margin: 0 0 20px; }
+.visgive__amt {
+  min-width: 74px; padding: 11px 16px; border-radius: 3px; cursor: pointer;
+  border: 1px solid rgba(220, 215, 203, .16); background: none; color: var(--t-display, #e9e5dc);
+  font-family: var(--font-display, serif); font-size: 17px;
+  transition: border-color .18s ease;
+}
+.visgive__amt--other { font-style: italic; font-size: 15.5px; color: #8c867b; }
+.visgive__amt:hover:not(:disabled) { border-color: var(--gold, #c9a35c); }
+.visgive__amt:disabled { cursor: not-allowed; opacity: .4; }
+.visgive__law {
+  font-family: var(--font-display, serif); font-size: 19px; line-height: 1.5;
+  color: var(--t-display, #e9e5dc); margin: 0 0 14px; max-width: 46ch;
+}
 
 /* BR-S377 — THE BUILD FLIP (#brBuildFlip, injected by app.js#syncBuildFlip).
    A builder's instrument, not part of the room: it sits bottom-CENTRE because both

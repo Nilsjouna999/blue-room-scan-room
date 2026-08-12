@@ -1626,6 +1626,12 @@ var VISION = [];
    accepting a stranger's words into a void. */
 var POST_TARGET = null;
 
+/* Three plain numbers, none of them preselected and none of them named a tier. The
+   prices that DO exist on this site are $4.99 and $7.99, so these sit below the
+   cheapest thing you can buy — a donation that costs more than the product would be
+   a nudge, and this block is the opposite of one. */
+var DONATE = ["$2", "$5", "$10"];
+
 var POST_KINDS = [
   { key: "idea", t: "An idea",  d: "A room, a game, a deck &mdash; something you would want to find here." },
   { key: "tip",  t: "A tip",    d: "Something that would read better, land harder, or sit somewhere else." },
@@ -1677,6 +1683,31 @@ function renderVision() {
       +     'stays free, always.</p>'
       + '</section>';
 
+  /* BR-S383 — LEAVING SOMETHING. Deliberately OUTSIDE the holdings gate that gapes
+     the post form: reading the vision is free, and the person most likely to want to
+     give is often the one who has not bought anything. It also means the sealed state
+     ends on something open rather than on a locked door.
+     The builder's own line carries this block and is set as its last word, not buried
+     in a lede — "if it is over your means even slightly, we don't want it." Every
+     other sentence here exists to make that one true: no lock behind it, no counter,
+     no thank-you tier, no suggested-amount nudge dressed as a default. The amounts
+     are three plain numbers and "another", and none of them is preselected.
+     Disabled for the same reason POST_TARGET is: no payment runs anywhere in this
+     build, and a give button that quietly does nothing is worse than one that says so. */
+  var coins = DONATE.map(function (d) {
+    return '<button type="button" class="visgive__amt" disabled>' + d + '</button>';
+  }).join('') + '<button type="button" class="visgive__amt visgive__amt--other" disabled>another</button>';
+
+  var give = '<section class="visgive" id="give">'
+    + '<h2 class="vis__h">Leave something</h2>'
+    + '<p class="vis__lede">Nothing here is locked behind this. What is free stays free, '
+    +   'and what costs says so on its own door. This is for someone who had it spare '
+    +   'and wanted to &mdash; no other reason, and no reason needed.</p>'
+    + '<div class="visgive__row">' + coins + '</div>'
+    + '<p class="visgive__law">If it is over your means even slightly, we don&rsquo;t want it.</p>'
+    + '<p class="vispost__note">Not connected yet &mdash; no payment runs anywhere in this build.</p>'
+  + '</section>';
+
   return '<div class="vis">'
     + '<header class="vis__top">'
     +   '<a class="vis__back" href="?dev=about-back" data-vision-back>&larr; What is open, and what is being made</a>'
@@ -1687,6 +1718,7 @@ function renderVision() {
     +   body
     + '</section>'
     + post
+    + give
   + '</div>';
 }
 
@@ -1732,24 +1764,29 @@ function wireVision() {
    One stack, so the board stays three tracks wide whether or not the second box is
    there — a fourth column would break a grid built for three. */
 function u1Aside() {
+  /* BR-S383 — ONE BOX, NOT TWO. It shipped as a pair, and the builder asked the
+     question that ends it: why two? Both opened the SAME room — `?dev=vision` and
+     `?dev=vision#post` — so the second box was a second object for a destination
+     that already had one. The Profile's own control inventory already carries three
+     such pairs and calls each of them out (brief §4); adding a fourth to a column
+     built on restraint was the wrong direction.
+     So: one box, and the gated half becomes a second DOOR inside it rather than a
+     second thing to look at. It grows a line when you have kept something; it does
+     not multiply. */
   var post = hasHoldings()
-    ? '<a class="u1box u1box--post" href="?dev=vision#post">'
-      +   '<span class="u1box__k" aria-hidden="true">&#9671; Yours</span>'
-      +   '<p class="u1box__t">An idea, a tip, a bug</p>'
-      +   '<p class="u1box__d">Something missing, something broken, or something you '
-      +     'would want to find here. It reaches the bench.</p>'
-      +   '<span class="u1box__go">Write it down &rarr;</span>'
+    ? '<a class="u1box__more" href="?dev=vision#post">'
+      +   'Or send back an idea, a tip or a bug &rarr;'
       + '</a>'
     : "";
   return '<aside class="u1aside" aria-label="Blue Room, beyond this list">'
-    + '<a class="u1box u1box--vision" href="?dev=vision">'
+    + '<div class="u1box u1box--vision">'
     +   '<span class="u1box__k" aria-hidden="true">&#9670; The whole of it</span>'
     +   '<p class="u1box__t">What Blue Room is for</p>'
     +   '<p class="u1box__d">This page is the ledger &mdash; what is open and what is '
     +     'being made. The reason any of it exists is next door.</p>'
-    +   '<span class="u1box__go">Read the vision &rarr;</span>'
-    + '</a>'
-    + post
+    +   '<a class="u1box__go" href="?dev=vision">Read the vision &rarr;</a>'
+    +   post
+    + '</div>'
   + '</aside>';
 }
 
