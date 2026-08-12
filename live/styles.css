@@ -5229,9 +5229,19 @@ body[data-devnav="1"] .devnav {
   color: var(--t-meta); cursor: pointer;
   transition: color 200ms var(--ease-settle, cubic-bezier(.2,.7,.2,1)),
               border-color 200ms var(--ease-settle, cubic-bezier(.2,.7,.2,1)),
-              background-color 200ms var(--ease-settle, cubic-bezier(.2,.7,.2,1));   /* BR-S300 M1: the background was the one thing in this feature that popped */
+              background-color 200ms var(--ease-settle, cubic-bezier(.2,.7,.2,1)),
+              opacity 220ms var(--ease-settle, cubic-bezier(.2,.7,.2,1));   /* BR-S300 M1: the background was the one thing in this feature that popped */
 }
 .orbitbtn:hover, .orbitbtn:focus-visible { color: var(--t-display); border-color: var(--t-meta); outline: none; }
+/* BR-S404 — IT GETS OUT OF THE WAY. A fixed control is over SOMETHING on every page,
+   so the fix is not another position: it is that the button stops competing while you
+   are reading and comes back the moment you reach for it. Dim and unfilled at rest,
+   full and grounded on hover or focus. On the MENU it stays at full strength, because
+   there it is not furniture over a room — it is the way through the building. */
+.orbitbtn { opacity: .42; }
+.orbitbtn:hover, .orbitbtn:focus-visible { opacity: 1; }
+body[data-view="menu"] .orbitbtn, html.orbit-open .orbitbtn { opacity: 1; }
+@media (prefers-reduced-motion: reduce) { .orbitbtn { transition: none; } }
 .orbitbtn__txt { font-family: var(--font-mono); font-size: 9px; letter-spacing: .22em; }
 /* the mark IS the concept: a hub with a ring around it, drawn in two dots and a rule */
 .orbitbtn__dots { position: relative; width: 13px; height: 13px; }
@@ -5916,7 +5926,18 @@ html.orbit-wings .orbit__field { --orbit-rx: clamp(200px, 25.5vw, 368px); --orbi
 .u1box__more:hover, .u1box__more:focus-visible { color: var(--t-display, #e9e5dc); outline: none; }
 
 /* ---- the vision room (?dev=vision) ---- */
-.vis { max-width: 720px; margin: 0 auto; padding: 40px 22px 96px; text-align: left; }
+/* BR-S404 — protocol §5: measure in `ch`, not `rem`. rem tracks root font-size and
+   drifts; ch is the thing the eye actually reads. 66ch for the manifesto, because
+   narrow is part of the argument. */
+.vis { max-width: 66ch; margin: 0 auto; padding: 40px 22px 96px; text-align: left; }
+/* ★ THE PAGE PHYSICALLY OPENS AT THE MOMENT IT ASKS YOU TO PARTICIPATE, and closes
+   again to say goodbye. The best idea in the audit, kept verbatim in intent. */
+.vispost { max-width: 84ch; margin-left: auto; margin-right: auto; }
+.visgive { max-width: 66ch; margin-left: auto; margin-right: auto; }
+.visgive__use {
+  font-family: var(--font-display, serif); font-size: 16px; line-height: 1.6;
+  color: #8c867b; margin: 16px 0 0; max-width: 46ch;
+}
 .vis__top { margin-bottom: 44px; }
 .vis__back { font-family: var(--font-mono, monospace); font-size: 9px; letter-spacing: .16em; text-transform: uppercase; color: #8c867b; text-decoration: none; }
 .vis__back:hover { color: var(--t-display, #e9e5dc); }
@@ -6095,18 +6116,30 @@ html.orbit-wings .orbit__field { --orbit-rx: clamp(200px, 25.5vw, 368px); --orbi
   position: absolute; top: 0; bottom: 0; width: 50%;
   opacity: 0; transition: opacity 260ms cubic-bezier(.2, .7, .2, 1);
 }
+/* BR-S404 — THE DARK LEANS, IT DOES NOT LIGHT UP. The first pass raised a pale wash
+   from each edge and it read as a smudge on the glass: light added to a near-black
+   room has nowhere to go but muddy, and it fought the seal it was drawn on.
+   The hovered side DEEPENS instead. Black gathers at that edge, the room closing
+   toward where the press would take you, and the only bright thing is the single
+   hairline on the way back — which grows rather than glows. Dark is this page's
+   material; the effect should be made of it. */
 .l1seal__half--l { left: 0; cursor: default;
-  background: linear-gradient(to right, rgba(150, 145, 138, .075), transparent 62%); }
+  background: linear-gradient(to right, rgba(0, 0, 0, .55), transparent 74%); }
 .l1seal__half--r { right: 0; cursor: pointer;
-  background: linear-gradient(to left, rgba(201, 163, 92, .10), transparent 62%); }
+  background: linear-gradient(to left, rgba(0, 0, 0, .58), transparent 74%); }
 .l1seal__half:hover { opacity: 1; }
 /* the way back earns a hairline as well as a wash; the edge does not, because there is
    nothing on the other side of it yet */
+/* the way back keeps one hairline, and it GROWS from the centre rather than fading up
+   — a line drawing itself is quieter than a light turning on, and it survives on a
+   black ground where a glow does not. */
 .l1seal__half--r::after {
-  content: ""; position: absolute; top: 14%; bottom: 14%; right: 0; width: 1px;
-  background: linear-gradient(transparent, rgba(201, 163, 92, .45), transparent);
+  content: ""; position: absolute; top: 50%; bottom: 50%; right: 0; width: 1px;
+  background: linear-gradient(transparent, rgba(201, 163, 92, .55), transparent);
+  transition: top 320ms cubic-bezier(.2, .7, .2, 1), bottom 320ms cubic-bezier(.2, .7, .2, 1);
 }
-@media (prefers-reduced-motion: reduce) { .l1seal__half { transition: none; } }
+.l1seal__half--r:hover::after { top: 12%; bottom: 12%; }
+@media (prefers-reduced-motion: reduce) { .l1seal__half, .l1seal__half--r::after { transition: none; } }
 
 /* BR-S401 — THE EDGE TUG. Left of L1 is where L2 will be. Until it exists, the track
    gives a little and comes back — the answer a drawer gives at its stop. Transform

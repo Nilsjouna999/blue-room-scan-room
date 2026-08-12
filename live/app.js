@@ -1606,56 +1606,67 @@ var VISION = [
   "a deck cut on a table &mdash; each one goes in, and what comes back is a record: " +
   "named, dated, filed, and yours.",
 
+  /* The price line is untouched by protocol instruction: concrete, responsible, and
+     entirely inside the metaphor. "Nothing here is built to make you come back" went —
+     it posited an adversary and contradicted what an archive IS. What replaces it is a
+     promise to the reader instead of a jab at an industry, which is §7's whole rule. */
   "The first rule is the one everything else is built on. <em>Everything read here is " +
   "yours to keep.</em> Looking is free and stays free. What costs money says so on its " +
-  "own door, once, in plain figures. Nothing here is built to make you come back &mdash; " +
-  /* BR-S393: "and it is still true" claimed objective truth for astrology, runes and
-     tarot — a claim this site's own footer explicitly declines to make ("a reflective
-     record, for insight, not instruction"). "Still there" keeps the whole point,
-     which was permanence and ownership, and claims nothing about the cosmos. */
-  "if you never open it again, the record is still there, and it is still yours.",
+  "own door, once, in plain figures. An archive is worth returning to on its own. " +
+  "Nothing here will chase you.",
+
+  "If you never open a record again, it stays there, and it stays yours.",
 
   { label: "Open now", sub: "what can be entered today" },
 
   "It is made of rooms rather than features. A room has a name, a door, and one thing " +
-  "it does. The Codex holds every mark the archive can read. The Drawing Room cuts " +
+  "it does. The Codex holds 222 entries across ten systems. The Drawing Room cuts " +
   "tarot. The Birth Reading takes a name and a date and gives back six marks. You can " +
   "find a room again without being told twice, and every way in is a way back out. " +
   "When something new is built it becomes a place, not another item in a list.",
 
-  /* BR-S393: this said "six marks come from SIX systems" and then listed five. There
-     are five — the I Ching gives two of the six, the hexagram and the trigram. A
-     wrong count in the paragraph that explains the method costs more than a typo.
-     "properly" also went: it implies one canonical reading, which is exactly the
-     authority this page should not claim. "On its own terms" says the true thing. */
-  "The six marks are drawn from five systems people have been reading for a very long " +
-  "time &mdash; astrology, the Chinese year, numerology, the runes, and the I Ching, " +
-  "which gives two. Blue Room does not rank them, blend them into one answer, or " +
-  "apologise for them. It reads each one on its own terms and files what it finds " +
-  "beside the others.",
+  /* "apologise for them" was the edgiest word on the page — it imports a cultural
+     grievance. Cut; the rest is method rather than defiance, and the sentence was
+     precise enough to keep. */
+  "The six marks are drawn from five systems &mdash; astrology, the Chinese year, " +
+  "numerology, the runes, and the I Ching, which gives two. Each is read on its own " +
+  "terms, then filed beside the others. Blue Room does not rank them or blend them " +
+  "into one answer.",
 
-  "What you keep gathers into a place of your own. A profile here is not a settings " +
-  "page; it is your page in the archive, and the Shelf inside it holds everything you " +
-  "have drawn. A crown gains a gem for every mark. Read for someone close and you earn " +
-  "a ring. The archive grows by being used, and the part of it that is yours grows with it.",
+  /* Split. Shelf, crown, gem, ring arriving in one breath turns prose into a manual;
+     the break is what converts a catalogue into accumulation. */
+  "What you keep gathers into a place of your own. A profile here is your page in the " +
+  "archive, not a settings screen. Its Shelf holds everything you have drawn.",
+
+  "Over time the page starts to carry its own marks. A gem for what you have read. A " +
+  "ring for someone you have read for.",
 
   { label: "Further on", sub: "what is being made" },
 
-  "Further on, the readings stop being a list and become ground. Your trigram is the " +
-  "land. Your year animal walks on it. Your sun sign is the sky over it, and your rune " +
-  "stands in it as a stone. The horizon curves because the world is round, and it turns " +
-  "once every twenty-four hours whether or not anyone is watching &mdash; so sitting " +
-  "still is rest rather than idleness. You are a passenger in your own reading.",
+  "What gathers in the archive will, further on, begin to form a world.",
 
+  "Your trigram is the land. Your year animal walks on it. Your sun sign is the sky " +
+  "over it, and your rune stands in it as a stone. The horizon curves because the " +
+  "world is round, and it turns once every twenty-four hours whether or not anyone is " +
+  "watching, so sitting still is rest rather than idleness. You are a passenger in " +
+  "your own reading.",
+
+  /* The one refusal that is fully earned: it follows a positive vision and names a
+     specific design boundary. The refusal budget is spent here. */
   "Other people arrive as marks, never as a feed. A ring carries someone you read for. " +
   "A gift carries a reading to someone who has none. Some rooms will be played by a " +
-  "whole table at once, where the unit is the group and not the reader. And love, which " +
-  "runs through every room here and lives in none of them, gets a room of its own.",
+  "whole table at once, where the unit is the group and not the reader.",
 
-  "It will keep expanding, and it will keep its outline while it does. Blue Room is not " +
-  "trying to look like anything else and is not going to get louder to be noticed. No " +
-  "counters, no streaks, no urgency, nothing measuring you back. A quiet, strange, " +
-  "carefully made place that knows what it is &mdash; and stays that way as it grows.",
+  "And love, which runs through every room here and lives in none of them, gets a room " +
+  "of its own.",
+
+  /* THE COVENANT. The comparison went entirely — "not trying to look like anything
+     else" was restraint announcing itself, which is not restraint. `I` appears here
+     and nowhere else on the page: it is the single moment the maker steps forward, and
+     confining it is what makes that land. The four-beat is broken so it does not scan
+     as a slogan. */
+  "It will keep expanding, and I mean to keep its character while it does. No " +
+  "counters. No streaks. Nothing here is keeping score of you.",
 
   "One archive. Every door kept."
 ];
@@ -2844,7 +2855,11 @@ function renderMenu(reveal) {
         <span class="l1seal__mark" aria-hidden="true">&#9670;</span>
         <p class="l1seal__k">Not open yet</p>
         <h2 class="l1seal__t" tabindex="-1">The Card Mint</h2>
-        <p class="l1seal__d">The card is already made &mdash; this is one. What is missing is the room that reads a picture of your own.</p>
+        <!-- BR-S404: was "the card is already made". The builder: "photo is already
+             a card" is the better slogan - and it is the desk's own thesis standing
+             right behind this seal, the claim the whole product is built on. The seal
+             should carry the strongest line, not a paraphrase of it. -->
+        <p class="l1seal__d">Every photo is already a card. What is missing is the room that reads one of yours.</p>
         <p class="l1seal__back">Press right to go back</p>
       </div>
     </div>
@@ -4059,7 +4074,7 @@ function _navBlocked(t) {
    so it won and _navStops recursed into itself. The seat was never missing — only
    the callers that had copied it.
    THE LATCH IS STRUCTURAL, NOT CODED. #about is rendered as a SIBLING of
-   .menu__track, and the vertical axis is gated on `_menuIndex(host) === 0`. So U1
+   .menu__track, and the vertical axis is gated on `_menuIndex(host) === MENU_HOME`. So U1
    hangs under whatever panel is index 0 — drop M1 from MENU_PANELS for the public
    build and U1 follows M2 down with no edit here. That is why this is a list edit
    and not a fork. */
@@ -4088,7 +4103,7 @@ function _u1SyncHash() {
   if (y > 4 && _u1SeatY != null && y < _u1SeatY - 8) return;   // the dead air, resolved before anything is touched
   const host = document.getElementById("menuView");
   if (!host || host.classList.contains("is-fullview")) return;
-  if (_menuIndex(host) !== 0) return;
+  if (_menuIndex(host) !== MENU_HOME) return;   // BR-S405: U1 hangs off HOME, not index 0
   if (_u1SeatY == null) {
     const about = host.querySelector("#about");
     if (!about) return;
@@ -4192,7 +4207,7 @@ document.addEventListener("keydown", function (e) {
     e.preventDefault();
     menuSlideTo(to, {});
   } else if (k === "ArrowDown" || k === "ArrowUp") {
-    if (_menuIndex(host) !== 0) return;                             // the vertical depth hangs off the desk only
+    if (_menuIndex(host) !== MENU_HOME) return;                     // BR-S405: the vertical depth hangs off HOME (The Draw), not the sealed desk
     if (_navStep(k === "ArrowDown" ? 1 : -1)) e.preventDefault();   // no stop left → the browser keeps its normal scroll
   }
 });
@@ -4349,7 +4364,7 @@ function _u1CanGlide(target) {
   if (state.view !== "menu" || _cxOpen || _navBlocked(target)) return false;
   const host = document.getElementById("menuView");
   if (!host || host.classList.contains("is-fullview")) return false;
-  if (_menuIndex(host) !== 0) return false;                          // desk only — M2/M3 are horizontal, they have no depth
+  if (_menuIndex(host) !== MENU_HOME) return false;                  // BR-S405: HOME only — L1/M2 are horizontal, they have no depth
   return true;
 }
 /* WHEEL — one deliberate push at either edge of the boundary. */
@@ -5531,7 +5546,7 @@ document.addEventListener("keydown", (e) => {
       // BR-S233: only the DESK slide's Enter opens the room — on the M2/M3 ribbon slides let
       // the focused control handle Enter (don't yank keyboard users into the scan room).
       const mv = document.getElementById("menuView");
-      if (!mv || _menuIndex(mv) === 0) { state.view = "room"; applyView(); window.scrollTo(0, 0); }
+      if (!mv || _menuIndex(mv) === MENU_HOME) { state.view = "room"; applyView(); window.scrollTo(0, 0); }   // BR-S405
     }
     else if (state.view === "draft" && e.key === "Escape") {
       /* Escape steps back one level: gate → intake, intake → menu */
