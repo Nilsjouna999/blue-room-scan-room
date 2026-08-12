@@ -293,6 +293,12 @@
 .pf-id__bearer { font-family: var(--pf-serif); font-weight: 600; font-size: 19px; line-height: 1.12; color: var(--pf-cream-display); }
 .pf-crownname { padding-left: 23px; margin: clamp(14px, 2.6vh, 22px) 0 0; }
 .pf-crownname__spine { font-family: var(--pf-mono); font-size: var(--pf-mono-meta); letter-spacing: var(--pf-mono-meta-trk); text-transform: uppercase; color: var(--pf-meta); margin: 9px 0 0; }
+/* BR-S396 — the one line saying what a reading contains (§10 Q9). Serif, because it is
+   a sentence and not a label; below the spine, because the spine is THIS reading and
+   this is what a reading IS. In the empty state it is the only description of the
+   thing on offer, so it stands alone with its own air above. */
+.pf-what { font-family: var(--pf-serif); font-size: 16px; font-style: italic; line-height: 1.55; color: var(--pf-meta); margin: 11px 0 0; max-width: 52ch; }
+.pf-crownname--empty { margin-top: clamp(18px, 3vh, 30px); }
 
 /* 2 — gold law: saturated gold pulled off wayfinding → warm-grey.
    Crown SVG, hairline section rules, and the focus ring KEEP their gold. */

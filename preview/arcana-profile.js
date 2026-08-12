@@ -248,12 +248,24 @@
 
     // the assembled name — the artifact, the largest type on the page (oil-edge treatment).
     // The spine (the systems that composed it) drops beneath as quiet mono provenance.
+    /* BR-S396 — THE ONE SENTENCE SAYING WHAT A READING CONTAINS. §10 Q9 of the brief,
+       and both critiques arrived at it independently: the page has never had it. A
+       visitor could read the crowned name, the spine and the gem count without ever
+       being told, in one plain line, what they are looking at.
+       It appears in BOTH states on purpose. Held, it names what the crown holds;
+       unheld, it is the only description of the thing on offer — and since BR-S384
+       took the price off this page, it is the only reason given to want one. */
+    var whatItIs = '<p class="pf-what">Six marks, read from a name and a birth date ' +
+      '&mdash; a sun sign, a year animal, a life path, a rune, a hexagram and a ' +
+      'trigram, each with a record of its own.</p>';
+
     var crownname = (taken && c.name)
       ? '<div class="pf-crownname">' +
           '<h1 class="pf-id__name">' + esc(c.name) + '</h1>' +
           (c.spine ? '<p class="pf-crownname__spine">' + esc(c.spine) + '</p>' : '') +
+          whatItIs +
         '</div>'
-      : '';
+      : '<div class="pf-crownname pf-crownname--empty">' + whatItIs + '</div>';
 
     // the Crown — the reading button; "Open this reading" IS the full arcana result page.
     // No profile-side redraw: to get a new reading, draw one from the Birth Reading.

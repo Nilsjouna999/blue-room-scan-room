@@ -33,6 +33,29 @@ ROOT = os.path.dirname(os.path.abspath(__file__))
 # labelled door into the workshop. Both sit beside the dev site rather than replacing
 # it, so the three are three URLs on one Pages deploy. They are BUILD OUTPUT that is
 # committed on purpose — a static host can only serve what is in the repo.
+# ★ BR-S396 — WHAT EACH BUILD IS FOR. The builder's rule, and it is the law this file
+# should be read against:
+#
+#   dev      (/)          EVERYTHING. Every room, every ?dev= route, ambiguous ideas
+#                         included. Nothing is hidden from the workshop.
+#   preview  (/preview/)  WHERE SEMI-FINISHED WORK IS CONNECTED INTO A COHERENT PAGE.
+#                         Anything not launch-cleared belongs HERE — not cut, not live.
+#   live     (/live/)     MASTERCLASS QUALITY ONLY. If it is not finished to that bar,
+#                         it does not appear.
+#
+# ★ THIS FILE DOES NOT YET IMPLEMENT THAT RULE. Today preview/ and live/ differ by ONE
+# thing, the build flip; everything else ships to both. The rule needs a third tier —
+# a PREVIEW_ONLY list cut from live/ but kept in preview/ — and two populations move
+# into it the moment it exists:
+#   · the vision room, currently in CUT_ROOMS (semi-finished: a draft text and a
+#     POST_TARGET of null) — under the rule it is preview/ material, not dev-only
+#   · the 101 gate hits that fail live/ today: the dev-nav (38), the dev-route links
+#     (49), the M1 A/B toggle (4) and the tuning params (10). The dev-nav and the
+#     tuning params are workshop tools and belong to dev alone; the M1 toggle's own
+#     comment says to remove it once chosen.
+# Doing that properly is its own task, because it changes what is published. Recorded
+# here rather than half-done, so the next session inherits the rule and not a guess.
+#
 # (folder, keeps the flip)
 VARIANTS = [("preview", True), ("live", False)]
 

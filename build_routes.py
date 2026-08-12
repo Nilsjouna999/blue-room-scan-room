@@ -26,6 +26,12 @@ ROUTES = [
     # path        room (the value app.js resolves)   what it is
     ("tarot",    "drawing-room",   "The Drawing Room — tarot"),
     ("reading",  "arcane",         "The Arcana intake — the birth reading starts here"),
+    # BR-S396: the Profile had no address at all, while every other product room had a
+    # typed one — and it is the room a returning visitor opens MOST (BR-S371 gave it
+    # door I for exactly that reason). Filed as §10 Q5 of the Profile brief.
+    # Safe to publish because BR-S376 gates it in the public builds: a visitor who
+    # holds nothing lands on M3's sealed niche rather than an empty members' page.
+    ("profile",  "profile",        "Your Profile — the page the Shelf lives inside"),
     # BR-S308: U1 is not a ?dev= room -- "about" is not in app.js's dev allow-list, so this
     # boots the ordinary menu and app.js seats it at the U1 stop. The room the public
     # roadmap points at gets the address a person would actually type.
