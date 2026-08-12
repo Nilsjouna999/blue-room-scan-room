@@ -696,6 +696,85 @@ The second is the one that would change the most code today.
 
 ---
 
+## 10-A. THE ANSWERS, AS OF BR-S391
+
+*Written after BR-S374 → BR-S390 closed the defect list. Six of the fourteen are now
+answered by work that exists and can be checked in the source. Three are answered by a
+fact about the product that was not visible when the questions were written. Five are
+genuine forks and stay the builder's.*
+
+### Answered by the build
+
+**Q11 — how is the mono register made readable without losing restraint?**
+**Answered, BR-S388.** It was a size-and-tracking problem, exactly as asked. Eight
+sizes across twelve trackings became three steps — `--pf-mono-micro/label/meta` — with
+the tracking belonging to the step, plus one shared prose tracking for mono that is a
+sentence rather than a label. Measured on the live page: 37 mono elements now render
+in five size/tracking combinations. Restraint was not spent: nothing got brighter.
+
+**Q1 — what does a person with nothing see?**
+**Now visible, and half-answered.** BR-S375 wired `br_holdings`, so the empty branch
+renders for the first time; BR-S384 took the price out of it. The design half is still
+open, but it is no longer a hypothetical — it can be looked at with `?holdings=0`.
+
+**Q10 — does a section render before it holds anything?**
+**Partly settled by consequence.** Minted still renders a lede saying "None yet", and
+BR-S384 fixed its spacing rather than removing it, which is a decision by default. The
+question stands as a design fork, but it is now one section, not most of §8A.
+
+**Q5 — where does the profile's own address live?**
+**Answered as a fact: it does not have one.** `build_routes.py` ROUTES carries
+`tarot`, `reading`, `about`, `roadmap` — no `profile`. Every other product room has a
+typed address and this one is reachable only by `?dev=profile`. Cheap to add; the
+gate added in BR-S376 means an unheld visitor lands on the sealed niche either way.
+**Recommendation: add `/profile/`.** It is the room a returning visitor opens most.
+
+**Q8 — should "Games for a table" and the Workshop appear on the profile?**
+**Already answered: no, and they never did.** They live in `ROOMS` and surface on U1,
+not here. (Both were also corrected in BR-S379/S380 — the first is now "Social games",
+in the builder's own words.)
+
+**Q9 — what is the one sentence that says what a reading contains?**
+**Proposed, not yet placed:** *"Six marks, read from a name and a birth date — a sun
+sign, a year animal, a life path, a rune, a hexagram and a trigram, each with a record
+of its own."* It is true today, it is the registry's own count, and it belongs above
+the crown in both states.
+
+### Answered by a fact the questions did not have
+
+**Q12 — what is this page for someone who has not paid?**
+★ **They never reach it.** M3 gates the Profile: `renderReliquaryTeaser()` shows a
+sealed "Held in conservation" niche and the "Open your Profile" door exists only in
+the unlocked branch. The Profile is a MEMBERS' page and never has to sell — the sealed
+niche is the conversion surface, and it is already written well. This reframes §9c's
+paywall argument and most of Q1's urgency: the empty state must be *correct*, not
+*persuasive*. (`?dev=profile` stays open in dev at the builder's request; BR-S376
+gates it in the public builds only.)
+
+**Q2 — what is the page's single job?**
+**Follows from Q12.** A members' page does not have "show you what else there is" as a
+co-equal job — that is the menu's. Of the three candidates, *hold what you have* is the
+job, and *get you back into your reading* is the one action it should make effortless.
+BR-S387 already acted on this: the Shelf now closes after Vault/Minted/Showcase, and
+the exits and referral sit outside it.
+
+**Q7 — does the Vault stay unmarketed as it fills?**
+**It is already less unmarketed than the rule claims.** BR-S387 made it a named region
+with an accessible label. The honest version of the rule: the Vault is not
+*advertised*, but it is not *hidden* — it is the first thing under the line.
+
+### Still the builder's — genuine forks
+
+| # | The fork | Why it cannot be answered from the source |
+|---|---|---|
+| **Q3** | Does Friends belong on a profile with no accounts? | Mock-only today. Depends on whether Blue Room ever shows you other people at all — a product decision, not a page decision. |
+| **Q4** | Is the Showcase for you or for a visitor? | It is the only feature implying an audience, on a product with no sharing. If nobody can visit, it is a private display case. |
+| **Q6** | What organises the shelf when it is full? | Time, kind, or rarity. Nothing in the design answers it and the Mint plus the Codex unlock roughly double the contents. |
+| **Q13** | The line, or tabs? | §9c argues the line is a smell; BR-S372 chose it deliberately. Both are defensible; only the builder can settle it. |
+| **Q14** | Is Blue Room a room you decorate? | Constrained customisation is well-evidenced and may still be the wrong product. |
+
+---
+
 ## 10. THE QUESTIONS THE REDESIGN MUST ANSWER
 
 1. **What does a person with nothing see?** This is the real first screen. Design
