@@ -5937,8 +5937,40 @@ html.orbit-wings .orbit__field { --orbit-rx: clamp(200px, 25.5vw, 368px); --orbi
    it again is how you leave. */
 .visgive__amt.is-on { border-color: var(--gold, #c9a35c); color: var(--gold-lit, #c9a35c); }
 .visgive__amt:disabled { cursor: not-allowed; opacity: .4; }
-.visgive__more { margin-bottom: 24px; }
+/* BR-S395: the letter now opens BELOW the law line, with nothing under it but the end
+   of the page — so opening and closing it cannot move a single thing above it. The top
+   margin is the block's own air; there is no bottom margin, because there is nothing
+   left to push. */
+.visgive__more { margin-top: 26px; }
 .visgive__more[hidden] { display: none; }   /* .vispost__ta sets display:block — BR-S381 */
+/* "another" turns INTO its field. The wrap matches the buttons' box exactly, so the row
+   keeps its shape when the swap happens and no neighbour shifts. */
+/* BR-S395 — THE SWAP MUST BE THE SAME SIZE, TO THE PIXEL. Measured, the button was
+   77px and the wrap 74px, and those three pixels were enough to re-wrap the flex row
+   from two lines to one — which moved the law line 55px, the exact thing this change
+   set out to stop. Both are pinned to one width now, so the row cannot reflow when one
+   becomes the other. If the word "another" is ever changed, this number changes with it. */
+.visgive__amt--other, .visgive__otherwrap { width: 92px; min-width: 0; }
+.visgive__otherwrap {
+  display: inline-flex; align-items: center; justify-content: center; gap: 2px;
+  padding: 11px 12px; border-radius: 3px;
+  border: 1px solid var(--gold, #c9a35c);
+}
+/* ★ THE SAME TRAP, A THIRD TIME. `display: inline-flex` above beats the UA's
+   `[hidden] { display: none }`, so this wrap was rendering even while hidden — the row
+   carried FIVE items instead of four, wrapped a line early, and that line was the 55px
+   the law was moving by. It is the identical defect as BR-S381's "Where were you?" and
+   BR-S385's `.visgive__more`, and I wrote the rule for both of those. ANY selector in
+   this file that sets an explicit display MUST restate its own hidden case. */
+.visgive__otherwrap[hidden] { display: none; }
+.visgive__cur { font-family: var(--font-display, serif); font-size: 17px; color: var(--gold-lit, #c9a35c); }
+.visgive__other {
+  width: 3.2ch; padding: 0; border: 0; background: none; outline: none;
+  font-family: var(--font-display, serif); font-size: 17px; color: var(--t-display, #e9e5dc);
+}
+.visgive__other::placeholder { color: #6f6a61; }
+/* the spinners would be a fourth way to change a number that already has three */
+.visgive__other::-webkit-outer-spin-button, .visgive__other::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
 .visgive__law {
   font-family: var(--font-display, serif); font-size: 19px; line-height: 1.5;
   color: var(--t-display, #e9e5dc); margin: 0 0 14px; max-width: 46ch;

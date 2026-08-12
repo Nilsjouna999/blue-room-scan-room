@@ -1786,8 +1786,22 @@ function renderVision() {
   var coins = DONATE.map(function (d) {
     return '<button type="button" class="visgive__amt" data-amt="' + d + '" aria-pressed="false" '
       + 'aria-expanded="false" aria-controls="giveMore">' + d + '</button>';
-  }).join('') + '<button type="button" class="visgive__amt visgive__amt--other" data-amt="other" '
-      + 'aria-pressed="false" aria-expanded="false" aria-controls="giveMore">another</button>';
+  }).join('')
+    /* BR-S395 — "another" TURNS INTO the field rather than sitting beside one. The
+       button hides and the input takes its place, so the row never grows a slot and
+       nothing on the line moves. Digits only, three of them: 999 is the ceiling, and a
+       ceiling is the point on a block whose closing line is "if it is over your means
+       even slightly, we don't want it" — a donation box you can type 100000 into is
+       arguing with its own last sentence. `inputmode` gives a phone the number pad;
+       the filter is on `input`, because a paste, a drag and a middle-click all reach
+       the value without a keystroke. */
+    + '<button type="button" class="visgive__amt visgive__amt--other" data-amt="other" '
+    +   'aria-pressed="false" aria-expanded="false" aria-controls="giveMore">another</button>'
+    + '<span class="visgive__otherwrap" id="giveOtherWrap" hidden>'
+    +   '<span class="visgive__cur" aria-hidden="true">$</span>'
+    +   '<input class="visgive__other" id="giveOther" type="text" inputmode="numeric" '
+    +     'maxlength="3" placeholder="0" aria-label="Another amount, in dollars, up to 999">'
+    + '</span>';
 
   var give = '<section class="visgive" id="give">'
     + '<h2 class="vis__h">Leave something</h2>'
@@ -1795,6 +1809,16 @@ function renderVision() {
     +   'and what costs says so on its own door. This is for someone who had it spare '
     +   'and wanted to &mdash; no other reason, and no reason needed.</p>'
     + '<div class="visgive__row" role="group" aria-label="Choose an amount">' + coins + '</div>'
+    /* BR-S395 — THE LAW LINE COMES FIRST NOW, AND THE LETTER OPENS BENEATH IT.
+       The letter used to sit BETWEEN the amounts and the law, so opening or closing it
+       shoved the law, the note and the whole page foot up and down by ~230px. The
+       builder's objection was exactly that: the page should stay solid and unmoving.
+       Reserving the space would have left a permanent hole, so the order changed
+       instead — with nothing below it but the end of the page, the block can open and
+       close without a single thing above it moving by a pixel.
+       It also reads better: you choose an amount, the line lands, and only then are
+       you asked if you want to say anything. */
+    + '<p class="visgive__law">If it is over your means even slightly, we don&rsquo;t want it.</p>'
     /* Hidden until an amount is chosen, and hidden again the moment it is un-chosen.
        The letter is OPTIONAL and says so in its own label, not in a note underneath. */
     + '<div class="visgive__more" id="giveMore" hidden>'
@@ -1808,7 +1832,6 @@ function renderVision() {
     +       'this build. Press the amount again to put it back.</p>'
     +   '</div>'
     + '</div>'
-    + '<p class="visgive__law">If it is over your means even slightly, we don&rsquo;t want it.</p>'
   + '</section>';
 
   return '<div class="vis">'
@@ -1841,6 +1864,27 @@ function wireVision() {
      holds your words is not closed. */
   var row = host.querySelector(".visgive__row");
   var more = host.querySelector("#giveMore");
+  var otherWrap = host.querySelector("#giveOtherWrap");
+  var otherIn = host.querySelector("#giveOther");
+  var otherBtn = row && row.querySelector('[data-amt="other"]');
+
+  /* BR-S395 — digits only, and never above 999. The filter runs on `input` rather than
+     `keydown` so a paste, a drag-and-drop and a middle-click paste are all caught; a
+     keydown guard only stops typing. Leading zeros go too, or "007" survives as an
+     amount nobody wrote. */
+  if (otherIn) otherIn.addEventListener("input", function () {
+    var v = otherIn.value.replace(/\D+/g, "").replace(/^0+(?=\d)/, "");
+    if (v && +v > 999) v = "999";
+    if (v !== otherIn.value) otherIn.value = v;
+  });
+
+  function resetOther() {
+    if (!otherWrap) return;
+    otherWrap.hidden = true;
+    if (otherIn) otherIn.value = "";
+    if (otherBtn) otherBtn.hidden = false;
+  }
+
   if (row && more) row.addEventListener("click", function (e) {
     var b = e.target.closest("[data-amt]");
     if (!b) return;
@@ -1854,13 +1898,23 @@ function wireVision() {
       more.hidden = true;
       var ta = more.querySelector("textarea");
       if (ta) ta.value = "";
+      resetOther();
       return;
     }
     b.classList.add("is-on");
     b.setAttribute("aria-pressed", "true");
     b.setAttribute("aria-expanded", "true");
     more.hidden = false;
+    // "another" TURNS INTO the field: the button steps aside so the row keeps its shape.
+    if (b === otherBtn && otherWrap) {
+      otherBtn.hidden = true;
+      otherWrap.hidden = false;
+      if (otherIn) { try { otherIn.focus({ preventScroll: true }); } catch (err) { otherIn.focus(); } }
+    } else {
+      resetOther();
+    }
   });
+  // clicks inside the field are clicks inside the row, so they never reach closeGive()
 
   /* BR-S385 — CLICKING AWAY PUTS IT BACK TOO. Anywhere that is not another amount and
      not the letter or its Continue closes the block and clears the choice, so the
@@ -1885,6 +1939,12 @@ function wireVision() {
       x.setAttribute("aria-pressed", "false");
       x.setAttribute("aria-expanded", "false");
     });
+    /* BR-S395: a typed amount IS deleted on click-away, unlike the letter, which is
+       kept. They are not the same kind of thing — the letter is words someone wrote and
+       losing them to a stray click would be a small cruelty; a number is a figure they
+       had not committed to, and leaving it sitting in a dismissed control is how
+       someone ends up giving an amount they thought they had cancelled. */
+    resetOther();
   }
   function onAway(e) {
     if (!document.body.contains(more)) {          // this mount is gone; so is this listener
