@@ -1618,7 +1618,57 @@ function u1Door(o, i) {
    is not a rough draft, it is a lie with a headline.
    Fill this with one string per paragraph and the section renders itself. While it is
    empty the room stays out of the public builds — see the note in build_public.py. */
-var VISION = [];
+/* BR-S390 — A DRAFT, WRITTEN ON REQUEST, AND STILL THE BUILDER'S TO CUT.
+   Every claim below is taken from something that already exists: the room registry,
+   the master spine, the passenger/turning-world docs, the growth strategy, and the
+   lines the site already says out loud ("Everything read here is yours to keep",
+   "One archive. Every door kept."). Nothing here promises a room that is not in
+   ROOMS, a price that is not on a door, or a mechanic nobody has decided.
+   Read it as a first pass at the shape, not as final wording. */
+var VISION = [
+  "Blue Room is an archive that reads things. A photograph, a name and a birth date, " +
+  "a deck cut on a table &mdash; each one goes in, and what comes back is a record: " +
+  "named, dated, filed, and yours.",
+
+  "The first rule is the one everything else is built on. <em>Everything read here is " +
+  "yours to keep.</em> Looking is free and stays free. What costs money says so on its " +
+  "own door, once, in plain figures. Nothing here is built to make you come back &mdash; " +
+  "if you never open it again, the record is still yours, and it is still true.",
+
+  "It is made of rooms rather than features. A room has a name, a door, and one thing " +
+  "it does. The Codex holds every mark the archive can read. The Drawing Room cuts " +
+  "tarot. The Birth Reading takes a name and a date and gives back six marks. You can " +
+  "find a room again without being told twice, and every way in is a way back out. " +
+  "When something new is built it becomes a place, not another item in a list.",
+
+  "The six marks come from six systems people have been reading for a very long time " +
+  "&mdash; astrology, the Chinese year, numerology, the runes, the I Ching. Blue Room " +
+  "does not rank them, blend them into one answer, or apologise for them. It reads each " +
+  "one properly, on its own terms, and files what it finds beside the others.",
+
+  "What you keep gathers into a place of your own. A profile here is not a settings " +
+  "page; it is your page in the archive, and the Shelf inside it holds everything you " +
+  "have drawn. A crown gains a gem for every mark. Read for someone close and you earn " +
+  "a ring. The archive grows by being used, and the part of it that is yours grows with it.",
+
+  "Further on, the readings stop being a list and become ground. Your trigram is the " +
+  "land. Your year animal walks on it. Your sun sign is the sky over it, and your rune " +
+  "stands in it as a stone. The horizon curves because the world is round, and it turns " +
+  "once every twenty-four hours whether or not anyone is watching &mdash; so sitting " +
+  "still is rest rather than idleness. You are a passenger in your own reading.",
+
+  "Other people arrive as marks, never as a feed. A ring carries someone you read for. " +
+  "A gift carries a reading to someone who has none. Some rooms will be played by a " +
+  "whole table at once, where the unit is the group and not the reader. And love, which " +
+  "runs through every room here and lives in none of them, gets a room of its own.",
+
+  "It will keep expanding, and it will keep its outline while it does. Blue Room is not " +
+  "trying to look like anything else and is not going to get louder to be noticed. No " +
+  "counters, no streaks, no urgency, nothing measuring you back. A quiet, strange, " +
+  "carefully made place that knows what it is &mdash; and stays that way as it grows.",
+
+  "One archive. Every door kept."
+];
 
 /* Where a submission is meant to land. Null until the builder names it — a form that
    silently goes nowhere is the same class of thing as invented copy. The control is

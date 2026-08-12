@@ -5856,6 +5856,11 @@ html.orbit-wings .orbit__field { --orbit-rx: clamp(200px, 25.5vw, 368px); --orbi
 .vis__lede { font-family: var(--font-display, serif); font-size: 16.5px; font-style: italic; line-height: 1.6; color: #8c867b; margin: 0 0 22px; max-width: 56ch; }
 .vis__p { font-family: var(--font-display, serif); font-size: 17.5px; line-height: 1.68; color: #c8c4bb; margin: 0 0 18px; max-width: 62ch; }
 .vis__p--empty { color: #8c867b; font-style: italic; }
+/* the one emphasised clause carries the founding rule — italic, and brought up to the
+   display tier so it reads as the sentence the rest of the page is built on */
+.vis__p em { font-style: italic; color: var(--t-display, #e9e5dc); }
+/* the closing line is the site's own footer sentence, returned to as a bookend */
+.vis__p:last-child { margin-top: 30px; color: var(--gold-lit, #c9a35c); font-style: italic; }
 .vis__body { margin-bottom: 64px; }
 
 .vispost { border-top: 1px solid rgba(220, 215, 203, .10); padding-top: 34px; display: block; }
