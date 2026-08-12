@@ -2819,6 +2819,12 @@ html.land-detent  .menu__track { --track-ease: cubic-bezier(.50, -0.18, .14, 1);
 html.land-detent2 .menu__track { --track-ease: cubic-bezier(.55, -0.28, .12, 1); }
   /* BR-S203: the stage is the first full-viewport screen; the desk/wall centre inside their panels, the About surface flows below */
   /* literal ease — --rv-ease is scoped to .reveal-stage and does not resolve here */
+/* BR-S400 — HOME IS THE MIDDLE PANEL NOW. The base transform matches home rather than
+   the first panel, so the track is already on The Draw at first paint and the boot seed
+   confirms it instead of correcting it — no flash of the locked desk on every load.
+   `.is-wall` is still home's class, so every rule written against it is untouched. */
+.menu__track { transform: translateX(-100%); }
+.menu.is-l1 .menu__track { transform: translateX(0); }
 .menu.is-wall .menu__track { transform: translateX(-100%); }
 .menu.is-reliquary .menu__track { transform: translateX(-200%); }   /* BR-S204: slide 3 (source-ordered AFTER is-wall so it wins if both ever coexist) */
 .menu__panel { flex: 0 0 100%; min-width: 0; min-height: 100vh; padding: 34px 24px; position: relative; display: flex; align-items: center; justify-content: center; }
@@ -6023,3 +6029,37 @@ html.orbit-wings .orbit__field { --orbit-rx: clamp(200px, 25.5vw, 368px); --orbi
   color: var(--t-display, #e9e5dc); margin: 0 0 14px; max-width: 46ch;
 }
 
+
+/* ── BR-S400 — L1's SEAL. The desk behind it stays legible: this is a locked-room
+   PREVIEW, so the visitor sees the real surface and sees that it is shut. The seal
+   covers the panel and takes the pointer, which is what actually stops the desk from
+   selling a card nothing can mint yet — dimming alone would leave every control live.
+   It paints only while the panel is the one on stage; offstage it costs nothing. */
+.l1seal {
+  position: absolute; inset: 0; z-index: 6;
+  display: flex; align-items: center; justify-content: center;
+  padding: 24px;
+  background: linear-gradient(rgba(10, 11, 13, .74), rgba(10, 11, 13, .88));
+  -webkit-backdrop-filter: saturate(.5) blur(1.5px); backdrop-filter: saturate(.5) blur(1.5px);
+}
+.menu__panel--desk { position: relative; }
+.l1seal__box { max-width: 34ch; text-align: center; }
+.l1seal__mark { display: block; font-size: 15px; color: var(--gold, #c9a35c); margin-bottom: 14px; }
+.l1seal__k {
+  font-family: var(--font-mono, monospace); font-size: 9px; letter-spacing: .24em;
+  text-transform: uppercase; color: var(--gold, #c9a35c); margin: 0 0 10px;
+}
+.l1seal__t {
+  font-family: var(--font-display, serif); font-weight: 400;
+  font-size: clamp(26px, 3.6vw, 38px); color: var(--t-display, #e9e5dc);
+  margin: 0 0 14px; line-height: 1.1;
+}
+.l1seal__t:focus-visible { outline: none; }
+.l1seal__d {
+  font-family: var(--font-display, serif); font-style: italic; font-size: 17px;
+  line-height: 1.6; color: #8c867b; margin: 0 0 22px;
+}
+.l1seal__back {
+  font-family: var(--font-mono, monospace); font-size: 9px; letter-spacing: .18em;
+  text-transform: uppercase; color: #6f6a61; margin: 0;
+}

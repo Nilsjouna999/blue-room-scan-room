@@ -3135,6 +3135,20 @@ function renderMenu(reveal) {
     </div>
     ${ANNEX_GO}
     ${ANNEX_DOWNCUE}
+    <!-- BR-S400 - THE SEAL OVER L1. The desk stays visible behind it, dimmed: the
+         builder's call was a locked room PREVIEW, not a hidden one, so a visitor who
+         stumbles left sees the real thing AND sees that it is not open. It covers the
+         panel and takes the pointer, which is what stops the desk's own controls from
+         selling a card nothing can mint yet. -->
+    <div class="l1seal">
+      <div class="l1seal__box">
+        <span class="l1seal__mark" aria-hidden="true">&#9670;</span>
+        <p class="l1seal__k">Not open yet</p>
+        <h2 class="l1seal__t" tabindex="-1">The Card Mint</h2>
+        <p class="l1seal__d">The card is already made &mdash; this is one. What is missing is the room that reads a picture of your own.</p>
+        <p class="l1seal__back">Press right to go back</p>
+      </div>
+    </div>
     </section>
     <section class="menu__panel menu__panel--wall is-offstage" inert aria-hidden="true" aria-label="The Reading Rooms">
     ${ANNEX_BACK}
@@ -3936,9 +3950,26 @@ function wireMenuReveal(host) {
    unreachable (guard + CSS hide). Slide 3 is gated by a MOCK localStorage flag and
    fails CLOSED (unset/thrown → the locked teaser). Module-level named handlers —
    never stack across remounts. */
+/* ★ BR-S400 — THE FRONT DOOR MOVES. The Draw takes the middle and becomes the room a
+   visitor arrives in; the card desk steps LEFT into L1 and is locked behind a
+   coming-soon seal. This is the change THE PIVOT has been waiting for: the desk sold a
+   card nothing can mint yet, on the first surface anyone met.
+
+   THREE CONTRACTS HOLD THIS TOGETHER, and breaking any one of them breaks the door:
+   1. L1's `hash` is NULL, not "". A null hash is never matched by _hashIndex and never
+      written by a slide, so L1 has no address — you can only reach it by stepping left,
+      and a refresh there returns you to the front. That is the builder's rule
+      ("refreshing on l1 goes m1") expressed as data rather than as a special case.
+   2. MENU_HOME, not 0, is where the app comes to rest. Every fallback in the panel
+      machinery returned 0 when it meant "home", and those are two different numbers now.
+   3. EVERY panel carries a `cls`, including home. The old model gave home no class and
+      identified it by the absence of one; with a panel to home's LEFT, absence can no
+      longer tell them apart. `.is-wall` is kept as home's class precisely so the many
+      existing `.is-wall` rules keep working untouched. */
+const MENU_HOME = 1;
 const MENU_PANELS = [
-  { cls: null,           sel: ".menu__panel--desk",      hash: "",           focus: ".menu__panel--desk .menu__go-btn" },
-  { cls: "is-wall",      sel: ".menu__panel--wall",      hash: "#rooms",     focus: ".menu__draw-title" },
+  { cls: "is-l1",        sel: ".menu__panel--desk",      hash: null,         focus: ".menu__panel--desk .l1seal__t" },
+  { cls: "is-wall",      sel: ".menu__panel--wall",      hash: "",           focus: ".menu__draw-title" },
   { cls: "is-reliquary", sel: ".menu__panel--reliquary", hash: "#reliquary", focus: ".menu__reliq-title" },
 ];
 let _menuPushed = 0;     // COUNT of synthetic history entries we pushed (never assign the index)
@@ -4010,15 +4041,21 @@ function _menuEls() {
   return { host, track, panels: MENU_PANELS.map(p => host.querySelector(p.sel)) };
 }
 function _menuIndex(host) {
-  for (let i = MENU_PANELS.length - 1; i >= 1; i--) {
+  // BR-S400: from 0, not 1 — L1 is a real panel with a real class, and home is no
+  // longer "the one without a class". Falls back to HOME, which is not index 0.
+  for (let i = MENU_PANELS.length - 1; i >= 0; i--) {
     if (MENU_PANELS[i].cls && host.classList.contains(MENU_PANELS[i].cls)) return i;
   }
-  return 0;
+  return MENU_HOME;
 }
-function _hashIndex() {                                 // '', '#about', a future '#codex' → the desk (vertical fragments live on slide 0)
+function _hashIndex() {   // '' → home (The Draw); '#about' → home, and U1 seats beneath it
   const h = location.hash;
-  for (let i = 1; i < MENU_PANELS.length; i++) if (MENU_PANELS[i].hash === h) return i;
-  return 0;
+  // A panel with a null hash (L1) is deliberately unmatchable: it has no address, so a
+  // refresh or a deep link can never land there.
+  for (let i = 0; i < MENU_PANELS.length; i++) {
+    if (typeof MENU_PANELS[i].hash === "string" && MENU_PANELS[i].hash === h) return i;
+  }
+  return MENU_HOME;
 }
 
 function cancelMenuSettle() { if (_menuSettle) { _menuSettle.cancel(); _menuSettle = null; } }
@@ -4247,12 +4284,16 @@ function wireMenuAnnex(host) {                                      // KEEP the 
   window.addEventListener("scroll", _u1OnScroll, { passive: true });
   _u1SeatInvalidate();                                              // BR-S313: this mount rebuilt the menu — the cached seat describes the old one
   const seedIdx = _hashIndex();
-  if (seedIdx > 0) menuSlideTo(seedIdx, { seed: true });            // deep-link: paint composed, no slide
+  // BR-S400: home is index 1 now, so the seed ALWAYS runs — it is what puts the track
+  // on The Draw. The base transform matches home, so nothing flashes before it does.
+  menuSlideTo(seedIdx, { seed: true });                             // deep-link: paint composed, no slide
   if (MENU_PANELS[seedIdx] && MENU_PANELS[seedIdx].cls === "is-wall") m2EnsureDeck(host);   // BR-S321: a deep link to #rooms never runs the settle, so the deck is fetched here too
   else MENU_PANELS.forEach(p => { if (p.cls) host.classList.remove(p.cls); });   // stale-state reset on remount
   /* BR-S308: U1 is arrived at two ways — /#about (the in-app link) and /about/ (the
      real address the generator emits). Both seat here; neither is a redirect. */
-  if (seedIdx === 0 && (location.hash === U1_HASH || window.BR_ROOM === "about")) _u1BootSeat();
+  // BR-S400: U1 re-parented from the desk to the front door. It is the page that says
+  // what Blue Room IS — it cannot hang beneath a locked room.
+  if (seedIdx === MENU_HOME && (location.hash === U1_HASH || window.BR_ROOM === "about")) _u1BootSeat();
 }
 
 /* BR-S243 — KEYBOARD NAVIGATION (the first, easiest pass).
