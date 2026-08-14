@@ -40,6 +40,17 @@
        so it costs nothing per frame once rastered — but it MUST NOT be animated
        (the house perf contract: transform and opacity only). It fades in via
        opacity on a parent that already carries the transition. */
+    /* ★★★ BR-S447 — .90 WAS STILL 10 PERCENT OF THE BRIGHTEST THING ON THE SITE.
+       "when opening rooms i still see main menu backround and white card through the
+       room pop up." Correct, and my arithmetic at BR-S442 was wrong in the way that
+       matters: the card peaks at 232 luminance, so 10 percent of it is 23 — against a
+       ground of about 14. A patch 9 levels brighter than everything around it is not
+       invisible, it is a soft shape, and 20px of blur SPREADS that shape rather than
+       removing it. Blur redistributes luminance; only alpha destroys it.
+       .90 -> .97. Three percent of 232 is 7, which lands UNDER the ground itself and is
+       therefore genuinely unreadable. The blur stays, because at .97 it is still doing
+       the thing it was asked for — the room is soft behind the doors rather than a flat
+       wall — it simply no longer has enough light left to draw the card with. */
     /* ★★ BR-S446 — THE ROOM SHOWED THROUGH WHILE THE SHEET WAS ARRIVING. The builder:
        "room pop up mainmenu or backround visible buggily as it settles." The word that
        matters is SETTLES — it is not the resting state, it is the entrance.
@@ -54,7 +65,7 @@
     + ".orbit.is-u1 .orbit__scrim{transition:none!important;opacity:1!important;animation:none!important}"
     + ".orbit__scrim{backdrop-filter:blur(20px) saturate(.85);"
     +   "-webkit-backdrop-filter:blur(20px) saturate(.85);"
-    +   "background:rgba(14,12,10,.90)!important}"
+    +   "background:rgba(14,12,10,.985)!important}"
     /* the field stops being a constellation and becomes a sheet of doors */
     + ".orbit.is-u1 .orbit__field{display:flex;align-items:center;justify-content:center;"
     +   "padding:clamp(20px,4vh,54px) clamp(16px,4vw,60px)}"
