@@ -56,7 +56,7 @@ js = (
 '      fetch("codex-data.json?v=200").then(function (r) { return r.text(); }),\n'
 '      fetch("arcana-build/kb_compact.json?v=200").then(function (r) { return r.text(); }),\n'
 '      fetch("arcana-build/practical.json?v=200").then(function (r) { return r.text(); }),\n'
-'      fetch("arcana-build/kwcolor.json?v=200").then(function (r) { return r.text(); })\n'
+'      fetch("arcana-build/kwcolor.json?v=412").then(function (r) { return r.text(); })\n'
 '    ]).then(function (t) {\n'
 '      host.innerHTML = SKELETON;\n'
 '      host.querySelector("#codex").textContent = t[0];\n'
