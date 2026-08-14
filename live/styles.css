@@ -5905,6 +5905,30 @@ html.orbit-wings .orbit__field { --orbit-rx: clamp(200px, 25.5vw, 368px); --orbi
 /* the turn-target, drawn only while open: a hairline down the right edge saying where
    the next frame lives. Never a chevron — the fragment is not a carousel. */
 .u1leak__turn { display: none; }
+/* ★★ BR-S432 — THE FRAGMENT OPENS AS A POPUP, NOT IN PLACE. The builder: "the what
+   coming the forge, photo snippet should be pop up so you can actually see with blurred
+   backround and cllicking sides dismisses it."
+   BR-S399 made it view-only and 108px so it could never grow past its own size and push
+   the column around. That constraint was about the COLUMN, and a fixed overlay does not
+   touch the column at all — so the thing it was protecting is not at risk. What survives
+   from BR-S399 is the part that mattered: it still navigates nowhere and opens nothing,
+   it is only larger. Right edge still turns to the next frame; anywhere else dismisses.
+   The blur is the same recipe the ROOMS sheet and the What's-coming popup use, so the
+   house has ONE way of putting something in front of you. */
+.u1leakbox { position: fixed; inset: 0; z-index: 240; display: flex; align-items: center;
+  justify-content: center; opacity: 0; pointer-events: none; transition: opacity 200ms ease; }
+.u1leakbox.is-in { opacity: 1; pointer-events: auto; }
+.u1leakbox__scrim { position: absolute; inset: 0; background: rgba(8, 9, 11, .66);
+  backdrop-filter: blur(14px) saturate(.9); -webkit-backdrop-filter: blur(14px) saturate(.9); }
+.u1leakbox__fig { position: relative; margin: 0; max-width: min(78vw, 900px); max-height: 82vh;
+  border: 1px solid rgba(233, 229, 220, .16); border-radius: 3px; overflow: hidden;
+  box-shadow: 0 30px 70px rgba(0, 0, 0, .7); cursor: pointer; }
+.u1leakbox__fig img { display: block; width: 100%; height: auto; max-height: 82vh; object-fit: contain; }
+.u1leakbox__cap { position: absolute; left: 0; right: 0; bottom: 0; margin: 0; padding: 10px 14px;
+  font-family: var(--font-mono, monospace); font-size: 9px; letter-spacing: .18em;
+  text-transform: uppercase; color: rgba(233, 229, 220, .72);
+  background: linear-gradient(to top, rgba(8, 9, 11, .82), transparent); }
+@media (prefers-reduced-motion: reduce) { .u1leakbox { transition: none; } }
 .u1leak.is-open { position: relative; }
 .u1leak.is-open .u1leak__turn {
   display: block; position: absolute; top: 6px; right: 0; bottom: 6px; width: 42%;

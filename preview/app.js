@@ -1804,48 +1804,70 @@ function wireL1Back() {
   });
 }
 
+/* ★ BR-S432 — the found fragment now opens as a LIGHTBOX. See the note on .u1leakbox
+   in styles.css for why BR-S399's "never grows past its own size" is satisfied rather
+   than broken: that rule protected the COLUMN, and a fixed overlay never touches it.
+   The gesture is unchanged — right edge turns the page, anywhere else puts it away,
+   Escape does the same because a keyboard has no edges to click. */
 function wireU1Leak() {
-  function close(el) {
-    if (!el) return;
-    el.classList.remove("is-open");
-    el.querySelectorAll(".u1leak__f").forEach(function (img, i) { img.hidden = i !== 0; });
+  var box = null, frames = [], at = 0;
+
+  function close() {
+    if (!box) return;
+    box.classList.remove("is-in");
+    var b = box; box = null;
+    setTimeout(function () { if (b && b.parentNode) b.remove(); }, 220);
   }
-  function closeAll(except) {
-    document.querySelectorAll(".u1leak.is-open").forEach(function (el) {
-      if (el !== except) close(el);
+
+  function show(i) {
+    if (!frames.length) return;
+    at = (i + frames.length) % frames.length;
+    var img = box.querySelector(".u1leakbox__fig img");
+    img.src = frames[at].src;
+    var cap = box.querySelector(".u1leakbox__cap");
+    cap.textContent = frames.length > 1
+      ? "The Card Mint · " + (at + 1) + " of " + frames.length + " · press the right edge to turn"
+      : "The Card Mint";
+  }
+
+  function open(el) {
+    if (box) close();
+    frames = Array.prototype.slice.call(el.querySelectorAll(".u1leak__f"));
+    if (!frames.length) return;
+    box = document.createElement("div");
+    box.className = "u1leakbox";
+    box.setAttribute("role", "dialog");
+    box.setAttribute("aria-label", el.getAttribute("aria-label") || "A detail of the card");
+    box.innerHTML = '<div class="u1leakbox__scrim"></div>'
+      + '<figure class="u1leakbox__fig"><img alt="" decoding="async">'
+      + '<figcaption class="u1leakbox__cap"></figcaption></figure>';
+    document.body.appendChild(box);
+    show(0);
+    /* the from-state has to be committed before the class, and never via rAF —
+       a throttled frame would leave this invisible AND unclickable (BR-S422/S426) */
+    void box.offsetHeight;
+    box.classList.add("is-in");
+
+    box.querySelector(".u1leakbox__scrim").addEventListener("click", close);
+    box.querySelector(".u1leakbox__fig").addEventListener("click", function (e) {
+      var r = this.getBoundingClientRect();
+      if (frames.length > 1 && (e.clientX - r.left) / r.width > 0.62) { show(at + 1); return; }
+      close();
     });
   }
+
   document.addEventListener("click", function (e) {
     var el = e.target.closest && e.target.closest(".u1leak");
-    if (!el) { closeAll(null); return; }
-    closeAll(el);
-    var frames = el.querySelectorAll(".u1leak__f");
-    if (!el.classList.contains("is-open")) { el.classList.add("is-open"); return; }
-    // the right EDGE turns the page; the rest of it closes, like the page around it
-    var r = el.getBoundingClientRect();
-    if (frames.length > 1 && (e.clientX - r.left) / r.width > 0.58) {
-      var cur = 0;
-      frames.forEach(function (f, i) { if (!f.hidden) cur = i; });
-      var next = (cur + 1) % frames.length;
-      frames.forEach(function (f, i) { f.hidden = i !== next; });
-      return;
-    }
-    close(el);
+    if (!el) return;
+    e.preventDefault();
+    open(el);
   }, true);
+
   document.addEventListener("keydown", function (e) {
-    if (e.key === "Escape") closeAll(null);
-    if (e.key !== "ArrowRight" && e.key !== "Enter" && e.key !== " ") return;
-    var el = document.activeElement;
-    if (!el || !el.classList || !el.classList.contains("u1leak")) return;
-    var frames = el.querySelectorAll(".u1leak__f");
-    if (!el.classList.contains("is-open")) { el.classList.add("is-open"); e.preventDefault(); return; }
-    if (e.key === "ArrowRight" && frames.length > 1) {
-      var cur = 0;
-      frames.forEach(function (f, i) { if (!f.hidden) cur = i; });
-      var next = (cur + 1) % frames.length;
-      frames.forEach(function (f, i) { f.hidden = i !== next; });
-      e.preventDefault();
-    }
+    if (e.key === "Escape") { close(); return; }
+    if (!box) return;
+    if (e.key === "ArrowRight" && frames.length > 1) { show(at + 1); e.preventDefault(); }
+    if (e.key === "ArrowLeft" && frames.length > 1) { show(at - 1); e.preventDefault(); }
   });
 }
 
