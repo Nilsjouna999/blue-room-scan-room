@@ -2432,7 +2432,15 @@ function renderWall() {
     + '<div class="menu__draw-mast">'
     + '<p class="menu__wall-eyebrow"><span class="menu__wall-eyemark" aria-hidden="true">◆</span> BLUE ROOM</p>'
     + '<h2 class="menu__draw-title" tabindex="-1">The Reading Rooms</h2>'
-    + '<p class="menu__draw-thesis">Not every card is developed. Some are drawn.</p>'
+    /* BR-S417 — "Not every card is developed. Some are drawn." is CUT, one commit after
+       the line below it went. The builder's call, and the pair is the point: BR-S411
+       removed the third sentence for restating its neighbours, and with that gone this
+       one was left restating the DOORS. Both doors already say which is which — "The
+       deeper reading, given at birth" and "three cards to one question" — so a thesis
+       distinguishing developed from drawn is a caption on a choice that captions itself.
+       ★ It also aged out with the shape: BR-S406/BR-S411 made the Card Mint one of THREE
+       products, and "developed vs drawn" is a two-product sentence. The masthead now runs
+       eyebrow -> title -> rule -> the doors, and the rule closes the head as designed. */
     + '</div>'
     + '<span class="menu__draw-cutline" aria-hidden="true"></span>'
     /* BR-S411 — "The deck is already cut. What remains is the turn." is CUT. The
