@@ -4757,6 +4757,51 @@ body[data-devnav="1"] .devnav {
 }
 #menuView .seed__close::before { transform: translate(-50%,-50%) rotate(45deg); }
 #menuView .seed__close::after  { transform: translate(-50%,-50%) rotate(-45deg); }
+
+/* ★★ BR-S450 — WHILE THE CODEX IS OPEN, THE ORB GOES WHITE.
+   The builder: "when codex is opened there should always be white orb closing
+   possibility even at different codex entries."
+
+   THE CONTROL WAS ALWAYS THERE — IT JUST NEVER STOPPED BEING THE SEAL. Measured at
+   every scroll depth in the open aperture (top, #runes at y=9632, after an entry
+   click): visibility visible, opacity 1, z-index 210, aria-label "Close the Codex".
+   So the affordance never disappears. What disappears is its READING: it is the same
+   cream-and-gold wax sphere open or shut, and a wax seal is the mark of the Codex, not
+   a way out of it. Over ten plates of warm parchment it also lands in the page's own
+   colour family, so the one control that returns you sits IN the thing it closes.
+
+   SAME SPHERE, DIFFERENT MATERIAL — the identical Deep Glass grammar (catchlight
+   position, crescent rim, the same five inset/drop shadows, same 42px, same place),
+   with only the body gradient swapped from wax to a cold neutral white. Nothing moves,
+   nothing resizes, and it is the same discipline as the tarot mark in BR-S449: an
+   object earns a new material when its job changes, not a new shape.
+
+   AND IT IS THE ONLY WHITE OBJECT ON A WARM PAGE. The palette is closed and every
+   plate in the Codex is warm; a cold white sphere cannot be mistaken for content,
+   which is exactly what a permanent escape hatch needs. Costs one gradient swap on a
+   class that is already toggled — no new element, no new listener, nothing per-frame. */
+#menuView.is-codex-open .seed,
+#menuView.is-codex-closing .seed {
+  background-image:
+    radial-gradient(closest-side, rgba(255,255,255,.92), rgba(255,255,255,.30) 52%, rgba(255,255,255,0) 78%),
+    radial-gradient(86% 86% at 26% 20%,
+      rgba(255,255,255,0) 0%, rgba(255,255,255,0) 64%,
+      rgba(255,255,255,.10) 78%, rgba(255,255,255,.40) 92%, rgba(255,255,255,.62) 100%),
+    radial-gradient(78% 78% at 33% 27%,
+      #ffffff 0%, #f7f9fb 14%, #e6eaf0 30%, #ccd3dc 50%,
+      #a4adb9 70%, #7b838f 88%, #9aa2ad 100%);
+  box-shadow:
+    inset -2px -3px 8px rgba(18,22,28,.30),
+    inset  3px  3px 7px rgba(255,255,255,.55),
+    0 1px 2px rgba(0,0,0,.62),
+    0 4px 10px rgba(0,0,0,.44),
+    0 10px 22px rgba(0,0,0,.28);
+}
+/* the two bars go to the same cold ink, so the mark belongs to the sphere it sits on */
+#menuView.is-codex-open .seed__close::before,
+#menuView.is-codex-open .seed__close::after,
+#menuView.is-codex-closing .seed__close::before,
+#menuView.is-codex-closing .seed__close::after { background: #1b2029; }
 /* lift only — the glyph is real text, so no scale (it would composite-stretch the ◆) */
 #menuView .seed:hover, #menuView .seed:focus-visible { transform: translate3d(0,-1px,0); outline: none;
   transition-duration: var(--orb-in); transition-timing-function: var(--orb-e-in); }
@@ -5028,8 +5073,38 @@ body[data-devnav="1"] .devnav {
 #menuView .mini__name { font-family: var(--font-display); font-size: 13.5px; color: #efe7d8; }
 #menuView .mini__tag { font-size: 10.5px; color: var(--cx-gold); letter-spacing: .02em; margin-top: 1px; }
 #menuView .mini__mean { font-size: 12px; color: #b3a898; line-height: 1.42; margin-top: 5px;
-  display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+  display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+  position: relative; }                      /* BR-S450: anchor for the truncation fade below */
 #menuView .mini__card.is-open .mini__mean { -webkit-line-clamp: unset; }
+
+/* ── BR-S450 — POLISH ON THE IN-ROOM POPUP. ──────────────────────────────────
+   The builder: "polish inside room pop up."
+
+   1. THE TRUNCATION READS AS DESIGNED, NOT AS DAMAGE. The meaning is clamped to
+      three lines and expands on .is-open — but the clamp cut mid-word with a hard
+      edge and nothing said there was more. Leo's entry is ~430 characters arriving
+      in a 300px box, so the third line simply stopped. A fade over the last line is
+      the difference between "this continues" and "this broke": the eye reads a soft
+      edge as depth and a hard one as a bug. It lifts on .is-open, because once the
+      text is complete a fade would be lying about there being more. */
+#menuView .mini__mean::after {
+  content: ""; position: absolute; right: 0; bottom: 0; width: 62%; height: 1.42em;
+  background: linear-gradient(90deg, rgba(22,17,12,0), #16110c 72%);
+  pointer-events: none;
+}
+#menuView .mini__card:hover .mini__mean::after { background: linear-gradient(90deg, rgba(26,20,14,0), #1a140e 72%); }
+#menuView .mini__card.is-open .mini__mean::after { content: none; }
+
+/*  2. THE SCROLLBAR JOINS THE ROOM. .mini__results scrolls, and it was handing a
+       default OS scrollbar to a 12px-radius panel in a warm dark palette — a bright
+       system chrome bar down the inside edge of the one surface in the house that is
+       trying to feel hand-made. Thin, in-register, and it keeps its gutter so the
+       cards never shift sideways when a search crosses the overflow threshold. */
+#menuView .mini__results { scrollbar-width: thin; scrollbar-color: #3a322a transparent; }
+#menuView .mini__results::-webkit-scrollbar { width: 6px; }
+#menuView .mini__results::-webkit-scrollbar-track { background: transparent; }
+#menuView .mini__results::-webkit-scrollbar-thumb { background: #3a322a; border-radius: 3px; }
+#menuView .mini__results::-webkit-scrollbar-thumb:hover { background: #4d4338; }
 
 #menuView .mini__more { display: block; text-align: center; margin-top: 8px; padding-top: 8px;
   border-top: 1px solid #241f1a; color: var(--cx-gold); font-size: 12px; letter-spacing: .02em; text-decoration: none; }
