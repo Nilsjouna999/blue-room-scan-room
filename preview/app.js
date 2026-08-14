@@ -2232,7 +2232,12 @@ function renderWall() {
     + '<a class="menu__draw-hit" href="?dev=arcane" aria-label="The Birth Reading"></a>'
     + '<span class="menu__door-kicker"><svg class="menu__draw-crown" viewBox="0 0 120 90" aria-hidden="true"><path d="M16 64 L26 28 L45 50 L60 18 L75 50 L94 28 L104 64" fill="none" stroke="url(#mwGold)" stroke-width="4" stroke-linejoin="round"/><path d="M15 64 H105" stroke="url(#mwGold)" stroke-width="3"/><circle cx="60" cy="18" r="5" fill="url(#mwGold)"/></svg> By Birth · Given, not chosen</span>'
     + '<span class="menu__door-name">The Birth Reading</span>'
-    + '<span class="menu__door-desc">Six marks. One name. The deeper reading — given at birth, read here.</span>'
+    /* BR-S445 — the birth door's description line is CUT. The builder's call, and it is
+       the same subtraction as BR-S411 and BR-S417 two lines up the column: the door
+       already carries its kicker ("By Birth · Given, not chosen"), its name, and the
+       spine naming all six marks underneath. "Six marks. One name." restates the spine
+       and "the deeper reading" ranks a product the panel no longer ranks that way.
+       A door that says what it is three times is not clearer, it is slower. */
     + '<span class="menu__draw-spine">Sun Sign · Year Animal · Life Path · Rune · Trigram · Hexagram</span>'
     + '</div>'
     /* ── BR-S342 — THE CONCORD LEAVES M2 ENTIRELY; IT LIVES ON THE BIRTH PAGE. ───
