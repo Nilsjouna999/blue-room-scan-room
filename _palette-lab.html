@@ -43,6 +43,7 @@
   <script src="_six-live.js"></script>
   <script src="_codex-membrane.js"></script>
   <script src="_rooms-u1.js"></script>
+  <script src="_whats-coming.js"></script>
   <div id="bar">
     <span id="name">original</span>
     <span class="sep">·</span>
@@ -50,6 +51,7 @@
     <button id="hv">H · card hover 0</button>
     <button id="cm">C · codex membrane</button>
     <button id="ru">R · rooms = U1</button>
+    <button id="wc">W · what's coming</button>
     <span class="sep">|</span>
     <button data-reg="0" class="on">0 orig</button>
     <button data-reg="1">1 colour only</button>
@@ -818,6 +820,26 @@
     if (e.key === "r" || e.key === "R") { ruOn = !ruOn; ruSync(); }
   });
   setInterval(ruSync, 250);
+
+  /* ── WHAT'S COMING (W) ───────────────────────────────────────────────────────
+     Arms the interceptor on the rail's "What's coming" link, which today navigates
+     to roadmap/ — and roadmap/ resolves to U1 itself (build_routes.py:44), so this
+     shows the same content without the navigation. W also opens it directly, since
+     the rail link is two panels away when you are looking at L1 or M2. */
+  var wcOn = /[?&]wc=1/.test(location.search), wcBtn = document.getElementById("wc");
+  function wcSync() {
+    var d = doc(); if (!d || !window.WhatsComing) return;
+    wcBtn.classList.toggle("on", wcOn);
+    if (wcOn) WhatsComing.tick(d); else WhatsComing.uninstall();
+  }
+  wcBtn.addEventListener("click", function () {
+    if (!wcOn) { wcOn = true; wcSync(); }
+    WhatsComing.open();                    /* pressing the button shows it, not just arms it */
+  });
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "w" || e.key === "W") { wcOn = !wcOn; wcSync(); if (wcOn) WhatsComing.open(); }
+  });
+  setInterval(wcSync, 250);
   </script>
 </body>
 </html>
