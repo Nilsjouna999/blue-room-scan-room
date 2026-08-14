@@ -3447,6 +3447,29 @@ html.is-travel .card .cardfinish { mix-blend-mode: normal; }
   .m2asks__q { animation: none; opacity: 0; }
   .m2asks__q:first-child { opacity: .52; }
 }
+/* ★★ BR-S449 — THE QUESTIONS BELONG TO THE DECK, NOT TO A BIRTH READING.
+   The builder: "the rotating question should not be seen when tab is birth reading
+   card example."
+
+   IT IS A CATEGORY ERROR, not clutter. Every line in M2_ASKS (app.js:2432) is a
+   question you PUT to something — "Where does this one go." · "What does he actually
+   feel." · "What is worth my next year." A tarot draw is exactly that: you bring a
+   question and cut the deck to it. A birth reading is the opposite by construction —
+   nothing is asked, the six marks are given by a name and a date, and the panel's own
+   copy two blocks below says so ("Six marks you were given rather than chose"). So a
+   question breathing over the birth face contradicts the card it is standing on.
+
+   KEYED OFF THE HERO'S OWN data-face, WHICH IS ALREADY THE TRUTH. m2WriteRead flips
+   `data-face` on [data-m2-hero] and the served markup opens on "birth" (app.js:2662+),
+   so there is no second state to keep in sync — the rule reads the same attribute the
+   card does. `:has()` because .m2asks is the hero's SIBLING (header vs stage), not its
+   descendant; .menu__draw is their nearest common ancestor. Already used 29× here.
+
+   VISIBILITY, NOT DISPLAY. `visibility:hidden` keeps the box's height, so the header
+   does not reflow when the face flips — a 3-line jump on every turn of the card would
+   be worse than the thing being fixed. The animations keep running underneath at zero
+   cost to the eye; they are pure CSS with no timer to leak (BR-S341). */
+.menu__draw:has([data-m2-hero][data-face="birth"]) .m2asks { visibility: hidden; }
 
 /* ── BR-S324 — THE CARD AND ITS WORDS LIGHT TOGETHER. ────────────────────────
    They sit in different grid columns with a whole card between them, so nothing about
@@ -3898,6 +3921,9 @@ html.m2-parch .m2hero {
    it defended. It existed to stop the tile lighting while a click would land on a
    different destination inside it — there is no second destination inside it now. */
 .menu__door--birth .menu__door-kicker { color: #c8ad70; opacity: .82; display: inline-flex; align-items: center; gap: 6px; }
+/* BR-S449 — the tarot kicker takes the SAME layout as birth's so the two mark slots sit
+   on one line, and keeps its own ink colour: same shape, different material. */
+.menu__door--tarot .menu__door-kicker { display: inline-flex; align-items: center; gap: 6px; }
 .menu__draw-crown { width: 15px; height: auto; display: inline-block; }
 /* ── BR-S328 — THE SPINE LIGHTS WITH ITS DOOR. ───────────────────────────────
    The spine is the row of marks a reading is actually made of — SUN SIGN · YEAR

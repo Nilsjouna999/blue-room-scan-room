@@ -2545,7 +2545,13 @@ function renderWall() {
        spine naming all six marks underneath. "Six marks. One name." restates the spine
        and "the deeper reading" ranks a product the panel no longer ranks that way.
        A door that says what it is three times is not clearer, it is slower. */
-    + '<span class="menu__draw-spine">Sun Sign · Year Animal · Life Path · Rune · Trigram · Hexagram</span>'
+    /* BR-S449 — THE SEPARATOR IS BOUND TO THE WORD BEFORE IT. Both spines wrap to two
+       lines at this column width, and a naked "· " lets the break fall BEFORE the dot —
+       so line 2 opened "· Trigram · Hexagram", a list continuing with a bullet hanging
+       in the left margin. &nbsp; welds each dot to the word it follows, so a break can
+       only ever happen AFTER a separator. Costs nothing, and it is the difference
+       between a set line and a wrapped one. */
+    + '<span class="menu__draw-spine">Sun Sign&nbsp;· Year Animal&nbsp;· Life Path&nbsp;· Rune&nbsp;· Trigram&nbsp;· Hexagram</span>'
     + '</div>'
     /* ── BR-S342 — THE CONCORD LEAVES M2 ENTIRELY; IT LIVES ON THE BIRTH PAGE. ───
        BR-S328 pulled it out of the birth door and gave it its own line here, which
@@ -2558,7 +2564,25 @@ function renderWall() {
        That is the better door, and two doors to one room from two different rooms
        is how a building starts lying about its own shape. This one goes. */
     + '<a class="menu__door menu__door--add menu__door--tarot" href="?dev=drawing-room">'
-    + '<span class="menu__door-kicker">By the Draw &middot; Tarot</span>'
+    /* ★ BR-S449 — THE TAROT DOOR GETS ITS MARK, AND THE PAIR IS FINALLY ONE SHAPE.
+       BR-S446 made both doors kicker → name → spine and called them "the same object
+       twice". They were not: birth carried a gold crown in its kicker and tarot carried
+       nothing, so one door had a mark slot and the other had a blank where it should be
+       — the single loudest asymmetry left in the pair.
+
+       ★ THE MARK IS DRAWN IN INK, NOT GOLD, AND THAT IS THE WHOLE DESIGN. Gold is the
+       crown register (docs: crown + hairline ink), and the crown on the birth door is
+       EARNED — a birth reading literally produces a crowned name. Minting a gold mark
+       for tarot to make the pair match would be decoration claiming a thing the room
+       does not do. So tarot gets the same slot, the same 15px, the same 6px gap — two
+       cut cards in `url(#mwInk)`, the ink gradient already defined at the top of
+       renderWall. Same shape, different material: which is what a CHOICE looks like,
+       where two identical doors would look like two adverts. */
+    + '<span class="menu__door-kicker"><svg class="menu__draw-crown menu__draw-cut" viewBox="0 0 120 90" aria-hidden="true">'
+    +   '<rect x="20" y="16" width="40" height="60" rx="4" fill="none" stroke="url(#mwInk)" stroke-width="4" transform="rotate(-10 40 46)"/>'
+    +   '<rect x="60" y="16" width="40" height="60" rx="4" fill="none" stroke="url(#mwInk)" stroke-width="4" transform="rotate(10 80 46)"/>'
+    +   '<path d="M60 34 L70 46 L60 58 L50 46 Z" fill="url(#mwInk)"/>'
+    + '</svg> By the Draw &middot; Tarot</span>'
     + '<span class="menu__door-name">A Tarot Reading</span>'
     /* ★ BR-S446 — BOTH DOORS BECOME kicker → name → spine, AND NOTHING ELSE.
        The builder: "remove and replace this with simpler, 1 question and 3 card draw,
@@ -2577,7 +2601,12 @@ function renderWall() {
        behind it has spent. Silence cannot contradict the room. m2SittingUsed() stays
        defined — the Drawing Room's own landing still reads it, which is where the fact
        belongs. */
-    + '<span class="menu__draw-spine">Three cards, one question · Five, the Deep Read</span>'
+    /* BR-S449 — "Five, the Deep Read" → "Five for the Deep Read". The builder's call,
+       and the comma was doing real damage: it read as an apposition, so the line looked
+       like "three cards" and "five" were two names for one offering. "for" makes it a
+       count OF something, which is what the other half of the line already does
+       ("Three cards, one question"). One word, and both halves finally parse alike. */
+    + '<span class="menu__draw-spine">Three cards, one question&nbsp;· Five for the Deep Read</span>'
     + '</a>'
     + '</div>'
     /* BR-S321: the "Deeper draws" link retired — its whole sentence is now the tarot
@@ -4837,6 +4866,66 @@ function _u1CanGlide(target) {
   if (_menuIndex(host) !== MENU_HOME) return false;                  // BR-S405: HOME only — L1/M2 are horizontal, they have no depth
   return true;
 }
+/* ★★ BR-S449 — THE HORIZONTAL AXIS HAD NO OWNER, AND THE BROWSER TOOK IT.
+   The builder: "when evoking go left on my touchpad from m1 it open codex instead l1."
+
+   THE CAUSE IS NOT IN THE CODEX. Nothing in this file has ever read `deltaX` — the
+   handler below is deltaY-only, and every other menu path (arrows, Esc, the annex
+   buttons) is a key or a click. So a two-finger horizontal swipe fell all the way
+   through to Chrome, which converts sustained horizontal overscroll into a HISTORY
+   NAVIGATION. And the aperture takes exactly one history entry when it opens
+   (app.js:3517, "BACK BELONGS TO THE APERTURE") — so Back is a documented way to land
+   on the Codex. The gesture was never opening the Codex; it was going backwards into
+   it. Which means no amount of work inside wireMenuCodex could have fixed this.
+
+   THE FIX IS TO CLAIM THE AXIS. Horizontal now moves the panel track, which is the
+   gesture the track has always deserved: the three panels ARE a horizontal filmstrip
+   (L1 ← M1 → M3) and were reachable by every input except the one that literally
+   means "sideways".
+
+   ★ preventDefault RUNS EVEN AT THE ENDS. This is the actual bug-kill and it is easy
+   to get wrong: if we only swallowed the gesture when a slide was available, a swipe
+   left while already ON L1 would still hand Chrome a history-back and still walk out
+   of the room. The axis is ours whenever the menu owns the screen — including when the
+   answer is "there is nothing further this way".
+
+   ★ ONE GESTURE = ONE STEP. A trackpad emits a continuous stream of wheel events for a
+   single flick, so without a latch one swipe would run the whole track end to end. The
+   latch closes on the step and only re-arms after the stream has genuinely RESTED
+   (below the jitter floor for _MX_REST ms) — the same "one deliberate push" discipline
+   the vertical boundary already uses, rather than a blind cooldown that would eat a
+   real second swipe from an impatient hand.
+
+   ★ THE DOMINANCE TEST IS STRICT. |deltaX| must beat |deltaY| outright: a diagonal
+   drift during a vertical scroll must never slide the panel sideways, and the descent
+   glide below is the more delicate of the two motions. */
+const _MX_FLOOR = 12;                     // jitter floor: below this the axis is noise, not intent
+const _MX_REST  = 220;                    // ms of quiet before a new swipe is allowed to count
+let _mxLatched = false, _mxRestT = null;
+function _mxCanSlide(target) {
+  if (state.view !== "menu" || _cxOpen || _navBlocked(target)) return false;
+  const host = document.getElementById("menuView");
+  if (!host || host.classList.contains("is-fullview")) return false;
+  /* never steal from something that genuinely scrolls sideways (a wide table, a rail).
+     The codex lives in an iframe and consumes its own wheel events, so it needs no
+     guard here — this is for horizontal panes inside our own document. */
+  if (target && target.closest && target.closest("[data-hscroll], .orbit, .mini")) return false;
+  return true;
+}
+window.addEventListener("wheel", function (e) {
+  if (e.ctrlKey || e.metaKey || e.altKey || e.shiftKey) return;       // pinch-zoom and browser gestures stay the browser's
+  const ax = Math.abs(e.deltaX);
+  if (ax <= _MX_FLOOR || ax <= Math.abs(e.deltaY)) return;            // not a horizontal gesture
+  if (!_mxCanSlide(e.target)) return;
+  e.preventDefault();                                                 // ★ ours even at the ends — this is what stops history-back
+  clearTimeout(_mxRestT);
+  _mxRestT = setTimeout(function () { _mxLatched = false; }, _MX_REST);
+  if (_mxLatched) return;                                             // the rest of this one flick is already spent
+  _mxLatched = true;
+  const host = document.getElementById("menuView");
+  menuSlideTo(_menuIndex(host) + (e.deltaX > 0 ? 1 : -1));            // right swipe → next panel, left → previous
+}, { passive: false });
+
 /* WHEEL — one deliberate push at either edge of the boundary. */
 window.addEventListener("wheel", function (e) {
   /* MID-GLIDE, ANY DIRECTION: hand control straight back. The gesture is NOT
