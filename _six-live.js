@@ -260,7 +260,12 @@
           .observe(hero, { attributes: true, attributeFilter: ["data-face"] });
       }
 
-      function hold(){ if(!onBirth()) return; if(awayT){ root.clearTimeout(awayT); awayT=null; } away(false); }
+      /* ★ AND IT MAY NOT TAKE THE COLUMN UNTIL IT CAN FILL IT. Even with the fetch
+         above, there is a window between mount and the archive arriving. Hiding the
+         app's own text during it is the same blank column in miniature — so the panel
+         simply does not come forward until DATA exists. Nothing is lost: the page
+         shows what it always showed until the moment the specimen is ready. */
+      function hold(){ if(!onBirth() || !DATA) return; if(awayT){ root.clearTimeout(awayT); awayT=null; } away(false); }
       function release(){ if(awayT) root.clearTimeout(awayT); awayT=root.setTimeout(function(){ away(true); },140); }
 
       var card=d.querySelector(".m2hero"), box=d.querySelector(".sx");
@@ -275,7 +280,7 @@
         li.addEventListener("blur",release);
       });
 
-      render(d,0);        /* built, then put away — the page opens as it always did */
+      if (DATA) render(d,0);   /* built, then put away — the page opens as it always did */
       away(true);
     }
     return true;
@@ -311,6 +316,27 @@
      a slow tick because the app rebuilds .m2read on every mount and would otherwise
      drop the panel. ?sx=0 turns it off. */
   if (root.document && !root.frameElement) {
+    /* ★★ THE BUG THE BUILDER SAW: THE PANEL OPENED EMPTY AND ATE THE COLUMN.
+       install() only wires the DOM. The archive and the perk palette were fetched by
+       the LAB (_palette-lab.html did SixLive.data() / .kwcolor()), and when the module
+       was promoted to the app at BR-S430 nothing took that job over. So DATA stayed
+       null, render() returned at its first line — but away(false) had already run, so
+       the app's own three children were hidden behind a box with nothing in it.
+       A blank column, which is worse than no feature, because the feature REMOVED
+       something to show nothing. The module now loads its own data. */
+    var base = "";
+    try {
+      var sc = root.document.currentScript
+        || root.document.querySelector('script[src*="_six-live"]');
+      if (sc) base = String(sc.getAttribute("src") || "").replace(/_six-live\.js.*$/, "");
+    } catch (e) {}
+    root.fetch(base + "codex-data.json").then(function (r) { return r.json(); })
+      .then(function (d) { DATA = d; })
+      .catch(function () {});
+    root.fetch(base + "arcana-build/kwcolor.json").then(function (r) { return r.json(); })
+      .then(function (m) { KWC = m; })
+      .catch(function () {});
+
     var boot = function () {
       if (/[?&]sx=0/.test(String(root.location.search || ""))) return true;
       return install(root.document);
