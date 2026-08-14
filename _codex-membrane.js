@@ -107,10 +107,25 @@
       canvas.style.width = W + "px"; canvas.style.height = H + "px";
       ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
       lattice();
-      /* "the blue under" — the exact three stops of the shipped band, so the codex's
-         own .tide meets it at one colour instead of a seam. */
+      /* ★★ THE UNDER MATCHES THE MAIN MENU, FLAT. The builder: "on below codexes white
+         line should be same backround color than main menu too."
+         The shipped BR-S237 band ran #161411 -> #100f0c -> #0a0b0d across its 4.5vh, and
+         that is why it read as a different colour: those are the MENU'S OWN three stops,
+         and #161411 is the warm key light that belongs at the TOP of the screen. The
+         menu's ground is
+             radial-gradient(110% 80% at 50% -10%, #161411, var(--ink-900) 55%, var(--ink-950))
+         with background-attachment: fixed (styles.css:77-82) — a key light hung above and
+         behind the viewer. By y = 0.955H that radial has fallen all the way off, so what
+         the menu actually shows at the height of this line is --ink-950, flat.
+         Painting the top-of-screen warmth at the bottom of the page was the mismatch.
+         Reading the live value rather than hardcoding it, so a palette change carries. */
+      var ink = "#0a0b0d";
+      try {
+        var v = doc.defaultView.getComputedStyle(doc.documentElement).getPropertyValue("--ink-950").trim();
+        if (v) ink = v;
+      } catch (e) {}
       var g = ctx.createLinearGradient(0, H * LINE_FRAC, 0, H);
-      g.addColorStop(0, "#161411"); g.addColorStop(0.55, "#100f0c"); g.addColorStop(1, "#0a0b0d");
+      g.addColorStop(0, ink); g.addColorStop(1, ink);
       maskGrad = g;
     }
     canvas.style.transform = "translate(0px,0px)";
