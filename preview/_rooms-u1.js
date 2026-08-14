@@ -46,6 +46,7 @@
        injected stylesheet, so removing it restores them in one delete. */
     + ".orbit__plate{display:none!important}"
     + ".u1rooms{width:100%;max-width:1180px;margin:0 auto}"
+    + ".u1rooms .u1door{cursor:pointer}"
     + ".u1rooms__head{display:flex;align-items:baseline;gap:12px;margin:0 0 clamp(12px,2vh,22px)}"
     + ".u1rooms__t{font-family:var(--font-mono);font-size:10px;letter-spacing:.2em;"
     +   "text-transform:uppercase;color:#6e6b63;margin:0}"
@@ -101,8 +102,25 @@
        dismisses the map. The plates escaped that because they are buttons the orbit
        binds itself; these are cloned <a>s the orbit has never heard of, so their click
        bubbled straight into the close handler. Stop it at the card. */
+    /* ★★ BR-S440 — THE WHOLE CARD IS THE DOOR, AND A CARD IS NOT THE BACKGROUND.
+       "backround close is buggy when rooms is opened." Probed it: `.orbit__field` carries
+       data-orbit-close (app.js:6914) and it is `inset:0`, so EVERY point in the sheet
+       resolves to a closer — including the cards. BR-S432 only shielded `.u1door__go`,
+       the 9px link, so clicking a card anywhere else dismissed the map instead of opening
+       the room. From the outside that reads as the background closing at random, because
+       the thing you pressed and the thing that answered were different objects.
+       Now: a click anywhere inside a card is the card's, and follows its own href. Only
+       the ground between and around the cards closes — which is what a scrim is for. */
     list.addEventListener("click", function (e) {
-      if (e.target.closest && e.target.closest(".u1door__go")) e.stopPropagation();
+      var door = e.target.closest && e.target.closest(".u1door");
+      if (!door) return;                       /* the ground: let it reach the closer */
+      e.stopPropagation();
+      if (e.target.closest(".u1door__go")) return;   /* the real link handles itself */
+      var go = door.querySelector(".u1door__go");
+      if (go && go.getAttribute("href")) {
+        e.preventDefault();
+        d.defaultView.location.href = go.getAttribute("href");
+      }
     }, true);
 
     wrap.appendChild(list);

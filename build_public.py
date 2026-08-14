@@ -140,6 +140,7 @@ COPY_FILES = [
     # BR-S427 added the tag. A file in the <head> that the build does not carry is a
     # broken host, not a missing feature.
     "_codex-membrane.js", "_six-live.js", "_rooms-u1.js", "_whats-coming.js",
+    "_codex-perks.js",
 ]
 
 # <head>/<body> lines pulled out of index.html: the surfaces those files serve are cut.

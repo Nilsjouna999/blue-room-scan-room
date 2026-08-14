@@ -4967,6 +4967,8 @@ _BYTES = DOC.encode('utf-8')
 # the thing it is drawn over: every route except the aperture navigates here, and the
 # parent that used to draw the line is gone on this page.
 HTML = HTML.replace('</body>', '<script src="_codex-membrane.js?v=437"></script></body>', 1) if '_codex-membrane.js' not in HTML else HTML
+# BR-S440 — the keywords take their colours from the authored bank, same as the reading.
+HTML = HTML.replace('</body>', '<script src="_codex-perks.js?v=440"></script></body>', 1) if '_codex-perks.js' not in HTML else HTML
 _f = io.open(os.path.join(SP, 'codex.html'), 'w', encoding='utf-8', newline='')
 _f.write(DOC)
 _f.close()
