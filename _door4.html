@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>BLUE ROOM — THE PLATE (M1, door 4)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+
+/* =============================================================
+   THE PLATE — M1 door 4. Tokens lifted verbatim from styles.css's
+   root block (warm ramp, ink scale, plate radius) and from the
+   Codex vessel recipe (codex.html:1-35, :422) for the gold ladder
+   and the raised-material box-shadow pair. Palette is CLOSED —
+   nothing here is invented, only assembled.
+============================================================= */
+
+:root{
+  /* --- from styles.css :root --- */
+  --t-display:#dcd7cb;
+  --t-primary:#d7d3ca;
+  --t-body:#b1ada4;
+  --t-meta:#948f87;
+  --t-ghost:#6e6b63;
+  --ink-950:#0a0b0d;
+  --ink-900:#100f0c;
+  --ink-850:#11100d;
+  --ink-800:#151310;
+  --ink-700:#1c1915;
+  --hair-1:rgba(233,229,220,.14);
+  --hair-2:rgba(233,229,220,.08);
+  --hair-3:rgba(233,229,220,.045);
+  --r-plate:4px;
+  --font-display:"Cormorant Garamond","Times New Roman",serif;
+  --font-ui:"Inter",-apple-system,"Segoe UI",sans-serif;
+  --font-mono:"IBM Plex Mono","Consolas",monospace;
+
+  /* --- from codex.html :root — the vessel/gold recipe named in the brief --- */
+  --ink-vessel:#11100d;
+  --gold:#c69b63;
+  --gold-dim:#9a7b4c;
+  --mount:0 18px 40px -24px rgba(0,0,0,.70);
+  --bevel:inset 0 1px 0 rgba(233,229,220,.04);
+  --grain:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+
+  --orb-bottom: clamp(96px,11vh,110px);
+}
+
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;}
+html{background:var(--ink-950);}
+body{
+  font-family:var(--font-ui);
+  color:var(--t-primary);
+  background:var(--ink-950); /* flat ground — no vignette, no second light source, per the builder's rule */
+  -webkit-font-smoothing:antialiased;
+  overflow:hidden;
+  height:100vh;
+  height:100svh;
+}
+
+/* =============================================================
+   Stage — everything sits above the ~80px chrome rail
+============================================================= */
+
+.stage{
+  position:relative;
+  height:100vh;
+  height:100svh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  padding-bottom:var(--orb-bottom);
+  gap:28px;
+}
+
+/* =============================================================
+   THE PLATE — the object. Not a container FOR the product, the
+   product itself, shown empty. Vessel material lifted from
+   codex.html:422-428, light kept above so it reads raised.
+============================================================= */
+
+.plate{
+  position:relative;
+  width:min(680px,88vw);
+  padding:34px 40px 26px;
+  border:1px solid var(--hair-1);
+  border-radius:var(--r-plate);
+  background:
+    linear-gradient(180deg,rgba(233,229,220,.024) 0,rgba(233,229,220,0) 65%),
+    var(--grain),
+    var(--ink-vessel);
+  background-repeat:no-repeat,repeat,no-repeat;
+  background-size:100% 100%,160px 160px,auto;
+  box-shadow:var(--bevel),var(--mount);
+}
+.plate::before{
+  content:"";
+  position:absolute;
+  inset:8px;
+  border-radius:2px;
+  pointer-events:none;
+  box-shadow:inset 0 0 0 1px var(--hair-2);
+}
+
+/* Row A — what this place is */
+.plate__mark{
+  font-family:var(--font-mono);
+  font-size:9px;
+  letter-spacing:.28em;
+  text-transform:uppercase;
+  color:var(--gold-dim);
+  margin-bottom:14px;
+}
+.plate__mark::before{content:"◆ ";}
+.plate__lede{
+  font-family:var(--font-display);
+  font-size:clamp(30px,3.4vw,42px);
+  font-weight:600;
+  line-height:1.06;
+  color:var(--t-display);
+  max-width:20ch;
+}
+.plate__meta{
+  margin-top:11px;
+  font-family:var(--font-mono);
+  font-size:10.5px;
+  letter-spacing:.14em;
+  color:var(--t-meta);
+  max-width:44ch;
+}
+
+/* Row B — the six wells */
+.wells{
+  margin-top:26px;
+  display:grid;
+  grid-template-columns:repeat(6,1fr);
+  gap:14px;
+}
+.well{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:9px;
+  height:92px;
+  border-radius:2px;
+  background:rgba(0,0,0,.18);
+  box-shadow:inset 0 1px 2px rgba(0,0,0,.55), inset 0 -1px 0 rgba(233,229,220,.045);
+  transition:box-shadow 220ms ease;
+}
+.well__cap{
+  font-family:var(--font-mono);
+  font-size:8.5px;
+  letter-spacing:.2em;
+  text-transform:uppercase;
+  color:var(--t-ghost);
+  text-align:center;
+  line-height:1.35;
+  padding:0 4px;
+}
+/* the returning-reader state: wells carry the actual mark, dot removed */
+.well[data-filled] .well__glyph{
+  font-family:var(--font-display);
+  font-size:20px;
+  color:var(--t-primary);
+}
+
+/* hover on Row C staggers a 1px lift across the wells, left to right —
+   the object acknowledging the act, contained inside the plate */
+.plate:has(.plate__act:hover) .wells .well,
+.plate:has(.plate__act:focus-visible) .wells .well{
+  box-shadow:inset 0 2px 3px rgba(0,0,0,.6), inset 0 -1px 0 rgba(233,229,220,.07);
+}
+.well:nth-child(1){transition-delay:0ms;}
+.well:nth-child(2){transition-delay:28ms;}
+.well:nth-child(3){transition-delay:56ms;}
+.well:nth-child(4){transition-delay:84ms;}
+.well:nth-child(5){transition-delay:112ms;}
+.well:nth-child(6){transition-delay:140ms;}
+
+/* Row C — the one act */
+.plate__rule{
+  margin-top:20px;
+  border:0;
+  border-top:1px solid var(--hair-2);
+}
+.plate__act{
+  display:flex;
+  justify-content:space-between;
+  align-items:baseline;
+  gap:18px;
+  margin-top:20px;
+  text-decoration:none;
+}
+.plate__ask{
+  font-family:var(--font-mono);
+  font-size:13px;
+  letter-spacing:.18em;
+  color:var(--t-ghost);
+  padding-bottom:6px;
+  border-bottom:1px solid var(--hair-1);
+}
+.plate__cta{
+  font-family:var(--font-mono);
+  font-size:11px;
+  letter-spacing:.22em;
+  text-transform:uppercase;
+  color:var(--t-display);
+  white-space:nowrap;
+  padding-bottom:5px;
+  border-bottom:1px solid var(--gold-dim);
+  transition:color 140ms ease, border-color 140ms ease;
+}
+.plate__act:hover .plate__cta,
+.plate__act:focus-visible .plate__cta{
+  color:var(--gold);
+  border-bottom-color:var(--gold);
+}
+.plate__price{
+  color:var(--gold-dim);
+  font-weight:400;
+}
+.plate__sub{
+  margin-top:9px;
+  font-family:var(--font-mono);
+  font-size:10px;
+  letter-spacing:.14em;
+  color:var(--t-ghost);
+}
+
+/* =============================================================
+   Row D — the exits, off the plate. One typographic row, no
+   enclosure. Order: free thing / members' route / the house.
+============================================================= */
+
+.exits{
+  font-family:var(--font-mono);
+  font-size:10px;
+  letter-spacing:.18em;
+  text-transform:uppercase;
+  color:var(--t-meta);
+  text-align:center;
+  max-width:88vw;
+  display:flex;
+  align-items:baseline;
+  justify-content:center;
+  flex-wrap:wrap;
+  row-gap:8px;
+}
+.exits a{
+  color:inherit;
+  text-decoration:none;
+  transition:color 140ms ease;
+}
+.exits a:hover,
+.exits a:focus-visible{
+  color:var(--t-display);
+}
+.exits .sep{
+  opacity:.42;
+  padding:0 1.1ch;
+  font-style:normal;
+}
+
+/* =============================================================
+   The fixed chrome this design keeps: the ~80px rail + two orbs.
+   Drawn minimally here so the plate's clearance is honest — not
+   the shipped chrome itself, a placeholder mark of where it sits.
+============================================================= */
+
+.railmark{
+  position:fixed;
+  left:0; right:0; bottom:0;
+  height:80px;
+  pointer-events:none;
+  background:linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,.28) 100%);
+}
+.orb{
+  position:fixed;
+  right:22px;
+  width:9px;height:9px;
+  border-radius:50%;
+  background:var(--ink-700);
+  border:1px solid var(--hair-2);
+  pointer-events:none;
+}
+.orb--a{bottom:34px;}
+.orb--b{bottom:56px;}
+
+/* =============================================================
+   PHONE — declared design, seam at 720px (the plate's own
+   measurement: below ~640px of plate width the six wells stop
+   reading in one glance at 6-across).
+============================================================= */
+
+@media (max-width:720px){
+  .stage{padding-bottom:calc(var(--orb-bottom) + 6px); gap:22px;}
+  .plate{
+    width:min(360px,92vw);
+    padding:26px 22px 20px;
+  }
+  .plate__lede{font-size:clamp(26px,7.5vw,32px); max-width:14ch;}
+  .plate__meta{font-size:10px;}
+
+  .wells{
+    grid-template-columns:repeat(3,1fr);
+    grid-template-rows:repeat(2,1fr);
+    gap:12px;
+  }
+  .well{height:108px;}
+  .well__cap{font-size:9px;}
+
+  .plate__act{
+    flex-direction:column;
+    align-items:stretch;
+    gap:0;
+  }
+  .plate__ask{
+    border-bottom:0;
+    padding:12px 0 12px;
+    border-top:1px solid var(--hair-2);
+    border-bottom:1px solid var(--hair-2);
+    text-align:center;
+  }
+  .plate__cta{
+    text-align:center;
+    padding:14px 0 12px;
+    border-bottom:1px solid var(--gold-dim);
+  }
+  .plate__sub{text-align:center;}
+
+  .exits{row-gap:9px;}
+}
+</style>
+</head>
+<body>
+
+<div class="railmark" aria-hidden="true"></div>
+<div class="orb orb--a" aria-hidden="true"></div>
+<div class="orb orb--b" aria-hidden="true"></div>
+
+<main class="stage">
+
+  <section class="plate" aria-label="The Birth Reading, shown empty">
+    <p class="plate__mark">BLUE ROOM</p>
+    <h1 class="plate__lede">An archive that reads people.</h1>
+    <p class="plate__meta">222 marks across nine systems. Six of them are already yours.</p>
+
+    <div class="wells" role="list" aria-label="The six given marks">
+      <div class="well" role="listitem"><span class="well__cap">Sun<br>Sign</span></div>
+      <div class="well" role="listitem"><span class="well__cap">Year<br>Animal</span></div>
+      <div class="well" role="listitem"><span class="well__cap">Life<br>Path</span></div>
+      <div class="well" role="listitem"><span class="well__cap">Rune</span></div>
+      <div class="well" role="listitem"><span class="well__cap">Tri&shy;gram</span></div>
+      <div class="well" role="listitem"><span class="well__cap">Hexa&shy;gram</span></div>
+    </div>
+
+    <hr class="plate__rule" />
+
+    <a class="plate__act" href="?dev=arcane" data-m1-birth>
+      <span class="plate__ask">DD / MM / YYYY</span>
+      <span class="plate__cta">The Birth Reading →</span>
+    </a>
+    <p class="plate__sub">The same six marks tonight and in ten years. Nothing is drawn.</p>
+  </section>
+
+  <nav class="exits" aria-label="Ways onward">
+    <a href="?dev=drawing-room">A free sitting — three cards, one question</a><i class="sep">·</i><a href="?dev=profile">Your Profile</a><i class="sep">·</i><a href="#about" data-m1-house>Inside Blue Room →</a>
+  </nav>
+
+</main>
+
+</body>
+</html>

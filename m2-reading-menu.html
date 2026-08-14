@@ -1,0 +1,347 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Blue Room — M2 · The Reading Rooms (redesign preview)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap"
+    rel="stylesheet"
+  />
+  <!-- base --vars + idioms (menu__door, msample__*, menu__codex, plaque-aside) -->
+  <link rel="stylesheet" href="styles.css?v=215" />
+
+  <style>
+  /* =====================================================================
+     M2 — "THE DRAW": the Desk's structural twin, cast in gold.
+     Standalone preview. Reuses M1's proven .menu__inner grid recipe so
+     parity is inherited, not argued. Silver develops (M1); gold draws (M2).
+     Colour law "crown + hairline ink": near-black; antique gold (#c8ad70 →
+     #a2864a via #mwGold) is the ONE hero metal, confined to five sanctioned
+     strokes; violet (#8a6fb0 literal) appears exactly once — the word "kept".
+     Motion: two GPU-only signatures (one-shot turn + one 9s opacity breath).
+     ===================================================================== */
+
+  html, body { background: var(--ink-950); }
+  body { overflow-x: hidden; }
+
+  /* full-viewport near-black stage (mirrors the app body ground) */
+  .m2stage-wrap {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 48px 24px;
+    background: radial-gradient(120% 85% at 50% -8%, #161411 0%, var(--ink-900) 55%, var(--ink-950) 100%);
+  }
+
+  /* ---- the surface: M1's .menu__inner recipe, verbatim ---- */
+  .menu__draw {
+    position: relative;
+    width: min(1180px, 92vw);
+    display: grid;
+    grid-template-columns: 360px 1fr;
+    grid-template-areas:
+      ".    stage"
+      "head stage"
+      "ctrl stage"
+      ".    stage";
+    grid-template-rows: 1fr auto auto 1fr;
+    column-gap: 72px;
+    row-gap: 14px;
+    align-items: start;
+    text-align: left;
+  }
+
+  /* mobile-only text back — hidden on the wide surface */
+  .menu__wall-back { display: none; }
+
+  /* ---- HEAD (left, top) — same front-door grammar as M1 ---- */
+  .menu__draw-head { grid-area: head; display: grid; gap: 9px; justify-items: start; position: relative; z-index: 2; }
+  .menu__draw-title {
+    font-family: var(--font-display); font-size: 30px; font-weight: 600;
+    letter-spacing: -.005em; color: var(--t-display); line-height: 1.04;
+  }
+  .menu__draw-title:focus { outline: none; }
+  .menu__draw-thesis { font-family: var(--font-display); font-size: 19px; line-height: 1.4; color: var(--t-primary); }
+
+  /* ---- STAGE (right, spans full height) — the standing monument ---- */
+  .menu__draw-stage {
+    grid-area: stage; align-self: center;
+    display: flex; flex-direction: column; align-items: center; gap: 14px;
+    position: relative; z-index: 2;
+  }
+  .menu__draw-herosub { font-family: var(--font-display); font-style: italic; font-size: 14px; line-height: 1.5; color: var(--t-body); text-align: center; }
+
+  .m2hero {
+    position: relative;
+    height: clamp(380px, 54vh, 560px);
+    aspect-ratio: 120 / 190;
+    width: auto;
+  }
+  .m2hero__back, .m2hero__face { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+  /* base state = reduced-motion-safe END state: card is born face-up */
+  .m2hero__back { opacity: .12; }
+  .m2hero__face { opacity: 1; clip-path: none; }
+  .m2pip-glow { opacity: .55; transform-box: fill-box; }
+
+  /* placard directly under the monument — Codex demoted to an inscription */
+  .menu__draw-placard {
+    margin-top: 4px;
+    font-family: var(--font-display); font-style: italic; font-size: 12px; letter-spacing: .01em;
+    color: var(--t-meta); text-decoration: none; transition: color 160ms ease;
+  }
+  .menu__draw-placard:hover { color: var(--t-display); }
+  .menu__draw-placard-mark { color: #c8ad70; opacity: .8; font-style: normal; margin-right: 3px; }
+
+  /* ---- CTRL (left, below head) — one loud act under the gold cut-line ---- */
+  .menu__draw-ctrl { grid-area: ctrl; display: flex; flex-direction: column; gap: 14px; position: relative; z-index: 2; }
+
+  /* THE CUT-LINE — the one connective gold signature (replaces M1's grey rule) */
+  .menu__draw-cutline {
+    display: block; width: 100%; max-width: 360px; height: 1px;
+    background: linear-gradient(90deg, #c8ad70, #a2864a);
+    opacity: .55; margin: 2px 0;
+  }
+
+  .menu__draw-doors { display: grid; gap: 12px; width: 100%; max-width: 360px; }
+
+  /* the primary act carries M1's exact .menu__door--add treatment */
+  .menu__door--pull .menu__door-desc { color: var(--silver); }
+
+  /* the By-Birth door — a whole-tile hit-area with an escaping Concord aside
+     (the live plaque idiom: a stretched inner link, not a nested anchor) */
+  .menu__door--birth { position: relative; }
+  .menu__draw-hit { position: absolute; inset: 0; z-index: 0; border-radius: 8px; }
+  .menu__door--birth:hover:not(:has(.menu__draw-aside:hover)) { border-color: var(--silver-dim); }
+  .menu__door--birth .menu__door-kicker { color: #c8ad70; opacity: .82; display: inline-flex; align-items: center; gap: 6px; }
+  .menu__draw-crown { width: 15px; height: auto; display: inline-block; }
+  .menu__draw-spine {
+    font-family: var(--font-mono); font-size: 8.5px; letter-spacing: .16em; text-transform: uppercase;
+    color: var(--faint); line-height: 1.5; margin-top: 2px;
+  }
+  .menu__draw-aside {
+    position: relative; z-index: 1; display: block; margin-top: 8px;
+    font-family: var(--font-display); font-style: italic; font-size: 12.5px; line-height: 1.4;
+    color: var(--silver-dim); text-align: left; text-decoration: none; transition: color 160ms ease;
+  }
+  .menu__draw-aside:hover, .menu__draw-aside:focus-visible { color: var(--t-display); }
+
+  /* the tier whisper — one 9px hairline, the free Pull never pitched twice */
+  .menu__draw-tiers {
+    font-family: var(--font-mono); font-size: 9px; letter-spacing: .14em;
+    color: var(--faint); text-decoration: none; line-height: 1.6; transition: color 160ms ease;
+    max-width: 360px;
+  }
+  .menu__draw-tiers:hover { color: var(--t-meta); }
+  .menu__draw-kept { color: #8a6fb0; font-style: normal; }   /* canon violet literal — NEVER var(--violet) */
+
+  /* the quiet rail — two wayfinding pills, gold-free AND violet-free */
+  .menu__draw-rail { display: flex; gap: 10px; flex-wrap: wrap; }
+  .menu__draw-rail .menu__codex { margin-top: 0; align-self: auto; }
+  .menu__draw-rail .menu__codex__mark { color: var(--silver-dim); }   /* kill the app-wide violet drift */
+
+  /* the foot — the ladder's floor, 8.5px, sealed by the credo */
+  .menu__draw-foot {
+    font-family: var(--font-mono); font-size: 8.5px; letter-spacing: .18em; text-transform: uppercase;
+    color: var(--faint); margin-top: 4px; line-height: 1.7;
+  }
+  .menu__draw-cuttick {
+    display: inline-block; width: 20px; height: 1px; vertical-align: middle; margin-right: 7px;
+    background: linear-gradient(90deg, #c8ad70, #a2864a); opacity: .55;
+  }
+  .menu__draw-credo { color: var(--t-ghost); opacity: .8; }
+
+  /* the faint Star watermark, behind the left column */
+  .menu__draw-wm {
+    position: absolute; left: -34px; top: 50%; transform: translateY(-50%);
+    width: 360px; max-width: 42vw; opacity: .05; pointer-events: none; z-index: 0;
+  }
+  .menu__draw-wm svg { width: 100%; height: auto; display: block; }
+
+  /* =========================== MOTION ===========================
+     Two GPU-only signatures, both reduced-motion safe, zero per-frame JS. */
+  @media (prefers-reduced-motion: no-preference) {
+    /* pre-turn state — card born back-showing */
+    .m2hero__back { opacity: 1; }
+    .m2hero__face { opacity: 0; clip-path: inset(0 0 100% 0); transform: translateY(8px); }
+    /* (1) THE TURN — one-shot, added by JS on first mount only */
+    .m2hero--turn .m2hero__face { animation: m2-turn 1.4s cubic-bezier(.2, .7, .2, 1) forwards; }
+    .m2hero--turn .m2hero__back { animation: m2-back-fade 1.4s cubic-bezier(.2, .7, .2, 1) forwards; }
+    /* (2) THE GILT BREATH — one slow ambient loop, opacity only */
+    .m2pip-glow { animation: m2-breath 9s ease-in-out infinite; }
+  }
+  @keyframes m2-turn { to { opacity: 1; clip-path: inset(0 0 0 0); transform: translateY(0); } }
+  @keyframes m2-back-fade { to { opacity: .12; } }
+  @keyframes m2-breath { 0%, 100% { opacity: .5; } 50% { opacity: .9; } }
+
+  @media (prefers-reduced-motion: reduce) {
+    .menu__door:hover { transform: none; }   /* lift off, colour/border still answer */
+  }
+
+  /* =========================== RESPONSIVE ===========================
+     Collapse at M1's breakpoint to a single LEFT-ANCHORED column — the
+     asymmetry is the concept; the wall's mobile recentering is NOT reproduced. */
+  @media (max-width: 1199px) {
+    .menu__draw {
+      width: 100%; max-width: 520px;
+      grid-template-columns: 1fr;
+      grid-template-areas: "head" "stage" "ctrl";
+      grid-template-rows: none;
+      column-gap: 0; row-gap: 20px;
+      justify-items: start; text-align: left;
+    }
+    .menu__wall-back {
+      display: inline-block; order: -1; background: none; border: 0; cursor: pointer;
+      font-family: var(--font-mono); font-size: 10.5px; letter-spacing: .1em; color: var(--t-meta); padding: 6px 10px 0;
+    }
+    .menu__wall-back:hover { color: var(--t-display); }
+    .menu__draw-stage { align-self: auto; align-items: flex-start; }
+    .menu__draw-herosub { text-align: left; }
+    .m2hero { height: auto; width: min(72vw, 300px); }
+    .menu__draw-cutline, .menu__draw-doors, .menu__draw-tiers { max-width: 100%; }
+    .menu__draw-wm { display: none; }   /* the watermark can't sit behind a stacked column cleanly */
+  }
+  @media (max-width: 520px) {
+    .m2stage-wrap { padding: 32px 18px; }
+  }
+  </style>
+</head>
+<body data-view="menu">
+
+  <!-- shared gradient defs — the ONE hero metal (#mwGold) + the ink (#mwInk) -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+    <linearGradient id="mwGold" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#c8ad70"/><stop offset=".55" stop-color="#a2864a"/><stop offset="1" stop-color="#5f471f"/></linearGradient>
+    <linearGradient id="mwInk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9c9790"/><stop offset="1" stop-color="#6f6b64"/></linearGradient>
+  </defs></svg>
+
+  <main class="m2stage-wrap">
+    <div class="menu__draw">
+
+      <button type="button" class="menu__wall-back">&larr; Back to the desk</button>
+
+      <!-- HEAD — the same house, same front-door grammar as M1 -->
+      <header class="menu__draw-head">
+        <p class="menu__wall-eyebrow"><span class="menu__wall-eyemark" aria-hidden="true">◆</span> BLUE ROOM</p>
+        <h2 class="menu__draw-title" tabindex="-1">The Reading Rooms</h2>
+        <p class="menu__draw-thesis">Not every card is developed. Some are drawn.</p>
+        <p class="menu__wall-trust">Asked the same, they answer the same.</p>
+      </header>
+
+      <!-- STAGE — the standing monument: the XVII Star, turned in gold -->
+      <section class="menu__draw-stage">
+        <div class="msample__cap">
+          <span class="msample__label">Sample Draw</span>
+          <span class="msample__type">XVII · The Star</span>
+        </div>
+        <p class="menu__draw-herosub">Seventy-eight cards. One question.</p>
+
+        <div class="m2hero" data-m2-hero>
+          <!-- back plate: ink quatrefoil, back-showing -->
+          <svg class="m2hero__back" viewBox="0 0 120 190" aria-hidden="true" preserveAspectRatio="xMidYMid meet">
+            <rect x="7" y="7" width="106" height="176" rx="7" fill="none" stroke="url(#mwInk)" stroke-width="1"/>
+            <rect x="13" y="13" width="94" height="164" rx="5" fill="none" stroke="url(#mwInk)" stroke-width=".5" opacity=".6"/>
+            <g stroke="url(#mwInk)" stroke-width=".6" fill="none" opacity=".7">
+              <path d="M60 42 L86 95 L60 148 L34 95 Z"/>
+              <path d="M60 64 L74 95 L60 126 L46 95 Z"/>
+              <circle cx="60" cy="95" r="4.5"/>
+            </g>
+          </svg>
+          <!-- face plate: the antique-gold XVII Star -->
+          <svg class="m2hero__face" viewBox="0 0 120 190" role="img" aria-label="XVII — The Star" preserveAspectRatio="xMidYMid meet">
+            <rect x="6" y="6" width="108" height="178" rx="7" fill="none" stroke="url(#mwGold)" stroke-width="1.1"/>
+            <rect x="11" y="11" width="98" height="168" rx="5" fill="none" stroke="url(#mwInk)" stroke-width=".5" opacity=".7"/>
+            <text x="60" y="30" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9" letter-spacing="2.5" fill="url(#mwGold)">XVII</text>
+            <g stroke="url(#mwGold)" fill="none">
+              <circle cx="60" cy="98" r="31" stroke-width=".8" opacity=".5"/>
+              <circle cx="60" cy="98" r="23" stroke-width=".6" opacity=".35"/>
+              <path d="M60 69 L64.6 86.9 L80.5 77.5 L71.1 93.4 L89 98 L71.1 102.6 L80.5 118.5 L64.6 109.1 L60 127 L55.4 109.1 L39.5 118.5 L48.9 102.6 L31 98 L48.9 93.4 L39.5 77.5 L55.4 86.9 Z" stroke-width=".9" opacity=".8"/>
+              <circle class="m2pip-glow" cx="60" cy="98" r="6.5" fill="url(#mwGold)" stroke="none"/>
+              <circle cx="60" cy="98" r="3.2" fill="url(#mwGold)" stroke="none"/>
+            </g>
+          </svg>
+        </div>
+
+        <!-- Codex demoted to a museum-placard inscription -->
+        <a class="menu__draw-placard" href="codex.html" data-codex-open><span class="menu__draw-placard-mark" aria-hidden="true">✦</span>The Codex — where every mark is defined &rarr;</a>
+      </section>
+
+      <!-- CTRL — one loud act under the gold cut-line, then a steep ladder -->
+      <div class="menu__draw-ctrl">
+        <span class="menu__draw-cutline" aria-hidden="true"></span>
+        <p class="msample__seal">The deck is already cut to you. One card is free to turn.</p>
+
+        <div class="menu__draw-doors">
+          <!-- THE ACT: the one filled primary door -->
+          <a class="menu__door menu__door--add menu__door--pull" href="?dev=drawing-room&pull=1">
+            <span class="menu__door-kicker">The Pull · By the Draw</span>
+            <span class="menu__door-name">Draw a card — free</span>
+            <span class="menu__door-desc">One card, cut to your question. Free — and yours to keep.</span>
+          </a>
+
+          <!-- THE DEEPER DOOR: By Birth — subordinate, dashed, gold-kickered -->
+          <div class="menu__door menu__door--sample menu__door--birth">
+            <a class="menu__draw-hit" href="?dev=arcane" aria-label="The Arcana Reading"></a>
+            <span class="menu__door-kicker">
+              <svg class="menu__draw-crown" viewBox="0 0 120 90" aria-hidden="true"><path d="M16 64 L26 28 L45 50 L60 18 L75 50 L94 28 L104 64" fill="none" stroke="url(#mwGold)" stroke-width="4" stroke-linejoin="round"/><path d="M15 64 H105" stroke="url(#mwGold)" stroke-width="3"/><circle cx="60" cy="18" r="5" fill="url(#mwGold)"/></svg>
+              By Birth · Given, not drawn
+            </span>
+            <span class="menu__door-name">The Arcana Reading</span>
+            <span class="menu__door-desc">Six marks. One name. The deeper reading — given at birth, read here.</span>
+            <span class="menu__draw-spine">Sun Sign · Year Animal · Life Path · Rune · Trigram · Hexagram</span>
+            <a class="menu__draw-aside" href="?dev=arcana-reading#/concord">Or two names, one bond — a Concord &rarr;</a>
+          </div>
+        </div>
+
+        <!-- THE TIER STRIP: the free Pull never pitched twice; one violet word -->
+        <a class="menu__draw-tiers" href="?dev=drawing-room">Deeper draws — A Sitting · three, free · The Deep Read · five, <em class="menu__draw-kept">kept</em> &rarr;</a>
+
+        <!-- THE QUIET RAIL: wayfinding only -->
+        <div class="menu__draw-rail">
+          <a class="menu__codex" href="?dev=profile"><span class="menu__codex__mark" aria-hidden="true">◆</span> The Reliquary — what you draw is kept <span class="menu__codex__arr" aria-hidden="true">→</span></a>
+          <a class="menu__codex" href="?dev=settings"><span class="menu__codex__mark" aria-hidden="true">◆</span> Settings <span class="menu__codex__arr" aria-hidden="true">→</span></a>
+        </div>
+
+        <!-- THE FOOT: the ladder's floor, sealed by the credo -->
+        <p class="menu__draw-foot"><span class="menu__draw-cuttick" aria-hidden="true"></span> One archive · every door kept. <span class="menu__draw-credo">Drawn once. Not reissued.</span></p>
+      </div>
+
+      <!-- the faint XVII Star watermark, behind the left column -->
+      <span class="menu__draw-wm" aria-hidden="true">
+        <svg viewBox="0 0 120 190" preserveAspectRatio="xMidYMid meet">
+          <g stroke="url(#mwInk)" fill="none">
+            <circle cx="60" cy="98" r="31" stroke-width=".8"/>
+            <circle cx="60" cy="98" r="23" stroke-width=".6"/>
+            <path d="M60 69 L64.6 86.9 L80.5 77.5 L71.1 93.4 L89 98 L71.1 102.6 L80.5 118.5 L64.6 109.1 L60 127 L55.4 109.1 L39.5 118.5 L48.9 102.6 L31 98 L48.9 93.4 L39.5 77.5 L55.4 86.9 Z" stroke-width=".9"/>
+          </g>
+        </svg>
+      </span>
+
+    </div>
+  </main>
+
+  <script>
+  /* THE TURN — one-shot on first mount only. GPU-only (clip-path/opacity/transform);
+     will-change applied just-in-time and cleared on animationend. Skipped entirely
+     under prefers-reduced-motion (the card is already born face-up via CSS). */
+  (function () {
+    var hero = document.querySelector('[data-m2-hero]');
+    if (!hero) return;
+    try {
+      if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    } catch (_) {}
+    var face = hero.querySelector('.m2hero__face');
+    var back = hero.querySelector('.m2hero__back');
+    if (face) face.style.willChange = 'transform, opacity, clip-path';
+    if (back) back.style.willChange = 'opacity';
+    hero.classList.add('m2hero--turn');
+    if (face) face.addEventListener('animationend', function () {
+      face.style.willChange = '';
+      if (back) back.style.willChange = '';
+    }, { once: true });
+  })();
+  </script>
+</body>
+</html>

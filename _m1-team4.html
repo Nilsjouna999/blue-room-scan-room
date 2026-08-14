@@ -1,0 +1,1115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>THE STANDING FIELD — M1 prototype</title>
+<style>
+  :root{
+    --t-display:#dcd7cb;
+    --t-primary:#d7d3ca;
+    --t-body:#b1ada4;
+    --t-meta:#948f87;
+    --t-ghost:#6e6b63;
+    --ink-950:#0a0b0d;
+    --ink-900:#100f0c;
+    --ink-850:#11100d;
+    --ink-800:#151310;
+    --ink-700:#1c1915;
+    --line-faint:rgba(233,229,220,.07);
+    --line:rgba(233,229,220,.12);
+    --line-strong:rgba(233,229,220,.2);
+    --silver-dim:var(--t-meta);
+    --gold:#c8ad70;
+    --gold-lit:#e0c48c;
+    --gold-dark:#5f471f;
+    --font-display:"Cormorant Garamond","Times New Roman",serif;
+    --font-ui:"Inter",-apple-system,"Segoe UI",sans-serif;
+    --font-mono:"IBM Plex Mono","Consolas",monospace;
+    /* THE CAPS VOICE — one small-mono-caps voice runs the whole page (eyebrow,
+       kicker, meta, rail, legend tag). Two sizes only, snapped: 9.5px for the
+       three PRIMARY captions that sit directly above a headline (eyebrow, kicker,
+       meta), 8.5px for the three AMBIENT ones that sit in furniture or in the
+       field itself (rail, legend tag). Both track at .16em-.18em; primary tier
+       tracks wider (.18em) because it sits over serif, ambient tracks .16em
+       because it sits over texture. No third size. */
+    --caps-primary-size:9.5px;
+    --caps-primary-track:.18em;
+    --caps-ambient-size:8.5px;
+    --caps-ambient-track:.16em;
+    /* THE ARRIVAL CURVE — one deceleration for every element that simply fades
+       and settles (field, masthead, both loci, the hairline, the berth). The
+       object gets its OWN curve deliberately: it is the one arrival with weight,
+       the hero beat the other five lead up to, and it earns a different signature
+       for that reason alone — not because five near-identical fades were each
+       hand-tuned to a slightly different bezier. */
+    --ease-arrive:cubic-bezier(.16,.84,.28,1);
+    --ease-pop:cubic-bezier(.2,.8,.2,1);
+    /* THE READ BERTH is defined as FIVE LINES OF THE READ, not as a pixel number.
+       The pixel height is derived. Five lines survive at every width in this file. */
+    /* the read's size is the NARROW size by default; the standing field raises it.
+       Polarity: the stacked arrangement is the unconditional page, not the fallback. */
+    --m2read-size:16px;
+    --m2read-lh:1.6;
+    --m2read-lines:5;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html,body{height:100%;}
+  html{background:var(--ink-950);}
+  body{
+    font-family:var(--font-ui);
+    color:var(--t-primary);
+    background:radial-gradient(110% 80% at 50% -10%, #161411 0%, var(--ink-900) 55%, var(--ink-950) 100%);
+    background-attachment:fixed;
+    -webkit-font-smoothing:antialiased;
+    /* NO overflow:hidden. It was here as "enforcement" of the one-screen law and it
+       was concealment: with a centred flow, content that does not fit overflows the
+       TOP, which document.scrollHeight never counts — the same invalid verification
+       that let the shipped narrow bug survive behind `.menu{overflow-x:clip}`.
+       A scrollbar is now allowed to appear and accuse this design. */
+    min-height:100%;
+  }
+
+  /* ===================== the stage =====================
+     POLARITY. This block used to be the wide standing field, with a
+     @media (max-width:900px) that UNDID `position:absolute; width:200px` on the
+     acts. That is the shipped bug's exact shape: the narrow page only fits
+     because a query fires to rescue it, so every rule added later at the top
+     level lands on the phone by default and has to be rescued again. Inverted:
+     the stacked arrangement is the UNCONDITIONAL page — it is what you get with
+     every media query in this file commented out, at any width — and the
+     standing field is an enhancement declared in one @media (min-width:901px)
+     block below. Measured with the queries disabled at 430x932: scrollWidth 430,
+     clientWidth 430, nothing under the rail. */
+  .m1{
+    position:relative;
+    width:100%;
+    min-height:100vh;
+    min-height:100svh;  /* iOS: the URL bar must not eat the last thing in the stack */
+    display:flex; flex-direction:column; align-items:center;
+    /* flex-start, never center. A centred flow that stops fitting pushes its
+       first rank off the TOP of the screen, where no scroll metric counts it. */
+    justify-content:flex-start; gap:clamp(6px,2vh,16px);
+    padding:10px 0 80px; /* 80px reserved chrome rail */
+  }
+
+  /* fake chrome rail — furniture that already exists, drawn so the field does not
+     pretend to own the whole viewport */
+  .m1rail{
+    position:absolute; left:0; right:0; bottom:0; height:80px;
+    border-top:1px solid var(--line-faint);
+    display:flex; align-items:center; justify-content:center;
+    gap:28px; flex-wrap:wrap; padding:0 16px; text-align:center;
+    font-family:var(--font-mono); font-size:var(--caps-ambient-size); letter-spacing:var(--caps-ambient-track); text-transform:uppercase;
+    color:var(--t-ghost);
+  }
+  .m1rail span{opacity:.7;}
+
+  /* ===================== THE FIELD OF MARKS =====================
+     Nine constellations, one per Codex system that carries entries, at their real
+     counts (12 · 17 · 12 · 22 · 56 · 24 · 8 · 64 · 7 = 222). The tenth system in
+     codex-data.json is a primer and holds no entries, so it draws nothing.
+     Cluster size is the system's size. The structure IS the claim. */
+  .field{
+    position:absolute; inset:0 0 80px 0;
+    /* `overflow:clip` was here and it was doing what body{overflow:hidden} was
+       doing a few rules up: making the page LOOK like it fits. Measured before
+       removal at 430x932 the field's own glyphs reached x=431.9 against a
+       clientWidth of 430, and clusters ran from y=-25.6 to y=869.7 — 17.7px
+       under the chrome rail — and the clip meant no metric ever said so.
+       It is gone, and the field is made to actually fit instead: the drift is
+       gone (below) and every cluster is inset 12px inside the field's box, so
+       a mark centred at the 98.5% extreme still lands ~7px clear of the edge at
+       every width, without a per-node pixel calculation that a resize invalidates.
+       Verified after: scrollWidth === clientWidth at all five viewports, and the
+       lowest mark sits 12px+ above the rail. */
+    z-index:1;
+    pointer-events:none;   /* atmosphere and inventory. Not a control, not a tab stop. */
+    /* the field fades in as ONE body, so each cluster's own opacity stays free for
+       the legend. A `forwards` fill on the cluster would outrank the legend rule. */
+    opacity:0;
+    animation:fieldIn 1.1s var(--ease-arrive) forwards;
+  }
+  /* a re-entry from the track: the settled end state, complete, at 0ms */
+  .m1.is-settled .field, .m1.is-settled .m1mast, .m1.is-settled .locus,
+  .m1.is-settled .seat__obj, .m1.is-settled .seat__hair, .m1.is-settled .berth{
+    animation:none !important; opacity:1 !important;
+  }
+  /* THE FIELD STANDS STILL. `drift 46s linear infinite` ran nine composited
+     layers for the whole life of the page and bought a ±26px translate nobody
+     can perceive at 46s; it also put every cluster 26px outside the field's box
+     in both directions, which is where the top-bleed and the rail-bleed above
+     came from. The field is full and it does not move — which is what a standing
+     corpus is. The 12px inset replaces the clip. */
+  .cluster{
+    position:absolute; inset:12px;
+  }
+  @keyframes fieldIn{ from{opacity:0;} to{opacity:1;} }
+  .mark{
+    position:absolute;
+    color:var(--t-meta);
+    transform:translate(-50%,-50%);
+    transition:opacity .38s ease;
+  }
+  .mark svg{display:block; width:100%; height:100%;}
+  .mark.is-lifted{ opacity:.04 !important; }
+
+  /* ===== THE LEGEND: which systems this act is made of =====
+     The travel is 560ms and then gone. The CLAIM has to outlast it. While an act
+     is addressed, the systems it actually draws from stand up out of the ambient
+     dim and say their name and their size; the systems it does not draw from stay
+     down. Birth lights six of the nine bodies, tarot lights two. That is the
+     reading's composition, stated in the material, held for as long as you look. */
+  .cluster{ transition:opacity .42s ease; }
+  .field.is-legend .cluster{ opacity:.5; }
+  .field.is-legend .cluster.is-drawn{ opacity:1; }
+  /* the systems this act is made of go the colour of the marks that fly out of
+     them and the colour of the edge of the thing they are absorbed into */
+  .cluster .mark{ transition:color .42s ease, opacity .38s ease; }
+  .cluster.is-drawn .mark{ color:var(--gold); }
+  .cluster__tag{
+    position:absolute; transform:translate(-50%,-50%);
+    font-family:var(--font-mono); font-size:var(--caps-ambient-size); letter-spacing:var(--caps-ambient-track);
+    text-transform:uppercase; color:var(--gold); white-space:nowrap;
+    opacity:0; transition:opacity .34s ease .06s;
+    text-shadow:0 0 10px rgba(10,11,13,.95), 0 0 3px rgba(10,11,13,1);
+  }
+  /* the bodies' names print over the copy at narrow widths — measured at 430,
+     where "ARCANA 22" landed on "your first free". They are off by default and
+     the standing field turns them on. */
+  .cluster__tag{ display:none; }
+  .cluster.is-drawn .cluster__tag{ opacity:.9; }
+  .cluster__tag b{ font-weight:500; color:var(--t-meta); }
+
+  /* a mark in flight, cloned out of the field and travelling to the seat */
+  .travelmark{
+    position:fixed; left:0; top:0;
+    pointer-events:none;
+    z-index:40;
+    color:var(--gold);
+    will-change:transform,opacity;
+  }
+  .travelmark svg{display:block; width:100%; height:100%;}
+
+  /* ===================== MASTHEAD ===================== */
+  .m1mast{
+    position:relative; z-index:5;
+    order:1;
+    padding:0 18px;
+    max-width:100%;
+    text-align:center;
+    opacity:0;
+    animation:fadeUp .7s var(--ease-arrive) forwards;
+    animation-delay:.05s;
+  }
+  @keyframes fadeUp{ from{opacity:0; transform:translateY(-6px);} to{opacity:1; transform:translateY(0);} }
+  .m1mast__eyebrow{
+    font-family:var(--font-mono); font-size:var(--caps-primary-size); letter-spacing:var(--caps-primary-track); text-transform:uppercase;
+    color:var(--gold); margin-bottom:5px;
+  }
+  .m1mast__title{
+    font-family:var(--font-display); font-weight:600; font-size:clamp(15px,1.6vw,17px);
+    line-height:1.3; color:var(--t-display);
+  }
+  /* the extent line is also the way IN to the extent. The one design in this fleet
+     that draws the whole Codex had no route to the Codex on it. */
+  .m1mast__extent{
+    font-family:var(--font-mono); font-size:11px; letter-spacing:.03em; line-height:1.55;
+    color:var(--t-meta); max-width:34ch; margin:6px auto 0;
+  }
+  .m1mast__extent a{
+    color:var(--t-body); text-decoration:none;
+    border-bottom:1px solid var(--line-strong); padding-bottom:1px;
+    transition:color .18s ease, border-color .18s ease;
+  }
+  .m1mast__extent a:hover, .m1mast__extent a:focus-visible{
+    color:var(--t-display); border-bottom-color:var(--t-display); outline:none;
+  }
+  .m1mast__extent a:focus-visible{ outline:1px solid var(--silver-dim); outline-offset:3px; }
+
+  /* ===================== THE TWO ACTS ===================== */
+  /* `relative`, never `static`: a static locus makes its halo's containing block
+     the whole stage, so an inset glow spans the entire document and pushes
+     horizontal overflow — measured at 512 wide as scrollWidth 527. */
+  .locus{
+    position:relative; z-index:6;
+    width:min(320px,90vw);
+    margin:0 auto;
+    text-align:center;
+    text-decoration:none;
+    display:block;
+    color:inherit;
+    cursor:pointer;
+  }
+  /* DISTANCE SURVIVES THE ROTATION. The depth relationship becomes a literal
+     distance rather than a stack of equal bands: the free act is welded to the
+     seat it is demonstrating, and the given act stands at the far edge of the
+     field with the whole corpus lying between them. Two acts at two distances,
+     which is what they are at wide. */
+  .locus--tarot{ order:2; margin-bottom:calc(-1 * clamp(6px,2vh,16px) + 4px); }
+  /* bounded, not auto: `margin-top:auto` measured a 152px dead gap at 430×900
+     (the .berth bottom to .locus--birth top). Distance survives; the gap does not
+     swallow a fifth of the tightest viewport in the pool. */
+  .locus--birth{ order:4; margin-top:clamp(24px, 8vh, 96px); }
+  .locus__halo{
+    /* the glow is contained by the act's own box here. At -30px it was the only
+       thing on the surface printing past the edges and under the rail. */
+    position:absolute; inset:0;
+    border-radius:50%;
+    background:radial-gradient(circle, rgba(200,173,112,.10) 0%, rgba(200,173,112,0) 70%);
+    opacity:0; transition:opacity .4s ease;
+    pointer-events:none;
+  }
+  .locus.is-gathered .locus__halo{opacity:1;}
+  .locus__kicker{
+    display:block;
+    font-family:var(--font-mono); font-weight:500; font-size:var(--caps-primary-size); letter-spacing:var(--caps-primary-track);
+    text-transform:uppercase; color:var(--gold); margin-bottom:5px;
+  }
+  .locus__name{
+    display:block;
+    font-family:var(--font-display); font-weight:500; font-size:clamp(18px,2.4vw,21px);
+    line-height:1.2; color:var(--t-primary); margin-bottom:6px;
+    transition:color .18s ease;
+  }
+  .locus.is-gathered .locus__name{ color:var(--t-display); }
+  /* THE POINTER IS ACKNOWLEDGED AT 0ms, IN CSS, WITH NO JS IN THE PATH.
+     The corpus response is deliberately debounced by 90ms — a gather is an
+     expensive statement and it should not fire on a cursor crossing the act on
+     its way somewhere else. But for 90ms the act itself gave no sign it was
+     even a thing you could touch, which reads as a dead page rather than as a
+     considered pause. These two lines are the acknowledgement; .is-gathered
+     below still outranks them (three classes to two), so the gathered halo
+     stays at full strength and the debounce is untouched. */
+  .locus:hover .locus__name{ color:var(--t-display); }
+  .locus:hover .locus__halo{ opacity:.45; }
+  .locus__line{
+    display:block;
+    font-family:var(--font-ui); font-size:12.5px; letter-spacing:.01em; line-height:1.5;
+    color:var(--t-body); max-width:none; margin:0 auto;
+  }
+  .locus:focus-visible{ outline:1px solid var(--silver-dim); outline-offset:6px; }
+  .locus{ opacity:0; animation:locusIn .5s var(--ease-arrive) forwards; }
+  .locus--tarot{ animation-delay:.3s; }
+  .locus--birth{ animation-delay:.38s; }
+  @keyframes locusIn{ from{opacity:0;} to{opacity:1;} }
+
+  /* ===================== THE SEAT ===================== */
+  .seat{
+    position:relative; z-index:8;
+    order:3;
+    width:min(400px,86vw);
+    display:flex; flex-direction:column; align-items:center;
+    text-align:center;
+  }
+  /* THE OBJECT IS THE PAGE'S LIGHT SOURCE. It was ink-dark, which left this
+     surface with no warm mass at all — the same bet another design in this fleet
+     makes, and the one place a field of dim marks genuinely needs an anchor.
+     The stock is the shipped parchment (styles.css:3574-3577). The gathered marks
+     are gold and are absorbed into something lit, which is the whole point. */
+  .seat__obj{
+    position:relative;
+    /* the floor was 300px, which on a 604px-tall laptop pushed the read under the
+       rail. The object yields before the page does. */
+    height:clamp(150px,24vh,240px);
+    aspect-ratio:120/190;
+    border-radius:6px;
+    background:linear-gradient(165deg,#efe9db,#dcd4c2);
+    border:1px solid rgba(20,14,8,.35);
+    box-shadow:0 22px 46px rgba(0,0,0,.62);
+    overflow:hidden;
+    opacity:0;
+    animation:objIn .6s var(--ease-pop) forwards;
+    animation-delay:.5s;
+  }
+  @keyframes objIn{ from{opacity:0; transform:scale(.92);} to{opacity:1; transform:scale(1);} }
+  .seat__obj > svg{ width:100%; height:100%; display:block; }
+  .seat__obj .face{
+    position:absolute; inset:0;
+    display:flex; flex-direction:column;
+    opacity:0; pointer-events:none;
+    transition:opacity .32s ease;
+  }
+  .seat__obj .face.is-on{ opacity:1; }
+  /* ink on parchment, not ink on ink */
+  .facehead{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:14px 14px 0;
+    font-family:var(--font-mono); font-size:9px; letter-spacing:.14em; color:#8a6a42;
+  }
+  .facename{
+    font-family:var(--font-display); font-size:15px; color:#1c150d;
+    padding:0 14px; margin-top:auto;
+  }
+  .facediv{ height:1px; background:linear-gradient(90deg,transparent,rgba(28,21,13,.28),transparent); margin:8px 14px; }
+  .faceorient{
+    font-family:var(--font-ui); font-size:10.5px; color:#5c503c;
+    padding:0 14px 12px;
+  }
+  .facemarks{
+    list-style:none; padding:0 14px; margin:6px 0; font-family:var(--font-mono);
+    font-size:9px; letter-spacing:.08em; color:#6a5c46; text-transform:uppercase;
+    display:flex; flex-wrap:wrap; gap:4px 10px; justify-content:center;
+  }
+
+  .seat__hair{
+    width:100%; height:1px; margin-top:10px;
+    background:linear-gradient(90deg,transparent,var(--line-strong),transparent);
+    transform:scaleX(0); transform-origin:center;
+    opacity:0;
+    animation:hairIn .18s var(--ease-arrive) forwards;
+    animation-delay:1.02s;
+  }
+  @keyframes hairIn{ from{opacity:0; transform:scaleX(0);} to{opacity:1; transform:scaleX(1);} }
+
+  /* ===================== THE READ BERTH =====================
+     Height derived from the read's own law: 5 lines × 1.6 × size. Never fewer
+     than five lines, at any viewport. Only the size scales. */
+  .berth{
+    width:100%;
+    margin-top:10px;
+    display:flex; flex-direction:column;
+    opacity:0;
+    animation:berthIn .3s var(--ease-arrive) forwards;
+    animation-delay:1.16s;
+  }
+  @keyframes berthIn{ from{opacity:0;} to{opacity:1;} }
+  /* THE LABEL IS GONE FROM THE EYE, NOT FROM THE PAGE.
+     "The reading in question" and "By the draw · tarot" were two mono-caps
+     captions under 10px stacked 6px apart — the exact defect the critique found
+     in the shipped header, reproduced here in miniature. A short-phone media
+     query already `display:none`'d the label, which was the file admitting the
+     line was disposable. It is disposable everywhere, not just under 750px tall:
+     sr-only at every width, so the caption tier drops from two voices to one
+     and the berth gains back ~17px of the read's own vertical budget on every
+     screen, not only the cramped ones. */
+  .berth__label{
+    position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden;
+    clip:rect(0,0,0,0); white-space:nowrap; border:0;
+  }
+  .berth__meta{
+    font-family:var(--font-mono); font-weight:500; font-size:var(--caps-primary-size); letter-spacing:var(--caps-primary-track);
+    text-transform:uppercase; color:var(--t-meta); margin-bottom:5px;
+  }
+  .berth__meta em{ color:var(--gold-lit); font-style:normal; }
+  .berth__mean{
+    font-family:var(--font-display); font-weight:400; font-size:var(--m2read-size);
+    line-height:var(--m2read-lh); color:var(--t-display);
+    min-height:calc(var(--m2read-size) * var(--m2read-lh) * var(--m2read-lines));
+    display:-webkit-box; -webkit-line-clamp:5; -webkit-box-orient:vertical; overflow:hidden;
+    transition:opacity .18s ease;
+  }
+  .berth.is-writing .berth__mean, .berth.is-writing .berth__meta{ opacity:.25; }
+
+  /* THE SEAT HAS NO DOOR OF ITS OWN.
+     There was a commit lip here whose href was rewritten to match whichever act was
+     addressed. It was a second route to a room that already had one — the exact
+     duplicate-destination this house kills twice by name — and a link that repoints
+     itself under a keyboard user's hands. Deleting it also frees the design to
+     gather on FOCUS again, because there is no longer anything under the visitor's
+     hands that can change destination. The seat is evidence. The doors are the two
+     lit acts standing in the field, and each is committed to where it stands. */
+
+  /* THE WHISPERS ARE GONE. Three drifting questions sat wide-only,
+     unclickable, atmospheric — on a surface whose named weakness is a busy
+     field behind reading text. This design's mechanism (the legend, the
+     travel, the lit act) already carries the whole argument; the whispers
+     were decoration doing no work, on the one surface that can least afford
+     unaccounted paint. */
+
+  .sr-only{
+    position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden;
+    clip:rect(0,0,0,0); white-space:nowrap; border:0;
+  }
+
+  /* reduced motion — the settled end state, complete, at 0ms */
+  @media (prefers-reduced-motion: reduce){
+    /* `.cluster{ animation:none !important; opacity:1 !important; }` WAS HERE and it
+       was silently deleting half the legend. Measured, at 1258×604 with real frames
+       and --force-prefers-reduced-motion: the seven systems the addressed act does
+       NOT draw from computed to opacity 1 instead of the legend's .5, because an
+       !important on a bare `.cluster` outranks `.field.is-legend .cluster`. So a
+       reduced-motion visitor got the gold half of the claim and not the standing-
+       down half — the composition of the reading, which is this design's whole
+       argument, read as "all nine systems, two of them gold". The rule existed to
+       stop the drift animation; the drift is gone, so the rule had nothing left to
+       switch off and only its side effect remained. Verified after removal:
+       undrawn clusters compute to 0.5 under reduced motion, same as everyone else.
+       The legend is a state change, not motion — it has no business being here. */
+    /* kill the animations only. Never touch `transform` here: the seat and the
+       birth act are positioned WITH transforms, and a blanket reset uncentres
+       the whole page for every reduced-motion visitor. */
+    .field, .m1mast, .locus, .seat__obj, .seat__hair, .berth{
+      animation:none !important; opacity:1 !important;
+    }
+  }
+
+  /* ===================== ≥901px — THE STANDING FIELD =====================
+     THE ONLY BLOCK THAT PLACES ANYTHING FREELY, and it is the block that can be
+     deleted without breaking the page. Everything above is the page; this is the
+     arrangement the page takes when there is room for depth. Free positioning
+     cannot hold once real copy wraps — verified failure at 430×932 before the
+     inversion: "By the Draw · Tarot" printed on top of the extent line.
+     What the standing field adds: the depth relationship (two acts at two
+     distances around a seat that sits between them), the bodies' names in the
+     field, the three questions, and the larger read.
+     What is identical either way: the field and its nine constellations, both
+     acts, the seat with object → read, the gathering, and all five lines of
+     the read. Nothing is deleted by a query in either direction. */
+  @media (min-width:901px){
+    .m1{ display:block; padding:0 0 80px; }
+    .m1mast{ padding:26px 30px 0; max-width:640px; text-align:left; }
+    .m1mast__extent{ max-width:46ch; margin:6px 0 0; }
+    .locus{ position:absolute; width:200px; margin:0; text-align:left; }
+    /* positions resolve against the BAND above the chrome rail, not the viewport.
+       Measured failure at 1258×604: `top:70%` put the given act, the seat and the
+       read under the rail on a short laptop, and `docScrollH === innerHeight` did
+       not notice, because they were on screen — just underneath the furniture. */
+    .locus--tarot{ left:16%; top:calc((100% - 80px) * .24); margin-bottom:0; }
+    /* 134px, not 104: the halo bleeds 30px past the act's box, and a glow printing
+       over the chrome rail is the same defect as text printing over it. */
+    .locus--birth{ left:84%; bottom:max(134px, 15%); transform:translateX(-100%); margin-top:0; }
+    .locus__halo{ inset:-30px; }
+    .locus__line{ max-width:26ch; margin:0; }
+    .seat{
+      position:absolute; left:50%; top:calc((100% - 80px) * .48);
+      transform:translate(-50%,-50%); width:min(440px,60vw);
+    }
+    /* the floor was 300px, which on a 604px-tall laptop pushed the read under the
+       rail. The object yields before the page does. */
+    .seat__obj{ height:clamp(210px,40vh,440px); animation-delay:.62s; }
+    /* THE THREE BEARINGS. THE STANDING FIELD has exactly two occupied
+       bearings — left:16%/top:24% of the band above the rail (tarot), and
+       left:84%/bottom:max(134px,15%) (birth) — plus the seat's centre
+       (left:50%/top:48% of that same band). A third act has no coordinate
+       yet: the next one to join this surface should stand at a THIRD
+       bearing around the same centre, roughly equidistant from the other
+       two (a rough trisection of the band, not a fourth corner), and it
+       displaces the whisper/legend reading exactly as tarot and birth do —
+       never the seat itself, which stays the fixed point everything else
+       gathers around. Write this down before the next room ships. */
+    /* THE OBJECT FINISHES LATER HERE (.62s + .6s = 1.22s) THAN THE NARROW POP
+       (.5s + .6s = 1.10s), because the card itself is bigger — but the hair and
+       the berth below kept their narrow-tier delays (1.02s / 1.16s) regardless
+       of width. At narrow that is a deliberate soft overlap: the hairline opens
+       80ms before the card finishes settling (1.02 vs 1.10), and the berth
+       begins writing 40ms before the hairline finishes (1.16 vs 1.20) — both
+       overlaps too small to read as separate beats. At wide the same two fixed
+       numbers land 200ms BEFORE the now-later object finishes, so the hairline
+       sweeps open and the read starts writing while the card is still mid-scale
+       — a visible desync, not a cascade. Fixed by carrying the SAME two offsets
+       (-.08s off the object's finish, -.04s off the hair's finish) forward to
+       the wide object's later finish time: 1.22 - .08 = 1.14, and
+       1.14 + .18 - .04 = 1.28. */
+    .seat__hair{ margin-top:14px; animation-delay:1.14s; }
+    .berth{ margin-top:14px; animation-delay:1.28s; }
+    .cluster__tag{ display:block; }
+    :root{ --m2read-size:19px; }
+    /* THE OBJECT NEARLY DOUBLES (clamp midpoint 195px narrow → 325px wide,
+       ×1.667) BUT ITS INTERIOR TYPE DID NOT. A card this much taller printing
+       the same absolute 9-15px type reads as sparse — the one place on this
+       surface where a container grows and its contents stand still. Text
+       scaled at ×1.3 (≈√1.667, the usual sub-linear step so cramped ratios do
+       not blow past legibility), the icon at ×1.3 flat since it is purely
+       visual and can track the container directly: 9→11.5, 15→19.5, 10.5→13.5,
+       9→11.5, 72→94. Padding carried the same ×1.3. */
+    .facehead{ padding:18px 18px 0; font-size:11.5px; }
+    .facename{ font-size:19.5px; padding:0 18px; }
+    .facediv{ margin:10px 18px; }
+    .faceorient{ font-size:13.5px; padding:0 18px 16px; }
+    .facemarks{ font-size:11.5px; padding:0 18px; gap:5px 13px; }
+    .faceicon svg{ width:94px; height:94px; }
+  }
+  /* STACKED TOUCH ORDER. Below 901px the seat is no longer positioned between
+     the two acts by absolute placement — it sits wherever flex order puts it.
+     Measured at 430x900 with .seat at order:3 (between the acts): tapping
+     Birth (bottom of the stack) rewrote the read ~230px above the visitor's
+     thumb, out of view. The seat now comes LAST: whichever act you touch, the
+     evidence appears below it, in the direction you were already reading. The
+     88px "distance" margin on .locus--birth was a spatial argument that only
+     reads as spatial at >=901px, where position:absolute does the work;
+     stacked, it was just an empty hole, so it collapses to ordinary rhythm
+     here and the ~64px it frees goes to must-fix 6 below. */
+  @media (max-width:900px){
+    .locus--tarot{ order:2; margin-bottom:0; }
+    .locus--birth{ order:3; margin-top:8px; }
+    .seat{ order:4; margin-top:clamp(20px,5vh,32px); }
+
+    /* THE CODEX DOOR WAS 16px TALL. Measured at 430x900: 201.8x16.3px hit box
+       on the one link to the Codex this screen has. Hit-slop, not layout — an
+       absolutely positioned ::after pads the tap target without moving the
+       text or the paragraph's own line-height. */
+    .m1mast__extent a{ position:relative; display:inline-block; }
+    .m1mast__extent a::after{
+      content:"";
+      position:absolute;
+      inset:-13px -6px; /* ~42px tall hit area, +12px wide */
+    }
+  }
+  @media (max-width:430px){
+    /* this is the only route to the Codex visible on this screen; measured at
+       430×900 there was 152px of unclaimed space next to it (see .locus--birth
+       above), so it does not need to be the smallest string on the page. */
+    .m1mast__extent{ font-size:12px; line-height:1.6; }
+    :root{ --m2read-size:15.5px; }
+    /* THE OBJECT YIELDS BEFORE THE READ. The reorder above reclaims ~64px of
+       vertical budget at 430x900 (birth's 88px gap -> 24px). Most of it goes
+       to the object — the page's one stated light source, and previously the
+       smallest thing in the pool at 136x216 — the rest to the read's own
+       line-height. Re-derived stack: content ends ~800px inside a 900px .m1
+       with the rail at 820-900px, ~20px clear, still zero scroll. */
+    .seat__obj{ height:clamp(170px,26vh,260px); }
+    .berth__mean{ line-height:1.68; }
+  }
+  /* short phones (375×667 class). The read block keeps all five lines here too;
+     only its size falls. Nothing in the stack is deleted by a media query. */
+  @media (max-width:900px) and (max-height:750px){
+    .m1{ gap:4px; }
+    .m1mast{ padding-top:2px; }
+    .m1mast__extent{ margin-top:2px; }
+    .seat__obj{ height:clamp(120px,17vh,160px); }
+    .facehead{ padding:8px 14px 0; }
+    .facename{ font-size:12.5px; }
+    .faceorient{ padding-bottom:8px; }
+    .facediv{ margin:3px 14px; }
+    .seat__hair{ margin-top:6px; }
+    .berth{ margin-top:6px; }
+    /* .berth__label was `display:none` here — that hid it from screen readers
+       too, at exactly the width where a visitor is most likely on a screen
+       reader. It is sr-only at every width now (see .berth__label above), so
+       there is nothing left for this rule to do; removed rather than kept as
+       a no-op that the next pass has to re-verify. */
+    .m1rail{ gap:14px; font-size:8px; letter-spacing:.1em; }
+    .berth__meta{ margin-bottom:4px; }
+    :root{ --m2read-size:13.5px; }
+  }
+</style>
+</head>
+<body>
+<div class="m1">
+
+  <div class="m1mast">
+    <p class="m1mast__eyebrow">◆ Blue Room</p>
+    <h1 class="m1mast__title">The Reading Rooms</h1>
+    <p class="m1mast__extent" id="extentLine"><a href="codex.html">222 marks across nine systems</a> — the signs, cards, runes and hexagrams the rooms read from. Two acts gather from them tonight.</p>
+  </div>
+
+  <div class="field" id="field" aria-hidden="true"></div>
+
+  <a class="locus locus--tarot" id="locusTarot" href="?dev=drawing-room" data-locus="tarot"
+     aria-label="A Tarot Reading. By the draw. A Sitting is three cards to one question, your first free; the Deep Read is five.">
+    <span class="locus__halo" aria-hidden="true"></span>
+    <span class="locus__kicker" aria-hidden="true">By the Draw · Tarot</span>
+    <span class="locus__name" aria-hidden="true">A Tarot Reading</span>
+    <span class="locus__line" aria-hidden="true">A Sitting — three cards to one question, your first free. Or the Deep Read — five.</span>
+  </a>
+
+  <a class="locus locus--birth" id="locusBirth" href="?dev=arcane" data-locus="birth"
+     aria-label="The Birth Reading. Given, not drawn. Six marks, one name — the deeper reading, given at birth and read here.">
+    <span class="locus__halo" aria-hidden="true"></span>
+    <span class="locus__kicker" aria-hidden="true">By Birth · Given, not drawn</span>
+    <span class="locus__name" aria-hidden="true">The Birth Reading</span>
+    <span class="locus__line" aria-hidden="true">Six marks. One name. The deeper reading — given at birth, read here.</span>
+  </a>
+
+  <div class="seat">
+    <div class="seat__obj" id="seatObj">
+      <svg viewBox="0 0 120 190" aria-hidden="true">
+        <defs>
+          <linearGradient id="mwGold" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#c8ad70"/><stop offset=".55" stop-color="#a2864a"/><stop offset="1" stop-color="#5f471f"/>
+          </linearGradient>
+          <linearGradient id="mwInk" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#9c9790"/><stop offset="1" stop-color="#6f6b64"/>
+          </linearGradient>
+        </defs>
+        <rect x="7" y="7" width="106" height="176" rx="5" fill="none" stroke="#8a6a42" stroke-width=".6" opacity=".5"/>
+      </svg>
+
+      <div class="face is-on" id="faceTarot">
+        <div class="facehead"><span>Arcana · XVII</span><span>◆</span></div>
+        <div class="faceicon" style="flex:1;display:flex;align-items:center;justify-content:center;min-height:0;">
+          <svg width="72" height="72" viewBox="0 0 72 72" aria-hidden="true" style="max-height:100%;">
+            <g stroke="url(#mwGold)" fill="none">
+              <circle cx="36" cy="36" r="24" stroke-width=".8" opacity=".5"/>
+              <circle cx="36" cy="36" r="17" stroke-width=".6" opacity=".35"/>
+              <path d="M36 12 L40 26 L54 20 L46 32 L60 36 L46 40 L54 52 L40 46 L36 60 L32 46 L18 52 L26 40 L12 36 L26 32 L18 20 L32 26 Z" stroke-width=".9" opacity=".85"/>
+              <circle cx="36" cy="36" r="3" fill="url(#mwGold)" stroke="none"/>
+            </g>
+          </svg>
+        </div>
+        <div class="facename">The Star</div>
+        <div class="facediv"></div>
+        <div class="faceorient">Upright · an example, not your draw</div>
+      </div>
+
+      <div class="face" id="faceBirth" aria-hidden="true">
+        <div class="facehead"><span>The Birth Reading</span><span>✧</span></div>
+        <div class="facediv" style="margin-top:14px;"></div>
+        <div class="facename">The Crowned Name</div>
+        <ul class="facemarks">
+          <li>Sun sign</li><li>Year animal</li><li>Life path</li><li>Rune</li><li>Trigram</li><li>Hexagram</li>
+        </ul>
+        <div class="facediv" style="margin-top:auto;"></div>
+        <div class="faceorient">By birth alone · an example, not your name</div>
+      </div>
+    </div>
+
+    <div class="seat__hair"></div>
+
+    <div class="berth" id="berth" role="status" aria-live="polite">
+      <p class="berth__label">The reading in question</p>
+      <p class="berth__meta" id="berthMeta"><em>Tarot</em> · from the major and minor arcana · 78 of 222</p>
+      <p class="berth__mean" id="berthMean">The Star stands for hope, renewal and quiet guidance after difficulty — the calm that follows the storm, and the small light you steer by.</p>
+      <!-- the legend, in the only form a non-sighted visitor can receive it: the
+           lit constellations said out loud, by the same write that lights them -->
+      <p class="sr-only" id="berthFrom">Gathered from the major arcana and the minor arcana.</p>
+    </div>
+
+  </div>
+
+  <div class="m1rail" aria-hidden="true">
+    <span>◆ Your Profile — kept →</span>
+    <span>◆ What's coming →</span>
+    <span>◆ Settings →</span>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var reduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var canAnimate = typeof Element !== "undefined" && !!Element.prototype.animate;
+
+  /* ---- seeded RNG: the house does not reshuffle itself between visits ---- */
+  function mulberry32(a){
+    return function(){
+      var t = a += 0x6D2B79F5;
+      t = Math.imul(t ^ t >>> 15, t | 1);
+      t ^= t + Math.imul(t ^ t >>> 7, t | 61);
+      return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    };
+  }
+
+  /* ---- glyph families, one per system, so the systems are TOLD APART ----
+     Deliberately not one uniform glyph pool: a visitor must be able to see that
+     the field is made of kinds. Bars for trigrams/hexagrams, staves for runes,
+     stars for arcana, suit marks for the minors, wheels for the zodiac. */
+  var FAM = {
+    zodiac: [
+      '<circle cx="12" cy="12" r="8"/><path d="M12 4 V20 M4 12 H20" stroke-width=".55"/>',
+      '<circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2.2"/>',
+      '<path d="M5 15 A7 7 0 1 1 19 15" /><path d="M5 15 L9 19 M19 15 L15 19" stroke-width=".7"/>'
+    ],
+    chinese: [
+      '<path d="M5 5 H19 V19 H5 Z" stroke-width=".7"/><path d="M5 12 H19" stroke-width=".55"/>',
+      '<path d="M6 4 V20 M18 4 V20 M6 9 H18 M6 15 H18" stroke-width=".7"/>',
+      '<path d="M12 4 L20 12 L12 20 L4 12 Z" stroke-width=".7"/><path d="M12 8 V16" stroke-width=".55"/>'
+    ],
+    numerology: [
+      '<path d="M8 8 L12 5 V19" stroke-width=".9"/>',
+      '<path d="M7 9 A5 5 0 1 1 13 15 L7 19 H17" stroke-width=".9"/>',
+      '<path d="M7 6 H16 L10 19" stroke-width=".9"/>'
+    ],
+    major: [
+      '<path d="M12 3 L14.4 9.8 L21.4 9.8 L15.8 14 L17.9 20.8 L12 16.6 L6.1 20.8 L8.2 14 L2.6 9.8 L9.6 9.8 Z"/>',
+      '<path d="M12 2 L14 10 L22 12 L14 14 L12 22 L10 14 L2 12 L10 10 Z"/>',
+      '<path d="M12 3 L20 8 V16 L12 21 L4 16 V8 Z" stroke-width=".7"/><path d="M12 8 V16" stroke-width=".5"/>'
+    ],
+    minor: [
+      '<path d="M12 3 V21" stroke-width=".9"/><path d="M9 6 L12 3 L15 6" stroke-width=".7"/>',          /* wand */
+      '<path d="M6 6 H18 A6 6 0 0 1 6 6 Z" stroke-width=".8"/><path d="M12 12 V19 M8 19 H16" stroke-width=".7"/>', /* cup */
+      '<path d="M12 3 V17" stroke-width=".9"/><path d="M7 17 H17 M12 17 V21" stroke-width=".7"/>',       /* sword */
+      '<circle cx="12" cy="12" r="7" stroke-width=".8"/><circle cx="12" cy="12" r="3.4" stroke-width=".6"/>' /* coin */
+    ],
+    rune: [
+      '<path d="M7 3 V21 M7 5 L16 9 M7 12 L16 16" stroke-width=".85"/>',
+      '<path d="M6 3 V21 M18 3 V21 M6 8 L18 16" stroke-width=".85"/>',
+      '<path d="M12 3 V21 M12 8 L18 3 M12 8 L6 3" stroke-width=".85"/>',
+      '<path d="M6 21 L12 3 L18 21" stroke-width=".85"/>'
+    ],
+    trigram: [
+      '<path d="M4 8 H20 M4 12 H20 M4 16 H20" stroke-width="1.1"/>',
+      '<path d="M4 8 H20 M4 12 H10 M14 12 H20 M4 16 H20" stroke-width="1.1"/>',
+      '<path d="M4 8 H10 M14 8 H20 M4 12 H20 M4 16 H10 M14 16 H20" stroke-width="1.1"/>'
+    ],
+    iching: [
+      '<path d="M4 4 H20 M4 8 H20 M4 12 H20 M4 16 H20 M4 20 H20 M4 24 H20" stroke-width=".95"/>',
+      '<path d="M4 5 H20 M4 9 H9 M13 9 H20 M4 13 H20 M4 17 H9 M13 17 H20 M4 21 H20" stroke-width=".95"/>',
+      '<path d="M4 5 H9 M13 5 H20 M4 9 H20 M4 13 H9 M13 13 H20 M4 17 H20 M4 21 H9 M13 21 H20" stroke-width=".95"/>'
+    ],
+    lexicon: [
+      '<path d="M12 4 L19 12 L12 20 L5 12 Z" stroke-width=".8"/>',
+      '<path d="M12 5 L18 12 L12 19 L6 12 Z" stroke-width=".8"/><circle cx="12" cy="12" r="1.6"/>'
+    ]
+  };
+
+  /* the real Codex systems, at their real entry counts — 222 in total.
+     (codex-data.json; the tenth system, "Tarot — Reading the Cards", is a primer
+     and carries no entries, so it draws no marks.) */
+  var SYSTEMS = [
+    { key:"zodiac",     n:12, fam:"zodiac",     x:12, y:15, r:11, s:[13,20], tag:"Zodiac",     say:"the zodiac" },
+    { key:"chinese",    n:17, fam:"chinese",    x:32, y:8,  r:13, s:[12,19], tag:"Chinese",    say:"the Chinese calendar" },
+    { key:"numerology", n:12, fam:"numerology", x:45, y:9,  r:11, s:[12,18], tag:"Numbers",    say:"the numbers" },
+    { key:"major",      n:22, fam:"major",      x:73, y:12, r:13, s:[13,22], tag:"Arcana",     say:"the major arcana" },
+    { key:"minor",      n:56, fam:"minor",      x:90, y:40, r:19, s:[10,17], tag:"Suits",      say:"the four suits" },
+    { key:"rune",       n:24, fam:"rune",       x:88, y:76, r:13, s:[12,19], tag:"Runes",      say:"the runes" },
+    { key:"trigram",    n:8,  fam:"trigram",    x:64, y:88, r:8,  s:[14,21], tag:"Trigrams",   say:"the trigrams" },
+    { key:"iching",     n:64, fam:"iching",     x:31, y:80, r:20, s:[11,18], tag:"Hexagrams",  say:"the hexagrams" },
+    { key:"lexicon",    n:7,  fam:"lexicon",    x:8,  y:52, r:8,  s:[13,20], tag:"Lexicon",    say:"the lexicon" }
+  ];
+  var SYS = {};
+  SYSTEMS.forEach(function(s){ SYS[s.key] = s; });
+
+  var field = document.getElementById("field");
+  var seatObj = document.getElementById("seatObj");
+  var bySystem = {};
+  var clusterEl = {};
+
+  function buildField(){
+    field.innerHTML = "";
+    bySystem = {};
+    clusterEl = {};
+    /* THE COUNT IS THE CLAIM, SO THE COUNT IS DRAWN. A width-proportional sample
+       was here — 0.38 below 431px, 0.52 below 701, 0.78 below 1101 — which meant a
+       phone drew 84 marks under a masthead that says 222. The masthead is the
+       design's whole argument and the material contradicted it on the one width
+       the critique calls finding number one. It was a paint-budget hedge, taken
+       without measuring, on the surface app.js calls the most paint-bound in the
+       build (BR-S276). Measured, headless Chrome 151, self-time by category over
+       load + the full 1.5s arrival, median of five runs, 430x900 phone:
+
+         84 marks (the sample)     222 marks (the corpus)
+         FCP              204ms    FCP              164ms
+         main scripting  29.6ms    main scripting  33.4ms
+         main rendering 325.5ms    main rendering 364.2ms
+         main painting   46.2ms    main painting   81.2ms
+         GPU/raster     553.9ms    GPU/raster     599.9ms
+         tasks >50ms          0    tasks >50ms          0
+         DOM nodes          393    DOM nodes          867
+
+       1.18x on total main-thread work, no long task, no overflow (scrollWidth
+       430 === clientWidth 430). And the number that ends the argument: this file
+       ALREADY drew all 222 above 1100px, at 485.5ms of main-thread work — so the
+       full corpus on a 430px phone (477.9ms) costs LESS than what the design has
+       been shipping to every desktop since it was written. The sample was not
+       buying anything.
+       Three cheaper renderings were built and measured rather than assumed:
+       one-shape-per-system glyphs bought nothing (480.5ms); a shared <symbol>
+       sprite referenced by <use> was WORSE at both widths (511.7 / 566.6ms,
+       build 19.9 / 32.1ms) because instantiating 222 shadow trees costs more than
+       parsing 222 inline paths; a canvas substrate was genuinely cheapest
+       (404.0ms) and was rejected anyway, because rasterised marks cannot take
+       `.cluster.is-drawn .mark{color:var(--gold))}` and the legend IS the claim.
+       Nothing needed cheapening. The corpus stands at every width. */
+    var rng = mulberry32(19750412);
+
+    SYSTEMS.forEach(function(sys, si){
+      var wrap = document.createElement("div");
+      wrap.className = "cluster";
+      /* the drift is gone; this draw is not. It is consumed so the seeded field
+         is the SAME field it was before the animation was removed — the marks
+         did not move, only the motion left. */
+      rng();
+      var fam = FAM[sys.fam];
+      /* the system's real entry count, not a fraction of it. The Math.max(3,...)
+         floor that was here only existed to keep the trigrams (8) and the lexicon
+         (7) from sampling down to one or two marks; at full count nothing can. */
+      var count = sys.n;
+      var list = [];
+      for (var i = 0; i < count; i++){
+        /* even-ish disc fill so a cluster reads as a body, not a clump */
+        var a = rng() * Math.PI * 2;
+        var rad = Math.sqrt(rng()) * sys.r;
+        var x = sys.x + Math.cos(a) * rad;
+        var y = sys.y + Math.sin(a) * rad * 0.78;
+        x = Math.max(1.5, Math.min(98.5, x));
+        y = Math.max(2, Math.min(94, y));
+        var size = sys.s[0] + rng() * (sys.s[1] - sys.s[0]);
+        var op = 0.17 + rng() * 0.26;
+        /* thin the field where reading happens — the seat's ellipse */
+        var dx = (x - 50) / 20, dy = (y - 46) / 26;
+        if (dx*dx + dy*dy < 1) op *= 0.34;
+
+        var el = document.createElement("div");
+        el.className = "mark";
+        el.style.left = x.toFixed(2) + "%";
+        el.style.top = y.toFixed(2) + "%";
+        el.style.width = size.toFixed(1) + "px";
+        el.style.height = size.toFixed(1) + "px";
+        el.style.opacity = op.toFixed(3);
+        el.innerHTML = '<svg viewBox="0 0 24 26" fill="none" stroke="currentColor" stroke-width="1">'
+                     + fam[Math.floor(rng() * fam.length)] + '</svg>';
+        wrap.appendChild(el);
+        list.push(el);
+      }
+      /* the body's name and its true size, drawn at the body's own edge. It is
+         hidden until this system is one the addressed act actually draws from. */
+      var tag = document.createElement("div");
+      tag.className = "cluster__tag";
+      tag.style.left = Math.max(7, Math.min(93, sys.x)).toFixed(2) + "%";
+      tag.style.top  = Math.max(5, Math.min(93, sys.y + sys.r * 0.86)).toFixed(2) + "%";
+      tag.innerHTML = sys.tag + ' <b>' + sys.n + '</b>';
+      wrap.appendChild(tag);
+
+      bySystem[sys.key] = list;
+      clusterEl[sys.key] = wrap;
+      field.appendChild(wrap);
+    });
+    if (current) lightLegend(current);
+  }
+  buildField();
+  /* THE FIELD IS BUILT ONCE. It used to tear itself down and rebuild all 222
+     nodes 200ms after every resize — which on a phone means every scroll that
+     moves the URL bar, and on a desktop means continuously while a window is
+     dragged. Worse, the rebuild ran through a NEW mulberry32 with the same seed
+     but a different sample count, so the constellations you were looking at were
+     silently replaced by different ones: the corpus is supposed to be the one
+     thing on this page that does not change. Every mark is positioned in
+     percentages inside a cluster that is `inset:12px` of the field, so the field
+     reflows itself at any width with no JS at all. What remains on resize is the
+     one thing that genuinely goes stale: marks in flight are position:fixed
+     clones carrying pixel coordinates from the old layout. */
+  var resizeT;
+  window.addEventListener("resize", function(){
+    clearTimeout(resizeT);
+    resizeT = setTimeout(cancelTravel, 200);
+  });
+
+  /* ================= THE GATHERING =================
+     A gather is literally what the reading is: marks are lifted out of the
+     systems the reading actually draws from, travel, and are absorbed by the
+     object. The birth reading gathers ONE mark from each of its six systems.
+     The tarot reading gathers five from the two arcana. */
+  /* THREE, NOT FIVE. The free product on offer is a Sitting — three cards to
+     one question. Five marks in flight was the Deep Read's count leaking onto
+     the free act; this design's own thesis is that the material states the
+     offer, so the material now states the true one. */
+  var GATHERS = {
+    tarot: ["major","minor","minor"],
+    birth: ["zodiac","chinese","numerology","rune","trigram","iching"]
+  };
+
+  /* meta text is no longer stored here — lightLegend() writes berthMeta now,
+     from the same GATHERS list it lights the field with, so the two can
+     never say something different. DATA only carries the read's meaning. */
+  var DATA = {
+    tarot: {
+      mean: "The Star stands for hope, renewal and quiet guidance after difficulty — the calm that follows the storm, and the small light you steer by."
+    },
+    birth: {
+      mean: "Six marks you were given rather than chose, read together into one crowned name. Nothing is dealt here — the same name and the same date return the same six, tonight and in ten years."
+    }
+  };
+
+  /* THE LEGEND. The systems this act is made of stand up; the rest stay down, and
+     the same call says them out loud. This is the design's claim — that the goods
+     are made of the corpus you are looking at — held for as long as the act is
+     addressed, rather than asserted for 560ms by marks in flight. */
+  /* THE BERTH CAPTION IS THE CLAIM. It used to print "By the draw · tarot" —
+     a bare duplicate of the kicker two ranks above it — while the one sentence
+     unique to this surface (which systems, how many marks) sat sr-only and
+     was never seen. Both are now written by this one function, from the same
+     GATHERS list that lights the field, so the words and the lit clusters can
+     never disagree: the caption goes visible everywhere, the fuller sentence
+     stays for anyone listening rather than looking. */
+  function lightLegend(name){
+    var keys = GATHERS[name] || [];
+    var seen = {}, said = [], total = 0;
+    keys.forEach(function(k){ if (!seen[k]){ seen[k] = 1; said.push(SYS[k].say); total += SYS[k].n; } });
+    SYSTEMS.forEach(function(s){
+      var el = clusterEl[s.key];
+      if (el) el.classList.toggle("is-drawn", !!seen[s.key]);
+    });
+    field.classList.add("is-legend");
+    var fromPhrase = said.length > 1 ? said.slice(0, -1).join(", ") + " and " + said[said.length - 1] : said[0];
+    if (berthFrom){
+      berthFrom.textContent = "Gathered from " + fromPhrase + ". " + said.length + " of nine systems.";
+    }
+    if (berthMeta){
+      var label = name === "tarot" ? "Tarot" : "Birth";
+      berthMeta.innerHTML = "<em>" + label + "</em> · from " + fromPhrase + " · " + total + " of 222";
+    }
+  }
+
+  var berth     = document.getElementById("berth");
+  var berthMeta = document.getElementById("berthMeta");
+  var berthMean = document.getElementById("berthMean");
+  var berthFrom = document.getElementById("berthFrom");
+  var faceTarot = document.getElementById("faceTarot");
+  var faceBirth = document.getElementById("faceBirth");
+  var locusTarot= document.getElementById("locusTarot");
+  var locusBirth= document.getElementById("locusBirth");
+
+  var current = null;
+  var inFlight = [];   /* {anim, clone, src} */
+
+  function cancelTravel(){
+    inFlight.forEach(function(t){
+      try{ t.anim.cancel(); }catch(e){}
+      if (t.clone && t.clone.parentNode) t.clone.parentNode.removeChild(t.clone);
+      t.src.classList.remove("is-lifted");
+    });
+    inFlight = [];
+  }
+
+  var pickCursor = 0;
+  function pickMarks(name){
+    var keys = GATHERS[name], out = [];
+    for (var i = 0; i < keys.length; i++){
+      var pool = bySystem[keys[i]];
+      if (!pool || !pool.length) continue;
+      var el = pool[(pickCursor + i * 7) % pool.length];
+      if (out.indexOf(el) === -1) out.push(el);
+    }
+    pickCursor = (pickCursor + 3) % 97;
+    return out;
+  }
+
+  function travel(name){
+    if (!canAnimate || reduced) return;
+    var r = seatObj.getBoundingClientRect();
+    if (!r.width) return;
+    var tx = r.left + r.width / 2, ty = r.top + r.height / 2;
+
+    pickMarks(name).forEach(function(src, i){
+      var s = src.getBoundingClientRect();
+      if (!s.width) return;
+      var clone = src.cloneNode(true);
+      clone.className = "travelmark";
+      clone.style.width = s.width + "px";
+      clone.style.height = s.height + "px";
+      clone.style.left = "0px"; clone.style.top = "0px";
+      document.body.appendChild(clone);
+      src.classList.add("is-lifted");
+
+      var sx = s.left, sy = s.top;
+      var ex = tx - s.width / 2, ey = ty - s.height / 2;
+      var side = (i % 2 ? 1 : -1);
+      var mx = (sx + ex) / 2 + side * Math.min(70, Math.abs(sx - ex) * 0.22);
+      var my = (sy + ey) / 2 - 46;
+
+      var anim = clone.animate([
+        { transform:"translate(" + sx + "px," + sy + "px) scale(1)",      opacity:0.55 },
+        { transform:"translate(" + mx + "px," + my + "px) scale(1.55)",   opacity:1, offset:0.5 },
+        { transform:"translate(" + ex + "px," + ey + "px) scale(0.45)",   opacity:0 }
+      ], { duration: 560 + i * 70, delay: i * 40, easing:"cubic-bezier(.32,.72,.24,1)", fill:"forwards" });
+
+      var rec = { anim:anim, clone:clone, src:src };
+      inFlight.push(rec);
+      anim.onfinish = function(){
+        if (clone.parentNode) clone.parentNode.removeChild(clone);
+        src.classList.remove("is-lifted");   /* the corpus is conserved: it goes back */
+        var k = inFlight.indexOf(rec); if (k > -1) inFlight.splice(k, 1);
+      };
+    });
+  }
+
+  /* ONE write point. Every piece of state moves in the same statement, so the
+     lit act, the face, the read and the lip's destination cannot disagree. */
+  function gatherTo(name){
+    if (name === current) return;
+    current = name;
+    cancelTravel();
+
+    var d = DATA[name], isT = (name === "tarot");
+    locusTarot.classList.toggle("is-gathered", isT);
+    locusBirth.classList.toggle("is-gathered", !isT);
+    faceTarot.classList.toggle("is-on", isT);
+    faceBirth.classList.toggle("is-on", !isT);
+    faceTarot.setAttribute("aria-hidden", isT ? "false" : "true");
+    faceBirth.setAttribute("aria-hidden", isT ? "true" : "false");
+    berthMean.textContent = d.mean;
+    lightLegend(name);
+
+    if (!reduced){
+      berth.classList.add("is-writing");
+      setTimeout(function(){ berth.classList.remove("is-writing"); }, 180);
+    }
+    travel(name);
+  }
+
+  /* ---- addressing. Hover, focus, and explicit touch — one behaviour for every
+     input, now that it is SAFE for focus to address: with the commit lip deleted,
+     nothing on this surface repoints itself under a visitor's hands. Tabbing shows
+     you the act you are about to enter and Enter enters it. Half of this design
+     was previously mouse-only: a keyboard visitor could never see the birth
+     reading's object, its meaning, or the systems it is made of. ---- */
+  var addressTimer;
+
+  /* THE BERTH IS A LIVE REGION, AND TABBING PAST IT SHOULD NOT NARRATE IT.
+     The berth is role=status aria-live=polite, which is right for the mouse and
+     for touch: the visitor moved onto an act and the read rewrote itself with no
+     other announcement. It is wrong for the keyboard. A visitor tabbing through
+     this page moves focus to an act, the focus handler gathers, and the live
+     region reads the whole 30-word meaning out over the act's own accessible
+     name — twice over if they tab across both. So the live region is muted for
+     the duration of a focus-driven write only, and restored immediately after,
+     so the very next mouse or touch gather still announces normally. The write
+     itself is unchanged, and the act's aria-label already says everything a
+     keyboard visitor needs before they press Enter. */
+  var liveT;
+  function writeSilently(name){
+    clearTimeout(liveT);
+    berth.setAttribute("aria-live", "off");
+    gatherTo(name);
+    /* one frame past the DOM write, so the mutation is never observed while
+       polite is in force; then the region is live again for pointer input. */
+    liveT = setTimeout(function(){ berth.setAttribute("aria-live", "polite"); }, 120);
+  }
+
+  [[locusTarot,"tarot"],[locusBirth,"birth"]].forEach(function(pair){
+    var el = pair[0], name = pair[1];
+    el.addEventListener("mouseenter", function(){
+      clearTimeout(addressTimer);
+      addressTimer = setTimeout(function(){ gatherTo(name); }, 90);
+    });
+    el.addEventListener("mouseleave", function(){ clearTimeout(addressTimer); });
+    el.addEventListener("focus", function(){ clearTimeout(addressTimer); writeSilently(name); });
+    /* THE FIRST TAP ENTERS. This handler called preventDefault() whenever the
+       tapped act was not the current one, which cancels the synthetic click the
+       anchor needs — so on a phone the given act, the one that is never current
+       at rest, could not be opened by tapping it. The first tap did something
+       (it gathered) but not the thing a tap on a link means, and nothing on
+       screen said "tap again". The gather still happens on the same tap; the
+       anchor is simply left alive, so the tap also does what it looks like it
+       does. Passive now, because nothing here cancels anything. */
+    el.addEventListener("touchstart", function(){
+      clearTimeout(addressTimer);
+      if (name !== current) gatherTo(name);
+    }, {passive:true});
+  });
+
+  /* ---- ARRIVAL, ONCE.
+     M1 is not a page you land on, it is a station on a track: ← from M2 and → from
+     L1 return you here many times in a session. An overture that re-runs on every
+     lateral re-entry is a toll. The corpus is standing there whether you arrived
+     now or five minutes ago — which is what a corpus is for. So the assembly plays
+     on the first arrival of a session and never again; every later arrival paints
+     the settled state at 0ms, and the gathering fires only when an act is
+     addressed. This is thematically native here in a way it is not for a design
+     whose whole thesis is the arrival event. ---- */
+  var seenThisSession = false;
+  try { seenThisSession = sessionStorage.getItem("m1FieldSeen") === "1"; } catch(e){}
+  var settle = reduced || seenThisSession;
+
+  /* The overture goes through gatherTo like everything else — ONE write point,
+     no exceptions. It previously set the lit act and the face by hand, which meant
+     a visitor who addressed the given act inside the first 620ms had their choice
+     stomped 620ms later and was left with both faces printed on top of each other
+     and the legend lighting the wrong systems. Measured, not reasoned: the state
+     was written in two places and the two places disagreed. And if the visitor got
+     there first, the overture stands down. */
+  current = null;
+  faceTarot.classList.remove("is-on");
+  if (settle){
+    document.querySelector(".m1").classList.add("is-settled");
+    gatherTo("tarot");
+  } else {
+    setTimeout(function(){ if (!current) gatherTo("tarot"); }, 620);
+  }
+  try { sessionStorage.setItem("m1FieldSeen", "1"); } catch(e){}
+})();
+</script>
+</body>
+</html>

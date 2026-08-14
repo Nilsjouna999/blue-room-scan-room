@@ -1,0 +1,402 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>THE STANDING ACCOUNT — M1 prototype</title>
+<style>
+  :root{
+    --t-display:#dcd7cb; --t-primary:#d7d3ca; --t-body:#b1ada4; --t-meta:#948f87; --t-ghost:#6e6b63;
+    --ink-950:#0a0b0d; --ink-900:#100f0c; --ink-850:#11100d; --ink-800:#151310; --ink-700:#1c1915;
+    /* two hairline weights survive from THE HAND: hair-1 is the ledger rule between
+       ranks, line-strong is the hover peak on a rule. hair-2 had no caller left once
+       the six-links and their idle underline were deleted with the fall — cut. */
+    --line-strong:rgba(233,229,220,.2);
+    --hair-1:rgba(233,229,220,.14);
+    --gold:#c8ad70;
+    --font-display:"Cormorant Garamond","Times New Roman",serif;
+    --font-ui:"Inter",-apple-system,"Segoe UI",sans-serif;
+    --font-mono:"IBM Plex Mono","Consolas",monospace;
+    --track-caps:.22em; --track-wide:.3em;
+    --ease-settle: cubic-bezier(.22,.9,.32,1);
+    /* vertical rhythm between the mark and the three ranks, viewport-relative so the
+       whole account closes inside one screen at every height. THE SLANT and its
+       --fall-step are gone — nothing in this file has a diagonal left anymore. */
+    --gap: clamp(20px, 3.4vh, 34px);
+  }
+
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html{background:var(--ink-950);}
+  body{
+    font-family:var(--font-ui); color:var(--t-primary);
+    background:radial-gradient(110% 80% at 50% -10%, #161411 0%, var(--ink-900) 55%, var(--ink-950) 100%);
+    background-attachment:fixed;
+    -webkit-font-smoothing:antialiased;
+    /* NO overflow-x:hidden. The shipped panel's `overflow-x: clip` is what let the
+       narrow clipping bug survive — a horizontal scrollbar here is the honest alarm,
+       and three lines of type at one measure should never need it. */
+  }
+  a{color:inherit;}
+
+  /* ============ THE ACCOUNT — a short list of facts, one screen ============ */
+  .acct{
+    min-height:100svh;
+    max-width:34em;
+    margin-inline:auto;
+    padding:clamp(18px,5vw,44px) clamp(18px,5vw,44px) clamp(86px,9.6vh,104px);
+    display:flex; flex-direction:column;
+    justify-content:center;
+  }
+
+  .acct__mark{
+    font-family:var(--font-mono); font-size:10.5px; letter-spacing:var(--track-wide);
+    text-transform:uppercase; color:var(--t-ghost); font-weight:400;
+    display:flex; align-items:center; gap:.5em;
+    padding-bottom:18px; margin-bottom:var(--gap);
+    border-bottom:1px solid var(--hair-1);
+  }
+  .acct__mark .mark__glyph{ color:var(--gold); }
+
+  /* ---- one rank, one fact, one route ---- */
+  .rank{
+    display:block;
+    padding-block:16px;
+    text-decoration:none;
+    border-top:1px solid var(--hair-1);
+    border-radius:2px; /* so the focus ring's corner matches the hairline's edge */
+  }
+  .rank:first-of-type{ border-top:none; padding-top:0; }
+
+  .rank__fact{
+    display:block;
+    font-family:var(--font-display); font-weight:500;
+    font-size:clamp(21px,3vw,30px); line-height:1.15; letter-spacing:.01em;
+    color:var(--t-display);
+    transition:color 160ms var(--ease-settle);
+  }
+  .rank__terms{
+    display:block;
+    margin-top:6px;
+    font-family:var(--font-ui); font-size:13.5px; line-height:1.4;
+    color:var(--t-meta);
+    transition:color 160ms var(--ease-settle);
+  }
+  .rank__arrow{
+    color:var(--t-ghost); display:inline-block;
+    transition:color 160ms var(--ease-settle), transform 160ms var(--ease-settle);
+  }
+  .rank:hover .rank__fact{ color:#fff; }
+  .rank:hover .rank__terms{ color:var(--t-body); }
+  .rank:hover .rank__arrow{ color:var(--gold); transform:translateX(3px); }
+  .rank:focus-visible{ outline:2px solid var(--gold); outline-offset:4px; }
+
+  /* ---- THE 152px BLOCK IS GONE, and this is where it went. ----
+     It was reserved here for "the visitor's own filed reading" and then never
+     filled, because this file holds no key that names a card, a meaning or a
+     date (drawing-room.js:13 — a reading lives at its own ?read= address). A
+     152px hole reserved for a sentence we are not entitled to print is a promise
+     of a prop. It is deleted outright, and with it the only -webkit-line-clamp
+     in the file: a clamp silently cuts a string the reader is never told was
+     cut, which is the same dishonesty at typographic scale. Where narrow needs
+     room below, the string is cut once, by hand, at authoring time.
+     The reservation that replaces it is small and real: .cut__say holds its own
+     lines from first paint, so spending the object never moves the doors. ---- */
+
+  @media (max-width:760px){
+    .rank__fact{ font-size:clamp(20px,5.6vw,26px); }
+  }
+
+  /* ============ THE CUT — the one interactive object on this screen ============
+     A short supply of three cuts, spent by hand, that leaves countable evidence:
+     three lozenges that fill, and a sentence that can only be written after the
+     visitor has caused it. It is INERT until pressed — M1 is a station crossed
+     many times a session and an arrival ceremony can be performed exactly once.
+     It never touches the two doors: they are plain anchors, present and clickable
+     at 0ms, and no state of this object can hide, disable or gate either one.
+     What the object changes is which sentence is true, never which door is open. */
+  .cut{
+    margin-top:var(--gap);
+    padding-top:16px;
+    border-top:1px solid var(--hair-1);
+  }
+  .cut__go{
+    font-family:var(--font-mono); font-size:10.5px; letter-spacing:var(--track-caps);
+    text-transform:uppercase; color:var(--t-body);
+    background:var(--ink-800);
+    border:1px solid var(--line-strong); border-radius:2px;
+    padding:12px 15px; min-height:44px;           /* a real touch target at 430 */
+    display:inline-flex; align-items:center; gap:1em;
+    cursor:pointer;
+    transition:color 160ms var(--ease-settle),
+               border-color 160ms var(--ease-settle),
+               background-color 160ms var(--ease-settle),
+               opacity 160ms var(--ease-settle),
+               transform 120ms var(--ease-settle);
+  }
+  .cut__go:hover{ color:var(--t-display); border-color:var(--line-strong); background:var(--ink-700); }
+  .cut__go:active{ transform:translateY(1px); background:var(--ink-850); }
+  .cut__go:focus-visible{ outline:2px solid var(--gold); outline-offset:3px; }
+  .cut__go[disabled]{
+    cursor:default; opacity:.66;
+    color:var(--t-ghost); border-color:var(--hair-1); background:transparent;
+    transform:none;
+  }
+  /* the countable evidence: three lozenges, gold once spent, ghost while unspent.
+     They are text inside the button — no node of their own, and no node per cut. */
+  .cut__tally{
+    font-size:11px; letter-spacing:.3em; color:var(--gold);
+    transition:color 160ms var(--ease-settle);
+  }
+  .cut__go[disabled] .cut__tally{ color:var(--t-meta); }
+  /* the sentence. It reserves its own lines from first paint, so a cut never
+     reflows the three ranks above it. */
+  .cut__say{
+    margin-top:11px;
+    font-family:var(--font-ui); font-size:13px; line-height:1.5;
+    color:var(--t-meta);
+    min-height:calc(13px * 1.5 * 3);
+    transition:color 200ms var(--ease-settle);
+  }
+  .cut__say b{ font-weight:500; color:var(--t-body); }
+  @media (min-width:761px){
+    .cut__say{ min-height:calc(13px * 1.5 * 2); }
+  }
+
+  /* ============ THE SHORT SCREEN ============
+     THE HAND's actual failure was a HEIGHT failure — no height query existed at
+     all, so it broke on a 1280×720 laptop as well as on any phone. This account
+     is six lines of type; it still gets the query, because "one screen" is a
+     height claim first. */
+  @media (max-height:800px){
+    :root{ --gap:clamp(14px, 2.4vh, 24px); }
+    .rank{ padding-block:13px; }
+    .cut{ padding-top:13px; }
+  }
+  @media (max-height:720px){
+    :root{ --gap:clamp(12px, 2vh, 20px); }
+    .rank{ padding-block:11px; }
+    .rank__terms{ font-size:13px; }
+    .cut{ padding-top:11px; }
+    .cut__go{ padding-block:10px; }
+    .cut__say{ margin-top:9px; }
+  }
+  @media (max-width:760px) and (max-height:640px){
+    .acct__mark{ padding-bottom:14px; margin-bottom:14px; }
+    .rank{ padding-block:9px; }
+    .rank__fact{ font-size:19px; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .rank__fact, .rank__terms, .rank__arrow,
+    .cut__go, .cut__tally, .cut__say{ transition:none !important; }
+    .cut__go:active{ transform:none; }
+  }
+
+  .sr-only{
+    position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden;
+    clip:rect(0,0,0,0); white-space:nowrap; border:0;
+  }
+</style>
+</head>
+<body>
+
+<main class="acct">
+
+  <h1 class="acct__mark"><span class="mark__glyph" aria-hidden="true">&#9670;</span> BLUE ROOM &mdash; what stands under your name</h1>
+
+  <!-- rank 1 — the free Sitting. Standing, not cost: what a price line was tried
+       and removed for on this exact door (app.js:2453-2459) — "the figure lives
+       in the room behind each door, and again on the cut button at the moment
+       it is actually owed." These sentences state what is owned, never what is
+       owed. -->
+  <a class="rank" href="?dev=drawing-room">
+    <b class="rank__fact" id="factSit">One free Sitting, unspent.</b>
+    <span class="rank__terms">
+      <span id="termsSit">Three cards to one question, dealt tonight and never repeated. Beyond it, the Deep Read: five cards, kept.</span>
+      <span class="rank__arrow" aria-hidden="true">&nbsp;&rarr;</span>
+    </span>
+  </a>
+
+  <!-- rank 2 — the Birth Reading -->
+  <a class="rank" href="?dev=arcane">
+    <b class="rank__fact" id="factBirth">Your Birth Reading has not been taken.</b>
+    <span class="rank__terms">
+      <span id="termsBirth">Six marks you were handed, not dealt &mdash; given once, then kept, under one name or two.</span>
+      <span class="rank__arrow" aria-hidden="true">&nbsp;&rarr;</span>
+    </span>
+  </a>
+
+  <!-- rank 3 — what's filed under this name -->
+  <a class="rank" href="codex.html">
+    <b class="rank__fact" id="factFiled">Nothing is filed under your name yet.</b>
+    <span class="rank__terms">
+      <span id="termsFiled">222 marks across nine systems are open to read without one.</span>
+      <span class="rank__arrow" aria-hidden="true">&nbsp;&rarr;</span>
+    </span>
+  </a>
+
+  <!-- THE CUT. Four nodes, the whole object. Note it is a <button type="button">
+       and sits OUTSIDE both anchors: it can never swallow a click meant for a
+       door, and it navigates nowhere. -->
+  <div class="cut">
+    <button class="cut__go" type="button" id="cutGo"
+            aria-label="Cut the deck. Three cuts, none spent.">
+      Cut the deck
+      <span class="cut__tally" id="cutTally" aria-hidden="true">&#9671;&#9671;&#9671;</span>
+    </button>
+    <p class="cut__say" id="cutSay" aria-live="polite">Three cuts sit here, unspent. Nothing on this screen is yours yet.</p>
+  </div>
+
+</main>
+
+<script>
+/* ═══ THE RETURN ═══════════════════════════════════════════════════════════════
+   A front door that has met you should not pitch you the thing you already own.
+   This is the whole mechanism: three bits that ALREADY EXIST in this repo, read
+   with the house try/catch pattern, FAIL-OPEN — a browser that refuses storage,
+   a private window, a first-ever visitor and a visitor who cleared their history
+   all take the same branch, which is the branch that does nothing at all.
+
+     br_dr_sitting_used   drawing-room.js:481  — the free Sitting has been cut
+     br_has_reading       arcane.js:1205       — a Birth Reading has been given
+     br_holdings          app.js:3038 / 6283   — something is owned
+
+   No fetch, no account, no new key, no writing. This script only reads, and if
+   nothing answers it returns before touching the DOM, so a cold arrival renders
+   the served markup byte for byte — which is already the correct cold account.
+   Every line it can write is a REPLACEMENT of a line that already exists once;
+   no second layout, no badge, nothing appears that was not already on the page. */
+(function(){
+  function bit(k){ try { return localStorage.getItem(k) === '1'; } catch (e){ return false; } }
+
+  /* ?as=cold|spent|held|both — a read-only override for judging this file cold,
+     since the whole claim (a door that answers differently on visit 7 than visit 1)
+     is invisible in a screenshot taken on first paint. This is a verification
+     harness, not a feature: it reads a URL param once, never writes storage, and
+     has no caller anywhere else in the file. It is excluded from the deny-list
+     public build the same way every other ?dev= harness in this repo is. */
+  var as = null;
+  try {
+    var qs = new URLSearchParams(location.search);
+    if (qs.has('as')) as = qs.get('as');
+  } catch (e) {}
+
+  var held, spent;
+  if (as === 'cold')       { held = false; spent = false; }
+  else if (as === 'spent') { held = false; spent = true;  }
+  else if (as === 'held')  { held = true;  spent = false; }
+  else if (as === 'both')  { held = true;  spent = true;  }
+  else {
+    held  = bit('br_has_reading') || bit('br_holdings');
+    spent = bit('br_dr_sitting_used');
+  }
+  if (!held && !spent) return;                 /* cold arrival — nothing happened here */
+
+  if (spent){
+    var fs = document.getElementById('factSit');
+    var ts = document.getElementById('termsSit');
+    if (fs) fs.textContent = 'Your free Sitting is spent.';
+    if (ts) ts.textContent = 'Every Sitting after is kept the same way. The Deep Read still waits, five cards.';
+  }
+
+  if (held){
+    var fb = document.getElementById('factBirth');
+    var tb = document.getElementById('termsBirth');
+    if (fb) fb.textContent = 'Your Birth Reading is read and kept.';
+    if (tb) tb.textContent = 'This door now reads a second name, given the same way.';
+
+    /* the filed rank. No card, no date and no meaning is invented here — this
+       script has no key that names what was drawn, so it does not print one.
+       CONVICTION's finding was a fabricated demo standing in for a real draw;
+       inventing a specific filed reading to fill the 152px block would be the
+       same failure with better prose. What is true and known from the bits
+       alone is printed; the reserved space stays exactly reserved. */
+    var ff = document.getElementById('factFiled');
+    var tf = document.getElementById('termsFiled');
+    if (ff) ff.textContent = 'What is yours is filed and kept.';
+    if (tf) tf.textContent = 'Open it, and the 222 marks it sits among.';
+  }
+})();
+
+/* ═══ THE CUT ══════════════════════════════════════════════════════════════════
+   CONVICTION's finding across all seven designs: every one of them prints a
+   plausible specimen — "The Star, upright" — and gives the visitor no way on the
+   surface to tell a real draw from a house illustration. This object is the
+   answer, and it answers by refusing to draw anything at all.
+
+   WHAT IT ASSERTS, and it is the only thing it is entitled to assert: that YOU
+   pressed, HOW MANY times, HOW FAR INTO THIS VISIT, and WHERE in the corpus each
+   press landed. Nothing else. No card, no meaning, no name, no date, no filed
+   reading — this file holds no key that names one, and inventing one to fill a
+   pretty block would be exactly the failure it was spent to fix.
+
+   WHY THE DEPTH CANNOT BE A PROP. It is not random and it is not authored: it is
+   the millisecond of the visitor's own press, folded into the corpus length
+   (1 + floor(t) mod 222). The sentence says so in plain words. Press again and it
+   is a different number; press twice in a row quickly and the two numbers are
+   near each other. A canned specimen cannot do that, and a reader can falsify the
+   claim in one second with their own finger — which is the only proof of liveness
+   worth having.
+
+   DATA: INLINED, deliberately. The only figure this object uses is 222, the
+   corpus total, typed as a literal — the same literal the served markup already
+   carries six lines above it in rank 3. The choice not taken was fetching
+   codex-data.json for a live count. Its drift risk is worse in both directions:
+   a network read on the most paint-bound surface in the build (BR-S276), and a
+   sentence whose central number is hostage to a request that can fail, leaving
+   the object asserting a count it never received. The drift risk of the choice
+   TAKEN is real and named: if the Codex grows past 222, this literal goes stale —
+   but it goes stale next to an identical stale literal in the same file, one
+   screen apart, so the two are found and fixed in the same edit.
+
+   Zero @keyframes. Nothing fires unasked. Nothing animates on load. Nothing here
+   listens to the wheel, arrow keys or scroll. */
+(function(){
+  var btn = document.getElementById('cutGo');
+  var say = document.getElementById('cutSay');
+  var tal = document.getElementById('cutTally');
+  if (!btn || !say || !tal) return;
+
+  var TOTAL = 222, SUPPLY = 3;
+  var born = (window.performance && performance.now) ? performance.now() : Date.now();
+  var at = [], sec = [];
+
+  function now(){ return (window.performance && performance.now) ? performance.now() : Date.now(); }
+
+  /* Strings are cut once, here, at authoring time — there is no clamp anywhere
+     in this file and nothing on this surface is truncated at render. */
+  function line(){
+    var n = at.length;
+    if (n === 1){
+      return 'One cut, <b>' + sec[0] + 's</b> into this visit, fell at <b>' + at[0] +
+             '</b> of 222 &mdash; that number is the millisecond you pressed, not a card. Two cuts left.';
+    }
+    if (n === 2){
+      return 'Two cuts, <b>' + sec[0] + 's</b> and <b>' + sec[1] + 's</b> in: <b>' + at[0] +
+             '</b>, <b>' + at[1] + '</b> of 222. Still no reading &mdash; only your own presses, counted. One cut left.';
+    }
+    return 'Three cuts spent, <b>' + sec[2] + 's</b> into your visit: <b>' + at[0] + '</b>, <b>' +
+           at[1] + '</b>, <b>' + at[2] + '</b> of 222. This deck counted you and dealt nothing &mdash; the two doors above deal.';
+  }
+
+  var LEFT = ['none spent.', 'two cuts left.', 'one cut left.', 'none left; the supply is spent.'];
+
+  btn.addEventListener('click', function(){
+    if (at.length >= SUPPLY) return;
+    var t = now();
+    at.push(1 + (Math.floor(t) % TOTAL));                 /* the press itself, folded into the corpus */
+    sec.push(Math.max(1, Math.round((t - born) / 1000))); /* seconds of THIS visit, not a stored figure */
+
+    /* countable evidence, on the surface, in the object that was spent */
+    tal.textContent = new Array(at.length + 1).join('◆') +
+                      new Array(SUPPLY - at.length + 1).join('◇');
+    say.innerHTML = line();                               /* integers only, computed above */
+    btn.setAttribute('aria-label', 'Cut the deck. Three cuts, ' + LEFT[at.length]);
+
+    if (at.length >= SUPPLY) btn.disabled = true;         /* the supply is finite, and says so */
+  });
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,993 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>M1 — THE INHABITED ORIGINAL v2</title>
+<style>
+/* ============================================================
+   THE INHABITED ORIGINAL v2 — M1 final build
+   Supersedes _m1-master2.html per _m1-master2-sheet-REVISED.md.
+   The shipped stage/berth machinery is kept; the two reading
+   sections are dense, adjacent, comparable; the archive lives
+   INSIDE the sections (wide grid only), never on the ground;
+   the field is authored, not rolled; the phone layout is its
+   own designed rank list, not the desktop stack squeezed.
+   ============================================================ */
+:root{
+  --t-display:#dcd7cb; --t-primary:#d7d3ca; --t-body:#b1ada4; --t-meta:#948f87;
+  --ink-950:#0a0b0d; --ink-900:#100f0c; --ink-850:#11100d; --ink-800:#151310; --ink-700:#1c1915;
+  --line-faint:rgba(233,229,220,.07); --line:rgba(233,229,220,.12); --line-strong:rgba(233,229,220,.2);
+  --silver:#c8c4bb; --silver-dim:#9c9790;
+  --font-display: Georgia, 'Iowan Old Style', serif;
+  --font-ui: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+  --ease-settle: cubic-bezier(.2,.7,.2,1);
+}
+/* THE TOKEN SCOPE (critique item 8). --t-ghost and --gold are M1's own registers,
+   not the shared :root's — this file has nothing else on the page to conflict
+   with, but the scope is kept honest to how it merges into app.js, where
+   --t-ghost already has 30 other consumers at a different value. */
+.menu__draw, .m1down{ --t-ghost:#86827a; --gold:#c8ad70; --silver-dim:var(--t-meta); }
+*{box-sizing:border-box;}
+html,body{background:var(--ink-950); color:var(--t-body); margin:0; padding:0;}
+body{
+  font-family:var(--font-ui);
+  min-height:100vh; display:flex; align-items:center; justify-content:center;
+  padding: 12px 20px 20px;
+  /* NO overflow-x:hidden / clip here. The sheet bans the concealment class by
+     name: a scrollbar is allowed to appear and accuse the build. */
+}
+a{ text-decoration:none; color:inherit; }
+button{ font:inherit; background:none; border:0; color:inherit; }
+
+/* ---------------- THE GRID ---------------- */
+.menu__draw{
+  position:relative; width:100%; max-width:560px;
+  display:grid; grid-template-columns:minmax(0,1fr);
+  column-gap:0; row-gap:20px;
+  align-items:start; justify-items:stretch; text-align:left;
+  padding-bottom:64px; /* orb clearance */
+}
+@media (min-width:1200px){
+  .menu__draw{
+    width:min(1180px,92vw); max-width:none;
+    grid-template-columns:minmax(300px,1fr) auto 330px;
+    grid-template-areas:
+      "mast  stage head"
+      "tarot stage head"
+      "birth stage exits";
+    grid-template-rows:auto auto auto;
+    column-gap:clamp(24px,3vw,52px); row-gap:12px;
+    padding-bottom:0;
+  }
+  .menu__draw-mast{ grid-area:mast; }
+  .m1sect--tarot{ grid-area:tarot; }
+  .m1sect--birth{ grid-area:birth; }
+  .menu__draw-stage{ grid-area:stage; align-self:center; }
+  .menu__draw-head{ grid-area:head; align-self:center; }
+  .m1exits{ grid-area:exits; align-self:end; }
+}
+/* landscape phones: a designed arrangement, not the stack squeezed */
+@media (min-width:700px) and (max-height:520px){
+  .menu__draw{
+    grid-template-columns:1fr auto; grid-template-areas:
+      "mast  stage"
+      "tarot stage"
+      "birth stage"
+      "exits exits";
+    align-items:start; row-gap:8px; column-gap:24px; padding-bottom:8px;
+  }
+  .menu__draw-mast{ grid-area:mast; }
+  .m1sect--tarot{ grid-area:tarot; }
+  .m1sect--birth{ grid-area:birth; }
+  .menu__draw-stage{ grid-area:stage; }
+  .menu__draw-head{ display:none; } /* the berth comes off; the reading lives one tap behind either door */
+  .m1exits{ grid-area:exits; }
+  .m2hero{ height:clamp(120px,40svh,200px); }
+  /* landscape is 700-812px WIDE, so none of the <=430 type rungs fire here — the
+     masthead was still rendering at its full 36px inside a 375px-tall screen.
+     The ladder is supposed to be per HEIGHT bracket; this is that, stated. */
+  .menu__draw-title{ font-size:19px; }
+  .menu__draw-thesis{ font-size:.9375rem; }
+  .menu__door-desc{ font-size:.78125rem; }
+  .m1sect{ padding:9px 12px 8px; gap:4px; }
+  .m1deep__line{ display:none; }
+  .menu__draw-placard, .m1sect__pull{ display:none; }
+  .m2flip{ margin-top:6px; }
+  body{ padding:8px 16px 8px; }
+}
+
+/* ---------------- MASTHEAD ---------------- */
+.menu__draw-mast{ display:grid; gap:6px; justify-items:start; }
+.menu__wall-eyebrow{ margin:0; font-family:var(--font-mono); font-size:9.5px; letter-spacing:.3em; text-transform:uppercase; color:var(--t-ghost); }
+/* gold economy: the eyebrow's lozenge is rest-state decoration, so it does not get
+   to be gold. Gold is focus rings, stirred marks, and the addressed way-line. */
+.menu__wall-eyemark{ color:var(--t-ghost); margin-right:.4em; }
+.menu__draw-title{ margin:0; font-family:var(--font-display); font-weight:600; font-size:36px; line-height:1.04; letter-spacing:-.005em; color:var(--t-display); text-wrap:balance; }
+.menu__draw-thesis{ margin:0; font-family:var(--font-display); font-size:1.1875rem; line-height:1.4; color:var(--t-primary); }
+
+/* ---------------- A SECTION ---------------- */
+.m1sect{
+  position:relative; isolation:isolate;
+  display:grid; gap:7px;
+  padding:13px 15px 11px;
+  border:1px solid var(--line);
+  border-radius:10px;
+  background:linear-gradient(180deg, rgba(233,229,220,.02), transparent 62%), var(--ink-850);
+}
+.m1sect__field{
+  position:absolute; inset:12px; z-index:0;
+  pointer-events:none; overflow:hidden; border-radius:8px;
+}
+/* WIDE-GRID ONLY, BY DESIGN. Not thinned below 1200px — absent. The base layout
+   is the offer; the wide grid is the offer inhabited. */
+@media (max-width:1199px){ .m1sect__field{ display:none; } }
+/* the shoal's recession is opacity/hue, which forced-colors deletes wholesale;
+   without this, high-contrast mode paints 28 full-contrast glyphs across the
+   reading band — exactly what the builder said was unacceptable. */
+@media (forced-colors: active){ .m1sect__field{ display:none; } }
+
+/* the shoal's stroke is #9c9790, stated as a literal by the sheet. It is NOT
+   var(--silver-dim): inside .menu__draw --silver-dim is remapped to --t-meta
+   (#948f87) per the token rule, which would quietly darken the whole shoal. */
+.m1mark{ position:absolute; transform:translate(-50%,-50%); color:#9c9790; pointer-events:auto; transition:color 220ms var(--ease-settle), opacity 220ms var(--ease-settle); }
+.m1mark svg{ display:block; width:100%; height:100%; fill:none; stroke:currentColor; stroke-width:1; stroke-linecap:round; }
+.m1sect.is-stirred .m1mark{ color:var(--gold); }
+.m1mark:focus-visible{ outline:1px solid var(--silver-dim); outline-offset:2px; }
+
+/* fields sit LAST in the section's DOM (absolutely positioned — the move is
+   free) so the door is announced before its decoration. */
+.m1sect > .menu__door,
+.m1sect > .m1deep,
+.m1sect > .m1marks__lead,
+.m1sect > .m1marks,
+.m1sect > .m1sect__foot{ position:relative; z-index:2; }
+/* THE FIELD IS A LAYER, NOT A ROW — it keeps position:absolute. It used to be
+   swept into the list above, which overrode its absolute positioning and made it
+   a zero-height grid row; with overflow:hidden that clipped all 28 marks out of
+   existence. The shoal painted NOTHING at any width. It only needs the z-index. */
+.m1sect > .m1sect__field{ z-index:0; }
+
+/* door */
+.menu__door{ display:grid; gap:6px; text-decoration:none; min-height:44px; }
+.menu__door-kicker{ font-family:var(--font-mono); font-size:9px; letter-spacing:.26em; text-transform:uppercase; color:var(--t-meta); display:flex; align-items:center; gap:6px; }
+/* gold economy: gold appears only on focus rings, stirred marks, and the
+   addressed door's way-line — never at rest. The birth kicker's colour-mix
+   gold is demoted to silver. */
+.menu__door--birth .menu__door-kicker{ color:color-mix(in srgb, var(--silver) 70%, var(--t-meta)); }
+.menu__draw-crown{ width:20px; height:15px; }
+.menu__door-name{ margin:0; font-family:var(--font-ui); font-weight:600; font-size:14.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--t-display); }
+.menu__door-desc{ font-family:var(--font-display); font-size:.84375rem; line-height:1.5; color:var(--silver); }
+/* the stations spine: wide-grid furniture, off below 1200 with the shoals */
+.menu__draw-spine{ font-family:var(--font-mono); font-size:8.5px; line-height:1.5; letter-spacing:.16em; text-transform:uppercase; color:var(--t-meta); transition:color 200ms var(--ease-settle); }
+.menu__door:hover .menu__draw-spine, .menu__door:focus-visible .menu__draw-spine{ color:var(--silver); }
+@media (max-width:1199px){ .menu__draw-spine{ display:none; } }
+
+/* specimens: wide-grid furniture — evidence for the reading eye, not the
+   phone thumb. */
+.m1spec{ margin:4px 0 0; border-left:1px solid var(--line); padding-left:11px; }
+.m1spec__label{ display:block; font-family:var(--font-mono); font-size:9px; letter-spacing:.2em; text-transform:uppercase; color:var(--t-ghost); margin:0 0 3px; }
+.m1spec__line{ margin:0; font-family:var(--font-display); font-style:italic; font-size:.9375rem; line-height:1.55; color:var(--t-body); }
+@media (max-width:1199px){ .m1spec{ display:none; } }
+
+.m1deep{ display:grid; gap:3px; min-height:44px; padding:2px 0; }
+/* below 1200 the Deep Read collapses to ITS ONE LINE, exactly as the sheet says:
+   S13 and S14 sit on one row, and only S12 (the explaining line) is dropped. */
+@media (max-width:1199px){
+  .m1deep{ display:flex; flex-wrap:wrap; align-items:center; gap:0 10px; }
+}
+.m1deep__name{ font-family:var(--font-ui); font-weight:600; font-size:12.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--t-display); }
+.m1deep__line{ font-family:var(--font-display); font-size:.8125rem; line-height:1.5; color:var(--silver); }
+.m1deep__go{ font-family:var(--font-mono); font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:var(--t-meta); transition:color 140ms var(--ease-settle); }
+.m1deep:hover .m1deep__go, .m1deep:focus-visible .m1deep__go{ color:var(--gold); }
+/* the Deep Read collapses to its one line below 1200 — S13+S14 only */
+@media (max-width:1199px){ .m1deep__line{ display:none; } }
+
+/* the one lit affordance per door: the way-line goes gold on hover/focus of
+   the door it belongs to. Everywhere else it is quiet silver. */
+.m1sect__way{ font-family:var(--font-mono); font-size:13px; letter-spacing:.14em; text-transform:uppercase; color:var(--silver); transition:color 200ms var(--ease-settle); }
+.menu__door:hover .m1sect__way, .menu__door:focus-visible .m1sect__way{ color:var(--gold); }
+.m1sect__pull{ margin:2px 0 0; font-family:var(--font-mono); font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:var(--t-meta); }
+
+.m1marks__lead{ margin:2px 0 0; font-family:var(--font-mono); font-size:9px; line-height:1.6; letter-spacing:.18em; text-transform:uppercase; color:var(--t-ghost); }
+.m1marks{ list-style:none; margin:0; padding:0; display:flex; flex-wrap:wrap; gap:4px 14px; }
+.m1marks__a{ display:inline-flex; min-height:24px; align-items:center; font-family:var(--font-mono); font-size:10px; letter-spacing:.12em; text-transform:uppercase; color:var(--t-meta); transition:color 140ms var(--ease-settle); }
+.m1marks__a:hover, .m1marks__a:focus-visible{ color:var(--t-display); }
+
+.m1sect__foot{ min-height:16px; margin:0; font-family:var(--font-mono); font-size:.5625rem; letter-spacing:.14em; text-transform:uppercase; color:var(--t-ghost); }
+/* the foot slot is where a MARK names itself on the first of two taps. Below
+   1200px there are no marks (the field is absent by design), so the slot was
+   reserving 32px of phone screen for an event that cannot occur there. It keeps
+   its 16px wherever the shoal it serves actually exists. */
+@media (max-width:1199px){ .m1sect__foot{ display:none; } }
+
+/* ONE consolidated focus ring (critique item 4) — reaches the placard too,
+   the one revenue-adjacent control v1 left outside the system. */
+.menu__door:focus-visible,
+.m1deep:focus-visible,
+.menu__draw-placard:focus-visible,
+.m1exits a:focus-visible,
+.m1exits button:focus-visible{
+  outline:2px solid var(--gold); outline-offset:3px; border-radius:8px;
+}
+.m1marks__a:focus-visible{ outline:1px solid var(--silver-dim); outline-offset:2px; }
+
+/* ---------------- STAGE ---------------- */
+.menu__draw-stage{ display:flex; flex-direction:column; align-items:flex-start; gap:8px; position:relative; z-index:2; }
+@media (min-width:1200px){ .menu__draw-stage{ align-items:center; } }
+.msample__cap{ display:flex; }
+.msample__label{ font-family:var(--font-mono); font-size:10px; letter-spacing:.2em; text-transform:uppercase; color:var(--t-ghost); }
+.menu__draw-herosub{ margin:0; font-family:var(--font-display); font-style:italic; font-size:14px; line-height:1.5; color:var(--t-body); text-align:left; }
+@media (min-width:1200px){ .menu__draw-herosub{ text-align:center; } }
+
+.m2hero{
+  position:relative; aspect-ratio:120/190; width:auto; max-width:392px;
+  height:clamp(400px,56vh,560px); /* vh fallback for browsers without svh */
+  border-radius:9px; overflow:hidden;
+  background:linear-gradient(165deg,#efe9db,#dcd4c2);
+  border:1px solid rgba(20,14,8,.35);
+  box-shadow:0 22px 46px rgba(0,0,0,.62);
+  transition:transform 600ms var(--ease-settle);
+  container-type:size; container-name:m2card;
+}
+@supports (height: 1svh){ .m2hero{ height:clamp(400px,52svh,560px); } }
+@media (max-width:1199px){
+  .m2hero{ height:clamp(220px,32vh,320px); }
+  @supports (height: 1svh){ .m2hero{ height:clamp(220px,30svh,320px); } }
+}
+@media (min-width:1200px) and (max-height:820px){
+  /* ladder rung 1, on the wide grid's short bracket: the masthead yields first. */
+  .menu__draw-mast{ gap:3px; }
+  .menu__draw-title{ font-size:22px; }
+  .menu__draw-thesis{ font-size:.9375rem; line-height:1.35; }
+  .menu__door-desc{ font-size:.78125rem; }
+  /* on a SHORT wide screen the binding column is the left one (mast + the two
+     sections), not the object — the specimens make it the tall column. So the
+     specimen's own type is the rung that yields here, not the card's height. */
+  .m1spec__line{ font-size:.8125rem; line-height:1.45; }
+  .m1spec{ margin-top:2px; padding-left:9px; }
+  .m1spec__label{ margin-bottom:2px; }
+  .m1deep__line{ font-size:.75rem; }
+  .menu__draw{ row-gap:6px; }
+  .m1sect{ padding:10px 12px 9px; gap:5px; }
+  body{ padding:8px 20px 10px; }
+  /* the object's 400px floor is what breaks 1280x720: at that height 52svh is
+     374px and the floor overrides it upward. On a short wide screen the floor
+     yields — the object is still the tallest thing on the page. */
+  .m2hero{ height:clamp(300px,52vh,560px); }
+  @supports (height: 1svh){ .m2hero{ height:clamp(300px,52svh,560px); } }
+  .m2read{ --m2read-size:1.0625rem; --m2read-lines:4; }
+}
+.m2hero__back, .m2hero__face{ position:absolute; inset:0; width:100%; height:100%; }
+.m2hero__back{ opacity:.14; }
+.m2hero__face{ opacity:.9; }
+.m2face, .m2bface{ position:absolute; inset:0; display:flex; flex-direction:column; justify-content:space-between; padding:14px 12px; color:#1c150d; }
+.m2face-head{ display:flex; justify-content:space-between; align-items:center; }
+/* the ink is quoted, verbatim, from arcana-profile.css:566-573 — nothing here
+   is invented, including by approximation. */
+.m2face-meta{ font-family:var(--font-mono); font-size:8.5px; letter-spacing:.2em; text-transform:uppercase; color:#5c503c; }
+.m2face-glyph{ color:#c98a5e; }
+.m2face-name{ font-family:var(--font-display); font-weight:600; font-size:15px; color:#1c150d; }
+.m2face-div{ height:1px; background:rgba(28,21,13,.35); margin:8px 0; }
+.m2face-orient{ font-family:var(--font-mono); font-size:9px; letter-spacing:.16em; text-transform:uppercase; color:#6a5c45; }
+/* the face fills the frame: container-query type, px fallback first */
+@supports (font-size: 1cqh){
+  .m2face-meta{ font-size:clamp(7.5px,1.6cqh,9.5px); }
+  .m2face-name{ font-size:clamp(13px,3.2cqh,18px); }
+  .m2face-orient{ font-size:clamp(8px,1.6cqh,10px); }
+  .m2bface__marks{ font-size:clamp(7.5px,1.7cqh,9.5px); }
+}
+.m2bface__headrule{ margin:0 0 8px; }
+.m2bface__name{ margin-bottom:6px; }
+/* the six marks are GLYPHS WITH NAMES in two columns — never a blank cream field.
+   Same real defs the shoal is drawn from. */
+.m2bface__marks{ list-style:none; margin:0; padding:0; display:grid; grid-template-columns:1fr 1fr; gap:4px 8px; font-family:var(--font-mono); font-size:8.5px; letter-spacing:.1em; text-transform:uppercase; color:#5c503c; }
+.m2bface__marks li{ display:flex; align-items:center; gap:4px; min-width:0; }
+.m2bface__marks svg{ flex:0 0 auto; width:11px; height:11px; fill:none; stroke:#c98a5e; stroke-width:1.1; stroke-linecap:round; }
+.m2bface__marks span{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+@supports (width: 1cqh){ .m2bface__marks svg{ width:clamp(9px,2.2cqh,13px); height:clamp(9px,2.2cqh,13px); } }
+/* THE FACE GRADES WITH THE FRAME, it does not truncate inside it. At the phone's
+   card size two columns of names cannot fit in ~120px of cream and the labels were
+   rendering as "LI…" / "GO…" — worse than the blank field this was meant to fix.
+   So: two columns while they fit, one column below that, and at thumbnail size the
+   six marks read as GLYPHS ALONE, which is honest, legible, and still six marks. */
+@container m2card (max-width: 178px){
+  .m2bface__marks{ grid-template-columns:1fr; gap:2px 0; }
+  .m2bface__name{ margin-bottom:3px; }
+}
+@container m2card (max-width: 132px){
+  .m2bface__marks{ grid-template-columns:repeat(3,1fr); justify-items:center; gap:5px 2px; }
+  .m2bface__marks span{ display:none; }          /* the face is aria-hidden; the
+                                                    names live in the berth + doors */
+  .m2bface__marks li{ justify-content:center; }
+}
+/* the honesty line must never be the thing that gets clipped: it wraps, and the
+   face gives it the room by letting the marks block shrink first. */
+.m2bface .m2face-orient{ white-space:normal; }
+.m2bface__marks{ min-height:0; overflow:hidden; }
+.m2bface__wall--bot{ margin-top:auto; }
+.m2tick{ position:absolute; width:8px; height:8px; border-color:rgba(28,21,13,.5); }
+.m2tick.tl{ top:8px; left:8px; border-top:1px solid; border-left:1px solid; }
+.m2tick.br{ bottom:8px; right:8px; border-bottom:1px solid; border-right:1px solid; }
+.m2hero[data-face="tarot"] .m2bface, .m2hero[data-face="birth"] .m2face{ display:none; }
+.m2hero[data-face="birth"] .m2hero__face{ display:none; }
+.m2hero[data-face="tarot"] .m2hero__back{ display:none; }
+/* THE CAPTION RENDERS. It is a SIBLING of .m2hero now, not a child clipped by
+   .m2hero's own overflow:hidden — that contradiction clipped the object's
+   name at every viewport since v1 was built. */
+.m2hero__name{ margin:0; width:100%; text-align:left; font-family:var(--font-mono); font-size:9px; letter-spacing:.18em; text-transform:uppercase; color:var(--t-ghost); }
+/* the honesty tag reaches AT through the caption too — the faces are aria-hidden */
+.vh{ position:absolute; width:1px; height:1px; margin:-1px; padding:0; overflow:hidden; clip-path:inset(50%); white-space:nowrap; border:0; }
+@media (min-width:1200px){ .m2hero__name{ text-align:center; } }
+/* the 320-class residual: caption off, the object floors instead */
+@media (max-width:340px){ .m2hero__name{ display:none; } }
+
+.m2flip{ display:flex; gap:8px; margin-top:10px; }
+.m2flip__opt{ min-height:44px; padding:0 14px; border:1px solid var(--line); border-radius:6px; font-family:var(--font-mono); font-size:10px; letter-spacing:.16em; text-transform:uppercase; color:var(--t-meta); cursor:pointer; transition:color 200ms var(--ease-settle), border-color 200ms var(--ease-settle); }
+/* the flip's active border demotes gold -> silver (gold economy) */
+.m2flip__opt.is-on{ color:var(--silver); border-color:var(--silver); }
+.m2flip__opt:focus-visible{ outline:2px solid var(--silver-dim); outline-offset:2px; }
+/* the toggle is redundant where the stir exists — the doors themselves turn
+   the face at narrow widths. */
+@media (max-width:430px){ .m2flip{ display:none; } }
+
+.menu__draw-placard{ margin-top:8px; font-family:var(--font-display); font-style:italic; font-size:12px; letter-spacing:.01em; color:var(--t-meta); display:inline-flex; align-items:center; gap:6px; min-height:44px; }
+/* the placard's mark demotes gold -> silver (gold economy) */
+.menu__draw-placard-mark{ color:var(--silver); }
+
+/* ---------------- HEAD / BERTH ---------------- */
+.menu__draw-head{ display:grid; gap:9px; position:relative; z-index:2; }
+/* the berth mean is a BODY-TEXT role, so it is set in rem (1.1875rem = 19px).
+   The micro-labels above it stay px — they are a label register, not reading. */
+.m2read{ display:grid; gap:6px; --m2read-size:1.1875rem; --m2read-lh:1.6; --m2read-lines:5; transition:opacity 180ms var(--ease-settle); }
+.m2read.is-writing{ opacity:.25; }
+.m2read__label{ margin:0; font-family:var(--font-mono); font-size:10.5px; letter-spacing:.22em; text-transform:uppercase; color:var(--t-ghost); }
+.m2read__meta{ margin:0; font-family:var(--font-mono); font-size:11.5px; letter-spacing:.2em; text-transform:uppercase; color:var(--t-meta); }
+/* the meta's numeral demotes gold -> silver (gold economy) */
+.m2read__meta .num{ color:var(--silver); }
+.m2read__mean{ margin:0; font-family:var(--font-display); font-size:var(--m2read-size); line-height:var(--m2read-lh); color:var(--t-body); min-height:calc(var(--m2read-size) * var(--m2read-lh) * var(--m2read-lines)); }
+/* NO -webkit-line-clamp here — the strings are authored to fit; a clamp is
+   honest about a paragraph and not honest about a sentence. */
+
+/* ---------------- EXITS ---------------- */
+/* the row wraps on GAP alone — no negative margins. The separator is a ::before on
+   the exit that follows it, so a wrapped line can never strand a lone "·". */
+.m1exits{ display:flex; flex-wrap:wrap; align-items:center; gap:0 4px; }
+.m1exit{ font-family:var(--font-mono); font-size:10px; letter-spacing:.16em; text-transform:uppercase; color:var(--t-meta); padding:12px 0; min-height:44px; display:inline-flex; align-items:center; cursor:pointer; transition:color 140ms var(--ease-settle); }
+.m1exit:hover{ color:var(--t-display); }
+.m1exit + .m1exit::before{ content:"·"; color:var(--t-ghost); margin-right:8px; }
+
+/* ---------------- THE YIELD LADDER ----------------
+   Stated once, obeyed by every bracket: MASTHEAD first (36 -> 26 -> 20 -> 15.5),
+   the door sentences second, the OBJECT third (svh floor), the FLIP fourth (off
+   at <=430, redundant to the stir), the BERTH fifth (to 4 lines, then off the
+   phone entirely under a height bracket) — its first step is at 430, the width
+   the builder named, because every rank above it has already yielded there. */
+@media (max-width:560px){
+  .menu__draw-title{ font-size:26px; }
+  .menu__draw-thesis{ font-size:1.0625rem; }
+}
+@media (max-width:430px){
+  .menu__draw-title{ font-size:20px; }
+  .menu__draw-thesis{ font-size:.96875rem; }
+  .menu__door-desc{ font-size:.78125rem; }
+  .m1deep__line{ font-size:.75rem; }
+  /* ladder rung 3 at its low end. NOT the sheet's clamp(170px,24svh,260px): at
+     430x932 that computes to 224px and makes this bracket WORSE by 19px. The
+     sheet's object rung was written without measuring; the measured value wins,
+     and it stays above the 140px floor the sheet sets for the 320-class. */
+  .m2hero{ height:clamp(170px,19svh,220px); }
+  .m1sect{ padding:11px 12px 10px; gap:5px; }
+  .menu__draw{ row-gap:8px; padding-bottom:20px; }
+  .menu__draw-stage{ gap:5px; }
+  .m2read{ --m2read-size:1.0625rem; --m2read-lines:4; }
+  body{ padding:8px 16px 10px; }
+}
+/* The ladder is supposed to be per HEIGHT bracket, and almost every rung in this
+   file was keyed to WIDTH — which is why a 430x932 flagship passed while a
+   393x852 phone did not. This is the object's height rung: below a 900px-tall
+   phone the card takes a smaller share of a smaller screen. It can afford to,
+   because the face now GRADES instead of truncating (see @container m2card). */
+@media (max-width:430px) and (max-height:900px){
+  .m2hero{ height:clamp(150px,17svh,200px); }
+}
+@media (max-width:390px){ .m2read{ --m2read-size:1rem; } }
+@media (max-width:360px){
+  .menu__draw-title{ font-size:15.5px; }
+  .m2read{ --m2read-size:.96875rem; }
+}
+/* LADDER RUNG 5, THE LAST ONE: the berth comes off the phone; the object keeps
+   its caption, and the reading itself is one tap behind either door.
+   The sheet set this bracket at "viewport height <= 700px". MEASURED, that
+   bracket does not fire at 430x932 and the page lands at 1044px against an
+   892px budget — 152px over, with the berth costing 169px. The sheet's rationale
+   ("the reading lives one tap behind either door") is height-independent and
+   true at every phone size; only its 700px number was unmeasured. So the rung is
+   taken at the WIDTH the builder named as well as at the height the sheet named.
+   Above 430px (tablets) the berth stays — there is room for it there.
+   THIS IS A DECLARED DEVIATION FROM THE SHEET, not a silent one. */
+@media (max-width:1199px) and (max-height:700px){
+  .menu__draw-head{ display:none; }
+}
+@media (max-width:430px){
+  .menu__draw-head{ display:none; }
+  /* and THE CODEX stops being said twice: the placard repeats a word that the
+     exits row carries 40px below it. The sheet's own rank law is that a room is
+     a WORD in the exits row — it already has one. Wide keeps the placard, where
+     the exits row is in a different column and the repeat does not read as one. */
+  .menu__draw-placard{ display:none; }
+}
+/* 320-class residual: the object floors, the caption is already off above */
+@media (max-width:340px){
+  .m2hero{ height:clamp(140px,22vh,220px); }
+  @supports (height: 1svh){ .m2hero{ height:clamp(140px,20svh,220px); } }
+}
+
+/* ---------------- THE DOWN-CUE TO U1 ----------------
+   Stand-in for app.js's ANNEX_DOWNCUE — this file has no U1 section to glide
+   to, so the link is a labelled anchor only, out of flow, costing the one
+   screen nothing, binding no key. In the merged app the real ANNEX_DOWNCUE
+   already renders here; this file's own down-cue is not a second one. */
+.m1down{ position:fixed; left:50%; bottom:10px; transform:translateX(-50%);
+  display:inline-flex; align-items:center; gap:7px; min-height:44px; padding:0 12px;
+  font-family:var(--font-mono); font-size:9px; letter-spacing:.22em; text-transform:uppercase;
+  color:var(--t-ghost); z-index:5; transition:color 140ms var(--ease-settle); }
+.m1down:hover{ color:var(--t-meta); }
+.m1down:focus-visible{ outline:2px solid var(--gold); outline-offset:3px; border-radius:6px; }
+
+/* reduced motion */
+@media (prefers-reduced-motion: reduce){
+  *{ transition-duration:0ms !important; animation-duration:0ms !important; }
+}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <!-- #c8ad70 is --gold's value written as a literal ON PURPOSE: this <defs> is a
+       child of <body>, NOT of .menu__draw, so var(--gold) is out of scope here and
+       computed to BLACK. On merge this <defs> either moves inside .menu__draw or
+       keeps the literal. Do not "restore" var(--gold) without moving the node. -->
+  <linearGradient id="mwGold" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#c8ad70"/><stop offset=".55" stop-color="#a2864a"/><stop offset="1" stop-color="#5f471f"/></linearGradient>
+  <linearGradient id="mwInk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9c9790"/><stop offset="1" stop-color="#6f6b64"/></linearGradient>
+
+  <!-- glyphs, lifted verbatim from codex.html via _m1-team5.html -->
+  <g id="gl-aries"><path d="M5.4,17.6 C5.4,8.6 9,5.8 12,11.6 C15,5.8 18.6,8.6 18.6,17.6"/></g>
+  <g id="gl-leo"><path d="M8.6,19.6 A3.3,3.3 0 1 1 12,16.3 C12,11.6 13.6,8 16.6,8 C19,8 20.1,10.6 18.8,12.9 C17.4,15.4 17.1,17.9 19.1,20.1"/></g>
+  <g id="gl-libra"><path d="M4,18.6 L20,18.6 M4,13.8 L8.3,13.8 M8.3,13.8 A4,4 0 0 1 15.7,13.8 M15.7,13.8 L20,13.8"/></g>
+  <g id="gl-scorpio"><path d="M4,7.6 C5.4,7.6 6,8.6 6,10.2 L6,18 M6,9.6 C6,7.8 9.8,7.8 9.8,10.1 L9.8,18 M9.8,9.6 C9.8,7.8 13.6,7.8 13.6,10.1 L13.6,17.4 C13.6,19 17.4,19 17.4,17.4 L17.4,11.8 M17.4,11.8 L20.6,15 M20.6,15 L16.9,15.4"/></g>
+  <g id="gl-capricorn"><path d="M4.6,7.4 C6.1,7.4 6.9,8.6 6.9,10.3 L6.9,17.6 M6.9,9.6 C7.5,7.5 10.6,7.2 11.6,9.6 L14,17.6 M13.8,13.2 C15.3,10.5 18.9,11.4 19.2,14.4 C19.4,17 17.2,18.7 15.2,17.8 C13.7,17.1 13.3,15.1 14.7,13.9"/></g>
+  <g id="gl-aquarius"><path d="M4,11.2 l3.2,-2.7 3.2,2.7 3.2,-2.7 3.2,2.7 3.2,-2.7 M4,16.6 l3.2,-2.7 3.2,2.7 3.2,-2.7 3.2,2.7 3.2,-2.7"/></g>
+  <g id="gl-pisces"><path d="M8.4,4 C3.2,8 3.2,16 8.4,20 M15.6,4 C20.8,8 20.8,16 15.6,20 M4.2,12 L19.8,12"/></g>
+  <g id="gl-cancer"><path d="M10.3,8 A2.7,2.7 0 1 1 7.6,5.3 A2.7,2.7 0 1 1 10.3,8 M10.3,8.6 C13.6,10 16.6,11 20,10.6 M13.7,16 A2.7,2.7 0 1 1 16.4,18.7 A2.7,2.7 0 1 1 13.7,16 M13.7,15.4 C10.4,14 7.4,13 4,13.4"/></g>
+
+  <g id="s-rn-01"><path d="M8,3 L8,21"/><path d="M8,7.2 L16.4,3"/><path d="M8,12.4 L16.4,8.2"/></g>
+  <g id="s-rn-07"><path d="M6.2,4.2 L17.8,19.8"/><path d="M17.8,4.2 L6.2,19.8"/></g>
+  <g id="s-rn-13"><path d="M12,6.2 L12,17.8"/><path d="M12,6.2 L17,3"/><path d="M12,17.8 L7,21"/></g>
+
+  <g id="suit-wands"><path d="M12,20.4 L12,4.6 M12,9.4 L7.6,5.6 M12,9.4 L16.4,5.6"/></g>
+  <g id="suit-cups"><path d="M6.8,5.6 C6.8,13.6 17.2,13.6 17.2,5.6 M12,13.6 L12,18.4 M8.2,19 L15.8,19"/></g>
+  <g id="suit-swords"><path d="M12,20.4 L12,4.6 M12,4.6 L8.8,8.4 M12,4.6 L15.2,8.4 M7.4,13.4 L16.6,13.4"/></g>
+  <g id="suit-pentacles"><path d="M18.6,12 A6.6,6.6 0 1 1 5.4,12 A6.6,6.6 0 1 1 18.6,12 M12,5.6 L16.3,18.4 L5.4,10.5 L18.6,10.5 L7.7,18.4 Z"/></g>
+
+  <g id="nm-1"><path d="M9,7.4 L12.4,4.6 L12.4,19.4 M9.6,19.4 L15.2,19.4"/></g>
+  <g id="nm-8"><path d="M12,11.4 A3.4,3.4 0 1 1 12.01,11.4 M12,11.4 A4.2,4.2 0 1 0 12.01,11.4"/></g>
+
+  <!-- the two bar glyphs the birth FACE needs as static defs. Bit order and the
+       6px / 3.4px line gaps are the same rule barGlyph() draws the shoal with:
+       tr-01 "111" (Heaven, three unbroken) and hx-01 "111111" (The Creative). -->
+  <g id="tg-heaven"><path d="M4,6 L20,6"/><path d="M4,12 L20,12"/><path d="M4,18 L20,18"/></g>
+  <g id="hx-creative"><path d="M4,4.3 L20,4.3"/><path d="M4,7.7 L20,7.7"/><path d="M4,11.1 L20,11.1"/><path d="M4,14.5 L20,14.5"/><path d="M4,17.9 L20,17.9"/><path d="M4,21.3 L20,21.3"/></g>
+
+  <g id="bd-major"><path d="M12,3.4 L19,12 L12,20.6 L5,12 Z"/><path d="M12,8.2 L15.4,12 L12,15.8 L8.6,12 Z"/></g>
+  <g id="bd-chinese"><path d="M5.2,8.4 L18.8,8.4 M5.2,15.6 L18.8,15.6 M12,4.6 L12,19.4"/><path d="M8.4,4.6 L8.4,8.4 M15.6,15.6 L15.6,19.4"/></g>
+</defs></svg>
+
+<div class="menu__draw" id="draw">
+
+  <!-- MASTHEAD -->
+  <div class="menu__draw-mast">
+    <p class="menu__wall-eyebrow"><span class="menu__wall-eyemark" aria-hidden="true">&#9670;</span> BLUE ROOM</p>
+    <h2 class="menu__draw-title">The Reading Rooms</h2>
+    <p class="menu__draw-thesis">A house that reads people, two ways &mdash; everything here is read out of one codex of signs.</p>
+  </div>
+
+  <!-- TAROT SECTION -->
+  <div class="m1sect m1sect--tarot" id="secTarot">
+    <a class="menu__door menu__door--add menu__door--tarot" href="?dev=drawing-room"
+       id="doorTarot" aria-labelledby="m1-tk m1-tn m1-td">
+      <span class="menu__door-kicker" id="m1-tk">By the Draw &middot; Tarot</span>
+      <h3 class="menu__door-name" id="m1-tn">A Tarot Reading</h3>
+      <span class="menu__door-desc" id="m1-td">A Sitting &mdash; three cards to one question. Your first is free.</span>
+      <span class="menu__draw-spine">The Ground &middot; The Crossing &middot; The Turn</span>
+      <p class="m1sect__pull" id="pullLine">The Pull &mdash; one card, free, whenever.</p>
+      <span class="m1sect__way">A Sitting &mdash; cut the deck &rarr;</span>
+      <!-- MERGE CHECKLIST ITEM (sheet, THE STRINGS / S9): this specimen is seeded
+           from drawing-room.js:110/384 and must be RE-DERIVED from the live engine
+           at merge, not shipped as authored prose. It is the one string on this
+           surface whose truth this file cannot itself guarantee. -->
+      <blockquote class="m1spec">
+        <span class="m1spec__label">The Sitting&rsquo;s closing block, verbatim</span>
+        <p class="m1spec__line">Read as one &mdash; the matter rests on intuition, is crossed by transition, and tends toward resilience. Drawn to the matter you laid down &mdash; a reflection to sit with, not a forecast.</p>
+      </blockquote>
+    </a>
+    <a class="m1deep" href="?dev=drawing-room#deep">
+      <span class="m1deep__name">The Deep Read</span>
+      <span class="m1deep__line">Five cards, not three &mdash; the same three places, plus what it grew from and what it reaches for.</span>
+      <span class="m1deep__go">Sit for five &rarr;</span>
+    </a>
+    <p class="m1sect__foot" id="footTarot" aria-live="off"></p>
+    <div class="m1sect__field" id="fieldTarot" role="img" aria-label="Marks drawn from the Major and Minor Arcana — wands, cups, swords, pentacles and the majors. Each opens its own entry in the Codex."></div>
+  </div>
+
+  <!-- BIRTH SECTION -->
+  <div class="m1sect m1sect--birth" id="secBirth">
+    <a class="menu__door menu__door--add menu__door--birth" href="?dev=arcane"
+       id="doorBirth" aria-labelledby="m1-bk m1-bn m1-bd">
+      <span class="menu__door-kicker" id="m1-bk"><svg class="menu__draw-crown" viewBox="0 0 120 90" aria-hidden="true"><path d="M16 64 L26 28 L45 50 L60 18 L75 50 L94 28 L104 64" fill="none" stroke="url(#mwGold)" stroke-width="4" stroke-linejoin="round"/><path d="M15 64 H105" stroke="url(#mwGold)" stroke-width="3"/><circle cx="60" cy="18" r="5" fill="url(#mwGold)"/></svg> By Birth &middot; Given, not drawn</span>
+      <h3 class="menu__door-name" id="m1-bn">The Birth Reading</h3>
+      <span class="menu__door-desc" id="m1-bd" data-sitting-desc>Six marks you were handed, not dealt &mdash; one name, then yours to keep.</span>
+      <span class="m1sect__way">Give a name and date &rarr;</span>
+      <blockquote class="m1spec">
+        <span class="m1spec__label">A real record&rsquo;s seal, verbatim &mdash; born 14 March 1991</span>
+        <p class="m1spec__line">The Silt-Bearing Daybringer. Silt-Bearing &middot; Daybringer &middot; filed at the stopping place &middot; keyed to vitality. Nothing is re-rolled on re-view.</p>
+      </blockquote>
+    </a>
+    <p class="m1marks__lead">The six, and what each is read from &mdash;</p>
+    <ul class="m1marks">
+      <li><a class="m1marks__a" href="codex.html#western">Sun Sign</a></li>
+      <li><a class="m1marks__a" href="codex.html#chinese">Year Animal</a></li>
+      <li><a class="m1marks__a" href="codex.html#numerology">Life Path</a></li>
+      <li><a class="m1marks__a" href="codex.html#runes">Rune</a></li>
+      <li><a class="m1marks__a" href="codex.html#trigrams">Trigram</a></li>
+      <li><a class="m1marks__a" href="codex.html#iching">Hexagram</a></li>
+    </ul>
+    <p class="m1sect__foot" id="footBirth" aria-live="off"></p>
+    <div class="m1sect__field" id="fieldBirth" role="img" aria-label="Marks drawn from the six given systems — sun signs, the Chinese zodiac, numerology, the runes, the trigrams and the hexagrams. Each opens its own entry in the Codex."></div>
+  </div>
+
+  <!-- STAGE — the shipped stage machinery, kept -->
+  <section class="menu__draw-stage">
+    <div class="msample__cap"><span class="msample__label" id="stageLabel">By Birth</span></div>
+    <p class="menu__draw-herosub" id="stageSub">Six marks. One name.</p>
+    <div class="m2hero" data-face="birth" id="hero">
+      <svg class="m2hero__back" viewBox="0 0 120 190" aria-hidden="true"><rect x="7" y="7" width="106" height="176" rx="7" fill="none" stroke="url(#mwInk)" stroke-width="1"/><g stroke="url(#mwInk)" stroke-width=".6" fill="none" opacity=".7"><path d="M60 42 L86 95 L60 148 L34 95 Z"/><circle cx="60" cy="95" r="4.5"/></g></svg>
+      <svg class="m2hero__face" viewBox="0 0 120 190" role="img" aria-label="XVII — The Star"><rect x="11" y="11" width="98" height="168" rx="5" fill="none" stroke="url(#mwGold)" stroke-width=".6" opacity=".55"/><text x="60" y="30" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9" letter-spacing="2.5" fill="url(#mwGold)">XVII</text><g stroke="url(#mwGold)" fill="none"><circle cx="60" cy="98" r="31" stroke-width=".8" opacity=".5"/><path d="M60 69 L64.6 86.9 L80.5 77.5 L71.1 93.4 L89 98 L71.1 102.6 L80.5 118.5 L64.6 109.1 L60 127 L55.4 109.1 L39.5 118.5 L48.9 102.6 L31 98 L48.9 93.4 L39.5 77.5 L55.4 86.9 Z" stroke-width=".9" opacity=".8"/><circle cx="60" cy="98" r="3.2" fill="url(#mwGold)" stroke="none"/></g></svg>
+      <div class="m2face" aria-hidden="true">
+        <div class="m2face-head"><span class="m2face-meta">Arcana &middot; XVII</span><span class="m2face-glyph">&#9670;</span></div>
+        <div class="m2face-name">The Star</div>
+        <div class="m2face-div"></div>
+        <div class="m2face-orient">Upright &middot; an example, not your draw</div>
+        <span class="m2tick tl"></span><span class="m2tick br"></span>
+      </div>
+      <div class="m2bface" aria-hidden="true">
+        <div class="m2face-head"><span class="m2face-meta">THE BIRTH READING</span><span class="m2face-glyph">&#10022;</span></div>
+        <div class="m2face-div m2bface__headrule"></div>
+        <div class="m2face-name m2bface__name">The Crowned Name</div>
+        <ul class="m2bface__marks">
+          <li><svg viewBox="0 0 24 24"><use href="#gl-libra"/></svg><span>Libra</span></li>
+          <li><svg viewBox="0 0 24 24"><use href="#bd-chinese"/></svg><span>Goat</span></li>
+          <li><svg viewBox="0 0 24 24"><use href="#nm-8"/></svg><span>Life path 8</span></li>
+          <li><svg viewBox="0 0 24 24"><use href="#s-rn-13"/></svg><span>Eihwaz</span></li>
+          <li><svg viewBox="0 0 24 24"><use href="#tg-heaven"/></svg><span>Heaven</span></li>
+          <li><svg viewBox="0 0 24 24"><use href="#hx-creative"/></svg><span>Hexagram 1</span></li>
+        </ul>
+        <div class="m2bface__wall--bot">
+          <div class="m2face-div"></div>
+          <div class="m2face-orient">By birth alone &middot; an example, not your name</div>
+        </div>
+        <span class="m2tick tl"></span><span class="m2tick br"></span>
+      </div>
+    </div>
+    <p class="m2hero__name"><span id="heroName">The Crowned Name</span><span class="vh" id="heroNameTag"> &mdash; an example, not your name</span></p>
+    <div class="m2flip" role="radiogroup" aria-label="What the card shows">
+      <button type="button" class="m2flip__opt is-on" role="radio" aria-checked="true" data-face="birth">Birth</button>
+      <button type="button" class="m2flip__opt" role="radio" aria-checked="false" data-face="tarot">Tarot</button>
+    </div>
+    <a class="menu__draw-placard" href="codex.html?v=363"><span class="menu__draw-placard-mark" aria-hidden="true">&#10022;</span>The Codex &mdash; where every mark is defined &rarr;</a>
+  </section>
+
+  <!-- HEAD / BERTH — one owner, the shipped m2WriteRead path -->
+  <header class="menu__draw-head">
+    <div class="m2read" role="status" aria-live="polite" id="berth">
+      <p class="m2read__label">The reading in question</p>
+      <p class="m2read__meta" id="berthMeta">BIRTH &middot; FROM SIX OF THE NINE SYSTEMS &middot; <span class="num">137</span> OF 222</p>
+      <p class="m2read__mean" id="berthMean">Six marks you were given rather than chose, read together into one crowned name. Nothing is drawn here &mdash; each mark is looked up, and read as it stands.</p>
+    </div>
+  </header>
+
+  <!-- EXITS — one typographic row, one weight, one separator; enclosure is
+       reserved for objects, a door is a word -->
+  <nav class="m1exits" aria-label="Ways out">
+    <button type="button" class="m1exit" id="exitDesk" data-annex-back>THE DESK</button>
+    <a class="m1exit" href="codex.html?v=363" data-codex-open>THE CODEX</a>
+    <a class="m1exit" href="?dev=profile">YOUR PROFILE</a>
+    <button type="button" class="m1exit" id="exitRooms" data-annex-go>ROOMS</button>
+  </nav>
+
+</div>
+
+<a class="m1down" id="downU1" href="#about" aria-label="About Blue Room — scroll down">About Blue Room <span aria-hidden="true">&#8964;</span></a>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---- THE FIELD IS AUTHORED, NOT ROLLED ----
+     Positions are frozen literals: [cid, glyph, sizeIndex, left%, top%, opacity].
+     Diffable in git, permanent across edits, independent per mark — adding a
+     17th tarot mark moves nothing. No PRNG anywhere in this file. */
+  /* MERGE CONDITION: on merge this reads the app's own cache-bust constant.
+     It is a literal here only because this file is standalone. */
+  var CODEX_V = "363";
+
+  var TRIBITS = { "tr-01":"111", "tr-05":"001" };
+  var HEXBITS = { "hx-01":"111111", "hx-33":"001111" };
+  function barGlyph(bits){
+    var n = bits.length, gap = n===3 ? 6 : 3.4, y0 = n===3 ? 6 : 4.3, out = "", i, y;
+    for (i=0;i<n;i++){
+      y = (y0 + (n-1-i)*gap).toFixed(1);            /* bit 0 is the BOTTOM line */
+      out += bits.charAt(i) === "1"
+        ? '<path d="M4,'+y+' L20,'+y+'"/>'
+        : '<path d="M4,'+y+' L10.4,'+y+'"/><path d="M13.6,'+y+' L20,'+y+'"/>';
+    }
+    return out;
+  }
+  var SIZES = [11.5, 14.5, 17.5];
+
+  /* [cid, use, sizeIndex, left%, top%, opacity, name, system]
+     ---------------------------------------------------------------------------
+     THE POSITIONS ARE SOLVED, THEN FROZEN. They are literals — no PRNG, nothing
+     re-rolled on re-view — but they were not guessed. `tools/m1-place-marks.py`
+     measures the real per-line text rects at 1200x900, 1440x900 and 1920x1080 and
+     solves for points that clear >=26px of ink at ALL THREE; the runtime guard's
+     threshold is 24px, so there are 2px of authoring margin. Re-run that script
+     and re-paste whenever the section copy changes — the numbers below are only
+     true for the strings currently on the page.
+     The hand-authored set that preceded this cleared nothing: every one of the 28
+     was inside the type, so the guard hid all 28 on every load.
+     NOTE FOR THE BUILDER: the surviving space is the right and bottom gutters.
+     A denser distribution is not available at 24px clearance with this much copy
+     in the sections — see the report. */
+  var TAROT_FIELD = [
+    ["mi-w01","suit-wands",0,      97, 97, .19,"Ace of Wands","Minor Arcana"],
+    ["mi-w07","suit-wands",1,      50,  3, .24,"Seven of Wands","Minor Arcana"],
+    ["mi-w14","suit-wands",2,      34, 96, .21,"King of Wands","Minor Arcana"],
+    ["mi-c01","suit-cups",0,       97, 35, .18,"Ace of Cups","Minor Arcana"],
+    ["mi-c07","suit-cups",1,       83,  3, .26,"Seven of Cups","Minor Arcana"],
+    ["mi-c14","suit-cups",2,       66, 90, .20,"King of Cups","Minor Arcana"],
+    ["mi-s01","suit-swords",0,     76, 27, .22,"Ace of Swords","Minor Arcana"],
+    ["mi-s07","suit-swords",1,     51, 97, .19,"Seven of Swords","Minor Arcana"],
+    ["mi-s14","suit-swords",2,     66,  5, .23,"King of Swords","Minor Arcana"],
+    ["mi-p01","suit-pentacles",0,  81, 97, .21,"Ace of Pentacles","Minor Arcana"],
+    ["mi-p07","suit-pentacles",1,  97,  6, .17,"Seven of Pentacles","Minor Arcana"],
+    ["mi-p14","suit-pentacles",2,  88, 25, .25,"King of Pentacles","Minor Arcana"],
+    ["ma-00","bd-major",1,         89, 90, .28,"The Fool","Major Arcana"],
+    ["ma-07","bd-major",2,         83, 35, .30,"The Chariot","Major Arcana"],
+    ["ma-14","bd-major",0,         97, 24, .24,"Temperance","Major Arcana"],
+    ["ma-21","bd-major",1,         60, 97, .27,"The World","Major Arcana"]
+  ];
+  /* Birth's free area is smaller than tarot's (its section carries the same
+     furniture in less height), so its 12 sit closer: 16px minimum centre-to-centre
+     against tarot's 33px. The three tightest slots are therefore given the SMALLEST
+     glyph size, which is why the size column here does not run in the same order as
+     tarot's. Sizes still total 3x small, 4x medium, 5x large, and every one of the
+     six systems still appears twice. */
+  var BIRTH_FIELD = [
+    ["wz-01","gl-aries",1,   97, 74, .20,"Aries","Sun Sign"],
+    ["wz-07","gl-libra",2,   91, 70, .23,"Libra","Sun Sign"],
+    ["cz-01","bd-chinese",0, 79,  3, .19,"Rat","Year Animal"],
+    ["cz-09","bd-chinese",2, 97,  7, .25,"Monkey","Year Animal"],
+    ["nu-01","nm-1",1,       94, 89, .18,"One","Life Path"],
+    ["nu-08","nm-8",2,       97, 82, .22,"Eight","Life Path"],
+    ["rn-01","s-rn-01",0,    83,  5, .21,"Fehu","Rune"],
+    ["rn-13","s-rn-13",2,    90,  3, .24,"Eihwaz","Rune"],
+    ["tr-01","bars",1,       92, 97, .26,"Heaven","Trigram"],
+    ["tr-05","bars",0,       76,  7, .19,"Mountain","Trigram"],
+    ["hx-01","bars",2,       69,  3, .28,"The Creative","Hexagram"],
+    ["hx-33","bars",1,       97, 97, .23,"Retreat","Hexagram"]
+  ];
+
+  function buildField(container, rows){
+    if (!container){ console.error("M1 field: no container to build into"); return; }
+    var frag = document.createDocumentFragment();
+    for (var i=0;i<rows.length;i++){
+      /* ONE MARK AT A TIME. An unmapped cid or a missing glyph skips that mark
+         and says so — it never aborts the script and takes the other 27 with it. */
+      try {
+        var cid = rows[i][0], use = rows[i][1], size = SIZES[rows[i][2]];
+        var left = rows[i][3], top = rows[i][4], op = rows[i][5];
+        if (!cid || !use) throw new Error("row " + i + " is missing a cid or a glyph");
+        if (size === undefined) throw new Error("size index " + rows[i][2] + " is not in SIZES");
+        var inner;
+        if (use === "bars"){
+          var bits = TRIBITS[cid] || HEXBITS[cid];
+          if (!bits) throw new Error("no bar signature mapped for " + cid);
+          inner = barGlyph(bits);
+        } else {
+          if (!document.getElementById(use)) throw new Error("no glyph def #" + use);
+          inner = '<use href="#' + use + '"/>';
+        }
+        var a = document.createElement("a");
+        a.className = "m1mark"; a.href = "codex.html?v=" + CODEX_V + "#" + cid;
+        a.setAttribute("tabindex","-1");
+        a.dataset.cid = cid; a.dataset.name = rows[i][6]; a.dataset.system = rows[i][7];
+        a.dataset.op = op.toFixed(3);
+        a.style.left = left + "%"; a.style.top = top + "%";
+        a.style.width = size + "px"; a.style.height = size + "px";
+        a.style.opacity = op;
+        a.innerHTML = '<svg viewBox="0 0 24 24">' + inner + '</svg>';
+        frag.appendChild(a);
+      } catch (err){
+        console.error("M1 field: skipping mark " + (rows[i] && rows[i][0]) + " — " + err.message);
+      }
+    }
+    container.appendChild(frag);
+  }
+  buildField(document.getElementById("fieldTarot"), TAROT_FIELD);
+  buildField(document.getElementById("fieldBirth"), BIRTH_FIELD);
+
+  /* ---- THE AUDIT ---- one list drives the shoal AND the berth legend, so a
+     mark that drifts off its section's gathered systems says so out loud. */
+  var M1_SYS = { major:22, minor:56, wz:12, cz:17, nu:12, rn:24, tr:8, hx:64, lx:7 };
+  var GATHERS = { tarot:["major","minor"], birth:["wz","cz","nu","rn","tr","hx"] };
+  function sum(keys){ var s=0; keys.forEach(function(k){ s += M1_SYS[k]||0; }); return s; }
+  var TOTAL = Object.keys(M1_SYS).reduce(function(s,k){ return s+M1_SYS[k]; },0);
+  var CID_SYS = { ma:"major", mi:"minor", wz:"wz", cz:"cz", nu:"nu", rn:"rn", tr:"tr", hx:"hx", lx:"lx" };
+  (function auditMarks(){
+    var errs = [];
+    [["tarot",TAROT_FIELD],["birth",BIRTH_FIELD]].forEach(function(pair){
+      var gathered = GATHERS[pair[0]];
+      pair[1].forEach(function(row){
+        var key = CID_SYS[row[0].slice(0,2)];
+        if (!key) errs.push("mark " + row[0] + " has no known system prefix");
+        else if (gathered.indexOf(key) < 0)
+          errs.push("mark " + row[0] + " (" + key + ") is not among the systems the " + pair[0] + " reading gathers");
+      });
+    });
+    if (sum(GATHERS.tarot) !== 78) errs.push("tarot legend figure is not 78");
+    if (sum(GATHERS.birth) !== 137) errs.push("birth legend figure is not 137");
+    if (TOTAL !== 222) errs.push("corpus total is not 222");
+    if (errs.length) console.error("M1 mark audit:\n  " + errs.join("\n  "));
+  })();
+
+  var METAS = {
+    tarot: "TAROT &middot; FROM THE MAJOR AND MINOR ARCANA &middot; <span class=\"num\">" + sum(GATHERS.tarot) + "</span> OF " + TOTAL,
+    birth: "BIRTH &middot; FROM SIX OF THE NINE SYSTEMS &middot; <span class=\"num\">" + sum(GATHERS.birth) + "</span> OF " + TOTAL
+  };
+  /* first paint and the write point read the SAME constant (critique item 3) */
+  var M2_BIRTH_READ = { mean: "Six marks you were given rather than chose, read together into one crowned name. Nothing is drawn here — each mark is looked up, and read as it stands." };
+  var M2_TAROT_READ = { mean: "Read as one — the matter rests on intuition, is crossed by transition, and tends toward resilience. Drawn to the matter you laid down — a reflection to sit with, not a forecast." };
+  var MEANS = { tarot: M2_TAROT_READ.mean, birth: M2_BIRTH_READ.mean };
+
+  var berth = document.getElementById("berth"),
+      berthMean = document.getElementById("berthMean"),
+      hero = document.getElementById("hero"),
+      heroName = document.getElementById("heroName"),
+      heroNameTag = document.getElementById("heroNameTag"),
+      stageLabel = document.getElementById("stageLabel"),
+      stageSub = document.getElementById("stageSub"),
+      secTarot = document.getElementById("secTarot"),
+      secBirth = document.getElementById("secBirth"),
+      doorBirthDesc = document.getElementById("m1-bd"),
+      flipOpts = document.querySelectorAll(".m2flip__opt");
+
+  var M2_FACE = "birth";
+  var reduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* ---- state is READ, not assumed: the same flag the rooms read ---- */
+  function m2SittingUsed(){ try { return localStorage.getItem("br_dr_sitting_used") === "1"; } catch (e) { return false; } }
+  (function reflectSittingState(){
+    /* birth is unaffected — the free sitting is a tarot term. */
+    var tarotDesc = document.getElementById("m1-td");
+    if (tarotDesc && m2SittingUsed()){
+      /* S6 [W], the spent variant: the free claim is DROPPED and nothing false
+         replaces it. "Your first is spent" would be the page telling a returning
+         customer about a loss on the way in — the sheet drops the clause, flat. */
+      tarotDesc.textContent = "A Sitting — three cards to one question.";
+    }
+  })();
+
+  /* ---- ONE OWNER OF THE BERTH: m2WriteRead ---- */
+  function m2WriteRead(r){
+    berth.querySelector(".m2read__label").textContent = "The reading in question";
+    var meta = document.getElementById("berthMeta");
+    if (meta) meta.innerHTML = METAS[r];
+    berthMean.textContent = MEANS[r].replace(/&mdash;/g,"—");
+  }
+
+  /* ---- ONE OWNER OF THE FACE: m2SetFace (the shipped shape) ----
+     Roving tabindex, the ARIA radio pattern, and the honesty label kept in
+     sync on the SAME element that carries data-face and the caption — the
+     three used to be able to disagree (critique item 6), now they cannot,
+     because one function writes all three. */
+  function m2SetFace(which, opts){
+    opts = opts || {};
+    if (which === M2_FACE && !opts.force) return;
+    M2_FACE = which;
+    flipOpts.forEach(function(b){
+      var on = b.dataset.face === which;
+      b.classList.toggle("is-on", on);
+      b.setAttribute("aria-checked", on ? "true" : "false");
+      if (on && opts && opts.focus) b.focus();
+    });
+    var settle = function(){
+      hero.setAttribute("data-face", which);
+      m2WriteRead(which);
+      /* THE FOUR THAT MUST NEVER DISAGREE, written in one place, in one pass:
+         data-m2-heroname, the visible caption, the caption's AT-only honesty
+         suffix, and the hero's aria-label. */
+      var shown = (which === "tarot") ? "The Star" : "The Crowned Name";
+      var tag   = (which === "tarot") ? " — an example, not your draw"
+                                      : " — an example, not your name";
+      var label = (which === "tarot")
+        ? "XVII — The Star · an example, not your draw"
+        : "The Crowned Name · an example, not your name";
+      heroName.textContent = shown;
+      if (heroNameTag) heroNameTag.textContent = tag;
+      hero.setAttribute("data-m2-heroname", shown);
+      hero.setAttribute("aria-label", label);
+      var faceSvg = hero.querySelector(".m2hero__face");
+      if (faceSvg) faceSvg.setAttribute("aria-label", which === "tarot" ? "XVII — The Star" : "The Crowned Name");
+      if (which === "tarot"){ stageLabel.textContent = "By the Draw"; stageSub.textContent = "A sample turn — not your draw."; }
+      else { stageLabel.textContent = "By Birth"; stageSub.textContent = "Six marks. One name."; }
+    };
+    /* focus and mount settle IMMEDIATELY (0ms); only the pointer path takes the
+       90ms swap-point inside the 180ms berth crossfade. */
+    if (reduced || opts.immediate){ settle(); berth.classList.remove("is-writing"); return; }
+    if (!berth.classList.contains("is-writing")) berth.classList.add("is-writing");
+    setTimeout(function(){ settle(); berth.classList.remove("is-writing"); }, 90);
+  }
+
+  /* address() is a THIN DISPATCHER: it stirs the marks and calls m2SetFace.
+     It never writes berthMeta/berthMean itself — one owner of the berth. */
+  function address(name, opts){
+    m2SetFace(name, opts || {});
+    secTarot.classList.toggle("is-stirred", name === "tarot");
+    secBirth.classList.toggle("is-stirred", name === "birth");
+  }
+
+  var hoverTimer = null;
+  function wireSection(el, name){
+    el.addEventListener("mouseenter", function(){
+      hoverTimer = setTimeout(function(){ address(name); }, 90);
+    });
+    el.addEventListener("mouseleave", function(){
+      if (hoverTimer){ clearTimeout(hoverTimer); hoverTimer = null; }
+    });
+    el.addEventListener("focus", function(){
+      berth.setAttribute("aria-live","off");
+      address(name, { immediate:true });        /* focus is 0ms, not debounced */
+      setTimeout(function(){ berth.setAttribute("aria-live","polite"); }, 120);
+    }, true);
+    el.addEventListener("touchstart", function(){ address(name); }, { passive:true });
+  }
+  wireSection(secTarot, "tarot");
+  wireSection(secBirth, "birth");
+
+  /* ---- the touch two-step: a mark NAMES itself first, opens second ---- */
+  var touchPrimary = window.matchMedia && window.matchMedia("(hover: none), (pointer: coarse)").matches;
+  var armed = null;
+  function footFor(el){ return document.getElementById(el.closest(".m1sect") === secTarot ? "footTarot" : "footBirth"); }
+  function disarm(){
+    if (!armed) return;
+    var f = footFor(armed); if (f) f.textContent = "";
+    armed = null;
+  }
+  [secTarot, secBirth].forEach(function(sect){
+    sect.addEventListener("click", function(ev){
+      var m = ev.target.closest(".m1mark");
+      if (!m) { disarm(); return; }
+      if (!touchPrimary) return;                 /* pointer devices open at once */
+      if (armed === m) { disarm(); return; }     /* second tap: let it navigate */
+      ev.preventDefault();                       /* only ever a MARK's own tap */
+      disarm();
+      armed = m;
+      var f = footFor(m);
+      if (f) f.textContent = m.dataset.name + " · " + m.dataset.system + " · touch again to open →";
+    });
+  });
+
+  flipOpts.forEach(function(b){
+    b.addEventListener("click", function(){ address(b.dataset.face); });
+  });
+
+  /* NO exit handlers here, on purpose. THE DESK and ROOMS carry data-annex-back /
+     data-annex-go and are consumed by app.js's existing delegated onMenuAnnexClick,
+     which slides in-page. The earlier window.location.href="?" / "rooms/" stand-ins
+     were a full reload and a 404-by-construction; they are deleted rather than
+     re-implemented. In this standalone file the two buttons are inert by design —
+     that is the correct stand-in, because a stand-in that navigates somewhere wrong
+     is worse than one that does nothing. */
+
+  /* ---- THE PARTING IS ENFORCED WHEREVER THE FIELD EXISTS ----
+     A guard on authored-correct positions, not the mechanism: any mark within
+     24px of a text rect (measured live) is hidden and the section's field
+     label is stripped if that empties it entirely — copy may never claim
+     what the material lacks. Runs only where the field is actually visible
+     (>=1200px — CSS already removes it below that), so there is no
+     innerWidth<=430 gate left to silently do nothing. */
+  /* THE WORDS, NOT THE BOXES. The parting has to be measured against the ink —
+     the per-line rects of the actual text runs — not against the block elements'
+     bounding boxes. A paragraph's box spans the full column width even where its
+     last line is three words long, so measuring boxes declares the whole section
+     occupied and evicts every mark. That is exactly what was happening: all 28
+     marks were display:none on every load, and the shoal painted nothing.
+     Range.getClientRects() gives one rect per rendered LINE, ending where the
+     line's text ends — which is what "the field must part around words" means. */
+  function textRects(sect){
+    var out = [];
+    var walker = document.createTreeWalker(sect, NodeFilter.SHOW_TEXT, {
+      acceptNode: function(n){
+        if (!n.nodeValue || !n.nodeValue.trim()) return NodeFilter.FILTER_REJECT;
+        if (n.parentElement.closest(".m1sect__field")) return NodeFilter.FILTER_REJECT;
+        return NodeFilter.FILTER_ACCEPT;
+      }
+    });
+    var n, r = document.createRange();
+    while ((n = walker.nextNode())){
+      r.selectNodeContents(n);
+      var list = r.getClientRects();
+      for (var i=0;i<list.length;i++){
+        if (list[i].width > 0 && list[i].height > 0) out.push(list[i]);
+      }
+    }
+    return out;
+  }
+
+  function rectDist(mx,my,r){
+    var cx = Math.max(r.left, Math.min(mx, r.right));
+    var cy = Math.max(r.top, Math.min(my, r.bottom));
+    return Math.hypot(mx-cx, my-cy);
+  }
+  function evict(){
+    if (window.innerWidth < 1200) return;
+    [secTarot, secBirth].forEach(function(sect){
+      var field = sect.querySelector(".m1sect__field");
+      if (!field || getComputedStyle(field).display === "none") return;
+      var marks = sect.querySelectorAll(".m1mark");
+      var rects = textRects(sect);
+      var left = 0;
+      marks.forEach(function(m){
+        var r = m.getBoundingClientRect();
+        var mx = r.left + r.width/2, my = r.top + r.height/2;
+        var close = rects.some(function(tr){ return rectDist(mx,my,tr) < 24; });
+        if (close) console.error("M1 field: evicting " + m.dataset.cid + " — within 24px of the reading band");
+        m.style.display = close ? "none" : "";
+        if (!close) left++;
+      });
+      if (left === 0){
+        if (!field.dataset.label) field.dataset.label = field.getAttribute("aria-label") || "";
+        field.removeAttribute("role"); field.removeAttribute("aria-label");
+        field.setAttribute("aria-hidden","true");
+      } else if (field.dataset.label){
+        field.setAttribute("role","img");
+        field.setAttribute("aria-label", field.dataset.label);
+        field.removeAttribute("aria-hidden");
+      }
+    });
+  }
+
+  /* MOUNT: ONE call, one writer. The old mount hand-patched aria-label and called
+     m2WriteRead beside a m2SetFace() that returned early on `which === M2_FACE`
+     and so never ran settle() at all — two writers again, by accident. force
+     makes the single owner do the whole job at paint. */
+  m2SetFace("birth", { force:true, immediate:true });
+  /* NOTE: the mount deliberately does NOT stir. The face and the berth open on
+     birth (the shipped default), but nothing has been hovered or chosen yet, and
+     the stir is the background ANSWERING an address. Stirring at mount put 12
+     gold marks on the page at rest, which breaks the gold economy outright and
+     spends the one signal that is supposed to mean "you are looking at this". */
+
+  var resizeTimer;
+  window.addEventListener("resize", function(){
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(evict, 200);
+  });
+  setTimeout(evict, 0);
+
+})();
+</script>
+</body>
+</html>

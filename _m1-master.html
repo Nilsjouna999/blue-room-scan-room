@@ -1,0 +1,643 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>THE TWO TENSES — M1 master</title>
+<style>
+  :root{
+    /* shipped palette, byte-for-byte from styles.css :root. --t-ghost is the
+       verified repo token (#6e6b63, styles.css:16). Gold is the live pair
+       hardcoded at styles.css:3303/3853/3856/3870/3892 + app.js:2420. */
+    --t-display:#dcd7cb; --t-primary:#d7d3ca; --t-body:#b1ada4; --t-meta:#948f87; --t-ghost:#6e6b63;
+    --ink-950:#0a0b0d; --ink-900:#100f0c; --ink-850:#11100d; --ink-800:#151310; --ink-700:#1c1915;
+    --line-strong:rgba(233,229,220,.2);
+    --hair-1:rgba(233,229,220,.14); --hair-2:rgba(233,229,220,.08);
+    --rule-c:rgba(233,229,220,.26);
+    --gold:#c8ad70; --gold-dim:#a2864a;
+    --font-display:"Cormorant Garamond","Times New Roman",serif;
+    --font-ui:"Inter",-apple-system,"Segoe UI",sans-serif;
+    --font-mono:"IBM Plex Mono","Consolas",monospace;
+    --track-caps:.22em; --track-wide:.3em;
+    --ease-settle:cubic-bezier(.22,.9,.32,1);
+    --gap:clamp(9px,1.5vh,20px);
+    /* the shipped reading-block law, styles.css:3277 — 19 × 1.6 × 5 = 152px */
+    --m2read-size:19px; --m2read-lh:1.6; --m2read-lines:5;
+  }
+
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html{background:var(--ink-950);}
+  body{
+    font-family:var(--font-ui); color:var(--t-primary);
+    background:radial-gradient(110% 80% at 50% -10%, #161411 0%, var(--ink-900) 55%, var(--ink-950) 100%);
+    background-attachment:fixed;
+    -webkit-font-smoothing:antialiased;
+    /* NO overflow-x:hidden anywhere in this document. The shipped
+       `.menu{overflow-x:clip}` is what let critique #1 survive silently.
+       A scrollbar is the honest alarm, and this page must never need one. */
+  }
+  a{color:inherit;}
+
+  /* ================= the flow — one measure, source = visual = priority ===== */
+  .field{
+    position:relative; min-height:100svh;
+    max-width:1120px; margin-inline:auto;
+    padding:clamp(14px,2vh,26px) clamp(18px,4.5vw,60px) clamp(88px,10vh,108px);
+    display:flex; flex-direction:column; gap:var(--gap);
+  }
+
+  /* ---- 1. the head. Struck, never animated, present in first paint. ---- */
+  .g-head .eyebrow{
+    font-family:var(--font-mono); font-size:10.5px; letter-spacing:var(--track-wide);
+    text-transform:uppercase; color:var(--t-ghost);
+    display:flex; align-items:center; gap:.5em; margin-bottom:4px;
+  }
+  .g-head .eyemark{ color:var(--gold); }
+  .g-head h1{
+    font-family:var(--font-display); font-weight:500; font-size:clamp(25px,3.2vw,36px);
+    color:var(--t-display); letter-spacing:.01em; line-height:1.05;
+  }
+  /* the thesis is a PREMISE, not atmosphere: it states what the place keeps and
+     names the axis the whole surface is laid out on. */
+  .g-head .thesis{
+    font-family:var(--font-display); font-style:italic; font-size:clamp(13.5px,1.4vw,16.5px);
+    color:var(--t-meta); margin-top:5px; line-height:1.3; max-width:56ch;
+  }
+  .g-head .thesis em{ font-style:italic; color:var(--t-primary); }
+
+  /* ---- 2. THE SPAN — one measured hairline with two named ends. ----
+     It is the page's spine: everything below hangs from a point on it.
+     The run behind whatever is alive is lit; the far end never lights. */
+  .g-span{ position:relative; height:30px; margin-top:2px; }
+  .g-span .rule{
+    position:absolute; top:14px; left:0; right:0; height:1px;
+    background:linear-gradient(90deg,
+      transparent 0,
+      var(--gold-dim) 2%, var(--gold-dim) 34%,      /* lit: the run behind tonight */
+      var(--rule-c) 46%, var(--rule-c) 98%,
+      transparent 100%);
+  }
+  .g-span .end{
+    position:absolute; top:0;
+    font-family:var(--font-display); font-style:italic; font-size:13px;
+    color:var(--t-ghost); line-height:1;
+  }
+  .g-span .end--now{ left:0; color:var(--t-meta); }
+  .g-span .end--given{ right:0; }
+  .g-span .pip{
+    position:absolute; top:10.5px; width:8px; height:8px;
+    transform:rotate(45deg); background:var(--ink-950);
+    border:1px solid var(--t-ghost);
+  }
+  .g-span .pip--t{ left:12%; border-color:var(--gold); background:var(--gold); }
+  .g-span .pip--b{ left:82%; }
+
+  /* ---- 3. the two tenses, hanging from the span ---- */
+  .g-decks{
+    display:flex; align-items:flex-start; gap:clamp(24px,4vw,72px);
+  }
+  .side{ min-width:0; }
+  .side--tarot{ flex:1 1 auto; display:grid; gap:var(--gap); justify-items:start; }
+  .side--birth{ flex:0 0 auto; width:clamp(240px,26vw,320px); display:grid; gap:10px;
+    padding-top:2px; }
+  .side__kicker{
+    font-family:var(--font-mono); font-size:10.5px; letter-spacing:var(--track-caps);
+    text-transform:uppercase; color:var(--t-ghost);
+  }
+
+  /* ---- the fall: heap + live face + the read welded to it (Team 1) ---- */
+  .g-fall{ display:flex; flex-wrap:wrap; align-items:flex-end; column-gap:0; row-gap:var(--gap); }
+  .g-stack{
+    flex:0 0 auto; position:relative;
+    height:clamp(200px,38vh,420px);
+    aspect-ratio:120/190; width:auto; max-width:100%;
+  }
+  .g-heap{ position:absolute; inset:0; }
+  .g-past{
+    position:absolute; inset:0; border-radius:6px;
+    background:linear-gradient(165deg,#dcd4c2,#c5bca8);
+    border:1px solid rgba(20,14,8,.42);
+    box-shadow:0 14px 30px rgba(0,0,0,.5);
+    transform-origin:50% 100%;
+    /* the heap slews toward the GIVEN end — spent cards fall into the past,
+       which is the axis stated by the span above them */
+    transform:translateX(calc(13px * var(--i,1))) translateY(calc(5px * var(--i,1))) rotate(calc(2.4deg * var(--i,1)));
+    opacity:calc(1 - .15 * var(--i,1));
+    transition:transform 260ms var(--ease-settle), opacity 260ms var(--ease-settle);
+  }
+  /* a spent card keeps its numeral — the record is legible, not a drop shadow */
+  .g-past b{
+    position:absolute; top:9px; left:0; right:0; text-align:center;
+    font-family:var(--font-mono); font-weight:400; font-size:9px; letter-spacing:2px;
+    color:#5c503c; opacity:.85;
+  }
+  .g-face{
+    position:absolute; inset:0; border-radius:6px;
+    background:linear-gradient(165deg,#efe9db,#dcd4c2); /* shipped parchment, styles.css:3574 */
+    border:1px solid rgba(20,14,8,.35);
+    box-shadow:0 20px 40px rgba(0,0,0,.6);
+    overflow:hidden; transform-origin:50% 100%;
+    transition:transform 260ms var(--ease-settle), opacity 260ms var(--ease-settle);
+    will-change:transform,opacity;
+  }
+  .g-face svg{ width:100%; height:100%; display:block; }
+  .g-face.is-out{ transform:translateY(28px) rotate(-5deg); opacity:0; }
+  .field.is-booting .g-face{ transform:translateY(-26px) rotate(4deg); opacity:0; transition:none; }
+  .field.is-booting .g-read{ opacity:0; transition:none; }
+
+  .g-read{
+    flex:1 1 300px; min-width:0; max-width:400px;
+    align-self:flex-end; margin-left:clamp(14px,2vw,28px);
+    margin-bottom:clamp(2px,1.6vh,22px);
+    display:grid; gap:4px;
+    transition:opacity 220ms var(--ease-settle), transform 220ms var(--ease-settle);
+  }
+  .g-read.is-out{ opacity:0; transform:translateY(8px); }
+  .g-read__label{
+    font-family:var(--font-mono); font-size:10.5px; letter-spacing:var(--track-caps);
+    text-transform:uppercase; color:var(--t-ghost);
+  }
+  .g-read__meta{ font-family:var(--font-mono); font-size:12px; letter-spacing:.02em; }
+  .g-read__seg--0{ color:var(--m2acc,#cfc7b6); }
+  .g-read__seg--1{ color:#a49e93; }
+  .g-read__num{ color:var(--gold); }
+  .g-read__dot{ color:var(--t-ghost); margin:0 .5em; }
+  .g-read__mean{
+    font-family:var(--font-display); font-size:var(--m2read-size); line-height:var(--m2read-lh);
+    color:var(--t-body);
+    display:-webkit-box; -webkit-line-clamp:var(--m2read-lines); -webkit-box-orient:vertical;
+    overflow:hidden; text-overflow:ellipsis;
+    /* THE 152px. Height is the law; the size is not (Team 3's mechanism). */
+    height:calc(var(--m2read-size) * var(--m2read-lh) * var(--m2read-lines));
+  }
+
+  /* ---- the deal, its terms, and the slot that upgrades in place ---- */
+  .deal-row{ display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+  .deal-btn{
+    font-family:var(--font-ui); font-weight:600; font-size:15px; letter-spacing:.02em;
+    color:var(--ink-950);
+    background:linear-gradient(180deg,var(--gold),var(--gold-dim));
+    border:none; border-radius:3px; padding:11px 22px; min-height:44px; cursor:pointer;
+    box-shadow:0 8px 20px -8px rgba(200,173,112,.5);
+    transition:filter 140ms var(--ease-settle), transform 140ms var(--ease-settle);
+  }
+  .deal-btn:hover{ filter:brightness(1.06); }
+  .deal-btn:active{ transform:translateY(1px); }
+  .deal-btn[disabled]{ opacity:.38; cursor:default; filter:none; box-shadow:none; }
+  .deal-count{ font-family:var(--font-mono); font-size:10.5px; letter-spacing:var(--track-caps);
+    text-transform:uppercase; color:var(--t-ghost); }
+  /* the slot: two children in ONE grid cell, always as tall as the taller one,
+     so the third-fall swap can never reflow the page (Team 1's earned offer). */
+  .deal-slot{ display:grid; width:100%; max-width:560px; }
+  .deal-slot > *{ grid-area:1 / 1; }
+  .deal-slot .terms, .deal-slot .offer{ font-family:var(--font-ui); font-size:13.5px; line-height:1.45; }
+  .deal-slot .terms{ color:var(--t-meta); }
+  .deal-slot .offer{ color:var(--t-body); }
+  .deal-slot a{ color:var(--gold); text-decoration:underline; text-underline-offset:3px;
+    transition:color 140ms var(--ease-settle); }
+  .deal-slot a:hover{ color:var(--t-display); }
+  .slot-off{ visibility:hidden; }
+
+  /* ---- the given side: one plate that CANNOT fall ---- */
+  .sealed{
+    width:78px; aspect-ratio:120/190; border-radius:5px;
+    background:linear-gradient(165deg,#e7e0d0,#d3cab6);
+    border:1px solid rgba(20,14,8,.35);
+    box-shadow:0 10px 24px rgba(0,0,0,.45);
+    display:grid; place-items:center;
+    /* no transition, no transform, no will-change, no class the deal can reach.
+       Stillness is the statement. */
+  }
+  .sealed svg{ width:34px; height:26px; }
+  .strike-door{
+    display:grid; gap:5px; text-decoration:none; border-radius:2px; justify-items:start;
+  }
+  .strike-door .naming{
+    font-family:var(--font-display); font-size:clamp(17px,1.9vw,21px);
+    color:var(--t-display); line-height:1.15;
+    transition:color 160ms var(--ease-settle);
+  }
+  .strike-door:hover .naming{ color:#fff; }
+  .strike-door .close{
+    font-family:var(--font-ui); font-size:13.5px; color:var(--t-meta); line-height:1.45; max-width:34em;
+  }
+  .six{
+    font-family:var(--font-mono); font-size:12px; letter-spacing:.05em; line-height:1.7;
+    color:var(--t-primary);
+  }
+  .six a{ color:var(--t-primary); text-decoration:none; border-bottom:1px solid var(--hair-2);
+    transition:border-color 140ms var(--ease-settle), color 140ms var(--ease-settle); }
+  .six a:hover{ border-bottom-color:var(--line-strong); color:var(--t-display); }
+  .six .dot{ color:var(--t-ghost); margin:0 .4em; }
+
+  /* ---- 4. the foot: colophon + catchword (Team 3's grammar) ---- */
+  .g-foot{
+    margin-top:auto; border-top:1px solid var(--hair-1); padding-top:clamp(10px,1.4vh,18px);
+    display:flex; align-items:flex-end; justify-content:space-between; gap:16px; flex-wrap:wrap;
+  }
+  .colophon{
+    font-family:var(--font-mono); font-size:10px; letter-spacing:.14em;
+    text-transform:uppercase; color:var(--t-ghost); line-height:2;
+  }
+  .colophon a{ color:var(--t-meta); text-decoration:none; border-bottom:1px solid var(--hair-1);
+    padding-bottom:1px; transition:color 160ms var(--ease-settle), border-color 160ms var(--ease-settle); }
+  .colophon a:hover{ color:var(--t-display); border-bottom-color:var(--t-display); }
+  .catchword{
+    display:inline-flex; align-items:center; gap:.6em; text-decoration:none;
+    font-family:var(--font-mono); font-size:10px; letter-spacing:.2em; text-transform:uppercase;
+    color:var(--t-meta); padding:4px 2px; min-height:32px;
+    transition:color 160ms var(--ease-settle), transform 160ms var(--ease-settle);
+  }
+  .catchword:hover{ color:var(--t-display); transform:translateY(2px); }
+  .catchword .arrow{ color:var(--gold); }
+
+  /* ONE focus ring for every control on the surface. */
+  .deal-btn:focus-visible, .strike-door:focus-visible, .six a:focus-visible,
+  .deal-slot a:focus-visible, .colophon a:focus-visible, .catchword:focus-visible{
+    outline:2px solid var(--gold); outline-offset:3px;
+  }
+
+  /* ================= narrow: the span stands on end ================= */
+  @media (max-width:900px){
+    .g-decks{ flex-direction:column; gap:calc(var(--gap) * 1.6); position:relative; }
+    /* the axis survives rotation: one vertical hairline runs the flow's start
+       edge, tonight above, given below — same law, stood on end (Team 2). */
+    .g-decks::before{
+      content:""; position:absolute; left:3px; top:6px; bottom:6px; width:1px;
+      background:linear-gradient(180deg, var(--gold-dim) 0%, var(--gold-dim) 30%, var(--rule-c) 55%, var(--rule-c) 100%);
+    }
+    .side{ padding-left:20px; position:relative; }
+    .side::before{
+      content:""; position:absolute; left:0; top:5px; width:7px; height:7px;
+      transform:rotate(45deg); background:var(--ink-950); border:1px solid var(--t-ghost);
+    }
+    .side--tarot::before{ border-color:var(--gold); background:var(--gold); }
+    .g-span{ display:none; }
+    /* the sealed plate stands beside the door's words — the still thing and its
+       name are one group, and the group costs one band, not two */
+    .side--birth{ width:auto; grid-template-columns:auto 1fr; column-gap:14px; }
+    .side--birth .side__kicker{ grid-column:1 / -1; }
+    .side--birth .sealed{ grid-row:2 / span 2; align-self:start; }
+    .g-stack{ height:clamp(118px,18vh,175px); }
+    .g-fall{ align-items:flex-start; flex-wrap:nowrap; }
+    .g-read{ flex:1 1 auto; margin-left:clamp(16px,3vw,22px); margin-bottom:0; align-self:flex-start; max-width:100%; }
+    /* the block re-proportions — 16 × 1.6 × 6 = 153.6. Height is the law. */
+    .g-read{ --m2read-size:16px; --m2read-lines:6; }
+    /* at narrow the read sits at the stack's flank, so the heap may not slew
+       sideways into it — it settles DOWN instead, inside the card's own
+       footprint, and the fall stays a fall */
+    .g-past{ transform:translateX(calc(1px * var(--i,1))) translateY(calc(6px * var(--i,1))) rotate(calc(1deg * var(--i,1))); opacity:calc(1 - .2 * var(--i,1)); }
+    .sealed{ width:58px; }
+    /* touch targets: the offer link and the six marks get real hit areas
+       without becoming chips */
+    .six a{ display:inline-flex; align-items:center; padding:11px 2px; margin:-11px 0; }
+    .deal-slot a{ display:inline-flex; align-items:center; padding:11px 2px; margin:-11px 0; }
+    .colophon a{ display:inline-block; padding:8px 3px; margin:-8px -3px; }
+  }
+  @media (max-width:344px){
+    /* only below the smallest phone still in service does the read give up
+       its place at the card's flank; stated floor, not chased */
+    .g-fall{ flex-wrap:wrap; }
+  }
+  /* the 360x640 class: every rank yields one more step; no rank is deleted */
+  @media (max-width:374px) and (max-height:700px){
+    .g-head h1{ font-size:20px; }
+    .g-head .thesis{ font-size:11.5px; }
+    .side{ padding-left:16px; }
+    .deal-btn{ min-height:40px; padding:8px 18px; }
+    .six{ font-size:10.5px; line-height:1.5; }
+    .sealed{ width:44px; }
+    .g-read{ --m2read-size:13px; }            /* stated: 104px, not 152 */
+    .g-decks{ gap:8px; }
+    .field{ padding-bottom:56px; }
+  }
+
+  /* ================= the short screen — height is the axis M1 cannot borrow
+     from, so height is the axis that is queried (Team 1's discipline) ======= */
+  @media (max-height:820px){
+    :root{ --gap:clamp(6px,1vh,13px); }
+    .g-stack{ height:clamp(160px,30vh,330px); }
+    .g-head h1{ font-size:clamp(23px,2.9vw,31px); }
+    .field{ padding-bottom:clamp(82px,9vh,96px); }
+  }
+  @media (max-height:720px){
+    .g-head .thesis{ font-size:13px; }
+    .g-read{ --m2read-size:15px; --m2read-lines:5; }   /* stated: 120px, not 152 */
+    .strike-door .close{ display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+    .g-span{ height:24px; }
+  }
+  @media (max-width:900px) and (max-height:880px){
+    .g-read{ --m2read-size:15px; --m2read-lines:5; }   /* stated: 120px, not 152 */
+    .strike-door .close{ display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+    .g-stack{ height:clamp(118px,18vh,190px); }
+  }
+  @media (max-width:900px) and (max-height:700px){
+    :root{ --gap:5px; }
+    .g-stack{ height:clamp(100px,16vh,160px); }
+    .g-head h1{ font-size:22px; }
+    .g-head .thesis{ font-size:12px; }
+    .g-read{ --m2read-size:14px; }            /* stated: 112px, not 152 */
+    .deal-slot .terms, .deal-slot .offer{ font-size:12.5px; }
+    .strike-door .close{ font-size:12.5px; }
+    .six{ font-size:11px; line-height:1.55; }
+    .sealed{ width:48px; }
+    .g-foot{ padding-top:8px; }
+    .colophon{ font-size:9.5px; line-height:1.7; }
+    .g-decks{ gap:10px; }
+    .field{ padding-bottom:64px; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .g-face, .g-read, .deal-btn, .g-past, .catchword{ transition:none !important; }
+    .field.is-booting .g-face, .field.is-booting .g-read{ transform:none; opacity:1; }
+    .catchword:hover{ transform:none; }
+  }
+
+  .sr-only{
+    position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden;
+    clip:rect(0,0,0,0); white-space:nowrap; border:0;
+  }
+</style>
+</head>
+<body>
+
+<div class="field" id="field">
+
+  <div class="g-head">
+    <p class="eyebrow"><span class="eyemark" aria-hidden="true">&#9670;</span> BLUE ROOM</p>
+    <h1>The Reading Rooms</h1>
+    <p class="thesis">Two readings are kept here &mdash; one <em>dealt tonight</em>, one <em>given</em> before you could ask.</p>
+  </div>
+
+  <div class="g-span" aria-hidden="true">
+    <span class="end end--now">tonight</span>
+    <span class="end end--given">given</span>
+    <div class="rule"></div>
+    <span class="pip pip--t"></span>
+    <span class="pip pip--b"></span>
+  </div>
+
+  <div class="g-decks">
+
+    <div class="side side--tarot">
+      <p class="side__kicker">Dealt tonight &middot; by the draw</p>
+      <div class="g-fall">
+        <div class="g-stack">
+          <div class="g-heap" id="heap" aria-hidden="true"></div>
+          <div class="g-face" id="face" aria-hidden="true">
+            <svg viewBox="0 0 120 190" preserveAspectRatio="xMidYMid meet">
+              <rect x="11" y="11" width="98" height="168" rx="5" fill="none" stroke="#8a6a42" stroke-width=".6" opacity=".55"/>
+              <text id="faceNum" x="60" y="30" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9" letter-spacing="2.5" fill="#5c503c">XVII</text>
+              <g stroke="#5c503c" fill="none">
+                <circle cx="60" cy="98" r="31" stroke-width=".8" opacity=".5"/>
+                <circle cx="60" cy="98" r="23" stroke-width=".6" opacity=".35"/>
+                <path id="faceGlyph" d="M60 69 L64.6 86.9 L80.5 77.5 L71.1 93.4 L89 98 L71.1 102.6 L80.5 118.5 L64.6 109.1 L60 127 L55.4 109.1 L39.5 118.5 L48.9 102.6 L31 98 L48.9 93.4 L39.5 77.5 L55.4 86.9 Z" stroke-width=".9" opacity=".8"/>
+                <circle cx="60" cy="98" r="3.2" fill="#8a6a42" stroke="none"/>
+              </g>
+              <text id="faceName" x="60" y="158" text-anchor="middle" font-family="Cormorant Garamond, serif" font-size="15" fill="#1c150d">The Star</text>
+            </svg>
+          </div>
+        </div>
+        <div class="g-read" id="readBlock">
+          <p class="g-read__label" id="readLabel">What fell &middot; The Star</p>
+          <p class="g-read__meta" id="readMeta"></p>
+          <p class="g-read__mean" id="readMean">The Star stands for hope, renewal and quiet guidance after difficulty &mdash; the calm that follows the storm, and the small light you steer by.</p>
+        </div>
+      </div>
+      <div class="deal-row">
+        <button type="button" class="deal-btn" id="dealBtn">Again &#10227;</button>
+        <span class="deal-count" id="dealCount">one has fallen</span>
+      </div>
+      <!-- The figures are the repo's own, not invented: Sitting $1.99 and Deep
+           Read $2.99 at drawing-room.js:82/:85; birth $4.99 / $7.99 for two at
+           app.js:1476. Written in markup so a no-JS arrival never gets a
+           resolved page with the price missing. The live door is in the VISIBLE
+           line from first paint; the third fall upgrades the sentence in place,
+           it does not manufacture the exit. -->
+      <div class="deal-slot">
+        <p class="terms" id="termsLine">A Sitting is three cards to one question &mdash; <a href="?dev=drawing-room">your first is free &rarr;</a> then $1.99. Five cards is the Deep Read, $2.99.</p>
+        <p class="offer slot-off" id="offerLine">Those were loose cards, and no question was asked. A Sitting takes three to a question you name &mdash; <a href="?dev=drawing-room">your first free, then $1.99 &rarr;</a></p>
+      </div>
+    </div>
+
+    <div class="side side--birth">
+      <p class="side__kicker">Given &middot; by birth alone</p>
+      <div class="sealed" aria-hidden="true">
+        <svg viewBox="0 0 120 90">
+          <path d="M16 64 L26 28 L45 50 L60 18 L75 50 L94 28 L104 64" fill="none" stroke="#8a6a42" stroke-width="6" stroke-linejoin="round"/>
+          <path d="M15 64 H105" stroke="#8a6a42" stroke-width="4"/>
+          <circle cx="60" cy="18" r="6" fill="#8a6a42"/>
+        </svg>
+      </div>
+      <a class="strike-door" href="?dev=arcane">
+        <span class="naming">The Birth Reading</span>
+        <span class="close" id="closeLine">Six marks, one name &mdash; $4.99. Two names, $7.99. Given at birth, unchanged by anything that falls across the table.</span>
+      </a>
+      <p class="six">
+        <a href="?dev=codex#sun-sign">Sun Sign</a><span class="dot">&middot;</span><a href="?dev=codex#year-animal">Year Animal</a><span class="dot">&middot;</span><a href="?dev=codex#life-path">Life Path</a><span class="dot">&middot;</span><a href="?dev=codex#rune">Rune</a><span class="dot">&middot;</span><a href="?dev=codex#trigram">Trigram</a><span class="dot">&middot;</span><a href="?dev=codex#hexagram">Hexagram</a>
+      </p>
+    </div>
+
+  </div>
+
+  <div class="g-foot">
+    <p class="colophon">
+      <a href="codex.html">The Codex &mdash; 222 marks, nine systems</a> &middot;
+      <a href="?dev=profile">Your Profile</a> &middot;
+      <a href="roadmap/">What&rsquo;s coming</a> &middot;
+      <a href="?dev=settings">Settings</a>
+    </p>
+    <a class="catchword" href="#u1" id="catchword">
+      <span class="arrow" aria-hidden="true">&#8595;</span> the room continues
+    </a>
+  </div>
+
+</div>
+
+<script>
+/* boot state set synchronously before first paint — never in the served markup */
+(function(){
+  if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+    document.getElementById('field').classList.add('is-booting');
+  }
+})();
+</script>
+
+<script>
+/* ═══ THE RETURN ═══ three bits that already exist in this repo, read with the
+   house try/catch, FAIL-OPEN: a cold arrival renders the served markup byte for
+   byte. br_dr_sitting_used (drawing-room.js:481) · br_has_reading
+   (arcane.js:1205) · br_holdings (app.js:3038/6283). Read-only, no fetch. */
+(function(){
+  function bit(k){ try { return localStorage.getItem(k) === '1'; } catch(e){ return false; } }
+  var held  = bit('br_has_reading') || bit('br_holdings');
+  var spent = bit('br_dr_sitting_used');
+  if (!held && !spent) return;
+  if (spent){
+    var t = document.getElementById('termsLine');
+    var o = document.getElementById('offerLine');
+    if (t) t.innerHTML = 'A Sitting is three cards to one question &mdash; <a href="?dev=drawing-room">your free one is spent, so $1.99 &rarr;</a> Five cards is the Deep Read, $2.99.';
+    if (o) o.innerHTML = 'Those were loose cards, and no question was asked. A Sitting takes three to a question you name &mdash; <a href="?dev=drawing-room">your free one is spent &middot; $1.99 &rarr;</a>';
+  }
+  if (held){
+    var c = document.getElementById('closeLine');
+    if (c) c.textContent = 'Six marks, one name — yours is read and kept. This door now reads a second name, $4.99.';
+  }
+})();
+</script>
+
+<script>
+(function(){
+  var COUNTWORD = ['none','one','two','three','four','five'];
+  var DECK = [
+    { num:"XVII", name:"The Star", meta:"Arcana · XVII · hope",
+      mean:"The Star stands for hope, renewal and quiet guidance after difficulty — the calm that follows the storm, and the small light you steer by.", accent:"#a98d57" },
+    { num:"0", name:"The Fool", meta:"Arcana · 0 · beginning",
+      mean:"The Fool stands for a leap taken before the ground is proven — the readiness to begin again, unweighted by what came before.", accent:"#a98d57" },
+    { num:"II", name:"Two of Cups", meta:"Cups · Two · union",
+      mean:"A meeting of equals, offered and returned — the first even exchange, before either side has asked for more than the other gave.", accent:"#5f8296" },
+    { num:"IX", name:"Nine of Swords", meta:"Swords · Nine · reversed · the turn",
+      mean:"The worst hour, reversed — the thought that kept you upright at 3am was never as certain as it felt, and morning is closer than it looked.", accent:"#98a1aa" },
+    { num:"VIII", name:"Eight of Pentacles", meta:"Pentacles · Eight · craft",
+      mean:"Slow, exact, repeated work — the kind that does not announce itself and is the only kind that actually accumulates.", accent:"#87936a" },
+    { num:"X", name:"Wheel of Fortune", meta:"Arcana · X · turning",
+      mean:"What turns, turns for everyone — the wheel does not remember who was on top of it last, and it is coming round again regardless.", accent:"#a98d57" }
+  ];
+
+  var field = document.getElementById('field');
+  var face = document.getElementById('face');
+  var faceNum = document.getElementById('faceNum');
+  var faceName = document.getElementById('faceName');
+  var readBlock = document.getElementById('readBlock');
+  var readLabel = document.getElementById('readLabel');
+  var readMeta = document.getElementById('readMeta');
+  var readMean = document.getElementById('readMean');
+  var deal = document.getElementById('dealBtn');
+  var dealCount = document.getElementById('dealCount');
+  var heap = document.getElementById('heap');
+  var terms = document.getElementById('termsLine');
+  var offer = document.getElementById('offerLine');
+  var live = null;
+  var CAP = 5, HEAP_MAX = 4;
+  var count = 0, last = -1;
+  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function metaHTML(meta){
+    var parts = String(meta||'').split('·').map(function(s){return s.trim();}).filter(Boolean);
+    var gilded = false;
+    return parts.map(function(p,i){
+      var inner = p.split(/\s+/).map(function(w){
+        var bare = w.replace(/[^\w]/g,'');
+        var isNum = /^\d+$/.test(bare) || /^[IVXLCDM]+$/.test(bare);
+        if (isNum && !gilded){ gilded = true; return '<span class="g-read__num">'+w+'</span>'; }
+        return w;
+      }).join(' ');
+      return '<span class="g-read__seg g-read__seg--'+(i>1?1:i)+'">'+inner+'</span>';
+    }).join('<span class="g-read__dot" aria-hidden="true">·</span>');
+  }
+
+  /* ONE code path writes this surface — first paint and every later fall. */
+  function write(entry){
+    readBlock.style.setProperty('--m2acc', entry.accent);
+    faceNum.textContent = entry.num;
+    faceName.textContent = entry.name;
+    readLabel.textContent = 'What fell · ' + entry.name;   /* the caption IS the announced name */
+    readMeta.innerHTML = metaHTML(entry.meta);
+    readMean.textContent = entry.mean;
+    live = entry;
+  }
+
+  /* THE HEAP: a fall lands on top of what fell. Spent cards keep their numeral
+     and slew toward the GIVEN end. Grows by transform only — zero layout. */
+  function spend(entry){
+    if (!entry) return;
+    var el = document.createElement('div');
+    el.className = 'g-past';
+    el.innerHTML = '<b>'+entry.num+'</b>';
+    heap.appendChild(el);
+    while (heap.children.length > HEAP_MAX) heap.removeChild(heap.firstChild);
+    for (var i = 0, n = heap.children.length; i < n; i++){
+      heap.children[i].style.setProperty('--i', n - i);
+    }
+  }
+
+  function pick(){
+    var i;
+    do { i = Math.floor(Math.random()*DECK.length); } while (DECK.length > 1 && i === last);
+    last = i; return DECK[i];
+  }
+
+  function tally(){
+    if (count >= 3 && count < CAP){
+      dealCount.textContent = (COUNTWORD[count]||count) + ' loose cards · no question asked';
+      return;
+    }
+    dealCount.textContent = (COUNTWORD[count]||count) + (count === 1 ? ' has fallen' : ' have fallen');
+  }
+
+  /* THE EARNED OFFER: at the third fall the terms upgrade IN PLACE. Once shown
+     it never leaves; retiring the deal at five must not withdraw the sale. */
+  function slot(){
+    if (count >= 3){ terms.classList.add('slot-off'); offer.classList.remove('slot-off'); }
+    if (count >= CAP){
+      deal.disabled = true;
+      dealCount.textContent = 'five have fallen · not one was asked anything';
+    }
+  }
+
+  /* arrival deal — one real entry served in markup, then a genuine random one
+     through the same write() every later fall uses */
+  count = 1;
+  write(pick());
+  tally();
+
+  function arm(){ readBlock.setAttribute('aria-live','polite'); }
+
+  /* timer, deliberately NOT rAF — a boot that hides the page's light source
+     behind a frame callback can arrive blank */
+  var landed = false;
+  function land(){
+    if (landed) return; landed = true;
+    field.classList.remove('is-booting');
+    setTimeout(arm, 420);
+  }
+  if (reduced){ land(); }
+  else {
+    setTimeout(land, 260);
+    window.addEventListener('load', function(){ setTimeout(land, 80); });
+  }
+
+  deal.addEventListener('click', function(){
+    if (deal.disabled) return;
+    count++;
+    var next = pick();
+    var spent = live;
+    if (reduced){ spend(spent); write(next); tally(); slot(); return; }
+    deal.disabled = true;
+    face.classList.add('is-out');
+    readBlock.classList.add('is-out');
+    setTimeout(function(){
+      spend(spent); write(next);   /* one statement — heap and face cannot disagree */
+      face.style.transition = 'none';
+      face.classList.remove('is-out');
+      face.style.transform = 'translateY(-26px) rotate(4deg)';
+      face.style.opacity = '0';
+      requestAnimationFrame(function(){
+        face.style.transition = ''; face.style.transform = ''; face.style.opacity = '';
+        readBlock.classList.remove('is-out');
+      });
+      tally(); slot();
+      if (count < CAP) deal.disabled = false;
+    }, 260);
+  });
+
+  /* catchword — on the live page this calls the existing _u1GlideTo(seat).
+     Standalone it can only signal. No wheel handler, no arrow keys, anywhere. */
+  document.getElementById('catchword').addEventListener('click', function(e){
+    e.preventDefault();
+  });
+})();
+</script>
+
+</body>
+</html>

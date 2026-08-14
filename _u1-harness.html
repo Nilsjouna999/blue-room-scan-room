@@ -1,0 +1,41 @@
+<!doctype html>
+<!-- THROWAWAY. BR-S381 verification harness: /about/ seats U1 by SCROLLING, so a
+     headless shot of it catches the desk instead. This mounts renderAbout() alone,
+     with the real app.js and the real styles.css, which is the only way to see U1's
+     own layout in a screenshot. Untracked scratch, same as _u1-full.html. -->
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>U1 harness</title>
+  <link rel="stylesheet" href="styles.css?v=399a" />
+  <style>
+    body { background: #0a0b0d; margin: 0; }
+    #u1 { padding: 40px 0 80px; }
+  </style>
+</head>
+<body>
+  <div id="menuView" hidden></div>
+  <div id="devView" hidden></div>
+  <div id="u1"></div>
+  <script>
+    // app.js boots against the real DOM ids; give it the ones it looks for, then take
+    // the one function this harness is for.
+    window.__U1_HARNESS = true;
+    // app.js's own ?holdings= parser sits in its boot tail, which does not survive this
+    // stripped DOM — so the harness sets the flag itself, BEFORE app.js loads.
+    try {
+      var h = new URLSearchParams(location.search).get("holdings");
+      if (h === "1") localStorage.setItem("br_holdings", "1");
+      else if (h === "0") localStorage.removeItem("br_holdings");
+    } catch (e) {}
+  </script>
+  <script src="data.js?v=236"></script>
+  <script src="app.js?v=399a"></script>
+  <script>
+    document.getElementById("u1").innerHTML =
+      (typeof renderAbout === "function") ? renderAbout()
+      : '<p style="color:#c66;font:14px monospace;padding:40px">renderAbout is not global — check app.js scope.</p>';
+  </script>
+</body>
+</html>

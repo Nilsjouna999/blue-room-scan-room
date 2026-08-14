@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>THE SPAN — M1 prototype</title>
+<style>
+  :root {
+    --t-display: #dcd7cb;
+    --t-primary: #d7d3ca;
+    --t-body: #b1ada4;
+    --t-meta: #948f87;
+    --t-ghost: #86827a;   /* lifted toward the Codex value, critique item 8 */
+
+    --ink-950: #0a0b0d;
+    --ink-900: #100f0c;
+    --line-faint: rgba(233, 229, 220, 0.07);
+    --line: rgba(233, 229, 220, 0.12);
+    --line-strong: rgba(233, 229, 220, 0.2);
+
+    --gold: #c8ad70;
+    --gold-dim: #a2864a;
+    --gold-rgb: 200, 173, 112;      /* audit item: the door-hover fill was the same
+                                        colour hand-typed as decimal rgba(). One value now. */
+    --card-back: #6f6b64;           /* audit item: the two card-back strokes were a
+                                        fifth un-tokenised hex with no name at all. */
+
+    --font-display: "Cormorant Garamond", "Times New Roman", serif;
+    --font-ui: "Inter", -apple-system, "Segoe UI", sans-serif;
+    --font-mono: "IBM Plex Mono", "Consolas", monospace;
+
+    --ease-settle: cubic-bezier(0.16, 1, 0.3, 1);
+    --ease-draw: cubic-bezier(0.65, 0, 0.35, 1);
+
+    /* the shipped reading-block spec, styles.css:3277 — 19 x 1.6 x 5 = 152px.
+       Invariant at every width now (must-fix #5/#6) — the block is the
+       anchor and everything else on the page yields around it. */
+    --m2read-size: 19px;
+    --m2read-lh: 1.6;
+
+    --gutter: clamp(20px, 5vw, 76px);
+    --rule-c: rgba(233, 229, 220, 0.26);
+    /* the run of the line that has already happened. Not a new colour: the
+       shipped gold at low alpha, off the token above. */
+    --rule-lit: rgba(var(--gold-rgb), 0.5);
+    /* THE DATER — where the lit run ends. 100% is the served value and the only
+       value a stranger ever gets: with no near date there is no scale, so the
+       line is lit end to end rather than pretending to measure something. A
+       visitor whose birth date the house already holds gets this rewritten
+       once, in px-free percent, from their own two dates. If the script never
+       runs, or storage throws, or the stored date is garbage, this stands. */
+    --lit-x: 100%;
+    --track-h: 78px;   /* the band the line and its marks occupy */
+    --open-w: 560px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { background: var(--ink-950); }
+  body {
+    font-family: var(--font-ui);
+    color: var(--t-primary);
+    background: radial-gradient(110% 80% at 50% -10%, #161411 0%, var(--ink-900) 55%, var(--ink-950) 100%);
+    background-attachment: fixed;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100%;
+    /* NO overflow-x:hidden anywhere. `.menu { overflow-x: clip }` is precisely what
+       let the shipped narrow bug survive unseen (critique #1). A scrollbar here is
+       the honest alarm, and this design must never need one. */
+  }
+  a { color: inherit; }
+
+  /* ===================== the band ===================== */
+
+  .m1 {
+    display: flex;
+    flex-direction: column;
+    /* flex-start, never centre: a centred flow that fills its band pushes its head
+       off the TOP of the screen, where document.scrollHeight never counts it.
+       (Adopted from team 3's invalid-verification finding — a solution, not a design.) */
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: clamp(16px, 3.4vh, 44px);
+    min-height: calc(100svh - 80px);
+    padding: clamp(16px, 3vh, 40px) var(--gutter) 10px;
+  }
+  .m1 { min-height: calc(100vh - 80px); }
+  @supports (height: 100svh) { .m1 { min-height: calc(100svh - 80px); } }
+
+  /* ---- the head. Struck, never animated, present in first paint, never gated. ---- */
+  .head { max-width: 44ch; }
+  .head__mark {
+    font-family: var(--font-mono); font-size: 10.5px; font-weight: 500;
+    letter-spacing: .3em; text-transform: uppercase; color: var(--t-ghost);
+    display: flex; align-items: center; gap: .55em; margin-bottom: 5px;
+  }
+  .head__mark i { color: var(--gold); font-style: normal; }
+  .head h1 {
+    font-family: var(--font-display); font-weight: 500;
+    font-size: clamp(24px, 3.2vw, 36px); line-height: 1.05;
+    color: var(--t-display); letter-spacing: .01em;
+  }
+  .head__thesis {
+    /* was clamp(13.5,1.5vw,17) — within 1.5px of .notch__name's clamp(15,1.5vw,18)
+       at every width, so the supporting line and the four live choices read as
+       the same rank. Stepped down and the vw coefficient cut so the gap holds
+       across the fluid range, not just at the clamp's own min/max. */
+    font-family: var(--font-display); font-style: italic;
+    font-size: clamp(13px, 1.1vw, 15px); line-height: 1.35;
+    color: var(--t-meta); margin-top: 5px;
+  }
+
+  /* ===================== THE SPAN =====================
+     One lit line across the dark. It runs from what was given to you before you
+     could ask, to what falls tonight. Four marks stand on it. Touching a mark
+     OPENS THE LINE THERE — the rule parts at that point and what the mark names
+     grows out of the gap. There is no stage and no destination region: the only
+     opening that exists is the one hanging off the mark you touched. */
+
+  .span { position: relative; width: 100%; flex: 1 1 auto; }
+
+  .span__track { position: relative; height: var(--track-h); width: 100%; }
+
+  /* THE ELAPSED RUN. The line is lit from its near end to --lit-x and neutral
+     after it, so the rule is not chrome between two labels — it is a measure
+     with a reading on it. For a stranger --lit-x is 100% and the whole line is
+     lit: everything between an indefinite past and tonight is already spent.
+     For a visitor the house has a birth date for, --lit-x is where that
+     visitor's last return falls on their own life, so the dark head at the far
+     end is the year they are in now. One number, written once, from two real
+     dates — nothing here is authored by hand. */
+  .rule {
+    position: absolute; top: 0; left: 0; right: 0; height: 1px;
+    background: linear-gradient(90deg,
+      transparent 0,
+      var(--rule-lit) 2%,
+      var(--rule-lit) var(--lit-x),
+      var(--rule-c) var(--lit-x),
+      var(--rule-c) 98%,
+      transparent 100%);
+    transition: background 220ms var(--ease-settle);
+  }
+  /* THE PARTING. The gap is authored from the touched mark's own coordinate —
+     no measurement, no layout read, one custom property. The lit run crosses
+     it: min()/max() clamp the two lit stops to the near and far lips of the
+     gap, so the stops stay in order at every combination of --x and --lit-x
+     and neither mechanism has to know the other's number. */
+  .span[data-open] .rule {
+    --lit-near: min(var(--lit-x), calc(var(--x) - 17px));
+    --lit-far:  max(var(--lit-x), calc(var(--x) + 17px));
+    background: linear-gradient(90deg,
+      transparent 0,
+      var(--rule-lit) 2%,
+      var(--rule-lit) var(--lit-near),
+      var(--rule-c) var(--lit-near),
+      var(--rule-c) calc(var(--x) - 17px),
+      transparent calc(var(--x) - 17px),
+      transparent calc(var(--x) + 17px),
+      var(--rule-lit) calc(var(--x) + 17px),
+      var(--rule-lit) var(--lit-far),
+      var(--rule-c) var(--lit-far),
+      var(--rule-c) 98%,
+      transparent 100%);
+  }
+
+  /* THE TWO ENDS OF THE SPAN, DATED. This is what stops the line reading as
+     chrome: chrome has no ends, and no chrome knows what tonight is. Both are
+     real text and neither is aria-hidden any more — the far one prints today's
+     actual date, and the near one is the only string on this surface that
+     differs between a stranger and someone the house already holds a reading
+     for. Set in the file's existing mono-caps ambient rank (10.5px, the
+     .head__mark / .m2read__label size), at --t-meta rather than --t-ghost,
+     because a date is information and the whole argument of the line rests on
+     these two strings. */
+  /* WHERE THEY STAND. top was -21px, the pip row, which was survivable while
+     the ends were the two short words `given` and `tonight` and is not
+     survivable now: a dated near end is ~17 characters and the first mark
+     stands at 8% of the track (115px at 1440, 66px at 820), so the date ran
+     straight through the Birth pip, and the far end ran through the Underneath
+     pip at 97%. The marks' coordinates are not mine to move, so the ends move
+     instead — to the one band that is clear at every width, below the marks'
+     own sub-labels (which bottom out at ~39px) and above where an opening
+     begins (--track-h + 14). The open mark's stem still crosses that band as a
+     1px hairline; it is the line's own material passing behind its own
+     reading, and at 0.5 alpha under 10.5px caps it costs nothing. */
+  .end {
+    position: absolute; top: 44px;
+    font-family: var(--font-mono); font-weight: 500; font-size: 10.5px;
+    letter-spacing: .18em; text-transform: uppercase;
+    color: var(--t-meta); white-space: nowrap;
+  }
+  .end--a { left: 0; }
+  .end--b { right: 0; }
+
+  /* ---- a mark on the line ---- */
+  .notch {
+    position: absolute; top: 0; left: var(--x); width: 0;
+    /* zero width so left:var(--x) IS the mark's exact coordinate — the same
+       coordinate the rule parts at and the opening hangs from. */
+  }
+  .notch__btn {
+    position: absolute; top: -22px; left: 0;
+    transform: translateX(calc(var(--anchor, -50%)));
+    display: block; min-width: 44px; min-height: 44px;
+    padding: 22px 8px 0;
+    background: none; border: 0; cursor: pointer;
+    font: inherit; color: inherit; text-align: center;
+  }
+  .notch--a .notch__btn { text-align: left; padding-left: 0; }
+  .notch--z .notch__btn { text-align: right; padding-right: 0; }
+  .notch__pip {
+    /* centred on the rule itself: rule is a 1px line at top:0, so the pip's
+       9px box (rotated 45deg, centre fixed by transform-origin:center) sits
+       at top:-4px so its centre lands on y=0.5, not 21px below it. Was 17px —
+       the mark was floating in the sub-label's clear space, not on the line
+       the copy claims it stands on. */
+    position: absolute; top: -4px; left: 0; width: 9px; height: 9px;
+    margin-left: -4.5px;
+    transform: rotate(45deg);
+    border: 1px solid var(--t-ghost);
+    background: var(--ink-950);
+    transition: border-color 180ms var(--ease-settle), background 180ms var(--ease-settle);
+  }
+  .notch__name {
+    display: block; font-family: var(--font-display);
+    font-size: clamp(15px, 1.5vw, 18px); line-height: 1.2;
+    color: var(--t-body); white-space: nowrap;
+    border-bottom: 1px solid transparent; padding-bottom: 2px;
+    transition: color 180ms var(--ease-settle), border-color 180ms var(--ease-settle);
+  }
+  .notch__sub {
+    display: block; margin-top: 3px;
+    font-family: var(--font-mono); font-size: 9.5px; letter-spacing: .16em;
+    text-transform: uppercase; color: var(--t-ghost); white-space: nowrap;
+    transition: color 180ms var(--ease-settle);
+  }
+  /* was var(--line) (.12 alpha) — the same weight as the resting hairline
+     between the two states it needs to distinguish (idle vs hovered), so the
+     affordance barely read against the dark ground. var(--line-strong) (.2)
+     is one clear step, and still below --rule-c (.26) and gold, so hover
+     never competes with the open state's own colour. */
+  .notch__btn:hover .notch__name { color: var(--t-display); border-bottom-color: var(--line-strong); }
+  /* was outline-offset:2px — the only unbordered control on the page sitting
+     1px inside where its peers land. .m1open-place__way a and
+     .m1open-place__list a are the other unbordered text targets in this file
+     and both sit at 3px; matched here so the focus ring reads as one system,
+     not two. */
+  .notch__btn:focus-visible { outline: 1px solid var(--t-meta); outline-offset: 3px; }
+  .notch.is-open .notch__pip { border-color: var(--gold); background: var(--gold); }
+  .notch.is-open .notch__name { color: var(--t-display); }
+  .notch.is-open .notch__sub { color: var(--t-meta); }
+
+  /* the stem: the line's own material, running from the gap down into what opened.
+     Starts at y:5 — the pip's own bottom edge (centre 0, radius 4.5, +.5 clearance)
+     — and its height is set so the far end still lands exactly at track-h + 14px,
+     where .open begins: (track-h + 14) - 5 = track-h + 9. */
+  .notch.is-open::after {
+    content: ""; position: absolute; left: 0; top: 5px;
+    width: 1px; height: calc(var(--track-h) + 9px);
+    background: linear-gradient(180deg, var(--gold-dim), var(--rule-c));
+  }
+
+  /* ---- the opening. ONE element, no home. It is inserted into the DOM
+     immediately after the mark you touched, and hangs off the line's own
+     gold stem as unboxed text — a line cannot produce a box, so there is no
+     border, no fill, no radius here any more. Only two marks stand on this
+     span now (birth at the near end, tarot at the far one), so the opening
+     never has to be measured off an interior coordinate: it pins to
+     whichever edge its mark occupies. */
+  .open {
+    position: absolute; top: calc(var(--track-h) + 14px);
+    left: 0; width: min(var(--open-w), 100%);
+    padding: 4px 0 16px;
+    animation: openIn 260ms var(--ease-settle) both;
+  }
+  /* the tarot mark stands at the far end (--x:100%); its opening hangs off
+     the line's right edge instead, mirrored, so it can never run off screen. */
+  .open--r { left: auto; right: 0; }
+  @keyframes openIn { from { opacity: 0; transform: translateY(-8px); } }
+  @media (prefers-reduced-motion: reduce) { .open { animation: none; } }
+
+  /* ===================== inside an opening ===================== */
+
+  .m1open-read { display: flex; gap: 18px; align-items: flex-start; }
+  .m1open-obj { flex: 0 0 auto; }
+  .m1open-body { flex: 1 1 auto; min-width: 0; }
+
+  .m2hero { position: relative; width: clamp(120px, 10vw, 146px); aspect-ratio: 120/190; }
+  .m2hero svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .m2hero__back { opacity: .5; }
+  .m2hero-edge { stroke-dasharray: 620; stroke-dashoffset: 620; animation: drawEdge 380ms var(--ease-draw) 40ms forwards; }
+  @keyframes drawEdge { to { stroke-dashoffset: 0; } }
+  .m2hero__mark { opacity: 0; animation: markIn 260ms ease-out 300ms forwards; }
+  @keyframes markIn { from { opacity: 0; transform: scale(.94); } to { opacity: 1; transform: scale(1); } }
+  .m2face {
+    position: absolute; inset: 14% 10%;
+    display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
+    text-align: center; padding-bottom: 8px;
+    opacity: 0; animation: markIn 260ms ease-out 380ms forwards;
+  }
+  /* the card shrinks to 66px at the shortest phone tier — a 9px nowrap string
+     no longer reliably fits an 80%-inset column that narrow. Clip rather than
+     let it run past the card's own edge. */
+  .m2face-meta, .m2face-orient { max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
+  /* was 8px/.18em and 7.5px/.1em — the critique's own flagged pattern (tracked
+     mono caps under 10px) at its worst point in this file, on the smallest
+     object on the page. Raised to a 9px floor; tracking trimmed so the strings
+     hold their measured width against the 120-146px card. */
+  .m2face-meta { font-family: var(--font-mono); font-size: 9px; letter-spacing: .13em; text-transform: uppercase; color: var(--gold); white-space: nowrap; }
+  .m2face-name { font-family: var(--font-display); font-size: 14px; color: var(--t-display); margin-top: 2px; }
+  .m2face-orient { font-family: var(--font-mono); font-size: 9px; letter-spacing: .06em; text-transform: uppercase; color: var(--t-meta); margin-top: 2px; }
+  @media (prefers-reduced-motion: reduce) {
+    .m2hero-edge { animation: none; stroke-dashoffset: 0; }
+    .m2hero__mark, .m2face { animation: none; opacity: 1; }
+  }
+
+  /* the 152px reading block, at its shipped spec, glued to the object it describes */
+  .m2read { display: grid; gap: 5px; animation: fadeIn 220ms ease-out 420ms both; }
+  @keyframes fadeIn { from { opacity: 0; } }
+  .m2read__label { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: .22em; text-transform: uppercase; color: var(--t-meta); }
+  .m2read__meta { font-family: var(--font-mono); font-size: 11px; letter-spacing: .18em; text-transform: uppercase; color: var(--t-meta); }
+  .m2read__meta .num { color: var(--t-display); }
+  /* audit (COST report): a design that claims nothing is withheld may not
+     withhold by CSS. The block is authored to fit five lines at the shipped
+     19x1.6 spec (styles.css:3277) — that is a copy fact, not a clamp; the
+     -webkit-line-clamp that used to enforce it would have silently cut any
+     future reading that ran long, with no visible sign it had happened. */
+  .m2read__mean {
+    font-family: var(--font-display);
+    font-size: var(--m2read-size);
+    line-height: var(--m2read-lh);
+    color: var(--t-body);
+  }
+
+  .m1open-spine {
+    margin-top: 10px;
+    font-family: var(--font-mono); font-size: 11px; letter-spacing: .04em;
+    color: var(--t-body);
+    display: flex; flex-wrap: wrap; align-items: center; gap: 2px 10px; row-gap: 2px;
+    animation: fadeIn 220ms ease-out 420ms both;
+  }
+  /* audit: no min-height at all, so the tap target on the highest-traffic
+     secondary links on the page was a single 11px text line — well under
+     the 44px floor. Real height, not a negative-margin hit area: the row
+     wraps (flex-wrap:wrap), and negative margins on wrapped flex items
+     overlap into the neighbouring row and land taps on the wrong link. */
+  .m1open-spine a {
+    display: inline-flex; align-items: center; min-height: 44px; padding: 2px 3px;
+    color: var(--t-primary); text-decoration: none; border-bottom: .5px solid var(--t-ghost);
+    transition: color 160ms var(--ease-settle), border-color 160ms var(--ease-settle);
+  }
+  .m1open-spine a:hover { color: var(--t-display); border-bottom-color: var(--t-meta); }
+  .m1open-spine a:focus-visible { outline: 1px solid var(--t-meta); outline-offset: 3px; }
+  /* the gap now carries the separation; the middle-dot glyph fights the
+     taller 44px row. */
+  .m1open-spine .sep { display: none; }
+  @media (prefers-reduced-motion: reduce) { .m2read, .m1open-spine { animation: none; } }
+
+  .m1open-door { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--line-faint); }
+  .m1open-door__row { display: flex; flex-wrap: wrap; gap: 8px; }
+  .m1open-door__name { display: block; font-family: var(--font-mono); font-size: 12.5px; letter-spacing: .04em; color: var(--t-display); margin-bottom: 5px; }
+  .m1open-door__desc { display: block; font-family: var(--font-ui); font-size: 12.5px; line-height: 1.5; color: var(--t-body); margin-bottom: 10px; }
+  .m1open-door__go {
+    display: inline-flex; align-items: center; justify-content: center;
+    min-height: 44px; padding: 0 16px;
+    font-family: var(--font-mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase;
+    color: var(--t-display); text-decoration: none;
+    border: 1px solid var(--line-strong); border-radius: 2px;
+    /* the only transition in the file with no named easing (defaulted to the
+       UA's linear-ish "ease"). Every other hover/open transition in this
+       file names var(--ease-settle) — matched here, on the one control that
+       is the entire point of the surface. */
+    transition: border-color 160ms var(--ease-settle), background 160ms var(--ease-settle);
+  }
+  .m1open-door__go:hover { border-color: var(--gold); background: rgba(var(--gold-rgb), 0.08); }
+  .m1open-door__go:focus-visible { outline: 1px solid var(--t-meta); outline-offset: 3px; }
+  .m1open-door__go .free { color: var(--gold); }
+  .m1open-pull {
+    min-height: 44px; padding: 0 12px;
+    font-family: var(--font-mono); font-size: 10.5px; letter-spacing: .06em;
+    color: var(--t-meta); background: none;
+    border: 1px solid var(--line); border-radius: 2px; cursor: pointer;
+    /* untransitioned, same defect as .m1open-spine a above — "Pull another"
+       is the one control a returning visitor clicks repeatedly, so its snap
+       was the most-repeated jump cut on the page. */
+    transition: color 160ms var(--ease-settle), border-color 160ms var(--ease-settle);
+  }
+  .m1open-pull:hover { color: var(--t-display); border-color: var(--t-meta); }
+  .m1open-pull:focus-visible { outline: 1px solid var(--t-meta); outline-offset: 3px; }
+  .m1open-door__deep { margin-top: 8px; }
+  .m1open-door__deep a {
+    display: inline-flex; align-items: center; min-height: 44px;
+    font-family: var(--font-mono); font-size: 10.5px; letter-spacing: .04em;
+    color: var(--t-meta); text-decoration: none; border-bottom: .5px solid var(--t-ghost);
+    transition: color 160ms var(--ease-settle), border-color 160ms var(--ease-settle);
+  }
+  .m1open-door__deep a:hover { color: var(--t-display); border-bottom-color: var(--t-meta); }
+  .m1open-door__deep a:focus-visible { outline: 1px solid var(--t-meta); outline-offset: 3px; }
+
+  /* THE STRANGER'S SENTENCE. A visitor who has never seen this page before
+     has to hear what Blue Room IS before hearing the two products — this is
+     the taxonomy, stated once, at the head's own supporting rank, ranked
+     under the line rather than above it because it is what the line PROVES,
+     not what introduces it. */
+  .span__thesis {
+    margin-top: 10px; max-width: 44ch;
+    font-family: var(--font-display); font-style: italic;
+    font-size: clamp(13px, 1.1vw, 15px); line-height: 1.35;
+    color: var(--t-meta);
+  }
+
+  /* THE CODEX LINE. Codex is not a peer on the axis — it is not "more tonight"
+     than a reading, it is what the axis is drawn OUT OF. One line beneath the
+     span says so, rather than a third mark pretending to rank beside the two
+     readings. Underneath needs no line here at all: the U1 glide the chrome
+     rail already advertises (↓) is that door, and a second one on this
+     surface would be the same "second door to a room that already has one"
+     pattern this codebase deletes on sight. */
+  .span__codex { margin-top: 10px; font-family: var(--font-mono); font-size: 11px; color: var(--t-ghost); }
+  .span__codex a {
+    color: var(--t-body); text-decoration: underline; text-decoration-color: var(--gold); text-underline-offset: 3px;
+    display: inline-flex; align-items: center; min-height: 44px;
+  }
+  .span__codex a:hover { color: var(--t-display); }
+  .span__codex a:focus-visible { outline: 1px solid var(--t-meta); outline-offset: 3px; }
+
+  /* ===================== chrome furniture (stand-ins) ===================== */
+  .rail {
+    position: fixed; left: 0; right: 0; bottom: 0; height: 80px;
+    border-top: 1px solid var(--line-faint);
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-mono); font-size: 10px; letter-spacing: .2em; text-transform: uppercase;
+    color: var(--t-ghost); background: var(--ink-950);
+  }
+  .orb { position: fixed; width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--line); bottom: 96px; opacity: .4; }
+  .orb--l { left: 20px; }
+  .orb--r { right: 20px; }
+
+  /* Short laptops keep the horizontal span — the design yields instead of the page
+     overflowing. The 152px block is untouched here; only the band the line occupies
+     and the paddings around the opening give. Measured worst case at 900x700 was
+     4px of clearance before this rule; it is 48 after. */
+  @media (min-width: 821px) and (max-height: 780px) {
+    :root { --track-h: 62px; }
+    .m1 { gap: 14px; padding-top: 16px; }
+    .head h1 { font-size: clamp(22px, 2.6vw, 30px); }
+    /* the ends now stand BELOW the marks rather than above them (see the base
+       rule), so the overlap this override used to fix — into the head block —
+       cannot happen at any height. What it fixes here instead is the floor:
+       --track-h drops to 62px at this tier, so an opening begins at 76px and
+       the ends give 2px to keep a clear 12px under them. */
+    .end { top: 42px; }
+    .open { padding: 14px 18px 12px; }
+    .m1open-spine { margin-top: 7px; }
+    .m1open-door { margin-top: 10px; padding-top: 9px; }
+    .m2hero { width: clamp(112px, 9vw, 132px); }
+  }
+
+  /* ===================== narrow: the same line, stood on end =====================
+     A phone is a vertical span. The line rotates; nothing else changes law.
+     The marks stack down it in the same order, the line still PARTS at the one
+     you touched, and the opening still hangs off that mark and nowhere else. */
+  @media (max-width: 820px) {
+    .m1 { gap: 12px; padding: 12px 18px 4px; }
+    .head { max-width: 100%; }
+    .span__track { height: auto; display: block; }
+    .rule { display: none; }
+
+    /* THE ENDS SURVIVE. They were display:none from 820px down, which deleted
+       the two dated terminals — and with them the one proof this surface has
+       that it knows what tonight is — on the width most visitors arrive at.
+       The line stands on end here, so its ends stand above and below it: the
+       near date is the stack's top caption, the far date its bottom one. Both
+       are single nowrap lines at every width down to 360px (the longest string
+       either can hold, "22 SEPTEMBER 1991", measures ~150px at this rank), so
+       neither can wrap and neither can move the stack when the script writes
+       the real dates over the served ones. */
+    .end {
+      position: static; display: block; font-size: 10px; letter-spacing: .16em;
+      padding-left: 22px;
+    }
+    .end--a { margin-bottom: 2px; }
+    .end--b { margin-top: 4px; }
+
+    .notch {
+      position: relative; left: auto; top: auto; width: auto; display: block;
+    }
+    /* each mark carries its own segment of the line. The open one carries none —
+       which is how the line parts, with no measurement and no JS. */
+    .notch::before {
+      content: ""; position: absolute; left: 4px; top: 0; bottom: 0;
+      width: 1px; background: var(--rule-c);
+    }
+    .notch--a::before { top: 14px; }
+    .notch--z::before { bottom: 50%; }
+    .notch.is-open::before { display: none; }
+    .notch.is-open::after { display: none; }
+
+    .notch__btn {
+      position: static; transform: none; display: block; width: 100%;
+      min-height: 44px; padding: 7px 0 7px 22px; text-align: left;
+    }
+    .notch--a .notch__btn, .notch--z .notch__btn { text-align: left; padding-left: 22px; padding-right: 0; }
+    .notch__pip { position: absolute; left: 0; top: 15px; margin-left: 0; }
+    .notch__name { font-size: 17px; display: inline; }
+    .notch__sub { display: inline; margin: 0 0 0 8px; }
+
+    .open, .open--r {
+      position: static; width: auto; margin: 4px 0 12px 22px;
+      padding: 13px 12px;
+    }
+    .m1open-read { gap: 12px; }
+    .m2hero { width: 100px; }
+    .m1open-door__desc { display: none; }
+    .m1open-door { margin-top: 12px; padding-top: 10px; }
+    .span__codex { margin-left: 22px; }
+    .orb { display: none; }
+  }
+  /* narrow-pass finding: on tall/normal phones (not the already-cramped short
+     tiers below, which have their own queries and stay top-anchored) .span
+     carries flex:1 1 auto but its stacked content is top-anchored inside that
+     box, leaving a measured ~300px dead gap above the rail at 430x900. Center
+     the stack in its available space instead — the short-phone queries below
+     fire after this one and are unaffected since they don't touch .span. */
+  @media (max-width: 820px) and (min-height: 760px) {
+    .span { display: flex; flex-direction: column; justify-content: center; }
+  }
+
+  /* narrow-pass finding: below ~460px the float this tier used to run (object
+     left, first lines of .m2read__mean squeezed beside it at ~243px, the rest
+     dropping to the full 348px measure once clear of the card) gave the
+     reading block a ragged, mid-sentence measure change — the weakest reading
+     experience on the page at the width the brief cares about most. Stacking
+     the card above the full-width reading keeps the same "nothing is clamped,
+     nothing is dropped" property without the ragged measure: one 348px
+     column, top to bottom. The ~140px this costs in extra height is well
+     inside the slack already measured at 430x900. */
+  @media (max-width: 460px) {
+    .m1open-read { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; }
+    .m1open-obj { float: none; margin: 0; }
+    .m2hero { width: 84px; }
+    .m2read__mean { display: block; height: auto; max-height: none; }
+    .m1open-door { clear: none; }
+  }
+
+  /* SHORT phones (375x667, 360x640). Nothing is removed — every rank yields a
+     step. The head keeps its statement of what this place is, all four marks keep
+     their names, and the reading keeps every word; the type and the rhythm give. */
+  @media (max-width: 820px) and (max-height: 720px) {
+    .m1 { gap: 9px; padding-top: 9px; }
+    .head h1 { font-size: 21px; }
+    .head__thesis { font-size: 12.5px; margin-top: 2px; }
+    /* was min-height:40px, 4px under the 44px floor this file audits every
+       other control against. The reading block no longer yields size at this
+       tier either (must-fix #5/#6), so the marks give up their own padding
+       instead of a hit target. */
+    .notch__btn { min-height: 44px; padding: 3px 0 3px 22px; }
+    .notch__pip { top: 12px; }
+    .notch__name { font-size: 15.5px; }
+    .notch__sub { font-size: 9px; }
+    .open, .open--r { margin: 2px 0 8px 22px; padding: 11px 11px; }
+    .m2hero { width: 78px; }
+    .m2read { gap: 3px; }
+    .m2read__label { font-size: 9.5px; }
+    .m2read__meta { font-size: 10px; }
+    .m1open-spine { margin-top: 7px; }
+    .m1open-door { margin-top: 9px; padding-top: 8px; }
+  }
+
+  @media (max-width: 400px) {
+    .m2hero { width: 80px; }
+    /* narrow-pass finding: this tier used to force the spine to a single
+       nowrap row with a hidden scrollbar (flex-wrap:nowrap; overflow-x:auto;
+       scrollbar-width:none). Measured at 375x812 that clipped it to "The
+       Ground · The Crossing · The Root · The Cr" with no visible affordance
+       that more existed — the exact defect this file exists to prevent, one
+       breakpoint lower and silent instead of visible. .m1open-spine already
+       wraps by default (flex-wrap:wrap, line ~281); nothing to do here but
+       not override that. */
+  }
+
+  /* The smallest screen still in service (360x640). Declared LAST so it outranks
+     the width-only rules above it. Every mark, every route, the whole reading and
+     the statement of what this place is all survive; the type takes another step
+     down and the block's label yields, because the mark it names is 40px above it.
+     Below this size the design overflows and I would rather report the floor. */
+  @media (max-width: 820px) and (max-height: 665px) {
+    .m1 { gap: 7px; padding-top: 7px; }
+    .head h1 { font-size: 19px; }
+    .head__thesis { font-size: 11.5px; }
+    /* both offenders at this tier were under the 44px floor (36px and 42px);
+       restored — the reading block holds its size here too, so the marks and
+       the door give up padding rather than a hit target. */
+    .notch__btn { min-height: 44px; padding: 2px 0 2px 22px; }
+    .notch__pip { top: 11px; }
+    .notch__name { font-size: 14.5px; }
+    .open, .open--r { margin: 2px 0 7px 22px; padding: 10px; }
+    .m2hero { width: 66px; }
+    .m2read__label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+    .m1open-door__go { min-height: 44px; }
+  }
+</style>
+</head>
+<body>
+
+<main class="m1">
+
+  <div class="head">
+    <p class="head__mark"><i aria-hidden="true">&#9670;</i> BLUE ROOM</p>
+    <h1>The Reading Rooms</h1>
+    <p class="head__thesis">Not every card is developed. Some are drawn tonight; the rest were given to you before you could ask.</p>
+  </div>
+
+  <!-- ARRIVAL. Nothing is open. What is on screen at first paint is the whole
+       plan — the line, its two dated ends, two named readings standing on
+       them — and interaction only ever ADDS. A visitor who never touches
+       anything sees a doorway, not an answer someone else already asked for. -->
+  <div class="span" id="span" style="--x:0%">
+    <div class="span__track" id="track">
+      <div class="rule" aria-hidden="true"></div>
+      <!-- THE NEAR TERMINAL. Served as the stranger's string, and it is the
+           only wording on this page that a returning visitor sees differently:
+           if the house already holds their birth date it prints that date
+           instead. Never a prompt, never a field — this surface asks for
+           nothing. -->
+      <span class="end end--a" data-end-a>before you could ask</span>
+
+      <div class="notch notch--a" data-seg="birth" style="--x:0%; --anchor:0%">
+        <button type="button" class="notch__btn" data-target="birth" aria-expanded="false" aria-controls="theOpening">
+          <span class="notch__pip" aria-hidden="true"></span>
+          <span class="notch__name">The Birth Reading</span>
+          <span class="notch__sub">given &middot; six marks</span>
+        </button>
+      </div>
+
+      <div class="notch notch--z" data-seg="tarot" style="--x:100%; --anchor:-100%">
+        <button type="button" class="notch__btn" data-target="tarot" aria-expanded="false" aria-controls="theOpening">
+          <span class="notch__pip" aria-hidden="true"></span>
+          <span class="notch__name">A Tarot Reading</span>
+          <span class="notch__sub">dealt &middot; first free</span>
+        </button>
+      </div>
+
+      <!-- THE FAR TERMINAL. Written by THE DATER below from new Date(), day and
+           month only — a year on a line whose far end is tonight is noise. It
+           stands last in the DOM because at 820px and under the line is
+           vertical and this is its bottom caption; at wide it is absolutely
+           positioned and its place in the order costs nothing. The served
+           string is the word alone, so a scriptless render still reads true. -->
+      <span class="end end--b" data-end-b>tonight</span>
+    </div>
+
+    <p class="span__thesis">Everything read here falls at one end of this or the other.</p>
+
+    <!-- Codex is not a third mark on the axis — it is what the axis is drawn
+         out of. One line beneath the span says so, rather than ranking it
+         beside the two readings. -->
+    <p class="span__codex"><a href="codex.html?v=363">Every mark this line is drawn out of &rarr;</a></p>
+  </div>
+
+</main>
+
+<div class="orb orb--l" aria-hidden="true"></div>
+<div class="orb orb--r" aria-hidden="true"></div>
+<div class="rail">L1 &nbsp;&larr;&nbsp;&nbsp;&nbsp; M1 &nbsp;&nbsp;&nbsp;&rarr;&nbsp; M2 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &darr; U1</div>
+
+<!-- the four openings, authored as inert templates. Exactly one is ever
+     instantiated, into a single element that is moved to the touched mark. -->
+<template id="tplTarot">
+  <div class="m1open-read">
+    <div class="m1open-obj">
+      <div class="m2hero">
+        <svg class="m2hero__back" viewBox="0 0 120 190" aria-hidden="true"><rect x="7" y="7" width="106" height="176" rx="7" fill="none" style="stroke:var(--card-back)" stroke-width="1" opacity=".6"/></svg>
+        <svg class="m2hero__face" viewBox="0 0 120 190" role="img" aria-label="One card of the deck, shown as an example">
+          <rect class="m2hero-edge" x="11" y="11" width="98" height="168" rx="5" fill="none" style="stroke:var(--gold)" stroke-width="1" opacity=".7"/>
+          <g class="m2hero__mark" style="stroke:var(--gold)" fill="none" opacity=".8">
+            <circle cx="60" cy="80" r="28" stroke-width=".8" opacity=".45"/>
+            <path d="M60 54 L64.1 70.3 L78.5 61.9 L70.1 76.3 L86 80 L70.1 83.7 L78.5 98.1 L64.1 89.7 L60 106 L55.9 89.7 L41.5 98.1 L49.9 83.7 L34 80 L49.9 76.3 L41.5 61.9 L55.9 70.3 Z" stroke-width=".9"/>
+            <circle cx="60" cy="80" r="3" style="fill:var(--gold)" stroke="none"/>
+          </g>
+        </svg>
+        <div class="m2face">
+          <span class="m2face-meta">Arcana &middot; XVII</span>
+          <div class="m2face-name" data-face-name>The Star</div>
+          <div class="m2face-orient">Upright</div>
+        </div>
+      </div>
+    </div>
+    <div class="m1open-body">
+      <div class="m2read">
+        <p class="m2read__label">What is dealt tonight</p>
+        <p class="m2read__meta" data-read-meta>A Sitting &middot; <span class="num">2</span> of 3 &middot; The Crossing</p>
+        <p class="m2read__mean" data-read-mean>What stands between you and the thing you asked about is not an obstacle — it is a crossing. The Star answers with quiet after a hard pull: what you want is still there, and it has not moved.</p>
+      </div>
+      <p class="m1open-spine">
+        <a href="codex.html?entry=ground">The Ground</a><span class="sep">&middot;</span>
+        <a href="codex.html?entry=crossing">The Crossing</a><span class="sep">&middot;</span>
+        <a href="codex.html?entry=root">The Root</a><span class="sep">&middot;</span>
+        <a href="codex.html?entry=crown">The Crown</a><span class="sep">&middot;</span>
+        <a href="codex.html?entry=turn">The Turn</a>
+      </p>
+      <div class="m1open-door">
+        <span class="m1open-door__name">A Tarot Reading</span>
+        <span class="m1open-door__desc">Three cards to one question, and your first is free. Or the Deep Read — five cards. A pull is logged, not reissued.</span>
+        <div class="m1open-door__row">
+          <a class="m1open-door__go" href="?dev=drawing-room">Enter&nbsp;&middot;&nbsp;<span class="free">Free&nbsp;&middot;&nbsp;2&nbsp;of&nbsp;3</span></a>
+          <button type="button" class="m1open-pull" data-pull>Pull another</button>
+        </div>
+        <!-- the Deep Read gets its own address rather than sharing the free
+             Sitting's — no figure on the surface, naming a product is not
+             pricing it. -->
+        <p class="m1open-door__deep"><a href="?dev=drawing-room#deep">The Deep Read — five cards &rarr;</a></p>
+      </div>
+    </div>
+  </div>
+</template>
+
+<template id="tplBirth">
+  <div class="m1open-read">
+    <div class="m1open-obj">
+      <div class="m2hero">
+        <svg class="m2hero__back" viewBox="0 0 120 190" aria-hidden="true"><rect x="7" y="7" width="106" height="176" rx="7" fill="none" style="stroke:var(--card-back)" stroke-width="1" opacity=".6"/></svg>
+        <svg class="m2hero__face" viewBox="0 0 120 190" role="img" aria-label="The Crowned Name, given at birth">
+          <rect class="m2hero-edge" x="11" y="11" width="98" height="168" rx="5" fill="none" style="stroke:var(--gold)" stroke-width="1" opacity=".7"/>
+          <g class="m2hero__mark">
+            <path d="M32 66 L42 36 L53 54 L60 28 L67 54 L78 36 L88 66" fill="none" style="stroke:var(--gold)" stroke-width="2.2" stroke-linejoin="round" opacity=".85"/>
+            <circle cx="60" cy="88" r="2.4" style="fill:var(--gold)"/>
+          </g>
+        </svg>
+        <div class="m2face">
+          <span class="m2face-meta">Six marks</span>
+          <div class="m2face-name">The Crowned Name</div>
+          <div class="m2face-orient">By birth alone</div>
+        </div>
+      </div>
+    </div>
+    <div class="m1open-body">
+      <div class="m2read">
+        <p class="m2read__label">What was given</p>
+        <p class="m2read__meta">Given &middot; <span class="num">6</span> marks &middot; 1 name</p>
+        <p class="m2read__mean">Nothing is dealt here — the same name and the same date return the same six, tonight and in ten years. Six marks you were given rather than chose, read together into one crowned name.</p>
+      </div>
+      <p class="m1open-spine">
+        <a href="codex.html?entry=sun">Sun Sign</a><span class="sep">&middot;</span>
+        <a href="codex.html?entry=animal">Year Animal</a><span class="sep">&middot;</span>
+        <a href="codex.html?entry=path">Life Path</a><span class="sep">&middot;</span>
+        <a href="codex.html?entry=rune">Rune</a><span class="sep">&middot;</span>
+        <a href="codex.html?entry=trigram">Trigram</a><span class="sep">&middot;</span>
+        <a href="codex.html?entry=hexagram">Hexagram</a>
+      </p>
+      <div class="m1open-door">
+        <span class="m1open-door__name">The Birth Reading</span>
+        <span class="m1open-door__desc">Six marks. One name. The deeper reading — given at birth, read here.</span>
+        <a class="m1open-door__go" href="?dev=arcane">Enter</a>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+/* ═══ THE DATER ══════════════════════════════════════════════════════════════
+   The two terminals of the span carry REAL TIME, so the front door proves at
+   first paint that it knows what tonight is. This is the whole mechanism, and
+   it is deliberately its own script: it touches nothing but the two .end
+   strings and one custom property, it never listens for a key or a wheel, it
+   never writes to storage, and if every line of it fails the page renders the
+   served markup byte for byte — which is already the correct stranger version.
+
+   THE FALLBACK IS THE DEFAULT, not a branch. `before you could ask` and
+   `--lit-x: 100%` are in the file; storage empty, storage throwing, and a
+   garbage stored value all return early and leave them standing. Nothing is
+   ever emptied and re-filled, so there is no skeleton and no half-state, and
+   because both terminals are single nowrap lines at every width, writing a
+   real date over the served one cannot shift the layout.
+
+   WHERE THE NEAR DATE COMES FROM. The gate is the two flags team 1 reads —
+   br_has_reading (arcane.js:1205) and br_holdings (app.js:3038/6283) — and the
+   date itself is read, read-only, from br_birth ('YYYY-MM-DD'). The house does
+   not persist that key yet: arcane.js:1203 already builds the exact tuple
+   ('birth~' + name + '~y~m~d') and throws it at the URL instead, so the second
+   reader below accepts that seed verbatim under br_reading_seed. Until one of
+   the two exists, every visitor takes the stranger path — which is the path
+   this script is written to make unbreakable. */
+(function () {
+  var span = document.getElementById('span');
+  var endA = document.querySelector('[data-end-a]');
+  var endB = document.querySelector('[data-end-b]');
+  if (!span || !endA || !endB) return;
+
+  var MONTH = ['January','February','March','April','May','June','July',
+               'August','September','October','November','December'];
+  function say(d, withYear) {
+    return d.getDate() + ' ' + MONTH[d.getMonth()] + (withYear ? ' ' + d.getFullYear() : '');
+  }
+
+  var now = new Date();
+
+  /* 1. THE FAR END. Always dated, for everyone, with no storage involved and
+        nothing to fail: the only way to see the word alone is to run the page
+        with scripting off. */
+  endB.textContent = say(now, false) + ' · Tonight';
+
+  /* 2. THE NEAR END. */
+  function get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+
+  function bornOn() {
+    if (get('br_has_reading') !== '1' && get('br_holdings') !== '1') return null;
+    var raw = get('br_birth'), seed, t;
+    if (!raw) {
+      seed = get('br_reading_seed');
+      if (seed) {
+        t = String(seed).split('~');
+        if (t.length >= 5 && t[0] === 'birth') raw = t[2] + '-' + t[3] + '-' + t[4];
+      }
+    }
+    if (!raw) return null;
+    var p = String(raw).trim().match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+    if (!p) return null;
+    var y = +p[1], m = +p[2], d = +p[3];
+    var dt = new Date(y, m - 1, d);
+    /* round-trip test: this is what rejects 2001-02-31, which Date() would
+       silently roll forward into March and print back as a real birthday. */
+    if (dt.getFullYear() !== y || dt.getMonth() !== m - 1 || dt.getDate() !== d) return null;
+    if (y < 1900) return null;
+    if (dt.getTime() > now.getTime()) return null;      /* not yet born */
+    return dt;
+  }
+
+  var born = null;
+  try { born = bornOn(); } catch (e) { born = null; }
+  if (!born) return;                    /* stranger. The served page is correct. */
+
+  endA.textContent = say(born, true);
+
+  /* 3. THE RUN BETWEEN THEM is now this visitor's own elapsed life, so the lit
+        portion is measured off it rather than authored: the line is lit as far
+        as their last return and neutral after it, and that dark head at the far
+        end is the year they are in now. Under one year old there is no last
+        return to stand on, so the line stays lit whole — the same value the
+        stranger gets, never a broken-looking sliver. */
+  var t0 = born.getTime(), t1 = now.getTime();
+  if (t1 - t0 < 31557600000) return;
+  var last = new Date(born.getFullYear(), born.getMonth(), born.getDate());
+  last.setFullYear(now.getFullYear());
+  if (last.getTime() > t1) last.setFullYear(now.getFullYear() - 1);
+  var pct = (last.getTime() - t0) / (t1 - t0) * 100;
+  if (!isFinite(pct) || pct <= 0 || pct >= 100) return;
+  span.style.setProperty('--lit-x', pct.toFixed(2) + '%');
+})();
+</script>
+
+<script>
+(function () {
+  var span   = document.getElementById('span');
+  var notches = Array.prototype.slice.call(document.querySelectorAll('.notch'));
+  var btns    = Array.prototype.slice.call(document.querySelectorAll('.notch__btn'));
+  var TPL   = { tarot: 'tplTarot', birth: 'tplBirth' };
+  var LABEL = { tarot: 'A Tarot Reading', birth: 'The Birth Reading' };
+  var state = null;
+
+  // THE OPENING. One element, and it has no home: it is inserted immediately
+  // after whichever mark was touched, and hangs from that mark's coordinate.
+  var opening = document.createElement('div');
+  opening.id = 'theOpening';
+  opening.setAttribute('role', 'group');
+
+  function setOpen(next) {
+    if (!next || !TPL[next] || state === next) return;
+    state = next;
+
+    var held = null;
+    notches.forEach(function (n) {
+      var on = n.getAttribute('data-seg') === state;
+      n.classList.toggle('is-open', on);
+      if (on) held = n;
+    });
+    btns.forEach(function (b) {
+      b.setAttribute('aria-expanded', b.getAttribute('data-target') === state ? 'true' : 'false');
+    });
+
+    // the line parts at the touched mark's own authored coordinate
+    var x = held ? (held.style.getPropertyValue('--x') || '50%') : '50%';
+    span.style.setProperty('--x', x.trim());
+    span.setAttribute('data-open', state);
+
+    var farEnd = held && held.style.getPropertyValue('--anchor').trim() === '-100%';
+    opening.className = 'open' + (farEnd ? ' open--r' : '');
+    opening.style.setProperty('--x', x.trim());
+    opening.setAttribute('aria-label', LABEL[state]);
+    opening.innerHTML = '';
+    opening.appendChild(document.getElementById(TPL[state]).content.cloneNode(true));
+
+    // THE MOVE
+    if (held) held.insertAdjacentElement('afterend', opening);
+
+    // openIn is defined on the base .open class, which stays on this element
+    // across every switch — only the modifier classes change. A CSS animation
+    // does not replay just because a still-present class's siblings changed,
+    // so after the first mark every later open swapped its content with no
+    // entrance at all. Cut the animation, force one layout read, restore it:
+    // the same 260ms openIn now plays on every touch, not only the first.
+    opening.style.animation = 'none';
+    void opening.offsetHeight;
+    opening.style.animation = '';
+
+    reserve();
+    wirePull();
+  }
+
+  // CLOSE. Returns the surface to its arrival state: nothing open, nothing
+  // reserved. The opening is removed from the DOM rather than merely hidden —
+  // there is no "closed but present" state on this surface.
+  function close() {
+    if (state === null) return;
+    state = null;
+    notches.forEach(function (n) { n.classList.remove('is-open'); });
+    btns.forEach(function (b) { b.setAttribute('aria-expanded', 'false'); });
+    span.removeAttribute('data-open');
+    if (opening.parentNode) opening.parentNode.removeChild(opening);
+    span.style.minHeight = '';
+  }
+
+  // The opening is absolutely positioned at wide, so the band it hangs in must be
+  // told how tall it is. Without this the page could clip it silently — which is
+  // the exact concealment class of bug that let the shipped narrow defect survive.
+  // Here the document is allowed to grow and a scrollbar is allowed to accuse us.
+  function reserve() {
+    if (window.innerWidth <= 820) { span.style.minHeight = ''; return; }
+    var track = parseFloat(getComputedStyle(document.documentElement)
+      .getPropertyValue('--track-h')) || 78;
+    span.style.minHeight = (track + 14 + opening.offsetHeight + 8) + 'px';
+  }
+  window.addEventListener('resize', reserve);
+
+  var sample = [
+    { name: 'The Star',  meta: 'A Sitting &middot; <span class="num">2</span> of 3 &middot; The Crossing',
+      mean: 'What stands between you and the thing you asked about is not an obstacle — it is a crossing. The Star answers with quiet after a hard pull: what you want is still there, and it has not moved.' },
+    { name: 'The Tower', meta: 'A Sitting &middot; <span class="num">1</span> of 3 &middot; The Ground',
+      mean: 'Where this actually stands, not where you hoped it stood. The Tower is not gentle about it — something here has already fallen, or is about to, and the useful question is what you were keeping upright.' },
+    { name: 'The Sun',   meta: 'A Sitting &middot; <span class="num">3</span> of 3 &middot; The Turn',
+      mean: 'Where this is headed if nothing changes. The Sun is the plainest card in the deck and it does not hedge: this goes well, and you will know it when it does, without needing anyone to confirm it.' }
+  ];
+  var sIdx = 0;
+  function wirePull() {
+    var btn = opening.querySelector('[data-pull]');
+    if (!btn) return;
+    btn.addEventListener('click', function () {
+      sIdx = (sIdx + 1) % sample.length;
+      var s = sample[sIdx];
+      opening.querySelector('[data-face-name]').textContent = s.name;
+      opening.querySelector('[data-read-meta]').innerHTML = s.meta;
+      opening.querySelector('[data-read-mean]').textContent = s.mean;
+      reserve();
+    });
+  }
+
+  // TRIGGER: activation only. No hover-open (it puts a trap on the pointer path
+  // between a mark and the free door), no focus-open (Tab must never rewrite what
+  // you are reaching for). Buttons fire on click, Enter and Space alike — touch,
+  // mouse and keyboard are one code path. Touching the mark that is already
+  // open closes it back to the arrival state, rather than being a dead click.
+  btns.forEach(function (b) {
+    b.addEventListener('click', function () {
+      var target = b.getAttribute('data-target');
+      if (state === target) close(); else setOpen(target);
+    });
+  });
+
+  // The only key this surface listens for. Nothing here touches ArrowLeft/Right
+  // (the panel track) or ArrowUp/Down and the wheel (the U1 glide).
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && state !== null) close();
+  });
+
+  // ARRIVAL: nothing is open. What is on screen at first paint is the whole
+  // plan — the line, its two dated ends, two named readings standing on it —
+  // and interaction only ever adds. No boot call here by design.
+})();
+</script>
+</body>
+</html>

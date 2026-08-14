@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<title>U1 · photographic plates v3</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+:root{
+  --t-display:#e9e5dc; --t-primary:#d7d3ca; --t-meta:#948f87; --t-ghost:#6e6b63;
+  --ink-950:#0a0b0d; --ink-900:#100f0c; --ink-850:#11100d;
+  --hair-1:rgba(233,229,220,.14); --hair-2:rgba(233,229,220,.08);
+  --line-strong:rgba(233,229,220,.2); --violet:#8b7bff; --silver-dim:var(--t-meta);
+  --font-display:"Cormorant Garamond","Times New Roman",serif;
+  --font-ui:"Inter",-apple-system,"Segoe UI",sans-serif;
+  --font-mono:"IBM Plex Mono","Consolas",monospace;
+}
+body{margin:0;padding:48px 20px;background:radial-gradient(110% 80% at 50% -10%,#161411 0%,var(--ink-900) 55%,var(--ink-950) 100%);}
+.about__rail{list-style:none;margin:0 auto;padding:0;display:flex;flex-direction:column;align-items:center;gap:46px;max-width:400px}
+.about__nugget{width:100%}
+
+/* ── the plate ─────────────────────────────────────────────────────────── */
+.about__plate{ position:relative; z-index:1; width:min(400px,100%);
+  display:flex; flex-direction:column; align-items:center; gap:13px;
+  padding:34px 26px 21px; border:1px solid var(--hair-1); border-radius:10px;
+  /* the stock, sunk one level (#11100d -> #100f0c) so the arriving texture
+     carries the composited mean back onto the stock. */
+  background:linear-gradient(180deg,rgba(233,229,220,.024) 0%,transparent 65%),var(--ink-900);
+  box-shadow:inset 0 1px 0 rgba(233,229,220,.04); }
+.about__plate::before{ content:""; position:absolute; inset:7px; border-radius:6px;
+  box-shadow:inset 0 0 0 1px var(--hair-2); pointer-events:none; }
+
+/* ── THE SHEET ─────────────────────────────────────────────────────────── */
+.about__plate::after{ content:""; position:absolute; inset:0; z-index:-1;
+  border-radius:inherit; pointer-events:none;
+  opacity:.848; transition:opacity 260ms ease;
+  -webkit-mask-image:var(--sheet);        mask-image:var(--sheet);
+  -webkit-mask-size:cover;                mask-size:cover;
+  -webkit-mask-position:center;           mask-position:center;
+  -webkit-mask-repeat:no-repeat;          mask-repeat:no-repeat; }
+@supports ((-webkit-mask-image:url("assets/sheet-01.png")) or (mask-image:url("assets/sheet-01.png"))){
+  .about__plate::after{ background:rgba(233,229,220,.092) }
+}
+.about__nugget:not(.about__nugget--unlit) .about__plate:hover::after{ opacity:1 }
+[data-nug="codex"]{--sheet:url("assets/sheet-01.png")}
+[data-nug="tarot"]{--sheet:url("assets/sheet-02.png")}
+[data-nug="arcana"]{--sheet:url("assets/sheet-03.png")}
+[data-nug="mint"]{--sheet:url("assets/sheet-04.png")}
+[data-nug="unlit"]{--sheet:url("assets/sheet-05.png")}
+
+.about__emblem{display:block;color:var(--silver-dim);filter:drop-shadow(0 7px 16px rgba(0,0,0,.5))}
+.about__emblem svg{width:48px;height:48px;display:block}
+.about__name{font-family:var(--font-ui);font-size:13px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--t-display);margin:0}
+.about__rule{width:44px;height:1px;background:linear-gradient(90deg,transparent,var(--hair-1) 20%,var(--hair-1) 80%,transparent)}
+.about__line{font-family:var(--font-display);font-size:clamp(16px,2.3vw,18.5px);line-height:1.5;color:var(--t-primary);text-align:center;max-width:31ch;margin:0}
+.about__micro{font-family:var(--font-mono);font-size:8.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--t-meta);margin:0}
+.about__door{margin-top:8px;display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:12px 20px;border:1px solid var(--hair-1);border-radius:8px;background:linear-gradient(180deg,rgba(233,229,220,.015),transparent 70%);cursor:pointer;font-family:var(--font-ui);font-size:11.5px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--t-display);text-decoration:none}
+.is-free .about__micro{color:#c8ad70}
+.is-free .about__emblem{color:#c8ad70}
+.is-paid .about__micro{color:color-mix(in srgb,var(--violet) 65%,var(--t-meta))}
+.is-paid .about__emblem{color:var(--violet)}
+
+/* unlit — the gold floor-glow becomes a background LAYER; ::after is the sheet */
+.about__nugget--unlit .about__plate{ border-style:dashed; border-color:var(--hair-2);
+  background:radial-gradient(120% 80% at 50% 120%,rgba(200,173,112,.05),transparent 62%),
+             linear-gradient(180deg,rgba(233,229,220,.024) 0%,transparent 65%),
+             var(--ink-900); }
+.about__nugget--unlit .about__emblem{filter:blur(6px);opacity:.45}
+.about__nugget--unlit .about__name{filter:blur(1.2px);opacity:.66}
+/* BR: --faint (#6e6b63) tops out at 3.60:1 and cannot carry the sheet. --t-meta. */
+.about__nugget--unlit .about__line,.about__nugget--unlit .about__micro{color:var(--t-meta)}
+@media (prefers-reduced-motion:reduce){ .about__plate::after{transition:none} }
+</style></head><body>
+<ol class="about__rail">
+<li class="about__nugget is-free" data-nug="codex"><div class="about__plate">
+ <span class="about__emblem"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor"><rect x="10" y="8" width="28" height="32" rx="2"/><path d="M17 16h14M17 24h14M17 32h9"/></svg></span>
+ <p class="about__name">The Codex</p><span class="about__rule"></span>
+ <p class="about__line">The whole archive of meanings — every card, sign, and rune — yours to search.</p>
+ <p class="about__micro">Free · always open</p><a class="about__door" href="#">Open the Codex &rarr;</a></div></li>
+<li class="about__nugget" data-nug="tarot"><div class="about__plate">
+ <span class="about__emblem"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor"><rect x="12" y="8" width="24" height="32" rx="3"/><path d="M24 16l4 8-4 8-4-8z"/></svg></span>
+ <p class="about__name">Tarot Divination</p><span class="about__rule"></span>
+ <p class="about__line">Cut the full deck to a question — the Pull, a Sitting, or the Deep Read — and what falls is read and filed.</p>
+ <p class="about__micro">Drawn once · not reissued.</p><a class="about__door" href="#">Enter the room &rarr;</a></div></li>
+<li class="about__nugget is-paid" data-nug="arcana"><div class="about__plate">
+ <span class="about__emblem"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor"><circle cx="24" cy="24" r="14"/><path d="M24 10v28M10 24h28"/></svg></span>
+ <p class="about__name">The Arcana Reading</p><span class="about__rule"></span>
+ <p class="about__line">A person, read by birth through six systems into a crowned name — a record kept for every reading.</p>
+ <p class="about__micro">By birth · or a Concord of two</p><a class="about__door" href="#">Enter the room &rarr;</a></div></li>
+<li class="about__nugget is-free" data-nug="mint"><div class="about__plate">
+ <span class="about__emblem"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor"><rect x="9" y="13" width="30" height="22" rx="2"/><circle cx="24" cy="24" r="6"/></svg></span>
+ <p class="about__name">Card Mint</p><span class="about__rule"></span>
+ <p class="about__line">Bring a photo — it is already a card. The room only develops it.</p>
+ <p class="about__micro">The Free Pull · the Halo Mint</p><button class="about__door">See a card develop &rarr;</button></div></li>
+<li class="about__nugget about__nugget--unlit" data-nug="unlit"><div class="about__plate">
+ <span class="about__emblem"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor"><path d="M24 12v24M16 20l8-8 8 8"/></svg></span>
+ <p class="about__name">The Unlit Room</p><span class="about__rule"></span>
+ <p class="about__line">Something is taking shape here — still too dim to name. The candle has not reached it yet.</p>
+ <p class="about__micro">Not yet lit</p></div></li>
+</ol></body></html>

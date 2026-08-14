@@ -1,0 +1,307 @@
+<!doctype html>
+<!-- THE BIRTH READING — rebuilt. Untracked scratch, v2.
+
+     WHY IT WAS REBUILT RATHER THAN PATCHED. v1 took eight consecutive corrections, each
+     one answered on its own, and nobody re-read the page as a page. It ended as four
+     registers arguing with each other — a literary opening, a plain-language middle, a
+     proof section and a facts table — and the builder's verdict was that the whole thing
+     had stopped being interesting.
+
+     ★ THE DIAGNOSIS, which matters more than any of the eight notes: THE PAGE WAS ENTIRELY
+     ARGUMENT. Every section was a REASON — why it is worth it, why it is different, why it
+     stays. Nothing on it was the thing itself. The one piece of real material, an actual
+     reading, was three lines buried two thirds down.
+
+     Meanwhile the strongest single finding of 273 agent-runs, recorded in this repo, is
+     that showing real output beats describing it. And the door that won did almost no
+     arguing: it showed six real glyphs and one withheld line.
+
+     SO THIS PAGE IS MADE OF THE PRODUCT INSTEAD OF ABOUT IT.
+       · a real reading, someone else's, printed at length and labelled as such
+       · the six marks with their REAL Codex entries — real names, real tags, real keywords
+       · the crowned name, and the plain statement of which marks built it
+       · then, small and last, the terms and the way in
+     Roughly a third the length of v1, and the persuasion is the material.
+
+     ★ EVERY WORD OF THE EXAMPLE IS REAL. Born 14 March 1991 gives Pisces (sunSign(), Feb 19
+     – Mar 20) and the Goat (1991 is listed in the Goat's own tag) and Life Path 1
+     (1+4+3+1+9+9+1 = 28 → 10 → 1). Those three are date-derived and checkable. The rune,
+     trigram and hexagram are seed-drawn per arcana-reading.js:120, so they are shown as
+     part of this one record rather than claimed as derivable from the date — which is the
+     distinction the claim audit was written to protect. Entry text is quoted from
+     codex-data.json, not written here.
+
+     ★ REGISTER. Plain words, short sentences, no history lesson, no feature bullets, and
+     nothing that flatters or predicts. It is an archive showing a record. -->
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>The Birth Reading — Blue Room</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --t-display:#dcd7cb; --t-primary:#d7d3ca; --t-body:#b1ada4;
+  --t-meta:#948f87; --t-ghost:#6e6b63;
+  --ink-950:#0a0b0d; --ink-vessel:#11100d; --ink-raised:#141310;
+  --hair-1:rgba(233,229,220,.14); --hair-2:rgba(233,229,220,.08);
+  --hair-3:rgba(233,229,220,.045);
+  --gold:#c69b63; --gold-dim:#9a7b4c;
+  --font-display:'Cormorant Garamond',Georgia,serif;
+  --font-mono:'IBM Plex Mono',Consolas,monospace;
+  --dur:160ms; --ease:cubic-bezier(.22,.61,.36,1);
+}
+*{box-sizing:border-box}
+html,body{height:100%; overflow:hidden}
+html{background:var(--ink-950)}
+body{margin:0; background:var(--ink-950); color:var(--t-body);
+  font-family:var(--font-mono); font-size:13px; line-height:1.7; -webkit-font-smoothing:antialiased}
+a{color:inherit}
+
+.ground{position:fixed; inset:0; z-index:0; background:var(--ink-950); pointer-events:none}
+.scroll{position:fixed; inset:0; z-index:1; overflow-y:auto; overflow-x:hidden;
+  overscroll-behavior:contain; scrollbar-width:thin; scrollbar-color:rgba(233,229,220,.13) transparent}
+.scroll::-webkit-scrollbar{width:9px}
+.scroll::-webkit-scrollbar-track{background:transparent}
+.scroll::-webkit-scrollbar-thumb{background:rgba(233,229,220,.12); border-radius:9px;
+  border:3px solid transparent; background-clip:content-box}
+.scroll:focus-visible{outline:none}
+.edge{position:fixed; left:0; right:0; z-index:2; pointer-events:none}
+.edge--t{top:0; height:46px; background:linear-gradient(180deg,var(--ink-950),rgba(10,11,13,0))}
+.edge--b{bottom:0; height:58px; background:linear-gradient(0deg,var(--ink-950),rgba(10,11,13,0))}
+
+.wrap{max-width:60ch; margin:0 auto; padding:48px 26px 170px}
+
+.back{display:inline-flex; gap:8px; font-size:9px; letter-spacing:.2em; text-transform:uppercase;
+  color:var(--t-ghost); text-decoration:none; padding:5px 0; transition:color var(--dur) var(--ease)}
+.back:hover,.back:focus-visible{color:var(--t-meta); outline:none}
+
+.h1{font-family:var(--font-display); font-weight:600; font-size:clamp(27px,3.6vw,38px);
+  line-height:1.1; color:var(--t-display); margin:22px 0 10px}
+.h1 em{font-style:italic; font-weight:400}
+.sub{font-family:var(--font-display); font-size:17px; line-height:1.5; color:var(--t-primary); margin:0 0 4px}
+
+/* ── THE RECORD. This is the page. Everything below it is a footnote. */
+.rec{margin-top:34px; border-top:1px solid var(--hair-2)}
+.rec__head{display:flex; justify-content:space-between; align-items:baseline; gap:14px;
+  padding:13px 0 16px; font-size:9px; letter-spacing:.18em; text-transform:uppercase; color:var(--t-meta)}
+.rec__head b{color:var(--gold-dim); font-weight:500}
+
+.mark{padding:17px 0; border-top:1px solid var(--hair-3); display:grid;
+  grid-template-columns:44px minmax(0,1fr); gap:16px; align-items:start}
+.mark__g{font-family:var(--font-display); font-size:27px; line-height:1; color:var(--t-display)}
+.mark__slot{font-size:8.5px; letter-spacing:.18em; text-transform:uppercase; color:var(--t-ghost); display:block; margin-bottom:5px}
+.mark__name{font-family:var(--font-display); font-size:19px; line-height:1.2; color:var(--t-display); display:block}
+.mark__tag{font-size:10px; color:var(--t-ghost); display:block; margin-top:3px}
+.mark__mean{font-family:var(--font-display); font-size:15.5px; line-height:1.55; color:var(--t-body); margin:9px 0 0}
+
+/* the name the six assemble into — the one lit thing on the page */
+.crown{margin-top:26px; padding:22px 0 24px; border-top:1px solid var(--hair-2); border-bottom:1px solid var(--hair-2); text-align:center}
+.crown__k{font-size:8.5px; letter-spacing:.2em; text-transform:uppercase; color:var(--t-meta); margin:0 0 12px}
+.crown__n{font-family:var(--font-display); font-size:clamp(26px,4vw,34px); font-weight:600;
+  line-height:1.15; color:var(--gold); margin:0}
+.crown__b{font-size:10.5px; color:var(--t-ghost); margin:12px 0 0; line-height:1.6}
+
+.note{margin-top:30px; font-size:12.5px; line-height:1.75; color:var(--t-body)}
+.note p{margin:0 0 12px} .note p:last-child{margin:0}
+.note em{font-family:var(--font-display); font-size:15px; font-style:italic; color:var(--t-primary)}
+
+.terms{margin-top:34px; padding-top:18px; border-top:1px solid var(--hair-3); display:grid; gap:7px}
+.terms div{display:grid; grid-template-columns:104px minmax(0,1fr); gap:14px; font-size:11.5px}
+.terms dt{color:var(--t-ghost); font-size:9px; letter-spacing:.14em; text-transform:uppercase; padding-top:2px}
+.terms dd{margin:0}
+
+.exits{margin-top:42px; padding-top:16px; border-top:1px solid var(--hair-3);
+  font-size:9.5px; letter-spacing:.18em; text-transform:uppercase; color:var(--t-ghost)}
+.exits a{text-decoration:none; color:var(--t-meta)} .exits a:hover{color:var(--t-primary)}
+.exits span{opacity:.4; margin:0 9px}
+
+/* ── THE OFFER. Unchanged in behaviour: absent until the record has been read, then it
+      arrives bottom right and stays. Solid, steady, warm at the act. */
+.buy{position:fixed; right:26px; bottom:26px; z-index:30; width:230px;
+  opacity:0; transform:translateY(10px); pointer-events:none;
+  transition:opacity 260ms var(--ease), transform 260ms var(--ease)}
+.buy.is-here{opacity:1; transform:none; pointer-events:auto}
+@media (prefers-reduced-motion:reduce){ .buy,.buy.is-here{transition:opacity 160ms linear; transform:none} }
+.buy__plate{background:linear-gradient(180deg,#16150f,#100f0b);
+  border:1px solid rgba(233,229,220,.10); border-top-color:rgba(233,229,220,.15); border-radius:3px;
+  box-shadow:inset 0 1px 0 rgba(233,229,220,.07), inset 0 -1px 0 rgba(0,0,0,.5),
+             0 6px 14px -6px rgba(0,0,0,.75), 0 2px 4px -2px rgba(0,0,0,.6);
+  padding:17px; transition:border-color var(--dur) var(--ease)}
+.buy:hover .buy__plate{border-color:rgba(233,229,220,.18)}
+.buy__price{font-family:var(--font-display); font-size:24px; font-weight:600; line-height:1;
+  color:var(--t-display); margin:0; display:inline-block}
+.buy__unit{display:inline-block; margin-left:8px; font-size:8.5px; letter-spacing:.14em;
+  text-transform:uppercase; color:var(--t-ghost)}
+.buy__need{font-size:10px; color:var(--t-ghost); margin:9px 0 0; line-height:1.5}
+.buy__act{display:flex; align-items:center; justify-content:center; width:100%; margin-top:12px;
+  font-family:var(--font-mono); font-size:10px; letter-spacing:.16em; text-transform:uppercase;
+  color:#17140e; background:linear-gradient(180deg,#d9b079,var(--gold));
+  border:0; border-radius:2px; padding:12px; min-height:44px; text-decoration:none;
+  transition:filter var(--dur) var(--ease), box-shadow var(--dur) var(--ease)}
+.buy__act:hover{filter:brightness(1.08); box-shadow:0 0 28px -8px rgba(198,155,99,.6)}
+.buy__act:focus-visible{outline:2px solid var(--gold); outline-offset:3px}
+.buy__second{display:block; margin:10px 0 0; padding-top:10px; border-top:1px solid var(--hair-3);
+  font-size:10px; color:var(--t-meta); text-decoration:none; line-height:1.45}
+.buy__second:hover{color:var(--t-primary)}
+
+@media (max-width:900px){
+  .wrap{padding:36px 20px 200px}
+  .mark{grid-template-columns:34px minmax(0,1fr); gap:13px}
+  .mark__g{font-size:22px}
+  .terms div{grid-template-columns:1fr; gap:2px}
+  .buy{left:0; right:0; bottom:0; width:auto; position:fixed;
+    background:linear-gradient(180deg,rgba(10,11,13,.86),var(--ink-950) 42%);
+    border-top:1px solid var(--hair-2); backdrop-filter:blur(10px); padding:12px 18px 15px}
+  .buy__plate{background:none; border:0; box-shadow:none; padding:0;
+    display:grid; grid-template-columns:auto minmax(0,1fr); gap:14px; align-items:center}
+  .buy:hover .buy__plate{border-color:transparent}
+  .buy__act{grid-column:2; margin:0}
+  .buy__need,.buy__second{grid-column:1/-1}
+  .buy__need{margin:2px 0 0}
+}
+</style>
+</head>
+<body>
+<div class="ground" aria-hidden="true"></div>
+<div class="edge edge--t" aria-hidden="true"></div>
+<div class="edge edge--b" aria-hidden="true"></div>
+
+<div class="scroll" tabindex="0" role="region" aria-label="The Birth Reading">
+<div class="wrap">
+
+  <a class="back" href="index.html">&#8592; Blue Room</a>
+
+  <h1 class="h1">Here are your six, and <em>what they say together</em>.</h1>
+  <p class="sub">This is someone else's, printed whole. Yours is read the same way.</p>
+
+  <!-- THE RECORD -->
+  <div class="rec">
+    <div class="rec__head">
+      <span>A record, in full</span>
+      <span><b>Born 14 March 1991</b></span>
+    </div>
+
+    <div class="mark">
+      <span class="mark__g">&#9811;&#xFE0E;</span>
+      <div>
+        <span class="mark__slot">Sun sign &middot; from the date</span>
+        <span class="mark__name">Pisces</span>
+        <span class="mark__tag">Water &middot; Mutable &middot; Neptune &middot; compassionate, imaginative, intuitive, escapist</span>
+        <p class="mark__mean">The most emotionally absorbent and imaginative sign, closing
+          the cycle as the final one.</p>
+      </div>
+    </div>
+
+    <div class="mark">
+      <span class="mark__g">&#32650;</span>
+      <div>
+        <span class="mark__slot">Year animal &middot; from the year</span>
+        <span class="mark__name">The Goat</span>
+        <span class="mark__tag">Fixed element: Earth &middot; gentle, creative, compassionate, indecisive</span>
+        <p class="mark__mean">Gentleness, creativity and compassion. Artistic and nurturing,
+          sensitive to what other people are feeling.</p>
+      </div>
+    </div>
+
+    <div class="mark">
+      <span class="mark__g">1</span>
+      <div>
+        <span class="mark__slot">Life path &middot; the digits, reduced</span>
+        <span class="mark__name">One</span>
+        <span class="mark__tag">1+4+3+1+9+9+1 = 28 &rarr; 10 &rarr; 1 &middot; leadership, independence, initiative</span>
+        <p class="mark__mean">The leader and the pioneer. Self-reliance, and the urge to
+          originate rather than follow.</p>
+      </div>
+    </div>
+
+    <div class="mark">
+      <span class="mark__g">&#5792;&#xFE0E;</span>
+      <div>
+        <span class="mark__slot">Rune</span>
+        <span class="mark__name">Fehu</span>
+        <span class="mark__tag">F &middot; cattle / wealth &middot; abundance, earned reward, new energy</span>
+        <p class="mark__mean">Cattle &mdash; the old measure of movable wealth. Resources
+          gained through effort rather than arriving.</p>
+      </div>
+    </div>
+
+    <div class="mark">
+      <span class="mark__g">&#9783;&#xFE0E;</span>
+      <div>
+        <span class="mark__slot">Trigram</span>
+        <span class="mark__name">K&#363;n &middot; Earth</span>
+        <span class="mark__tag">The Receptive &middot; yin &middot; the mother &middot; devoted, yielding</span>
+        <p class="mark__mean">Receptivity and devotion. The one that carries a thing through
+          rather than starting it.</p>
+      </div>
+    </div>
+
+    <div class="mark">
+      <span class="mark__g">&#9776;&#xFE0E;&#9776;&#xFE0E;</span>
+      <div>
+        <span class="mark__slot">Hexagram &middot; two trigrams stacked</span>
+        <span class="mark__name">2 &middot; The Receptive</span>
+        <span class="mark__tag">Earth over Earth &middot; yielding, devotion, nurture, support</span>
+        <p class="mark__mean">Pure yin, doubled. Where the Creative begins a thing, this one
+          completes it &mdash; strength gained by yielding rather than forcing.</p>
+      </div>
+    </div>
+
+    <div class="crown">
+      <p class="crown__k">And the name the six assemble into</p>
+      <p class="crown__n">The Silt-Bearing Daybringer</p>
+      <p class="crown__b">Silt-Bearing &middot; Daybringer &middot; filed at the stopping
+        place &middot; keyed to vitality<br />
+        Four of the marks build the name. The other two stand beside it and are read with it.</p>
+    </div>
+
+    <div class="note">
+      <p>Look at the last three. The record is soft all the way down &mdash; receptive,
+        yielding, carried through &mdash; and then the number in the middle of it is the
+        one that stands alone and starts things.</p>
+      <p>Nothing here smooths that over. <em>It names the tension and leaves it standing.</em></p>
+    </div>
+  </div>
+
+  <div class="terms">
+    <div><dt>What you give</dt><dd>A name and a date of birth. Nothing else.</dd></div>
+    <div><dt>What you get</dt><dd>A record like the one above, with your six in it, and a link that reopens it whole.</dd></div>
+    <div><dt>What it costs</dt><dd>$4.99 for one name. $7.99 for two, read against each other.</dd></div>
+    <div><dt>What is withheld</dt><dd>Nothing. Every entry above is in the Codex and free to read right now.</dd></div>
+    <div><dt>If it changes</dt><dd>It does not. The same name and date return the same six, tonight and in ten years.</dd></div>
+  </div>
+
+  <nav class="exits">
+    <a href="codex.html">The Codex</a><span>&middot;</span>
+    <a href="?dev=profile">Your profile</a><span>&middot;</span>
+    <a href="index.html#about">The house &#8595;</a>
+  </nav>
+
+</div>
+</div>
+
+<aside class="buy">
+  <div class="buy__plate">
+    <p class="buy__price">$4.99</p>
+    <span class="buy__unit">One name &middot; kept</span>
+    <p class="buy__need">The six were already yours. This gives you the reading of them.</p>
+    <a class="buy__act" href="?dev=arcane">Read my six marks</a>
+    <a class="buy__second" href="?dev=drawing-room">A name and a date, nothing else. Or take a free Sitting first.</a>
+  </div>
+</aside>
+
+<script>
+/* the offer arrives once the record has been read past, not before */
+(function(){
+  var buy=document.querySelector('.buy'), gate=document.querySelector('.crown');
+  function show(){ if(buy) buy.classList.add('is-here'); }
+  if(!buy||!gate||!('IntersectionObserver' in window)){ show(); return; }
+  var io=new IntersectionObserver(function(rows){
+    if(rows.some(function(r){return r.isIntersecting;})){ show(); io.disconnect(); }
+  },{rootMargin:'0px 0px -45% 0px'});
+  io.observe(gate);
+})();
+</script>
+</body>
+</html>

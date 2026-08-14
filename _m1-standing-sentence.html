@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>M1 — THE STANDING SENTENCE</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  :root {
+    --t-display: #dcd7cb;
+    --t-primary: #d7d3ca;
+    --t-body: #b1ada4;
+    --t-meta: #948f87;
+    --t-ghost: #86827a; /* codex value — item 8 already applied here */
+    --ink-950: #0a0b0d;
+    --ink-900: #100f0c;
+    --line-faint: rgba(233,229,220,.07);
+    --line: rgba(233,229,220,.12);
+    --line-strong: rgba(233,229,220,.2);
+    --gold: #c9a35c;
+    --font-display: "Cormorant Garamond","Times New Roman",serif;
+    --font-ui: "Inter",-apple-system,"Segoe UI",sans-serif;
+    --font-mono: "IBM Plex Mono","Consolas",monospace;
+    --ease-settle: cubic-bezier(.22,.61,.36,1);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  html { background: var(--ink-950); }
+  body {
+    font-family: var(--font-ui);
+    color: var(--t-primary);
+    background: radial-gradient(110% 80% at 50% -10%, #161411 0%, var(--ink-900) 55%, var(--ink-950) 100%);
+    background-attachment: fixed;
+    -webkit-font-smoothing: antialiased;
+    display: flex; align-items: center; justify-content: center;
+    min-height: 100dvh;
+    overflow-x: hidden;
+  }
+
+  /* ===== the frame: chrome furniture that already exists, reproduced only as a
+     measuring stick — the fixed rail + two orbs the real M1 already ships ===== */
+  .stagebox { position: relative; width: 100%; height: 100dvh; overflow: hidden; }
+  .rail {
+    position: absolute; left: 0; right: 0; bottom: 0; height: 64px;
+    border-top: 1px solid var(--line-faint);
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-mono); font-size: 10px; letter-spacing: .16em; color: var(--t-ghost);
+  }
+  .orb { position: absolute; bottom: 84px; width: 34px; height: 34px; border-radius: 50%;
+    border: 1px solid var(--line); display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-mono); font-size: 12px; color: var(--t-meta); }
+  .orb--l { left: 20px; } .orb--r { right: 20px; }
+
+  /* ===== the flow — one continuous paragraph, R0 through R5 ===== */
+  .flow {
+    width: min(760px, 88vw);
+    padding: clamp(16px, 4vh, 40px) clamp(4px, 2vw, 4px) 96px;
+    display: flex; flex-direction: column;
+    text-align: left;
+  }
+
+  /* R0 — running head */
+  .r0 {
+    font-family: var(--font-mono); font-size: 10px; letter-spacing: .16em; text-transform: uppercase;
+    color: var(--t-meta); margin-bottom: clamp(18px, 3vh, 30px);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .r0::before { content: "◆"; color: var(--gold); font-size: 9px; }
+
+  /* R1 — epigraph: fixed-height, cross-fading questions, unchanged engine */
+  .r1 {
+    position: relative; height: 2.6em; margin-bottom: clamp(14px, 2.6vh, 26px);
+    pointer-events: none;
+  }
+  .r1__q {
+    position: absolute; inset: 0; display: flex; align-items: center;
+    font-family: var(--font-display); font-style: italic; font-size: 16px; line-height: 1.5;
+    color: var(--t-ghost); opacity: 0;
+    animation: r1fade 27.2s linear infinite;
+  }
+  .r1__q:nth-child(1) { animation-delay: 0s; }
+  .r1__q:nth-child(2) { animation-delay: -9s; }
+  .r1__q:nth-child(3) { animation-delay: -18s; }
+  @keyframes r1fade {
+    0%   { opacity: 0; transform: translateY(5px); }
+    3%   { opacity: .5; transform: translateY(0); }
+    18%  { opacity: .5; transform: translateY(0); }
+    24%  { opacity: 0; transform: translateY(-5px); }
+    100% { opacity: 0; transform: translateY(-5px); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .r1__q { animation: none; opacity: 0; }
+    .r1__q:first-child { opacity: .5; }
+  }
+
+  /* R2 — the standing sentence. the largest object on the page, and it is words. */
+  .r2 {
+    font-family: var(--font-display); font-weight: 500;
+    font-size: clamp(30px, 4.4vw, 54px); line-height: 1.14;
+    color: var(--t-body);
+    max-width: 26ch;
+    margin-bottom: clamp(20px, 3.4vh, 34px);
+  }
+  .r2 .offer {
+    color: var(--t-display);
+    text-decoration: none;
+    background-image: linear-gradient(var(--gold), var(--gold));
+    background-repeat: no-repeat;
+    background-position: 0 100%;
+    background-size: 100% 1px;
+    padding-bottom: .02em;
+    transition: background-size 260ms var(--ease-settle), color 260ms var(--ease-settle);
+    border-radius: 2px;
+  }
+  .r2 .offer:hover, .r2 .offer:focus-visible {
+    background-size: 100% 2px;
+    color: #f1ecdf;
+  }
+  .r2 .offer:focus-visible {
+    outline: 1px solid var(--gold);
+    outline-offset: 4px;
+  }
+  .r2 .offer:active { color: var(--gold); }
+  .r2 .tail {
+    display: block; font-family: var(--font-mono); font-size: 12px; letter-spacing: .04em;
+    color: var(--t-ghost); font-style: normal; margin-top: 10px;
+  }
+
+  /* R3 — the subordinate clause. the ~152px reading block. untouched token, new voice. */
+  .r3 {
+    border-left: 1px solid var(--line);
+    padding-left: 1em;
+    margin-bottom: clamp(22px, 3.4vh, 36px);
+  }
+  .r3__intro {
+    font-family: var(--font-mono); font-size: 10.5px; letter-spacing: .2em; text-transform: uppercase;
+    color: var(--t-ghost); margin-bottom: 6px;
+  }
+  .r3__mark { color: var(--gold); }
+  .r3__mean {
+    font-family: var(--font-display); font-size: 19px; line-height: 1.6;
+    color: var(--t-body); margin: 0 0 12px;
+    display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 5; overflow: hidden;
+    height: calc(19px * 1.6 * 5);
+  }
+  @media (max-width: 560px) {
+    .r3__mean { -webkit-line-clamp: 7; height: calc(17px * 1.6 * 7); font-size: 17px; }
+  }
+  .r3__switch {
+    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+    font-family: var(--font-mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase;
+  }
+  .r3__switch [role="radiogroup"] { display: flex; gap: 4px; }
+  .r3__opt {
+    background: none; border: none; cursor: pointer;
+    font: inherit; color: var(--t-ghost); padding: 6px 4px;
+    border-bottom: 1px solid transparent;
+    transition: color 200ms var(--ease-settle), border-color 200ms var(--ease-settle);
+  }
+  .r3__opt[aria-checked="true"] { color: var(--t-display); border-bottom-color: var(--gold); }
+  .r3__opt:focus-visible { outline: 1px solid var(--gold); outline-offset: 2px; }
+  .r3__sep { color: var(--t-ghost); }
+  .r3__pull {
+    margin-left: auto; background: none; border: 1px solid var(--line-strong); border-radius: 3px;
+    color: var(--t-meta); font: inherit; padding: 6px 12px; cursor: pointer;
+    transition: color 200ms var(--ease-settle), border-color 200ms var(--ease-settle);
+  }
+  .r3__pull:hover, .r3__pull:focus-visible { color: var(--t-display); border-color: var(--gold); }
+  .r3__pull:focus-visible { outline: 1px solid var(--gold); outline-offset: 2px; }
+
+  /* R4 — colophon */
+  .r4 {
+    font-family: var(--font-mono); font-size: 10px; letter-spacing: .05em; text-transform: uppercase;
+    color: var(--t-ghost); line-height: 1.8; margin-bottom: clamp(20px, 3vh, 30px);
+    padding-right: 64px; /* clears the two fixed orbs */
+  }
+  .r4 a { color: var(--t-meta); text-decoration: none; border-bottom: 1px solid var(--line); }
+  .r4 a:hover, .r4 a:focus-visible { color: var(--t-display); border-color: var(--gold); }
+  .r4 a:focus-visible { outline: 1px solid var(--gold); outline-offset: 2px; }
+  .r4__dot { color: var(--line-strong); margin: 0 8px; }
+
+  /* R5 — catchword */
+  .r5 {
+    background: none; border: none; cursor: pointer;
+    font-family: var(--font-mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase;
+    color: var(--t-ghost); display: flex; align-items: center; gap: 8px;
+    padding: 6px 4px; align-self: flex-start;
+    transition: color 200ms var(--ease-settle), transform 200ms var(--ease-settle);
+  }
+  .r5:hover, .r5:focus-visible { color: var(--t-display); transform: translateY(2px); }
+  .r5:focus-visible { outline: 1px solid var(--gold); outline-offset: 3px; }
+  .r5__arrow { color: var(--gold); font-size: 12px; }
+
+  @media (max-width: 430px) {
+    /* BR: at this width the two fixed orbs (furniture, see .orb--l/.orb--r above)
+       sit inside the flow's own reserved bottom padding, left:20/right:20, 34px each.
+       R4 wraps to two lines here and R5 sits directly under it — both rows need
+       real clearance from BOTH orbs, not just the right one, or the catchword
+       collides with the left orb. Measured: without this, .r5's rect overlapped
+       .orb--l's rect by 14px horizontally and 16px vertically at 430x740. */
+    .flow { width: min(92vw, 520px); padding-bottom: 130px; }
+    .r2 { max-width: none; }
+    .r4 { padding-right: 46px; padding-left: 0; margin-bottom: clamp(26px, 4vh, 38px); }
+    .r5 { padding-left: 46px; padding-right: 46px; }
+  }
+</style>
+</head>
+<body>
+<div class="stagebox">
+  <div class="flow">
+
+    <div class="r0">BLUE ROOM</div>
+
+    <div class="r1" aria-hidden="true">
+      <div class="r1__q">Where does this one go.</div>
+      <div class="r1__q">Who am I going to meet.</div>
+      <div class="r1__q">What is worth my next year.</div>
+    </div>
+
+    <h1 class="r2">
+      This is an archive of readings.
+      One is <a href="?dev=arcane" class="offer">given to you at birth</a> and never changes.
+      One is <a href="?dev=drawing-room" class="offer">dealt to you tonight</a> and never repeats.
+      <span class="tail">your first Sitting is free</span>
+    </h1>
+
+    <div class="r3">
+      <div class="r3__intro">— tonight the deck turned</div>
+      <p class="r3__mean"><span class="r3__mark">XVII · The Star</span>, upright. A quiet return of
+        nerve after a long dark stretch — not triumph, just enough light to see the
+        next few steps by. What you doubted about yourself was never the whole
+        story.</p>
+      <div class="r3__switch">
+        <div role="radiogroup" aria-label="showing">
+          <button type="button" class="r3__opt" role="radio" aria-checked="true">given</button>
+          <span class="r3__sep">/</span>
+          <button type="button" class="r3__opt" role="radio" aria-checked="false">dealt</button>
+        </div>
+        <button type="button" class="r3__pull">pull again</button>
+      </div>
+    </div>
+
+    <div class="r4">
+      The deck is already cut. What remains is the turn.
+      <span class="r4__dot">·</span><a href="?dev=codex">every mark in it is defined</a>
+      <span class="r4__dot">·</span><a href="?dev=profile">what's coming</a>
+      <span class="r4__dot">·</span><a href="#settings">settings</a>
+    </div>
+
+    <button type="button" class="r5"><span class="r5__arrow">↓</span> the room continues — what Blue Room is</button>
+
+  </div>
+  <div class="orb orb--l">‹</div>
+  <div class="orb orb--r">›</div>
+  <div class="rail">L1 · M2 THE DRAW · U1</div>
+</div>
+</body>
+</html>

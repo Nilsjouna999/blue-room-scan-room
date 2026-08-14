@@ -1,0 +1,443 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>THE HAND — M1 prototype (fleet 3)</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet"
+  href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" />
+<style>
+/* =====================================================================
+   THE HAND — M1 as an act, not a display.
+   Standalone prototype. Real palette (lifted verbatim from styles.css
+   :root). No navigation wired, no keys bound, nothing below the fold.
+   ===================================================================== */
+
+:root {
+  --t-display: #dcd7cb;
+  --t-primary: #d7d3ca;
+  --t-body: #b1ada4;
+  --t-meta: #948f87;
+  --t-ghost: #6e6b63;
+  --ink-950: #0a0b0d;
+  --ink-900: #100f0c;
+  --ink-850: #11100d;
+  --ink-800: #151310;
+  --ink-700: #1c1915;
+  --line-faint: rgba(233, 229, 220, 0.07);
+  --line: rgba(233, 229, 220, 0.12);
+  --line-strong: rgba(233, 229, 220, 0.2);
+  --gold: #c8ad70;
+  --gold-dim: color-mix(in srgb, var(--gold) 55%, var(--t-ghost));
+  --font-display: "Cormorant Garamond", "Times New Roman", serif;
+  --font-ui: "Inter", -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "IBM Plex Mono", "Consolas", monospace;
+  --ease-settle: cubic-bezier(.16, .84, .44, 1);
+
+  /* the one number that authors the slant. 0 at narrow, restored at wide. */
+  --fall-step: 1;
+}
+
+* { box-sizing: border-box; }
+html, body {
+  margin: 0; padding: 0; background: var(--ink-950); color: var(--t-primary);
+  font-family: var(--font-ui);
+  overflow-x: hidden;           /* the test: nothing below should ever need this */
+}
+body { min-height: 100vh; }
+
+/* ---------------------------------------------------------------------
+   THE FIELD — one screen, no scroll, the chrome rail's 80px respected.
+--------------------------------------------------------------------- */
+.field {
+  position: relative;
+  min-height: 100vh;
+  padding: clamp(20px, 3.4vh, 40px) clamp(18px, 6vw, 64px) 96px;
+  display: flex; flex-direction: column;
+  gap: clamp(14px, 2.2vh, 22px);
+  max-width: 760px;
+}
+
+/* dev-only harness chrome — not part of the design, just orientation for review */
+.harness {
+  position: fixed; top: 10px; right: 10px; z-index: 50;
+  font-family: var(--font-mono); font-size: 9.5px; letter-spacing: .12em; text-transform: uppercase;
+  color: var(--t-ghost); background: var(--ink-900); border: 1px solid var(--line-faint);
+  padding: 7px 10px; border-radius: 4px; display: grid; gap: 4px; text-align: right;
+}
+.harness b { color: var(--gold); font-weight: 500; }
+
+/* ---------------------------------------------------------------------
+   GROUP 1 — THE HEAD. Struck, small, first paint, never animated.
+--------------------------------------------------------------------- */
+.g-head {
+  display: flex; align-items: baseline; gap: 10px;
+  margin-inline-start: calc(0% * var(--fall-step));
+}
+.g-head__mark { font-family: var(--font-mono); font-size: 10px; letter-spacing: .28em; color: var(--gold); }
+.g-head__name {
+  font-family: var(--font-display); font-weight: 600; font-size: 15px;
+  letter-spacing: .01em; color: var(--t-display); margin: 0;
+}
+.g-head__name .sr-h2 {
+  font-size: 10px; font-weight: 500; letter-spacing: .18em; text-transform: uppercase;
+  color: var(--t-ghost); margin-inline-start: 10px;
+}
+
+/* ---------------------------------------------------------------------
+   GROUP 2 — THE FALLEN FACE. Warm, the field's only light source.
+--------------------------------------------------------------------- */
+.g-face-row {
+  display: flex; flex-wrap: wrap; align-items: flex-end; gap: clamp(14px, 2.4vw, 26px);
+  margin-inline-start: calc(4% * var(--fall-step));
+}
+.g-face {
+  position: relative;
+  height: clamp(240px, 42vh, 460px);
+  aspect-ratio: 120 / 190; width: auto; flex: none;
+  border-radius: 10px;
+  background: linear-gradient(178deg, #1c2028 0%, #171a20 46%, #101319 100%);
+  box-shadow:
+    inset 0 0 0 1px rgba(200, 173, 112, 0.24),
+    inset 0 1px 0 rgba(233, 229, 220, 0.05),
+    0 20px 44px rgba(0, 0, 0, 0.55),
+    0 0 34px rgba(200, 173, 112, 0.05);
+  transition: transform 240ms var(--ease-settle), opacity 240ms var(--ease-settle),
+              box-shadow 220ms var(--ease-settle), filter 220ms var(--ease-settle);
+}
+.g-face.is-falling-out { transform: translateY(10px) rotate(-1.2deg); opacity: 0; }
+.g-face.is-falling-in  { animation: fall-in 320ms var(--ease-settle) both; }
+@keyframes fall-in {
+  from { transform: translateY(-14px) rotate(1.4deg); opacity: 0; }
+  to   { transform: translateY(0) rotate(0); opacity: 1; }
+}
+.g-face__crown {
+  position: absolute; top: 14px; left: 0; right: 0; text-align: center;
+  font-size: 13px; color: var(--gold-dim); letter-spacing: .3em;
+}
+.g-face__name {
+  position: absolute; left: 12px; right: 12px; bottom: clamp(14px, 2.6vh, 22px);
+  font-family: var(--font-display); font-size: clamp(15px, 2.3vh, 20px); font-weight: 600;
+  line-height: 1.06; text-align: center; color: var(--t-display); pointer-events: none;
+}
+
+/* GROUP 3 — the read, welded to the face's lower outer edge, one object with it. */
+.g-read {
+  flex: 1 1 220px; min-width: 0;
+  align-self: flex-end;
+  margin-block-end: clamp(6px, 4vh, 30px);        /* laps the face's lower third at wide */
+  display: grid; gap: 6px;
+  --m2read-size: 19px; --m2read-lh: 1.6; --m2read-lines: 5;
+}
+.g-read__label {
+  font-family: var(--font-mono); font-size: 10.5px; letter-spacing: .22em; text-transform: uppercase;
+  color: var(--t-ghost); margin: 0;
+}
+.g-read__meta {
+  font-family: var(--font-mono); font-size: 11.5px; letter-spacing: .18em; text-transform: uppercase;
+  color: var(--t-meta); margin: 0;
+}
+.g-read__meta a { color: inherit; text-decoration: none; border-bottom: 1px solid transparent; }
+.g-read__meta a:hover, .g-read__meta a:focus-visible { color: var(--gold); border-color: currentColor; }
+.g-read__meta .num { color: var(--gold); }
+.g-read__mean {
+  font-family: var(--font-display); font-size: var(--m2read-size); line-height: var(--m2read-lh);
+  color: var(--t-body); margin: 0;
+  height: calc(var(--m2read-size) * var(--m2read-lh) * var(--m2read-lines));
+  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: var(--m2read-lines); overflow: hidden;
+  transition: opacity 180ms var(--ease-settle);
+}
+.g-read__mean.is-swapping { opacity: 0; transition-delay: 0ms; }
+
+/* ---------------------------------------------------------------------
+   GROUP 4 — THE DEAL. One real button, terms always printed beneath it,
+   one fixed-height slot that swaps in place at the third fall.
+--------------------------------------------------------------------- */
+.g-deal {
+  margin-inline-start: calc(11% * var(--fall-step));
+  display: grid; gap: 10px; max-width: 420px;
+}
+.g-deal__btn {
+  justify-self: start;
+  font-family: var(--font-mono); font-size: 10.5px; letter-spacing: .22em; text-transform: uppercase;
+  color: var(--t-primary); background: none; cursor: pointer;
+  border: 1px solid var(--line); border-radius: 999px;
+  padding: 12px 26px; min-height: 44px;
+  transition: color 160ms var(--ease-settle), border-color 160ms var(--ease-settle);
+}
+.g-deal__btn:hover:not(:disabled) { color: var(--t-display); border-color: var(--silver-dim, var(--t-meta)); }
+.g-deal__btn:disabled { opacity: .4; cursor: default; }
+.g-deal__terms {
+  font-family: var(--font-mono); font-size: 11px; letter-spacing: .04em; line-height: 1.5;
+  color: var(--t-meta); margin: 0;
+}
+.g-deal__terms b { color: var(--t-primary); font-weight: 500; }
+.g-deal__slot {
+  position: relative; min-height: 44px; display: grid; align-items: center;
+}
+.g-deal__slot > * {
+  grid-area: 1 / 1;
+  font-family: var(--font-display); font-style: italic; font-size: 15.5px; line-height: 1.4;
+  color: var(--t-body); margin: 0;
+  transition: opacity 260ms var(--ease-settle), transform 260ms var(--ease-settle);
+}
+.g-deal__seal { opacity: 1; transform: translateY(0); }
+.g-deal__offer {
+  opacity: 0; transform: translateY(6px); pointer-events: none;
+  font-style: normal; color: var(--t-primary);
+}
+.g-deal__offer a { color: var(--gold); text-decoration: none; border-bottom: 1px solid var(--gold-dim); }
+.g-deal__offer a:hover, .g-deal__offer a:focus-visible { color: var(--t-display); border-color: var(--gold); }
+.is-earned .g-deal__seal { opacity: 0; transform: translateY(-6px); }
+.is-earned .g-deal__offer { opacity: 1; transform: translateY(0); pointer-events: auto; }
+
+/* ---------------------------------------------------------------------
+   GROUP 5 — THE STRIKE. No container, no edge, no background, no object.
+   Given, not drawn — and unmoved by anything above it.
+--------------------------------------------------------------------- */
+.g-strike {
+  margin-inline-start: calc(9% * var(--fall-step));
+  display: block; text-decoration: none; color: inherit; cursor: pointer;
+  padding-top: clamp(10px, 1.6vh, 16px);
+  border-top: 1px solid var(--line-faint);
+}
+.g-strike__crown { font-size: 12px; letter-spacing: .3em; color: var(--gold-dim); }
+.g-strike__marks {
+  margin: 8px 0 6px; padding: 0; list-style: none;
+  display: flex; flex-wrap: wrap; gap: 7px 0;
+  font-family: var(--font-mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase;
+}
+.g-strike__marks li { display: contents; }
+.g-strike__marks a {
+  color: var(--t-meta); text-decoration: none; padding: 4px 2px; border-bottom: 1px solid transparent;
+}
+.g-strike__marks a:hover, .g-strike__marks a:focus-visible { color: var(--gold); border-color: currentColor; }
+.g-strike__marks .sep { color: var(--t-ghost); margin: 0 8px; align-self: center; }
+.g-strike__line {
+  font-family: var(--font-display); font-size: 14.5px; line-height: 1.5; color: var(--t-body); margin: 0; max-width: 480px;
+}
+
+/* ---------------------------------------------------------------------
+   The terminus — a gold tick pointing down at U1. Composition, not copy.
+--------------------------------------------------------------------- */
+.g-tick {
+  margin-inline-start: calc(0% * var(--fall-step));
+  display: flex; align-items: center; gap: 8px;
+  font-family: var(--font-mono); font-size: 9.5px; letter-spacing: .2em; text-transform: uppercase;
+  color: var(--t-ghost); margin-top: auto;
+}
+.g-tick svg { color: var(--gold-dim); }
+
+/* one shared focus ring for the two controls that carry the whole page's revenue */
+.g-deal__btn:focus-visible,
+.g-strike:focus-visible,
+.g-read__meta a:focus-visible,
+.g-strike__marks a:focus-visible {
+  outline: 1px solid var(--gold); outline-offset: 3px;
+}
+
+/* the 120x120 furniture reservation — orbs live here, M1's own ink never enters it */
+.furniture-note {
+  position: fixed; right: 18px; bottom: 18px; width: 96px; height: 96px;
+  border: 1px dashed var(--line-faint); border-radius: 999px;
+  display: flex; align-items: center; justify-content: center; text-align: center;
+  font-family: var(--font-mono); font-size: 8px; letter-spacing: .1em; color: var(--t-ghost);
+  pointer-events: none;
+}
+.chrome-rail-note {
+  position: fixed; left: 0; right: 0; bottom: 0; height: 60px;
+  border-top: 1px solid var(--line-faint);
+  display: flex; align-items: center; padding: 0 24px; gap: 20px;
+  font-family: var(--font-mono); font-size: 9px; letter-spacing: .16em; text-transform: uppercase; color: var(--t-ghost);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .g-face, .g-read__mean, .g-deal__slot > * { transition: none; animation: none !important; }
+}
+
+/* -----------------------------------------------------------------
+   ★ THE ONLY BREAKPOINT. --fall-step: 0 flattens the slant to a
+   stack. Nothing else changes — no rewritten grid, no second layout.
+------------------------------------------------------------------ */
+@media (max-width: 640px) {
+  :root { --fall-step: 0; }
+  .field { gap: 12px; padding-top: 16px; padding-bottom: 72px; }
+  .g-face-row { flex-direction: column; align-items: flex-start; gap: 12px; }
+  .g-face { height: clamp(170px, 26vh, 280px); }
+  .g-read { align-self: stretch; margin-block-end: 0; }
+  .g-deal { gap: 8px; }
+  .g-deal__btn { padding: 10px 22px; }
+  .g-strike { padding-top: 8px; }
+  .g-strike__marks { margin: 6px 0 4px; gap: 4px 0; font-size: 10px; }
+  .g-strike__line { font-size: 13.5px; }
+  .g-tick { display: none; }   /* the tick is a wide-viewport composition cue; narrow already ends at the rail */
+  .furniture-note { width: 64px; height: 64px; }
+}
+</style>
+</head>
+<body>
+
+<div class="harness">
+  <div>THE HAND — fleet 3 prototype</div>
+  <div>falls: <b id="hCount">1</b> / 5</div>
+  <div id="hHint">no nav wired · no keys bound</div>
+</div>
+
+<main class="field">
+
+  <!-- GROUP 1 — the head -->
+  <div class="g-head">
+    <span class="g-head__mark" aria-hidden="true">◆</span>
+    <h1 class="g-head__name">BLUE ROOM<span class="sr-h2">The Reading Rooms</span></h1>
+  </div>
+
+  <!-- GROUP 2 + 3 — the fallen face, and the read welded to it -->
+  <div class="g-face-row">
+    <div class="g-face" id="face" aria-live="off">
+      <div class="g-face__name" id="faceName">The Star</div>
+    </div>
+    <div class="g-read">
+      <p class="g-read__label" id="liveLabel">The read</p>
+      <p class="g-read__meta" id="readMeta">
+        Major Arcana · <span class="num">17</span> · Upright
+      </p>
+      <p class="g-read__mean" id="readMean">
+        Hope steadies after a fall. What broke open lets the light back in — not a
+        rescue, a return to trusting what still works.
+      </p>
+    </div>
+  </div>
+
+  <!-- GROUP 4 — the deal, the terms, and the slot that earns its swap -->
+  <div class="g-deal" id="dealGroup">
+    <button class="g-deal__btn" id="dealBtn" type="button">Again ⟳</button>
+    <p class="g-deal__terms" id="dealTerms">
+      Three to a question. <b>Your first is free.</b>
+    </p>
+    <div class="g-deal__slot">
+      <p class="g-deal__seal">The deck is already cut. What remains is the turn.</p>
+      <p class="g-deal__offer">That is three. Take them to one question —
+        <a href="?dev=drawing-room">your Sitting is free →</a>
+      </p>
+    </div>
+  </div>
+
+  <!-- GROUP 5 — the strike. No container, no edge, unmoved.
+       NOTE: this is a DIV acting as the whole-strike link (role="link", real
+       navigation on click/Enter via JS below), not an <a>, because it wraps
+       six real per-mark <a> elements — and interactive content cannot nest
+       inside <a> in HTML5 (the parser silently truncates it; caught in the
+       430px pass). Each mark stops propagation so its own href wins. -->
+  <div class="g-strike" id="strikeWhole" tabindex="0" role="link"
+       data-href="?dev=arcane" aria-labelledby="strikeLine">
+    <span class="g-strike__crown" aria-hidden="true">♛</span>
+    <ul class="g-strike__marks">
+      <li><a href="#" onclick="return false;">Sun Sign</a></li><li class="sep" aria-hidden="true">·</li>
+      <li><a href="#" onclick="return false;">Year Animal</a></li><li class="sep" aria-hidden="true">·</li>
+      <li><a href="#" onclick="return false;">Life Path</a></li><li class="sep" aria-hidden="true">·</li>
+      <li><a href="#" onclick="return false;">Rune</a></li><li class="sep" aria-hidden="true">·</li>
+      <li><a href="#" onclick="return false;">Trigram</a></li><li class="sep" aria-hidden="true">·</li>
+      <li><a href="#" onclick="return false;">Hexagram</a></li>
+    </ul>
+    <p class="g-strike__line" id="strikeLine">Six marks. One name. Given, not drawn — and unchanged by anything you do here.</p>
+  </div>
+
+  <!-- the terminus -->
+  <div class="g-tick" aria-hidden="true">
+    <span>further in</span>
+    <svg width="10" height="14" viewBox="0 0 10 14" fill="none">
+      <path d="M5 0V12M5 12L1 8M5 12L9 8" stroke="currentColor" stroke-width="1.2"/>
+    </svg>
+  </div>
+
+</main>
+
+<div class="furniture-note">orbs<br/>(furniture)</div>
+<div class="chrome-rail-note">
+  <span>THE DESK</span><span>Codex</span><span>YOUR PROFILE</span><span>ROOMS</span>
+  <span style="margin-left:auto;opacity:.5">— 80px chrome rail, untouched —</span>
+</div>
+
+<p id="polite" aria-live="polite" class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden;"></p>
+
+<script>
+(function () {
+  var DECK = [
+    { name: "The Star", cls: "Major Arcana", num: "17", state: "Upright",
+      mean: "Hope steadies after a fall. What broke open lets the light back in — not a rescue, a return to trusting what still works." },
+    { name: "The Tower", cls: "Major Arcana", num: "16", state: "Reversed",
+      mean: "The break already happened somewhere quieter. This is the part where the rubble gets counted, not the part where it falls." },
+    { name: "Three of Cups", cls: "Minor Arcana", num: "3", state: "Upright",
+      mean: "Something is worth telling other people about. The reading is not for you alone — say it out loud to someone who was there." },
+    { name: "The Hermit", cls: "Major Arcana", num: "9", state: "Upright",
+      mean: "The answer was never going to arrive with company. Take the lamp, close the door, and let the quiet finish the sentence." },
+    { name: "Ten of Swords", cls: "Minor Arcana", num: "10", state: "Reversed",
+      mean: "The worst of it is already behind you, whether it feels that way yet or not. Mornings after are still mornings." },
+    { name: "The Sun", cls: "Major Arcana", num: "19", state: "Upright",
+      mean: "Nothing left to read between the lines. What you see is what is actually there, and for once that is the good news." }
+  ];
+
+  var count = 1, cap = 5, earnedAt = 3;
+  var face = document.getElementById("face");
+  var faceName = document.getElementById("faceName");
+  var mean = document.getElementById("readMean");
+  var meta = document.getElementById("readMeta");
+  var btn = document.getElementById("dealBtn");
+  var deal = document.getElementById("dealGroup");
+  var hCount = document.getElementById("hCount");
+  var polite = document.getElementById("polite");
+
+  function write(entry, announce) {
+    faceName.textContent = entry.name;
+    meta.innerHTML = entry.cls + " · <span class=\"num\">" + entry.num + "</span> · " + entry.state;
+    mean.classList.add("is-swapping");
+    setTimeout(function () {
+      mean.textContent = entry.mean;
+      mean.classList.remove("is-swapping");
+    }, 90);
+    if (announce) polite.textContent = entry.name + ". " + entry.mean;
+  }
+
+  // first paint — a real deal, already dealt, through the same path every later one uses
+  write(DECK[0], false);
+
+  btn.addEventListener("click", function () {
+    if (count >= cap) return;
+    count++;
+    hCount.textContent = count;
+    var entry = DECK[(count - 1) % DECK.length];
+
+    face.classList.add("is-falling-out");
+    setTimeout(function () {
+      write(entry, true);
+      face.classList.remove("is-falling-out");
+      face.classList.add("is-falling-in");
+      setTimeout(function () { face.classList.remove("is-falling-in"); }, 340);
+    }, 200);
+
+    if (count >= earnedAt) deal.classList.add("is-earned");
+    if (count >= cap) {
+      btn.disabled = true;
+      btn.textContent = "The deck is cut for tonight";
+    }
+  });
+
+  // the strike — the div stands in for a real <a> because it wraps six real
+  // per-mark anchors (nesting <a> in <a> is invalid and silently truncated
+  // by the parser). Clicking anywhere in it EXCEPT on a mark link navigates.
+  var strike = document.getElementById("strikeWhole");
+  function strikeGo(e) {
+    if (e.target.closest("a")) return;   // a per-mark Codex link handled its own click
+    window.location.href = strike.getAttribute("data-href");
+  }
+  strike.addEventListener("click", strikeGo);
+  strike.addEventListener("keydown", function (e) {
+    if (e.target !== strike) return;      // don't fire on a focused mark link
+    if (e.key === "Enter" || e.key === " ") { e.preventDefault(); strikeGo(e); }
+  });
+})();
+</script>
+</body>
+</html>

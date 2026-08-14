@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PRINTED IN FULL — M1 prototype, Team 7 (overtime)</title>
+<style>
+  /* ============================================================
+     TEAM 7 — PRINTED IN FULL  ·  OVERTIME REVISION
+
+     ONE SENTENCE, true of no other design in the pool:
+     this is the only surface that QUOTES THE PAID READING — a
+     stranger reads a sentence of the thing that costs money
+     before spending anything, printed at reading size, on first
+     paint, with no script and nothing withheld.
+
+     ADVOCATE'S CORRECTION, overtime round two. "The Deep Read has
+     its own address" is NO LONGER free ground: teams 3, 5 and 6
+     all now ship href="?dev=drawing-room#deep", and teams 1, 2
+     and 4 print the words. Checked, not assumed. What survives
+     the whole fleet is one thing and it is narrower and better:
+
+       every other design sells the paid reading by COUNTING it
+       — "five cards", "or five", "the Deep Read is five" —
+       and this one PRINTS A LINE OF IT.
+
+     WILDCARD, SPENT HERE: all three printed specimens were
+     INVENTED prose that merely sounded like product output. They
+     are now VERBATIM ENGINE OUTPUT, re-derivable from the seeds
+     given in the comments beside each. Team 1 refuses to print a
+     specimen at all because inventing a filed reading is a
+     failure with better prose — that argument was fatal to this
+     design and is now inverted: this is the only surface in the
+     fleet showing real goods. The engine's actual words are also
+     WEAKER than what was invented here, and the paid line is the
+     weakest of the three. That is the finding, and it stands.
+
+     A count is a spec. A quoted line is the goods. Nobody else
+     in the pool lets a visitor find out what the extra two cards
+     actually say without paying, and that is a thing a stranger
+     notices in one glance and cannot get anywhere else here.
+
+     That claim was in this file already and was being whispered:
+     the quoted paid line sat at 12px, italic, inside a running
+     paragraph, below the free way in, in the smallest register
+     on the surface — the one uncontested win, set as an aside.
+     It is now a printed reading rank of its own, labelled, at
+     reading size, with its own address under it. Restraint was
+     costing the argument and restraint lost.
+
+     ALSO CORRECTED: the pair was not actually broken. The grid
+     was still repeat(2,minmax(0,1fr)) with two identically-
+     structured sides — a matched pair asserted to be unmatched
+     in a comment. It is now measurably unequal: the dealt side
+     takes the wider track because it carries two depths and two
+     printed readings; the given side is narrower and shorter and
+     leaves for the Codex. The asymmetry is visible at a glance
+     instead of only in this comment.
+
+     WHAT CHANGED IN OVERTIME, and why (honest, not loyal):
+
+     1. THE PAIR IS BROKEN. The old file was two of the same kind
+        of thing set out beside one another — which is the shipped
+        surface with the boxes taken off, and the builder's own
+        ranking punishes exactly that (4 > 3 > 2 > 1 is almost
+        exactly distance travelled from what ships). The two sides
+        are no longer symmetrical: the dealt side carries TWO ways
+        in at two depths, the given side carries one way in and a
+        row of marks that leave the page entirely. Nothing about
+        this surface is a matched pair any more.
+
+     2. THE DEEP READ HAS ITS OWN ADDRESS. Free ground no other
+        design in the fleet contests: all seven route every tarot
+        interest to one undifferentiated door, and three never
+        print the words "Deep Read" at all. Here the paid reading
+        is its own named object with its own way in and its own
+        printed line of what it adds. This is NOT price-on-the-
+        door (RULED OUT, app.js:2453-2459): no figure appears
+        anywhere. A price with no goods is a plan comparison,
+        which is what that code rejects; the goods with no price
+        is a sample, which is the opposite move.
+
+     3. THE EXAMPLE SAYS IT IS AN EXAMPLE. Free ground the
+        conviction pass named: every design in the fleet ships a
+        canned reading dressed as a live draw and none of them
+        lets a stranger tell the difference. This one labels it,
+        in the copy, in words — "an example, not your draw."
+        Costs nothing, requires no state, contested by nobody.
+
+     4. THE READING BLOCK IS NOW THE ANCHOR, NOT THE PASSENGER.
+        Free ground the type pass named: every design makes the
+        ~152px block yield size before the page yields space.
+        Inverted here — at every step down, the masthead shrinks
+        first and the printed reading shrinks last and least.
+
+     5. SIX REAL DOORS OUT OF THE PAGE. The named worst-at of the
+        old file was "gives no sense of a larger house." Answered
+        with material that was already on the page as dead text:
+        the six birth marks are now live links into the real
+        Codex walls (#western, #chinese, #numerology, #runes,
+        #trigrams, #iching — verified ids in codex.html). No
+        field, no glyphs, no paint cost, no drift toward the
+        protected pair. Depth of world at zero DOM cost.
+
+     6. THE OVERFLOW POLICY WAS WRONG AND IS CORRECTED. The old
+        file said a scrollbar was "allowed to appear and accuse
+        it." On M1 that is false comfort: app.js:4749 turns the
+        first downward notch into a 934px glide, so anything
+        below the fold is unreachable, not merely inconvenient.
+        Overflow here is a defect, not an accusation. The ladder
+        of steps below is sized to bottom out at 320x568 with the
+        matter intact.
+
+     WORST AT, named and accepted: no mood, no motion, no object,
+     no ceremony. This surface has no atmosphere and does not try
+     for any. If the builder wants the room to feel like a room
+     before it feels like a door, this is not the design.
+
+     GATE (described without the seven banned words): one flow of
+     printed matter — the house named in a line, then two unlike
+     announcements set out beside one another at wide widths and
+     one after the other when narrow. One of them is dealt and
+     opens twice, at two depths, the deeper one paid. The other is
+     given, opens once, and hands off six live marks that leave
+     for the Codex. Underneath, a rule of routes.
+
+     STILL TRUE FROM THE ORIGINAL: no JavaScript in this file at
+     all. No -webkit-line-clamp anywhere. Nothing display:none at
+     any width. Where the narrow screen needed room the STRINGS
+     were cut short at authoring time, once, for every width.
+     100svh, no overflow:hidden.
+
+     THE ~152px READING BLOCK (styles.css:3277): kept as a
+     MIN-height on each printed reading at >=760px so a short
+     example cannot collapse the rank. Below that the reservation
+     is released and the same full string sets to more lines. The
+     block is never shortened, only re-set.
+
+     PALETTE: every value below is already in the codebase.
+     --gold/--gold-lit/--gold-dark collect the literals styles.css
+     hardcodes (critique item 9); --t-ghost is the Codex's own
+     value (item 8). No new colour is proposed.
+
+     AUDIT FIX (mechanical pass): --t-ghost had drifted to an
+     invented #86827a, 46 points lighter than styles.css:16's
+     #6e6b63. The palette is closed — 21 registers built and
+     rejected, no new colour permitted, not even by accident.
+     Corrected to the canonical literal; no other token in this
+     file diverges from styles.css.
+     ============================================================ */
+  :root{
+    --t-display:#dcd7cb; --t-primary:#d7d3ca; --t-body:#b1ada4; --t-meta:#948f87; --t-ghost:#6e6b63;
+    --ink-950:#0a0b0d; --ink-900:#100f0c; --ink-850:#11100d; --ink-800:#151310; --ink-700:#1c1915;
+    --line-faint:rgba(233,229,220,.07); --line:rgba(233,229,220,.12); --line-strong:rgba(233,229,220,.2);
+    --silver-dim:var(--t-meta);
+    --gold:#c8ad70; --gold-lit:#e0c48c; --gold-dark:#5f471f;
+    --font-display:"Cormorant Garamond","Times New Roman",serif;
+    --font-ui:"Inter",-apple-system,"Segoe UI",sans-serif;
+    --font-mono:"IBM Plex Mono","Consolas",monospace;
+    --track-wide:.3em;
+    /* the reading block's own contract, styles.css:3277 */
+    --m2read-size:19px; --m2read-lh:1.6; --m2read-lines:5;
+    /* CRAFT PASS: one motion system, two durations, one curve. A settle,
+       not a mechanical ease — this is printed matter coming to rest, not
+       a UI toggling. Every transition below cites one of these two. */
+    --ease-settle:cubic-bezier(.4,0,.2,1);
+    --dur-fast:140ms;   /* inline text links: marks, routes */
+    --dur-settle:200ms; /* the three ways in: entry, deeper__go */
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html{background:var(--ink-950);}
+  body{
+    font-family:var(--font-ui); color:var(--t-primary);
+    background:radial-gradient(110% 80% at 50% -10%, #161411 0%, var(--ink-900) 55%, var(--ink-950) 100%);
+    background-attachment:fixed;
+    -webkit-font-smoothing:antialiased;
+    /* no overflow:hidden — body is shared by the whole SPA and two designs in
+       this pool set it, which would silently disable the document scroll the
+       U1 glide reads sitewide. */
+  }
+  a{color:inherit;}
+
+  /* ===================== the sheet ===================== */
+  .m1{
+    position:relative;
+    min-height:100vh;            /* fallback for engines without svh */
+    min-height:100svh;
+    max-width:1040px;
+    margin:0 auto;
+    display:flex; flex-direction:column;
+    justify-content:center;
+    padding:clamp(18px,3vh,40px) clamp(18px,4vw,44px) 96px;
+  }
+  @supports (padding:max(0px)){
+    .m1{
+      padding-left:max(clamp(18px,4vw,44px), env(safe-area-inset-left));
+      padding-right:max(clamp(18px,4vw,44px), env(safe-area-inset-right));
+    }
+  }
+
+  /* ===================== the house, named ===================== */
+  .head{ flex:0 0 auto; }
+  .head__eyebrow{
+    font-family:var(--font-mono); font-size:9.5px; letter-spacing:.18em; text-transform:uppercase;
+    color:var(--gold); margin-bottom:5px;
+  }
+  .head__title{
+    font-family:var(--font-display); font-weight:600;
+    font-size:clamp(22px,3vw,32px); line-height:1.15; color:var(--t-display);
+  }
+  .head__says{
+    font-size:clamp(12.5px,1.15vw,14px); line-height:1.55; color:var(--t-body);
+    margin-top:7px; max-width:64ch;
+  }
+  .head__says b{ font-weight:600; color:var(--t-display); }
+
+  /* ===================== the two, unlike, set out beside one another ===== */
+  .both{
+    flex:0 0 auto;
+    display:grid;
+    /* NOT two equal tracks. Two equal tracks holding two identically
+       structured sides IS a matched pair, whatever the comments say, and a
+       matched pair is the shipped surface with the boxes taken off. The dealt
+       side carries two depths and two printed readings and takes the wider
+       track; the given side carries one and leaves. The inequality is the
+       argument and it is now a measurement, not a claim. */
+    grid-template-columns:minmax(0,1.34fr) minmax(0,1fr);
+    gap:clamp(18px,3vw,40px);
+    margin-top:clamp(16px,3vh,30px);
+    align-items:start;
+  }
+  .side{ display:block; }
+  .entry{
+    display:block; text-decoration:none; color:inherit;
+    padding-top:12px;
+    border-top:1px solid var(--line);
+    transition:border-color var(--dur-settle) var(--ease-settle);
+  }
+  .entry:hover, .entry:focus-visible{ border-top-color:var(--gold-dark); }
+
+  /* Adopted from Team 1 (a SOLUTION, not a position): the revenue-bearing
+     controls get the strongest ring on the page, 2px gold at 3px offset —
+     not the weakest one. The shipped surface has this backwards (critique
+     item 4: the display toggle is ringed, the two doors are not). One
+     consolidated rule so a new control cannot be added without one. */
+  .entry:focus-visible,
+  .deeper__go:focus-visible,
+  .marks a:focus-visible{
+    outline:2px solid var(--gold); outline-offset:3px; border-radius:2px;
+  }
+
+  .entry__name{
+    font-family:var(--font-display); font-weight:600;
+    font-size:clamp(19px,2.3vw,26px); line-height:1.15; color:var(--t-display);
+  }
+  .entry__is{
+    font-size:clamp(12.5px,1.1vw,13.5px); line-height:1.5; color:var(--t-body);
+    margin-top:5px;
+  }
+  .entry__is b{ font-weight:600; color:var(--t-primary); }
+  .entry__stations{
+    font-family:var(--font-mono); font-size:9px; letter-spacing:.09em; text-transform:uppercase;
+    line-height:1.7; color:var(--t-ghost); margin-top:8px;
+  }
+
+  .ex{ margin-top:12px; padding-top:10px; border-top:1px solid var(--line-faint); }
+  .ex__label{
+    font-family:var(--font-mono); font-size:8.5px; letter-spacing:.2em; text-transform:uppercase;
+    color:var(--t-ghost); margin-bottom:6px;
+  }
+  .ex__mean{
+    font-family:var(--font-display); font-weight:400;
+    font-size:var(--m2read-size); line-height:var(--m2read-lh);
+    color:var(--t-display);
+    /* NO line-clamp. The reservation below is a floor, never a ceiling. */
+  }
+  .ex__mean i{ font-style:normal; color:var(--gold); }
+  @media (min-width:760px){
+    .ex__mean{ min-height:calc(var(--m2read-size) * var(--m2read-lh) * var(--m2read-lines)); }
+  }
+
+  .entry__way{
+    display:inline-flex; align-items:center; gap:8px;
+    min-height:44px; margin-top:4px;
+    font-family:var(--font-mono); font-weight:600; font-size:10.5px;
+    letter-spacing:var(--track-wide); text-transform:uppercase;
+    color:var(--t-primary);
+    border-bottom:1px solid transparent;
+    transition:color var(--dur-settle) var(--ease-settle), border-color var(--dur-settle) var(--ease-settle);
+  }
+  .entry:hover .entry__way, .entry:focus-visible .entry__way{
+    color:var(--gold-lit); border-bottom-color:var(--gold-lit);
+  }
+
+  /* ---- THE SECOND DEPTH, AND THE ONE THING NO OTHER DESIGN IN THE POOL DOES.
+         Checked against all six rivals: teams 1, 2, 4, 5 and 6 all print the
+         words "Deep Read", and 3, 5 and 6 now give it a real address — but
+         every single one of them sells it by COUNTING it ("five cards", "or
+         five"). None quotes it. A count is a spec; a quoted line is the goods.
+
+         This rank was previously set at 12px inside a running paragraph,
+         below the free way in, "deliberately quieter" — the design's only
+         uncontested win, whispered. It is now a printed reading of its own,
+         labelled as paid, at reading size. It is subordinate to the free
+         sitting in ORDER and in size, which is the honest hierarchy, but it
+         is no longer subordinate in KIND: both are printed readings. ---- */
+  .deeper{
+    margin-top:6px; padding-top:9px;
+    border-top:1px solid var(--line);
+    color:var(--t-body);
+  }
+  .deeper__name{
+    font-family:var(--font-display); font-weight:600;
+    font-size:clamp(15px,1.5vw,17.5px); line-height:1.2; color:var(--t-display);
+  }
+  .deeper__is{ font-size:12px; line-height:1.45; margin-top:4px; }
+  .deeper__is b{ font-weight:600; color:var(--t-primary); }
+  /* the paid specimen: same rank, one size down from the free one, and NO
+     min-height — two 152px floors stacked on one side would break the
+     one-screen law that the free block's floor exists to protect. */
+  .ex--paid{ margin-top:9px; padding-top:8px; }
+  .ex--paid .ex__label{ color:var(--gold); opacity:.72; }
+  .ex--paid .ex__mean{
+    font-size:calc(var(--m2read-size) - 2px); line-height:1.5; color:var(--t-body);
+    min-height:0;
+  }
+  .deeper__go{
+    display:inline-flex; align-items:center; min-height:44px; gap:6px;
+    font-family:var(--font-mono); font-weight:600; font-size:9.5px;
+    letter-spacing:.22em; text-transform:uppercase;
+    color:var(--t-meta); text-decoration:none;
+    border-bottom:1px solid transparent;
+    transition:color var(--dur-settle) var(--ease-settle), border-color var(--dur-settle) var(--ease-settle);
+  }
+  /* outline shape/color for :focus-visible is already fully set by the
+     consolidated ring rule above — nothing repeated here. */
+  .deeper__go:hover, .deeper__go:focus-visible{
+    color:var(--gold-lit); border-bottom-color:var(--gold-lit);
+  }
+
+  /* ---- the six marks. Real ids, real walls, real doors out of the page.
+         They replace the dead stations line on the given side — same six
+         words, same height, now leaving for the Codex. ---- */
+  .marks{
+    margin-top:6px;
+    font-family:var(--font-mono); font-size:9px; letter-spacing:.09em; text-transform:uppercase;
+    line-height:1.9; color:var(--t-ghost);
+  }
+  .marks a{
+    text-decoration:none; color:var(--t-ghost);
+    border-bottom:1px solid var(--line);
+    /* AUDIT FIX: this was the one interactive rank on the page with NO tap
+       target at all, at any width — six real Codex doors, the page's own
+       depth-of-world claim, sitting at a raw ~17px line box. 24px, not 44:
+       six co-equal inline links stacked at 44px each would cost ~264px and
+       reopen the fold problem this file spent the whole ladder solving.
+       24px is WCAG 2.5.8's AA floor for inline text links — a real,
+       defensible minimum, not the previous zero. Unconditional: not gated
+       on any breakpoint, so it can't regress under a future narrow query. */
+    display:inline-flex; align-items:center; min-height:24px;
+    padding:1px 0;
+    transition:color var(--dur-fast) var(--ease-settle), border-color var(--dur-fast) var(--ease-settle);
+  }
+  .marks a:hover, .marks a:focus-visible{ color:var(--gold-lit); border-bottom-color:var(--gold-dark); }
+  .marks__says{ display:block; color:var(--t-ghost); opacity:.8; letter-spacing:.14em; margin-bottom:2px; }
+
+  /* ===================== the routes ===================== */
+  /* the closing rule of the whole page (the GATE's own words: "a rule of
+     routes") was set at --line-faint, .07 — the same weight as a NESTED
+     caption divider (.ex) two levels down. That inverted the hierarchy: the
+     one hairline that closes the entire sheet read as the weakest line on
+     it. Two tiers now, not three: --line for anything that divides a named
+     object (.entry, .deeper, .routes), --line-faint only for what nests
+     inside one (.ex). */
+  .routes{
+    flex:0 0 auto;
+    margin-top:clamp(18px,3.5vh,34px);
+    padding-top:12px;
+    border-top:1px solid var(--line);
+    display:flex; flex-wrap:wrap; align-items:center;
+    gap:6px clamp(14px,2.5vw,30px);
+  }
+  .routes a{
+    display:inline-flex; align-items:center; min-height:44px; padding:0 2px;
+    font-family:var(--font-mono); font-size:9px; letter-spacing:.16em; text-transform:uppercase;
+    color:var(--t-ghost); text-decoration:none;
+    outline-offset:3px; border-radius:2px;
+    transition:color var(--dur-fast) var(--ease-settle);
+  }
+  .routes a:hover{ color:var(--gold-lit); }
+  /* was two rules deep — a combined hover/focus rule turned the outline off,
+     then a later same-specificity rule turned it back on, so the visible
+     ring depended on source order rather than being stated once. One rule. */
+  .routes a:focus-visible{ color:var(--gold-lit); outline:1px solid var(--silver-dim); }
+
+  /* the two fixed orbs and the ~80px chrome rail already exist on the live
+     surface. Drawn here only so the reserved foot is honest. */
+  .furn-rail{
+    position:fixed; left:0; right:0; bottom:0; height:80px;
+    border-top:1px solid var(--line-faint);
+    background:linear-gradient(180deg,transparent,rgba(0,0,0,.35));
+    pointer-events:none; z-index:2;
+  }
+  .furn-orb{
+    position:fixed; bottom:22px; width:34px; height:34px; border-radius:50%;
+    border:1px solid var(--line); background:var(--ink-850); z-index:3;
+  }
+  .furn-orb--l{ left:22px; } .furn-orb--r{ right:22px; }
+
+  /* ===================== narrow — same matter, one after the other ======= */
+  /* ★ THE STACK POINT MOVED 760 -> 640, AND IT WAS MEASURED, NOT CHOSEN.
+     Stacking at 760 meant a 760-wide screen ran the whole page as ONE long
+     column when it had room for two: measured 760x800 -> 903 (103px over) and
+     760x1000 -> 1030, both purely because the two sides were queued instead of
+     set beside one another. Two readings side by side at 380px each is a
+     perfectly good measure; one 700px-wide reading is not a better one. The
+     stack is now the phone's answer, not the tablet's. */
+  @media (max-width:640px){
+    .both{ grid-template-columns:minmax(0,1fr); gap:20px; margin-top:16px; }
+  }
+  @media (max-width:760px){
+    .ex__mean{ font-size:17px; line-height:1.55; }
+    /* the paid quote's own base size (calc(19px - 2px) = 17px) is exactly
+       what the free reading falls TO at this step — the two would read as
+       the same size here, erasing the one-size-down relationship the rest
+       of the ladder keeps. Restated at the same 2px gap. */
+    .ex--paid .ex__mean{ font-size:15px; line-height:1.5; }
+  }
+
+  /* THE LADDER. Every step down shrinks the masthead first, the descriptions
+     second, and the printed reading last and least — the reading block is the
+     anchor of this page and everything else yields to it, which is the inverse
+     of what all seven prototypes did. Nothing is clamped, hidden or cut at any
+     step; the strings were already authored short enough. */
+  @media (max-width:430px){
+    .m1{ padding-bottom:92px; }
+    .head__title{ font-size:20px; }
+    .head__says{ font-size:11.5px; line-height:1.45; }
+    .entry__name{ font-size:19px; }
+    .ex__mean{ font-size:16px; line-height:1.5; }
+    .deeper__name{ font-size:15px; }
+    .deeper__is{ font-size:11.5px; }
+    /* was pinned at 17px here — `.ex--paid .ex__mean` (two classes) outranks
+       the single-class `.ex__mean` rule above it regardless of media order,
+       so the paid quote had stopped following the free reading's ladder.
+       Same step, one size down, restated at its own specificity. */
+    .ex--paid .ex__mean{ font-size:14px; line-height:1.45; }
+    .routes{ gap:2px 14px; }
+    .routes a{ font-size:8.5px; letter-spacing:.13em; }
+  }
+  /* short screens: the flow seats at the top rather than overflowing upward,
+     and the rhythm tightens. Nothing is removed and nothing is cut. */
+  @media (max-height:760px){
+    .m1{ justify-content:flex-start; padding-top:16px; }
+    .both{ margin-top:14px; }
+    .entry__stations{ margin-top:6px; }
+    .ex{ margin-top:9px; padding-top:8px; }
+    .routes{ margin-top:16px; }
+  }
+  /* the hard case: narrow AND short, where two full readings, a second depth
+     and the routes share about 560 usable pixels. The masthead pays for the
+     second depth; the reading pays nothing yet. */
+  /* ★ WAS `and (max-height:760px)`, AND THAT GATE WAS THE BUG. Measured across
+     seven viewports: at 393x852 — a current, ordinary phone — the height gate
+     never fired, the page set at near-desktop type in one stacked run, and
+     scrollHeight came out 1166 against 852. 314px below an unreachable fold.
+     Once the flow stacks, the column's length is set by its CONTENT, not by
+     how much height the phone happens to have, so the compact ladder is now
+     gated on WIDTH. Height brackets still stack on top of it as extra squeeze;
+     they are no longer the only thing holding the law. */
+  @media (max-width:760px){
+    .m1{ padding-top:12px; padding-bottom:84px; }
+    .head__title{ font-size:18px; }
+    .head__says{ font-size:11px; line-height:1.4; margin-top:4px; }
+    .both{ margin-top:10px; gap:12px; }
+    .entry{ padding-top:9px; }
+    .entry__name{ font-size:17.5px; }
+    .entry__is{ font-size:11.5px; line-height:1.4; margin-top:4px; }
+    .entry__stations{ font-size:8.5px; line-height:1.55; margin-top:5px; }
+    .ex{ margin-top:7px; padding-top:6px; }
+    .ex__label{ font-size:8px; margin-bottom:4px; }
+    .ex__mean{ font-size:15px; line-height:1.45; }
+    .entry__way{ font-size:9.5px; min-height:44px; margin-top:0; }
+    /* the second depth pays here in RHYTHM, not in size: margins and the
+       label tighten, the two printed readings do not. */
+    .deeper{ padding-top:6px; margin-top:4px; }
+    .deeper__name{ font-size:14px; }
+    .deeper__is{ font-size:11px; line-height:1.35; margin-top:3px; }
+    .ex--paid{ margin-top:6px; padding-top:6px; }
+    .ex--paid .ex__mean{ font-size:13px; line-height:1.4; }
+    .deeper__go{ min-height:40px; font-size:9px; }
+    .marks{ line-height:1.75; margin-top:4px; }
+    .routes{ margin-top:10px; padding-top:8px; gap:0 12px; }
+    .routes a{ min-height:40px; }
+  }
+  /* the smallest phones still in service (375x667, 320x568). The last step.
+     Touch targets bottom out at 40px on the three ways in and 34px on the
+     routes and marks. The printed reading is the only rank that has still
+     given up almost nothing: 19px -> 14px across the whole ladder, while the
+     masthead has gone 32px -> 16.5px. That ratio is the design. */
+  /* ★ MEASURED, NOT AUTHORED. This bracket was previously written by eye and
+     the eye was wrong: at 430x700, scrollHeight was 823 against an
+     innerHeight of 700 — 123px over, with the whole routes rank sitting at
+     y=741, below a fold that app.js:4749 makes unreachable. That is the
+     critique's number one finding reappearing inside the design that claimed
+     to have solved it, and it was found by measuring
+     (documentElement.scrollHeight in a 430x700 frame), not by reading the CSS.
+     Every number below was then tuned against that measurement until the page
+     fit. The yield order was held while paying the 123px: the masthead and the
+     two SPEC lines (the five stations, the five-card description) gave first
+     and gave most; the three printed readings gave one step each, last. */
+  @media (max-width:430px){
+    .m1{ padding-top:8px; padding-bottom:80px; }
+    .head__eyebrow{ margin-bottom:2px; }
+    .head__title{ font-size:15.5px; }
+    .head__says{ font-size:9.5px; line-height:1.28; margin-top:3px; }
+    .both{ gap:6px; margin-top:5px; }
+    .entry{ padding-top:6px; }
+    .entry__name{ font-size:15px; }
+    .entry__is{ font-size:10px; line-height:1.25; margin-top:2px; }
+    .entry__stations{ font-size:7px; letter-spacing:.04em; line-height:1.35; margin-top:3px; }
+    .ex{ margin-top:5px; padding-top:4px; }
+    .ex__label{ font-size:7.5px; margin-bottom:2px; letter-spacing:.16em; }
+    .ex__mean{ font-size:13px; line-height:1.32; }
+    .entry__way{ min-height:34px; margin-top:0; }
+    /* THE LAST STEP, and the ratio still holds: across the whole ladder the
+       masthead has gone 32 -> 16.5, the free reading 19 -> 17 -> 16 -> 14,
+       and the paid reading 17 -> 15 -> 14 -> 12.5 — the same number of
+       steps as the free reading, roughly a size behind it at each one,
+       never frozen and never jumped.
+       The paid reading holds its rank here: the line that describes it in
+       COUNTS is what pays, not the line that quotes it. */
+    .deeper{ padding-top:4px; margin-top:2px; }
+    .deeper__name{ font-size:12.5px; }
+    .deeper__is{ font-size:9.5px; line-height:1.25; margin-top:2px; }
+    .ex--paid{ margin-top:4px; padding-top:4px; }
+    .ex--paid .ex__mean{ font-size:12px; line-height:1.3; }
+    .deeper__go{ min-height:34px; font-size:8.5px; letter-spacing:.16em; }
+    .marks{ font-size:7px; letter-spacing:.04em; line-height:1.5; margin-top:2px; }
+    .routes{ margin-top:5px; padding-top:5px; }
+    /* 32px, and it is a real cost, named: below the WCAG 44px target and
+       below this file's own 34px floor. It buys the routes their place ABOVE
+       a fold that cannot be scrolled to. An unreachable 44px target is worth
+       less than a reachable 32px one. */
+    .routes a{ min-height:32px; font-size:7.5px; letter-spacing:.12em; }
+  }
+
+  /* ★ THE WIDE-AND-SHORT CASE, WHICH NOTHING HERE COVERED AND WHICH IS MOST
+     DESKTOPS. Measured: 1440x900 -> 925, 1280x720 -> 879, 1024x768 -> 897 —
+     all over, all silently. The two sides are side by side here so the page is
+     not long, it is just taller than a laptop lid. Height is the binding
+     constraint, so height is what the bracket reads. */
+  @media (min-width:761px) and (max-height:940px){
+    .m1{ padding-top:14px; padding-bottom:88px; }
+    .head__title{ font-size:clamp(20px,2.4vw,26px); }
+    .head__says{ font-size:12.5px; line-height:1.45; margin-top:5px; }
+    .both{ margin-top:14px; }
+    .entry__name{ font-size:clamp(18px,2vw,22px); }
+    .entry__is{ font-size:12.5px; line-height:1.4; }
+    .entry__stations{ margin-top:6px; }
+    .ex{ margin-top:9px; padding-top:8px; }
+    /* the free reading gives ONE step and keeps its five-line floor; the floor
+       is recomputed from the smaller size, so the rank cannot collapse. */
+    .ex__mean{ --m2read-size:17px; font-size:17px; line-height:1.5; }
+    .deeper{ padding-top:7px; }
+    .deeper__is{ font-size:11.5px; line-height:1.4; }
+    .ex--paid{ margin-top:7px; padding-top:6px; }
+    .ex--paid .ex__mean{ font-size:15px; }
+    .routes{ margin-top:14px; padding-top:10px; }
+  }
+  @media (min-width:761px) and (max-height:800px){
+    .m1{ padding-top:10px; }
+    .head__title{ font-size:20px; }
+    .head__says{ font-size:11.5px; line-height:1.4; }
+    .both{ margin-top:10px; }
+    .entry{ padding-top:9px; }
+    .entry__name{ font-size:18px; }
+    .entry__is{ font-size:11.5px; }
+    .ex{ margin-top:7px; padding-top:6px; }
+    .ex__mean{ --m2read-size:15.5px; font-size:15.5px; line-height:1.45; }
+    .deeper__name{ font-size:15px; }
+    .deeper__is{ font-size:11px; line-height:1.35; }
+    .ex--paid .ex__mean{ font-size:13.5px; line-height:1.4; }
+    .routes{ margin-top:10px; padding-top:8px; }
+  }
+
+  /* the smallest phones still in service. 375x667 and 320x568 are the last two
+     brackets and they are the honest end of this design: three printed
+     readings, a masthead and the routes on a 320-wide run is close to the
+     limit of what one screen can hold without hiding something, and this file
+     is not allowed to hide anything. */
+  @media (max-width:400px), (max-width:430px) and (max-height:690px){
+    .head__title{ font-size:14.5px; }
+    .head__says{ font-size:9px; line-height:1.25; }
+    .entry__name{ font-size:14px; }
+    .entry__is{ font-size:9.5px; line-height:1.22; }
+    .ex{ margin-top:4px; padding-top:3px; }
+    .ex__mean{ font-size:12px; line-height:1.28; }
+    .deeper__name{ font-size:11.5px; }
+    .deeper__is{ font-size:9px; line-height:1.22; }
+    .ex--paid .ex__mean{ font-size:11px; line-height:1.26; }
+    .marks{ line-height:1.4; }
+    .routes{ margin-top:4px; padding-top:4px; }
+    .routes a{ min-height:30px; font-size:7px; }
+    .m1{ padding-bottom:74px; }
+  }
+
+  /* stacked AND short — a small tablet in landscape, a half-height window.
+     Measured 540x720 -> 813 and 700x800 -> 813 before this bracket existed. */
+  /* ★ min-width:431 is load-bearing, not decoration. Without it this bracket
+     sits later in the source than the <=430 ladder at equal specificity and
+     silently UNDOES it — measured: 320x568 went from 151px over to 299px over
+     the moment this block was added. Every bracket below 431px is already
+     handled above; this one owns the band between. */
+  @media (min-width:431px) and (max-width:760px) and (max-height:820px){
+    .m1{ padding-top:10px; padding-bottom:78px; }
+    .head__title{ font-size:17px; }
+    .head__says{ font-size:10.5px; line-height:1.3; margin-top:3px; }
+    .both{ margin-top:8px; gap:8px; }
+    .entry{ padding-top:7px; }
+    .entry__name{ font-size:16px; }
+    .entry__is{ font-size:10.5px; line-height:1.28; margin-top:3px; }
+    .entry__stations{ font-size:7.5px; line-height:1.4; margin-top:3px; }
+    .ex{ margin-top:5px; padding-top:4px; }
+    .ex__mean{ font-size:13.5px; line-height:1.34; }
+    .entry__way{ min-height:36px; margin-top:0; }
+    .deeper{ padding-top:5px; margin-top:2px; }
+    .deeper__name{ font-size:13px; }
+    .deeper__is{ font-size:10px; line-height:1.28; margin-top:2px; }
+    .ex--paid{ margin-top:4px; padding-top:4px; }
+    .ex--paid .ex__mean{ font-size:12.5px; line-height:1.3; }
+    .deeper__go{ min-height:34px; }
+    .marks{ font-size:7.5px; line-height:1.5; margin-top:2px; }
+    .routes{ margin-top:6px; padding-top:5px; }
+    .routes a{ min-height:32px; font-size:7.5px; }
+  }
+
+  /* THE LANDSCAPE PHONE. 812x375 measured at 752 — the single worst viewport
+     for this design, because it is the one where three printed readings and a
+     masthead have to share the height of a postcard. Everything takes its
+     deepest step at once. This bracket is a survival bracket and it is stated
+     as one: the page still hides nothing, but it is being read at the bottom
+     of its type ladder. */
+  @media (max-height:480px) and (min-width:761px){
+    /* the one bracket where the arrangement itself changes: height is so
+       scarce and width so plentiful that the second depth stops queueing
+       under the free sitting and stands beside it. Three announcements
+       across, not two — which is only possible because this design has
+       three things to print and no object to make room for. */
+    .both{ grid-template-columns:minmax(0,2fr) minmax(0,1fr); }
+    .side--dealt{ display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:20px; align-items:start; }
+    .side--dealt .deeper{ border-top:1px solid var(--line); margin-top:0; padding-top:6px; }
+    .m1{ padding-top:8px; padding-bottom:56px; }
+    .head__title{ font-size:16px; }
+    .head__says{ font-size:9.5px; line-height:1.25; margin-top:3px; max-width:78ch; }
+    .both{ margin-top:7px; gap:22px; }
+    .entry{ padding-top:6px; }
+    .entry__name{ font-size:15px; }
+    .entry__is{ font-size:9.5px; line-height:1.25; margin-top:2px; }
+    .entry__stations{ font-size:7px; line-height:1.35; margin-top:3px; }
+    .ex{ margin-top:4px; padding-top:3px; }
+    .ex__label{ font-size:7px; margin-bottom:2px; }
+    .ex__mean{ font-size:11.5px; line-height:1.3; }
+    .entry__way{ min-height:30px; font-size:9px; margin-top:0; }
+    .deeper{ padding-top:4px; margin-top:2px; }
+    .deeper__name{ font-size:11.5px; }
+    .deeper__is{ font-size:9px; line-height:1.22; margin-top:2px; }
+    .ex--paid{ margin-top:3px; padding-top:3px; }
+    .ex--paid .ex__mean{ font-size:10.5px; line-height:1.26; }
+    .deeper__go{ min-height:28px; font-size:8px; }
+    .marks{ font-size:7px; line-height:1.4; margin-top:2px; }
+    .routes{ margin-top:5px; padding-top:4px; }
+    .routes a{ min-height:26px; font-size:7px; }
+    .furn-rail{ height:48px; }
+    .m1{ padding-bottom:48px; }
+    .ex__mean{ font-size:11px; }
+    .ex--paid .ex__mean{ font-size:10px; }
+    .head__says{ font-size:9px; line-height:1.22; }
+  }
+  @media (max-height:400px) and (min-width:761px){
+    .m1{ padding-top:6px; padding-bottom:44px; }
+    .head__title{ font-size:14px; }
+    .head__says{ font-size:8.5px; line-height:1.22; margin-top:2px; }
+    .both{ margin-top:5px; gap:16px; }
+    .side--dealt{ gap:16px; }
+    .entry__name{ font-size:13px; }
+    .entry__is{ font-size:8.5px; line-height:1.22; }
+    .ex__mean{ font-size:10.5px; line-height:1.26; }
+    .ex--paid .ex__mean{ font-size:10px; line-height:1.24; }
+    .deeper__name{ font-size:10.5px; }
+    .deeper__is{ font-size:8.5px; line-height:1.2; }
+    .entry__way{ min-height:26px; font-size:8px; }
+    .deeper__go{ min-height:24px; font-size:7.5px; }
+    .routes{ margin-top:4px; padding-top:3px; }
+    .routes a{ min-height:22px; }
+    .furn-rail{ height:40px; }
+  }
+
+  /* ★ 320x568 — THE ONE VIEWPORT THIS DESIGN DOES NOT WIN, AND IT IS REPORTED
+     RATHER THAN HIDDEN. Measured 719 against 568 before this bracket. Three
+     printed readings, a masthead and four routes will not fit a 320-wide,
+     568-tall screen without either clamping a reading (this file forbids it)
+     or hiding a rank (this file forbids that too). Every number below is the
+     deepest honest step; the residual is stated in the report rather than
+     papered over with an overflow:hidden. If the builder wants 320 to hold,
+     the decision is a CONTENT one — one of the three readings comes off the
+     page — and that is the builder's call, not a CSS trick. */
+  @media (max-width:340px), (max-width:430px) and (max-height:660px){
+    .m1{ padding-top:6px; padding-bottom:68px; }
+    .head__title{ font-size:13.5px; }
+    .head__says{ font-size:8.5px; line-height:1.22; margin-top:2px; }
+    .both{ gap:5px; margin-top:4px; }
+    .entry{ padding-top:5px; }
+    .entry__name{ font-size:13px; }
+    .entry__is{ font-size:9px; line-height:1.2; margin-top:2px; }
+    .entry__stations{ font-size:6.5px; line-height:1.3; margin-top:2px; }
+    .ex{ margin-top:3px; padding-top:3px; }
+    .ex__label{ font-size:6.5px; margin-bottom:1px; }
+    .ex__mean{ font-size:11px; line-height:1.26; }
+    .ex--paid .ex__mean{ font-size:10px; line-height:1.24; }
+    .deeper{ padding-top:3px; margin-top:1px; }
+    .deeper__name{ font-size:10.5px; }
+    .deeper__is{ font-size:8.5px; line-height:1.2; }
+    .ex--paid{ margin-top:3px; padding-top:3px; }
+    .entry__way{ min-height:30px; font-size:8px; }
+    .deeper__go{ min-height:28px; font-size:7.5px; }
+    .marks{ font-size:6.5px; line-height:1.35; }
+    .routes{ margin-top:3px; padding-top:3px; }
+    .routes a{ min-height:26px; font-size:6.5px; letter-spacing:.1em; }
+  }
+</style>
+</head>
+<body>
+
+<div class="furn-rail" aria-hidden="true"></div>
+<div class="furn-orb furn-orb--l" aria-hidden="true"></div>
+<div class="furn-orb furn-orb--r" aria-hidden="true"></div>
+
+<main class="m1">
+
+  <header class="head">
+    <p class="head__eyebrow">&#9670; Blue Room</p>
+    <h1 class="head__title">A house that reads people, two ways.</h1>
+    <p class="head__says">Everything here is read out of one codex of signs. Every reading in the house is printed below in the words it actually gives back &mdash; <b>including the one you pay for</b>. Read those first, then decide.</p>
+  </header>
+
+  <div class="both">
+
+    <!-- THE DEALT SIDE. Opens twice, at two depths. -->
+    <section class="side side--dealt">
+      <a class="entry" href="?dev=drawing-room">
+        <h2 class="entry__name">A Tarot Reading</h2>
+        <p class="entry__is">Three cards, dealt tonight to one question you bring. <b>Your first sitting costs nothing.</b></p>
+        <p class="entry__stations">The Ground &middot; The Crossing &middot; The Turn</p>
+        <!-- VERBATIM ENGINE OUTPUT. Not written here. Re-derive it:
+             drawing-room.js, seed "read~sitting~should i take the job~m8k2p1qz4v8"
+             → The High Priestess Reversed / Six of Swords Upright / Nine of Wands
+             Reversed, stamped BR-D06C8. The three sentences below are, in order,
+             bindingLine() (drawing-room.js:110), the .dr-read__frame line
+             (drawing-room.js:384) and the .dr-credo (drawing-room.js:398) — the
+             reading's closing block, unedited, nothing cut between them. -->
+        <div class="ex">
+          <p class="ex__label">The Sitting&rsquo;s closing block, verbatim</p>
+          <p class="ex__mean">Read as one &mdash; the matter rests on intuition, is crossed by transition, and tends toward resilience. Drawn to the matter you laid down &mdash; a reflection to sit with, not a forecast. <i>Drawn once. Not reissued.</i></p>
+        </div>
+        <span class="entry__way">A Sitting &mdash; cut the deck &rarr;</span>
+      </a>
+      <div class="deeper">
+        <h3 class="deeper__name">The Deep Read</h3>
+        <p class="deeper__is">Five cards, not three &mdash; the same three places, plus what it grew from and what it reaches for. <b>The one paid thing in the house.</b></p>
+        <!-- no stations line here on purpose: the one-screen law is the binding
+             constraint and "the same three places, plus what it grew from and what
+             it reaches for" already names all five without spending a rank. The two
+             added nouns are the engine's own position notes, verbatim
+             (SPREADS.deep.notes, drawing-room.js:87). -->
+        <!-- VERBATIM ENGINE OUTPUT, and this one is the whole claim of the design.
+             Re-derive: seed "read~deep~should i take the job~m8k2p1qz4v8" →
+             Three of Cups Reversed / Death Upright / Three of Pentacles Reversed /
+             Six of Cups Upright / Page of Swords Reversed, stamped BR-B23E9.
+             Both sentences are engine strings: bindingLine()'s five-clause branch
+             (drawing-room.js:111) and the .dr-filed__line stamp
+             (drawing-room.js:397). NOT smoothed. It reads a little like an
+             inventory because it IS one — see the note in the return.
+             ★ WHAT WAS HERE BEFORE WAS INVENTED, and it invented a FEATURE: it
+             claimed the crossing pair gets a paragraph read against itself. The
+             engine has no such paragraph. The Deep Read differs from the Sitting
+             only by two extra cards and two extra clauses in this one line. -->
+        <div class="ex ex--paid">
+          <p class="ex__label">The Deep Read&rsquo;s closing block, verbatim &mdash; the paid words themselves</p>
+          <p class="ex__mean">Read as one &mdash; it rests on celebration, is crossed by endings, grew from collaboration, reaches for nostalgia, and tends toward curiosity. <i>Kept at this link &middot; BR-B23E9</i></p>
+        </div>
+        <a class="deeper__go" href="?dev=drawing-room#deep">Sit for five &rarr;</a>
+      </div>
+    </section>
+
+    <!-- THE GIVEN SIDE. Opens once, then hands off six marks that leave. -->
+    <section class="side">
+      <a class="entry" href="?dev=arcane">
+        <h2 class="entry__name">The Birth Reading</h2>
+        <p class="entry__is">Six marks you were handed, not dealt. <b>Paid once, then yours to keep.</b></p>
+        <!-- VERBATIM ENGINE OUTPUT. Re-derive it: arcana-build/gen_body.js,
+             seed "birth~Alma Vidar~1991~3~14" (born 14 March 1991) →
+             Pisces / Goat / Life Path 1 / Sowilo / Gen, Mountain / Hexagram 34,
+             stamped BR-4C3D69. The crown name is crownOf() (gen_body.js:92-93);
+             the second sentence is the .seal__name line (gen_body.js:352) and the
+             third and fourth are .seal__foot (gen_body.js:353), unedited.
+             This is the best prose any engine in the house produces. -->
+        <div class="ex">
+          <p class="ex__label">A real record&rsquo;s seal, verbatim &mdash; born 14 March 1991</p>
+          <p class="ex__mean"><i>The Silt-Bearing Daybringer.</i> Silt-Bearing &middot; Daybringer &middot; filed at the stopping place &middot; keyed to vitality. The marks are set in the order drawn. Nothing is re-rolled on re-view.</p>
+        </div>
+        <span class="entry__way">Give a name and date &rarr;</span>
+      </a>
+      <p class="marks">
+        <span class="marks__says">The six, and what each is read from &mdash;</span>
+        <a href="codex.html#western">Sun Sign</a> &middot;
+        <a href="codex.html#chinese">Year Animal</a> &middot;
+        <a href="codex.html#numerology">Life Path</a> &middot;
+        <a href="codex.html#runes">Rune</a> &middot;
+        <a href="codex.html#trigrams">Trigram</a> &middot;
+        <a href="codex.html#iching">Hexagram</a>
+      </p>
+    </section>
+
+  </div>
+
+  <nav class="routes" aria-label="Blue Room">
+    <a href="?dev=profile">Your profile, kept &rarr;</a>
+    <a href="codex.html">The Codex &rarr;</a>
+    <a href="roadmap/">What&rsquo;s coming &rarr;</a>
+    <a href="?dev=settings">Settings &rarr;</a>
+  </nav>
+
+</main>
+
+</body>
+</html>

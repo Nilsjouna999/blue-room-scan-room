@@ -1,0 +1,584 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>THE HAND — M1 prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap"
+  rel="stylesheet"
+/>
+<style>
+  /* ============================================================
+     THE HAND — fleet 3, standalone prototype.
+     One flow along one slant. No column, no panel, no sidebar.
+     Tokens lifted verbatim from styles.css — palette is CLOSED.
+     The fallen face STAYS WARM — it is the page's only light
+     source, and this design does not spend that.
+  ============================================================= */
+  :root {
+    --t-display: #dcd7cb;
+    --t-primary: #d7d3ca;
+    --t-body: #b1ada4;
+    --t-meta: #948f87;
+    --t-ghost: #6e6b63;
+    --ink-950: #0a0b0d;
+    --ink-900: #100f0c;
+    --ink-850: #11100d;
+    --ink-800: #151310;
+    --ink-700: #1c1915;
+    --line: rgba(233, 229, 220, 0.12);
+    --line-strong: rgba(233, 229, 220, 0.2);
+    --hair-1: rgba(233, 229, 220, .14);
+    --hair-2: rgba(233, 229, 220, .08);
+    --gold: #c8ad70;
+    --gold-dim: #b6a06a;
+    --cream: #e7ddc4;
+    --cream-dim: #cdbf98;
+    --font-display: "Cormorant Garamond", "Times New Roman", serif;
+    --font-ui: "Inter", -apple-system, "Segoe UI", sans-serif;
+    --font-mono: "IBM Plex Mono", "Consolas", monospace;
+    --ease-settle: cubic-bezier(.22, .61, .36, 1);
+
+    /* THE SLANT. One custom property scales every group's inline offset.
+       At full width the flow drifts right as it falls; at narrow it
+       flattens to a stack with no other rule changing. */
+    --fall-step: 1;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  html { background: var(--ink-950); }
+  body {
+    font-family: var(--font-ui);
+    color: var(--t-primary);
+    background: var(--ink-950);
+    min-height: 100vh;
+    overflow-x: hidden; /* the test, not the protection: nothing below should ever need this */
+  }
+
+  a { color: inherit; text-decoration: none; }
+  button { font: inherit; color: inherit; }
+
+  :focus-visible {
+    outline: 2px solid var(--gold);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  .hand {
+    position: relative;
+    min-height: 100vh;
+    padding: clamp(20px, 4vh, 40px) clamp(18px, 5vw, 56px) 112px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+    max-width: 720px;
+    margin: 0 auto;
+  }
+  .g-head, .g-strike, .g-tick { align-self: stretch; }
+
+  .fall {
+    margin-inline-start: calc(var(--pct, 0%) * var(--fall-step));
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  /* GROUP 1 — the head. struck, small, first paint, never animated. */
+  .g-head {
+    --pct: 0%;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: .28em;
+    text-transform: uppercase;
+    color: var(--t-ghost);
+  }
+  .g-head__mark { color: var(--gold-dim); font-size: 13px; }
+  .g-head h1 {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: .28em;
+    text-transform: uppercase;
+    color: var(--t-meta);
+    font-weight: 500;
+    margin: 0;
+  }
+  .g-head h1 .sr-h2 {
+    font-size: 10px; font-weight: 500; letter-spacing: .18em; text-transform: uppercase;
+    color: var(--t-ghost); margin-inline-start: 10px;
+  }
+
+  /* GROUP 2 + GROUP 3 share one row at wide: the face falls, the read sits
+     outboard of it and overlaps its lower third in the BLOCK axis only —
+     never the inline axis, so the two are never printed one over the other. */
+  .g-fallgroup {
+    --pct: 4%;
+    display: flex;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 0 clamp(18px, 3vw, 34px);
+    max-width: 100%;
+  }
+
+  .g-face {
+    height: clamp(340px, 48vh, 520px);
+    aspect-ratio: 120 / 190;
+    width: auto;
+    max-width: 100%;
+    flex: 0 0 auto;
+    border-radius: 3px;
+    position: relative;
+    background:
+      radial-gradient(120% 90% at 30% 18%, rgba(255, 246, 220, .16), transparent 60%),
+      linear-gradient(165deg, #e7ddc4 0%, #d9cba4 46%, #c7b581 100%);
+    box-shadow: 0 30px 70px -30px rgba(0, 0, 0, .7), 0 2px 0 rgba(255, 255, 255, .06) inset;
+    border: 1px solid rgba(20, 16, 10, .25);
+    overflow: hidden;
+    color: #2a2318;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 20px;
+    transition: transform 240ms var(--ease-settle), opacity 240ms var(--ease-settle);
+  }
+  .g-face.is-falling-out { transform: translate(-3%, 6%) rotate(-2deg); opacity: 0; }
+  .g-face.is-falling-in  { animation: strike-in 320ms var(--ease-settle); }
+  @keyframes strike-in {
+    from { transform: translateY(-14px); opacity: 0; }
+    to   { transform: translateY(0);     opacity: 1; }
+  }
+  .g-face__meta {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    color: rgba(42, 35, 24, .62);
+    margin: 0 0 4px;
+  }
+  .g-face__name {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-style: italic;
+    font-size: clamp(26px, 3.4vw, 34px);
+    line-height: 1.05;
+    margin: 0;
+  }
+
+  /* GROUP 3 — the read, welded to the face's lower outer edge. At wide it
+     sits outboard, overlapping the face's lower third in the block axis.
+     At narrow it drops directly beneath (handled in the query). */
+  .g-read {
+    flex: 1 1 260px;
+    display: grid;
+    align-content: end;
+    gap: 6px;
+    --m2read-size: 19px;
+    --m2read-lh: 1.6;
+    --m2read-lines: 5;
+    max-width: 46ch;
+    padding-bottom: 6px;
+    margin-inline-start: calc(2% * var(--fall-step));
+  }
+  .g-read__label {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    letter-spacing: .22em;
+    text-transform: uppercase;
+    color: var(--t-ghost);
+    margin: 0 0 2px;
+  }
+  .g-read__meta {
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    color: var(--t-meta);
+    margin: 0;
+  }
+  .g-read__meta .num { color: var(--gold); }
+  .g-read__mean {
+    font-family: var(--font-display);
+    font-size: var(--m2read-size);
+    line-height: var(--m2read-lh);
+    color: var(--t-body);
+    margin: 0;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 4;
+    overflow: hidden;
+    min-height: calc(var(--m2read-size) * var(--m2read-lh) * 4);
+    transition: opacity 160ms var(--ease-settle);
+  }
+  .g-read.is-writing .g-read__mean,
+  .g-read.is-writing .g-read__meta { opacity: 0; }
+
+  /* GROUP 4 — the deal control and its terms, always printed. */
+  .g-deal {
+    --pct: 9%;
+    margin-top: 10px;
+    display: grid;
+    gap: 10px;
+    max-width: 46ch;
+  }
+  .deal-btn {
+    appearance: none;
+    background: transparent;
+    border: 1px solid var(--line-strong);
+    color: var(--t-display);
+    font-family: var(--font-ui);
+    font-weight: 600;
+    font-size: 15px;
+    letter-spacing: .01em;
+    padding: 11px 20px;
+    min-height: 44px;
+    border-radius: 3px;
+    cursor: pointer;
+    width: max-content;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: border-color 180ms var(--ease-settle), color 180ms var(--ease-settle), background 180ms var(--ease-settle);
+  }
+  .deal-btn:hover:not(:disabled) { border-color: var(--gold-dim); color: var(--cream); }
+  .deal-btn:active { transform: translateY(1px); }
+  .deal-btn:disabled { opacity: .45; cursor: default; }
+  .deal-btn__ring { font-size: 15px; transition: transform 240ms var(--ease-settle); }
+  .deal-btn.is-turning .deal-btn__ring { transform: rotate(220deg); }
+
+  .g-deal__terms {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: .04em;
+    color: var(--t-meta);
+    margin: 0;
+  }
+  .g-deal__terms b { color: var(--t-display); font-weight: 500; }
+
+  /* fixed-height in-place swap slot: seal line -> earned offer. Same height,
+     same position, no reflow, no growth. */
+  .g-deal__slot {
+    height: 46px;
+    display: grid;
+    align-items: center;
+    position: relative;
+  }
+  .g-deal__slot > * {
+    grid-area: 1 / 1;
+    margin: 0;
+    transition: opacity 220ms var(--ease-settle), transform 220ms var(--ease-settle);
+  }
+  .g-deal__seal {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 16px;
+    color: var(--t-ghost);
+  }
+  .g-deal__offer {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 17px;
+    color: var(--cream);
+    opacity: 0;
+    transform: translateY(4px);
+    pointer-events: none;
+  }
+  .g-deal__offer a { border-bottom: 1px solid var(--gold-dim); padding-bottom: 1px; }
+  .g-deal__offer a:hover { border-color: var(--gold); color: var(--gold); }
+  .g-deal.is-offered .g-deal__seal   { opacity: 0; transform: translateY(-4px); }
+  .g-deal.is-offered .g-deal__offer  { opacity: 1; transform: translateY(0); pointer-events: auto; }
+  .g-deal.is-done .g-deal__seal      { color: var(--t-ghost); }
+
+  /* GROUP 5 — the strike: given, not drawn. No container, no edge, no
+     background, no object — full inline width at the foot. */
+  .g-strike {
+    --pct: 0%;
+    margin-top: clamp(28px, 5vh, 46px);
+    width: 100%;
+    display: block;
+    border-top: 1px solid var(--hair-1);
+    padding-top: 20px;
+  }
+  .g-strike__row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 8px 0;
+    margin-bottom: 8px;
+  }
+  .g-strike__crown { color: var(--gold-dim); font-size: 15px; margin-right: 10px; }
+  .g-strike__mark {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--t-body);
+    transition: color 180ms var(--ease-settle);
+  }
+  .g-strike__mark + .g-strike__mark::before {
+    content: "·";
+    color: var(--t-ghost);
+    margin: 0 9px;
+  }
+  .g-strike:hover .g-strike__mark,
+  .g-strike:focus-visible .g-strike__mark { color: var(--cream); }
+  .g-strike__line {
+    font-family: var(--font-display);
+    font-size: 15px;
+    font-style: italic;
+    color: var(--t-meta);
+    max-width: 52ch;
+    margin: 0;
+  }
+
+  /* the terminus: a gold tick pointing out of the screen, down at U1 */
+  .g-tick {
+    --pct: 0%;
+    margin-top: clamp(20px, 4vh, 34px);
+    display: flex;
+    justify-content: flex-end;
+    padding-right: 4%;
+  }
+  .g-tick svg { display: block; opacity: .7; }
+
+  /* clearance for the existing bottom chrome rail + orbs — untouched, unmentioned */
+  .rail-note {
+    position: fixed;
+    left: 0; right: 0; bottom: 0;
+    height: 80px;
+    border-top: 1px solid var(--hair-2);
+    background: linear-gradient(180deg, transparent, var(--ink-950) 60%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    color: var(--t-ghost);
+    pointer-events: none;
+  }
+  .rail-note::after { content: "existing 80px chrome rail + orbs — untouched, unmentioned by this design's own ink"; }
+  /* the 120x120 corner the orbs occupy — M1's own ink never enters it */
+  .furniture-note {
+    position: fixed; right: 18px; bottom: 92px; width: 96px; height: 96px;
+    border: 1px dashed var(--hair-2); border-radius: 999px;
+    display: flex; align-items: center; justify-content: center; text-align: center;
+    font-family: var(--font-mono); font-size: 8px; letter-spacing: .1em; color: var(--t-ghost);
+    pointer-events: none;
+  }
+
+  /* 430px: ONE layout, one rule change. --fall-step: 0 flattens the slant
+     to a stack. The read unglues from outboard to beneath. Nothing else
+     differs — this is the whole responsive story. */
+  @media (max-width: 599px) {
+    :root { --fall-step: 0; }
+    .g-fallgroup { flex-direction: column; align-items: flex-start; gap: 14px 0; }
+    .g-face { height: clamp(240px, 38vh, 340px); }
+    .g-read { max-width: 100%; padding-bottom: 0; margin-inline-start: 0; }
+    .g-deal, .g-strike__line { max-width: 100%; }
+    .furniture-note { width: 60px; height: 60px; right: 10px; bottom: 86px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .g-face, .deal-btn__ring, .g-deal__seal, .g-deal__offer, .g-read__mean, .g-read__meta {
+      transition-duration: 1ms !important;
+      animation-duration: 1ms !important;
+    }
+  }
+
+  /* dev harness — not part of the design, just this file's ruler for review */
+  .harness-note {
+    position: fixed; top: 8px; left: 8px; z-index: 9;
+    font-family: var(--font-mono); font-size: 10px; letter-spacing: .08em;
+    color: var(--t-ghost); background: rgba(0,0,0,.4); padding: 4px 8px; border-radius: 3px;
+    pointer-events: none;
+  }
+  .harness-note b { color: var(--gold); font-weight: 500; }
+</style>
+</head>
+<body>
+
+<div class="harness-note">_m1-thehand.html — standalone, not wired · falls: <b id="hCount">1</b>/5 · resize to 430px</div>
+
+<main class="hand">
+
+  <header class="fall g-head">
+    <span class="g-head__mark" aria-hidden="true">&#9670;</span>
+    <h1>BLUE ROOM<span class="sr-h2">The Reading Rooms</span></h1>
+  </header>
+
+  <div class="fall g-fallgroup">
+    <section class="g-face" id="face" data-face aria-live="off">
+      <p class="g-face__meta" id="faceMeta">Arcana &middot; XVII &middot; hope</p>
+      <p class="g-face__name" id="faceName">The Star</p>
+    </section>
+
+    <section class="g-read" id="read" aria-live="polite">
+      <p class="g-read__label" id="readLabel">The card in hand</p>
+      <p class="g-read__meta" id="readMeta"><span class="num">XVII</span> &middot; upright &middot; hope</p>
+      <p class="g-read__mean" id="readMean">The Star stands for hope, renewal and quiet guidance after difficulty &mdash; the calm that follows the storm, and the small light you steer by.</p>
+    </section>
+  </div>
+
+  <section class="fall g-deal" id="dealGroup">
+    <button class="deal-btn" id="dealBtn" type="button">
+      <span class="deal-btn__ring" aria-hidden="true">&#8635;</span>
+      <span>Again</span>
+    </button>
+    <p class="g-deal__terms" id="dealTerms">Three to a question. <b>Your first is free.</b></p>
+    <div class="g-deal__slot">
+      <p class="g-deal__seal">The deck is already cut. What remains is the turn.</p>
+      <p class="g-deal__offer">That is three. Take them to one question &mdash; <a href="?dev=drawing-room">your Sitting is free &rarr;</a></p>
+    </div>
+  </section>
+
+  <a class="fall g-strike" href="?dev=arcane" id="strikeLink" aria-labelledby="strikeLabel">
+    <div class="g-strike__row">
+      <span class="g-strike__crown" aria-hidden="true">&#9819;</span>
+      <span class="g-strike__mark">Sun Sign</span>
+      <span class="g-strike__mark">Year Animal</span>
+      <span class="g-strike__mark">Life Path</span>
+      <span class="g-strike__mark">Rune</span>
+      <span class="g-strike__mark">Trigram</span>
+      <span class="g-strike__mark">Hexagram</span>
+    </div>
+    <p class="g-strike__line" id="strikeLabel">Six marks. One name. Given, not drawn &mdash; and unchanged by anything you do here.</p>
+  </a>
+
+  <div class="fall g-tick" aria-hidden="true">
+    <svg width="26" height="34" viewBox="0 0 26 34" fill="none">
+      <path d="M13 1V27" stroke="#c8ad70" stroke-width="1.2"/>
+      <path d="M4 20L13 30L22 20" stroke="#c8ad70" stroke-width="1.2" fill="none"/>
+    </svg>
+  </div>
+
+</main>
+
+<div class="furniture-note" aria-hidden="true">orbs<br/>(furniture)</div>
+<div class="rail-note" aria-hidden="true"></div>
+
+<script>
+(function () {
+  "use strict";
+
+  // The small embedded deck — a stand-in for M2_DECK. The real build reads
+  // the same codex source m2Pull() already reads; nothing new invented.
+  var DECK = [
+    { name: "The Star", meta: "XVII · upright · hope",
+      mean: "The Star stands for hope, renewal and quiet guidance after difficulty — the calm that follows the storm, and the small light you steer by." },
+    { name: "The Fool", meta: "0 · upright · beginnings",
+      mean: "The Fool stands at the edge with nothing behind him yet — the leap taken before the reasons are ready, and the trust that the ground will meet him." },
+    { name: "Two of Cups", meta: "2 · upright · union",
+      mean: "Two of Cups is a meeting recognised rather than arranged — the moment two separate accounts agree to become one." },
+    { name: "The Tower", meta: "XVI · reversed · delay",
+      mean: "The Tower reversed is the fall postponed, not cancelled — pressure held a while longer inside a structure that already knows its answer." },
+    { name: "Nine of Pentacles", meta: "9 · upright · self-sufficiency",
+      mean: "Nine of Pentacles is a garden built alone and kept alone — comfort earned by hand, needing no one's permission to enjoy it." },
+    { name: "The Moon", meta: "XVIII · upright · uncertainty",
+      mean: "The Moon lights a path that is not fully a path — shapes half-seen, true feeling under a surface that keeps rearranging itself." }
+  ];
+
+  var faceEl = document.getElementById("face");
+  var faceMeta = document.getElementById("faceMeta");
+  var faceName = document.getElementById("faceName");
+  var readEl = document.getElementById("read");
+  var readLabel = document.getElementById("readLabel");
+  var readMeta = document.getElementById("readMeta");
+  var readMean = document.getElementById("readMean");
+  var dealBtn = document.getElementById("dealBtn");
+  var dealGroup = document.getElementById("dealGroup");
+  var dealTerms = document.getElementById("dealTerms");
+  var hCount = document.getElementById("hCount");
+
+  var reduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var deals = 0;      // session-only. Never persisted — a sample that persists
+                       // manufactures an identity for a draw that is not a reading.
+  var CAP = 5, OFFER_AT = 3;
+  var busy = false;
+
+  function gild(html) {
+    var done = false;
+    return html.split(" · ").map(function (seg) {
+      if (!done && (/^[ivxlcdm]+$/i.test(seg) || /^\d+$/.test(seg))) {
+        done = true;
+        return '<span class="num">' + seg + "</span>";
+      }
+      return seg;
+    }).join(" · ");
+  }
+
+  // ONE code path writes both face and read, first paint included.
+  function deal(fromButton) {
+    if (busy) return;
+    busy = true;
+    var c = DECK[Math.floor(Math.random() * DECK.length)];
+
+    function write() {
+      faceMeta.textContent = c.meta;
+      faceName.textContent = c.name;
+      readLabel.textContent = "The card in hand";
+      readMeta.innerHTML = gild(c.meta);
+      readMean.textContent = c.mean;
+      faceEl.setAttribute("aria-label", "Dealt: " + c.name + ", " + c.meta);
+    }
+
+    deals++;
+    hCount.textContent = Math.min(deals + 1, CAP);
+
+    if (reduced || !fromButton) {
+      // first paint (arrival deal) and reduced-motion re-deals: resolve at rest.
+      write();
+      settleCount();
+      busy = false;
+      return;
+    }
+
+    dealBtn.classList.add("is-turning");
+    dealBtn.disabled = true;
+    faceEl.classList.add("is-falling-out");
+    readEl.classList.add("is-writing");
+
+    setTimeout(function () {                          // 240ms — outgoing face falls
+      write();
+      faceEl.classList.remove("is-falling-out");
+      faceEl.classList.add("is-falling-in");
+      readEl.classList.remove("is-writing");
+      settleCount();
+      setTimeout(function () {                         // 320ms — incoming face settles
+        faceEl.classList.remove("is-falling-in");
+        dealBtn.classList.remove("is-turning");
+        dealBtn.disabled = deals >= CAP;
+        busy = false;
+      }, 320);
+    }, 240);
+  }
+
+  function settleCount() {
+    if (deals >= OFFER_AT && deals < CAP) {
+      dealGroup.classList.add("is-offered");
+    }
+    if (deals >= CAP) {
+      dealGroup.classList.add("is-done");
+      dealBtn.disabled = true;
+      dealBtn.querySelector("span:last-child").textContent = "The deck is cut for tonight";
+    }
+  }
+
+  // Real <button>. Enter/Space come from the platform, scoped to focus —
+  // no key binding of our own, no listener on window, arrows/wheel untouched.
+  dealBtn.addEventListener("click", function () { deal(true); });
+
+  // first paint: a real deal, through the real code path, before anything is asked.
+  deal(false);
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,370 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>THE PASSAGE — M1 prototype</title>
+<style>
+  /* ── tokens lifted verbatim from styles.css:8-60 — no new palette ── */
+  :root {
+    --t-display: #dcd7cb;
+    --t-primary: #d7d3ca;
+    --t-body: #b1ada4;
+    --t-meta: #948f87;
+    --t-ghost: #6e6b63;
+    --ink-950: #0a0b0d;
+    --ink-900: #100f0c;
+    --ink-850: #11100d;
+    --ink-800: #151310;
+    --ink-700: #1c1915;
+    --line-faint: rgba(233, 229, 220, 0.07);
+    --line: rgba(233, 229, 220, 0.12);
+    --line-strong: rgba(233, 229, 220, 0.2);
+    --gold: #c8ad70;
+    --gold-dim: #a2864a;
+    --font-display: "Cormorant Garamond", "Times New Roman", serif;
+    --font-ui: "Inter", -apple-system, "Segoe UI", sans-serif;
+    --font-mono: "IBM Plex Mono", "Consolas", monospace;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: var(--ink-950); color: var(--t-primary); }
+  body {
+    font-family: var(--font-ui);
+    min-height: 100svh;
+    display: flex; flex-direction: column;
+  }
+
+  /* ── the band above the rail ── */
+  .m1band {
+    flex: 1 1 auto;
+    display: flex; align-items: center; justify-content: flex-start;
+    padding: 6vh 8vw;
+    min-height: calc(100svh - 80px);
+  }
+
+  /* ── the passage ── */
+  .m1pass {
+    max-width: min(46ch, 88vw);
+    padding-inline-end: 64px; /* clears the fixed orbs */
+  }
+  .m1pass__flow {
+    font-family: var(--font-display);
+    font-size: clamp(22px, 2.5vw, 31px);
+    line-height: 1.45;
+    color: var(--t-primary);
+    margin: 0;
+  }
+  .m1pass__mark {
+    font-family: var(--font-mono);
+    font-size: 0.55em;
+    letter-spacing: .18em;
+    color: var(--t-ghost);
+    vertical-align: 2px;
+  }
+
+  .m1pass__live {
+    font: inherit;
+    color: inherit;
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    text-decoration: none;
+    border-bottom: 1px solid var(--gold-dim);
+    transition: color 180ms ease, border-color 180ms ease, font-size 220ms ease, opacity 220ms ease;
+  }
+  .m1pass__live:hover { color: var(--t-display); border-color: var(--gold); }
+  .m1pass__live:focus-visible {
+    outline: 1px solid var(--gold);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+  .m1pass__live[aria-expanded="true"] {
+    color: var(--gold);
+    border-color: var(--gold);
+  }
+
+  /* the recede rule: when an opening exists, everything not the held clause drops register */
+  .m1pass.is-open .m1pass__flow > *:not(.is-held) {
+    font-size: clamp(15px, 1.4vw, 17px);
+    line-height: 1.5;
+    color: var(--t-meta);
+    transition: font-size 220ms ease, color 220ms ease;
+  }
+  .m1pass.is-open .m1pass__flow .is-held {
+    font-size: clamp(22px, 2.5vw, 31px);
+    color: var(--t-display);
+  }
+  .m1pass .m1pass__flow > * { transition: font-size 220ms ease, color 220ms ease; }
+
+  /* seal clause — always inert, always closes */
+  .m1pass__seal {
+    background: none; border: none; padding: 0; font: inherit; color: var(--t-meta);
+    cursor: pointer; text-decoration: underline dotted var(--line-strong);
+  }
+  .m1pass__seal:focus-visible { outline: 1px solid var(--gold); outline-offset: 3px; }
+
+  /* ── the opening ── */
+  .m1pass__open {
+    display: block;
+    margin: 14px 0 4px;
+    padding: 16px 18px 18px;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    background: linear-gradient(180deg, var(--ink-800), var(--ink-850));
+    max-width: 100%;
+  }
+  @media (min-width: 720px) {
+    .m1pass__open--reading {
+      float: right;
+      shape-outside: inset(0 0 0 0 round 4px);
+      margin: 8px 0 12px 24px;
+      width: min(280px, 40vw);
+    }
+  }
+
+  .m1pass__open[hidden] { display: none; }
+
+  .m1pass__openlabel {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: .22em;
+    text-transform: uppercase;
+    color: var(--t-ghost);
+    margin: 0 0 10px;
+  }
+
+  /* ── m2hero, reused, height re-sourced ── */
+  .m2hero {
+    position: relative;
+    width: 100%;
+    max-width: 190px;
+    aspect-ratio: 120 / 190;
+    margin: 0 auto 12px;
+    border-radius: 4px;
+    background: linear-gradient(160deg, var(--ink-700), var(--ink-900));
+    border: 1px solid var(--line-strong);
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden;
+  }
+  .m2hero svg { width: 78%; height: 90%; }
+  .m2hero__name {
+    position: absolute; bottom: 8px; left: 0; right: 0; text-align: center;
+    font-family: var(--font-display); font-style: italic; font-size: 13px; color: var(--t-display);
+  }
+  .m2hero.is-assembling svg path, .m2hero.is-assembling svg circle {
+    stroke-dasharray: 240; stroke-dashoffset: 240;
+    animation: m1-draw 480ms ease forwards;
+  }
+  @keyframes m1-draw { to { stroke-dashoffset: 0; } }
+
+  /* ── m2read, reused verbatim ── */
+  .m2read { display: grid; gap: 6px; --m2read-size: 15px; --m2read-lh: 1.55; --m2read-lines: 5; margin-bottom: 10px; }
+  .m2read__label { font-family: var(--font-mono); font-size: 9.5px; letter-spacing: .22em; text-transform: uppercase; color: var(--t-ghost); margin: 0 0 2px; }
+  .m2read__meta { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: .2em; text-transform: uppercase; color: var(--t-meta); margin: 0; }
+  .m2read__seg--0 { color: var(--gold); }
+  .m2read__seg--1 { color: #a49e93; }
+  .m2read__seg--2 { color: #8b867e; }
+  .m2read__dot { color: #6f6b64; margin: 0 .4em; }
+  .m2read__mean {
+    font-family: var(--font-display); font-size: var(--m2read-size); line-height: var(--m2read-lh);
+    color: var(--t-body); margin: 0;
+    display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 5; overflow: hidden;
+    height: calc(var(--m2read-size) * var(--m2read-lh) * var(--m2read-lines));
+  }
+
+  /* ── spine, reused, per-mark links ── */
+  .menu__draw-spine {
+    display: flex; flex-wrap: wrap; gap: 2px 0;
+    font-family: var(--font-mono); font-size: 10px; letter-spacing: .05em;
+    color: var(--t-ghost); margin: 0 0 12px;
+  }
+  .menu__draw-spine a { color: var(--t-meta); text-decoration: none; border-bottom: 1px dotted var(--line); }
+  .menu__draw-spine a:hover { color: var(--gold); border-color: var(--gold); }
+  .menu__draw-spine a:focus-visible { outline: 1px solid var(--gold); outline-offset: 2px; }
+  .menu__draw-spine .sep { margin: 0 .35em; color: var(--t-ghost); }
+
+  /* ── door, reused, one instance, inside the opening ── */
+  .menu__door {
+    display: block; text-decoration: none;
+    border: 1px solid var(--line-strong); border-radius: 3px;
+    padding: 10px 12px;
+    background: rgba(200,173,112,.04);
+  }
+  .menu__door:hover { border-color: var(--gold-dim); background: rgba(200,173,112,.08); }
+  .menu__door:focus-visible { outline: 1px solid var(--gold); outline-offset: 3px; }
+  .menu__door-name { display: block; font-family: var(--font-display); font-size: 16px; color: var(--t-display); }
+  .menu__door-status { display: block; font-family: var(--font-mono); font-size: 10px; letter-spacing: .1em; color: var(--t-meta); margin-top: 3px; }
+
+  /* ── place opening (Codex / underneath): two lines + way in ── */
+  .m1pass__place p { font-family: var(--font-display); font-size: 16px; line-height: 1.5; color: var(--t-body); margin: 0 0 12px; }
+  .m1pass__place a { color: var(--gold); text-decoration: none; border-bottom: 1px solid var(--gold-dim); font-family: var(--font-mono); font-size: 12px; letter-spacing: .05em; }
+
+  /* ── 430px: elision instead of float ── */
+  @media (max-width: 430px) {
+    .m1pass { max-width: 100%; padding-inline-end: 0; }
+    .m1pass__flow { font-size: 19px; line-height: 1.45; }
+    .m1pass__open--reading { float: none; width: 100%; margin: 14px 0 4px; }
+    .m1pass.is-open .m1pass__flow > .m1pass__elide {
+      display: block; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      font-size: 13px; color: var(--t-ghost); cursor: pointer; border: none; background: none; text-align: left; width: 100%; padding: 4px 0;
+    }
+    .m2hero { max-width: 44vw; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .m2hero.is-assembling svg path, .m2hero.is-assembling svg circle { animation: none; stroke-dashoffset: 0; }
+    .m1pass * { transition: none !important; }
+  }
+
+  /* furniture stand-ins, so the band's real budget is visible */
+  .rail-stub { height: 80px; border-top: 1px solid var(--line-faint); display: flex; align-items: center; padding: 0 8vw; font-family: var(--font-mono); font-size: 11px; letter-spacing: .1em; color: var(--t-ghost); }
+  .orb-stub { position: fixed; right: 24px; bottom: 96px; width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--line); opacity: .5; }
+  .orb-stub.b { bottom: 44px; width: 28px; height: 28px; }
+</style>
+</head>
+<body>
+
+<div class="m1band">
+  <article class="m1pass" id="m1pass" aria-label="Blue Room">
+    <p class="m1pass__flow" id="m1flow">
+      <span class="m1pass__mark" aria-hidden="true">◆</span> <strong>BLUE ROOM.</strong>
+      Not every card is developed — some are
+      <button type="button" class="m1pass__live" id="live-tarot" data-opens="tarot" aria-expanded="false" aria-controls="m1open">drawn</button>,
+      three to one question, and your first is free. Others are
+      <button type="button" class="m1pass__live" id="live-birth" data-opens="birth" aria-expanded="false" aria-controls="m1open">given at birth</button>
+      and never change: six marks, one name, the same tonight and in ten years. Every mark has a
+      <button type="button" class="m1pass__live" id="live-codex" data-opens="codex" aria-expanded="false" aria-controls="m1open">written entry</button>.
+      The deck is already cut; what remains is the turn —
+      <button type="button" class="m1pass__live" id="live-under" data-opens="under" aria-expanded="false" aria-controls="m1open">and there is more of this underneath</button>.
+      <button type="button" class="m1pass__seal" id="live-seal" aria-label="Close the open passage">The deck is already cut. What remains is the turn.</button>
+    </p>
+
+    <div class="m1pass__open" id="m1open" role="group" aria-live="polite"></div>
+  </article>
+</div>
+
+<div class="rail-stub">THE DESK &nbsp;·&nbsp; Codex &nbsp;·&nbsp; YOUR PROFILE — kept &nbsp;·&nbsp; ROOMS</div>
+<div class="orb-stub" aria-hidden="true"></div>
+<div class="orb-stub b" aria-hidden="true"></div>
+
+<script>
+(function(){
+  var pass = document.getElementById('m1pass');
+  var open = document.getElementById('m1open');
+  var lives = Array.prototype.slice.call(document.querySelectorAll('.m1pass__live'));
+  var sitting = false; // m2SittingUsed() stand-in
+
+  var CONTENT = {
+    tarot: {
+      held: '#live-tarot',
+      render: function () {
+        return openReading({
+          label: 'By the Draw · Tarot',
+          hero: heroTarot(),
+          heroName: 'The Star',
+          meta: '<span class="m2read__seg m2read__seg--0">XVII</span><span class="m2read__dot">·</span><span class="m2read__seg m2read__seg--1">Major Arcana</span><span class="m2read__dot">·</span><span class="m2read__seg m2read__seg--2">Upright</span>',
+          mean: 'Nothing is drawn here — each mark is looked up, and read as it stands. The Star closes The Turn: after The Crown, quiet return.',
+          spine: ['The Ground','The Crossing','The Root','The Crown','The Turn'],
+          doorHref: '?dev=drawing-room',
+          doorName: 'A Tarot Reading',
+          doorStatus: 'A Sitting — three cards, ' + (sitting ? 'your free one is spent' : 'your first free') + '. Or the Deep Read — five.'
+        });
+      }
+    },
+    birth: {
+      held: '#live-birth',
+      render: function () {
+        return openReading({
+          label: 'By Birth · Given, not drawn',
+          hero: heroBirth(),
+          heroName: 'The Crowned Name',
+          meta: '<span class="m2read__seg m2read__seg--0">Six marks</span><span class="m2read__dot">·</span><span class="m2read__seg m2read__seg--2">By birth alone</span>',
+          mean: 'Six marks you were given rather than chose, read together into one crowned name. The same in ten years as tonight.',
+          spine: ['Sun Sign','Year Animal','Life Path','Rune','Trigram','Hexagram'],
+          doorHref: '?dev=arcane',
+          doorName: 'The Birth Reading',
+          doorStatus: 'Six marks. One name. The deeper reading — given at birth, read here.'
+        });
+      }
+    },
+    codex: {
+      held: '#live-codex',
+      render: function () {
+        return '<p class="m1pass__openlabel">The Codex</p>'
+          + '<div class="m1pass__place">'
+          + '<p>Every mark on every reading is defined here — one entry per card, per sign, per rune. Nothing named on this page is unexplained.</p>'
+          + '<a href="codex.html?v=363" data-codex-open>The Codex — where every mark is defined &rarr;</a>'
+          + '</div>';
+      }
+    },
+    under: {
+      held: '#live-under',
+      render: function () {
+        return '<p class="m1pass__openlabel">Underneath</p>'
+          + '<div class="m1pass__place">'
+          + '<p>Blue Room, the two products, and what is coming next — the house explained, one level down.</p>'
+          + '<a href="#about" id="m1-glide-under">Keep going down &rarr;</a>'
+          + '</div>';
+      }
+    }
+  };
+
+  function heroTarot() {
+    return '<div class="m2hero is-assembling" data-hero><svg viewBox="0 0 120 190" role="img" aria-label="XVII — The Star"><rect x="11" y="11" width="98" height="168" rx="5" fill="none" stroke="#c8ad70" stroke-width=".8" opacity=".6"/><circle cx="60" cy="98" r="31" fill="none" stroke="#c8ad70" stroke-width=".8" opacity=".5"/><circle cx="60" cy="98" r="3.2" fill="#c8ad70"/></svg><span class="m2hero__name">The Star</span></div>';
+  }
+  function heroBirth() {
+    return '<div class="m2hero is-assembling" data-hero><svg viewBox="0 0 120 190" role="img" aria-label="The Crowned Name"><path d="M16 64 L26 28 L45 50 L60 18 L75 50 L94 28 L104 64" fill="none" stroke="#c8ad70" stroke-width="3" stroke-linejoin="round"/><path d="M15 66 H105" stroke="#c8ad70" stroke-width="2"/><circle cx="60" cy="18" r="4" fill="#c8ad70"/></svg><span class="m2hero__name">The Crowned Name</span></div>';
+  }
+
+  function openReading(d) {
+    var spine = d.spine.map(function (m, i) {
+      return (i ? '<span class="sep">·</span>' : '') + '<a href="codex.html?v=363#' + encodeURIComponent(m) + '">' + m + '</a>';
+    }).join('');
+    return '<p class="m1pass__openlabel">' + d.label + '</p>'
+      + d.hero
+      + '<div class="m2read" data-m2-read>'
+      +   '<p class="m2read__label">The reading in question</p>'
+      +   '<p class="m2read__meta" data-m2-meta>' + d.meta + '</p>'
+      +   '<p class="m2read__mean" data-m2-mean>' + d.mean + '</p>'
+      + '</div>'
+      + '<p class="menu__draw-spine">' + spine + '</p>'
+      + '<a class="menu__door" href="' + d.doorHref + '">'
+      +   '<span class="menu__door-name">' + d.doorName + '</span>'
+      +   '<span class="menu__door-status">' + d.doorStatus + '</span>'
+      + '</a>';
+  }
+
+  function setOpen(key) {
+    var def = CONTENT[key];
+    if (!def) return;
+    open.innerHTML = def.render();
+    pass.classList.add('is-open');
+    lives.forEach(function (b) {
+      var isHeld = ('#' + b.id) === def.held;
+      b.setAttribute('aria-expanded', String(isHeld));
+      b.classList.toggle('is-held', isHeld);
+    });
+    var live = document.querySelector(def.held);
+    if (live) live.classList.add('is-held');
+  }
+
+  lives.forEach(function (btn) {
+    btn.addEventListener('click', function () { setOpen(btn.dataset.opens); });
+    btn.addEventListener('focus', function () { setOpen(btn.dataset.opens); });
+    var t;
+    btn.addEventListener('mouseenter', function () { t = setTimeout(function () { setOpen(btn.dataset.opens); }, 140); });
+    btn.addEventListener('mouseleave', function () { clearTimeout(t); });
+  });
+
+  document.getElementById('live-seal').addEventListener('click', function () { setOpen('tarot'); });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') setOpen('tarot');
+  });
+
+  // arrives already open — teaches the mechanic in the first 500ms
+  setOpen('tarot');
+})();
+</script>
+</body>
+</html>

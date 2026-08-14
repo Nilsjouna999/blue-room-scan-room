@@ -1,0 +1,972 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>M1 — THE STANDING SENTENCE (prototype)</title>
+<style>
+  /* ============================================================
+     TEAM 3 — THE STANDING SENTENCE
+
+     ONE SENTENCE, true of no other design in the pool:
+     this is the only surface in the fleet that tells a stranger WHY there are
+     two readings instead of THAT there are two — the two products are defined
+     against each other in one breath, by their predicates, and the whole offer
+     is four words a visitor can repeat without the page in front of them:
+     never changes / never repeats.
+
+     That is the claim, and it is a visitor claim, not an architecture one.
+     Every other design in the pool arranges the two readings — side by side,
+     stacked, gathered out of a field, opened one at a time — and arrangement
+     can only say "there are two of these." A predicate contrast says what the
+     distinction IS: one is permanent and was always yours, the other is
+     unrepeatable and happens tonight. A stranger who reads six words of this
+     page has the entire product line and the reason it is a line. Nobody else
+     is contesting this, and it cannot be retrofitted onto a design made of
+     objects, because objects sit next to each other and can only be compared
+     by looking; predicates contrast whether you look or not.
+
+     The consequence, not the claim: because the products are grammatical
+     subjects, a third and fourth address cost a clause and no space, and
+     nothing on this page can be a box.
+
+     THE GATE, described without the seven banned words: six ranks of a printed
+     leaf, set in one measure and read top to bottom — a running head naming the
+     house and its neighbours, an epigraph, one large sentence whose subjects are
+     the ways in, a subordinate clause under it reporting the reading dealt
+     today, foot matter naming where else the book goes, and a catchword saying
+     what is printed on the next leaf down.
+
+     WHAT SEPARATES THIS FROM TEAM 7 — a TEST, not a description, because we
+     are the two type-first designs and the rule cuts pairs. Read each page
+     aloud and stop at the end of the first breath. Team 7 gives you two
+     announcements: "A Tarot Reading — three cards, dealt tonight" and "The
+     Birth Reading — six marks you were handed." Both true, both complete, and
+     the relation between them is left to adjacency, which is the one thing
+     reading aloud destroys. This one gives you a definition: "The Birth
+     Reading is given to you at birth and never changes. A Tarot Reading is
+     dealt to you tonight and never repeats." Same two products, and only the
+     second one told you what kind of house has both. Team 7's claim is that
+     nothing is withheld; it keeps that claim perfectly and it is the honest
+     ceiling of a small idea. This claim is larger and the test above decides
+     it in five seconds without a screenshot.
+
+     (Team 7 is also provably identical in frame 1 and frame 10,000, and on
+     every visit any visitor ever makes. This page is not, and it does not ask
+     to be taken on trust: the clause below carries a dateline off the
+     visitor's own clock, and on the second arrival it names, in English, the
+     card this browser was shown on the previous one. A printed illustration
+     can be given a date. It cannot tell you what it said to YOU last time.)
+
+     WORST AT, named and not hedged: there is no object anywhere on this
+     surface, lit or unlit. In a category where the product is a thing you
+     want to hold, this page argues entirely in language and never shows you
+     one. That is a real cost, and it is not a cost this design can pay down:
+     the moment an object is added, the eye goes to the object and the
+     predicates become its caption — which is every other design in the pool,
+     and the exact thing this page exists to not be. There is no smaller
+     object, no corner treatment, no unlit placeholder that avoids this; the
+     failure mode is categorical, not a matter of degree. The fix is
+     unavailable to this design, not declined by it.
+     ============================================================ */
+  :root {
+    --ease-settle: cubic-bezier(.2,.7,.2,1);
+
+    /* ---- shipped palette. --t-*, --ink-*, --line*, --hair-*, --grade-* and
+       --m2read-* are declared in styles.css :root and copied byte-for-byte.
+       --gold / --gold-card are NOT tokens in styles.css — the hexes are the
+       live production literals (#c9a35c is the unfired var(--gold,…) fallback,
+       #c8ad70 is hardcoded at styles.css:3303/3853/3856/3870/3892). Named here
+       so this file has one place to change when critique item 9 is fixed. ---- */
+    --t-display: #dcd7cb;
+    --t-primary: #d7d3ca;
+    --t-body: #b1ada4;
+    --t-meta: #948f87;
+    --t-ghost: #6e6b63;
+
+    --ink-950: #0a0b0d;
+    --ink-900: #100f0c;
+    --ink-850: #11100d;
+    --ink-800: #151310;
+    --ink-700: #1c1915;
+
+    --line-faint: rgba(233, 229, 220, 0.07);
+    --line: rgba(233, 229, 220, 0.12);
+    --hair-1: rgba(233, 229, 220, .14);
+    --hair-2: rgba(233, 229, 220, .08);
+
+    --grade-a: #d8cdb4;
+    --grade-b: #a9a49a;
+    --gold: #c9a35c;
+    --gold-card: #c8ad70;
+
+    --font-display: "Cormorant Garamond", "Times New Roman", serif;
+    --font-ui: "Inter", -apple-system, "Segoe UI", sans-serif;
+    --font-mono: "IBM Plex Mono", "Consolas", monospace;
+
+    /* the ~152px reading block, styles.css:3277 — height held, not the size */
+    --m2read-size: 19px;
+    --m2read-lh: 1.6;
+    --m2read-lines: 5;
+
+    /* RHYTHM, not a metronome. Six ranks of a printed page do not sit at one
+       repeated distance — a running head sits close to its epigraph (same
+       register), the sentence gets an entrance, the clause stays bound to
+       what it explains, and the foot matter binds to itself. Each transition
+       is named for what it is, not for its position in a list. */
+    --gap-01: 8px;   /* r0 -> r1 : same register, meta to meta */
+    --gap-12: 26px;  /* r1 -> r2 : entrance air before the sentence */
+    --gap-23: 18px;  /* r2 -> r3 : the clause stays close to what dealt it */
+    --gap-45: 6px;   /* r4 -> r5 : colophon to catchword, foot binds tight */
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    /* was `height:100%`, which on mobile Safari resolves against the LARGE
+       viewport — the foot ranks (colophon, catchword) then sit underneath the
+       browser toolbar on first paint and only appear once you scroll, on a
+       page whose own law is that it does not scroll. Team 7 got this right and
+       the fix is theirs: measure against the SMALL viewport and let the flow
+       declare its own floor. */
+    min-height: 100%;
+    background: radial-gradient(120% 140% at 20% -10%, var(--ink-800) 0%, var(--ink-900) 45%, var(--ink-950) 100%);
+    color: var(--t-body);
+    font-family: var(--font-ui);
+    /* NO overflow:hidden. It was here as an "enforcement" of the one-screen law
+       and it was concealment: with a centred flow, content that does not fit
+       overflows the TOP, which document.scrollHeight never counts. The law is
+       now enforced by the flow fitting, and a scrollbar is allowed to appear
+       and accuse this design if it ever stops fitting. */
+  }
+
+  a { color: inherit; }
+
+  /* ================= furniture that already exists ================= */
+
+  .m1-orb {
+    position: fixed;
+    bottom: 22px;
+    width: 34px; height: 34px;
+    border-radius: 50%;
+    border: 1px solid var(--line);
+    background: var(--ink-850);
+    z-index: 5;
+  }
+  .m1-orb--l { left: 22px; }
+  .m1-orb--r { right: 22px; }
+
+  .m1-rail {
+    position: fixed;
+    left: 0; right: 0; bottom: 0;
+    height: 64px;
+    background: linear-gradient(180deg, transparent, rgba(0,0,0,.35));
+    border-top: 1px solid var(--line-faint);
+    z-index: 3;
+    pointer-events: none;
+  }
+
+  /* ================= the flow =================
+     SIX RANKS OF A PRINTED PAGE, and nothing else. There is no control on this
+     surface: not one <button>, not one toggle, not one panel, not one thing
+     that opens. Every live element is a WORD, and every word that is live is a
+     link that leaves. That is the whole interaction model and it is stated here
+     so that any future edit which adds a widget can be recognised as a breach. */
+
+  .m1-flow {
+    position: relative;
+    z-index: 4;
+    min-height: 100vh;   /* fallback for engines without svh */
+    min-height: 100svh;
+    max-width: 940px;
+    margin: 0 auto;
+    padding: clamp(20px, 7vh, 70px) 56px 84px;
+    display: flex;
+    flex-direction: column;
+    /* flex-start, not center: a centred flow that fills its band pushes its
+       first rank off the top of the screen, where nothing can measure it. */
+    justify-content: flex-start;
+    /* no row gap here — each rank states its own margin-top below, because a
+       single repeated distance between six unlike ranks is not a rhythm,
+       it's a metronome. */
+    gap: 0;
+  }
+  .m1-flow > * { flex: 0 0 auto; }
+
+  /* R0 — running head */
+  .r0 {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    /* .14em — the CHROME tracking value: this rank and R4 persist across
+       every visit, so they share one tracking, distinct from the .20em
+       given to the two ranks below that report THIS visit (R3, R5). */
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--t-ghost);
+    /* was `display:flex; line-height:1`. The running head now carries a clause,
+       not a wordmark, and a clause must be allowed to break: at 320px it sets
+       to two lines and at 1440px to one, with no second type treatment and no
+       second rank. Nothing else on the page changes.
+       1.45 -> 1.3: a running head is brief, foot matter (R4) is a list of
+       links that needs 1.6 to stay legible when it wraps. Sharing one number
+       between the two blurred the register they're meant to keep apart; 1.3
+       is tight enough to read as a masthead line while still opening enough
+       air between its two wrapped lines at 320px not to collide. */
+    line-height: 1.3;
+    margin: 0;
+    /* no measure: a running head is one line for as long as the leaf is wide
+       enough to hold it, and breaks only when the leaf is not. */
+    max-width: 100%;
+  }
+  .r0 .mark { color: var(--gold); margin-right: .5em; }
+
+  /* R1 — epigraph. STATIC. The previous build put seven rotating questions here
+     on a 44s keyframe schedule. They were the one rank on a page made of type
+     where type was decoration rather than structure, they were aria-hidden (so
+     a sixth of the page did not exist for a screen reader), they needed a
+     reduced-motion branch, and they cost 40px that the arithmetic did not have.
+     A printed page's grammar for a line above the title is an epigraph, and an
+     epigraph does not move. */
+  .r1 {
+    margin: var(--gap-01) 0 0;
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 16px;
+    line-height: 1.5;
+    color: var(--t-meta);
+    max-width: 40ch;
+  }
+
+  /* R2 — the standing sentence */
+  .r2 {
+    margin: var(--gap-12) 0 0;
+    font-family: var(--font-display);
+    font-weight: 500;
+    /* vh in the clamp: this sentence is the design, so it is the thing that
+       yields when the screen is short, rather than the page overflowing */
+    font-size: clamp(25px, min(4.6vw, 5.4vh), 44px);
+    line-height: 1.16;
+    color: var(--t-body);
+    max-width: 21em;
+  }
+  /* A real underline, not a border. `border-bottom-width` was transitioning a
+     box dimension on a line of the largest type on the page — a layout-forcing
+     property, animated, inside the one element whose measure everything else is
+     laid out against. `text-decoration-*` is paint: the rule thickens and
+     brightens without the line box changing by a hundredth of a pixel. */
+  .r2 a {
+    font-weight: 700;
+    color: var(--t-display);
+    text-decoration: underline;
+    text-decoration-thickness: 1.5px;
+    text-decoration-color: rgba(233,229,220,.32);
+    text-underline-offset: .14em;
+    text-decoration-skip-ink: auto;
+    transition: text-decoration-color 160ms var(--ease-settle), text-decoration-thickness 160ms var(--ease-settle);
+  }
+  .r2 a:hover, .r2 a:focus-visible {
+    text-decoration-thickness: 2px;
+    text-decoration-color: var(--t-display);
+  }
+  /* MUST-FIX 1 (scouting report) — a real focus indicator, restored. Every
+     `:focus-visible` rule on this page was previously pairing a hover-style
+     change with `outline:none`, which is a hover state wearing a keyboard
+     user's name, not a focus ring: a mouse user gets the same visual cue a
+     keyboard user gets and the keyboard user gets nothing extra to find their
+     place by. One consolidated rule, the shipped gold (styles.css:3303),
+     covers every live control on the page. Outline does not reflow, so this
+     costs nothing structurally. */
+  .r2 a:focus-visible,
+  .r2 .cl--from a:focus-visible,
+  .r2 .tail a:focus-visible,
+  .r4 a:focus-visible,
+  .r5:focus-visible {
+    outline: 2px solid var(--gold-card);
+    outline-offset: 3px;
+  }
+  /* THE AXIS — the two words that are the whole argument.
+     The copy already carried the contrast (given/dealt, never changes/never
+     repeats) and nothing in the type said so, which meant the one idea in this
+     design that no competitor has was legible only to somebody who read the
+     whole sentence. These four words now take display ink — the only words on
+     the page besides the two product names that do — so the four things the
+     eye lands on, in order, are: The Birth Reading · never changes · A Tarot
+     Reading · never repeats. That is the offer, the relation between the two
+     halves of it, and the reason there are two, in four glances.
+     Cost: two spans. No layout, no new animation step, no new rank. */
+  .r2 .ax {
+    font-style: normal;
+    font-weight: 700;
+    color: var(--t-display);
+  }
+
+  /* R2.5 — the source clause. Set between the sentence and the terms, because
+     it is neither: smaller than a product, larger than a footnote. It is the
+     only rank on the page that states the size of the house, and it states it
+     in real material (the true Codex count) rather than in a promise. */
+  .r2 .cl--from {
+    display: block;
+    margin-top: 9px;
+    font-size: .62em;
+    line-height: 1.3;
+    color: var(--t-meta);
+  }
+  .r2 .cl--from a {
+    font-weight: 600;
+    color: var(--t-primary);
+    text-decoration-thickness: 1px;
+  }
+  .r2 .cl--from a:hover, .r2 .cl--from a:focus-visible {
+    color: var(--t-display);
+    text-decoration-thickness: 1.5px;
+  }
+
+  .r2 .tail {
+    display: block;
+    margin-top: 10px;
+    font-family: var(--font-ui);
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--t-meta);
+    letter-spacing: 0;
+    max-width: 62ch;
+  }
+  .r2 .tail em { font-style: normal; color: var(--t-primary); }
+  /* A THIRD AND FOURTH ADDRESS, AND THEY COST A CLAUSE.
+     The Deep Read is the five-card product. On every other surface in this
+     competition it is either an unlinked phrase inside the tarot description
+     or is not printed at all — a visitor who has already decided they want it
+     has nowhere to click and, in three of the seven, no way to learn it
+     exists. Here it is a named thing you can go to, and adding it cost one
+     anchor and no layout, because a product on this page is a grammatical
+     subject rather than a box that has to be found room for. It sets at the
+     tail's own weight: subordinate to the two readings above it in size and
+     in ink, live in exactly the same way.
+     (The Codex used to be the tail's third sentence. It is now its own clause
+     one rank up — see .cl--from. Either way it has ONE door on this page, not
+     two: app.js:2472-2474's rule holds.) */
+  .r2 .tail a {
+    font-weight: 600;
+    color: var(--t-primary);
+    text-decoration-thickness: 1px;
+  }
+  .r2 .tail a:hover, .r2 .tail a:focus-visible {
+    color: var(--t-display);
+    text-decoration-thickness: 1.5px;
+  }
+
+  /* R3 — subordinate clause: the ~152px reading block, height held */
+  .r3 {
+    /* was `1em` — .r3 sets no font-size of its own, so that 1em resolved
+       against the browser's unset 16px default, not against the clause's own
+       19px (--m2read-size). The indent worked by accident, not by relation.
+       18px stated directly: close enough to read as "one em" of the clause it
+       indents, off by one so the hanging edge lands crisper against the
+       sentence's own left edge above it. */
+    margin: var(--gap-23) 0 0 18px;
+    display: grid;
+    gap: 6px;
+  }
+  .r3__label {
+    /* 10px, not 10.5 — the half-point step from R0/R4 read as a mistake, not
+       a decision: too close to double as a size relationship, too far to be
+       the same size. Unified to 10px; the .20em tracking (the EVENT value,
+       shared with R5) is what tells this rank apart from the chrome ranks. */
+    font-family: var(--font-mono); font-size: 10px; letter-spacing: .20em;
+    text-transform: uppercase; color: var(--t-ghost); margin: 0;
+  }
+  .r3__mean {
+    font-family: var(--font-display);
+    font-size: var(--m2read-size);
+    line-height: var(--m2read-lh);
+    margin: 0;
+    color: var(--t-body);
+    background-image: linear-gradient(175deg, var(--grade-a) 0%, var(--grade-a) 22%, var(--grade-b) 88%);
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent;
+    /* A FLOOR, NEVER A CEILING. This was `height:` plus `-webkit-line-clamp`,
+       which is a page made entirely of writing reserving the right to cut a
+       sentence off mid-word and not say so. A design whose whole claim is that
+       it is one written thing may not withhold by CSS — the clamp is deleted,
+       the fixed height becomes a min-height, and the ~152px reservation now
+       only stops a short clause from collapsing the rank. If a clause ever
+       runs long, it sets to more lines and the page is allowed to accuse
+       itself, which is the same law already stated on `body`. (Team 7 named
+       this rule; the rule is a solution, so it is taken.) */
+    min-height: calc(var(--m2read-size) * var(--m2read-lh) * var(--m2read-lines));
+    /* the reservation is a height, so the MEASURE is set to the width at which
+       a typical clause fills those lines — too wide and the floor renders as a
+       hole under the sentence. */
+    max-width: 21em;
+  }
+  /* forced-colors strips background-image, and this page is made of type —
+     a text-rendering failure here is the whole page, not one block */
+  @media (forced-colors: active) {
+    .r3__mean { -webkit-text-fill-color: CanvasText; background-image: none; color: CanvasText; }
+    .r3__mean b { -webkit-text-fill-color: CanvasText; color: CanvasText; }
+  }
+  .r3__mean b {
+    font-weight: 600;
+    color: var(--gold-card);
+    -webkit-text-fill-color: var(--gold-card);
+  }
+
+  /* R4 — colophon. Routes only. Two lines at every width.
+     `margin-top: auto` seats the colophon and the catchword at the FOOT of the
+     page rather than trailing the clause. That is the printed grammar — a
+     colophon and a catchword are foot ranks — and it is safe by construction:
+     an auto margin only distributes leftover space, so if the flow ever stops
+     fitting it resolves to zero and nothing is pushed anywhere. Centring the
+     whole flow would fill the same air and is the thing that previously drove
+     the running head off the top of the screen; this cannot. */
+  .r4 {
+    /* auto, not a --gap value: R4 is foot matter and takes whatever the flow
+       has left over, which is how it stays pinned to the bottom of a page
+       that changes height with the dealt clause. The 12-viewport sweep is
+       what proves this never collapses to less than the visual minimum, not
+       a stated number — there is nothing to floor it against once the
+       column no longer has slack. */
+    margin: auto 0 0;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--t-ghost);
+    line-height: 1.6;
+    max-width: 70ch;
+  }
+  .r4 a {
+    color: var(--t-meta);
+    text-decoration: none;
+    border-bottom: 1px solid var(--hair-1);
+    padding-bottom: 1px;
+    transition: color 160ms var(--ease-settle), border-color 160ms var(--ease-settle);
+  }
+  .r4 a:hover, .r4 a:focus-visible { color: var(--t-display); border-bottom-color: var(--t-display); }
+
+  /* R5 — catchword. An ANCHOR, not a button: a printed page's catchword is the
+     first word of the next page printed at the foot of this one, and it is text.
+     On the live page the click calls the existing _u1GlideTo(seat). */
+  .r5 {
+    margin: var(--gap-45) 0 0;
+    align-self: flex-start;
+    display: inline-flex;
+    align-items: center;
+    gap: .6em;
+    text-decoration: none;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: .20em;
+    text-transform: uppercase;
+    color: var(--t-meta);
+    line-height: 1.4;
+    padding: 4px 2px;
+    /* `white-space:nowrap` was a promise this rank could not keep: at 320px the
+       narrow rule adds 52px of padding on both sides (the orb clearance), which
+       leaves 216px of line for a word that measured wider than the screen once
+       the padding was charged. The catchword is allowed to take two lines
+       rather than leave the page. */
+    flex-wrap: wrap;
+    max-width: 100%;
+    transition: color 160ms var(--ease-settle), transform 160ms var(--ease-settle);
+  }
+  .r5:hover, .r5:focus-visible { color: var(--t-display); transform: translateY(2px); }
+  .r5 .arrow { font-size: 12px; }
+
+  /* ================= THE SETTING =================
+     This page does not arrive. It is SET.
+
+     Every word is in its final place in the first painted frame — nothing
+     enters, nothing moves, nothing is transparent, no rank is hidden and then
+     revealed, and no box is laid out twice. What resolves is INK STRENGTH, and
+     it resolves in the order a compositor sets a sentence: the proposition,
+     then the reading you are given, then the reading you are dealt, then the
+     terms; and only once the sentence is standing does the clause subordinate
+     to it take ink. The unit of movement is the clause, which is why the
+     clauses are the only new elements in the markup and why each one is
+     nothing but words.
+
+     What deliberately does NOT participate: the running head, the epigraph,
+     the colophon and the catchword. They are standing matter — the same on
+     every visit — and standing matter is already in the forme when the page
+     is inked. Only the sentence dealt tonight, and the clause under it, are
+     newly set. That is the whole distinction between this and a page fading
+     itself in rank by rank.
+
+     570ms, once, ends (measured: `document.getAnimations()`, 8 finite
+     animations, max delay+duration = 370+200). Every link is clickable at 0ms and legible at 0ms. */
+  @keyframes ink        { from { color: var(--t-ghost); } to { color: var(--t-body); } }
+  @keyframes ink-named  { from { color: var(--t-ghost); } to { color: var(--t-display); } }
+  @keyframes ink-terms  { from { color: var(--t-ghost); } to { color: var(--t-meta); } }
+  @keyframes ink-lift   { from { color: var(--t-ghost); } to { color: var(--t-primary); } }
+  /* the clause at R3 is painted through a clipped gradient, so its ink cannot
+     be a colour — it is the strength of the impression instead. Filter is
+     paint, not layout, and the words are fully present at .58 the whole time. */
+  @keyframes ink-plate  { from { filter: brightness(.58); } to { filter: none; } }
+
+  .r2 .cl        { animation: ink 200ms var(--ease-settle) var(--at, 0ms) both; }
+  .r2 .cl a      { animation: ink-named 200ms var(--ease-settle) var(--at, 0ms) both; }
+  .r2 .tail      { animation: ink-terms 200ms var(--ease-settle) var(--at, 0ms) both; }
+  .r2 .tail em   { animation: ink-lift 200ms var(--ease-settle) var(--at, 0ms) both; }
+  /* the tail's two addresses ink with the terms they sit in — same delay, so
+     no fifth step is added and the setting still ends at 570ms */
+  .r2 .tail a    { animation: ink-lift 200ms var(--ease-settle) var(--at, 0ms) both; }
+  /* the axis words ink WITH the clause that contains them — same delay, no
+     fifth step, and the contrast lands as each half of it is set */
+  .r2 .cl .ax   { animation: ink-named 200ms var(--ease-settle) var(--at, 0ms) both; }
+  /* the source clause is not a product: it takes the terms' ink, and its link
+     takes the tail's, so nothing in the setting says "third offer" */
+  .r2 .cl--from   { animation-name: ink-terms; }
+  .r2 .cl--from a { animation-name: ink-lift; }
+  .r3            { animation: ink-plate 200ms var(--ease-settle) 370ms both; }
+
+  /* the grammatical order, stated once as five numbers, one step apart.
+     Was 0/100/190/250/280 — three unequal gaps (100/90/60/30) left over from
+     when .cl--from was inserted between the third clause and the tail without
+     re-spacing what came after it: the last two steps landed 30ms apart,
+     which reads as one beat, not two, defeating the point of a stagger. Five
+     events in one 280ms span, one interval, stated once: 70ms. */
+  .r2 .cl:nth-of-type(1) { --at:   0ms; }  /* the proposition */
+  .r2 .cl:nth-of-type(2) { --at:  70ms; }  /* the reading given */
+  .r2 .cl:nth-of-type(3) { --at: 140ms; }  /* the reading dealt */
+  .r2 .cl--from          { --at: 210ms; }  /* what both are read out of */
+  .r2 .tail, .r2 .tail em, .r2 .tail a { --at: 280ms; } /* the terms */
+  /* still 8 finite animations' worth of steps and the setting still ends at
+     570ms: the plate at 370+200 is unchanged and nothing was added after it. */
+
+  /* Reduced motion. Every word is already in place and already legible, so the
+     branch is a plain switch-off: with the animations gone the ranks fall back
+     to their declared colours, which are the animations' end states. Nothing is
+     gated behind motion and no rank is hidden from anybody. */
+  @media (prefers-reduced-motion: reduce) {
+    .r5:hover, .r5:focus-visible { transform: none; }
+    .r2 .cl, .r2 .cl a, .r2 .cl .ax, .r2 .tail, .r2 .tail em, .r2 .tail a, .r3 { animation: none; }
+  }
+
+  /* ================= THE YIELD ORDER =================
+     Stated once, and every bracket below obeys it. When a screen cannot hold
+     the page, the ranks give way in this order and no other:
+
+       1. the epigraph (R1)   — the only line that states nothing needed to act
+       2. the source clause    — yields its RANK, never its words: it drops to
+                                 the terms' register and sits with them. What
+                                 it says (one Codex, 222 signs, free to walk)
+                                 is on the page at every width; only its
+                                 seniority is negotiable.
+       3. the terms (the tail) — restates in small type what the sentence says
+       4. the sentence (R2)    — yields SIZE, never words
+       5. the clause (R3)      — yields last, and yields its STRING, never its
+                                 legibility: a short form is authored and
+                                 written once at arrival, exactly as the long
+                                 one is. Nothing is ever clamped.
+
+     This is the inversion. Every other design here makes the reading block
+     subordinate to the page's pitch — the block shrinks first so the masthead
+     can keep its size. Here the thing being sold is the last thing that gives,
+     and the frame around it goes first. That is only affordable because the
+     frame IS type: there is no object, no container and no ornament competing
+     for the height. ================= */
+
+  /* ================= short screens ================= */
+  @media (max-height: 840px) {
+    .m1-flow {
+      --gap-01: 6px; --gap-12: 20px; --gap-23: 14px; --gap-45: 5px;
+      padding-top: clamp(18px, 4vh, 34px); padding-bottom: 80px;
+    }
+    .r2 .tail { margin-top: 7px; }
+  }
+  @media (max-height: 700px) {
+    .m1-flow {
+      --gap-01: 5px; --gap-12: 16px; --gap-23: 11px; --gap-45: 4px;
+      padding-top: 18px; padding-bottom: 74px;
+    }
+    .r1 { font-size: 15px; }
+  }
+
+  /* ================= narrow ================= */
+  @media (max-width: 700px) {
+    .m1-flow {
+      --gap-01: 6px; --gap-12: 18px; --gap-23: 12px; --gap-45: 5px;
+      padding: 20px 26px 82px; max-width: 100%;
+    }
+    .r1 { max-width: 100%; font-size: 15px; }
+    .r2 { max-width: 100%; line-height: 1.2; font-size: clamp(21px, 6.1vw, 30px); }
+    /* YIELD ORDER, step 2 — the source clause gives seniority, not words */
+    .r2 .cl--from { font-size: .60em; margin-top: 7px; }
+    /* YIELD ORDER, step 4 — the clause yields last and yields least. It drops
+       one step of size (19 -> 17) and holds five lines; the ~52 characters
+       that no longer fit are given up by the STRING, not by a clamp: a short
+       form is authored in DEALT[] and written once at arrival. */
+    .r3 { margin-left: 0; }
+    .r3__mean { --m2read-size: 17px; }
+    /* the foot orbs are fixed at left:22/right:22, 34px square — they occupy
+       x:22-56 and x:(100vw-56)-(100vw-22). R4/R5 sit at the foot too, and on
+       a short narrow screen `margin-top:auto` can land the catchword's line
+       box inside that same 22-56 band (measured: r5 top 370.9/bottom 390.9
+       against orb top 360/bottom 394 at 683x416 — a real, not cosmetic,
+       overlap). 52px clears the far edge of either orb (34px box + 18px
+       air) from BOTH sides; the base 26px inset already covers the near
+       edge, so this is the missing half of a rule that already existed for
+       the right orb. */
+    .r4, .r5 { padding-left: 52px; padding-right: 52px; }
+    /* touch targets. The catchword and the four colophon links read fine to a
+       mouse and fail 44px for a thumb — R5's box is grown with a pseudo-element
+       so the visible glyph and line metrics don't move, and R4's links get
+       real padding with an equal negative margin so the row doesn't widen. */
+    .r5 { position: relative; }
+    .r5::before {
+      content: '';
+      position: absolute;
+      top: -14px; bottom: -14px; left: -8px; right: -8px;
+    }
+    .r4 { line-height: 2.2; }
+    .r4 a { padding: 11px 4px; margin: -11px -4px; display: inline-block; } /* was 9px — measured 41px, 3px short of 44 */
+    /* MUST-FIX 2 (scouting report) — the four product links are the whole
+       architectural claim of this page and had zero touch-target treatment:
+       measured 29/29/17/19px against R4's 41px. Inline padding-block paints
+       outside the line box without adding to it, so this is layout-neutral —
+       verified: scrollHeight unchanged at 430x900, measured after 45/45/45/47px. */
+    .r2 a { padding-block: 8px; margin-block: -8px; }
+    .r2 .cl--from a, .r2 .tail a { padding-block: 14px; margin-block: -14px; }
+  }
+  /* MUST-FIX 3 (scouting report) — the min-height:850px override that used to
+     sit here is DELETED. Its own comment defended it against a 320x568/375x667
+     overflow that its own min-height:850px query can never see (neither
+     viewport reaches 850px tall). Measured consequence at 430x900: a fixed
+     90px gap above the colophon and 161px of true dead space below the
+     catchword before the fixed rail. Plain `margin-top:auto` (the base R4
+     rule above) already gives a constant 26px clearance above the orbs at
+     every height — both edges are bottom-anchored (orb-top = 100vh-56,
+     footer-bottom = 100vh-82) — so the override was solving nothing here.
+     Re-measured after deletion: 430x900 scrollHeight still exactly 900,
+     768x1024 unaffected (outside this bracket entirely). */
+  @media (max-width: 700px) and (max-height: 720px) {
+    .m1-flow { --gap-01: 4px; --gap-12: 13px; --gap-23: 9px; --gap-45: 4px; padding-top: 14px; }
+    .r2 .tail { font-size: 12px; }
+  }
+  /* the smallest phone still in service (320x568). Everything yields a step.
+     The epigraph is the one rank that goes: it is the only line on the page
+     that states nothing the visitor needs in order to act. The routes stay,
+     because they are the building. */
+  @media (max-width: 700px) and (max-height: 620px) {
+    /* r1 is gone, so --gap-12 is now the whole r0->r2 distance, not an
+       entrance held against an epigraph — it is cut to match */
+    .m1-flow { --gap-01: 3px; --gap-12: 8px; --gap-23: 7px; --gap-45: 3px; padding-top: 12px; padding-bottom: 70px; }
+    .r1 { display: none; }
+    .r2 { font-size: clamp(18px, 6.1vw, 30px); line-height: 1.16; }
+    /* YIELD ORDER, step 2 taken all the way: the source clause drops out of
+       the display face entirely and sets with the terms. Every word survives.
+       This is deliberately the SAME register and measure the terms use, so the
+       two together occupy the height the terms alone used to — the Codex
+       sentence was cut out of the tail when it moved up a rank, so this
+       bracket's arithmetic is a swap, not an addition. */
+    .r2 .cl--from { font-family: var(--font-ui); font-size: 11.5px; line-height: 1.5; margin-top: 5px; }
+    .r2 .tail { font-size: 11.5px; margin-top: 5px; }
+    /* the 44px touch-target line-height (2.2) charged against two wrapped
+       colophon lines is what the 840/840->620 steps don't have room for —
+       measured 3px of overflow at 320x568 before this line. Tightened only
+       here, where every other rank has already given up a step; the padding
+       and negative-margin tap-area trick still holds, just against a smaller
+       line box. */
+    .r4 { line-height: 1.85; }
+    /* still the last to give, and still only one step: 15.5, not 14. Every
+       other rank on this screen has already yielded twice. */
+    .r3__mean { --m2read-size: 15.5px; }
+    /* the clause's label goes to assistive tech only — the clause still opens
+       with an em dash, which is what said "subordinate" in the first place */
+    .r3__label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  }
+  /* the narrow branch's r2 font-size is vw-based (clamp(18px, 6.1vw, 30px)) —
+     correct for a tall phone, wrong for a WIDE-but-short one: at 683x416 the
+     6.1vw term hits its 30px ceiling regardless of the 416px height, and the
+     sentence alone runs to 164px. Measured overflow: scrollHeight 477 against
+     innerHeight 416. Below 460px of height, force the same vh-governed size
+     the landscape rule below uses, so the sentence yields to height the same
+     way it already yields to width. */
+  @media (max-width: 700px) and (max-height: 460px) {
+    .r2 { font-size: clamp(16px, 3.6vh, 26px); line-height: 1.14; }
+  }
+
+  /* phone landscape — wide AND short. Neither the max-width:700 branch nor the
+     max-height:840/700 branches alone cover this case: a landscape phone (e.g.
+     812x375) is wider than 700px so the narrow rules never fire, but shorter
+     than the height brackets assume desktop-scale type is affordable. Measured
+     without this rule: scrollHeight 528 against innerHeight 375 — 153px of
+     content, including the whole colophon and catchword, cut below the fold on
+     a surface whose own law is that a scrollbar is allowed to appear and accuse
+     the design. This is the answer for the wide-short case specifically.
+     (The rail is fixed/pointer-events:none furniture, not flow content, so
+     the flow's own padding-bottom does not need to clear its 64px — a bare
+     24px foot margin is the correct number here, not the 60-84px the other
+     brackets use for taller screens.) */
+  @media (max-height: 460px) and (min-width: 701px) {
+    .m1-flow { padding: 12px 40px 24px; --gap-01: 4px; --gap-12: 10px; --gap-23: 8px; --gap-45: 3px; }
+    .r1 { display: none; }
+    .r2 { font-size: clamp(18px, 3.6vh, 26px); line-height: 1.14; }
+    .r2 .cl--from { font-family: var(--font-ui); font-size: 12px; line-height: 1.5; margin-top: 5px; }
+    .r2 .tail { font-size: 12px; margin-top: 5px; }
+    .r3 { margin-left: 0; }
+    /* the one bracket where height, not width, is the binding constraint, so
+       the clause takes its deepest step — and it is still the smallest step
+       taken by any rank on this screen (the epigraph is gone entirely). */
+    .r3__mean { --m2read-size: 14.5px; }
+  }
+
+  /* iOS notch / home indicator */
+  @supports (padding: max(0px)) {
+    .m1-flow {
+      padding-left: max(26px, env(safe-area-inset-left));
+      padding-right: max(26px, env(safe-area-inset-right));
+    }
+    @media (min-width: 701px) { .m1-flow { padding-left: 56px; padding-right: 56px; } }
+  }
+</style>
+</head>
+<body>
+
+  <div class="m1-orb m1-orb--l" aria-hidden="true"></div>
+  <div class="m1-orb m1-orb--r" aria-hidden="true"></div>
+  <div class="m1-rail" aria-hidden="true"></div>
+
+  <main class="m1-flow">
+
+    <!-- R0 running head. A running head names the book and locates the leaf.
+         This one now does the second half of that job: it states, in the page's
+         own writing and in no other material, that this leaf has a sealed card
+         desk on one hand and the visitor's profile on the other. No arrow, no
+         plan of the house, no control — a printed page names its neighbours,
+         it does not draw them. Down is already named at the foot, by the
+         catchword, which is the printed grammar for exactly that. -->
+    <p class="r0"><span class="mark" aria-hidden="true">&#9670;</span>BLUE ROOM &middot; between the sealed card desk and your profile</p>
+
+    <!-- R1 epigraph -->
+    <p class="r1">The deck is already cut. What remains is the turn.</p>
+
+    <!-- R2 the standing sentence -->
+    <h1 class="r2">
+      <span class="cl">This is an archive of readings.</span>
+      <span class="cl"><a href="?dev=arcane" id="offer-birth">The Birth Reading</a>
+      is given to you at birth and <em class="ax">never changes</em>.</span>
+      <span class="cl"><a href="?dev=drawing-room" id="offer-tarot">A Tarot Reading</a>
+      is dealt to you tonight and <em class="ax">never repeats</em>.</span>
+      <!-- THE SOURCE CLAUSE. Not a third product — what the two above are made
+           of, and the only thing here a stranger can walk through for nothing.
+           It was the third sentence of the terms, in 14px UI grey, where it
+           read as a footnote about a link. Moved up a rank it does two jobs no
+           other rank can: it states the scale of the house in real material
+           (222, the true Codex count), and it says the two readings share one
+           source — which is the sentence that makes them a line rather than a
+           menu. -->
+      <span class="cl cl--from">Both are read out of <a href="codex.html?v=363" id="offer-codex">one Codex of 222 signs</a>, open to walk now.</span>
+      <span class="tail" id="r2-tail">A Sitting is three cards to one question, <em>your first free</em>. <a href="?dev=drawing-room&amp;read=deep" id="offer-deep">The Deep Read</a> is five cards to the same question, and is the one paid thing here.</span>
+    </h1>
+
+    <!-- R3 subordinate clause -->
+    <div class="r3">
+      <p class="r3__label">Dealt <span id="r3-when">tonight</span></p>
+      <p class="r3__mean" id="r3-mean">
+        &mdash; A Sitting turned <b>XVII &middot; The Star, upright</b>. Hope after a hard stretch, the water still moving. Three cards to one question, filed where each fell.
+      </p>
+    </div>
+
+    <!-- R4 colophon -->
+    <!-- R4 colophon. The Codex is NOT here any more: it is a clause in the
+         sentence above, and this file's own comment kills duplicate doors on
+         the same principle app.js:2472-2474 states ("two doors to one room is
+         how a building starts lying about its own shape"). A colophon lists
+         where the leaf sits in the book; it does not re-list what the page has
+         already said. -->
+    <p class="r4">
+      <a href="?dev=profile">Your Profile</a> &middot;
+      <a href="roadmap/">What&rsquo;s coming</a> &middot;
+      <a href="?dev=settings">Settings</a>
+    </p>
+
+    <!-- R5 catchword -->
+    <a class="r5" id="r5-catchword" href="#u1">
+      <span class="arrow" aria-hidden="true">&#8595;</span> the room continues
+    </a>
+
+  </main>
+
+<script>
+  /* ONE WRITE PATH. The clause is written once, at arrival, from the live deck.
+     There is no control that rewrites it and therefore no second code path that
+     could make a different claim about the same reading than first paint made.
+     (The shipped surface has exactly that defect at app.js:2548 vs 2737.)
+
+     There is deliberately no "pull again": a storefront that deals for free,
+     repeatedly, is giving away the product it is selling, and a page whose
+     grammar is a printed page does not have a re-roll button on it. The deck
+     being alive is proved by the clause differing on the next arrival, which
+     is the same evidence at none of the cost. */
+  /* ============================================================
+     THE CLAUSE IS ITS OWN WITNESS.
+
+     THE GAP, and it is the fleet's: every design here prints a plausible
+     reading and asks to be believed it was dealt. A date alone does not fix
+     that — a printed illustration can be stamped with today's date as easily
+     as a live one can, because a date only says WHEN THE PAGE LOADED, which is
+     true of a photograph of a page. Admitting the reading is an example does
+     not fix it either; that is Team 7's ceiling and it converts the strongest
+     rank on the page into a disclaimer.
+
+     WHAT ACTUALLY CONSTITUTES PROOF, in type: a page that says something now
+     which only a live page could say, and which the visitor can check LATER
+     WITHOUT REMEMBERING ANYTHING. So the clause is given two tenses, and they
+     are the two halves of one experiment:
+
+       FIRST ARRIVAL — the clause makes a dated, falsifiable promise about its
+       own future: it turned at 09:12 today, come back and it will have turned
+       something else. A canned illustration can be dated; it cannot promise.
+
+       EVERY ARRIVAL AFTER — the clause pays the promise off by NAMING what it
+       turned last time, and on what day, in the visitor's own second person.
+       The visitor does not have to remember the last card, because the page
+       remembers it FOR them and prints it beside a different one. Two card
+       names, one of them theirs from a previous day, in the same sentence: an
+       illustration cannot do this, and neither can a page that merely rotates
+       a random string, because the string it names is the one THIS BROWSER was
+       shown and no other.
+
+     That is the whole mechanism, and it is why the receipt is worth more than
+     the promise: R2 says a Tarot Reading NEVER REPEATS. R3 now demonstrates
+     that claim about itself, by name, with a date. The standing sentence makes
+     the assertion and the live clause is the evidence for it — which is the
+     one relation between two ranks that no arrangement of objects can produce.
+
+     THE TYPOGRAPHIC MARK, nameable by a reader who never interacts: R3 is the
+     only writing on this leaf that carries a DATELINE — a day and a clock
+     time. Running heads, epigraphs, colophons and catchwords are standing
+     matter and are never dated, in print or here. A dateline is the printed
+     grammar for matter set for one impression only. A stranger can say what
+     kind of thing it is out loud: "that one's dated, the rest isn't."
+
+     COST: no new rank, no new type value, no object, no animation step, no
+     event handler, no layout read. Two strings and a `br_` key.
+     ============================================================ */
+
+  /* THE STRING YIELDS, NOT THE LEGIBILITY. Each clause is authored twice — a
+     long form and a short one — and the width is read ONCE, at the same moment
+     the clause is written. This is still one write path: there is no resize
+     handler, no re-render and no second code path that could make a different
+     claim about the same reading than first paint made. (The shipped surface
+     has exactly that defect at app.js:2548 vs 2737.) A phone gets a shorter
+     sentence, deliberately, in the author's hand; it never gets the long one
+     with its end cut off by a clamp it cannot see.
+
+     The head of the clause is now ONE string per card, not two, and the
+     sentence that yields on a phone is the provenance sentence, not the card.
+     ("Three cards to one question" left the clause entirely: the terms one
+     rank up already say it, and that repetition was the height this mechanism
+     is paid for with. The clause is shorter than it was at every width.) */
+  var DEALT = [
+    { name: 'The Star',
+      head: '&mdash; A Sitting turned <b>XVII &middot; The Star, upright</b>. Hope after a hard stretch, the water still moving.' },
+    { name: 'Strength',
+      head: '&mdash; A Sitting turned <b>XI &middot; Strength, reversed</b>. A held thing that wants to be forced instead of met.' },
+    { name: 'Five of Cups',
+      head: '&mdash; A Sitting turned <b>Five of Cups, upright</b>. Three spilled, two still standing behind you.' },
+    { name: 'The Hermit',
+      head: '&mdash; A Sitting turned <b>The Hermit, upright</b>. A lamp carried away from the crowd, on purpose.' }
+  ];
+
+  /* THE HOUSE FAIL-OPEN PATTERN. Storage is read inside try/catch and a
+     failure — private mode, a wiped profile, a browser that refuses file://
+     origins — returns null, which is exactly the first-arrival state. The page
+     then makes the promise instead of the receipt and nothing anywhere breaks.
+     Read once, at arrival. Never in a handler. */
+  var LEDGER = 'br_m1_dealt';
+  var prior = null;
+  try {
+    var raw = window.localStorage.getItem(LEDGER);
+    if (raw) { prior = JSON.parse(raw); }
+  } catch (e) { prior = null; }
+  if (!prior || typeof prior.i !== 'number' || typeof prior.name !== 'string') { prior = null; }
+
+  /* NEVER REPEATS, ENFORCED. The sentence above claims a Tarot Reading never
+     repeats; a draw that could hand back last night's card would make the page
+     a liar in one visit. Everything this browser has already been shown is
+     excluded until the four are spent, and only then does the ledger start
+     over — and even then the immediately previous card is still barred, so the
+     receipt sentence is true on every arrival without exception. */
+  var seen = (prior && Object.prototype.toString.call(prior.seen) === '[object Array]') ? prior.seen : [];
+  var pool = [], i;
+  for (i = 0; i < DEALT.length; i++) { if (seen.indexOf(i) === -1) { pool.push(i); } }
+  if (!pool.length) {
+    seen = [];
+    for (i = 0; i < DEALT.length; i++) { if (!prior || i !== prior.i) { pool.push(i); } }
+  }
+  var idx = pool[Math.floor(Math.random() * pool.length)];
+  var pick = DEALT[idx];
+
+  /* The visitor's own clock, in the visitor's own locale format. The day is
+     the dateline; the time is what makes the promise checkable rather than
+     decorative — "today" is a claim, "at 09:12 today" is a reading of an
+     instrument the visitor is holding. */
+  var now = new Date();
+  var day = now.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+  var clock = now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+  var narrow = window.innerWidth <= 700;
+
+  /* THE PROVENANCE SENTENCE — the promise, then the receipt. English, in the
+     clause's own voice, at the clause's own size. Not a badge, not a label,
+     not a watermark, and never the word "example": the sentence does not
+     describe the reading's status, it reports the reading's history, which is
+     a thing only a page with a history can report. */
+  var prov;
+  if (prior) {
+    var lastWhen = (prior.on === day) ? 'Earlier today' : ('Last time, on ' + prior.on + ',');
+    prov = narrow
+      ? lastWhen + ' it turned <b>' + prior.name + '</b>; this is not it.'
+      : lastWhen + ' it turned <b>' + prior.name + '</b> for you; that one is filed, and this is not it.';
+  } else {
+    prov = narrow
+      ? 'It turned at <b>' + clock + ' today</b> and will not turn twice.'
+      : 'It turned at <b>' + clock + ' today</b>; come back and it will have turned something else.';
+  }
+
+  /* ONE WRITE. The served markup already holds a real entry, so a no-JS or
+     pre-boot arrival is never blank and never shows a placeholder — it simply
+     shows a clause with no dateline, which is honest: without a clock there is
+     nothing to witness. */
+  document.getElementById('r3-mean').innerHTML = pick.head + ' ' + prov;
+
+  /* THE DATELINE. The label rank was already the page's dateline ("Dealt 13
+     Aug"); it now also counts, in words, how many times this leaf has been set
+     for this visitor. An ordinal is the smallest possible piece of English
+     that cannot be faked by a static file, and it increments in front of the
+     one reader who can check it. Beyond the tenth it falls back to figures,
+     because "seventeenth" is not a running head. */
+  var ORD = ['', '', 'second', 'third', 'fourth', 'fifth', 'sixth', 'seventh', 'eighth', 'ninth', 'tenth'];
+  var count = (prior && typeof prior.n === 'number') ? prior.n + 1 : 1;
+  document.getElementById('r3-when').innerHTML =
+    day + (count > 1 ? ' &middot; your ' + (ORD[count] || (count + 'th')) : '');
+
+  /* THE LEDGER. Written last, so a visitor who leaves mid-paint is not charged
+     a turn. Same fail-open wrap: if the write is refused, every arrival is a
+     first arrival and the page makes the promise for ever, which is the
+     correct degradation — it never claims a history it cannot produce. */
+  try {
+    seen.push(idx);
+    window.localStorage.setItem(LEDGER, JSON.stringify({
+      i: idx, name: pick.name, on: day, n: count, seen: seen
+    }));
+  } catch (e) {}
+
+  /* R5 catchword — on the live page this calls the existing _u1GlideTo(seat),
+     the same glide the wheel handler fires at app.js:4749. Standalone, it can
+     only signal; this fade is a stand-in and is the one thing in this file
+     that is not the real mechanism. */
+  document.getElementById('r5-catchword').addEventListener('click', function (e) {
+    e.preventDefault();
+    document.body.style.transition = 'opacity 300ms var(--ease-settle)';
+    document.body.style.opacity = '.55';
+    setTimeout(function () { document.body.style.opacity = '1'; }, 320);
+  });
+</script>
+
+</body>
+</html>

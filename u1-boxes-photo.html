@@ -1,0 +1,324 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>U1 boxes — the photographed sheet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+/* =============================================================
+   U1 BOXES v4 — THE PHOTOGRAPHED SHEET, AS A STENCIL
+
+   Rebuilt a third time, on an 18-agent measure/design/refute pass. The one
+   sentence that reconciles every finding: THE PHOTOGRAPH STOPS BEING
+   COMPOSITED AND BECOMES A STENCIL. Its luminance is the ALPHA of a mask;
+   the CSS paints the archive's own light through it. Alpha 0 issues zero
+   paint, so the plate stock survives byte for byte — which removes the
+   colour risk, the blend/stacking risk and the entire legibility problem at
+   once, for the price of one honest darkroom grade baked into a static file.
+
+   WHAT THE REFUTERS OVERTURNED IN v3 (all of it was mine):
+
+   · plus-lighter is GONE. Additive compositing was solving a problem the
+     mask doesn't have, and it was what manufactured the contrast crisis:
+     under a mask the maximum attainable background is hard-clamped at
+     a*233 + (1-a)*base INDEPENDENT of the photograph, so AA is guaranteed
+     by construction at every crop and every breakpoint. Worst single pixel
+     measured: 4.734:1. The text scrim v3 carried is deleted — it was
+     protecting against a number that can no longer occur.
+
+   · PER-PLATE ALPHA is GONE. It was compensating for the sheet's own 3.68x
+     left-to-right illumination ramp, i.e. it was correcting a wash by
+     dimming whole plates. The bake FLAT-FIELDS instead — divides the field
+     by its own illumination envelope — so the five windows arrive already
+     equal and one alpha serves all five.
+
+   · THE RAW PHOTO is GONE from the browser. At any legal alpha the ungraded
+     file leaves ~70-80% of the plate bit-identical to flat stock: only the
+     blowouts survive and the mid-band fibre quantises to nothing. That is a
+     countable starfield, which is the failure the builder already rejected
+     once. The bake applies levels (black point p70, white p99.5, gamma .5)
+     so the grain survives. Flip the GRADE switch to see the difference.
+
+   · FLIPS are BACK. They were killed in v3 because CSS cannot flip a
+     background without an extra paint layer under the animating ancestor.
+     Baked into the file, that cost is zero.
+
+   THE ASSETS: five 288x208 LA PNGs, ~29 KB each, 148 KB total, all ten pairs
+   disjoint. Built by build_plate_sheets.py from assets/plate-stock.png, which
+   is a BUILD INPUT and is never served to a browser.
+
+   STILL A TASTE CALL, LEFT ON A SWITCH: the art director ruled the
+   photographed FRAME out entirely — a poster asset, never chrome, and the
+   7px platemark is already the impression of a rectangle. It is kept here as
+   a toggle because it is the builder's photograph and his eye owns that call.
+   When on, it is nine-sliced (210/190/210/190) so the portrait frame is never
+   stretched 2.59:1 onto the landscape plate.
+
+   No live filter, no blend mode, no fixed height, no magic pixel offsets.
+============================================================= */
+
+:root {
+  --t-display:#e9e5dc; --t-primary:#d7d3ca; --t-body:#b1ada4;
+  --t-meta:#948f87; --t-ghost:#6e6b63; --faint:var(--t-ghost);
+  --ink-950:#0a0b0d; --ink-900:#100f0c; --ink-850:#11100d;
+  --line:rgba(233,229,220,.12); --line-strong:rgba(233,229,220,.2);
+  --hair-1:rgba(233,229,220,.14); --hair-2:rgba(233,229,220,.08); --hair-3:rgba(233,229,220,.045);
+  --silver-dim:var(--t-meta); --violet:#8b7bff; --gold:#c8ad70;
+  --font-display:"Cormorant Garamond","Times New Roman",serif;
+  --font-ui:"Inter",-apple-system,"Segoe UI",sans-serif;
+  --font-mono:"IBM Plex Mono","Consolas",monospace;
+
+  --ink: 233,229,220;    /* the light the marks are made of */
+  --a: .092;             /* the ship alpha — peak mark L 36.0, under the 1px border's 45.8 */
+  --rest: .848;          /* resting opacity; hover lifts it to 1 */
+  --frame: .8;
+}
+* { box-sizing:border-box; }
+html { background:var(--ink-950); }
+body { margin:0; padding:140px 24px 120px; color:var(--t-primary);
+  background:radial-gradient(120% 90% at 50% 0%, #16151a 0%, var(--ink-950) 62%) fixed;
+  -webkit-font-smoothing:antialiased; }
+
+/* ---------- controls ---------- */
+.bar { position:fixed; inset:0 0 auto 0; z-index:40; display:flex; flex-wrap:wrap; align-items:center; gap:10px 18px;
+  padding:13px 20px; background:rgba(8,8,10,.94); border-bottom:1px solid var(--hair-2); backdrop-filter:blur(6px);
+  font-family:var(--font-mono); font-size:10px; letter-spacing:.12em; text-transform:uppercase; color:var(--t-meta); }
+.bar__grp { display:flex; align-items:center; gap:8px; }
+.bar__lab { color:var(--faint); }
+.bar input[type=range] { width:128px; accent-color:var(--gold); }
+.bar__val { color:var(--t-display); min-width:30px; font-variant-numeric:tabular-nums; }
+.bar__sw { appearance:none; cursor:pointer; font:inherit; letter-spacing:inherit; text-transform:inherit;
+  color:var(--t-meta); background:transparent; border:1px solid var(--hair-1); border-radius:3px; padding:5px 10px; }
+.bar__sw[aria-pressed="true"] { color:var(--gold); border-color:color-mix(in srgb, var(--gold) 50%, var(--hair-1)); }
+.bar__note { flex:1 1 100%; color:var(--faint); letter-spacing:.05em; text-transform:none; font-size:10.5px; }
+
+/* ---------- the rail ---------- */
+.about__rail { position:relative; list-style:none; margin:0 auto; padding:0; width:min(760px,100%); display:grid; row-gap:clamp(64px,12vh,132px); }
+.about__rail::before { content:""; position:absolute; inset-block:-8px; left:50%; width:1px; transform:translateX(-.5px);
+  background:linear-gradient(transparent, var(--hair-3) 6%, var(--hair-1) 46%, var(--hair-1) 54%, var(--hair-3) 94%, transparent); }
+.about__nugget { position:relative; display:flex; }
+.about__nugget[data-side="left"] { justify-content:flex-start; }
+.about__nugget[data-side="right"] { justify-content:flex-end; }
+.about__nugget[data-side="center"] { justify-content:center; }
+.about__ord { position:absolute; top:-.34em; z-index:0; font-family:var(--font-display); font-size:clamp(78px,14vw,144px);
+  line-height:1; color:rgba(233,229,220,.16); pointer-events:none; user-select:none; }
+.about__nugget[data-side="left"]  .about__ord { right:clamp(8px,4vw,56px); }
+.about__nugget[data-side="right"] .about__ord { left:clamp(8px,4vw,56px); }
+.about__nugget[data-side="center"] .about__ord { right:clamp(8px,3vw,24px); }
+.about__nugget.is-free .about__ord { color:rgba(200,173,112,.16); }
+.about__nugget.is-paid .about__ord { color:rgba(139,123,255,.15); }
+
+/* ---------- the plate ----------
+   the stock is SUNK one level (#11100d -> #100f0c) so the arriving texture
+   carries the composited mean back onto the builder's colour. No fixed
+   height any more: the sheets are pre-cropped files sized with `cover`. */
+.about__plate { position:relative; z-index:1; width:min(400px,100%);
+  display:flex; flex-direction:column; align-items:center; gap:13px; padding:34px 26px 21px;
+  border:1px solid var(--hair-1); border-radius:10px;
+  background:linear-gradient(180deg, rgba(233,229,220,.024) 0%, transparent 65%), var(--ink-900);
+  box-shadow:inset 0 1px 0 rgba(233,229,220,.04); }   /* L4: never a shadow ON the tile */
+.about__plate::before { content:""; position:absolute; inset:7px; border-radius:6px;
+  box-shadow:inset 0 0 0 1px var(--hair-2); pointer-events:none; }   /* the platemark (L6) */
+
+/* THE SHEET. z-index:-1 seats it ABOVE the plate's own background and BELOW
+   the platemark and every glyph; .about__plate's z-index:1 stops it escaping. */
+.about__plate::after { content:""; position:absolute; inset:0; z-index:-1;
+  border-radius:inherit; pointer-events:none;
+  opacity:var(--rest); transition:opacity 260ms ease;
+  -webkit-mask-image:var(--sheet);      mask-image:var(--sheet);
+  -webkit-mask-size:cover;              mask-size:cover;
+  -webkit-mask-position:center;         mask-position:center;
+  -webkit-mask-repeat:no-repeat;        mask-repeat:no-repeat; }
+/* the ink is declared ONLY where masking exists — without the guard, an engine
+   with no mask support paints a flat slab across the whole plate. */
+@supports ((-webkit-mask-image:url("assets/sheet-01.png")) or (mask-image:url("assets/sheet-01.png"))) {
+  .about__plate::after { background:rgba(var(--ink), var(--a)); }
+}
+.about__nugget:not(.about__nugget--unlit) .about__plate:hover::after { opacity:1; }
+@media (prefers-reduced-motion:reduce) { .about__plate::after { transition:none; } }
+
+/* the five windows — the ONLY thing that differs between plates */
+[data-nug="codex"]  { --sheet:url("assets/sheet-01.png"); }
+[data-nug="tarot"]  { --sheet:url("assets/sheet-02.png"); }
+[data-nug="arcana"] { --sheet:url("assets/sheet-03.png"); }
+[data-nug="mint"]   { --sheet:url("assets/sheet-04.png"); }
+[data-nug="unlit"]  { --sheet:url("assets/sheet-05.png"); }
+
+/* RAW — the ungraded photograph, positioned by the old atlas. Kept only so the
+   starfield can be seen rather than argued about: at this alpha ~70-80% of the
+   plate is bit-identical to flat stock and only the blowouts survive. */
+body.raw .about__plate::after {
+  -webkit-mask-image:url("assets/plate-alpha.png"); mask-image:url("assets/plate-alpha.png");
+  -webkit-mask-size:1291.82px 1715.00px;            mask-size:1291.82px 1715.00px;
+  -webkit-mask-position:var(--rawpos);              mask-position:var(--rawpos); }
+
+/* THE FRAME — nine-sliced, so the portrait frame is never stretched onto the
+   landscape plate. Border widths track the slices (210/34 = 6.18, 190/30 = 6.33)
+   so the corner blowouts stay square. Ruled OUT by the art director; on a
+   switch because it is the builder's photograph. */
+.frame { position:absolute; inset:0; z-index:2; pointer-events:none;
+  border-style:solid; border-width:34px 30px; border-color:transparent;
+  border-image-source:url("assets/plate-sheet-grey.png");
+  border-image-slice:210 190 210 190; border-image-repeat:stretch;
+  mix-blend-mode:plus-lighter; opacity:0; }
+body.framed .frame { opacity:var(--frame); }
+body.framed .about__plate { border-color:transparent; }
+body.framed .about__plate::before { box-shadow:none; }
+
+/* the sheet nothing has happened to yet */
+body.unlit-blank .about__nugget--unlit .about__plate::after,
+body.unlit-blank .about__nugget--unlit .frame { opacity:0; }
+
+/* ---------- plate contents ---------- */
+.about__emblem, .about__name, .about__rule, .about__line, .about__micro, .about__door { position:relative; z-index:1; }
+.about__emblem { display:block; color:var(--silver-dim); filter:drop-shadow(0 7px 16px rgba(0,0,0,.5)); }
+.about__emblem svg { width:48px; height:48px; display:block; }
+.about__name { font-family:var(--font-ui); font-size:14px; font-weight:600; letter-spacing:.16em; text-transform:uppercase; color:var(--t-display); margin:0; }
+.about__rule { width:44px; height:1px; background:linear-gradient(90deg, transparent, var(--hair-1) 20%, var(--hair-1) 80%, transparent); }
+.about__line { font-family:var(--font-display); font-weight:500; font-size:clamp(16px,2.3vw,18.5px); line-height:1.38; color:var(--t-primary); text-align:center; max-width:31ch; margin:0; }
+.about__micro { font-family:var(--font-mono); font-size:10px; font-weight:500; letter-spacing:.24em; text-transform:uppercase; color:var(--t-body); margin:0; }
+.about__door { display:inline-flex; align-items:center; min-height:44px; padding:12px 20px; margin-top:4px;
+  font-family:var(--font-ui); font-size:11.5px; font-weight:600; letter-spacing:.16em; text-transform:uppercase;
+  color:var(--t-display); text-decoration:none; border:1px solid var(--line-strong); border-radius:3px;
+  transition:border-color 200ms ease, color 200ms ease, transform 200ms ease; }
+.about__door:hover { transform:translateY(-1.5px); }
+.about__nugget.is-free .about__micro { color:var(--gold); }
+.about__nugget.is-paid .about__micro { color:color-mix(in srgb, var(--violet) 72%, var(--t-body)); }
+.about__nugget.is-free .about__door { border-color:color-mix(in srgb, var(--gold) 42%, var(--line-strong)); }
+.about__nugget.is-free .about__door:hover { border-color:var(--gold); color:var(--gold); }
+.about__nugget.is-paid .about__door { border-color:color-mix(in srgb, var(--violet) 45%, var(--line-strong)); }
+.about__nugget.is-paid .about__door:hover { border-color:var(--violet); color:var(--violet); }
+.about__nugget--unlit .about__plate { border-style:dashed; border-color:var(--hair-2); }
+.about__nugget--unlit .about__emblem { filter:blur(6px) drop-shadow(0 7px 16px rgba(0,0,0,.5)); opacity:.5; }
+.about__nugget--unlit .about__name { filter:blur(1.2px); opacity:.66; }
+/* --faint tops out at 3.60:1 and cannot carry a textured plate. --t-meta. */
+.about__nugget--unlit .about__line, .about__nugget--unlit .about__micro { color:var(--t-meta); }
+
+@media (max-width:699px){ .about__ord { display:none; } }
+@media (max-width:559px){ body{padding-top:186px} .about__nugget[data-side]{justify-content:center} }
+</style>
+</head>
+<body class="unlit-blank">
+
+<div class="bar">
+  <div class="bar__grp"><span class="bar__lab">Marks</span>
+    <input id="dial" type="range" min="0" max="200" value="100" aria-label="Mark strength" />
+    <span class="bar__val" id="dialVal">100</span></div>
+  <div class="bar__grp"><span class="bar__lab">Light</span>
+    <button class="bar__sw" id="swInk" aria-pressed="true">warm</button></div>
+  <div class="bar__grp"><span class="bar__lab">Grade</span>
+    <button class="bar__sw" id="swGrade" aria-pressed="true">baked</button></div>
+  <div class="bar__grp"><span class="bar__lab">Frame</span>
+    <button class="bar__sw" id="swFrame" aria-pressed="false">off</button>
+    <input id="fdial" type="range" min="0" max="100" value="80" aria-label="Frame strength" /></div>
+  <div class="bar__grp"><span class="bar__lab">Unlit</span>
+    <button class="bar__sw" id="swUnlit" aria-pressed="true">bare</button></div>
+  <p class="bar__note" id="note"></p>
+</div>
+
+<ol class="about__rail" id="rail"></ol>
+
+<script>
+"use strict";
+
+var EM = {
+codex:'<svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10 V31"/><path d="M20 10 C15 7.5 9 7.3 6 9.2 V29 C9 27.2 15 27.4 20 30"/><path d="M20 10 C25 7.5 31 7.3 34 9.2 V29 C31 27.2 25 27.4 20 30"/><path d="M9.2 14.6 H16 M9.2 18.4 H16 M9.2 22.2 H14.5 M23.8 14.6 H30.6 M23.8 18.4 H30.6 M25.3 22.2 H30.6" stroke-width=".75" opacity=".5"/></svg>',
+tarot:'<svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="12" width="13" height="20" rx="2" opacity=".42" transform="rotate(-12 13.5 22)"/><rect x="20" y="12" width="13" height="20" rx="2" opacity=".42" transform="rotate(12 26.5 22)"/><rect x="13.5" y="9.5" width="13" height="21" rx="2"/><path d="M20 15 L23.5 20 L20 25 L16.5 20 Z" stroke-width=".75"/></svg>',
+arcana:'<svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 29 L7.8 13 L14.5 19.5 L20 8 L25.5 19.5 L32.2 13 L33.5 29 Z"/><path d="M8.6 24.8 H31.4" stroke-width=".75" opacity=".5"/><circle cx="13.5" cy="27" r=".9" stroke-width=".75" opacity=".5"/><circle cx="20" cy="27" r=".9" stroke-width=".75" opacity=".5"/><circle cx="26.5" cy="27" r=".9" stroke-width=".75" opacity=".5"/></svg>',
+mint:'<svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="7.5" width="22" height="25" rx="2.2"/><path d="M10 26 L15 20 L19 24 L25 16.5 L30 22" stroke-width=".75" opacity=".5"/><circle cx="15.5" cy="15" r="2.4" stroke-width=".75" opacity=".5"/><path d="M6 6 L8 8 M34 6 L32 8 M6 34 L8 32 M34 34 L32 32" stroke-width=".75" opacity=".4"/></svg>',
+unlit:'<svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="20" cy="20" r="11"/><path d="M20 16.5 L23 20 L20 23.5 L17 20 Z" stroke-width=".75" opacity=".5"/><path d="M20 7 V4.7 M20 33 V35.3 M7 20 H4.7 M33 20 H35.3" stroke-width=".75" opacity=".4"/></svg>'
+};
+
+/* THE FIVE SHEETS — 288x208 windows of assets/plate-stock.png, all ten pairs
+   disjoint, baked by build_plate_sheets.py (flat-field, then levels p70/p99.5
+   at gamma .5, 5-bit alpha). `rawpos` positions the UNGRADED file for the
+   grade A/B only; the shipped path never touches it. */
+var PLATES = [
+ { key:'codex', ord:'I', side:'left', cls:'is-free', rawpos:'-236.65px -854.72px',
+   name:'The Codex',
+   line:'166 entries across eight systems. Every card, sign, rune and hexagram the rooms read from.',
+   micro:'Free · no account', door:'Open the Codex →' },
+
+ { key:'tarot', ord:'II', side:'right', cls:'', rawpos:'-637.56px -1077.48px',
+   name:'Tarot Divination',
+   line:'Three cards for a Sitting, five for the Deep Read, cut from the full 78 and filed where each fell.',
+   micro:'First sitting free · to $2.99', door:'Cut the deck →' },
+
+ { key:'arcana', ord:'III', side:'left', cls:'is-paid', rawpos:'-236.65px -565.17px',
+   name:'The Birth Reading',
+   line:'Six marks from a name and birth date: astrology, numerology, runes, the I Ching, each with a record.',
+   micro:'$4.99 · $7.99 for two', door:'Give a name and date →' },
+
+ { key:'mint', ord:'IV', side:'right', cls:'is-free', rawpos:'-637.56px -342.44px',
+   name:'The Card Mint',
+   line:'One card from one photograph. The room develops what is already in it, then keeps it a page.',
+   micro:'Free · or the paid Halo Mint', door:'See a card develop →' },
+
+ { key:'unlit', ord:'V', side:'center', cls:'about__nugget--unlit', rawpos:'-236.65px -208.81px',
+   name:'The Unlit Room',
+   line:'A fifth room, unbuilt. Nothing to read here yet; the candle has not reached this end of the hall.',
+   micro:'Not yet open · no date', door:'' }
+];
+
+document.getElementById('rail').innerHTML = PLATES.map(function(p){
+  return '<li class="about__nugget' + (p.cls ? ' ' + p.cls : '') + '" data-side="' + p.side + '" data-nug="' + p.key + '" style="--rawpos:' + p.rawpos + '">'
+    + '<span class="about__ord" aria-hidden="true">' + p.ord + '</span>'
+    + '<div class="about__plate">'
+    +   '<div class="frame" aria-hidden="true"></div>'
+    +   '<span class="about__emblem" aria-hidden="true">' + EM[p.key] + '</span>'
+    +   '<p class="about__name">' + p.name + '</p>'
+    +   '<span class="about__rule" aria-hidden="true"></span>'
+    +   '<p class="about__line">' + p.line + '</p>'
+    +   '<p class="about__micro">' + p.micro + '</p>'
+    +   (p.door ? '<a class="about__door" href="#" onclick="return false">' + p.door + '</a>' : '')
+    + '</div></li>';
+}).join('');
+
+var NOTE = {
+  baked: 'The stencil, graded. Flat-fielded (the sheet has a 3.68× left-to-right illumination ramp that would otherwise rake a wash across a plate) then levelled p70→p99.5 at γ0.5, so the mid-band fibre survives instead of quantising away. Five files, 148 KB total.',
+  raw:   'The UNGRADED file at the same alpha: ~70–80% of every plate is bit-identical to flat stock and only the blowouts land. A countable starfield — this is the failure the grade exists to prevent.'
+};
+function note(){ document.getElementById('note').textContent = document.body.classList.contains('raw') ? NOTE.raw : NOTE.baked; }
+
+document.getElementById('dial').addEventListener('input', function(e){
+  document.documentElement.style.setProperty('--a', (0.092 * e.target.value/100).toFixed(4));
+  document.getElementById('dialVal').textContent = e.target.value;
+});
+document.getElementById('fdial').addEventListener('input', function(e){
+  document.documentElement.style.setProperty('--frame', (e.target.value/100).toFixed(3));
+});
+document.getElementById('swInk').addEventListener('click', function(e){
+  var warm = e.target.textContent === 'white';
+  document.documentElement.style.setProperty('--ink', warm ? '233,229,220' : '255,255,255');
+  e.target.textContent = warm ? 'warm' : 'white'; e.target.setAttribute('aria-pressed', warm);
+});
+document.getElementById('swGrade').addEventListener('click', function(e){
+  var raw = document.body.classList.toggle('raw');
+  e.target.textContent = raw ? 'raw' : 'baked'; e.target.setAttribute('aria-pressed', !raw); note();
+});
+document.getElementById('swFrame').addEventListener('click', function(e){
+  var on = document.body.classList.toggle('framed');
+  e.target.setAttribute('aria-pressed', on); e.target.textContent = on ? 'nine-sliced' : 'off';
+});
+document.getElementById('swUnlit').addEventListener('click', function(e){
+  var on = document.body.classList.toggle('unlit-blank');
+  e.target.setAttribute('aria-pressed', on); e.target.textContent = on ? 'bare' : 'marked like the rest';
+});
+note();
+
+/* deep-link: ?dial=0..200 · ?ink=white · ?grade=raw · ?frame=1 · ?f=0..100 · ?unlit=0 */
+(function(){
+  var q = new URLSearchParams(location.search);
+  if (q.get('ink') === 'white')  document.getElementById('swInk').click();
+  if (q.get('grade') === 'raw')  document.getElementById('swGrade').click();
+  if (q.get('frame') === '1')    document.getElementById('swFrame').click();
+  if (q.get('unlit') === '0')    document.getElementById('swUnlit').click();
+  if (q.has('f'))    { var g=document.getElementById('fdial'); g.value=q.get('f'); g.dispatchEvent(new Event('input')); }
+  if (q.has('dial')) { var s=document.getElementById('dial');  s.value=q.get('dial'); s.dispatchEvent(new Event('input')); }
+})();
+</script>
+</body>
+</html>

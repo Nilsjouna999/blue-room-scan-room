@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>THE HAND — M1 prototype (fleet 3)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" />
+<style>
+/* =============================================================
+   THE HAND — standalone M1 prototype, fleet 3.
+   Real palette, no navigation wired. See build notes at file foot.
+============================================================= */
+:root{
+  /* palette — lifted verbatim from styles.css. No new colours proposed. */
+  --ink-950:#0a0b0d; --ink-900:#100f0c; --ink-850:#11100d; --ink-800:#151310;
+  --t-display:#dcd7cb; --t-primary:#d7d3ca; --t-body:#b1ada4; --t-meta:#948f87; --t-ghost:#86827a;
+  --line:rgba(233,229,220,.12); --line-faint:rgba(233,229,220,.07); --line-strong:rgba(233,229,220,.2);
+  --gold:#c8ad70;
+  --font-display:"Cormorant Garamond","Times New Roman",serif;
+  --font-ui:"Inter",-apple-system,"Segoe UI",sans-serif;
+  --font-mono:"IBM Plex Mono","Consolas",monospace;
+  --ease-settle: cubic-bezier(.22,.61,.36,1);
+
+  /* THE SLANT — one number drives the whole fall line. Percent of inline size. */
+  --fall-step: 1;
+}
+
+* { box-sizing:border-box; margin:0; padding:0; }
+html,body{ height:100%; }
+html{ background:var(--ink-950); }
+body{
+  font-family:var(--font-ui); color:var(--t-primary);
+  background:
+    radial-gradient(140% 90% at 18% -10%, rgba(200,173,112,.05), transparent 55%),
+    var(--ink-950);
+  min-height:100%;
+  display:flex; flex-direction:column; align-items:center;
+  padding: 34px 24px 120px;
+}
+
+/* ── the field ─────────────────────────────────────────────── */
+.field{
+  width:min(760px, 100%);
+  display:flex; flex-direction:column;
+  gap: clamp(18px, 3vh, 28px);
+}
+
+/* every group carries its own inline offset as % of the field width */
+.g1{ margin-inline-start: calc(0%  * var(--fall-step)); }
+.g2{ margin-inline-start: calc(4%  * var(--fall-step)); }
+.g3{ margin-inline-start: calc(11% * var(--fall-step)); }
+.g4{ margin-inline-start: calc(9%  * var(--fall-step)); }
+.g5{ margin-inline-start: calc(0%  * var(--fall-step)); }
+.field > * { max-width:100%; min-width:0; }
+
+/* ── GROUP 1 — the head. struck, small, never animated. ──────
+   font-mono 11px/.28em for the wordmark; a real h1 in display serif beneath,
+   present at first paint, the fail-safe for a cold arrival + a screen reader. */
+.g1{ display:flex; flex-direction:column; gap:6px; }
+.g1__mark{
+  font-family:var(--font-mono); font-size:11px; font-weight:500;
+  letter-spacing:.28em; text-transform:uppercase; color:var(--t-ghost);
+}
+.g1__mark::before{ content:"◆ "; color:var(--gold); }
+.g1 h1{
+  font-family:var(--font-display); font-weight:600; font-style:normal;
+  font-size:clamp(20px, 2.6vw, 25px); line-height:1.15; color:var(--t-display);
+  letter-spacing:.002em;
+}
+.g1 h1 em{ font-style:italic; color:var(--t-body); font-weight:500; }
+
+/* ── GROUP 2 — the fallen face. warm, the only lit mass. ──────
+   No type of its own beyond the struck name inset at its foot — same grammar
+   as the shipped .m2hero__name: display serif, 600, tight tracking, centred. */
+.g2{
+  position:relative;
+  height:clamp(340px, 48vh, 520px); aspect-ratio: 120/190; width:auto; max-width:100%;
+  border-radius:12px;
+  background:linear-gradient(178deg,#171b22 0%,#12151b 46%,#0d1014 100%);
+  box-shadow:
+    inset 0 0 0 1px rgba(200,173,112,.22),
+    inset 0 1px 0 rgba(233,229,220,.05),
+    0 18px 40px rgba(0,0,0,.5), 0 2px 6px rgba(0,0,0,.4);
+  transform: translateY(0) rotate(0deg);
+  transition: transform 240ms var(--ease-settle), opacity 240ms var(--ease-settle);
+}
+.g2.is-falling{ opacity:0; transform: translateY(-18px); }
+.g2__name{
+  position:absolute; left:10px; right:10px; bottom:clamp(14px,2.4vh,20px);
+  font-family:var(--font-display); font-weight:600; font-size:clamp(15px,2.1vh,19px);
+  letter-spacing:.005em; line-height:1.05; text-align:center; color:var(--t-display);
+  pointer-events:none;
+}
+.g2__glow{ position:absolute; inset:-40px; z-index:-1; border-radius:50%;
+  background:radial-gradient(circle, rgba(220,215,203,.06), transparent 70%); pointer-events:none; }
+
+/* ── GROUP 3 — the read. welded to the face's underside-outboard
+   edge; the 152px block, tokens UNCHANGED from styles.css:3277. ──── */
+.g3{
+  display:grid; gap:6px; --m2read-size:19px; --m2read-lh:1.6; --m2read-lines:5;
+  padding-top: clamp(4px, 1vh, 10px);
+  min-height:152px;
+}
+.g3__label{
+  font-family:var(--font-mono); font-size:10.5px; letter-spacing:.22em;
+  text-transform:uppercase; color:var(--t-ghost);
+}
+.g3__meta{
+  font-family:var(--font-mono); font-size:11.5px; letter-spacing:.2em;
+  text-transform:uppercase; color:var(--t-meta);
+}
+.g3__meta b{ color:var(--gold); font-weight:500; }
+.g3__meta .dot{ color:#6f6b64; margin:0 .5em; }
+.g3__mean{
+  font-family:var(--font-display); font-size:var(--m2read-size); line-height:var(--m2read-lh);
+  font-weight:500; color:var(--t-body); max-width: 46ch;
+  display:-webkit-box; -webkit-line-clamp: var(--m2read-lines); -webkit-box-orient:vertical; overflow:hidden;
+}
+.g3.is-writing .g3__mean, .g3.is-writing .g3__meta{ opacity:.35; transition:opacity 120ms; }
+.g3__mean, .g3__meta{ transition:opacity 180ms var(--ease-settle) 80ms; }
+
+/* ── GROUP 4 — the deal control and its terms. one real button.
+   15px/600/.01em — the single largest UI-weight object on the page,
+   because this is the revenue control and it earns the engineering. ── */
+.g4{ display:flex; flex-direction:column; gap:10px; align-items:flex-start; }
+.g4__deal{
+  font-family:var(--font-ui); font-size:15px; font-weight:600; letter-spacing:.01em;
+  color:var(--ink-950); background:var(--t-display);
+  border:none; border-radius:3px; padding:12px 22px; min-height:44px;
+  cursor:pointer; transition: transform 140ms var(--ease-settle), background 140ms;
+}
+.g4__deal:hover:not(:disabled){ background:#fff; }
+.g4__deal:active:not(:disabled){ transform: scale(.97); }
+.g4__deal:disabled{ opacity:.4; cursor:default; }
+.g4__deal:focus-visible, .g5__strike:focus-visible{
+  outline: 1px solid var(--gold); outline-offset: 3px;
+}
+.g4__terms{
+  font-family:var(--font-ui); font-size:13px; color:var(--t-meta); line-height:1.5;
+}
+.g4__slot{ min-height:44px; display:flex; align-items:center; }
+.g4__seal{
+  font-family:var(--font-display); font-style:italic; font-size:15.5px; color:var(--t-ghost);
+}
+.g4__offer{
+  font-family:var(--font-display); font-style:italic; font-size:16.5px; color:var(--t-display);
+  text-decoration:none; border-bottom:1px solid var(--gold); padding-bottom:1px;
+}
+.g4__offer:hover{ color:#fff; }
+
+/* ── GROUP 5 — the strike. no container, no edge, no background.
+   full inline width, above one gold hairline. mono caps for the six marks,
+   the only place on the page condensed type is allowed BELOW 11px is
+   nowhere — the shipped 8.5px/10px violations are not repeated here. ── */
+.g5{ border-top:1px solid var(--line); padding-top:16px; display:flex; flex-direction:column; gap:10px; }
+.g5__strike{ display:flex; flex-direction:column; gap:10px; text-decoration:none; color:inherit; cursor:pointer; }
+.g5__crown{ font-family:var(--font-mono); font-size:11px; letter-spacing:.26em; text-transform:uppercase; color:var(--gold); }
+.g5__marks{
+  font-family:var(--font-mono); font-size:12px; letter-spacing:.16em; text-transform:uppercase;
+  color:var(--t-body); display:flex; flex-wrap:wrap; gap:2px 0;
+}
+.g5__marks a{ color:var(--t-body); text-decoration:none; border-bottom:1px solid transparent; }
+.g5__marks a:hover, .g5__marks a:focus-visible{ color:var(--t-display); border-bottom-color:var(--line-strong); }
+.g5__marks .sep{ color:var(--t-ghost); margin:0 .55em; }
+.g5__line{ font-family:var(--font-ui); font-size:13.5px; color:var(--t-meta); line-height:1.5; max-width:52ch; }
+
+/* the terminus — gold tick, points at U1 */
+.tick{ align-self:center; margin-top:8px; width:22px; height:22px; opacity:.8; }
+
+/* ── 430px: --fall-step goes to 0 and the slant flattens. nothing
+   else changes — no rewritten grid, no second breakpoint. ── */
+@media (max-width: 600px){
+  :root{ --fall-step: 0; }
+  .g2{ height:clamp(240px, 38vh, 340px); }
+}
+@media (prefers-reduced-motion: reduce){
+  .g2, .g3__mean, .g3__meta{ transition:none !important; }
+}
+</style>
+</head>
+<body>
+
+<main class="field" id="field">
+
+  <div class="g1">
+    <span class="g1__mark">Blue Room</span>
+    <h1>Something fell the moment you arrived. <em>Read it below.</em></h1>
+  </div>
+
+  <div class="g2" id="face">
+    <div class="g2__glow"></div>
+    <span class="g2__name" id="faceName">XVII — The Star</span>
+  </div>
+
+  <div class="g3" id="read">
+    <div class="g3__label">The read</div>
+    <p class="g3__meta" id="readMeta">Major Arcana <span class="dot">·</span> <b>17</b> <span class="dot">·</span> upright</p>
+    <p class="g3__mean" id="readMean">Hope after the dark. Nothing is dealt here in the sense a machine deals — the card is drawn once, and read as it falls. This is what fell for you, tonight.</p>
+  </div>
+
+  <div class="g4">
+    <button class="g4__deal" id="dealBtn" type="button">Again ⟳</button>
+    <p class="g4__terms" id="termsLine">Three to a question. Your first is free.</p>
+    <div class="g4__slot" id="offerSlot">
+      <span class="g4__seal">The deck is already cut. What remains is the turn.</span>
+    </div>
+  </div>
+
+  <div class="g5">
+    <div class="g5__strike" id="strikeLink" role="link" tabindex="0" aria-labelledby="strikeLabel" data-route="arcane">
+      <span class="g5__crown" aria-hidden="true">◆ Blue Room</span>
+      <span class="g5__marks" id="strikeLabel">
+        <a href="#" data-route="codex-sun">Sun Sign</a><span class="sep">·</span><a href="#" data-route="codex-animal">Year Animal</a><span class="sep">·</span><a href="#" data-route="codex-life">Life Path</a><span class="sep">·</span><a href="#" data-route="codex-rune">Rune</a><span class="sep">·</span><a href="#" data-route="codex-trigram">Trigram</a><span class="sep">·</span><a href="#" data-route="codex-hex">Hexagram</a>
+      </span>
+      <span class="g5__line">Six marks. One name. Given, not drawn — and unchanged by anything you do here.</span>
+    </div>
+  </div>
+
+  <svg class="tick" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <path d="M12 3v15M12 18l-6-6M12 18l6-6" stroke="#c8ad70" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>
+
+</main>
+
+<script>
+(function(){
+  var CARDS = [
+    {name:"XVII — The Star", meta:["Major Arcana","17","upright"], mean:"Hope after the dark. Nothing is dealt here in the sense a machine deals — the card is drawn once, and read as it falls. This is what fell for you, tonight."},
+    {name:"IX — The Hermit", meta:["Major Arcana","9","upright"], mean:"A light carried alone. What you are looking for is not out there yet — it is the walking that finds it, not the arriving."},
+    {name:"II — The High Priestess", meta:["Major Arcana","2","reversed"], mean:"A door kept, not opened. Something is known and not yet said — including, maybe, to you."},
+    {name:"The Six of Cups", meta:["Minor Arcana","VI · Cups","upright"], mean:"An old room, revisited. Not everything behind you is finished with you — some of it is still owed."},
+    {name:"The Knight of Swords", meta:["Minor Arcana","Knight · Swords","upright"], mean:"Moving before it is settled. Fast is not the same as ready, and tonight it does not have to be."}
+  ];
+  var idx = 0, dealCount = 0, CAP = 5, OFFER_AT = 3;
+  var face = document.getElementById('face');
+  var faceName = document.getElementById('faceName');
+  var read = document.getElementById('read');
+  var readMeta = document.getElementById('readMeta');
+  var readMean = document.getElementById('readMean');
+  var dealBtn = document.getElementById('dealBtn');
+  var offerSlot = document.getElementById('offerSlot');
+  var strikeLink = document.getElementById('strikeLink');
+  var live = document.createElement('div');
+  live.setAttribute('aria-live','polite');
+  live.className = 'sr-only';
+  live.style.cssText = 'position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);';
+  document.body.appendChild(live);
+
+  function writeCard(c, announce){
+    faceName.textContent = c.name;
+    readMeta.innerHTML = c.meta[0] + ' <span class="dot">·</span> <b>' + c.meta[1] + '</b> <span class="dot">·</span> ' + c.meta[2];
+    readMean.textContent = c.mean;
+    if (announce) live.textContent = c.name + '. ' + c.mean;
+  }
+
+  function deal(){
+    if (dealBtn.disabled) return;
+    dealCount++;
+    var next = CARDS[(idx + 1) % CARDS.length];
+    idx = (idx + 1) % CARDS.length;
+    face.classList.add('is-falling');
+    read.classList.add('is-writing');
+    setTimeout(function(){
+      writeCard(next, true);
+      face.classList.remove('is-falling');
+      read.classList.remove('is-writing');
+    }, 220);
+
+    if (dealCount >= OFFER_AT){
+      offerSlot.innerHTML = '<a class="g4__offer" href="#" data-route="drawing-room">That is three. Take them to one question — your Sitting is free →</a>';
+    }
+    if (dealCount >= CAP){
+      dealBtn.disabled = true;
+      dealBtn.textContent = 'The deck is cut for tonight';
+    }
+  }
+
+  dealBtn.addEventListener('click', deal);
+  // the strike: one hit target wrapping six independent marks. clicks on a
+  // mark stop here and do not also fire the wrapper's own navigation.
+  document.querySelectorAll('.g5__marks a').forEach(function(a){
+    a.addEventListener('click', function(e){ e.preventDefault(); e.stopPropagation(); });
+  });
+  strikeLink.addEventListener('click', function(e){ e.preventDefault(); });
+  strikeLink.addEventListener('keydown', function(e){
+    if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); }
+  });
+  // first paint is already a real card, written through this same shape —
+  // no separate boot string, no process/permanence contradiction.
+  writeCard(CARDS[0], false);
+})();
+</script>
+
+<!-- =====================================================================
+BUILD NOTES — read alongside the file, not required for it to run.
+
+TYPE SYSTEM (exhaustive — every text object on the page, real values):
+
+  G1 wordmark   font-mono   11px / 500 / .28em / caps      color var(--t-ghost)
+  G1 h1         font-display 20-25px(clamp) / 600 / normal  color var(--t-display)
+                  em run: italic / 500                       color var(--t-body)
+  G2 face name  font-display clamp(15-19px) / 600 / .005em  color var(--t-display)
+  G3 label      font-mono   10.5px / 400 / .22em / caps     color var(--t-ghost)
+  G3 meta       font-mono   11.5px / 400 / .2em / caps      color var(--t-meta)
+                  numeral inline                              color var(--gold)
+  G3 meaning    font-display 19px / 500 / 1.6 / 5-line clamp color var(--t-body)
+  G4 deal btn   font-ui     15px / 600 / .01em              color var(--ink-950) on var(--t-display)
+  G4 terms      font-ui     13px / 400 / normal             color var(--t-meta)
+  G4 seal       font-display 15.5px / italic 500            color var(--t-ghost)
+  G4 offer      font-display 16.5px / italic 500            color var(--t-display), gold underline
+  G5 crown      font-mono   11px / 500 / .26em / caps       color var(--gold)
+  G5 marks      font-mono   12px / 400 / .16em / caps       color var(--t-body)
+  G5 line       font-ui     13.5px / 400 / 1.5              color var(--t-meta)
+
+  LEADS AT EACH MOMENT:
+    first paint (cold, no motion) — G2's warmth (largest lit mass) then G3's
+    19px serif meaning (the largest BODY type on the page, deliberately
+    bigger than any label) then G4's 15px button. G1 is present but never
+    leads — it is the fail-safe, sized to be found, not to be seen first.
+    on deal — G2/G3 together, cross-fading as one object (spec: "80ms" stagger).
+    at the third deal — G4's offer line, because it REPLACES the quietest
+    text on the page (the 15.5px italic seal) with the brightest (16.5px,
+    var(--t-display), gold rule) in the same slot. Contrast does the work,
+    not size.
+    G5 never leads. It is intentionally the coolest register on the page
+    (t-body/t-meta, no gold on its prose) so it reads as fact rather than
+    pitch — the gold is spent only on the crown mark and the offer link.
+
+  NO type on this page is below 11px. NO caps run is below 10.5px. The
+  shipped tile's 8.5px "Drawn once. Not reissued." class of violation does
+  not have an equivalent object here — the free/spent state is printed at
+  13px in G4__terms, always legible, never the smallest thing on the page.
+
+WHAT THIS FILE DOES NOT DO: no navigation is wired (marks in G5 and the
+offer link in G4 are `href="#"`/no-op, per the brief); no session cap
+persistence; not merged into styles.css or app.js. It is judged on the
+single question in the brief: does the second deal feel like something was
+done for you, or like a page refreshed.
+===================================================================== -->
+</body>
+</html>

@@ -1,0 +1,171 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>U1 plates — the photographed sheet</title>
+<style>
+:root{
+  --ink-950:#0a0b0d; --ink-900:#100f0c; --ink-850:#11100d;
+  --hair-1:rgba(233,229,220,.14); --hair-2:rgba(233,229,220,.08);
+  --line-strong:rgba(233,229,220,.2);
+  --t-display:rgba(233,229,220,.92); --t-primary:rgba(233,229,220,.82);
+  --t-body:rgba(233,229,220,.7); --t-meta:rgba(233,229,220,.5);
+  --violet:#8b7bff; --gold:#c8ad70;
+  --stock:#11100d;
+
+  /* THE SHEET — one file, five disjoint windows into it. */
+  --sheet:url("assets/plate-mask.png");
+  --sheet-size:812.95px 751.70px;    /* 584x540 packed atlas x (245/176) */
+  --ink:233,229,220;                 /* the room's own candle, never pure white */
+  --sheet-a:.145;                    /* HOVER  peak 48.3 L = the 1px border */
+  --sheet-rest:.827;                 /* REST   x.145 = .120 -> peak 42.9 L, between ring and border */
+}
+*{box-sizing:border-box}
+html{background:var(--ink-950)}
+body{margin:0;padding:56px 24px 96px;
+  background:radial-gradient(120% 90% at 50% 0%,#16151a 0%,var(--ink-950) 62%) fixed;
+  font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--t-body)}
+h1{font:600 11px/1 ui-monospace,monospace;letter-spacing:.28em;text-transform:uppercase;
+   color:var(--t-meta);margin:0 0 40px;text-align:center}
+.stack{display:flex;flex-direction:column;align-items:center;gap:52px;max-width:860px;margin:0 auto}
+
+/* ---------------- THE PLATE ---------------- */
+.plate{
+  position:relative;z-index:1;width:min(400px,100%);height:245px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:11px;
+  padding:34px 26px 21px;border:1px solid var(--hair-1);border-radius:10px;
+  box-shadow:inset 0 1px 0 rgba(233,229,220,.04);
+  background:linear-gradient(180deg,rgba(233,229,220,.024) 0%,transparent 65%),var(--stock);
+}
+.plate::before{content:"";position:absolute;inset:7px;border-radius:6px;
+  box-shadow:inset 0 0 0 1px var(--hair-2);pointer-events:none;z-index:2}
+
+/* RECIPE C — the photograph as a MASK on the archive's own candle colour.
+   The sheet's black is not drawn at all: alpha 0 = nothing painted = --stock
+   survives byte-for-byte. Only the marks land, and they land in rgb(--ink). */
+.plate::after{
+  content:"";position:absolute;inset:0;border-radius:inherit;z-index:0;pointer-events:none;
+  background:rgba(var(--ink),var(--sheet-a));
+  opacity:var(--sheet-rest);            /* .827 x .145 = .120 effective */
+  transition:opacity 260ms ease;        /* compositor-only: no repaint, no filter */
+  -webkit-mask-image:var(--sheet); mask-image:var(--sheet);
+  -webkit-mask-size:var(--sheet-size); mask-size:var(--sheet-size);
+  -webkit-mask-position:var(--bx) var(--by); mask-position:var(--bx) var(--by);
+  -webkit-mask-repeat:no-repeat; mask-repeat:no-repeat;
+}
+.plate:hover::after{opacity:1}
+
+.p1{--bx:-2.78px;   --by:-2.78px}
+.p2{--bx:-409.26px; --by:-2.78px}
+.p3{--bx:-2.78px;   --by:-253.35px}
+.p4{--bx:-409.26px; --by:-253.35px}
+.p5{--bx:-2.78px;   --by:-503.92px}
+
+.em{width:48px;height:48px;position:relative;z-index:1;
+  filter:drop-shadow(0 7px 16px rgba(0,0,0,.5));color:var(--t-meta)}
+.nm{position:relative;z-index:1;font:600 13px/1 inherit;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--t-display);margin:0}
+.ru{position:relative;z-index:1;width:44px;height:1px;
+  background:linear-gradient(90deg,transparent,var(--hair-1) 20%,var(--hair-1) 80%,transparent)}
+.ln{position:relative;z-index:1;font:500 17px/1.38 Georgia,"Times New Roman",serif;
+  color:var(--t-primary);text-align:center;max-width:31ch;margin:0}
+.mi{position:relative;z-index:1;font:500 10px/1.4 ui-monospace,monospace;
+  letter-spacing:.24em;text-transform:uppercase;color:var(--t-body);margin:0}
+.is-free .mi{color:var(--gold)} .is-paid .mi{color:#a89bf5}
+.dr{position:relative;z-index:1;display:inline-flex;align-items:center;min-height:44px;
+  padding:12px 20px;margin-top:2px;font:600 11.5px/1 inherit;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--t-display);text-decoration:none;
+  border:1px solid var(--line-strong);border-radius:3px;
+  transition:border-color 200ms ease,color 200ms ease,transform 200ms ease}
+.is-free .dr{border-color:rgba(200,173,112,.42)} .is-free .dr:hover{border-color:var(--gold);color:var(--gold)}
+.is-paid .dr{border-color:rgba(139,123,255,.45)} .is-paid .dr:hover{border-color:var(--violet);color:var(--violet)}
+.dr:hover{transform:translateY(-1.5px)}
+
+/* ---------------- the recipe bench ---------------- */
+.bench{max-width:1080px;margin:96px auto 0}
+.bench h2{font:600 10px/1 ui-monospace,monospace;letter-spacing:.28em;text-transform:uppercase;
+  color:var(--t-meta);margin:0 0 20px;text-align:center}
+.row{display:flex;gap:20px;justify-content:center;flex-wrap:wrap}
+.cell{width:240px}
+.cell b{display:block;font:600 9px/1.5 ui-monospace,monospace;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--t-meta);margin:10px 0 0;text-align:center}
+.cell i{display:block;font:400 9px/1.5 ui-monospace,monospace;color:rgba(233,229,220,.32);
+  text-align:center;font-style:normal}
+.sw{position:relative;height:147px;border:1px solid var(--hair-1);border-radius:8px;
+  background:var(--stock);overflow:hidden}
+.sw::after{content:"";position:absolute;inset:0;
+  --bx2:-245.56px; --by2:-152.01px; /* P4 in the packed atlas, .6 scale */
+  background-size:487.77px 451.02px;background-position:var(--bx2) var(--by2);
+  background-repeat:no-repeat}
+/* A — normal mode, photo laid on, plate colour re-asserted above it */
+.rA::after{background-image:url("assets/_bench-grey.png");opacity:.1303}
+/* B — plus-lighter, the photo added */
+.rB::after{background-image:var(--sheet);mix-blend-mode:plus-lighter;opacity:.1228}
+/* C — mask on the archive candle */
+.rC::after{background:rgba(var(--ink),var(--sheet-a));
+  -webkit-mask-image:var(--sheet);mask-image:var(--sheet);
+  mask-size:487.77px 451.02px;mask-size:487.77px 451.02px;
+  -webkit-mask-position:var(--bx2) var(--by2);mask-position:var(--bx2) var(--by2);
+  -webkit-mask-repeat:no-repeat;mask-repeat:no-repeat}
+/* D — dust bed + a second, differently-placed copy for the cracks */
+.rD::after{background:rgba(var(--ink),.075);
+  -webkit-mask-image:var(--sheet);mask-image:var(--sheet);
+  mask-size:487.77px 451.02px;mask-size:487.77px 451.02px;
+  -webkit-mask-position:var(--bx2) var(--by2);mask-position:var(--bx2) var(--by2);
+  -webkit-mask-repeat:no-repeat;mask-repeat:no-repeat}
+.rD .over{position:absolute;inset:0;background:rgba(var(--ink),.115);
+  -webkit-mask-image:var(--sheet);mask-image:var(--sheet);
+  -webkit-mask-size:975.54px 902.04px;mask-size:975.54px 902.04px;
+  -webkit-mask-position:-240px -120px;mask-position:-240px -120px;
+  -webkit-mask-repeat:no-repeat;mask-repeat:no-repeat}
+/* raw, for reference */
+.rRAW::after{background-image:url("assets/_bench-grey.png");opacity:1}
+</style>
+
+<h1>U1 · the photographed sheet · five disjoint windows, one file</h1>
+
+<div class="stack">
+  <div class="plate p1 is-free">
+    <svg class="em" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1"><circle cx="24" cy="24" r="15"/><path d="M24 9v30M9 24h30"/></svg>
+    <p class="nm">The Scan</p><div class="ru"></div>
+    <p class="ln">You hand it a photograph. It hands back the reading that was already in it.</p>
+    <p class="mi">Free · no account</p><a class="dr" href="#">Enter</a>
+  </div>
+
+  <div class="plate p2 is-free">
+    <svg class="em" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1"><rect x="11" y="7" width="26" height="34" rx="2"/><path d="M17 17h14M17 24h14M17 31h8"/></svg>
+    <p class="nm">The Codex</p><div class="ru"></div>
+    <p class="ln">Every instrument the archive owns, written out in plain words, so nothing it says is a trick.</p>
+    <p class="mi">Free · 166 entries</p><a class="dr" href="#">Open</a>
+  </div>
+
+  <div class="plate p3 is-paid">
+    <svg class="em" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1"><path d="M24 6l16 9v18l-16 9-16-9V15z"/><circle cx="24" cy="24" r="6"/></svg>
+    <p class="nm">The Reading</p><div class="ru"></div>
+    <p class="ln">A stranger's whole shape, drawn from the day they began and nothing else.</p>
+    <p class="mi">$4.99 · yours to keep</p><a class="dr" href="#">Begin</a>
+  </div>
+
+  <div class="plate p4 is-paid">
+    <svg class="em" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1"><circle cx="24" cy="20" r="9"/><path d="M14 41c0-6 4.5-9 10-9s10 3 10 9"/></svg>
+    <p class="nm">The Concord</p><div class="ru"></div>
+    <p class="ln">One record, two names on it. It can only ever be filled once.</p>
+    <p class="mi">$7.99 · one per pair</p><a class="dr" href="#">Bind</a>
+  </div>
+
+  <div class="plate p5">
+    <svg class="em" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1"><path d="M12 40V12l12-6 12 6v28"/><path d="M24 40V22"/></svg>
+    <p class="nm">The Reliquary</p><div class="ru"></div>
+    <p class="ln">Where the things you have been given are kept, and counted, and can be shown.</p>
+    <p class="mi">Account · nothing sold here</p><a class="dr" href="#">Look in</a>
+  </div>
+</div>
+
+<div class="bench" style="--sheet-img:url('assets/plate-mask.png')">
+  <h2>the bench · same crop (P4, the loudest), four recipes</h2>
+  <div class="row">
+    <div class="cell"><div class="sw rRAW"></div><b>raw photo, normal, α1</b><i>plate 17→5.5 · cold black · dead</i></div>
+    <div class="cell"><div class="sw rA"></div><b>A · normal, α .1303</b><i>peak 48 · field 15.5 (−1.5) · R−B 4→3.5</i></div>
+    <div class="cell"><div class="sw rB"></div><b>B · plus-lighter, α .1228</b><i>peak 48 · field +0.8 · R−B exact</i></div>
+    <div class="cell"><div class="sw rC"></div><b>C · mask, ink α .145</b><i>peak 48 · field UNTOUCHED · R−B +1.3</i></div>
+    <div class="cell"><div class="sw rD"><span class="over"></span></div><b>D · dust .075 + cracks .115@2×</b><i>two masks, two scales</i></div>
+  </div>
+</div>

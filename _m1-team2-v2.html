@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>THE SPAN — M1 prototype</title>
+<style>
+  :root {
+    --t-display: #dcd7cb;
+    --t-primary: #d7d3ca;
+    --t-body: #b1ada4;
+    --t-meta: #948f87;
+    --t-ghost: #86827a;   /* lifted toward the Codex value, critique item 8 */
+
+    --ink-950: #0a0b0d;
+    --ink-900: #100f0c;
+    --ink-850: #11100d;
+    --ink-800: #151310;
+    --ink-700: #1c1915;
+    --line-faint: rgba(233, 229, 220, 0.07);
+    --line: rgba(233, 229, 220, 0.12);
+    --line-strong: rgba(233, 229, 220, 0.2);
+
+    --gold: #c8ad70;
+    --gold-dim: #a2864a;
+
+    --font-display: "Cormorant Garamond", "Times New Roman", serif;
+    --font-ui: "Inter", -apple-system, "Segoe UI", sans-serif;
+    --font-mono: "IBM Plex Mono", "Consolas", monospace;
+
+    --ease-settle: cubic-bezier(0.16, 1, 0.3, 1);
+    --ease-draw: cubic-bezier(0.65, 0, 0.35, 1);
+
+    /* the shipped reading-block spec, styles.css:3277 — 19 x 1.6 x 5 = 152px */
+    --m2read-size: 19px;
+    --m2read-lh: 1.6;
+    --m2read-lines: 5;
+
+    --gutter: clamp(20px, 5vw, 76px);
+    --rule-c: rgba(233, 229, 220, 0.26);
+    /* the run of the line that has already happened. Not a new colour: the
+       shipped gold at low alpha. */
+    --rule-lit: rgba(200, 173, 112, 0.5);
+    --track-h: 78px;   /* the band the line and its marks occupy */
+    --open-w: 560px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { background: var(--ink-950); }
+  body {
+    font-family: var(--font-ui);
+    color: var(--t-primary);
+    background: radial-gradient(110% 80% at 50% -10%, #161411 0%, var(--ink-900) 55%, var(--ink-950) 100%);
+    background-attachment: fixed;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100%;
+    /* NO overflow-x:hidden anywhere. `.menu { overflow-x: clip }` is precisely what
+       let the shipped narrow bug survive unseen (critique #1). A scrollbar here is
+       the honest alarm, and this design must never need one. */
+  }
+  a { color: inherit; }
+
+  /* ===================== the band ===================== */
+
+  .m1 {
+    display: flex;
+    flex-direction: column;
+    /* flex-start, never centre: a centred flow that fills its band pushes its head
+       off the TOP of the screen, where document.scrollHeight never counts it.
+       (Adopted from team 3's invalid-verification finding — a solution, not a design.) */
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: clamp(16px, 3.4vh, 44px);
+    min-height: calc(100svh - 80px);
+    padding: clamp(16px, 3vh, 40px) var(--gutter) 10px;
+  }
+  .m1 { min-height: calc(100vh - 80px); }
+  @supports (height: 100svh) { .m1 { min-height: calc(100svh - 80px); } }
+
+  /* ---- the head. Struck, never animated, present in first paint, never gated. ---- */
+  .head { max-width: 44ch; }
+  .head__mark {
+    font-family: var(--font-mono); font-size: 10.5px; font-weight: 500;
+    letter-spacing: .3em; text-transform: uppercase; color: var(--t-ghost);
+    display: flex; align-items: center; gap: .55em; margin-bottom: 5px;
+  }
+  .head__mark i { color: var(--gold); font-style: normal; }
+  .head h1 {
+    font-family: var(--font-display); font-weight: 500;
+    font-size: clamp(24px, 3.2vw, 36px); line-height: 1.05;
+    color: var(--t-display); letter-spacing: .01em;
+  }
+  .head__thesis {
+    /* was clamp(13.5,1.5vw,17) — within 1.5px of .notch__name's clamp(15,1.5vw,18)
+       at every width, so the supporting line and the four live choices read as
+       the same rank. Stepped down and the vw coefficient cut so the gap holds
+       across the fluid range, not just at the clamp's own min/max. */
+    font-family: var(--font-display); font-style: italic;
+    font-size: clamp(13px, 1.1vw, 15px); line-height: 1.35;
+    color: var(--t-meta); margin-top: 5px;
+  }
+
+  /* ===================== THE SPAN =====================
+     One lit line across the dark. It runs from what was given to you before you
+     could ask, to what falls tonight. Four marks stand on it. Touching a mark
+     OPENS THE LINE THERE — the rule parts at that point and what the mark names
+     grows out of the gap. There is no stage and no destination region: the only
+     opening that exists is the one hanging off the mark you touched. */
+
+  .span { position: relative; width: 100%; flex: 1 1 auto; }
+
+  .span__track { position: relative; height: var(--track-h); width: 100%; }
+
+  .rule {
+    position: absolute; top: 0; left: 0; right: 0; height: 1px;
+    background: linear-gradient(90deg,
+      transparent 0, var(--rule-c) 2%, var(--rule-c) 98%, transparent 100%);
+    transition: background 220ms var(--ease-settle);
+  }
+  /* THE PARTING, AND THE ELAPSED RUN. The gap is authored from the touched
+     mark's own coordinate — no measurement, no layout read, one custom
+     property. The run BEHIND the mark is lit and the run ahead of it is not,
+     so the line reads as a measure of time that has already passed. Touch the
+     birth mark and a sliver is lit with the whole night ahead of it; touch the
+     tarot mark and almost the entire line is behind you. The difference
+     between the two products is drawn, not written. */
+  .span[data-open] .rule {
+    background: linear-gradient(90deg,
+      transparent 0,
+      var(--rule-lit) 2%,
+      var(--rule-lit) calc(var(--x) - 26px),
+      transparent calc(var(--x) - 26px),
+      transparent calc(var(--x) + 26px),
+      var(--rule-c) calc(var(--x) + 26px),
+      var(--rule-c) 98%,
+      transparent 100%);
+  }
+
+  /* THE TWO ENDS OF THE SPAN, NAMED. This is the whole reason the line is not
+     chrome: chrome has no ends. They are real text, not aria-hidden, because
+     without them a non-sighted visitor is handed two buttons standing on
+     nothing. Stepped up from 13px ghost — they were the faintest ink on a
+     surface whose entire argument rests on them. */
+  .end {
+    position: absolute; top: -23px;
+    font-family: var(--font-display); font-style: italic; font-size: 15px;
+    color: var(--t-meta); white-space: nowrap;
+  }
+  .end--a { left: 0; }
+  .end--b { right: 0; }
+
+  /* ---- a mark on the line ---- */
+  .notch {
+    position: absolute; top: 0; left: var(--x); width: 0;
+    /* zero width so left:var(--x) IS the mark's exact coordinate — the same
+       coordinate the rule parts at and the opening hangs from. */
+  }
+  .notch__btn {
+    position: absolute; top: -22px; left: 0;
+    transform: translateX(calc(var(--anchor, -50%)));
+    display: block; min-width: 44px; min-height: 44px;
+    padding: 22px 8px 0;
+    background: none; border: 0; cursor: pointer;
+    font: inherit; color: inherit; text-align: center;
+  }
+  .notch--a .notch__btn { text-align: left; padding-left: 0; }
+  .notch--z .notch__btn { text-align: right; padding-right: 0; }
+  .notch__pip {
+    /* centred on the rule itself: rule is a 1px line at top:0, so the pip's
+       9px box (rotated 45deg, centre fixed by transform-origin:center) sits
+       at top:-4px so its centre lands on y=0.5, not 21px below it. Was 17px —
+       the mark was floating in the sub-label's clear space, not on the line
+       the copy claims it stands on. */
+    position: absolute; top: -4px; left: 0; width: 9px; height: 9px;
+    margin-left: -4.5px;
+    transform: rotate(45deg);
+    border: 1px solid var(--t-ghost);
+    background: var(--ink-950);
+    transition: border-color 180ms var(--ease-settle), background 180ms var(--ease-settle);
+  }
+  .notch--a .notch__pip { left: 0; }
+  .notch__name {
+    display: block; font-family: var(--font-display);
+    font-size: clamp(15px, 1.5vw, 18px); line-height: 1.2;
+    color: var(--t-body); white-space: nowrap;
+    border-bottom: 1px solid transparent; padding-bottom: 2px;
+    transition: color 180ms var(--ease-settle), border-color 180ms var(--ease-settle);
+  }
+  .notch__sub {
+    display: block; margin-top: 3px;
+    font-family: var(--font-mono); font-size: 9.5px; letter-spacing: .16em;
+    text-transform: uppercase; color: var(--t-ghost); white-space: nowrap;
+    transition: color 180ms var(--ease-settle);
+  }
+  /* was var(--line) (.12 alpha) — the same weight as the resting hairline
+     between the two states it needs to distinguish (idle vs hovered), so the
+     affordance barely read against the dark ground. var(--line-strong) (.2)
+     is one clear step, and still below --rule-c (.26) and gold, so hover
+     never competes with the open state's own colour. */
+  .notch__btn:hover .notch__name { color: var(--t-display); border-bottom-color: var(--line-strong); }
+  .notch__btn:focus-visible { outline: 1px solid var(--t-meta); outline-offset: 2px; }
+  .notch.is-open .notch__pip { border-color: var(--gold); background: var(--gold); }
+  .notch.is-open .notch__name { color: var(--t-display); }
+  .notch.is-open .notch__sub { color: var(--t-meta); }
+
+  /* the stem: the line's own material, running from the gap down into what opened.
+     Starts at y:5 — the pip's own bottom edge (centre 0, radius 4.5, +.5 clearance)
+     — and its height is set so the far end still lands exactly at track-h + 14px,
+     where .open begins: (track-h + 14) - 5 = track-h + 9. */
+  /* starts BELOW the mark's own name, not at the pip: at top:5 it ran straight
+     down through the middle of "A Tarot Reading" and struck the T of "The
+     Birth Reading". The gold pip carries the eye from the rule to the name;
+     the stem carries it from the name to what opened. */
+  .notch.is-open::after {
+    content: ""; position: absolute; left: 0; top: 46px;
+    width: 1px; height: calc(var(--track-h) - 32px);
+    background: linear-gradient(180deg, var(--gold-dim), var(--rule-c));
+  }
+
+  /* ---- the opening. ONE element, no home. It is inserted into the DOM
+     immediately after the mark you touched, and hangs from that mark's
+     coordinate. Nothing is reserved for it and nothing waits for it. ---- */
+  /* NO BOX. The border, the radius and the fill are gone. A bordered rounded
+     rectangle under a row of named marks is a tab panel, and a tab panel is
+     the exact thing this design must not be mistaken for. What is left is the
+     STEM CONTINUING: the line descends out of the gap and becomes the opening's
+     own edge. One hairline, on the side the mark is on. The material hangs off
+     the line rather than sitting in a container beside it. */
+  .open {
+    position: absolute; top: calc(var(--track-h) + 14px);
+    left: clamp(0px, var(--x), calc(100% - var(--open-w)));
+    width: min(var(--open-w), 100%);
+    padding: 4px 0 0 20px;
+    border-left: 1px solid var(--line);
+    animation: openIn 260ms var(--ease-settle) both;
+  }
+  .open--place { --open-w: 420px; }
+  /* a mark past the middle of the span has no room to its right, so its opening
+     hangs from the mark's LEFT and the line becomes its RIGHT edge. The stem
+     still lands on the mark; the opening still cannot leave the screen.
+     Same law, mirrored. */
+  .open--r {
+    left: clamp(0px, calc(var(--x) - var(--open-w)), calc(100% - var(--open-w)));
+    padding: 4px 20px 0 0;
+    border-left: 0; border-right: 1px solid var(--line);
+    text-align: left;
+  }
+  @keyframes openIn { from { opacity: 0; transform: translateY(-8px); } }
+  @media (prefers-reduced-motion: reduce) { .open { animation: none; } }
+
+  /* ===================== inside an opening ===================== */
+
+  .m1open-read { display: flex; gap: 18px; align-items: flex-start; }
+  .m1open-obj { flex: 0 0 auto; }
+  .m1open-body { flex: 1 1 auto; min-width: 0; }
+
+  .m2hero { position: relative; width: clamp(120px, 10vw, 146px); aspect-ratio: 120/190; }
+  .m2hero svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .m2hero__back { opacity: .5; }
+  .m2hero-edge { stroke-dasharray: 620; stroke-dashoffset: 620; animation: drawEdge 380ms var(--ease-draw) 40ms forwards; }
+  @keyframes drawEdge { to { stroke-dashoffset: 0; } }
+  .m2hero__mark { opacity: 0; animation: markIn 260ms ease-out 300ms forwards; }
+  @keyframes markIn { from { opacity: 0; transform: scale(.94); } to { opacity: 1; transform: scale(1); } }
+  .m2face {
+    position: absolute; inset: 14% 10%;
+    display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
+    text-align: center; padding-bottom: 8px;
+    opacity: 0; animation: markIn 260ms ease-out 380ms forwards;
+  }
+  /* the card shrinks to 66px at the shortest phone tier — a 9px nowrap string
+     no longer reliably fits an 80%-inset column that narrow. Clip rather than
+     let it run past the card's own edge. */
+  .m2face-meta, .m2face-orient { max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
+  /* was 8px/.18em and 7.5px/.1em — the critique's own flagged pattern (tracked
+     mono caps under 10px) at its worst point in this file, on the smallest
+     object on the page. Raised to a 9px floor; tracking trimmed so the strings
+     hold their measured width against the 120-146px card. */
+  .m2face-meta { font-family: var(--font-mono); font-size: 9px; letter-spacing: .13em; text-transform: uppercase; color: var(--gold); white-space: nowrap; }
+  .m2face-name { font-family: var(--font-display); font-size: 14px; color: var(--t-display); margin-top: 2px; }
+  .m2face-orient { font-family: var(--font-mono); font-size: 9px; letter-spacing: .06em; text-transform: uppercase; color: var(--t-meta); margin-top: 2px; }
+  @media (prefers-reduced-motion: reduce) {
+    .m2hero-edge { animation: none; stroke-dashoffset: 0; }
+    .m2hero__mark, .m2face { animation: none; opacity: 1; }
+  }
+
+  /* the 152px reading block, at its shipped spec, glued to the object it describes */
+  .m2read { display: grid; gap: 5px; animation: fadeIn 220ms ease-out 420ms both; }
+  @keyframes fadeIn { from { opacity: 0; } }
+  .m2read__label { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: .22em; text-transform: uppercase; color: var(--t-meta); }
+  .m2read__meta { font-family: var(--font-mono); font-size: 11px; letter-spacing: .18em; text-transform: uppercase; color: var(--t-meta); }
+  .m2read__meta .num { color: var(--t-display); }
+  .m2read__mean {
+    font-family: var(--font-display);
+    font-size: var(--m2read-size);
+    line-height: var(--m2read-lh);
+    color: var(--t-body);
+    display: -webkit-box; -webkit-box-orient: vertical;
+    -webkit-line-clamp: 5; overflow: hidden;
+    height: calc(var(--m2read-size) * var(--m2read-lh) * var(--m2read-lines));
+  }
+
+  .m1open-spine {
+    margin-top: 10px;
+    font-family: var(--font-mono); font-size: 11px; letter-spacing: .04em;
+    color: var(--t-body);
+    display: flex; flex-wrap: wrap; gap: 2px 6px;
+    animation: fadeIn 220ms ease-out 420ms both;
+  }
+  .m1open-spine a {
+    color: var(--t-primary); text-decoration: none; border-bottom: .5px solid var(--t-ghost); padding-bottom: 1px;
+    /* was untransitioned — hovering any of the five Codex links snapped colour
+       and border instantly, the only unanimated hover in the reading body. */
+    transition: color 160ms var(--ease-settle), border-color 160ms var(--ease-settle);
+  }
+  .m1open-spine a:hover { color: var(--t-display); border-bottom-color: var(--t-meta); }
+  .m1open-spine a:focus-visible { outline: 1px solid var(--t-meta); outline-offset: 2px; }
+  .m1open-spine .sep { color: var(--t-ghost); }
+  @media (prefers-reduced-motion: reduce) { .m2read, .m1open-spine { animation: none; } }
+
+  .m1open-door { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--line-faint); }
+  .m1open-door__row { display: flex; flex-wrap: wrap; gap: 8px; }
+  .m1open-door__name { display: block; font-family: var(--font-mono); font-size: 12.5px; letter-spacing: .04em; color: var(--t-display); margin-bottom: 5px; }
+  .m1open-door__desc { display: block; font-family: var(--font-ui); font-size: 12.5px; line-height: 1.5; color: var(--t-body); margin-bottom: 10px; }
+  .m1open-door__go {
+    display: inline-flex; align-items: center; justify-content: center;
+    min-height: 44px; padding: 0 16px;
+    font-family: var(--font-mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase;
+    color: var(--t-display); text-decoration: none;
+    border: 1px solid var(--line-strong); border-radius: 2px;
+    /* the only transition in the file with no named easing (defaulted to the
+       UA's linear-ish "ease"). Every other hover/open transition in this
+       file names var(--ease-settle) — matched here, on the one control that
+       is the entire point of the surface. */
+    transition: border-color 160ms var(--ease-settle), background 160ms var(--ease-settle);
+  }
+  .m1open-door__go:hover { border-color: var(--gold); background: rgba(200,173,112,0.08); }
+  .m1open-door__go:focus-visible { outline: 1px solid var(--t-meta); outline-offset: 3px; }
+  .m1open-door__go .free { color: var(--gold); }
+  .m1open-pull {
+    min-height: 44px; padding: 0 12px;
+    font-family: var(--font-mono); font-size: 10.5px; letter-spacing: .06em;
+    color: var(--t-meta); background: none;
+    border: 1px solid var(--line); border-radius: 2px; cursor: pointer;
+    /* untransitioned, same defect as .m1open-spine a above — "Pull another"
+       is the one control a returning visitor clicks repeatedly, so its snap
+       was the most-repeated jump cut on the page. */
+    transition: color 160ms var(--ease-settle), border-color 160ms var(--ease-settle);
+  }
+  .m1open-pull:hover { color: var(--t-display); border-color: var(--t-meta); }
+  .m1open-pull:focus-visible { outline: 1px solid var(--t-meta); outline-offset: 3px; }
+
+  .m1open-place__line { font-family: var(--font-display); font-size: 17px; color: var(--t-primary); line-height: 1.4; }
+  .m1open-place__way { margin-top: 10px; font-family: var(--font-mono); font-size: 11px; }
+  .m1open-place__way a { color: var(--t-display); text-decoration: underline; text-decoration-color: var(--gold); text-underline-offset: 3px; }
+  .m1open-place__list { margin-top: 8px; display: grid; }
+  .m1open-place__list a {
+    display: flex; align-items: center; min-height: 40px; font-family: var(--font-mono); font-size: 11px; color: var(--t-body); text-decoration: none;
+    transition: color 160ms var(--ease-settle);
+  }
+  .m1open-place__list a:hover { color: var(--t-display); }
+  .m1open-place__way a:focus-visible,
+  .m1open-place__list a:focus-visible { outline: 1px solid var(--t-meta); outline-offset: 3px; }
+
+  /* ---- the foot mark. In normal flow, not on the line. ---- */
+  .notch--foot { position: relative; left: auto; top: auto; width: 100%; }
+  .notch--foot .notch__btn {
+    position: static; transform: none; text-align: left;
+    display: flex; align-items: center; gap: 11px;
+    min-height: 44px; padding: 0; width: auto;
+  }
+  .notch--foot .notch__name, .notch--foot .notch__sub { display: inline-block; }
+  .notch--foot .notch__sub { margin-top: 0; }
+  .notch--foot .notch__pip { position: static; margin: 0; }
+  .notch--foot.is-open::after { display: none; }
+  /* the foot mark's opening stands BESIDE it, in the band that is empty anyway,
+     so opening it costs the page no height at all. It was below the mark and
+     ran 220px under the rail — the exact below-the-fold failure this surface
+     cannot have, since the first downward notch glides to U1. */
+  .open--foot {
+    position: static; width: min(440px, 100%);
+    margin: 6px 0 0 5px; padding: 4px 0 0 20px;
+    border-left: 1px solid var(--line); border-right: 0;
+  }
+
+  /* ===================== chrome furniture (stand-ins) ===================== */
+  .rail {
+    position: fixed; left: 0; right: 0; bottom: 0; height: 80px;
+    border-top: 1px solid var(--line-faint);
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-mono); font-size: 10px; letter-spacing: .2em; text-transform: uppercase;
+    color: var(--t-ghost); background: var(--ink-950);
+  }
+  .orb { position: fixed; width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--line); bottom: 96px; opacity: .4; }
+  .orb--l { left: 20px; }
+  .orb--r { right: 20px; }
+
+  /* Short laptops keep the horizontal span — the design yields instead of the page
+     overflowing. The 152px block is untouched here; only the band the line occupies
+     and the paddings around the opening give. Measured worst case at 900x700 was
+     4px of clearance before this rule; it is 48 after. */
+  @media (min-width: 821px) and (max-height: 780px) {
+    :root { --track-h: 48px; }
+    .m1 { gap: 9px; padding-top: 10px; padding-bottom: 4px; }
+    .head__thesis { font-size: 12.5px; margin-top: 3px; }
+    /* the foot mark now stands in flow rather than on the line, so it is the
+       one rank that costs height here. It gives first. */
+    .notch--foot .notch__btn { min-height: 30px; }
+    .notch--foot .notch__name { font-size: 15px; }
+    /* the 152px block is NOT touched here — that contract holds at every width
+       >= 461px, which is the point of naming it. */
+    .head h1 { font-size: clamp(20px, 2.3vw, 28px); }
+    /* .end sits at top:-21px against a 14px gap above it (was 16-44px) —
+       7px of overlap into the head block at this height tier. Pull it in to
+       -13px, which clears an 14px gap with 1px to spare, and drop 1pt to match. */
+    .end { top: -13px; font-size: 12px; }
+    .open { padding: 14px 18px 12px; }
+    .m1open-spine { margin-top: 5px; font-size: 10.5px; }
+    .m1open-door { margin-top: 7px; padding-top: 6px; }
+    .m1open-door__name { margin-bottom: 3px; }
+    .m1open-door__desc { margin-bottom: 7px; line-height: 1.4; }
+    .m1open-door__go, .m1open-pull { min-height: 40px; }
+    .m2hero { width: clamp(108px, 9vw, 126px); }
+  }
+
+  /* ===================== narrow: the same line, stood on end =====================
+     A phone is a vertical span. The line rotates; nothing else changes law.
+     The marks stack down it in the same order, the line still PARTS at the one
+     you touched, and the opening still hangs off that mark and nowhere else. */
+  @media (max-width: 820px) {
+    .m1 { gap: 12px; padding: 12px 18px 4px; }
+    .head { max-width: 100%; }
+    .span__track { height: auto; display: block; }
+    .rule { display: none; }
+
+    /* THE ENDS SURVIVE. They were display:none here, which deleted the one
+       thing that makes this a span rather than a list of links — on the width
+       where most visitors arrive. The line stands on end, so its ends stand
+       above and below it. */
+    .end {
+      position: static; display: block; font-size: 13.5px;
+      padding-left: 22px; color: var(--t-ghost);
+    }
+    .end--a { margin-bottom: 2px; }
+    .end--b { margin-top: 2px; }
+
+    .notch {
+      position: relative; left: auto; top: auto; width: auto; display: block;
+    }
+    /* each mark carries its own segment of the line. The open one carries none —
+       which is how the line parts, with no measurement and no JS. */
+    .notch::before {
+      content: ""; position: absolute; left: 4px; top: 0; bottom: 0;
+      width: 1px; background: var(--rule-c);
+    }
+    .notch.is-past::before { background: var(--rule-lit); }
+    .notch--a::before { top: 14px; }
+    .notch--z::before { bottom: 0; }
+    .notch--foot::before { display: none; }
+    .notch.is-open::before { display: none; }
+    .notch.is-open::after { display: none; }
+    .notch--foot { margin-top: 6px; padding-top: 8px; border-top: 1px solid var(--line-faint); }
+    .notch--foot .notch__btn { padding-left: 0; }
+
+    .notch__btn {
+      position: static; transform: none; display: block; width: 100%;
+      min-height: 44px; padding: 7px 0 7px 22px; text-align: left;
+    }
+    .notch--a .notch__btn, .notch--z .notch__btn { text-align: left; padding-left: 22px; padding-right: 0; }
+    .notch__pip { position: absolute; left: 0; top: 15px; margin-left: 0; }
+    .notch__name { font-size: 17px; display: inline; }
+    .notch__sub { display: inline; margin: 0 0 0 8px; }
+
+    .open, .open--place, .open--r, .open--foot {
+      position: static; width: auto; margin: 4px 0 12px 22px;
+      padding: 2px 0 0 14px;
+      border-left: 1px solid var(--line); border-right: 0;
+    }
+    .m1open-read { gap: 12px; }
+    .m2hero { width: 100px; }
+    .m2read { --m2read-size: 15px; --m2read-lh: 1.55; }
+    .m1open-door__desc { display: none; }
+    .m1open-door { margin-top: 12px; padding-top: 10px; }
+    .orb { display: none; }
+  }
+
+  /* Below ~460px there is no longer enough measure beside the object for five
+     lines of meaning. The object is floated INTO the reading: the first lines run
+     beside it and the rest run full width. Nothing is stacked and nothing is
+     dropped — but the block is set WHOLE here rather than clamped to 152px,
+     because ragged lines around a float cannot be cut at five without cutting
+     mid-sentence. This is the one width where the block is not the shipped 152. */
+  @media (max-width: 460px) {
+    .m1open-read { display: block; }
+    .m1open-obj { float: left; margin: 2px 13px 8px 0; }
+    .m2hero { width: 92px; }
+    .m2read__mean { display: block; height: auto; max-height: none; }
+    .m1open-door { clear: left; }
+  }
+
+  /* SHORT phones (375x667, 360x640). Nothing is removed — every rank yields a
+     step. The head keeps its statement of what this place is, all four marks keep
+     their names, and the reading keeps every word; the type and the rhythm give. */
+  @media (max-width: 820px) and (max-height: 720px) {
+    .m1 { gap: 9px; padding-top: 9px; }
+    .head h1 { font-size: 21px; }
+    .head__thesis { font-size: 12.5px; margin-top: 2px; }
+    .notch__btn { min-height: 40px; padding: 3px 0 3px 22px; }
+    .notch__pip { top: 12px; }
+    .notch__name { font-size: 15.5px; }
+    .notch__sub { font-size: 9px; }
+    .open, .open--place, .open--r, .open--foot { margin: 2px 0 8px 22px; padding: 2px 0 0 12px; }
+    .m2hero { width: 78px; }
+    .m2read { --m2read-size: 13px; --m2read-lh: 1.5; gap: 3px; }
+    .m2read__label { font-size: 9.5px; }
+    .m2read__meta { font-size: 10px; }
+    .m1open-spine { margin-top: 7px; font-size: 10px; }
+    .m1open-door { margin-top: 9px; padding-top: 8px; }
+  }
+
+  @media (max-width: 400px) {
+    .m2hero { width: 80px; }
+    .m2read { --m2read-size: 13.5px; --m2read-lh: 1.45; }
+    /* the spine WRAPS here rather than becoming a horizontal scroll strip. The
+       strip put real Codex links past the right edge of the viewport, which is
+       the same class of defect as the shipped narrow clip — a route you cannot
+       see. Two wrapped rows cost 14px and hide nothing. */
+    .m1open-spine { flex-wrap: wrap; }
+  }
+
+  /* The smallest screen still in service (360x640). Declared LAST so it outranks
+     the width-only rules above it. Every mark, every route, the whole reading and
+     the statement of what this place is all survive; the type takes another step
+     down and the block's label yields, because the mark it names is 40px above it.
+     Below this size the design overflows and I would rather report the floor. */
+  @media (max-width: 820px) and (max-height: 665px) {
+    .m1 { gap: 7px; padding-top: 7px; }
+    .head h1 { font-size: 19px; }
+    .head__thesis { font-size: 11.5px; }
+    .notch__btn { min-height: 36px; padding: 2px 0 2px 22px; }
+    .notch__pip { top: 11px; }
+    .notch__name { font-size: 14.5px; }
+    .open, .open--place, .open--r, .open--foot { margin: 2px 0 7px 22px; padding: 2px 0 0 11px; }
+    .m2hero { width: 66px; }
+    .m2read { --m2read-size: 12.5px; --m2read-lh: 1.45; }
+    .m2read__label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+    .m1open-door__go { min-height: 42px; }
+  }
+</style>
+</head>
+<body>
+
+<main class="m1">
+
+  <div class="head">
+    <p class="head__mark"><i aria-hidden="true">&#9670;</i> BLUE ROOM &middot; THE READING ROOMS</p>
+    <h1>Two Readings of One Life</h1>
+    <p class="head__thesis">Blue Room reads a life and keeps the reading &mdash; filed under your name, and never paid for before you have seen it.</p>
+  </div>
+
+  <div class="span" id="span" data-open="tarot" style="--x:52%">
+    <div class="span__track" id="track">
+      <div class="rule" aria-hidden="true"></div>
+      <span class="end end--a">born</span>
+
+      <!-- TWO marks, and they are the two products. Four evenly-named stations
+           on a rule is a tab bar; two, at unequal coordinates, between named
+           ends, is a measure of time. The Codex and the meta routes are not
+           destinations on the line — the Codex is reachable from every mark
+           inside both openings and from the rail, and what is kept lives at
+           the foot, below. -->
+      <div class="notch notch--a" data-seg="birth" style="--x:7%; --anchor:0%">
+        <button type="button" class="notch__btn" data-target="birth" aria-expanded="false" aria-controls="theOpening">
+          <span class="notch__pip" aria-hidden="true"></span>
+          <span class="notch__name">The Birth Reading</span>
+          <span class="notch__sub">6 marks &middot; one name &middot; paid</span>
+        </button>
+      </div>
+
+      <div class="notch notch--z" data-seg="tarot" data-side="r" style="--x:76%; --anchor:-50%">
+        <button type="button" class="notch__btn" data-target="tarot" aria-expanded="true" aria-controls="theOpening">
+          <span class="notch__pip" aria-hidden="true"></span>
+          <span class="notch__name">A Tarot Reading</span>
+          <!-- SITTING_WORD = m2SittingUsed() ? "spent" : "free". One word, three sites: this line, the door's line and the door's label below. Nothing else on this surface names the state, so nothing else can contradict it. -->
+          <span class="notch__sub" data-tarot-sub>3 cards &middot; one answer &middot; free</span>
+        </button>
+      </div>
+
+      <span class="end end--b">tonight</span>
+    </div>
+  </div>
+
+  <!-- the foot mark. Off the line, because it is not a moment in anyone's life.
+       Same law: its opening is inserted immediately after it and nowhere else. -->
+  <div class="notch notch--foot" data-seg="under">
+    <button type="button" class="notch__btn" data-target="under" aria-expanded="false" aria-controls="theOpening">
+      <span class="notch__pip" aria-hidden="true"></span>
+      <span class="notch__name">Underneath &darr;</span>
+      <span class="notch__sub">the codex, and what is kept</span>
+    </button>
+  </div>
+
+</main>
+
+<div class="orb orb--l" aria-hidden="true"></div>
+<div class="orb orb--r" aria-hidden="true"></div>
+<div class="rail">L1 &nbsp;&larr;&nbsp;&nbsp;&nbsp; M1 &nbsp;&nbsp;&nbsp;&rarr;&nbsp; M2 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &darr; U1</div>
+
+<!-- the four openings, authored as inert templates. Exactly one is ever
+     instantiated, into a single element that is moved to the touched mark. -->
+<template id="tplTarot">
+  <div class="m1open-read">
+    <div class="m1open-obj">
+      <div class="m2hero">
+        <svg class="m2hero__back" viewBox="0 0 120 190" aria-hidden="true"><rect x="7" y="7" width="106" height="176" rx="7" fill="none" stroke="#6f6b64" stroke-width="1" opacity=".6"/></svg>
+        <svg class="m2hero__face" viewBox="0 0 120 190" role="img" aria-label="One card of the deck, shown as an example">
+          <rect class="m2hero-edge" x="11" y="11" width="98" height="168" rx="5" fill="none" stroke="#c8ad70" stroke-width="1" opacity=".7"/>
+          <g class="m2hero__mark" stroke="#c8ad70" fill="none" opacity=".8">
+            <circle cx="60" cy="80" r="28" stroke-width=".8" opacity=".45"/>
+            <path d="M60 54 L64.1 70.3 L78.5 61.9 L70.1 76.3 L86 80 L70.1 83.7 L78.5 98.1 L64.1 89.7 L60 106 L55.9 89.7 L41.5 98.1 L49.9 83.7 L34 80 L49.9 76.3 L41.5 61.9 L55.9 70.3 Z" stroke-width=".9"/>
+            <circle cx="60" cy="80" r="3" fill="#c8ad70" stroke="none"/>
+          </g>
+        </svg>
+        <div class="m2face">
+          <span class="m2face-meta">Arcana &middot; XVII</span>
+          <div class="m2face-name" data-face-name>The Star</div>
+          <div class="m2face-orient">Upright</div>
+        </div>
+      </div>
+    </div>
+    <div class="m1open-body">
+      <div class="m2read">
+        <p class="m2read__label">What a sitting looks like</p>
+        <p class="m2read__meta" data-read-meta>A Sitting &middot; <span class="num">2</span> of 3 &middot; The Crossing</p>
+        <p class="m2read__mean" data-read-mean>What stands between you and the thing you asked about is not an obstacle — it is a crossing. The Star answers with quiet after a hard pull: what you want is still there, and it has not moved.</p>
+      </div>
+      <p class="m1open-spine">
+        <a href="codex.html?entry=ground">The Ground</a><span class="sep">&middot;</span>
+        <a href="codex.html?entry=crossing">The Crossing</a><span class="sep">&middot;</span>
+        <a href="codex.html?entry=root">The Root</a><span class="sep">&middot;</span>
+        <a href="codex.html?entry=crown">The Crown</a><span class="sep">&middot;</span>
+        <a href="codex.html?entry=turn">The Turn</a>
+      </p>
+      <div class="m1open-door">
+        <span class="m1open-door__name">A Tarot Reading</span>
+        <!-- SITTING_WORD, site 2 of 3. Substituting "spent" for "free" is the only edit this line ever needs; it reads true both ways. -->
+        <span class="m1open-door__desc">Three cards to one question. Tonight&rsquo;s sitting is free; the Deep Read is five cards, and it is the one thing here you pay for. What falls is filed under your name and is not dealt twice.</span>
+        <div class="m1open-door__row">
+          <!-- SITTING_WORD, site 3 of 3. -->
+          <a class="m1open-door__go" href="?dev=drawing-room">Ask a question&nbsp;&middot;&nbsp;<span class="free">tonight:&nbsp;free</span></a>
+          <button type="button" class="m1open-pull" data-pull>See another</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<template id="tplBirth">
+  <div class="m1open-read">
+    <div class="m1open-obj">
+      <div class="m2hero">
+        <svg class="m2hero__back" viewBox="0 0 120 190" aria-hidden="true"><rect x="7" y="7" width="106" height="176" rx="7" fill="none" stroke="#6f6b64" stroke-width="1" opacity=".6"/></svg>
+        <svg class="m2hero__face" viewBox="0 0 120 190" role="img" aria-label="A crowned name, shown as an example">
+          <rect class="m2hero-edge" x="11" y="11" width="98" height="168" rx="5" fill="none" stroke="#c8ad70" stroke-width="1" opacity=".7"/>
+          <g class="m2hero__mark">
+            <path d="M32 66 L42 36 L53 54 L60 28 L67 54 L78 36 L88 66" fill="none" stroke="#c8ad70" stroke-width="2.2" stroke-linejoin="round" opacity=".85"/>
+            <circle cx="60" cy="88" r="2.4" fill="#c8ad70"/>
+          </g>
+        </svg>
+        <div class="m2face">
+          <span class="m2face-meta">Six marks</span>
+          <div class="m2face-name">The Crowned Name</div>
+          <div class="m2face-orient">By birth alone</div>
+        </div>
+      </div>
+    </div>
+    <div class="m1open-body">
+      <div class="m2read">
+        <p class="m2read__label">What a birth reading gives</p>
+        <p class="m2read__meta">Given &middot; <span class="num">6</span> marks &middot; one name</p>
+        <p class="m2read__mean">Nothing is dealt here. The same name and the same date return the same six marks tonight and in ten years — six you were handed rather than chose, read together into one crowned name that is yours to keep.</p>
+      </div>
+      <p class="m1open-spine">
+        <a href="codex.html?entry=sun">Sun Sign</a><span class="sep">&middot;</span>
+        <a href="codex.html?entry=animal">Year Animal</a><span class="sep">&middot;</span>
+        <a href="codex.html?entry=path">Life Path</a><span class="sep">&middot;</span>
+        <a href="codex.html?entry=rune">Rune</a><span class="sep">&middot;</span>
+        <a href="codex.html?entry=trigram">Trigram</a><span class="sep">&middot;</span>
+        <a href="codex.html?entry=hexagram">Hexagram</a>
+      </p>
+      <div class="m1open-door">
+        <span class="m1open-door__name">The Birth Reading</span>
+        <span class="m1open-door__desc">The six marks you were handed at birth, read together into one name. It is paid for once, it is never redrawn, and it reads the same in ten years as it does tonight.</span>
+        <a class="m1open-door__go" href="?dev=arcane">Give a name and a date</a>
+      </div>
+    </div>
+  </div>
+</template>
+
+<template id="tplCodex">
+  <p class="m1open-place__line">Every mark either reading can hand you, written out in full, one entry each.</p>
+  <p class="m1open-place__way"><a href="codex.html?v=363">The Codex — every mark, defined &rarr;</a></p>
+</template>
+
+<template id="tplUnder">
+  <p class="m1open-place__line">Nothing under here is a reading. It is where the meanings are written down, where your own readings are kept, and where the rooms that are not open yet are listed.</p>
+  <div class="m1open-place__list">
+    <a href="codex.html?v=363">&#9670; The Codex — every mark, defined &rarr;</a>
+    <a href="?dev=profile">&#9670; Your Profile — every reading you have had, filed &rarr;</a>
+    <a href="roadmap/">&#9670; The Roadmap — the rooms not open yet &rarr;</a>
+    <a href="?dev=settings">&#9670; Settings &rarr;</a>
+  </div>
+</template>
+
+<script>
+(function () {
+  var span   = document.getElementById('span');
+  var notches = Array.prototype.slice.call(document.querySelectorAll('.notch'));
+  var btns    = Array.prototype.slice.call(document.querySelectorAll('.notch__btn'));
+  var TPL   = { tarot: 'tplTarot', birth: 'tplBirth', codex: 'tplCodex', under: 'tplUnder' };
+  var PLACE = { codex: 1, under: 1 };
+  var LABEL = {
+    tarot: 'A Tarot Reading', birth: 'The Birth Reading',
+    codex: 'The Codex', under: 'Underneath — the Codex, and what is kept'
+  };
+  var state = null;
+
+  // THE OPENING. One element, and it has no home: it is inserted immediately
+  // after whichever mark was touched, and hangs from that mark's coordinate.
+  var opening = document.createElement('div');
+  opening.id = 'theOpening';
+  opening.setAttribute('role', 'group');
+
+  function setOpen(next) {
+    if (!next || !TPL[next] || state === next) return;
+    state = next;
+
+    var held = null, past = true;
+    notches.forEach(function (n) {
+      var on = n.getAttribute('data-seg') === state;
+      n.classList.toggle('is-open', on);
+      // the run of the line BEHIND the open mark is lit. On the wide line the
+      // rule's own gradient does this; stood on end there is no single rule, so
+      // each mark's own segment carries it. Same law, both orientations.
+      n.classList.toggle('is-past', past && !on && state !== 'under');
+      if (on) { held = n; past = false; }
+    });
+    btns.forEach(function (b) {
+      b.setAttribute('aria-expanded', b.getAttribute('data-target') === state ? 'true' : 'false');
+    });
+
+    // the line parts at the touched mark's own authored coordinate, and the run
+    // BEHIND that coordinate lights. The foot mark is not on the line, so when
+    // it opens the line goes back to rest rather than parting at a coordinate
+    // nothing stands on.
+    var x = held ? (held.style.getPropertyValue('--x') || '').trim() : '';
+    if (x) {
+      span.style.setProperty('--x', x);
+      span.setAttribute('data-open', state);
+    } else {
+      span.removeAttribute('data-open');
+    }
+
+    // which side the opening hangs from is AUTHORED on the mark, not inferred
+    // from its anchor. A mark past the middle of the span opens to its left so
+    // the material never has to leave the screen and the stem always lands.
+    var side = held ? held.getAttribute('data-side') : null;
+    opening.className = 'open'
+      + (PLACE[state] ? ' open--place' : '')
+      + (state === 'under' ? ' open--foot' : '')
+      + (side === 'r' ? ' open--r' : '');
+    if (x) opening.style.setProperty('--x', x);
+    opening.setAttribute('aria-label', LABEL[state]);
+    opening.innerHTML = '';
+    opening.appendChild(document.getElementById(TPL[state]).content.cloneNode(true));
+
+    // THE MOVE
+    if (held) held.insertAdjacentElement('afterend', opening);
+
+    reserve();
+    wirePull();
+  }
+
+  // The opening is absolutely positioned at wide, so the band it hangs in must be
+  // told how tall it is. Without this the page could clip it silently — which is
+  // the exact concealment class of bug that let the shipped narrow defect survive.
+  // Here the document is allowed to grow and a scrollbar is allowed to accuse us.
+  function reserve() {
+    if (window.innerWidth <= 820) { span.style.minHeight = ''; return; }
+    var track = parseFloat(getComputedStyle(document.documentElement)
+      .getPropertyValue('--track-h')) || 78;
+    // the foot mark's opening is in flow, so the band gives up its reservation
+    // and the foot rises to meet the line. Opening the meta list costs the page
+    // no height at all — which it must not, since the first downward wheel
+    // notch on M1 glides to U1 and anything under the rail is unreachable.
+    span.style.minHeight = state === 'under'
+      ? (track + 14) + 'px'
+      : (track + 14 + opening.offsetHeight + 8) + 'px';
+  }
+  window.addEventListener('resize', reserve);
+
+  var sample = [
+    { name: 'The Star',  meta: 'A Sitting &middot; <span class="num">2</span> of 3 &middot; The Crossing',
+      mean: 'What stands between you and the thing you asked about is not an obstacle — it is a crossing. The Star answers with quiet after a hard pull: what you want is still there, and it has not moved.' },
+    { name: 'The Tower', meta: 'A Sitting &middot; <span class="num">1</span> of 3 &middot; The Ground',
+      mean: 'Where this actually stands, not where you hoped it stood. The Tower is not gentle about it — something here has already fallen, or is about to, and the useful question is what you were keeping upright.' },
+    { name: 'The Sun',   meta: 'A Sitting &middot; <span class="num">3</span> of 3 &middot; The Turn',
+      mean: 'Where this is headed if nothing changes. The Sun is the plainest card in the deck and it does not hedge: this goes well, and you will know it when it does, without needing anyone to confirm it.' }
+  ];
+  var sIdx = 0;
+  function wirePull() {
+    var btn = opening.querySelector('[data-pull]');
+    if (!btn) return;
+    btn.addEventListener('click', function () {
+      sIdx = (sIdx + 1) % sample.length;
+      var s = sample[sIdx];
+      opening.querySelector('[data-face-name]').textContent = s.name;
+      opening.querySelector('[data-read-meta]').innerHTML = s.meta;
+      opening.querySelector('[data-read-mean]').textContent = s.mean;
+      reserve();
+    });
+  }
+
+  // TRIGGER: activation only. No hover-open (it puts a trap on the pointer path
+  // between a mark and the free door), no focus-open (Tab must never rewrite what
+  // you are reaching for). Buttons fire on click, Enter and Space alike — touch,
+  // mouse and keyboard are one code path.
+  btns.forEach(function (b) {
+    b.addEventListener('click', function () { setOpen(b.getAttribute('data-target')); });
+  });
+
+  // The only key this surface listens for. Nothing here touches ArrowLeft/Right
+  // (the panel track) or ArrowUp/Down and the wheel (the U1 glide).
+  document.addEventListener('keydown', function (e) {
+    var home = /[?&]state=returning\b/.test(location.search) ? 'birth' : 'tarot';
+    if (e.key === 'Escape' && state !== home) {
+      setOpen(home);
+      document.querySelector('[data-target="' + home + '"]').focus();
+    }
+  });
+
+  // THE FRONT DOOR RECOGNISES YOU. M1 is the front door of a house that already
+  // knows whether tonight's Sitting has been spent — m2SittingUsed() exists and
+  // is live. Every M1 design in the pool, this one included, was a cold-arrival
+  // page that greeted a member exactly like a stranger. It costs one branch.
+  // In the real build the test is m2SittingUsed(); here ?state=returning stands
+  // in for it so the state can be looked at.
+  var spent = /[?&]state=returning\b/.test(location.search);
+  if (spent) {
+    // the deal is not on offer again tonight, so the page does not open with it
+    // and does not print "first free" over a Sitting that is already logged.
+    // SITTING_WORD = "spent". The three lines below are the free-state strings
+    // with that one word substituted; no other wording moves.
+    var sub = document.querySelector('[data-tarot-sub]');
+    if (sub) sub.innerHTML = '3 cards &middot; one answer &middot; spent';
+    document.getElementById('tplTarot').content
+      .querySelector('.m1open-door__go').innerHTML =
+        'Ask a question&nbsp;&middot;&nbsp;<span class="free">tonight:&nbsp;spent</span>';
+    document.getElementById('tplTarot').content
+      .querySelector('.m1open-door__desc').textContent =
+        'Three cards to one question. Tonight’s sitting is spent; the Deep Read is five cards, and it is the one thing here you pay for. What falls is filed under your name and is not dealt twice.';
+  }
+
+  // Arrival: a reading is already open, hanging off its own mark, before anyone
+  // touches anything. The mechanic teaches itself and nothing is gated. Which
+  // one opens is the one thing on this surface that knows who arrived.
+  setOpen(spent ? 'birth' : 'tarot');
+})();
+</script>
+</body>
+</html>

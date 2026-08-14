@@ -1,0 +1,706 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>M1 — THE INHABITED ORIGINAL</title>
+<style>
+/* ============================================================
+   THE INHABITED ORIGINAL — M1 master build
+   Shipped desk, re-tracked; the archive lives inside the two
+   reading sections, never on the ground; goods quoted verbatim.
+   ============================================================ */
+:root{
+  --t-display:#dcd7cb; --t-primary:#d7d3ca; --t-body:#b1ada4; --t-meta:#948f87; --t-ghost:#86827a;
+  --ink-950:#0a0b0d; --ink-900:#100f0c; --ink-850:#11100d; --ink-800:#151310; --ink-700:#1c1915;
+  --line-faint:rgba(233,229,220,.07); --line:rgba(233,229,220,.12); --line-strong:rgba(233,229,220,.2);
+  --silver:#c8c4bb; --silver-dim:#9c9790;
+  --gold:#c8ad70;
+  --font-display: Georgia, 'Iowan Old Style', serif;
+  --font-ui: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+  --ease-settle: cubic-bezier(.2,.7,.2,1);
+}
+*{box-sizing:border-box;}
+html,body{background:var(--ink-950); color:var(--t-body); margin:0; padding:0;}
+body{
+  font-family:var(--font-ui);
+  min-height:100vh; display:flex; align-items:center; justify-content:center;
+  padding: 12px 20px 20px;
+  /* NO overflow-x:hidden / clip here. The sheet bans the concealment class by
+     name: a scrollbar is allowed to appear and accuse the build. */
+}
+a{ text-decoration:none; color:inherit; }
+button{ font:inherit; background:none; border:0; color:inherit; }
+
+/* ---------------- THE GRID ---------------- */
+.menu__draw{
+  position:relative; width:100%; max-width:560px;
+  display:grid; grid-template-columns:minmax(0,1fr);
+  column-gap:0; row-gap:20px;
+  align-items:start; justify-items:stretch; text-align:left;
+  padding-bottom:64px; /* orb clearance */
+}
+@media (min-width:1200px){
+  .menu__draw{
+    width:min(1180px,92vw); max-width:none;
+    grid-template-columns:minmax(300px,1fr) auto 330px;
+    /* the 330px region keeps the wall text; the shipped layout's two void cells
+       (rows 1 and 3 of that region) are reclaimed — one by the berth growing
+       into it, one by the exits row. No cell in this grid is empty. */
+    grid-template-areas:
+      "mast  stage head"
+      "tarot stage head"
+      "birth stage exits";
+    grid-template-rows:auto auto auto;
+    column-gap:clamp(24px,3vw,52px); row-gap:12px;
+    padding-bottom:0;
+  }
+  .menu__draw-mast{ grid-area:mast; }
+  .m1sect--tarot{ grid-area:tarot; }
+  .m1sect--birth{ grid-area:birth; }
+  .menu__draw-stage{ grid-area:stage; align-self:center; }
+  .menu__draw-head{ grid-area:head; align-self:center; }
+  .m1exits{ grid-area:exits; }
+}
+
+/* ---------------- MASTHEAD ---------------- */
+.menu__draw-mast{ display:grid; gap:6px; justify-items:start; }
+.menu__wall-eyebrow{ margin:0; font-family:var(--font-mono); font-size:9.5px; letter-spacing:.3em; text-transform:uppercase; color:var(--t-ghost); }
+.menu__wall-eyemark{ color:var(--gold); margin-right:.4em; }
+.menu__draw-title{ margin:0; font-family:var(--font-display); font-weight:600; font-size:36px; line-height:1.04; letter-spacing:-.005em; color:var(--t-display); }
+.menu__draw-thesis{ margin:0; font-family:var(--font-display); font-size:19px; line-height:1.4; color:var(--t-primary); }
+
+/* ---------------- A SECTION ---------------- */
+.m1sect{
+  position:relative; isolation:isolate;
+  display:grid; gap:7px;
+  padding:13px 15px 11px;
+  border:1px solid var(--line);
+  border-radius:10px;
+  background:linear-gradient(180deg, rgba(233,229,220,.02), transparent 62%), var(--ink-850);
+}
+.m1sect__field{
+  position:absolute; inset:12px; z-index:0;
+  pointer-events:none; overflow:hidden; border-radius:8px;
+  --m1-op-ceiling: .36;
+}
+.m1sect > .menu__door,
+.m1sect > .m1sect__term,
+.m1sect > .m1deep,
+.m1sect > .m1marks__lead,
+.m1sect > .m1marks,
+.m1sect > .m1sect__foot{ position:relative; z-index:2; }
+
+.m1mark{ position:absolute; transform:translate(-50%,-50%); color:var(--silver-dim); pointer-events:auto; transition:color 220ms var(--ease-settle), opacity 220ms var(--ease-settle); }
+.m1mark svg{ display:block; width:100%; height:100%; fill:none; stroke:currentColor; stroke-width:1; stroke-linecap:round; }
+.m1sect.is-stirred .m1mark{ color:var(--gold); }
+.m1mark:focus-visible{ outline:1px solid var(--silver-dim); outline-offset:2px; }
+
+/* door */
+.menu__door{ display:grid; gap:6px; text-decoration:none; min-height:44px; }
+.menu__door-kicker{ font-family:var(--font-mono); font-size:9px; letter-spacing:.26em; text-transform:uppercase; color:var(--t-meta); display:flex; align-items:center; gap:6px; }
+.menu__door--birth .menu__door-kicker{ color:color-mix(in srgb, var(--gold) 82%, var(--t-meta)); }
+.menu__draw-crown{ width:20px; height:15px; }
+.menu__door-name{ font-family:var(--font-ui); font-weight:600; font-size:14.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--t-display); }
+.menu__door-desc{ font-family:var(--font-display); font-size:13.5px; line-height:1.5; color:var(--silver); }
+.menu__draw-spine{ font-family:var(--font-mono); font-size:8.5px; line-height:1.5; letter-spacing:.16em; text-transform:uppercase; color:var(--t-meta); transition:color 200ms var(--ease-settle); }
+.menu__door:hover .menu__draw-spine, .menu__door:focus-visible .menu__draw-spine{ color:var(--silver); }
+
+.m1spec{ margin:4px 0 0; border-left:1px solid var(--line); padding-left:11px; }
+.m1spec__label{ display:block; font-family:var(--font-mono); font-size:9px; letter-spacing:.2em; text-transform:uppercase; color:var(--t-ghost); margin:0 0 3px; }
+.m1spec__line{ margin:0; font-family:var(--font-display); font-style:italic; font-size:15px; line-height:1.55; color:var(--t-body); }
+
+.m1sect__term{ margin:0; font-family:var(--font-mono); font-size:8.5px; line-height:1.7; letter-spacing:.18em; text-transform:uppercase; color:var(--t-meta); }
+
+.m1deep{ display:grid; gap:3px; min-height:44px; padding:2px 0; }
+.m1deep__name{ font-family:var(--font-ui); font-weight:600; font-size:12.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--t-display); }
+.m1deep__line{ font-family:var(--font-display); font-size:13px; line-height:1.5; color:var(--silver); }
+.m1deep__go{ font-family:var(--font-mono); font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:var(--t-meta); transition:color 140ms var(--ease-settle); }
+.m1deep:hover .m1deep__go, .m1deep:focus-visible .m1deep__go{ color:var(--gold); }
+
+.m1sect__way{ font-family:var(--font-mono); font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:var(--t-meta); }
+
+.m1marks__lead{ margin:2px 0 0; font-family:var(--font-mono); font-size:9px; line-height:1.6; letter-spacing:.18em; text-transform:uppercase; color:var(--t-ghost); }
+.m1marks{ list-style:none; margin:0; padding:0; display:flex; flex-wrap:wrap; gap:4px 14px; }
+.m1marks__a{ display:inline-flex; min-height:24px; align-items:center; font-family:var(--font-mono); font-size:10px; letter-spacing:.12em; text-transform:uppercase; color:var(--t-meta); transition:color 140ms var(--ease-settle); }
+.m1marks__a:hover, .m1marks__a:focus-visible{ color:var(--t-display); }
+
+.m1sect__foot{ min-height:16px; margin:0; font-family:var(--font-mono); font-size:9px; letter-spacing:.14em; text-transform:uppercase; color:var(--t-ghost); }
+
+/* ONE consolidated focus ring (critique item 4). The gold is spent on the ring,
+   not on wayfinding in rest state — which is what the Profile's law forbids. */
+.menu__door:focus-visible,
+.m1deep:focus-visible,
+.m1exits a:focus-visible,
+.m1exits button:focus-visible{
+  outline:2px solid var(--gold); outline-offset:3px; border-radius:8px;
+}
+.m1marks__a:focus-visible{ outline:1px solid var(--silver-dim); outline-offset:2px; }
+
+/* ---------------- STAGE ---------------- */
+.menu__draw-stage{ display:flex; flex-direction:column; align-items:flex-start; gap:8px; position:relative; z-index:2; }
+@media (min-width:1200px){ .menu__draw-stage{ align-items:center; } }
+.msample__cap{ display:flex; }
+.msample__label{ font-family:var(--font-mono); font-size:10px; letter-spacing:.2em; text-transform:uppercase; color:var(--t-ghost); }
+.menu__draw-herosub{ margin:0; font-family:var(--font-display); font-style:italic; font-size:14px; line-height:1.5; color:var(--t-body); text-align:left; }
+@media (min-width:1200px){ .menu__draw-herosub{ text-align:center; } }
+
+.m2hero{ position:relative; height:clamp(400px,56vh,620px); aspect-ratio:120/190; width:auto;
+  border-radius:9px; overflow:hidden;
+  background:linear-gradient(165deg,#efe9db,#dcd4c2);
+  border:1px solid rgba(20,14,8,.35);
+  box-shadow:0 22px 46px rgba(0,0,0,.62);
+  transition:transform 600ms var(--ease-settle);
+}
+/* the object is third in the yield order: it steps once when the layout stacks,
+   again at the narrow floor. It never yields before the masthead or the
+   descriptions, and never after the reading block. */
+@media (max-width:1199px){ .m2hero{ height:clamp(220px,32vh,320px); } }
+/* MEASURED, not guessed: at 1280x720 the panel stood 57px past one screen, and
+   the driver was the acts column (745px), NOT the object — shrinking the card
+   there bought nothing. So the same yield order runs on HEIGHT: masthead first,
+   the descriptions second, and the reading block untouched. */
+@media (min-width:1200px) and (max-height:820px){
+  .menu__draw-title{ font-size:26px; }
+  .menu__draw-thesis{ font-size:17px; }
+  .menu__door-desc{ font-size:12.5px; }
+  .m1spec__line{ font-size:14px; }
+  .m1deep__line{ font-size:12px; }
+  .menu__draw{ row-gap:8px; }
+  .m1sect{ padding:11px 13px 10px; }
+  body{ padding:8px 20px 10px; }
+}
+.m2hero__back, .m2hero__face{ position:absolute; inset:0; width:100%; height:100%; }
+.m2hero__back{ opacity:.14; }
+.m2hero__face{ opacity:.9; }
+.m2face, .m2bface{ position:absolute; inset:0; display:flex; flex-direction:column; justify-content:space-between; padding:14px 12px; color:#241d12; }
+.m2face-head{ display:flex; justify-content:space-between; align-items:center; }
+.m2face-meta{ font-family:var(--font-mono); font-size:8.5px; letter-spacing:.2em; text-transform:uppercase; color:#5a4a2c; }
+.m2face-glyph{ color:#b6924f; }
+.m2face-name{ font-family:var(--font-display); font-weight:600; font-size:15px; color:#241d12; }
+.m2face-div{ height:1px; background:rgba(90,74,44,.35); margin:8px 0; }
+.m2face-orient{ font-family:var(--font-mono); font-size:9px; letter-spacing:.16em; text-transform:uppercase; color:#6c5a38; }
+.m2bface__headrule{ margin:0 0 8px; }
+.m2bface__name{ margin-bottom:6px; }
+.m2bface__marks{ list-style:none; margin:0; padding:0; display:flex; flex-wrap:wrap; gap:3px 10px; font-family:var(--font-mono); font-size:8.5px; letter-spacing:.1em; text-transform:uppercase; color:#5a4a2c; }
+.m2bface__wall--bot{ margin-top:auto; }
+.m2tick{ position:absolute; width:8px; height:8px; border-color:#8a733f; }
+.m2tick.tl{ top:8px; left:8px; border-top:1px solid; border-left:1px solid; }
+.m2tick.br{ bottom:8px; right:8px; border-bottom:1px solid; border-right:1px solid; }
+.m2hero[data-face="tarot"] .m2bface, .m2hero[data-face="birth"] .m2face{ display:none; }
+.m2hero[data-face="birth"] .m2hero__face{ display:none; }
+.m2hero[data-face="tarot"] .m2hero__back{ display:none; }
+.m2hero__name{ position:absolute; bottom:-22px; left:0; width:100%; text-align:center; font-family:var(--font-mono); font-size:9px; letter-spacing:.18em; text-transform:uppercase; color:var(--t-ghost); }
+
+.m2flip{ display:flex; gap:8px; margin-top:10px; }
+.m2flip__opt{ min-height:44px; padding:0 14px; border:1px solid var(--line); border-radius:6px; font-family:var(--font-mono); font-size:10px; letter-spacing:.16em; text-transform:uppercase; color:var(--t-meta); cursor:pointer; transition:color 200ms var(--ease-settle), border-color 200ms var(--ease-settle); }
+.m2flip__opt.is-on{ color:var(--gold); border-color:var(--gold); }
+.m2flip__opt:focus-visible{ outline:2px solid var(--silver-dim); outline-offset:2px; }
+
+.menu__draw-placard{ margin-top:8px; font-family:var(--font-display); font-style:italic; font-size:12px; letter-spacing:.01em; color:var(--t-meta); display:inline-flex; align-items:center; gap:6px; min-height:44px; }
+.menu__draw-placard-mark{ color:var(--gold); }
+
+/* ---------------- HEAD / BERTH ---------------- */
+.menu__draw-head{ display:grid; gap:9px; position:relative; z-index:2; }
+.m2read{ display:grid; gap:6px; --m2read-size:19px; --m2read-lh:1.6; --m2read-lines:5; transition:opacity 180ms var(--ease-settle); }
+.m2read.is-writing{ opacity:.25; }
+.m2read__label{ margin:0; font-family:var(--font-mono); font-size:10.5px; letter-spacing:.22em; text-transform:uppercase; color:var(--t-ghost); }
+.m2read__meta{ margin:0; font-family:var(--font-mono); font-size:11.5px; letter-spacing:.2em; text-transform:uppercase; color:var(--t-meta); }
+.m2read__meta .num{ color:var(--gold); }
+.m2read__mean{ margin:0; font-family:var(--font-display); font-size:var(--m2read-size); line-height:var(--m2read-lh); color:var(--t-body); min-height:calc(var(--m2read-size) * var(--m2read-lh) * var(--m2read-lines)); }
+
+/* ---------------- EXITS ---------------- */
+.m1exits{ display:flex; flex-wrap:wrap; align-items:center; gap:0; }
+.m1exit{ font-family:var(--font-mono); font-size:10px; letter-spacing:.16em; text-transform:uppercase; color:var(--t-meta); padding:12px 10px 12px 0; min-height:44px; display:inline-flex; align-items:center; cursor:pointer; transition:color 140ms var(--ease-settle); }
+.m1exit:hover{ color:var(--t-display); }
+.m1exit + .m1exit::before{ content:"·"; color:var(--t-ghost); margin:0 10px 0 -6px; }
+
+/* ---------------- THE YIELD LADDER ----------------
+   Stated once, obeyed by every bracket: MASTHEAD first (36 -> 26 -> 20 -> 15.5),
+   the section descriptions second, the OBJECT third (floor 26vh / 170px), and
+   the READING BLOCK last and least — its first step is below 430, so at 430
+   every other rank has already yielded and the read has not. */
+@media (max-width:560px){
+  .menu__draw-title{ font-size:26px; }
+  .menu__draw-thesis{ font-size:17px; }
+}
+@media (max-width:430px){
+  .menu__draw-title{ font-size:20px; }
+  .menu__draw-thesis{ font-size:15.5px; }
+  .menu__door-desc{ font-size:12.5px; }
+  .m1deep__line{ font-size:12px; }
+  .m1spec__line{ font-size:14px; }
+  .m2hero{ height:clamp(170px,26vh,260px); }
+  .m1sect__field{ --m1-op-ceiling:.22; }
+  .m1sect{ padding:11px 12px 10px; }
+  .menu__draw{ row-gap:14px; }
+}
+/* the read steps only after everything above it has */
+@media (max-width:414px){ .m2read{ --m2read-size:17px; } }
+@media (max-width:390px){ .m2read{ --m2read-size:16px; } }
+@media (max-width:360px){
+  .menu__draw-title{ font-size:15.5px; }
+  .m2read{ --m2read-size:15.5px; }
+}
+/* 320-class screens: the birth shoal comes off before any string does. */
+@media (max-width:330px){ #fieldBirth{ display:none; } }
+
+/* ---------------- THE DOWN-CUE TO U1 ----------------
+   Out of flow by design: it is existing chrome, it costs the one screen nothing,
+   and it binds no key — the track's own arrow/wheel handling is untouched. */
+.m1down{ position:fixed; left:50%; bottom:10px; transform:translateX(-50%);
+  display:inline-flex; align-items:center; gap:7px; min-height:44px; padding:0 12px;
+  font-family:var(--font-mono); font-size:9px; letter-spacing:.22em; text-transform:uppercase;
+  color:var(--t-ghost); z-index:5; transition:color 140ms var(--ease-settle); }
+.m1down:hover{ color:var(--t-meta); }
+.m1down:focus-visible{ outline:2px solid var(--gold); outline-offset:3px; border-radius:6px; }
+
+/* reduced motion */
+@media (prefers-reduced-motion: reduce){
+  *{ transition-duration:0ms !important; animation-duration:0ms !important; }
+}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <linearGradient id="mwGold" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--gold)"/><stop offset=".55" stop-color="#a2864a"/><stop offset="1" stop-color="#5f471f"/></linearGradient>
+  <linearGradient id="mwInk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9c9790"/><stop offset="1" stop-color="#6f6b64"/></linearGradient>
+
+  <!-- glyphs, lifted verbatim from codex.html via _m1-team5.html -->
+  <g id="gl-aries"><path d="M5.4,17.6 C5.4,8.6 9,5.8 12,11.6 C15,5.8 18.6,8.6 18.6,17.6"/></g>
+  <g id="gl-leo"><path d="M8.6,19.6 A3.3,3.3 0 1 1 12,16.3 C12,11.6 13.6,8 16.6,8 C19,8 20.1,10.6 18.8,12.9 C17.4,15.4 17.1,17.9 19.1,20.1"/></g>
+  <g id="gl-libra"><path d="M4,18.6 L20,18.6 M4,13.8 L8.3,13.8 M8.3,13.8 A4,4 0 0 1 15.7,13.8 M15.7,13.8 L20,13.8"/></g>
+  <g id="gl-scorpio"><path d="M4,7.6 C5.4,7.6 6,8.6 6,10.2 L6,18 M6,9.6 C6,7.8 9.8,7.8 9.8,10.1 L9.8,18 M9.8,9.6 C9.8,7.8 13.6,7.8 13.6,10.1 L13.6,17.4 C13.6,19 17.4,19 17.4,17.4 L17.4,11.8 M17.4,11.8 L20.6,15 M20.6,15 L16.9,15.4"/></g>
+  <g id="gl-capricorn"><path d="M4.6,7.4 C6.1,7.4 6.9,8.6 6.9,10.3 L6.9,17.6 M6.9,9.6 C7.5,7.5 10.6,7.2 11.6,9.6 L14,17.6 M13.8,13.2 C15.3,10.5 18.9,11.4 19.2,14.4 C19.4,17 17.2,18.7 15.2,17.8 C13.7,17.1 13.3,15.1 14.7,13.9"/></g>
+  <g id="gl-aquarius"><path d="M4,11.2 l3.2,-2.7 3.2,2.7 3.2,-2.7 3.2,2.7 3.2,-2.7 M4,16.6 l3.2,-2.7 3.2,2.7 3.2,-2.7 3.2,2.7 3.2,-2.7"/></g>
+  <g id="gl-pisces"><path d="M8.4,4 C3.2,8 3.2,16 8.4,20 M15.6,4 C20.8,8 20.8,16 15.6,20 M4.2,12 L19.8,12"/></g>
+  <g id="gl-cancer"><path d="M10.3,8 A2.7,2.7 0 1 1 7.6,5.3 A2.7,2.7 0 1 1 10.3,8 M10.3,8.6 C13.6,10 16.6,11 20,10.6 M13.7,16 A2.7,2.7 0 1 1 16.4,18.7 A2.7,2.7 0 1 1 13.7,16 M13.7,15.4 C10.4,14 7.4,13 4,13.4"/></g>
+
+  <g id="s-rn-01"><path d="M8,3 L8,21"/><path d="M8,7.2 L16.4,3"/><path d="M8,12.4 L16.4,8.2"/></g>
+  <g id="s-rn-07"><path d="M6.2,4.2 L17.8,19.8"/><path d="M17.8,4.2 L6.2,19.8"/></g>
+  <g id="s-rn-13"><path d="M12,6.2 L12,17.8"/><path d="M12,6.2 L17,3"/><path d="M12,17.8 L7,21"/></g>
+
+  <g id="suit-wands"><path d="M12,20.4 L12,4.6 M12,9.4 L7.6,5.6 M12,9.4 L16.4,5.6"/></g>
+  <g id="suit-cups"><path d="M6.8,5.6 C6.8,13.6 17.2,13.6 17.2,5.6 M12,13.6 L12,18.4 M8.2,19 L15.8,19"/></g>
+  <g id="suit-swords"><path d="M12,20.4 L12,4.6 M12,4.6 L8.8,8.4 M12,4.6 L15.2,8.4 M7.4,13.4 L16.6,13.4"/></g>
+  <g id="suit-pentacles"><path d="M18.6,12 A6.6,6.6 0 1 1 5.4,12 A6.6,6.6 0 1 1 18.6,12 M12,5.6 L16.3,18.4 L5.4,10.5 L18.6,10.5 L7.7,18.4 Z"/></g>
+
+  <g id="nm-1"><path d="M9,7.4 L12.4,4.6 L12.4,19.4 M9.6,19.4 L15.2,19.4"/></g>
+  <g id="nm-8"><path d="M12,11.4 A3.4,3.4 0 1 1 12.01,11.4 M12,11.4 A4.2,4.2 0 1 0 12.01,11.4"/></g>
+
+  <g id="bd-major"><path d="M12,3.4 L19,12 L12,20.6 L5,12 Z"/><path d="M12,8.2 L15.4,12 L12,15.8 L8.6,12 Z"/></g>
+  <g id="bd-chinese"><path d="M5.2,8.4 L18.8,8.4 M5.2,15.6 L18.8,15.6 M12,4.6 L12,19.4"/><path d="M8.4,4.6 L8.4,8.4 M15.6,15.6 L15.6,19.4"/></g>
+</defs></svg>
+
+<div class="menu__draw" id="draw">
+
+  <!-- MASTHEAD -->
+  <div class="menu__draw-mast">
+    <p class="menu__wall-eyebrow"><span class="menu__wall-eyemark" aria-hidden="true">&#9670;</span> BLUE ROOM</p>
+    <h2 class="menu__draw-title">The Reading Rooms</h2>
+    <p class="menu__draw-thesis">A house that reads people, two ways &mdash; everything here is read out of one codex of signs.</p>
+  </div>
+
+  <!-- TAROT SECTION -->
+  <div class="m1sect m1sect--tarot" id="secTarot">
+    <div class="m1sect__field" id="fieldTarot" role="img" aria-label="Marks drawn from the Major and Minor Arcana — wands, cups, swords, pentacles and the majors. Each opens its own entry in the Codex."></div>
+    <a class="menu__door menu__door--add menu__door--tarot" href="?dev=drawing-room"
+       id="doorTarot" aria-labelledby="m1-tk m1-tn m1-td">
+      <span class="menu__door-kicker" id="m1-tk">By the Draw &middot; Tarot</span>
+      <span class="menu__door-name" id="m1-tn">A Tarot Reading</span>
+      <span class="menu__door-desc" id="m1-td">A Sitting &mdash; three cards to one question. Your first is free.</span>
+      <span class="menu__draw-spine">The Ground &middot; The Crossing &middot; The Turn</span>
+      <span class="m1sect__way">A Sitting &mdash; cut the deck &rarr;</span>
+      <blockquote class="m1spec">
+        <span class="m1spec__label">The Sitting&rsquo;s closing block, verbatim</span>
+        <p class="m1spec__line">Read as one &mdash; the matter rests on intuition, is crossed by transition, and tends toward resilience. Drawn to the matter you laid down &mdash; a reflection to sit with, not a forecast.</p>
+      </blockquote>
+    </a>
+    <p class="m1sect__term">Drawn once. Not reissued.</p>
+    <a class="m1deep" href="?dev=drawing-room#deep">
+      <span class="m1deep__name">The Deep Read</span>
+      <span class="m1deep__line">Five cards, not three &mdash; the same three places, plus what it grew from and what it reaches for.</span>
+      <span class="m1deep__go">Sit for five &rarr;</span>
+    </a>
+    <p class="m1sect__foot" id="footTarot" aria-live="off"></p>
+  </div>
+
+  <!-- STAGE -->
+  <section class="menu__draw-stage">
+    <div class="msample__cap"><span class="msample__label" id="stageLabel">By Birth</span></div>
+    <p class="menu__draw-herosub" id="stageSub">Six marks. One name.</p>
+    <div class="m2hero" data-face="birth" id="hero">
+      <svg class="m2hero__back" viewBox="0 0 120 190" aria-hidden="true"><rect x="7" y="7" width="106" height="176" rx="7" fill="none" stroke="url(#mwInk)" stroke-width="1"/><g stroke="url(#mwInk)" stroke-width=".6" fill="none" opacity=".7"><path d="M60 42 L86 95 L60 148 L34 95 Z"/><circle cx="60" cy="95" r="4.5"/></g></svg>
+      <svg class="m2hero__face" viewBox="0 0 120 190" role="img" aria-label="XVII — The Star"><rect x="11" y="11" width="98" height="168" rx="5" fill="none" stroke="url(#mwGold)" stroke-width=".6" opacity=".55"/><text x="60" y="30" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9" letter-spacing="2.5" fill="url(#mwGold)">XVII</text><g stroke="url(#mwGold)" fill="none"><circle cx="60" cy="98" r="31" stroke-width=".8" opacity=".5"/><path d="M60 69 L64.6 86.9 L80.5 77.5 L71.1 93.4 L89 98 L71.1 102.6 L80.5 118.5 L64.6 109.1 L60 127 L55.4 109.1 L39.5 118.5 L48.9 102.6 L31 98 L48.9 93.4 L39.5 77.5 L55.4 86.9 Z" stroke-width=".9" opacity=".8"/><circle cx="60" cy="98" r="3.2" fill="url(#mwGold)" stroke="none"/></g></svg>
+      <div class="m2face" aria-hidden="true">
+        <div class="m2face-head"><span class="m2face-meta">Arcana &middot; XVII</span><span class="m2face-glyph">&#9670;</span></div>
+        <div class="m2face-name">The Star</div>
+        <div class="m2face-div"></div>
+        <div class="m2face-orient">Upright &middot; an example, not your draw</div>
+        <span class="m2tick tl"></span><span class="m2tick br"></span>
+      </div>
+      <div class="m2bface" aria-hidden="true">
+        <div class="m2face-head"><span class="m2face-meta">THE BIRTH READING</span><span class="m2face-glyph">&#10022;</span></div>
+        <div class="m2face-div m2bface__headrule"></div>
+        <div class="m2face-name m2bface__name">The Crowned Name</div>
+        <ul class="m2bface__marks"><li>Sun sign</li><li>Year animal</li><li>Life path</li><li>Rune</li><li>Trigram</li><li>Hexagram</li></ul>
+        <div class="m2bface__wall--bot">
+          <div class="m2face-div"></div>
+          <div class="m2face-orient">By birth alone &middot; an example, not your name</div>
+        </div>
+        <span class="m2tick tl"></span><span class="m2tick br"></span>
+      </div>
+      <span class="m2hero__name" id="heroName">The Star</span>
+    </div>
+    <div class="m2flip" role="radiogroup" aria-label="What the card shows">
+      <button type="button" class="m2flip__opt is-on" role="radio" aria-checked="true" data-face="birth">Birth</button>
+      <button type="button" class="m2flip__opt" role="radio" aria-checked="false" data-face="tarot">Tarot</button>
+    </div>
+    <a class="menu__draw-placard" href="codex.html?v=363"><span class="menu__draw-placard-mark" aria-hidden="true">&#10022;</span>The Codex &mdash; where every mark is defined &rarr;</a>
+  </section>
+
+  <!-- HEAD / BERTH -->
+  <header class="menu__draw-head">
+    <div class="m2read" role="status" aria-live="polite" id="berth">
+      <p class="m2read__label">The reading in question</p>
+      <p class="m2read__meta" id="berthMeta">BIRTH &middot; FROM SIX OF THE NINE SYSTEMS &middot; <span class="num">137</span> OF 222</p>
+      <p class="m2read__mean" id="berthMean">Six marks you were given rather than chose, read together into one crowned name. Nothing is drawn here &mdash; each mark is looked up, and read as it stands.</p>
+    </div>
+  </header>
+
+  <!-- BIRTH SECTION -->
+  <div class="m1sect m1sect--birth" id="secBirth">
+    <div class="m1sect__field" id="fieldBirth" role="img" aria-label="Marks drawn from the six given systems — sun signs, the Chinese zodiac, numerology, the runes, the trigrams and the hexagrams. Each opens its own entry in the Codex."></div>
+    <a class="menu__door menu__door--add menu__door--birth" href="?dev=arcane"
+       id="doorBirth" aria-labelledby="m1-bk m1-bn m1-bd">
+      <span class="menu__door-kicker" id="m1-bk"><svg class="menu__draw-crown" viewBox="0 0 120 90" aria-hidden="true"><path d="M16 64 L26 28 L45 50 L60 18 L75 50 L94 28 L104 64" fill="none" stroke="url(#mwGold)" stroke-width="4" stroke-linejoin="round"/><path d="M15 64 H105" stroke="url(#mwGold)" stroke-width="3"/><circle cx="60" cy="18" r="5" fill="url(#mwGold)"/></svg> By Birth &middot; Given, not drawn</span>
+      <span class="menu__door-name" id="m1-bn">The Birth Reading</span>
+      <span class="menu__door-desc" id="m1-bd">Six marks you were handed, not dealt &mdash; one name, then yours to keep.</span>
+      <span class="m1sect__way">Give a name and date &rarr;</span>
+      <blockquote class="m1spec">
+        <span class="m1spec__label">A real record&rsquo;s seal, verbatim &mdash; born 14 March 1991</span>
+        <p class="m1spec__line">The Silt-Bearing Daybringer. Silt-Bearing &middot; Daybringer &middot; filed at the stopping place &middot; keyed to vitality. Nothing is re-rolled on re-view.</p>
+      </blockquote>
+    </a>
+    <p class="m1marks__lead">The six, and what each is read from &mdash;</p>
+    <ul class="m1marks">
+      <li><a class="m1marks__a" href="codex.html#western">Sun Sign</a></li>
+      <li><a class="m1marks__a" href="codex.html#chinese">Year Animal</a></li>
+      <li><a class="m1marks__a" href="codex.html#numerology">Life Path</a></li>
+      <li><a class="m1marks__a" href="codex.html#runes">Rune</a></li>
+      <li><a class="m1marks__a" href="codex.html#trigrams">Trigram</a></li>
+      <li><a class="m1marks__a" href="codex.html#iching">Hexagram</a></li>
+    </ul>
+    <p class="m1sect__foot" id="footBirth" aria-live="off"></p>
+  </div>
+
+  <!-- EXITS -->
+  <nav class="m1exits" aria-label="Ways out">
+    <button type="button" class="m1exit" id="exitDesk">THE DESK</button>
+    <a class="m1exit" href="codex.html?v=363">THE CODEX</a>
+    <a class="m1exit" href="?dev=profile">YOUR PROFILE</a>
+    <button type="button" class="m1exit" id="exitRooms">ROOMS</button>
+  </nav>
+
+</div>
+
+<a class="m1down" id="downU1" href="#u1" aria-label="Down to what Blue Room is">What this is <span aria-hidden="true">&darr;</span></a>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---- seeded rng, build-once ---- */
+  function mulberry32(a){
+    return function(){
+      a |= 0; a = (a + 0x6D2B79F5) | 0;
+      var t = Math.imul(a ^ (a >>> 15), 1 | a);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+  var rng = mulberry32(19750412);
+
+  /* the true King Wen / trigram line patterns, bottom line first, lifted from
+     codex.html's own data-sig attributes — so a trigram mark IS its trigram. */
+  var TRIBITS = { "tr-01":"111", "tr-05":"001" };
+  var HEXBITS = { "hx-01":"111111", "hx-33":"001111" };
+  function barGlyph(bits){
+    var n = bits.length, gap = n===3 ? 6 : 3.4, y0 = n===3 ? 6 : 4.3, out = "", i, y;
+    for (i=0;i<n;i++){
+      y = (y0 + (n-1-i)*gap).toFixed(1);            /* bit 0 is the BOTTOM line */
+      out += bits.charAt(i) === "1"
+        ? '<path d="M4,'+y+' L20,'+y+'"/>'
+        : '<path d="M4,'+y+' L10.4,'+y+'"/><path d="M13.6,'+y+' L20,'+y+'"/>';
+    }
+    return out;
+  }
+
+  /* Each mark is a real Codex id: 16 in the tarot section (4 suits x 3 sizes,
+     plus 4 major badges), 12 in the birth section (two of each of six systems).
+     name/system are what the touch two-step prints in the foot slot. */
+  var TAROT_MARK_DATA = [
+    ["mi-w01","suit-wands",0,"Ace of Wands","Minor Arcana"],
+    ["mi-w07","suit-wands",1,"Seven of Wands","Minor Arcana"],
+    ["mi-w14","suit-wands",2,"King of Wands","Minor Arcana"],
+    ["mi-c01","suit-cups",0,"Ace of Cups","Minor Arcana"],
+    ["mi-c07","suit-cups",1,"Seven of Cups","Minor Arcana"],
+    ["mi-c14","suit-cups",2,"King of Cups","Minor Arcana"],
+    ["mi-s01","suit-swords",0,"Ace of Swords","Minor Arcana"],
+    ["mi-s07","suit-swords",1,"Seven of Swords","Minor Arcana"],
+    ["mi-s14","suit-swords",2,"King of Swords","Minor Arcana"],
+    ["mi-p01","suit-pentacles",0,"Ace of Pentacles","Minor Arcana"],
+    ["mi-p07","suit-pentacles",1,"Seven of Pentacles","Minor Arcana"],
+    ["mi-p14","suit-pentacles",2,"King of Pentacles","Minor Arcana"],
+    ["ma-00","bd-major",1,"The Fool","Major Arcana"],
+    ["ma-07","bd-major",2,"The Chariot","Major Arcana"],
+    ["ma-14","bd-major",0,"Temperance","Major Arcana"],
+    ["ma-21","bd-major",1,"The World","Major Arcana"]
+  ];
+  var BIRTH_MARK_DATA = [
+    ["wz-01","gl-aries",1,"Aries","Sun Sign"],
+    ["wz-07","gl-libra",2,"Libra","Sun Sign"],
+    ["cz-01","bd-chinese",0,"Rat","Year Animal"],
+    ["cz-09","bd-chinese",2,"Monkey","Year Animal"],
+    ["nu-01","nm-1",1,"One","Life Path"],
+    ["nu-08","nm-8",2,"Eight","Life Path"],
+    ["rn-01","s-rn-01",0,"Fehu","Rune"],
+    ["rn-13","s-rn-13",2,"Eihwaz","Rune"],
+    ["tr-01","bars",1,"Heaven","Trigram"],
+    ["tr-05","bars",0,"Mountain","Trigram"],
+    ["hx-01","bars",2,"The Creative","Hexagram"],
+    ["hx-33","bars",1,"Retreat","Hexagram"]
+  ];
+  /* three sizes, inside the 11–18px band the sheet fixes */
+  var SIZES = [11.5, 14.5, 17.5];
+
+  function buildField(container, rows){
+    var frag = document.createDocumentFragment();
+    for (var i=0;i<rows.length;i++){
+      var cid = rows[i][0], use = rows[i][1], size = SIZES[rows[i][2]];
+      var left = 6 + rng()*88, top = 6 + rng()*88;
+      var op = .17 + rng()*.19;
+      var a = document.createElement("a");
+      a.className = "m1mark"; a.href = "codex.html?v=363#" + cid;
+      a.setAttribute("tabindex","-1");
+      a.dataset.cid = cid; a.dataset.name = rows[i][3]; a.dataset.system = rows[i][4];
+      a.dataset.op = op.toFixed(3);
+      a.style.left = left + "%"; a.style.top = top + "%";
+      a.style.width = size + "px"; a.style.height = size + "px";
+      a.style.opacity = op;
+      var inner = (use === "bars")
+        ? barGlyph(TRIBITS[cid] || HEXBITS[cid])
+        : '<use href="#' + use + '"/>';
+      a.innerHTML = '<svg viewBox="0 0 24 24">' + inner + '</svg>';
+      frag.appendChild(a);
+    }
+    container.appendChild(frag);
+  }
+  buildField(document.getElementById("fieldTarot"), TAROT_MARK_DATA);
+  buildField(document.getElementById("fieldBirth"), BIRTH_MARK_DATA);
+
+  /* ---- the one write point ---- */
+  var M1_SYS = { major:22, minor:56, wz:12, cz:17, nu:12, rn:24, tr:8, hx:64, lx:7 };
+  var GATHERS = { tarot:["major","minor"], birth:["wz","cz","nu","rn","tr","hx"] };
+  function sum(keys){ var s=0; keys.forEach(function(k){ s += M1_SYS[k]||0; }); return s; }
+  var TOTAL = Object.keys(M1_SYS).reduce(function(s,k){ return s+M1_SYS[k]; },0);
+
+  var METAS = {
+    tarot: "TAROT &middot; FROM THE MAJOR AND MINOR ARCANA &middot; <span class=\"num\">" + sum(GATHERS.tarot) + "</span> OF " + TOTAL,
+    birth: "BIRTH &middot; FROM SIX OF THE NINE SYSTEMS &middot; <span class=\"num\">" + sum(GATHERS.birth) + "</span> OF " + TOTAL
+  };
+  /* first paint and the write point read the SAME constant, so paint one and
+     paint two can never make different claims (critique item 3). */
+  var M2_BIRTH_READ = { mean: "Six marks you were given rather than chose, read together into one crowned name. Nothing is drawn here — each mark is looked up, and read as it stands." };
+  var M2_TAROT_READ = { mean: "Read as one — the matter rests on intuition, is crossed by transition, and tends toward resilience. Drawn to the matter you laid down — a reflection to sit with, not a forecast." };
+  var MEANS = { tarot: M2_TAROT_READ.mean, birth: M2_BIRTH_READ.mean };
+
+  /* THE AUDIT. The figures in the berth legend and the marks in the shoals are
+     read off ONE list: a mark whose system is not gathered by its section, or
+     whose section's systems do not sum to the printed figure, says so out loud
+     rather than drifting quietly. */
+  var CID_SYS = { ma:"major", mi:"minor", wz:"wz", cz:"cz", nu:"nu", rn:"rn", tr:"tr", hx:"hx", lx:"lx" };
+  (function auditMarks(){
+    var errs = [];
+    [["tarot",TAROT_MARK_DATA],["birth",BIRTH_MARK_DATA]].forEach(function(pair){
+      var gathered = GATHERS[pair[0]];
+      pair[1].forEach(function(row){
+        var key = CID_SYS[row[0].slice(0,2)];
+        if (!key) errs.push("mark " + row[0] + " has no known system prefix");
+        else if (gathered.indexOf(key) < 0)
+          errs.push("mark " + row[0] + " (" + key + ") is not among the systems the " + pair[0] + " reading gathers");
+      });
+    });
+    if (sum(GATHERS.tarot) !== 78) errs.push("tarot legend figure is not 78");
+    if (sum(GATHERS.birth) !== 137) errs.push("birth legend figure is not 137");
+    if (TOTAL !== 222) errs.push("corpus total is not 222");
+    if (errs.length) console.error("M1 mark audit:\n  " + errs.join("\n  "));
+  })();
+  var FACE = { tarot:{ meta:"Arcana &middot; XVII", name:"The Star", orient:"Upright" }, birth:null };
+
+  var berth = document.getElementById("berth"),
+      berthMeta = document.getElementById("berthMeta"),
+      berthMean = document.getElementById("berthMean"),
+      hero = document.getElementById("hero"),
+      heroName = document.getElementById("heroName"),
+      stageLabel = document.getElementById("stageLabel"),
+      stageSub = document.getElementById("stageSub"),
+      secTarot = document.getElementById("secTarot"),
+      secBirth = document.getElementById("secBirth"),
+      flipOpts = document.querySelectorAll(".m2flip__opt");
+
+  var ADDRESSED = "birth";
+  var reduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  function writeBerth(name){
+    berthMeta.innerHTML = METAS[name];
+    berthMean.textContent = MEANS[name].replace(/&mdash;/g,"—");
+  }
+
+  function setFace(name){
+    hero.setAttribute("data-face", name);
+    var shown = (name === "tarot") ? "The Star" : "The Crowned Name";
+    if (name === "tarot"){
+      stageLabel.textContent = "By the Draw";
+      stageSub.textContent = "A sample turn — not your draw.";
+    } else {
+      stageLabel.textContent = "By Birth";
+      stageSub.textContent = "Six marks. One name.";
+    }
+    /* the attribute, the caption and the SVG's own label move together — the
+       three used to be able to disagree (critique item 6). */
+    heroName.textContent = shown;
+    hero.setAttribute("data-m2-heroname", shown);
+    var faceSvg = hero.querySelector(".m2hero__face");
+    if (faceSvg) faceSvg.setAttribute("aria-label", name === "tarot" ? "XVII — The Star" : "The Crowned Name");
+    flipOpts.forEach(function(b){
+      var on = b.dataset.face === name;
+      b.classList.toggle("is-on", on);
+      b.setAttribute("aria-checked", on ? "true" : "false");
+    });
+  }
+
+  function address(name){
+    if (name === ADDRESSED) return;
+    ADDRESSED = name;
+    if (!reduced) berth.classList.add("is-writing");
+    setTimeout(function(){
+      writeBerth(name);
+      setFace(name);
+      if (!reduced) berth.classList.remove("is-writing");
+    }, reduced ? 0 : 90);
+    secTarot.classList.toggle("is-stirred", name === "tarot");
+    secBirth.classList.toggle("is-stirred", name === "birth");
+  }
+
+  var hoverTimer = null;
+  function wireSection(el, name){
+    el.addEventListener("mouseenter", function(){
+      hoverTimer = setTimeout(function(){ address(name); }, 90);
+    });
+    el.addEventListener("mouseleave", function(){
+      if (hoverTimer){ clearTimeout(hoverTimer); hoverTimer = null; }
+    });
+    el.addEventListener("focus", function(){
+      berth.setAttribute("aria-live","off");
+      address(name);
+      setTimeout(function(){ berth.setAttribute("aria-live","polite"); }, 120);
+    }, true);
+    el.addEventListener("touchstart", function(){ address(name); }, { passive:true });
+  }
+  wireSection(secTarot, "tarot");
+  wireSection(secBirth, "birth");
+
+  /* ---- the touch two-step: a mark NAMES itself first, opens second ---- */
+  var touchPrimary = window.matchMedia && window.matchMedia("(hover: none), (pointer: coarse)").matches;
+  var armed = null;
+  function footFor(el){ return document.getElementById(el.closest(".m1sect") === secTarot ? "footTarot" : "footBirth"); }
+  function disarm(){
+    if (!armed) return;
+    var f = footFor(armed); if (f) f.textContent = "";
+    armed = null;
+  }
+  [secTarot, secBirth].forEach(function(sect){
+    sect.addEventListener("click", function(ev){
+      var m = ev.target.closest(".m1mark");
+      if (!m) { disarm(); return; }
+      if (!touchPrimary) return;                 /* pointer devices open at once */
+      if (armed === m) { disarm(); return; }     /* second tap: let it navigate */
+      ev.preventDefault();                       /* only ever a MARK's own tap */
+      disarm();
+      armed = m;
+      var f = footFor(m);
+      if (f) f.textContent = m.dataset.name + " · " + m.dataset.system + " · touch again to open →";
+    });
+  });
+
+  flipOpts.forEach(function(b){
+    b.addEventListener("click", function(){ address(b.dataset.face); });
+  });
+
+  document.getElementById("exitDesk").addEventListener("click", function(){
+    window.location.href = "?"; /* L1 slide, stand-in for data-annex-go */
+  });
+  document.getElementById("exitRooms").addEventListener("click", function(){
+    window.location.href = "rooms/";
+  });
+
+  /* ---- thinning at narrow width, once per layout ---- */
+  function rectDist(mx,my,r){
+    var cx = Math.max(r.left, Math.min(mx, r.right));
+    var cy = Math.max(r.top, Math.min(my, r.bottom));
+    return Math.hypot(mx-cx, my-cy);
+  }
+  function thin(){
+    var narrow = window.innerWidth <= 430;
+    [secTarot, secBirth].forEach(function(sect){
+      var marks = sect.querySelectorAll(".m1mark");
+      var textEls = sect.querySelectorAll(".menu__door-kicker,.menu__door-name,.menu__door-desc,.menu__draw-spine,.m1spec__line,.m1deep,.m1marks,.m1sect__term");
+      var rects = []; textEls.forEach(function(t){ rects.push(t.getBoundingClientRect()); });
+      marks.forEach(function(m){
+        var base = parseFloat(m.dataset.op);
+        /* the ceiling the sheet fixes for narrow, applied where the opacity is
+           actually set — the CSS custom property alone could never reach an
+           inline style, which is why this was silently doing nothing. */
+        m.style.opacity = narrow ? Math.min(base, .22) : base;
+        if (!narrow){ m.style.display = ""; return; }
+        var r = m.getBoundingClientRect();
+        var mx = r.left + r.width/2, my = r.top + r.height/2;
+        var close = rects.some(function(tr){ return rectDist(mx,my,tr) < 24; });
+        m.style.display = close ? "none" : "";
+      });
+      /* copy-truth: a field whose marks the thinning has all removed must stop
+         announcing marks. The label may never claim what the material lacks. */
+      var field = sect.querySelector(".m1sect__field");
+      var left = 0;
+      marks.forEach(function(m){ if (m.style.display !== "none") left++; });
+      if (left === 0){
+        if (!field.dataset.label) field.dataset.label = field.getAttribute("aria-label") || "";
+        field.removeAttribute("role"); field.removeAttribute("aria-label");
+        field.setAttribute("aria-hidden","true");
+      } else if (field.dataset.label){
+        field.setAttribute("role","img");
+        field.setAttribute("aria-label", field.dataset.label);
+        field.removeAttribute("aria-hidden");
+      }
+    });
+  }
+  /* mount, then set the face explicitly: the markup's data-face and the script's
+     idea of what is showing are made to agree in one line, at paint (item 2). */
+  setFace(ADDRESSED);
+  writeBerth(ADDRESSED);
+  secBirth.classList.add("is-stirred");
+
+  var resizeTimer;
+  window.addEventListener("resize", function(){
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(thin, 200);
+  });
+  setTimeout(thin, 0);
+
+})();
+</script>
+</body>
+</html>

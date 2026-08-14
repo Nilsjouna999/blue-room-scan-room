@@ -1,0 +1,391 @@
+<!doctype html>
+<!-- THE PROTOTYPE GALLERY — untracked scratch.
+
+     One page that shows every prototype this session and the fleets produce, in the
+     order they were made, as live scaled-down renders rather than screenshots. Click
+     any one to open it full size.
+
+     It PROBES for each file rather than assuming it exists, so entries that have not
+     been built yet show as pending instead of breaking the page. That means this file
+     never needs updating as the fleets land — it fills in by itself. Refresh to re-probe.
+
+     Serve it: python -m http.server 8765   then open /_prototypes.html -->
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Prototypes — first to last</title>
+  <style>
+    :root {
+      --ink: #0d0c0b; --ink-2: #131211; --line: rgba(233,229,220,.10);
+      --line-2: rgba(233,229,220,.055);
+      --t: #d7d3ca; --t-2: #a09b92; --t-3: #7d7972; --gold: #c9a35c;
+      --mono: "IBM Plex Mono", ui-monospace, monospace;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; background: #0a0a09; color: var(--t); font-family: var(--mono); }
+    body {
+      background: radial-gradient(120% 80% at 50% -10%, #17150f 0%, #0f0e0c 55%, #0a0a09 100%);
+      background-attachment: fixed;
+      padding: 40px 32px 80px;
+    }
+    header { max-width: 1320px; margin: 0 auto 34px; }
+    h1 { font-size: 13px; letter-spacing: .22em; text-transform: uppercase; font-weight: 600; margin: 0 0 8px; }
+    .sub { font-size: 10.5px; letter-spacing: .06em; color: var(--t-3); line-height: 1.7; margin: 0; max-width: 60ch; }
+    .bar { display: flex; gap: 8px; align-items: center; margin-top: 18px; flex-wrap: wrap; }
+    .bar button {
+      font: inherit; font-size: 9px; letter-spacing: .16em; text-transform: uppercase;
+      background: none; color: var(--t-2); border: 1px solid var(--line);
+      border-radius: 3px; padding: 6px 12px; cursor: pointer;
+    }
+    .bar button.on { color: var(--gold); border-color: var(--gold); }
+
+    .group { max-width: 1320px; margin: 0 auto 10px; }
+    .group h2 {
+      font-size: 9px; letter-spacing: .24em; text-transform: uppercase; color: var(--t-3);
+      font-weight: 500; margin: 30px 0 14px; padding-bottom: 9px;
+      border-bottom: 1px solid var(--line-2);
+    }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(392px, 1fr)); gap: 22px; }
+
+    .card { display: flex; flex-direction: column; text-decoration: none; color: inherit; }
+    .shot {
+      position: relative; overflow: hidden; border-radius: 4px;
+      border: 1px solid var(--line); background: var(--ink);
+      aspect-ratio: 1440 / 900;
+    }
+    .shot iframe {
+      position: absolute; top: 0; left: 0; width: 1440px; height: 900px;
+      border: 0; transform-origin: top left; pointer-events: none;
+    }
+    .shot .veil { position: absolute; inset: 0; }
+    .card:hover .shot { border-color: rgba(233,229,220,.26); }
+
+    .pending .shot { display: grid; place-items: center; border-style: dashed; }
+    .pending .shot::after {
+      content: "not built yet"; font-size: 9px; letter-spacing: .2em;
+      text-transform: uppercase; color: var(--t-3);
+    }
+    .pending .meta .n { color: var(--t-3); }
+
+    .meta { display: grid; gap: 3px; padding: 11px 2px 0; }
+    .meta .n { font-size: 11px; letter-spacing: .07em; color: var(--t); font-weight: 600; }
+    .meta .o { font-size: 8.5px; letter-spacing: .2em; text-transform: uppercase; color: var(--gold); opacity: .78; }
+    .meta .d { font-size: 10px; letter-spacing: .02em; color: var(--t-3); line-height: 1.6; }
+    footer { max-width: 1320px; margin: 46px auto 0; font-size: 9.5px; color: var(--t-3); letter-spacing: .06em; line-height: 1.8; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Prototypes — first to last</h1>
+    <p class="sub">Every prototype this session produced, in the order it was made. These are
+    live renders, not pictures. Click one to open it full size. Entries that have not been
+    built yet show as pending and fill in on refresh.</p>
+    <div class="bar">
+      <button id="all" class="on">show all</button>
+      <button id="built">built only</button>
+      <span style="color:var(--t-3);font-size:9px;letter-spacing:.14em">·</span>
+      <button id="live" class="on">live</button>
+      <span id="count" style="color:var(--t-3);font-size:9px;letter-spacing:.14em"></span>
+      <span id="pulse" style="color:var(--gold);font-size:9px;letter-spacing:.14em;opacity:0;transition:opacity 600ms ease"></span>
+    </div>
+  </header>
+  <main id="out"></main>
+  <footer>
+    Served from this repo. Nothing here is tracked or committed. Refresh to re-probe for
+    prototypes the fleets have finished since you last looked.
+  </footer>
+
+  <script>
+  /* THE MANIFEST, in the order things were made. Each entry is probed with a HEAD
+     request before it is rendered, which is what lets this file list prototypes that do
+     not exist yet without breaking. The fleets write to the paths named here, so the
+     gallery fills itself in as they land — no editing this file, just refresh.
+
+     The palette-lab entries all point at the SAME file with a different ?r= register,
+     which is why they each get their own tile: a register is a prototype even though it
+     shares a document with seven others. */
+  /* ORDER: the LIVE WORK IS AT THE TOP. This started chronological, which was right when
+     nothing was moving and wrong the moment four agents began writing to four of these
+     files. You should not have to scroll past a baseline and eight settled registers to
+     reach the four things that are actually changing. Newest and most active first;
+     the reference material sinks to the bottom where it can be found when wanted. */
+  var GROUPS = [
+    {
+      title: "THE DOOR — five premises, built in isolation",
+      items: [
+        { f: "_door1.html", n: "1 · The Claim", o: "the door", d: "One sentence and a way in. Everything else deleted until what remains cannot be reduced." },
+        { f: "_door2.html", n: "2 · The Threshold", o: "the door", d: "You see the house through the door before you go in. Shown, never explained." },
+        { f: "_door3.html", n: "3 · The Offer", o: "the door", d: "Unmistakably a recommendation. One thing held out and named." },
+        { f: "_door4.html", n: "4 · The Plate", o: "the door", d: "One object, one line, one way in, nothing else on screen." },
+        { f: "_door5.html", n: "5 · The Specimen", o: "the door", d: "Introduces the place by showing a real reading, verbatim. The proof and the introduction are one object." }
+      ]
+    },
+    {
+      title: "Fleet 3 — four teams, four master designs",
+      items: [
+        { f: "_m1-team1.html", n: "Team 1", o: "fleet 3", d: "The page as an ACT, not a display. Built by its own team and attacked by its own critic before submission." },
+        { f: "_m1-team2.html", n: "Team 2", o: "fleet 3", d: "The result appears WHERE YOU TOUCHED — no reserved stage." },
+        { f: "_m1-team3.html", n: "Team 3", o: "fleet 3", d: "LANGUAGE is the architecture. Type is the object, not the label." },
+        { f: "_m1-team4.html", n: "Team 4", o: "fleet 3", d: "The HOUSE before the goods. Orientation precedes transaction." },
+        { f: "_m1-team5.html", n: "Team 5", o: "fleet 3b", d: "Inherits THE STANDING FIELD and must build the gathering it only promised." },
+        { f: "_m1-team6.html", n: "Team 6", o: "fleet 3b", d: "From nothing. The field territory is taken — find another form for the same principles." },
+        { f: "_m1-team7.html", n: "Team 7", o: "fleet 3b", d: "From nothing, and arguing the opposite: clarity as the beautiful thing, not the enemy of it." }
+      ]
+    },
+    {
+      /* The teams wrote these on their own initiative — named prototypes that are not
+         any team's submission. They are the alternatives that were explored and set
+         aside, which makes them worth keeping visible: a design you can see next to the
+         one that beat it tells you what the choice actually was. */
+      title: "Left behind — alternatives the teams built and did not submit",
+      items: [
+        { f: "_m1-hand.html", n: "The Hand", o: "unsubmitted", d: "Built and set aside during the competition." },
+        { f: "_m1-hand-fleet3.html", n: "The Hand (fleet 3)", o: "unsubmitted", d: "A second pass at the same idea." },
+        { f: "_m1-field.html", n: "The Standing Field", o: "unsubmitted", d: "Static prototype, built and not submitted." },
+        { f: "_m1-passage.html", n: "The Passage", o: "unsubmitted", d: "Built and set aside." },
+        { f: "_m1-standing-sentence.html", n: "The Standing Sentence", o: "unsubmitted", d: "The leanest of the unsubmitted set." }
+      ]
+    },
+    {
+      title: "The master design",
+      items: [
+        { f: "_m1-master.html", n: "Fable's master", o: "fable", d: "The strongest parts of all four prototypes and the five briefs, assembled into one design." },
+        { f: "_m1-final.html", n: "The final", o: "fleet 4", d: "The master design after the 27-agent audit, revised by Fable and built." }
+      ]
+    },
+    {
+      title: "The live page — the thing everything is measured against",
+      items: [
+        { f: "index.html", n: "M1 as it ships today", o: "live", d: "The three-column front door. The baseline for every critique and every design." }
+      ]
+    },
+    {
+      title: "Palette lab — colour, material and density registers",
+      items: [
+        { f: "_palette-lab.html?r=0", n: "0 · original", o: "lab", d: "Untouched, inside the harness." },
+        { f: "_palette-lab.html?r=1", n: "1 · reading + polish", o: "lab", d: "Colour only: small text lifted, card capped, grain over the gradient, violet brought down." },
+        { f: "_palette-lab.html?r=2", n: "2 · loosen", o: "lab", d: "Space only. The tile's four type registers stop touching." },
+        { f: "_palette-lab.html?r=3", n: "3 · rank", o: "lab", d: "Type only. Tracking down, spine to ghost, so one thing leads." },
+        { f: "_palette-lab.html?r=4", n: "4 · unbox", o: "lab", d: "Container only. No border — a hairline rule and space, the Codex's grammar." },
+        { f: "_palette-lab.html?r=5", n: "5 · tiles: all three", o: "lab", d: "Loosen, rank and unbox together." },
+        { f: "_palette-lab.html?r=6", n: "6 · rail family + cold flip", o: "lab", d: "The three links made a set, the specificity bug fixed, the switch squared and cooled." },
+        { f: "_palette-lab.html?r=7", n: "7 · everything", o: "lab", d: "The full proposal." }
+      ]
+    }
+  ];
+
+  var SCALE = 0;
+
+  /* The probe returns the file's Last-Modified as well as whether it exists, and that
+     header is what makes the live watch bearable. Reloading every frame on a timer would
+     flicker the whole page every few seconds and throw away scroll position for nothing;
+     comparing Last-Modified means a frame is only reloaded when its file has ACTUALLY
+     changed on disk. python -m http.server sends the header, so this costs one HEAD per
+     entry per tick and nothing else. */
+  /* ★ FILE:// MODE. Opened by double-clicking rather than through the server, every
+     fetch() in this page fails — file:// has an opaque origin, so the HEAD probe throws
+     and EVERY tile renders as "not built yet". The page looks empty and broken when in
+     fact all twenty prototypes are sitting right there on disk. That is what happened.
+     So when the protocol is file:, the probe stops asking and simply says yes: iframes
+     still render fine from a file:// parent (we never touch contentDocument, only
+     display it), a missing file just shows an empty frame, and the live watch turns
+     itself off because there is nothing it can legally check.
+     The server is still the better way to view this — it is the only way the page can
+     update itself while the fleets write — but opening the file must not produce a
+     blank wall. */
+  var FILEMODE = location.protocol === "file:";
+
+  function probe(path) {
+    if (FILEMODE) return Promise.resolve({ ok: true, lm: "" });
+    return fetch(path.split("?")[0], { method: "HEAD", cache: "no-store" })
+      .then(function (r) {
+        return { ok: r.ok, lm: r.headers.get("last-modified") || "" };
+      })
+      .catch(function () { return { ok: false, lm: "" }; });
+  }
+
+  /* The preview is a real iframe scaled down, not a screenshot, because a screenshot of
+     a prototype goes stale the moment the prototype changes and nothing tells you. A
+     live frame is always the current truth. pointer-events are off so the tile stays a
+     link; the anchor opens it full size. */
+  function tile(it, ok) {
+    var a = document.createElement("a");
+    a.className = "card" + (ok ? "" : " pending");
+    if (ok) { a.href = it.f; a.target = "_blank"; a.rel = "noopener"; }
+    a.innerHTML =
+      '<div class="shot"></div>' +
+      '<div class="meta">' +
+        '<span class="o">' + it.o + '</span>' +
+        '<span class="n">' + it.n + '</span>' +
+        '<span class="d">' + it.d + '</span>' +
+      '</div>';
+    if (ok) {
+      var fr = document.createElement("iframe");
+      fr.src = it.f;
+      fr.loading = "lazy";
+      fr.setAttribute("scrolling", "no");
+      a.querySelector(".shot").appendChild(fr);
+    }
+    a.dataset.built = ok ? "1" : "0";
+    return a;
+  }
+
+  /* The frames are laid out at a fixed 1440x900 and scaled to whatever the tile turned
+     out to be, so every preview shows the same viewport regardless of the grid's width.
+     Recomputed on resize — a preview that scales with the window but not with its own
+     frame would crop differently at every size, which makes two tiles uncomparable. */
+  function rescale() {
+    var s = document.querySelector(".shot");
+    if (!s) return;
+    SCALE = s.clientWidth / 1440;
+    document.querySelectorAll(".shot iframe").forEach(function (fr) {
+      fr.style.transform = "scale(" + SCALE + ")";
+    });
+  }
+
+  var out = document.getElementById("out");
+  var STATE = {};   // path -> { item, card, built, lm }
+
+  function paint() {
+    var built = 0, total = 0;
+    Object.keys(STATE).forEach(function (k) {
+      total++; if (STATE[k].built) built++;
+    });
+    document.getElementById("count").textContent = built + " of " + total + " built";
+  }
+
+  function flash(msg) {
+    var p = document.getElementById("pulse");
+    p.textContent = msg;
+    p.style.opacity = "1";
+    setTimeout(function () { p.style.opacity = "0"; }, 2600);
+  }
+
+  Promise.all(GROUPS.map(function (g) {
+    return Promise.all(g.items.map(function (it) { return probe(it.f); }))
+      .then(function (rs) { return { g: g, rs: rs }; });
+  })).then(function (res) {
+    res.forEach(function (r) {
+      var sec = document.createElement("section");
+      sec.className = "group";
+      var h = document.createElement("h2");
+      h.textContent = r.g.title;
+      var grid = document.createElement("div");
+      grid.className = "grid";
+      r.g.items.forEach(function (it, i) {
+        var card = tile(it, r.rs[i].ok);
+        STATE[it.f] = { item: it, card: card, built: r.rs[i].ok, lm: r.rs[i].lm };
+        grid.appendChild(card);
+      });
+      sec.appendChild(h); sec.appendChild(grid); out.appendChild(sec);
+    });
+    paint();
+    rescale();
+    if (FILEMODE) {
+      var lb = document.getElementById("live");
+      lb.className = ""; lb.textContent = "static";
+      document.getElementById("count").textContent =
+        "opened as a file — no live updates. Serve the folder and open localhost for those.";
+    }
+  });
+
+  /* THE LIVE WATCH. Fleets are writing to these paths while the page is open, so the
+     gallery polls every 7 seconds and updates only what moved:
+       pending -> built     the tile is replaced in place and a frame appears
+       built, file changed  that ONE frame reloads, nothing else touched
+       nothing changed      no DOM work at all
+     Scroll position survives because the page never reloads itself, and a frame that has
+     not changed is never disturbed — which matters when four agents are editing four
+     files and you are trying to look at one of them. */
+  var TICK = 7000;
+  var watching = true;
+
+  /* NOTHING THE WATCHER DOES MAY MOVE THE PAGE UNDER YOU.
+     This is the whole point of a live gallery: you scroll down to the team you care
+     about, leave it open, and it updates in place. Three separate things can break that,
+     so all three are held down here:
+       · replacing a tile is a DOM mutation above your scroll position, and the browser's
+         scroll anchoring can decide to compensate. It is measured and restored instead.
+       · an iframe that loads can pull focus, and focus moves the viewport.
+       · restoring once is not enough — a frame finishing its load a beat later can shift
+         things again, so the position is re-asserted on the next frame and once more
+         shortly after.
+     If scrollY has not actually moved, nothing is written, so this is inert on a quiet
+     tick. */
+  function keepScroll(fn) {
+    var y = window.scrollY, x = window.scrollX;
+    fn();
+    function restore() {
+      if (window.scrollY !== y || window.scrollX !== x) window.scrollTo(x, y);
+    }
+    requestAnimationFrame(restore);
+    setTimeout(restore, 220);
+    setTimeout(restore, 700);
+  }
+
+  function bust(path) {
+    return path + (path.indexOf("?") >= 0 ? "&" : "?") + "_t=" + (performance.now() | 0);
+  }
+
+  function tick() {
+    if (FILEMODE || !watching || document.hidden) return;
+    Object.keys(STATE).forEach(function (path) {
+      var s = STATE[path];
+      probe(path).then(function (r) {
+        if (r.ok && !s.built) {
+          keepScroll(function () {
+            var fresh = tile(s.item, true);
+            s.card.replaceWith(fresh);
+            s.card = fresh; s.built = true; s.lm = r.lm;
+            rescale(); paint();
+          });
+          flash("+ " + s.item.n);
+          return;
+        }
+        if (r.ok && s.built && r.lm && r.lm !== s.lm) {
+          s.lm = r.lm;
+          keepScroll(function () {
+            var fr = s.card.querySelector("iframe");
+            if (fr) { fr.src = bust(s.item.f); }
+          });
+          flash("updated " + s.item.n);
+          return;
+        }
+        if (!r.ok && s.built) {
+          keepScroll(function () {
+            var pend = tile(s.item, false);
+            s.card.replaceWith(pend);
+            s.card = pend; s.built = false; s.lm = "";
+            paint();
+          });
+        }
+      });
+    });
+  }
+
+  setInterval(tick, TICK);
+  document.addEventListener("visibilitychange", function () { if (!document.hidden) tick(); });
+
+  document.getElementById("live").addEventListener("click", function () {
+    watching = !watching;
+    this.className = watching ? "on" : "";
+    this.textContent = watching ? "live" : "paused";
+    if (watching) tick();
+  });
+
+  window.addEventListener("resize", rescale);
+
+  document.getElementById("all").addEventListener("click", function () {
+    this.className = "on"; document.getElementById("built").className = "";
+    document.querySelectorAll(".card").forEach(function (c) { c.style.display = ""; });
+  });
+  document.getElementById("built").addEventListener("click", function () {
+    this.className = "on"; document.getElementById("all").className = "";
+    document.querySelectorAll(".card").forEach(function (c) {
+      c.style.display = c.dataset.built === "1" ? "" : "none";
+    });
+  });
+  </script>
+</body>
+</html>

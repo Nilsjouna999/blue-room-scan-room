@@ -1,0 +1,1183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>THE FORE-EDGE — Team 6, overtime</title>
+<style>
+  /* ============================================================
+     TEAM 6 — THE FORE-EDGE (overtime revision)
+
+     ONE SENTENCE, true of no other design in the pool:
+     this is the only surface that draws THE OFFER TO SCALE INSIDE
+     THE HOUSE — the deck's 78 leaves tinted at their true depth in
+     a 222-leaf mass, so a stranger sees in one glance both what is
+     for sale and the 144 that is not yet, and the two ways in are
+     one object behaving two ways (it OPENS, or it stays SHUT)
+     rather than two things set out beside each other.
+
+     ADVOCATE'S SHARPENING. The claim above was in this file and
+     was being whispered. Every other design in the pool answers
+     WHAT THE HOUSE CONTAINS. Teams 4 and 5 do it better than we
+     ever will — 222 real marks, real Codex ids, real doors. Not
+     one of the seven answers IN WHAT PROPORTION, and proportion is
+     the only question whose answer is a picture of headroom: the
+     house is bigger than the thing you are being sold, and here is
+     how much bigger. That is the one thing a visitor takes away
+     from this surface that no other surface here can give them,
+     and it was being carried by a 1px hairline at rgba(.14),
+     8.5px type, parked in the gutter, underneath the opening at
+     narrow. The design's best sentence was set in its faintest
+     ink. Fixed: the deck band, the gold bracket, the grain
+     demoted, the default cut moved out of the deck. See below.
+
+     WHAT WAS OVER-DEFENDED, and it was diluting the above: the
+     grain. One rule per entry, quarter-device-pixel moiré
+     snapping, the geometry law — the best engineering in the file
+     and the most words spent on it. But nobody can COUNT 222
+     hairlines; at 430px that ruling is texture, which is this
+     design's own named worst-at. Worse, at rgba(.5) it was the
+     loudest ink on the surface and it out-shouted the nine seams
+     and the deck band — the only two marks that carry the
+     argument. The grain is kept, and it is now MATERIAL rather
+     than the claim: .38, under the proportion, not over it.
+
+     WHY THAT IS NOT TEAMS 4 OR 5. They scatter the corpus into
+     222 separate marks and answer IDENTITY: which mark is this,
+     where does it link. This answers QUANTITY: how much of the
+     archive is this, how much of it does one act take. No sentence
+     describes both. The old draft's "a hole cut into the material"
+     was team 5's sentence and it is deleted — nothing here is a
+     void. The mass is CUT and the leaves below the cut are
+     DISPLACED, and the grain phase jumps at the cut face to prove
+     it (see .block__lower).
+
+     WORST-AT, NAMED AND ACCEPTED: at 430px the mass is ~330px of
+     ruled dark and it reads as a texture more than as an archive —
+     the proportion argument is weakest exactly where the critique
+     says the page matters most. It is not hidden there and it
+     still holds every true depth, but the h1 and the two acts
+     carry that width, not the material.
+
+     GATE — described without column/left/right/centre/panel/card/
+     sidebar: the archive stood on its edge as one mass, ruled once
+     per entry, nine banks thick, with the tarot's share bracketed;
+     a hand cuts it at a depth and the mass opens there; what the
+     opening says depends on where in the corpus the cut landed.
+
+     WHAT THE MEASUREMENT REPORTS KILLED, and it is gone:
+      - body{overflow:hidden} — DELETED. body is shared by the whole
+        SPA; as written it would have silently disabled the document
+        scroll the U1 glide reads (app.js:4749) sitewide. The
+        one-screen law is now kept by the content fitting, and a
+        scrollbar is allowed to appear and accuse this design.
+        (Solution taken from team 7.)
+      - width:100vw — DELETED. It is the mobile horizontal-scroll
+        footgun and it is why this design ranked LAST of seven on
+        the critique's number one finding.
+      - NO H1 — FIXED. This design ranked last of seven on unsighted
+        arrival. The house now names itself and what it does in a
+        real heading, in plain words, before any metaphor and before
+        any product; the metaphor is demoted to a supporting line.
+        The nine banks and their counts are given to assistive tech
+        as a list, so the proportion the seams carry visually is not
+        sighted-only.
+      - the object went nowhere. The block used to produce a demo
+        and stop — "interesting aspects, but not actually main menu."
+        Every cut now ends in a real way in.
+      - the brightness flash ignored prefers-reduced-motion. Guarded.
+
+     THE FREE GROUND, TAKEN: the Deep Read had no address anywhere
+     in the fleet — three designs never printed the words at all. It
+     has one here, and only this design can state it in its own
+     material: a Sitting takes three leaves, the Deep Read takes
+     five, and the difference is a thickness you can see. That is a
+     count of material in the unit the surface already trades in,
+     not a price and not a plan comparison — app.js:2453-2459
+     rejects putting PRICES on the tiles, and no number here is
+     currency. "Or the Deep Read — five." is already live copy at
+     app.js:2480; this gives it a door instead of a footnote.
+
+     THE SECOND FREE GROUND: nothing in the fleet distinguished a
+     live draw from canned demo copy. The cut is seeded by where the
+     hand landed, and the parting prints that true depth as a
+     figure — a value that could only have come from this visit.
+  ============================================================ */
+  :root{
+    --t-display:#dcd7cb; --t-primary:#d7d3ca; --t-body:#b1ada4; --t-meta:#948f87; --t-ghost:#6e6b63;
+    --ink-950:#0a0b0d; --ink-900:#100f0c; --ink-850:#11100d; --ink-800:#151310; --ink-700:#1c1915;
+    --line-faint:rgba(233,229,220,.07); --line:rgba(233,229,220,.12); --line-strong:rgba(233,229,220,.2);
+    --hair-1:rgba(233,229,220,.14); --hair-2:rgba(233,229,220,.08); --hair-3:rgba(233,229,220,.045);
+    --font-display:"Cormorant Garamond","Times New Roman",serif;
+    --font-ui:"Inter",-apple-system,"Segoe UI",sans-serif;
+    --font-mono:"IBM Plex Mono","Consolas",monospace;
+    --track-caps:.22em; --track-wide:.3em;
+    --ease-settle:cubic-bezier(.2,.7,.2,1);
+    --gold:#c8ad70; --gold-lit:#e0c48c;   /* shipped literals — styles.css:3303, 3853, 3892 */
+    --leaf:233,229,220;                   /* the shipped cream triplet, reused for leaf edges */
+
+    /* THE GUTTER — the run of dark beside the material where every depth-marker
+       is written at wide widths. NARROW IS NATIVE: the unconditional page has no
+       gutter and the markers sit ON the material (see .block__bracket etc.
+       below, in their base — not overridden — form). The gutter is an ADDITION,
+       switched on only above 560px by the min-width query near the bottom of
+       this sheet. Polarity taken from team 4: narrow is not a rescue. */
+    --gut:0px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html{background:var(--ink-950);}
+  body{
+    font-family:var(--font-ui);
+    background:var(--ink-950);
+    color:var(--t-body);
+    -webkit-font-smoothing:antialiased;
+    /* NO overflow:hidden. See the note above — it was concealment, and on the
+       real surface it would have been sitewide breakage. */
+  }
+  .sr-only{
+    position:absolute; width:1px; height:1px; padding:0; margin:-1px;
+    overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; border:0;
+  }
+
+  .m1{
+    position:relative;
+    min-height:100vh;          /* fallback for engines without svh */
+    min-height:100svh;
+    width:100%;                /* never 100vw */
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    /* bottom padding reserves the real chrome rail (80px) + orb clearance */
+    padding:18px clamp(16px,5vw,72px) 96px;
+    gap:0;
+  }
+
+  /* -------- 1. the house names itself -------- */
+  .mast{
+    width:100%;
+    max-width:1400px;
+    flex:0 0 auto;
+    text-align:left;
+    padding-bottom:10px;
+  }
+  .mast__mark{
+    font-family:var(--font-mono);
+    font-size:9px;
+    letter-spacing:.3em;
+    text-transform:uppercase;
+    color:var(--gold);
+  }
+  /* PLAIN FIRST. An arrival — sighted or not — is told what this place is and
+     what it does before it is told anything clever. The metaphor comes after,
+     as support, never as the only explanation. */
+  .mast__title{
+    margin-top:8px;
+    font-family:var(--font-display);
+    font-weight:600;
+    font-size:clamp(18px,2.4vw,27px);
+    line-height:1.2;
+    color:var(--t-display);
+    max-width:26ch;
+  }
+  .mast__says{
+    margin-top:8px;
+    font-size:clamp(12px,1.1vw,13.5px);
+    line-height:1.5;
+    color:var(--t-body);
+    max-width:56ch;
+  }
+  .mast__sentence{
+    margin-top:4px;
+    font-family:var(--font-display);
+    font-style:italic;
+    font-size:clamp(12.5px,1.4vw,14.5px);
+    line-height:1.4;
+    color:var(--t-meta);
+    max-width:640px;
+  }
+  .mast__sentence em{ font-style:normal; color:var(--t-body); }
+
+  /* -------- 2. the stage: THE MASS + THE OPENING + THE GUTTER -------- */
+  .stage{
+    position:relative;
+    width:100%;
+    max-width:1400px;
+    flex:1 1 auto;
+    min-height:60px;
+    padding-right:var(--gut);
+    display:flex;
+    align-items:center;
+    justify-content:flex-start;
+  }
+
+  .block{
+    position:relative;
+    width:100%;
+    border-top:1px solid var(--gold);
+    border-bottom:1px solid var(--gold);
+    background-color:var(--ink-700);
+    cursor:pointer;
+    outline-offset:3px;
+    /* NOT overflow:hidden. It was clipping .block__bracket and .block__tick to
+       invisible at every width above 560px — both are positioned outside the
+       block's own box at wide widths, and this was the single element carrying
+       the whole proportion argument rendering as nothing on desktop. Nothing
+       else in the block needs clipping: .block__lower is bounded by its own
+       top/bottom, .parting is kept inside blockH by the geometry law's
+       amendment (fitBlock), and the grain background never exceeds its box. */
+  }
+  .block:focus-visible{ outline:1px solid var(--t-meta); }
+
+  /* the material below the cut, drawn separately so its grain PHASE JUMPS at
+     the cut face. That jump is the whole proof: the mass has been opened and
+     what is under the cut has moved, rather than a shape being punched out. */
+  .block__lower{
+    position:absolute; left:0; right:0; bottom:0;
+    background-color:var(--ink-700);
+    pointer-events:none;
+    z-index:1;
+  }
+
+  /* stratum boundary — a gap in the grain with one bright rule in it. It must
+     read louder than the leaf lines it interrupts. Nine banks are visible at
+     rest or the design has no argument. */
+  .block__seam{
+    position:absolute; left:0; right:0;
+    height:5px;
+    margin-top:-2px;
+    background:var(--ink-700);
+    pointer-events:none;
+    z-index:2;
+  }
+  .block__seam::after{
+    content:"";
+    position:absolute; left:0; right:0; top:2px; height:1px;
+    background:rgba(var(--leaf),.9);
+  }
+
+  /* ---- markers: children of .block, so their % depth resolves against the
+          material they are pointing at, not the stage ---- */
+
+  /* THE DECK BAND — the deck's 78 leaves, tinted across their true depth in the
+     material itself. This is the design's whole argument made visible with no
+     label, no gutter and no interaction: the offer drawn to scale inside the
+     archive it comes out of, and the unsold remainder above and below it. It
+     survives at 430px where the gutter cannot. z-index 2 so it sits over the
+     displaced lower leaves and under the opening. */
+  .block__deck{
+    position:absolute; left:0; right:0;
+    background:rgba(200,173,112,.075);
+    border-top:1px solid rgba(200,173,112,.5);
+    border-bottom:1px solid rgba(200,173,112,.5);
+    pointer-events:none;
+    z-index:2;
+  }
+
+  /* the bracket was drawn in the faintest ink on the surface — the design's best
+     sentence set in its lightest weight. It is now gold, and z-index 5 so the
+     opening can never cover it. BASE STATE IS NARROW-NATIVE: the bracket stands
+     ON the material, left:0. The min-width:561px query below moves it outside
+     the material into the gutter — an addition, not the default. */
+  .block__bracket{
+    position:absolute;
+    left:0;
+    margin-left:8px;
+    width:1px;
+    background:var(--gold);
+    pointer-events:none;
+    z-index:5;
+  }
+  .block__bracket::before,
+  .block__bracket::after{
+    content:"";
+    position:absolute; left:0; width:7px; height:1px;
+    background:var(--gold);
+  }
+  .block__bracket::before{ top:0; }
+  .block__bracket::after{ bottom:0; }
+  .block__braclabel{
+    position:absolute;
+    left:6px; top:50%;
+    transform:translateY(-50%);
+    font-family:var(--font-mono);
+    font-size:10px;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+    color:var(--t-display);
+    white-space:nowrap;
+  }
+  /* the bracket stands ON the material at base width and outranks the opening,
+     which is right for the rule — it is the argument. But the LABEL is text, and
+     with a reading printed it lands on top of the reading's second line. Nothing
+     may sit on the words, and at that moment the label is saying twice what the
+     opening already says in full ("Inside the 78 —"), so it stands down. The
+     gold rule stays; only the duplicated word goes. Reinstated at wide widths,
+     where the label sits in the gutter and never touches the reading. */
+  .block.has-read .block__braclabel{ opacity:0; }
+
+  /* six lookup ticks — hidden until .is-looking. BASE STATE IS NARROW-NATIVE:
+     the ticks sit on the material's own right edge, name-first-then-rule
+     reversed so the rule touches the edge. The min-width:561px query moves them
+     out into the gutter in their original left-to-right order. */
+  .block__tick{
+    position:absolute;
+    left:auto; right:8px;
+    margin-left:0;
+    display:flex;
+    flex-direction:row-reverse;
+    align-items:center;
+    gap:5px;
+    opacity:0;
+    transform:translateX(-4px);
+    transition:opacity 220ms var(--ease-settle), transform 220ms var(--ease-settle);
+    pointer-events:none;
+    white-space:nowrap;
+    z-index:3;
+  }
+  @media (prefers-reduced-motion:reduce){ .block__tick{ transition:opacity 220ms linear; } }
+  .stage.is-looking .block__tick{ opacity:1; transform:translateX(0); }
+  .block__tick-line{ width:12px; height:1px; background:var(--gold); flex:0 0 auto; }
+  .block__tick-name{
+    font-family:var(--font-mono);
+    font-size:8.5px;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+    color:var(--t-display);
+  }
+  .nm-sm{ display:none; }
+  @media (max-width:820px){
+    .nm-lg{ display:none; }
+    .nm-sm{ display:inline; }
+    .block__tick{ margin-left:15px; gap:4px; }
+    .block__tick-line{ width:9px; }
+    .block__tick-name{ font-size:8px; letter-spacing:.08em; }
+    /* the bracket label does NOT shrink with the ticks. It is the one number on
+       this surface that carries the whole argument; it is not furniture. */
+    .block__braclabel{ letter-spacing:.08em; }
+  }
+
+  /* -------- 3. THE OPENING — the mass parted at the cut -------- */
+  /* Not a void. Its ground is the material's own dark, its two edges are the
+     exposed cut faces, and the leaves under it have been pushed down. */
+  .parting{
+    position:absolute;
+    left:0; right:0;
+    top:0;
+    z-index:4;
+    background:var(--ink-700);
+    border-top:1px solid rgba(200,173,112,.72);    /* the underside of the raised mass — a shade under
+                                                        the mass's own full-strength gold edge, so the
+                                                        outer boundary of the whole 222-leaf archive stays
+                                                        the strongest line on the page, not an internal cut */
+    border-bottom:1px solid rgba(var(--leaf),.4);  /* the face of what stayed put */
+    box-shadow:0 6px 14px -6px rgba(0,0,0,.85);    /* the raised mass casts onto what is under it */
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    gap:6px;
+    padding:12px clamp(8px,2vw,28px) 10px;
+    transition:transform 220ms var(--ease-settle);
+    will-change:transform;
+  }
+  @media (prefers-reduced-motion:reduce){ .parting{ transition:none; } }
+
+  .pMeta{
+    font-family:var(--font-mono);
+    font-size:9px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--t-meta);
+  }
+  .pMeta em{ font-style:normal; color:var(--gold); }
+  /* NO line-clamp anywhere. The reading is never silently truncated: the
+     opening takes its natural height and the mass pays for it (see fitBlock). */
+  .pMean{
+    font-family:var(--font-display);
+    font-size:19px;
+    line-height:1.6;
+    color:var(--t-display);
+    max-width:78ch;
+  }
+  @media (max-width:640px){ .pMean{ font-size:16px; } }
+
+  /* ---- THE PAID LINE ----
+     Inside the 78 the opening stops describing the deck and prints one line of
+     what the deck actually SAYS. It is the same string the shipped room speaks
+     for a drawn card — drawing-room.js:546, firstSentence() of that card's own
+     meaning, the first sentence of the prose the Deep Read prints under the
+     position. Nothing here is written by this file.
+
+     IT IS NOT A SECOND ANNOUNCEMENT. .pMean ends in a colon and this completes
+     it: one sentence that changes voice where the goods begin. To keep that true
+     the frame gives up the reading voice whenever there is a reading to print —
+     see .parting.has-read .pMean below — so the opening never holds two objects
+     set at the same weight. */
+  .pQuote{
+    font-family:var(--font-display);
+    font-size:19px;
+    line-height:1.42;   /* tighter than .pMean's 1.6 — this is one sentence, not a
+                           paragraph, and every line it saves is a line of ruling
+                           the mass keeps. Measured, not taste: see the report. */
+    color:var(--t-display);
+    max-width:78ch;     /* the same measure .pMean has always had. At 64ch the
+                           longest of the 78 sentences took a third line at wide
+                           and cost the mass 27px of ruling for nothing. */
+  }
+  /* the visitor must never mistake it for their own draw */
+  .pQuote__tag{
+    display:inline-block;
+    margin-left:9px;
+    font-family:var(--font-mono);
+    font-size:8.5px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--t-ghost);
+    white-space:nowrap;
+  }
+  /* out of the deck there is nothing to quote — display:none, so it takes no flex
+     gap and the lookup opening is exactly the height it always was */
+  .parting:not(.has-read) .pQuote{ display:none; }
+  .parting.has-read .pMean{
+    font-family:var(--font-ui);
+    font-size:12px;
+    line-height:1.45;
+    color:var(--t-body);
+    max-width:60ch;
+  }
+
+  /* the ways out of the opening — the object now ends in a door, always */
+  .pWays{
+    display:flex; flex-wrap:wrap; align-items:center;
+    gap:4px clamp(14px,2.4vw,28px);
+    margin-top:2px;
+  }
+  .pWay{
+    display:inline-flex; align-items:center;
+    min-height:44px;
+    font-family:var(--font-mono);
+    font-size:10px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    font-weight:600;
+    color:var(--t-primary);
+    text-decoration:none;
+    border-bottom:1px solid var(--line-strong);
+    transition:color 160ms var(--ease-settle), border-color 160ms var(--ease-settle);
+  }
+  .pWay:hover, .pWay:focus-visible{ color:var(--gold-lit); border-color:var(--gold-lit); }
+  .pWay:focus-visible{ outline:1px solid var(--t-meta); outline-offset:3px; }
+  /* THE THICKNESS MARK — three leaves against five, drawn in the material's own
+     unit. This is the only place in the fleet where the size of an act is shown
+     rather than stated, and it is a count of leaves, never a price. */
+  .pWay i{
+    display:inline-block; width:11px; height:9px; margin-right:7px;
+    flex:0 0 auto;
+    background:repeating-linear-gradient(180deg,
+      rgba(var(--leaf),.75) 0, rgba(var(--leaf),.75) 1px,
+      transparent 1px, transparent 3px);
+  }
+  .pWay--deep i{ height:15px; }
+
+  /* -------- 4. the two acts -------- */
+  /* BASE STATE IS NARROW-NATIVE: acts stack full-width. min-width:561px widens
+     the gap and caps each act at 420px — an addition, not a rescue. */
+  .acts{
+    width:100%;
+    max-width:1400px;
+    flex:0 0 auto;
+    display:flex;
+    flex-wrap:wrap;
+    align-items:flex-end;
+    justify-content:space-between;
+    gap:14px 20px;
+    padding:14px 0 10px;
+  }
+
+  .act{ max-width:100%; }
+  .act__kicker{
+    font-family:var(--font-mono);
+    font-size:9px;
+    letter-spacing:.2em;
+    text-transform:uppercase;
+    color:var(--t-ghost);
+    margin-bottom:4px;
+  }
+  .act__name{
+    font-family:var(--font-display);
+    font-size:18px;
+    color:var(--t-display);
+    margin-bottom:3px;
+  }
+  .act__line{
+    font-family:var(--font-ui);
+    font-size:12px;
+    color:var(--t-body);
+    margin-bottom:8px;
+  }
+  .act__go{
+    display:inline-flex; align-items:center;
+    min-height:44px;
+    font-family:var(--font-mono);
+    font-size:10px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    font-weight:600;
+    color:var(--t-primary);
+    text-decoration:none;
+    border-bottom:1px solid var(--line-strong);
+    transition:color 160ms var(--ease-settle), border-color 160ms var(--ease-settle);
+  }
+  .act__go:hover, .act__go:focus-visible{ color:var(--gold-lit); border-color:var(--gold-lit); }
+  .act__go:focus-visible{ outline:1px solid var(--t-meta); outline-offset:3px; }
+
+  .legend{
+    margin-top:8px;
+    font-family:var(--font-mono);
+    font-size:9px;
+    letter-spacing:.08em;
+    color:var(--t-ghost);
+    opacity:0;
+    transition:opacity 220ms var(--ease-settle);
+  }
+  .lookup.is-active .legend{ opacity:1; }
+
+  /* the Codex is what the whole surface is MADE of — written at the weight of
+     the acts' own supporting line, not smaller than everything else on screen */
+  .quiet{
+    width:100%;
+    max-width:1400px;
+    text-align:left;
+    font-family:var(--font-mono);
+    font-size:9px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--t-meta);
+    padding:2px 0 8px;
+  }
+  .quiet a{
+    display:inline-flex; align-items:center; min-height:44px; padding:2px 0;
+    color:var(--t-primary); text-decoration:none; border-bottom:1px solid var(--line-strong);
+  }
+  .quiet a:hover, .quiet a:focus-visible{ color:var(--gold-lit); border-color:var(--gold-lit); }
+  .quiet a:focus-visible{ outline:1px solid var(--t-meta); outline-offset:3px; }
+
+  /* -------- THE POLARITY: narrow is native, wide is the addition --------
+     Inverted on the architect's ruling (solution taken from team 4). The base
+     rules above this line ARE the page: no gutter, markers on the material,
+     acts stacked full-width. That is not a rescue state — it is what renders
+     with zero media queries at all. Below, a min-width:561px query switches
+     the gutter on: at 430px a reserved-and-shrunk gutter was spending 92px, a
+     fifth of the screen, writing 8px labels for nothing — that failure mode
+     cannot recur if the gutter is never the default in the first place. */
+  @media (min-width:561px){
+    :root{ --gut:clamp(92px,13vw,168px); }
+    .stage{ padding-right:var(--gut); }
+    .block__tick{
+      left:100%; right:auto; margin-left:18px;
+      flex-direction:row;
+    }
+    .block__bracket{ left:100%; margin-left:7px; }
+    .block__braclabel{ left:8px; }
+    /* out in the gutter the label never touches the reading — reinstated */
+    .block.has-read .block__braclabel{ opacity:1; }
+    .acts{ gap:18px 32px; }
+    .act{ max-width:420px; }
+  }
+  @media (max-width:430px){
+    /* THE REAL FINDING AT THIS WIDTH: not overflow — the opening's own card
+       (measured ~216px: 12+10 padding, one meta line, a 4-line pMean at the
+       old 15px/1.5, two wrapped 44px ways) comes within ~10px of the block's
+       whole computed height (~222-230px at a typical 900px-tall phone, once
+       fitBlock's pitch floors at 1px because the stage only inherits ~238px
+       of a 900px screen). The mass and the card become the same object; the
+       grain the whole design is named for goes to near-zero on both sides.
+       The fix is not shrinking the card further — it already can't lose the
+       no-line-clamp reading — it's giving the block back the height the mast
+       and acts were spending on wrapping the title through an artificial
+       26ch column narrower than the viewport itself. */
+    .mast__title{ max-width:none; font-size:17px; line-height:1.16; }
+    .mast__says{ max-width:none; font-size:11px; line-height:1.42; margin-top:4px; }
+    .mast__sentence{ max-width:none; font-size:11.5px; margin-top:4px; }
+    .mast{ padding-bottom:6px; }
+
+    /* the legend reserves its line-height even at opacity:0 (lookup not yet
+       touched) — 21px given back on the one act that never got the space
+       lit-state depends on hover/focus, neither of which this width mostly
+       gets, so the reserve was dead weight almost always */
+    .legend{ margin-top:0; max-height:0; overflow:hidden; }
+    .lookup.is-active .legend{ max-height:20px; margin-top:6px; }
+    .acts{ gap:12px 20px; padding:8px 0 6px; }
+    .act__kicker{ margin-bottom:2px; }
+    .act__name{ margin-bottom:2px; font-size:17px; }
+    .act__line{ margin-bottom:6px; font-size:11.5px; }
+
+    .pMean{ font-size:14px; line-height:1.44; }
+    /* the quoted line keeps the reading size the spec prose used to hold; the
+       frame drops to 11px. The two together are shorter than the spec sentence
+       they replaced, so the mass keeps its ruling — see the report. */
+    .pQuote{ font-size:14px; line-height:1.44; }
+    .parting.has-read .pMean{ font-size:11px; line-height:1.4; }
+    .pQuote__tag{ margin-left:7px; font-size:8px; letter-spacing:.1em; }
+    /* row-gap was 0 — two pWay rows each with a real 44px hit target were
+       landing edge-to-edge with no seam between them; a fast tap near the
+       boundary could register on the wrong one */
+    .pWays{ gap:8px 14px; }
+    .pWay{ font-size:9px; letter-spacing:.09em; }
+    .parting{ padding:10px clamp(8px,2vw,20px) 9px; gap:4px; }
+    .quiet{ padding:2px 0 6px; }
+  }
+  /* short screens: the flow tightens a step at a time. Nothing is removed and
+     nothing is cut; if a screen is ever shorter than this the page is allowed
+     to scroll and accuse itself rather than quietly hide a word. */
+  @media (max-height:760px){
+    .m1{ padding-top:12px; padding-bottom:88px; }
+    .mast{ padding-bottom:6px; }
+    .acts{ padding:10px 0 6px; }
+    .pMean{ font-size:17px; }
+    .pQuote{ font-size:17px; }
+  }
+  @media (max-width:520px) and (max-height:760px){
+    .mast__title{ font-size:17px; }
+    .mast__says{ font-size:11px; line-height:1.45; }
+    .mast__sentence{ font-size:11.5px; }
+    .pMean{ font-size:14px; line-height:1.45; }
+    .pQuote{ font-size:14px; line-height:1.45; }
+    .parting.has-read .pMean{ font-size:11px; line-height:1.4; }
+    .parting{ padding:9px 10px 8px; gap:4px; }
+    .pWay{ min-height:40px; }
+    .act__name{ font-size:16px; }
+    .act__line{ font-size:11.5px; margin-bottom:5px; }
+    .act__go{ min-height:40px; }
+  }
+
+  /* -------- simulated existing chrome: 80px rail + two fixed orbs -------- */
+  .rail-sim{
+    position:fixed; left:0; right:0; bottom:0; height:80px;
+    display:flex; align-items:center; justify-content:center; gap:28px;
+    font-family:var(--font-mono); font-size:9px; letter-spacing:.14em; text-transform:uppercase;
+    color:var(--t-ghost);
+    border-top:1px solid var(--line-faint);
+    background:var(--ink-950);
+    pointer-events:none;
+  }
+  .orb-sim{
+    position:fixed; bottom:16px; width:14px; height:14px; border-radius:50%;
+    border:1px solid var(--line-strong);
+    pointer-events:none;
+  }
+  .orb-sim--a{ right:16px; }
+  .orb-sim--b{ right:40px; }
+</style>
+</head>
+<body>
+
+<main class="m1" id="m1">
+
+  <div class="mast">
+    <div class="mast__mark">&#9670; BLUE ROOM</div>
+    <h1 class="mast__title">Blue Room reads a person out of one archive of 222 marks. There are two ways in.</h1>
+    <p class="mast__says">A reading is a short piece of writing about you, made from marks in that archive &mdash; either dealt to you tonight, or looked up from the day you were born.</p>
+    <p class="mast__sentence">The archive is below, stood on its edge. <em>78 of it is the deck. The other 144 is never dealt &mdash; it is looked up.</em></p>
+  </div>
+
+  <div class="stage" id="stage">
+    <div class="block" id="block" role="button" tabindex="0"
+         aria-label="The archive, 222 marks deep, nine banks in order. 78 of them are the deck a tarot reading is dealt from; the other 144 are looked up. Choose a depth to cut at.">
+      <ul class="sr-only" id="bankList"></ul>
+    </div>
+  </div>
+
+  <div class="acts">
+    <div class="act lookup" id="lookupAct" aria-label="The Birth Reading. Looked up from six of the archive's marks, paid once, kept.">
+      <div class="act__kicker">Looked up &middot; the mass stays shut</div>
+      <div class="act__name">The Birth Reading</div>
+      <p class="act__line">Six marks you were handed, not dealt. Paid once, then yours to keep.</p>
+      <a class="act__go" href="?dev=arcane">Give a name and date &rarr;</a>
+      <div class="legend" id="legend"></div>
+    </div>
+
+    <div class="act cut" id="cutAct" aria-label="A Tarot Reading. Dealt from the deck: a Sitting of three leaves free, or the five-leaf Deep Read.">
+      <div class="act__kicker">Dealt &middot; the mass opens</div>
+      <div class="act__name">A Tarot Reading</div>
+      <p class="act__line">Three leaves to one question, your first free &mdash; or five, for the Deep Read.</p>
+      <a class="act__go" href="?dev=drawing-room">Cut the deck &rarr;</a>
+    </div>
+  </div>
+
+  <p class="quiet">Every leaf here is written up in the <a href="codex.html?v=363" data-codex-open>Codex &rarr;</a></p>
+</main>
+
+<div class="rail-sim" aria-hidden="true">Rooms &nbsp;·&nbsp; Profile &nbsp;·&nbsp; What's coming &nbsp;·&nbsp; Settings</div>
+<div class="orb-sim orb-sim--a" aria-hidden="true"></div>
+<div class="orb-sim orb-sim--b" aria-hidden="true"></div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---- the nine bearing banks + the guide, verified against codex-data.json ----
+     12 + 17 + 12 + 22 + 56 + 24 + 8 + 64 + 7 = 222
+     The tenth bank (Tarot — Reading the Cards) has entries:[] and is therefore
+     drawn as a bracket label over the two tarot strata, never as material. */
+  var BANKS = [
+    { id:"zodiac",  name:"Western Zodiac",    short:"Zodiac",  count:12, lookup:true,  unit:"a sun sign" },
+    { id:"chinese", name:"Chinese Zodiac",    short:"Chinese", count:17, lookup:true,  unit:"a year animal" },
+    { id:"numer",   name:"Numerology",        short:"Number",  count:12, lookup:true,  unit:"a life-path number" },
+    { id:"major",   name:"Major Arcana",      short:"Major",   count:22, lookup:false, unit:"a major arcana card", tarot:true },
+    { id:"minor",   name:"Minor Arcana",      short:"Minor",   count:56, lookup:false, unit:"a minor arcana card", tarot:true },
+    { id:"futhark", name:"Elder Futhark",     short:"Runes",   count:24, lookup:true,  unit:"a rune" },
+    { id:"trigram", name:"Eight Trigrams",    short:"Trigram", count:8,  lookup:true,  unit:"a trigram" },
+    { id:"iching",  name:"I Ching",           short:"I Ching", count:64, lookup:true,  unit:"a hexagram" },
+    { id:"lexicon", name:"Blue Room Lexicon", short:"Lexicon", count:7,  lookup:true,  unit:"a house term" }
+  ];
+  var TOTAL = BANKS.reduce(function(a,b){ return a+b.count; }, 0);
+  if (TOTAL !== 222) { console.error("THE FORE-EDGE: bank counts drifted from 222 —", TOTAL); }
+
+  /* ---- THE FIVE PLACES OF THE DEEP READ ----
+     Verbatim from drawing-room.js:85-87, SPREADS.deep.positions / .notes. A
+     Sitting has the first, second and fifth of these; the Deep Read has all five.
+     That is what the extra six pixels of thickness under .pWay--deep are made of,
+     and it is why the frame names a place before the line is quoted. */
+  var DEEP_PLACES = [
+    { name:"The Ground",   note:"what it rests on" },
+    { name:"The Crossing", note:"what stands against it" },
+    { name:"The Root",     note:"what it grew from" },
+    { name:"The Crown",    note:"what it reaches for" },
+    { name:"The Turn",     note:"where it tends" }
+  ];
+
+  /* ---- READ — the first sentence of each of the 78 cards' own meanings ----
+     Deck order: the 22 Major Arcana, then the 56 Minor (Wands, Cups, Swords,
+     Pentacles; Ace to King) — the order codex-data.json holds them in, which is
+     the order this mass is ruled in, so leaf number maps straight to card.
+
+     SOURCE, and nothing here is written by this file: each string is
+     firstSentence(card.meaning) — drawing-room.js:466 and :546 — the exact string
+     the shipped Drawing Room speaks aloud for a card it has dealt, taken from the
+     card's `meaning` field in codex-data.json. Upright. No reversed line is
+     quoted, because no orientation is claimed.
+
+     THE TRADEOFF, STATED. This is a second copy of Codex content and it can drift
+     from the first. It is inlined rather than fetched because M1 is the most
+     paint-bound surface in the build (BR-S276) and a prototype that fetches the
+     Codex to print one sentence is not a prototype anyone can measure. ON SHIP
+     THIS ARRAY IS DELETED: drawing-room.js already loads the real 78 into DECK,
+     and the line becomes firstSentence(DECK[i].meaning) against that. The length
+     guard below is the same guard BANKS has, for the same reason. */
+  var READ = [
+    "The Fool represents new beginnings, innocence, and a leap into the unknown.",
+    "The Magician stands for manifestation, willpower, and the resourceful use of one's skills and tools to turn ideas into reality.",
+    "The High Priestess represents intuition, the subconscious mind, and hidden or as-yet-unrevealed knowledge.",
+    "The Empress embodies abundance, nurturing, fertility, and the creative force of nature.",
+    "The Emperor represents authority, structure, and stable, rational leadership.",
+    "The Hierophant represents tradition, established institutions, and conventional belief systems such as religion, education, or formal codes of conduct.",
+    "The Lovers represents love, deep connection, and harmony between partners, as well as significant choices, especially those involving values and relationships.",
+    "The Chariot represents willpower, determination, and victory achieved through focus and self-discipline.",
+    "Strength represents inner fortitude, courage, and the mastery of raw impulse through patience and compassion rather than brute force.",
+    "The Hermit represents introspection, solitude, and the search for inner truth.",
+    "The Wheel of Fortune represents cycles, fate, and the turning points of life that lie beyond personal control.",
+    "Justice represents fairness, truth, and the law of cause and effect.",
+    "The Hanged Man represents surrender, suspension, and gaining a new perspective by pausing rather than pushing forward.",
+    "Death represents endings, transformation, and the transition from one state of being to another.",
+    "Temperance represents balance, moderation, and the harmonious blending of opposites.",
+    "The Devil represents bondage, materialism, and unhealthy attachment, often to habits, desires, or relationships that limit freedom.",
+    "The Tower represents sudden, disruptive upheaval that destroys false structures and forces revelation.",
+    "The Star represents hope, inspiration, and renewal following a period of hardship.",
+    "The Moon represents illusion, fear, and the murky realm of the unconscious and dreams.",
+    "The Sun represents joy, success, and vitality.",
+    "Judgement represents reckoning, rebirth, and answering an inner call to a higher purpose.",
+    "The World represents completion, fulfillment, and the successful integration of a long journey's lessons.",
+    "The Ace of Wands represents the pure potential of Fire: a fresh spark of inspiration, passion, and creative drive not yet given shape.",
+    "The Two of Wands stands for planning, personal power, and the pull between comfort and the wider world.",
+    "The Three of Wands represents expansion, foresight, and the early results of a plan already set in motion.",
+    "The Four of Wands embodies celebration, homecoming, and a stable foundation reached after sustained effort.",
+    "The Five of Wands represents conflict, competition, and the friction that arises when several strong wills clash.",
+    "The Six of Wands speaks to victory, public recognition, and the confidence earned by hard-won success.",
+    "The Seven of Wands represents defense, perseverance, and holding one's position against challenge.",
+    "The Eight of Wands stands for swift movement, momentum, and events accelerating toward resolution.",
+    "The Nine of Wands represents resilience, vigilance, and the persistence needed for one last effort.",
+    "The Ten of Wands embodies burden, overload, and the weight of responsibilities carried alone.",
+    "The Page of Wands represents curiosity, enthusiasm, and the eagerness of a beginner discovering a new passion.",
+    "The Knight of Wands speaks to bold action, adventure, and passion pursued at full speed.",
+    "The Queen of Wands represents confidence, warmth, and independence expressed with magnetic energy.",
+    "The King of Wands stands for visionary leadership, boldness, and command of ambition put to purposeful use.",
+    "The Ace of Cups represents the pure potential of the heart: new love, emotional beginnings, and an outpouring of compassion.",
+    "The Two of Cups stands for partnership, mutual attraction, and the harmony of two people meeting as equals.",
+    "The Three of Cups represents celebration, friendship, and the shared joy of community.",
+    "The Four of Cups embodies apathy, contemplation, and a discontent that has turned inward.",
+    "The Five of Cups represents grief, loss, and regret over what has spilled and cannot be recovered.",
+    "The Six of Cups stands for nostalgia, childhood memory, and the warmth of simple, innocent giving.",
+    "The Seven of Cups represents choices, fantasy, and the difficulty of telling illusion from substance.",
+    "The Eight of Cups stands for walking away from what no longer satisfies in search of something deeper.",
+    "The Nine of Cups represents satisfaction, contentment, and a wish granted.",
+    "The Ten of Cups stands for emotional fulfillment, family harmony, and lasting domestic happiness.",
+    "The Page of Cups represents emotional curiosity, a creative or intuitive message, and the wide-eyed beginning of feeling something new.",
+    "The Knight of Cups stands for romantic pursuit, an invitation offered with sincerity, and following the heart's ideal.",
+    "The Queen of Cups represents deep emotional intuition, compassion, and a nurturing wisdom turned inward before it is offered outward.",
+    "The King of Cups stands for emotional mastery expressed outwardly, calm authority, and the diplomatic balancing of heart and head.",
+    "The Ace of Swords represents clarity, breakthrough, and the sudden cutting-through of confusion by a sharp new idea.",
+    "The Two of Swords speaks to stalemate, indecision, and a deliberate avoidance of a difficult choice.",
+    "The Three of Swords represents heartbreak, sorrow, and the pain of a truth that wounds.",
+    "The Four of Swords stands for rest, recovery, and a deliberate withdrawal for the sake of healing.",
+    "The Five of Swords represents conflict, discord, and a victory won at too high a cost.",
+    "The Six of Swords embodies transition, moving on, and the passage from difficulty toward calmer circumstances.",
+    "The Seven of Swords represents strategy, stealth, and a solitary or evasive approach to a difficult situation.",
+    "The Eight of Swords speaks to restriction, entrapment, and a sense of being bound that is largely self-imposed.",
+    "The Nine of Swords represents anxiety, worry, and mental anguish that intensifies in the dark, private hours.",
+    "The Ten of Swords stands for a painful ending, betrayal, and reaching a definitive rock bottom.",
+    "The Page of Swords represents curiosity, vigilance, and an eager, unformed engagement with new ideas and information.",
+    "The Knight of Swords embodies swift action, ambition, and a forceful drive toward a goal.",
+    "The Queen of Swords represents clear perception, independence, and direct, unsentimental communication.",
+    "The King of Swords speaks to intellectual authority, logic, and judgment grounded in clear, impartial thinking.",
+    "The Ace of Pentacles represents new opportunity, material prosperity, and the seed of a stable, tangible beginning.",
+    "The Two of Pentacles stands for balance, juggling multiple priorities, and adaptability amid shifting material demands.",
+    "The Three of Pentacles represents skilled collaboration, craftsmanship, and work recognized by others.",
+    "The Four of Pentacles embodies material security taken to the point of control, possessiveness, and a tight grip on what one has.",
+    "The Five of Pentacles represents material hardship, financial loss, and the feeling of being left out in the cold.",
+    "The Six of Pentacles speaks to generosity, charity, and the balanced exchange of giving and receiving.",
+    "The Seven of Pentacles represents patience, assessment, and the evaluation of an investment of time, money, or labor.",
+    "The Eight of Pentacles stands for diligence, craftsmanship, and the steady mastery of a skill through repetition.",
+    "The Nine of Pentacles represents self-sufficiency, material abundance, and the refined comfort earned through one's own independent effort.",
+    "The Ten of Pentacles embodies legacy, generational wealth, and long-term material security built over a lifetime.",
+    "The Page of Pentacles represents a student of the material world: practical curiosity, a new opportunity, and the focused ambition of a beginner.",
+    "The Knight of Pentacles speaks to diligence, steadiness, and methodical progress toward a practical goal.",
+    "The Queen of Pentacles represents nurture expressed through practical care, material abundance, and a deep groundedness in the physical world.",
+    "The King of Pentacles stands for worldly prosperity, business acumen, and outward authority over the material realm."
+  ];
+  if (READ.length !== 78) { console.error("THE FORE-EDGE: the deck's readings drifted from 78 —", READ.length); }
+
+  /* the six banks the Birth Reading draws from — one entry each, at true depth */
+  var LOOKUP_SIX = ["zodiac","chinese","numer","futhark","trigram","iching"];
+
+  var stage     = document.getElementById("stage");
+  var block     = document.getElementById("block");
+  var legend    = document.getElementById("legend");
+  var lookupAct = document.getElementById("lookupAct");
+  var bankList  = document.getElementById("bankList");
+
+  var parting, lower, seamEls = [], tickEls = [], bracketEl, braclabelEl, deckEl;
+
+  var reduceMotion = window.matchMedia
+    ? window.matchMedia("(prefers-reduced-motion: reduce)") : { matches:false };
+
+  function idx(id){ return BANKS.map(function(b){ return b.id; }).indexOf(id); }
+  function before(i){ var s=0; for (var k=0;k<i;k++) s += BANKS[k].count; return s; }
+
+  function buildOnce(){
+    /* THE MATERIAL, GIVEN TO ASSISTIVE TECH. The seams carry the nine banks and
+       their proportions visually; without this the whole argument of the surface
+       is sighted-only. No other design in the fleet hands over its own contents. */
+    BANKS.forEach(function(b){
+      var li = document.createElement("li");
+      li.textContent = b.name + " — " + b.count + " marks"
+        + (b.tarot ? " (part of the deck)" : " (looked up, never dealt)");
+      bankList.appendChild(li);
+    });
+    /* the deck band states the proportion visually; this states it to AT, so the
+       one argument only this design makes is not sighted-only. */
+    var share = document.createElement("li");
+    share.textContent = "Of the 222, 78 are the deck a tarot reading is dealt from. "
+      + "The remaining 144 are looked up.";
+    bankList.appendChild(share);
+
+    lower = document.createElement("div");
+    lower.className = "block__lower";
+    block.appendChild(lower);
+
+    parting = document.createElement("div");
+    parting.className = "parting";
+    parting.setAttribute("aria-live","polite");
+    parting.innerHTML =
+      '<p class="pMeta"></p>' +
+      '<p class="pMean"></p>' +
+      '<p class="pQuote"></p>' +
+      '<div class="pWays"></div>';
+    block.appendChild(parting);
+
+    BANKS.forEach(function(bank, i){
+      if (i === 0) return;                       // no seam above the first bank
+      var seam = document.createElement("div");
+      seam.className = "block__seam";
+      block.appendChild(seam);
+      seamEls.push(seam);
+    });
+
+    deckEl = document.createElement("div");
+    deckEl.className = "block__deck";
+    block.appendChild(deckEl);
+
+    bracketEl = document.createElement("div");
+    bracketEl.className = "block__bracket";
+    braclabelEl = document.createElement("span");
+    braclabelEl.className = "block__braclabel";
+    braclabelEl.innerHTML = '<span class="nm-lg">Tarot — 78 of 222</span><span class="nm-sm">78/222</span>';
+    bracketEl.appendChild(braclabelEl);
+    block.appendChild(bracketEl);
+
+    LOOKUP_SIX.forEach(function(id){
+      var b = BANKS[idx(id)];
+      var tick = document.createElement("div");
+      tick.className = "block__tick";
+      tick.innerHTML =
+        '<span class="block__tick-line" aria-hidden="true"></span>' +
+        '<span class="block__tick-name"><span class="nm-lg">' + b.name + '</span>' +
+        '<span class="nm-sm">' + b.short + '</span></span>';
+      block.appendChild(tick);                   // CHILD OF .block — not the stage
+      tickEls.push({ id:id, el:tick });
+    });
+
+    legend.textContent = "The mass stays shut — six marks light where they already stand.";
+  }
+
+  /* ================= THE GEOMETRY LAW =================
+     avail  = the stage's own rendered height (the rail, orbs, masthead, acts and
+              Codex line are already excluded by .m1's padding and flex layout —
+              never recomputed by hand, so the law cannot drift from the render)
+     period = clamp(1.02, (avail - pad) / 222, 3.5), snapped to a quarter device pixel
+     blockH = 222 * period
+     THE AMENDMENT: the opening parts the mass, so the mass can never be thinner
+     than what is written in the opening. blockH is raised to the opening's
+     measured height. Nothing can spill past the gold boundary, at any size.
+  ==================================================== */
+  /* DEFAULT CUT — moved OUT of the deck (was 0.34, inside the Minor Arcana).
+     Opening inside the tarot band on first paint put the opening on top of the
+     one region the surface is arguing about, and it made the first sentence a
+     read a stranger sees "the cut fell inside the deck" — the pitch every other
+     design in the pool also makes. Cutting at 0.72 lands in the I Ching, the
+     largest of the six looked-up banks, so the first frame states the thing only
+     this design can state: most of the archive is not the deck. The deck band
+     sits above the opening, whole and unobstructed, while it says so. */
+  var currentDepthFrac = 0.72;
+  var currentPeriod = 2;
+
+  function partingH(){ return parting.getBoundingClientRect().height; }
+
+  function fitBlock(){
+    var pad = 16;
+    var avail = stage.getBoundingClientRect().height;
+    var free = avail - pad;
+
+    /* pitch cap raised from 2.4 to 3.5 on measurement, not taste: at 2.4 the mass
+       topped out at 500px and floated with 269px of slack on a 1080-tall screen —
+       a band, not a mass. The archive must look large because it is large. */
+    var pitch = free / TOTAL;
+    if (pitch < 1)   pitch = 1;
+    if (pitch > 3.5) pitch = 3.5;
+
+    /* THE MOIRÉ MITIGATION. The period is snapped to a QUARTER of a device pixel,
+       not to a whole one. Whole-pixel snapping at dpr 1 offers only 1px and 2px and
+       throws away up to a fifth of the mass's height; quarter snapping keeps it
+       filling its space while making the period RATIONAL with a denominator of 4 —
+       so the ruling repeats exactly every four leaves in a whole number of device
+       pixels, there are only four sub-pixel phases, and no long-range beat can
+       form. Recomputed whenever devicePixelRatio changes. */
+    var dpr = window.devicePixelRatio || 1;
+    var period = Math.floor(pitch * dpr * 4) / (dpr * 4);
+    if (period < 1.02) period = 1.02;
+    currentPeriod = period;
+
+    var blockH = Math.round(TOTAL * period);
+    if (blockH < 222) blockH = 222;                       // the mass can never vanish
+    var ph = partingH();
+    if (ph > blockH) blockH = Math.ceil(ph);              // the mass >= what it holds
+    var ceiling = Math.max(222, Math.floor(avail));
+    if (blockH > ceiling) blockH = ceiling;               // never taller than the stage
+
+    block.style.height = blockH + "px";
+
+    var lineFrac = 1 / period;
+    var grain =
+      /* .5 -> .38. The grain is MATERIAL, not the argument. At .5 the 222 leaf
+         lines were the loudest ink on the surface and they out-shouted the nine
+         seams and the deck band — the two marks that actually carry proportion.
+         Nobody can count 222 hairlines; everybody can see one band against the
+         rest. The grain now reads as the stuff, and the proportion reads first. */
+      "repeating-linear-gradient(180deg, rgba(var(--leaf),.38) 0, rgba(var(--leaf),.38) " +
+      (lineFrac*100).toFixed(3) + "%, transparent " + (lineFrac*100).toFixed(3) +
+      "%, transparent 100%)";
+    block.style.backgroundImage = grain;
+    block.style.backgroundSize  = "100% " + period + "px";
+    lower.style.backgroundImage = grain;
+    lower.style.backgroundSize  = "100% " + period + "px";
+
+    return blockH;
+  }
+
+  function placeMarkers(){
+    var cum = 0, seamI = 0;
+    BANKS.forEach(function(bank, i){
+      cum += bank.count;
+      if (i === BANKS.length - 1) return;
+      var seam = seamEls[seamI++];
+      if (seam) seam.style.top = ((cum / TOTAL) * 100) + "%";
+    });
+
+    var mS = before(idx("major"));
+    var mE = mS + BANKS[idx("major")].count + BANKS[idx("minor")].count;
+    bracketEl.style.top    = ((mS / TOTAL) * 100) + "%";
+    bracketEl.style.height = (((mE - mS) / TOTAL) * 100) + "%";
+    /* the band is the same true proportion as the bracket, drawn on the material */
+    deckEl.style.top    = ((mS / TOTAL) * 100) + "%";
+    deckEl.style.height = (((mE - mS) / TOTAL) * 100) + "%";
+
+    tickEls.forEach(function(t){
+      var i = idx(t.id);
+      var mid = before(i) + BANKS[i].count / 2;
+      t.el.style.top = ((mid / TOTAL) * 100) + "%";
+    });
+    tickTransforms(stage.classList.contains("is-looking"));
+  }
+  function tickTransforms(on){
+    tickEls.forEach(function(t){
+      t.el.style.transform = "translateY(-50%) translateX(" + (on ? "0" : "-4px") + ")";
+    });
+  }
+
+  function recalc(){
+    fitBlock();
+    placeMarkers();
+    positionParting(currentDepthFrac, false);
+  }
+
+  /* THE DISPLACEMENT. The opening sits at the cut; everything under it is drawn
+     by .block__lower with its grain phase shifted by the opening's own height, so
+     the ruling visibly steps at the cut face. That step is the evidence that the
+     mass was opened rather than punched through. */
+  function positionParting(frac, animate){
+    var bH = block.getBoundingClientRect().height;
+    var pH = partingH();                       // measured fresh — never frozen inline
+    var y = Math.max(0, Math.min(bH - pH, frac*bH - pH/2));
+    if (!animate || reduceMotion.matches) parting.style.transition = "none";
+    parting.style.transform = "translateY(" + y + "px)";
+    lower.style.top = (y + pH) + "px";
+    lower.style.backgroundPositionY = (-(pH % currentPeriod)).toFixed(3) + "px";
+    if (!animate || reduceMotion.matches){
+      requestAnimationFrame(function(){ parting.style.transition = ""; });
+    }
+  }
+
+  /* THE BANK IS READ OFF THE LEAF, not off the raw fraction. It used to be read
+     off the fraction while the printed leaf number was the ROUNDED fraction, so at
+     one sub-leaf position either side of every boundary the opening named one bank
+     and printed a leaf belonging to its neighbour. Harmless while the opening only
+     described a bank; not harmless now that the leaf number IS a card and a line of
+     that card's reading is printed under it. One source, one answer. */
+  function bankAtLeaf(leaf){
+    var cum = 0;
+    for (var i=0;i<BANKS.length;i++){
+      cum += BANKS[i].count;
+      if (leaf <= cum) return BANKS[i];
+    }
+    return BANKS[BANKS.length-1];
+  }
+
+  /* THE CUT. Where the hand lands is the seed — the leaf number printed below is
+     a value that could only have come from this visit, not from a canned string.
+     And the depth decides what the opening can offer: the deck only draws from
+     the 78 leaves inside the bracket. Cut outside it and the surface says so
+     rather than pretending every depth deals a card. */
+  function cutAt(frac){
+    currentDepthFrac = Math.max(0.02, Math.min(0.98, frac));
+    var leaf = Math.max(1, Math.min(TOTAL, Math.round(currentDepthFrac * TOTAL)));
+    var bank = bankAtLeaf(leaf);
+
+    var meta = parting.querySelector(".pMeta");
+    var mean = parting.querySelector(".pMean");
+    var quote = parting.querySelector(".pQuote");
+    var ways = parting.querySelector(".pWays");
+
+    /* the cut is seeded by where the hand landed; the date is the cheapest second
+       proof that this frame was drawn for THIS visit, not served canned — team 3's
+       solution, one line, no new element */
+    meta.innerHTML = bank.name.toLowerCase() + " &middot; <em>leaf " + leaf + " of " + TOTAL + "</em>"
+      + " &middot; " + new Date().toLocaleDateString();
+
+    if (bank.tarot){
+      /* THE LEAF IS A CARD. The mass is ruled in the deck's own order, so the leaf
+         the hand landed on IS a card: leaf 42 is The Fool, leaf 119 is the King of
+         Pentacles. The frame names the place the Deep Read would seat it in and
+         ends on a colon; the quoted line finishes the sentence. */
+      var ord = Math.max(0, Math.min(77, leaf - before(idx("major")) - 1));
+      var place = DEEP_PLACES[leaf % DEEP_PLACES.length];
+      mean.textContent =
+        "Inside the 78 — the Deep Read seats this leaf at "
+        + place.name + ", " + place.note + ":";
+      quote.innerHTML = READ[ord]
+        + '<span class="pQuote__tag">An example, not your draw.</span>';
+      parting.classList.add("has-read");
+      block.classList.add("has-read");
+      ways.innerHTML =
+        '<a class="pWay" href="?dev=drawing-room"><i aria-hidden="true"></i>A Sitting &mdash; three leaves, first free &rarr;</a>' +
+        '<a class="pWay pWay--deep" href="?dev=drawing-room#deep"><i aria-hidden="true"></i>The Deep Read &mdash; five &rarr;</a>';
+    } else {
+      /* out of the deck there is no card, so there is nothing to quote and nothing
+         is quoted. The one thing this surface must never do is print reading prose
+         for a leaf a reading cannot lift. */
+      quote.textContent = "";
+      parting.classList.remove("has-read");
+      block.classList.remove("has-read");
+      mean.textContent =
+        "144 of the 222 are never dealt — they are looked up and read as they "
+        + "stand. This is " + bank.name + ", " + bank.count
+        + " of them. Six such banks make the Birth Reading.";
+      ways.innerHTML =
+        '<a class="pWay" href="?dev=arcane">The Birth Reading &mdash; give a name and date &rarr;</a>' +
+        '<a class="pWay" href="codex.html?v=363#' + bank.id + '">Read this bank in the Codex &rarr;</a>';
+    }
+
+    fitBlock();                       // the new opening may be taller — the mass pays
+    placeMarkers();
+    positionParting(currentDepthFrac, true);
+    if (!reduceMotion.matches){
+      block.animate([{filter:"brightness(1.35)"},{filter:"brightness(1)"}],
+                    {duration:420, easing:"cubic-bezier(.2,.7,.2,1)"});
+    }
+  }
+
+  block.addEventListener("pointerdown", function(e){
+    if (e.target.closest && e.target.closest("a")) return;   // a way in is not a cut
+    var r = block.getBoundingClientRect();
+    cutAt((e.clientY - r.top) / r.height);
+  });
+  block.addEventListener("keydown", function(e){
+    /* Enter/Space ONLY. Arrow keys and the wheel are never bound anywhere on this
+       surface — the track (L1 / M2 / the U1 glide at app.js:4749) keeps them. */
+    if (e.target !== block) return;
+    if (e.key === "Enter" || e.key === " " || e.key === "Spacebar"){
+      e.preventDefault();
+      cutAt(Math.random());
+    }
+  });
+
+  function setLooking(on){
+    stage.classList.toggle("is-looking", on);
+    lookupAct.classList.toggle("is-active", on);
+    tickTransforms(on);
+  }
+  ["mouseenter","focusin"].forEach(function(evt){
+    lookupAct.addEventListener(evt, function(){ setLooking(true); });
+  });
+  ["mouseleave","focusout"].forEach(function(evt){
+    lookupAct.addEventListener(evt, function(){ setLooking(false); });
+  });
+  lookupAct.addEventListener("touchstart", function(){ setLooking(true); }, {passive:true});
+
+  buildOnce();
+  cutAt(currentDepthFrac);
+  recalc();
+  window.addEventListener("resize", recalc);
+  if (window.visualViewport) window.visualViewport.addEventListener("resize", recalc);
+
+  /* devicePixelRatio changes (zoom, monitor swap) re-derive the grain period */
+  (function watchDpr(){
+    if (!window.matchMedia) return;
+    var mq = window.matchMedia("(resolution: " + (window.devicePixelRatio||1) + "dppx)");
+    var on = function(){ recalc(); watchDpr(); };
+    if (mq.addEventListener) mq.addEventListener("change", on, {once:true});
+    else if (mq.addListener) mq.addListener(on);
+  })();
+})();
+</script>
+
+</body>
+</html>

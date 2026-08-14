@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Blue Room — The Filed Record (M1)</title>
+<style>
+/* ============================================================
+   THE FILED RECORD — M1, THE FRONT DOOR
+   Tokens lifted verbatim from styles.css :root + codex.html's
+   local vessel tokens (--gold family, --ink-vessel, --bevel,
+   --mount, --grain, --dur-step, --ff-mono). The palette is closed;
+   nothing here is a new colour.
+   ============================================================ */
+:root{
+  --t-display:#dcd7cb; --t-primary:#d7d3ca; --t-body:#b1ada4; --t-meta:#948f87; --t-ghost:#6e6b63;
+  --ink-950:#0a0b0d; --ink-900:#100f0c; --ink-vessel:#11100d;
+  --hair-1:rgba(233,229,220,.14); --hair-2:rgba(233,229,220,.08); --hair-3:rgba(233,229,220,.045);
+  --gold:#c69b63; --gold-dim:#9a7b4c; --gold-lit:#dbb47b;
+  --r-plate:4px;
+  --font-display:"Cormorant Garamond","Times New Roman",serif;
+  --font-ui:"Inter",-apple-system,"Segoe UI",sans-serif;
+  --font-mono:"IBM Plex Mono","Consolas",monospace;
+  --dur-step:160ms;
+  --bevel: inset 0 1px 0 rgba(233,229,220,.04);
+  --mount: 0 18px 40px -24px rgba(0,0,0,.70);
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;background:var(--ink-950);color:var(--t-primary);font-family:var(--font-ui);}
+body{min-height:100vh;min-height:100svh;overflow-x:hidden;}
+a{text-decoration:none;color:inherit;}
+
+/* ---------- THE GROUND — silent, no field, no light ---------- */
+.door{
+  position:relative;
+  min-height:100vh; min-height:100svh;
+  display:flex; flex-direction:column;
+  padding:0 8vw;
+  background:var(--ink-950);
+}
+.door__rail-space{height:80px; flex:none;} /* the existing chrome rail's reserved space */
+
+/* ---------- BAND 1 · THE LINTEL ---------- */
+.lintel{
+  padding-top:clamp(28px,6vh,56px);
+  max-width:640px;
+}
+.lintel__mark{
+  font-family:var(--font-mono); font-size:9px; letter-spacing:.22em; text-transform:uppercase;
+  color:var(--t-ghost); margin:0 0 14px;
+}
+.lintel__head{
+  font-family:var(--font-display); font-weight:600;
+  font-size:clamp(30px,3.4vw,40px); line-height:1.14;
+  color:var(--t-display); margin:0 0 12px;
+}
+.lintel__count{
+  font-family:var(--font-mono); font-size:10px; letter-spacing:.12em;
+  color:var(--t-meta); margin:0;
+}
+
+/* ---------- middle: plate + act, vertically centred in remaining space ---------- */
+.stage{
+  flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:clamp(20px,3.2vh,30px);
+  padding:16px 0 8px;
+}
+
+/* ---------- BAND 2 · THE SPECIMEN PLATE — stolen from codex.html #lectern ---------- */
+.plate{
+  position:relative;
+  width:min(660px,72vw);
+  padding:26px 34px 20px;
+  border:1px solid var(--hair-1);
+  border-radius:10px;
+  background:
+    linear-gradient(180deg,rgba(233,229,220,.024) 0,rgba(233,229,220,0) 65%),
+    var(--grain), var(--ink-vessel);
+  box-shadow:var(--bevel), var(--mount);
+}
+.plate::before{
+  content:""; position:absolute; inset:8px; border-radius:2px; pointer-events:none;
+  box-shadow:inset 0 0 0 1px var(--hair-2);
+}
+.plate__cap{
+  display:flex; justify-content:space-between; align-items:baseline;
+  font-family:var(--font-mono); font-size:9px; letter-spacing:.22em; text-transform:uppercase;
+  color:var(--t-ghost); margin-bottom:16px;
+}
+.plate__cap b{font-weight:400; color:var(--gold-dim);}
+
+.plate__crown{display:flex; justify-content:center; margin-bottom:10px;}
+.plate__crown svg{width:22px; height:auto; color:var(--gold-dim);}
+
+.plate__name{
+  text-align:center;
+  font-family:var(--font-display); font-weight:600;
+  font-size:clamp(30px,4.2vw,44px); line-height:1.08; letter-spacing:-.012em;
+  color:var(--t-display);
+  text-shadow:0 1px 0 rgba(10,11,13,.92), 0 -1px 0 rgba(233,229,220,.09);
+  margin:0 0 20px;
+}
+
+.plate__marks{
+  display:flex; justify-content:space-between; gap:6px;
+  margin:0 0 16px;
+}
+.mark{
+  flex:1; display:flex; flex-direction:column; align-items:center; gap:6px;
+  padding:6px 2px; border-radius:3px;
+  transition:background var(--dur-step) ease;
+}
+.mark:hover, .mark:focus-visible{background:rgba(233,229,220,.03); outline:none;}
+.mark__glyph{
+  font-size:22px; line-height:1; color:var(--t-primary);
+  transition:color var(--dur-step) ease;
+}
+.mark:hover .mark__glyph, .mark:focus-visible .mark__glyph{color:var(--gold);}
+.mark__name{
+  font-family:var(--font-mono); font-size:8.5px; letter-spacing:.16em; text-transform:uppercase;
+  color:var(--t-ghost); text-align:center;
+}
+.mark__addr{
+  font-family:var(--font-mono); font-size:8px; letter-spacing:.08em;
+  color:var(--gold-dim); text-align:center;
+}
+
+.plate__hr{ height:1px; background:var(--hair-2); margin:0 8px 16px; }
+
+.plate__derivation{
+  font-family:var(--font-mono); font-size:10px; line-height:1.55; text-align:center;
+  color:var(--gold-dim); margin:0 0 14px; min-height:2.4em;
+  display:flex; align-items:center; justify-content:center;
+}
+.plate__derivation span{transition:opacity var(--dur-step) ease;}
+
+.plate__binding{
+  font-family:var(--font-display); font-style:italic; font-size:15px;
+  color:var(--t-meta); text-align:right; margin:0;
+}
+
+/* ---------- BAND 3 · THE ACT ---------- */
+.act{ text-align:center; max-width:520px; }
+.act__lede{
+  font-family:var(--font-ui); font-size:15px; line-height:1.5; color:var(--t-body);
+  margin:0 0 14px;
+}
+.act__go{
+  display:inline-flex; align-items:center; gap:10px;
+  font-family:var(--font-display); font-weight:600; font-size:22px; color:var(--t-display);
+  transition:color var(--dur-step) ease;
+}
+.act__go svg{width:34px; height:auto; stroke:currentColor;}
+.act__go .go-tail{transition:stroke-dashoffset 260ms ease;}
+.act__go:hover, .act__go:focus-visible{color:var(--gold-lit); outline:none;}
+.act__sub{
+  font-family:var(--font-mono); font-size:9.5px; letter-spacing:.18em; text-transform:uppercase;
+  color:var(--t-ghost); margin:8px 0 0;
+}
+.act__quiet{
+  margin:22px 0 0;
+  font-family:var(--font-mono); font-size:11px; color:var(--t-meta);
+  display:inline-flex; align-items:center; gap:7px;
+}
+.act__quiet a{ color:var(--t-meta); border-bottom:1px solid transparent; transition:color var(--dur-step) ease, border-color var(--dur-step) ease; }
+.act__quiet a:hover, .act__quiet a:focus-visible{ color:var(--t-display); border-color:var(--hair-1); }
+.act__quiet svg{width:16px; height:auto; color:var(--gold-dim); flex:none;}
+
+/* ---------- BAND 4 · THE EXIT ROW (rail) ---------- */
+.rail{
+  position:fixed; left:0; right:0; bottom:0; height:80px;
+  display:flex; align-items:center; justify-content:center; gap:14px;
+  font-family:var(--font-ui); font-size:13px; letter-spacing:.02em; color:var(--t-meta);
+  background:linear-gradient(180deg, rgba(10,11,13,0), rgba(10,11,13,.55) 40%, var(--ink-950));
+}
+.rail a{ color:var(--t-meta); transition:color var(--dur-step) ease; }
+.rail a:hover, .rail a:focus-visible{ color:var(--t-display); outline:none; }
+.rail__sep{ color:var(--t-ghost); opacity:.5; }
+.rail__house{ display:inline-flex; align-items:center; gap:4px; }
+.rail__chev{ font-size:11px; transform:translateY(1px); }
+
+/* ============================================================
+   THE PHONE — the vitrine: NOT a squeeze. Declared at 640px, the
+   quieter seam borrowed from codex.html's own --measure collapse.
+   The 1199px seam (styles.css:2727) is the build's existing
+   one-column collapse; above it nothing here changes shape.
+   ============================================================ */
+@media (max-width:1199px){
+  .plate{ width:calc(100% - 0px); max-width:660px; }
+}
+
+@media (max-width:640px){
+  .door{ padding:0 20px; }
+  .door__rail-space{height:70px;}
+  .lintel{ padding-top:22px; max-width:none; }
+  .lintel__head{ font-size:26px; }
+  .stage{ justify-content:flex-start; gap:16px; padding-top:8px; }
+
+  /* the glass leaves: the plate stops being an object IN a room and
+     becomes the page — no border, no radius, no shadow, no grain. */
+  .plate{
+    width:100%; max-width:none;
+    border:none; border-radius:0; box-shadow:none;
+    background:var(--ink-950);
+    padding:0;
+  }
+  .plate::before{ display:none; }
+  .plate__cap{ font-size:9px; margin-bottom:14px; }
+  .plate__crown{ justify-content:flex-start; margin-bottom:8px; }
+  .plate__name{
+    text-align:left; font-size:30px; max-width:14ch;
+    margin:0 0 18px;
+  }
+  /* six marks: re-placed, not shrunk — two rows of three */
+  .plate__marks{
+    flex-wrap:wrap; gap:14px 0;
+  }
+  .mark{ flex:0 0 33.333%; }
+  .mark__addr{ display:none; } /* moves into the tap state, see .mark--open */
+  .mark.is-open .mark__addr{ display:block; }
+
+  .plate__hr{ margin:0 0 14px; }
+  .plate__derivation{ text-align:left; justify-content:flex-start; font-size:10px; }
+  .plate__binding{ text-align:left; font-size:14px; }
+
+  .act{ text-align:left; max-width:none; }
+  .act__go{
+    display:flex; width:100%; justify-content:center;
+    height:52px; border:1px solid var(--hair-1); border-radius:var(--r-plate);
+    font-size:17px; margin-top:4px;
+  }
+  .act__lede{ font-size:14px; }
+  .act__sub{ text-align:center; }
+  .act__quiet{ display:flex; justify-content:center; width:100%; margin-top:18px; }
+
+  .rail{ height:70px; font-size:12px; }
+}
+</style>
+</head>
+<body>
+
+<div class="door">
+  <div class="door__rail-space"></div>
+
+  <!-- BAND 1 · THE LINTEL -->
+  <header class="lintel">
+    <p class="lintel__mark">&#9670; BLUE ROOM &middot; THE ARCHIVE</p>
+    <h1 class="lintel__head">An archive that reads people.</h1>
+    <p class="lintel__count">222 marks &middot; nine systems &middot; every one a real entry</p>
+  </header>
+
+  <!-- middle stage: BAND 2 + BAND 3 -->
+  <div class="stage">
+
+    <!-- BAND 2 · THE SPECIMEN PLATE -->
+    <section class="plate" aria-label="A filed Birth Reading, shown as a specimen">
+      <div class="plate__cap">
+        <span>RECORD &middot; THE BIRTH READING</span>
+        <b>SPECIMEN</b>
+      </div>
+
+      <div class="plate__crown">
+        <svg viewBox="0 0 24 18" aria-hidden="true">
+          <path d="M2 16 L2.6 5 L8 9.5 L12 2 L16 9.5 L21.4 5 L22 16 Z" fill="none" stroke="currentColor" stroke-width="1.05" stroke-linejoin="round"/>
+          <path d="M3.2 16 L20.8 16" stroke="currentColor" stroke-width="1.05"/>
+        </svg>
+      </div>
+
+      <h2 class="plate__name">The Silt-Bearing Inheritor</h2>
+
+      <div class="plate__marks" id="marks">
+        <a class="mark" href="https://example-codex.invalid/codex.html#wz-08" data-kw="water &middot; fixed &middot; depth" data-addr="WZ 08 &rarr;">
+          <span class="mark__glyph">&#9807;</span>
+          <span class="mark__name">Scorpio</span>
+          <span class="mark__addr">WZ 08</span>
+        </a>
+        <a class="mark" href="https://example-codex.invalid/codex.html#cz-05" data-kw="earth &middot; strength &middot; ambition" data-addr="CZ 05 &rarr;">
+          <span class="mark__glyph">&#40845;</span>
+          <span class="mark__name">Dragon</span>
+          <span class="mark__addr">CZ 05</span>
+        </a>
+        <a class="mark" href="https://example-codex.invalid/codex.html#nu-04" data-kw="structure &middot; discipline &middot; foundation" data-addr="NU 04 &rarr;">
+          <span class="mark__glyph">4</span>
+          <span class="mark__name">Life Path</span>
+          <span class="mark__addr">NU 04</span>
+        </a>
+        <a class="mark" href="https://example-codex.invalid/codex.html#rn-24" data-kw="heritage &middot; home &middot; tradition &middot; inheritance &middot; belonging" data-addr="RN 24 &rarr;">
+          <span class="mark__glyph">&#5855;</span>
+          <span class="mark__name">Othala</span>
+          <span class="mark__addr">RN 24</span>
+        </a>
+        <a class="mark" href="https://example-codex.invalid/codex.html#tr-05" data-kw="stillness &middot; boundary &middot; the youngest son" data-addr="TR 05 &rarr;">
+          <span class="mark__glyph">&#9782;</span>
+          <span class="mark__name">G&egrave;n</span>
+          <span class="mark__addr">TR 05</span>
+        </a>
+        <a class="mark" href="https://example-codex.invalid/codex.html#hx-18" data-kw="repair &middot; what was neglected &middot; setting right" data-addr="HX 18 &rarr;">
+          <span class="mark__glyph">&#19921;</span>
+          <span class="mark__name">Hexagram</span>
+          <span class="mark__addr">HX 18</span>
+        </a>
+      </div>
+
+      <div class="plate__hr"></div>
+
+      <p class="plate__derivation"><span id="deriv">Scorpio gave water &middot; Dragon gave earth &middot; Othala gave the Inheritor</span></p>
+
+      <p class="plate__binding">Filed at the stopping place.</p>
+    </section>
+
+    <!-- BAND 3 · THE ACT -->
+    <section class="act">
+      <p class="act__lede">Yours is six marks you did not choose. It takes a name and a date.</p>
+      <a class="act__go" href="?dev=arcane">
+        <span>SET YOUR MARKS</span>
+        <svg viewBox="0 0 56 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.15" stroke-linecap="round" stroke-linejoin="round">
+          <line class="go-tail" x1="1" y1="8" x2="47" y2="8"/>
+          <path d="M40 3 L47 8 L40 13"/>
+        </svg>
+      </a>
+      <p class="act__sub">The Birth Reading &middot; the step the house recommends</p>
+
+      <p class="act__quiet">
+        <a href="?dev=drawing-room">Or take a free Sitting first &mdash; three cards to one question, complete and yours.</a>
+        <svg viewBox="0 0 56 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.15" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="1" y1="8" x2="47" y2="8"/>
+          <path d="M40 3 L47 8 L40 13"/>
+        </svg>
+      </p>
+    </section>
+
+  </div>
+</div>
+
+<!-- BAND 4 · THE EXIT ROW -->
+<nav class="rail" aria-label="Blue Room exits">
+  <a href="?dev=profile">Your Profile</a>
+  <span class="rail__sep">&middot;</span>
+  <a class="rail__house" href="#about" aria-label="The House — scroll down">The House <span class="rail__chev">&#8964;</span></a>
+</nav>
+
+<script>
+/* THE ONE MOTION — lives entirely inside the plate. Hover (desktop) or
+   tap (phone, two-step) swaps the derivation line for that mark's real
+   keywords. Nothing outside the plate moves; the line holds a fixed
+   min-height so there is no reflow.
+   Desktop: uses hover directly. Phone (<=640px, coarse pointer): first
+   tap fills the line + reveals the address; a second tap on the SAME
+   mark follows the link, tapping elsewhere clears back to the default. */
+(function(){
+  var DEFAULT_LINE = document.getElementById('deriv').textContent;
+  var derivEl = document.getElementById('deriv');
+  var marks = Array.prototype.slice.call(document.querySelectorAll('.mark'));
+  var isCoarse = window.matchMedia && window.matchMedia('(max-width:640px), (pointer:coarse)').matches;
+
+  function setLine(text){ derivEl.textContent = text; }
+
+  if(!isCoarse){
+    marks.forEach(function(m){
+      m.addEventListener('mouseenter', function(){ setLine(m.getAttribute('data-kw')); });
+      m.addEventListener('focus', function(){ setLine(m.getAttribute('data-kw')); });
+      m.addEventListener('mouseleave', function(){ setLine(DEFAULT_LINE); });
+      m.addEventListener('blur', function(){ setLine(DEFAULT_LINE); });
+    });
+  } else {
+    marks.forEach(function(m){
+      m.addEventListener('click', function(e){
+        if(!m.classList.contains('is-open')){
+          e.preventDefault();
+          marks.forEach(function(o){ o.classList.remove('is-open'); });
+          m.classList.add('is-open');
+          setLine(m.getAttribute('data-kw'));
+        }
+        /* second tap on an already-open mark: let the link through */
+      });
+    });
+    document.addEventListener('click', function(e){
+      if(!e.target.closest('.mark')){
+        marks.forEach(function(o){ o.classList.remove('is-open'); });
+        setLine(DEFAULT_LINE);
+      }
+    });
+  }
+})();
+</script>
+
+</body>
+</html>

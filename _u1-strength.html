@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8" />
+<title>U1 — how strong should the sheet be?</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Inter:wght@500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+:root{--t-display:#e9e5dc;--t-primary:#d7d3ca;--t-body:#b1ada4;--t-meta:#948f87;
+ --hair-1:rgba(233,229,220,.14);--hair-2:rgba(233,229,220,.08);--line-strong:rgba(233,229,220,.2);
+ --font-display:"Cormorant Garamond",serif;--font-ui:"Inter",sans-serif;--font-mono:"IBM Plex Mono",monospace;}
+*{box-sizing:border-box}
+body{margin:0;padding:40px 28px 60px;background:#0a0b0d;color:var(--t-primary);-webkit-font-smoothing:antialiased}
+h1{font-family:var(--font-mono);font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--t-meta);font-weight:500;margin:0 0 6px}
+p.sub{font-family:var(--font-mono);font-size:10.5px;letter-spacing:.05em;color:#6e6b63;margin:0 0 32px;max-width:96ch;line-height:1.7}
+.row{display:flex;flex-wrap:wrap;gap:34px}
+figure{margin:0;width:400px}
+figcaption{font-family:var(--font-mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--t-meta);margin:0 0 10px;display:flex;justify-content:space-between}
+figcaption b{color:#c8ad70;font-weight:500}
+figcaption.now b{color:#8b7bff}
+
+/* the engraved-relic stone, verbatim from u1-membrane.js (BR-S230/S231) — this
+   is the surface that is ACTUALLY live, not the flat stock in styles.css */
+.plate{position:relative;z-index:1;width:400px;min-height:250px;display:flex;flex-direction:column;
+ align-items:center;gap:13px;padding:34px 26px 21px;border:1px solid rgba(233,229,220,.10);border-radius:10px;
+ background:radial-gradient(130% 90% at 50% -12%, rgba(233,229,220,.05), transparent 55%),
+            radial-gradient(100% 65% at 32% 118%, rgba(0,0,0,.5), transparent 62%),
+            linear-gradient(180deg,#16140f 0%,#100e0b 100%);
+ box-shadow:inset 0 1px 0 rgba(233,229,220,.12),inset 0 2px 3px rgba(0,0,0,.42),
+            inset 0 -1px 0 rgba(0,0,0,.55),inset 0 0 26px rgba(0,0,0,.34);}
+.plate::before{content:"";position:absolute;inset:7px;border-radius:6px;box-shadow:inset 0 0 0 1px var(--hair-2);pointer-events:none}
+.plate::after{content:"";position:absolute;inset:0;z-index:-1;border-radius:inherit;pointer-events:none;
+ opacity:.848;background:rgba(233,229,220,var(--a));
+ -webkit-mask-image:url("assets/sheet-01.png");mask-image:url("assets/sheet-01.png");
+ -webkit-mask-size:cover;mask-size:cover;-webkit-mask-position:center;mask-position:center;
+ -webkit-mask-repeat:no-repeat;mask-repeat:no-repeat}
+
+.emblem{color:var(--t-meta);filter:drop-shadow(0 7px 16px rgba(0,0,0,.5))}
+.emblem svg{width:48px;height:48px;display:block}
+.name{font-family:var(--font-ui);font-size:14px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--t-display);margin:0;text-shadow:0 1px 0 rgba(233,229,220,.10),0 -1px 1px rgba(0,0,0,.55)}
+.rule{width:44px;height:1px;background:linear-gradient(90deg,transparent,rgba(198,155,99,.5) 30%,rgba(198,155,99,.5) 70%,transparent)}
+.line{font-family:var(--font-display);font-weight:500;font-size:18.5px;line-height:1.38;color:var(--t-primary);text-align:center;max-width:31ch;margin:0;text-shadow:0 1px 0 rgba(233,229,220,.05),0 -1px 1px rgba(0,0,0,.4)}
+.micro{font-family:var(--font-mono);font-size:10px;font-weight:500;letter-spacing:.24em;text-transform:uppercase;color:#c8ad70;margin:0;text-shadow:0 1px 1px rgba(0,0,0,.5)}
+.door{display:inline-flex;align-items:center;min-height:44px;padding:12px 20px;margin-top:4px;font-family:var(--font-ui);
+ font-size:11.5px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--t-display);text-decoration:none;
+ border:1px solid color-mix(in srgb,#c8ad70 42%,var(--line-strong));border-radius:3px}
+</style></head>
+<body>
+<h1>How strong should the sheet be?</h1>
+<p class="sub">Same plate, same photograph, same engraved-relic stone that is live right now. Only the mask alpha changes.
+The number under each is how far that setting moves the plate's MEAN luminance, out of 255 — under about 2 levels is
+at the edge of what an eye finds on a dark screen.</p>
+<div class="row" id="row"></div>
+<script>
+var EM='<svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10 V31"/><path d="M20 10 C15 7.5 9 7.3 6 9.2 V29 C9 27.2 15 27.4 20 30"/><path d="M20 10 C25 7.5 31 7.3 34 9.2 V29 C31 27.2 25 27.4 20 30"/><path d="M9.2 14.6 H16 M9.2 18.4 H16 M9.2 22.2 H14.5 M23.8 14.6 H30.6 M23.8 18.4 H30.6 M25.3 22.2 H30.6" stroke-width=".75" opacity=".5"/></svg>';
+var OPTS=[[0.092,'+1.3 levels','shipped now'],[0.14,'+2.0 levels',''],[0.20,'+2.9 levels',''],[0.28,'+4.1 levels','']];
+document.getElementById('row').innerHTML = OPTS.map(function(o,i){
+ return '<figure><figcaption class="'+(o[2]?'now':'')+'"><span>alpha '+o[0].toFixed(3)+(o[2]?' — '+o[2]:'')+'</span><b>'+o[1]+'</b></figcaption>'
+ +'<div class="plate" style="--a:'+o[0]+'">'
+ +'<span class="emblem">'+EM+'</span>'
+ +'<p class="name">The Codex</p><span class="rule"></span>'
+ +'<p class="line">166 entries across eight systems. Every card, sign, rune and hexagram the rooms read from.</p>'
+ +'<p class="micro">Free · no account</p>'
+ +'<a class="door" href="#" onclick="return false">Open the Codex →</a>'
+ +'</div></figure>';
+}).join('');
+</script>
+</body></html>

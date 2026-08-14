@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8" /><meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>U1 — the whole surface, as it is live</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+/* ── LAYER 1: the styles.css baseline for .about__, copied verbatim ───────────
+   The live page cannot be photographed headless (u1-membrane.js needs a real
+   rAF), so this file reassembles the exact cascade instead:
+     1  styles.css baseline      (inline, below)
+     2  u1-plates.css            (real <link>, so what ships is what is shot)
+     3  u1-membrane.js's runtime <style>  (inline AFTER the link — the script
+        appends to <head> at runtime, so it is genuinely last in document order,
+        and every u1-plates rule that must win does so on SPECIFICITY, not order)
+   Get that order wrong and the probe lies. */
+:root{
+ --t-display:#e9e5dc;--t-primary:#d7d3ca;--t-body:#b1ada4;--t-meta:#948f87;--t-ghost:#6e6b63;--faint:var(--t-ghost);
+ --ink-950:#0a0b0d;--ink-900:#100f0c;--ink-850:#11100d;
+ --line:rgba(233,229,220,.12);--line-strong:rgba(233,229,220,.2);
+ --hair-1:rgba(233,229,220,.14);--hair-2:rgba(233,229,220,.08);--hair-3:rgba(233,229,220,.045);
+ --silver-dim:var(--t-meta);--violet:#8b7bff;
+ --font-display:"Cormorant Garamond","Times New Roman",serif;
+ --font-ui:"Inter",-apple-system,"Segoe UI",sans-serif;
+ --font-mono:"IBM Plex Mono","Consolas",monospace;}
+*{box-sizing:border-box}
+html{background:var(--ink-950)}
+body{margin:0;padding:96px 24px 140px;color:var(--t-primary);
+ background:radial-gradient(120% 90% at 50% 0%,#16151a 0%,var(--ink-950) 62%) fixed;-webkit-font-smoothing:antialiased}
+
+.about__intro{width:min(640px,100%);margin:0 auto clamp(55px,18vh,144px);display:grid;justify-items:center;text-align:center;gap:21px}
+.about__eyebrow{font-family:var(--font-mono);font-size:9.5px;letter-spacing:.32em;text-transform:uppercase;color:var(--faint);margin:0}
+.about__eyemark{color:var(--silver-dim)}
+.about__headline{display:grid;grid-auto-flow:row;justify-items:center;align-items:center;row-gap:clamp(3px,.9vw,9px);
+ font-family:var(--font-display);font-weight:600;font-size:clamp(30px,6vw,46px);line-height:1.04;letter-spacing:-.012em;color:var(--t-display);margin:0}
+.about__hx{white-space:nowrap;color:var(--t-display)}
+.about__hx:first-of-type{transform:translateX(clamp(-58px,-5.4vw,-26px))}
+.about__hx:last-of-type{transform:translateX(clamp(26px,5.4vw,58px))}
+.about__lede{display:grid;justify-items:center;row-gap:clamp(15px,2.6vh,30px);width:100%;margin:0}
+.about__lede p{font-family:var(--font-display);font-weight:500;font-size:clamp(14.5px,2.2vw,16.5px);line-height:1.66;letter-spacing:.006em;color:var(--t-primary);max-width:34ch;margin:0;opacity:.95}
+.about__wick{width:1px;height:clamp(34px,8vh,55px);margin-top:5px;background:linear-gradient(var(--hair-1),var(--hair-3) 70%,transparent)}
+
+.about__rail{position:relative;list-style:none;margin:0 auto;padding:0;width:min(760px,100%);display:grid;row-gap:clamp(89px,22vh,233px)}
+.about__rail::before{content:"";position:absolute;inset-block:-8px;left:50%;width:1px;transform:translateX(-.5px);
+ background:linear-gradient(transparent,var(--hair-3) 6%,var(--hair-1) 46%,var(--hair-1) 54%,var(--hair-3) 94%,transparent)}
+.about__nugget{position:relative;display:flex}
+.about__nugget[data-side="left"]{justify-content:flex-start}
+.about__nugget[data-side="right"]{justify-content:flex-end}
+.about__nugget[data-side="center"]{justify-content:center}
+.about__ord{position:absolute;top:-.34em;z-index:0;font-family:var(--font-display);font-size:clamp(78px,14vw,144px);line-height:1;color:var(--line);pointer-events:none;user-select:none}
+.about__nugget[data-side="left"] .about__ord{left:-.08em}
+.about__nugget[data-side="right"] .about__ord{right:-.08em}
+.about__nugget[data-side="center"] .about__ord{left:50%;transform:translateX(-50%)}
+
+.about__plate{position:relative;z-index:1;width:min(400px,100%);display:flex;flex-direction:column;align-items:center;gap:13px;
+ padding:34px 26px 21px;border:1px solid var(--hair-1);border-radius:10px;
+ background:linear-gradient(180deg,rgba(233,229,220,.024) 0%,transparent 65%),var(--ink-850);
+ box-shadow:inset 0 1px 0 rgba(233,229,220,.04)}
+.about__plate::before{content:"";position:absolute;inset:7px;border-radius:6px;box-shadow:inset 0 0 0 1px var(--hair-2);pointer-events:none}
+.about__emblem{display:block;color:var(--silver-dim);filter:drop-shadow(0 7px 16px rgba(0,0,0,.5))}
+.about__emblem-svg{width:48px;height:48px;display:block}
+.about__name{font-family:var(--font-ui);font-size:13px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--t-display);margin:0}
+.about__rule{width:44px;height:1px;background:linear-gradient(90deg,transparent,var(--hair-1) 20%,var(--hair-1) 80%,transparent)}
+.about__line{font-family:var(--font-display);font-weight:500;font-size:clamp(16px,2.3vw,18.5px);line-height:1.5;color:var(--t-primary);text-align:center;max-width:31ch;margin:0}
+.about__micro{font-family:var(--font-mono);font-size:8.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--t-meta);margin:0}
+.about__door{display:inline-flex;align-items:center;min-height:44px;padding:12px 20px;font-family:var(--font-ui);font-size:11.5px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--t-display);text-decoration:none;border:1px solid var(--line-strong);border-radius:8px}
+.about__nugget.is-free .about__micro{color:#c8ad70}
+.about__nugget.is-paid .about__micro{color:color-mix(in srgb,var(--violet) 65%,var(--t-meta))}
+.about__nugget.is-free .about__ord{color:rgba(200,173,112,.14)}
+.about__nugget.is-paid .about__ord{color:rgba(139,123,255,.13)}
+.about__nugget.is-free .about__door{border-color:color-mix(in srgb,#c8ad70 42%,var(--line-strong))}
+.about__nugget.is-paid .about__door{border-color:color-mix(in srgb,var(--violet) 45%,var(--line-strong))}
+.about__nugget--unlit .about__plate{border-style:dashed;border-color:var(--hair-2);background:var(--ink-900)}
+.about__nugget--unlit .about__plate::after{content:"";position:absolute;inset:0;border-radius:inherit;background:radial-gradient(120% 80% at 50% 120%,rgba(200,173,112,.05),transparent 62%);pointer-events:none}
+.about__nugget--unlit .about__emblem{filter:blur(6px) drop-shadow(0 7px 16px rgba(0,0,0,.5));opacity:.5}
+.about__nugget--unlit .about__name{filter:blur(1.2px);opacity:.66}
+.about__nugget--unlit .about__line,.about__nugget--unlit .about__micro{color:var(--faint)}
+
+.about__close{display:grid;justify-items:center;gap:16px;margin-top:clamp(120px,22vh,300px)}
+.about__wick--close{margin-top:0}
+.about__seal{font-family:var(--font-display);font-size:15px;color:var(--silver-dim);opacity:.82}
+.about__foot{margin:0;text-align:center;font-family:var(--font-mono);font-size:8.5px;letter-spacing:.28em;text-transform:uppercase;color:var(--faint)}
+</style>
+
+<!-- ── LAYER 2: the real shipped overrides ── -->
+<link rel="stylesheet" href="u1-plates.css" />
+
+<!-- ── LAYER 3: u1-membrane.js's runtime <style>, verbatim from u1-membrane.js:305-328.
+     The script appends this to <head> at runtime, so it is genuinely LAST. Any
+     u1-plates rule that must win has to do it on specificity. ── -->
+<style>
+#about.u1lines .about__rail{row-gap:clamp(210px,46vh,460px);}
+#about.u1lines .about__intro{margin-bottom:clamp(96px,26vh,220px);}
+#about.u1lines .about__close{margin-top:clamp(120px,37vh,300px);}
+#about.u1lines{padding-bottom:max(22vh,clamp(200px,39vh,380px));}
+#about.u1lines .about__plate{transition:none!important;}
+#about.u1lines .about__nugget:not(.about__nugget--unlit) .about__plate{
+ background:radial-gradient(130% 90% at 50% -12%, rgba(233,229,220,.05), transparent 55%),radial-gradient(100% 65% at 32% 118%, rgba(0,0,0,.5), transparent 62%),linear-gradient(180deg,#16140f 0%,#100e0b 100%);
+ border-color:rgba(233,229,220,.10);
+ box-shadow:inset 0 1px 0 rgba(233,229,220,.12),inset 0 2px 3px rgba(0,0,0,.42),inset 0 -1px 0 rgba(0,0,0,.55),inset 0 0 26px rgba(0,0,0,.34);}
+#about.u1lines .about__name{text-shadow:0 1px 0 rgba(233,229,220,.10),0 -1px 1px rgba(0,0,0,.55);}
+#about.u1lines .about__line{text-shadow:0 1px 0 rgba(233,229,220,.05),0 -1px 1px rgba(0,0,0,.4);}
+#about.u1lines .about__micro{text-shadow:0 1px 1px rgba(0,0,0,.5);}
+#about.u1lines .about__rule{background:linear-gradient(90deg,transparent,rgba(198,155,99,.5) 30%,rgba(198,155,99,.5) 70%,transparent);}
+</style>
+</head>
+<body>
+<section id="about" class="about u1lines">
+ <header class="about__intro">
+  <p class="about__eyebrow"><span class="about__eyemark" aria-hidden="true">◆</span> BLUE ROOM</p>
+  <h2 class="about__headline" aria-label="Everything read here is yours to keep.">
+   <span class="about__hx" aria-hidden="true">Everything read here</span>
+   <span class="about__hx" aria-hidden="true">is yours to keep.</span></h2>
+  <div class="about__lede">
+   <p class="about__ident">The archive draws tarot and birth readings, develops a card from a photograph, and&nbsp;files&nbsp;each one on a page of its own.</p>
+  </div>
+  <p class="about__spec">
+   <span>Five rooms</span><span class="about__spec-d" aria-hidden="true">·</span>
+   <span class="about__spec-free">Three free to enter</span><span class="about__spec-d" aria-hidden="true">·</span>
+   <span class="about__spec-paid">One paid</span><span class="about__spec-d" aria-hidden="true">·</span>
+   <span>One unlit</span></p>
+  <span class="about__sill" aria-hidden="true"><span class="about__sill-line"></span><span class="about__sill-span">I &ndash; V</span></span>
+ </header>
+ <ol class="about__rail" id="rail"></ol>
+ <footer class="about__close">
+  <span class="about__wick about__wick--close"></span>
+  <span class="about__seal">◆</span>
+  <p class="about__foot">One archive. Every door kept.</p>
+ </footer>
+</section>
+<script>
+var EM={
+codex:'<svg class="about__emblem-svg" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10 V31"/><path d="M20 10 C15 7.5 9 7.3 6 9.2 V29 C9 27.2 15 27.4 20 30"/><path d="M20 10 C25 7.5 31 7.3 34 9.2 V29 C31 27.2 25 27.4 20 30"/><path d="M9.2 14.6 H16 M9.2 18.4 H16 M9.2 22.2 H14.5 M23.8 14.6 H30.6 M23.8 18.4 H30.6 M25.3 22.2 H30.6" stroke-width=".75" opacity=".5"/></svg>',
+tarot:'<svg class="about__emblem-svg" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="12" width="13" height="20" rx="2" opacity=".42" transform="rotate(-12 13.5 22)"/><rect x="20" y="12" width="13" height="20" rx="2" opacity=".42" transform="rotate(12 26.5 22)"/><rect x="13.5" y="9.5" width="13" height="21" rx="2"/><path d="M20 15 L23.5 20 L20 25 L16.5 20 Z" stroke-width=".75"/></svg>',
+arcana:'<svg class="about__emblem-svg" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 29 L7.8 13 L14.5 19.5 L20 8 L25.5 19.5 L32.2 13 L33.5 29 Z"/><path d="M8.6 24.8 H31.4" stroke-width=".75" opacity=".5"/><circle cx="13.5" cy="27" r=".9" stroke-width=".75" opacity=".5"/><circle cx="20" cy="27" r=".9" stroke-width=".75" opacity=".5"/><circle cx="26.5" cy="27" r=".9" stroke-width=".75" opacity=".5"/></svg>',
+mint:'<svg class="about__emblem-svg" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="7.5" width="22" height="25" rx="2.2"/><path d="M10 26 L15 20 L19 24 L25 16.5 L30 22" stroke-width=".75" opacity=".5"/><circle cx="15.5" cy="15" r="2.4" stroke-width=".75" opacity=".5"/><path d="M6 6 L8 8 M34 6 L32 8 M6 34 L8 32 M34 34 L32 32" stroke-width=".75" opacity=".4"/></svg>',
+unlit:'<svg class="about__emblem-svg" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="20" cy="20" r="11"/><path d="M20 16.5 L23 20 L20 23.5 L17 20 Z" stroke-width=".75" opacity=".5"/><path d="M20 7 V4.7 M20 33 V35.3 M7 20 H4.7 M33 20 H35.3" stroke-width=".75" opacity=".4"/></svg>'};
+var P=[
+ ['codex','I','left','is-free','The Codex','166 entries across eight systems. Every card, sign, rune and hexagram the rooms read from.','Free · no account','Open the Codex →'],
+ ['tarot','II','right','','Tarot Divination','Three cards for a Sitting, five for the Deep Read, cut from the full 78 and filed where each fell.','First sitting free · to $2.99','Cut the deck →'],
+ ['arcana','III','left','is-paid','The Birth Reading','Six marks from a name and birth date: astrology, numerology, runes, the I Ching, each with a record.','$4.99 · $7.99 for two','Give a name and date →'],
+ ['mint','IV','right','is-free','The Card Mint','One card from one photograph. The room develops what is already in it, then keeps it a page.','Free · or the paid Halo Mint','See a card develop →'],
+ ['unlit','V','center','about__nugget--unlit','The Unlit Room','A fifth room, unbuilt. Nothing to read here yet; the candle has not reached this end of the hall.','Not yet open · no date','']];
+document.getElementById('rail').innerHTML=P.map(function(p){
+ return '<li class="about__nugget'+(p[3]?' '+p[3]:'')+'" data-side="'+p[2]+'" data-nug="'+p[0]+'">'
+ +'<span class="about__ord" aria-hidden="true">'+p[1]+'</span><div class="about__plate">'
+ +'<span class="about__frame" aria-hidden="true"></span>'
+ +'<span class="about__emblem" aria-hidden="true">'+EM[p[0]]+'</span><p class="about__name">'+p[4]+'</p>'
+ +'<span class="about__rule" aria-hidden="true"></span><p class="about__line">'+p[5]+'</p>'
+ +'<p class="about__micro">'+p[6]+'</p>'
+ +(p[7]?'<a class="about__door" href="#" onclick="return false">'+p[7]+'</a>':'')
+ +'</div></li>';}).join('');
+</script>
+</body></html>

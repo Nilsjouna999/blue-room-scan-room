@@ -1,0 +1,449 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>U1 boxes — paper prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+/* =============================================================
+   U1 BOXES — PAPER PROTOTYPE (standalone, uncommitted-to-live)
+
+   Three dials, so the builder's eye decides instead of a description:
+     PAPER    archival fold  <——>  full crumple   (the material question)
+     TYPE     as shipped     <——>  audited        (the type-design question)
+     COPY     as shipped     <——>  rewritten      (the fleet's copy set)
+
+   MATERIAL LAW obeyed here, from the perf guard + the art director:
+     · no live SVG filter of any kind — the plates carry an opacity+transform
+       reveal on the real page, and a filter under a fading ancestor gets
+       re-evaluated per frame in at least one engine. Folds are GRADIENTS on
+       the plate's existing background stack; creases are plain SVG strokes.
+     · no new pseudo-element — ::before is the platemark ring, ::after is the
+       unlit under-glow. Both are taken. Folds ride the background stack.
+     · no shadow, bevel or lift on the tile. A fold is a tonal event, not a
+       3D one. The lift stays on the emblem, as the live sheet already has it.
+     · the light is the room's own candle: neutral rgba(233,229,220,·).
+       Never gold, never violet — a warm ridge spanning 400px is a wash.
+
+   CREASE GEOMETRY follows the crumpled-paper literature: a hierarchical
+   ridge network, NOT uniform noise — a few long ridges crossing most of the
+   sheet plus a much denser population of short ones, thinning toward the
+   edges, meeting at irregular angles. Every crease is drawn as a PAIRED
+   COUPLET — a thin hard highlight abutting a wider soft shadow — because on
+   dark stock that couplet is the entire visual vocabulary of "folded".
+============================================================= */
+
+:root {
+  --t-display: #e9e5dc; --t-primary: #d7d3ca; --t-body: #b1ada4;
+  --t-meta: #948f87;    --t-ghost: #6e6b63;   --faint: var(--t-ghost);
+  --ink-950: #0a0b0d;   --ink-900: #100f0c;   --ink-850: #11100d;
+  --line: rgba(233,229,220,.12); --line-strong: rgba(233,229,220,.2);
+  --hair-1: rgba(233,229,220,.14); --hair-2: rgba(233,229,220,.08); --hair-3: rgba(233,229,220,.045);
+  --silver-dim: var(--t-meta); --violet: #8b7bff; --gold: #c8ad70;
+  --font-display: "Cormorant Garamond", "Times New Roman", serif;
+  --font-ui: "Inter", -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "IBM Plex Mono", "Consolas", monospace;
+
+  /* the paper dial, 0 = archival fold, 1 = full crumple. JS drives these. */
+  --crush: 0;
+  --ridge: .030;   /* highlight alpha on a ridge  */
+  --valley: .10;   /* shadow alpha in a valley    */
+  --stock: #11100d;/* the sheet, DEEPENED as the dial climbs — see the note below */
+}
+
+/* THE ONE MEASUREMENT THAT DECIDES THIS WHOLE BUILD
+   --ink-850 #11100d sits at sRGB 0.067. There is no room left to darken:
+   a valley painted rgba(0,0,0,.30) moves it to 0.047 and is invisible, while
+   a ridge at rgba(255,255,255,.10) moves it to 0.160 and reads instantly.
+   So on this stock EVERY crease is a highlight, and a physically balanced
+   crease map reads as a net LIGHTENING of the plate — the builder's colour
+   drifts, which is the one thing he asked not to happen.
+   The fix: sink the stock toward #0c0b09 as the creases arrive, so the
+   highlights carry the mean back up to the same perceived --ink-850. The
+   colour is held by compensation, not by leaving the texture off. */
+
+* { box-sizing: border-box; }
+html { background: var(--ink-950); }
+body {
+  margin: 0; padding: 132px 24px 120px;
+  background: radial-gradient(120% 90% at 50% 0%, #16151a 0%, var(--ink-950) 62%) fixed;
+  color: var(--t-primary); -webkit-font-smoothing: antialiased;
+}
+
+/* ---------- the control bar ---------- */
+.bar {
+  position: fixed; inset: 0 0 auto 0; z-index: 40;
+  display: flex; flex-wrap: wrap; align-items: center; gap: 10px 22px;
+  padding: 13px 20px; background: rgba(8,8,10,.93);
+  border-bottom: 1px solid var(--hair-2); backdrop-filter: blur(6px);
+  font-family: var(--font-mono); font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--t-meta);
+}
+.bar__grp { display: flex; align-items: center; gap: 9px; }
+.bar__lab { color: var(--faint); }
+.bar input[type=range] { width: 168px; accent-color: var(--gold); }
+.bar__val { color: var(--t-display); min-width: 92px; font-variant-numeric: tabular-nums; }
+.bar__sw {
+  appearance: none; cursor: pointer; font: inherit; letter-spacing: inherit; text-transform: inherit;
+  color: var(--t-meta); background: transparent; border: 1px solid var(--hair-1);
+  border-radius: 3px; padding: 5px 11px;
+}
+.bar__sw[aria-pressed="true"] { color: var(--gold); border-color: color-mix(in srgb, var(--gold) 50%, var(--hair-1)); }
+.bar__note { flex: 1 1 100%; color: var(--faint); letter-spacing: .06em; text-transform: none; font-size: 10.5px; }
+
+/* ---------- the rail (a straight copy of the live geometry) ---------- */
+.about__rail { position: relative; list-style: none; margin: 0 auto; padding: 0; width: min(760px,100%); display: grid; row-gap: clamp(64px,12vh,132px); }
+.about__rail::before { content:""; position:absolute; inset-block:-8px; left:50%; width:1px; transform:translateX(-.5px);
+  background: linear-gradient(transparent, var(--hair-3) 6%, var(--hair-1) 46%, var(--hair-1) 54%, var(--hair-3) 94%, transparent); }
+.about__nugget { position: relative; display: flex; }
+.about__nugget[data-side="left"]   { justify-content: flex-start; }
+.about__nugget[data-side="right"]  { justify-content: flex-end; }
+.about__nugget[data-side="center"] { justify-content: center; }
+
+.about__ord { position:absolute; top:-.34em; z-index:0; font-family:var(--font-display); font-size:clamp(78px,14vw,144px); line-height:1; color:var(--line); pointer-events:none; user-select:none; }
+.about__nugget[data-side="left"]   .about__ord { left:-.08em; }
+.about__nugget[data-side="right"]  .about__ord { right:-.08em; }
+.about__nugget[data-side="center"] .about__ord { left:50%; transform:translateX(-50%); }
+
+/* THE PLATE. Background stack, bottom→top:
+     4 = the flat stock (--ink-850)
+     3 = the live top-bevel wash
+     2 = fold B, the horizontal third   (couplet: hard ridge + soft valley)
+     1 = fold A, the near-vertical carry (couplet: hard ridge + soft valley)
+   Fold offsets/tilt are per-plate custom properties, so every sheet has its
+   own history off one shared grammar. Zero new nodes, zero stacking contexts. */
+.about__plate {
+  position: relative; z-index: 1; width: min(400px,100%);
+  display: flex; flex-direction: column; align-items: center; gap: 13px;
+  padding: 34px 26px 21px; border: 1px solid var(--hair-1); border-radius: 10px;
+  box-shadow: inset 0 1px 0 rgba(233,229,220,.04);
+  background:
+    linear-gradient(var(--foldA-ang, 92deg),
+      transparent calc(var(--foldA-at, 47%) - 9%),
+      rgba(0,0,0,var(--valley))       calc(var(--foldA-at, 47%) - 1.2%),
+      rgba(233,229,220,var(--ridge))  var(--foldA-at, 47%),
+      rgba(233,229,220,calc(var(--ridge) * .35)) calc(var(--foldA-at, 47%) + 1.1%),
+      transparent calc(var(--foldA-at, 47%) + 10%)),
+    linear-gradient(var(--foldB-ang, 179deg),
+      transparent calc(var(--foldB-at, 71%) - 11%),
+      rgba(0,0,0,calc(var(--valley) * .8)) calc(var(--foldB-at, 71%) - 1.4%),
+      rgba(233,229,220,calc(var(--ridge) * .8)) var(--foldB-at, 71%),
+      transparent calc(var(--foldB-at, 71%) + 12%)),
+    linear-gradient(180deg, rgba(233,229,220,.024) 0%, transparent 65%),
+    var(--stock);
+}
+.about__plate::before { content:""; position:absolute; inset:7px; border-radius:6px; box-shadow: inset 0 0 0 1px var(--hair-2); pointer-events:none; }
+
+/* the crease network — a plain SVG sibling, no filter, no will-change, no blend.
+   It only fades UP as the dial passes the archival-fold end. */
+.paper {
+  position: absolute; inset: 0; border-radius: inherit; overflow: hidden;
+  pointer-events: none; z-index: 0; opacity: var(--crease-op, 0);
+}
+.paper svg { width: 100%; height: 100%; display: block; }
+
+/* the sheet that was never carried — no folds at all (the Unlit plate) */
+.about__nugget--unlit.no-folds .about__plate { background: linear-gradient(180deg, rgba(233,229,220,.024) 0%, transparent 65%), var(--ink-900); }
+.about__nugget--unlit.no-folds .paper { opacity: 0 !important; }
+
+/* ---------- plate contents ---------- */
+.about__emblem { display:block; color:var(--silver-dim); filter:drop-shadow(0 7px 16px rgba(0,0,0,.5)); position:relative; z-index:1; }
+.about__emblem svg { width:48px; height:48px; display:block; }
+.about__name, .about__rule, .about__line, .about__micro, .about__door { position: relative; z-index: 1; }
+.about__name  { font-family:var(--font-ui); font-size:13px; font-weight:600; letter-spacing:.16em; text-transform:uppercase; color:var(--t-display); margin:0; }
+.about__rule  { width:44px; height:1px; background:linear-gradient(90deg, transparent, var(--hair-1) 20%, var(--hair-1) 80%, transparent); }
+.about__line  { font-family:var(--font-display); font-weight:500; font-size:clamp(16px,2.3vw,18.5px); line-height:1.5; color:var(--t-primary); text-align:center; max-width:31ch; margin:0; }
+.about__micro { font-family:var(--font-mono); font-size:8.5px; letter-spacing:.2em; text-transform:uppercase; color:var(--t-meta); margin:0; }
+.about__door  { display:inline-flex; align-items:center; min-height:44px; padding:12px 20px; margin-top:4px;
+  font-family:var(--font-ui); font-size:11.5px; font-weight:600; letter-spacing:.18em; text-transform:uppercase;
+  color:var(--t-display); text-decoration:none; border:1px solid var(--line-strong); border-radius:3px;
+  transition: border-color 200ms ease, color 200ms ease, transform 200ms ease; }
+.about__door:hover { transform: translateY(-1.5px); }
+.about__nugget.is-free .about__micro { color:#c8ad70; }
+.about__nugget.is-paid .about__micro { color: color-mix(in srgb, var(--violet) 65%, var(--t-meta)); }
+.about__nugget.is-free .about__ord { color: rgba(200,173,112,.14); }
+.about__nugget.is-paid .about__ord { color: rgba(139,123,255,.13); }
+.about__nugget.is-free .about__door { border-color: color-mix(in srgb, #c8ad70 42%, var(--line-strong)); }
+.about__nugget.is-free .about__door:hover { border-color:#c8ad70; color:#c8ad70; }
+.about__nugget.is-paid .about__door { border-color: color-mix(in srgb, var(--violet) 45%, var(--line-strong)); }
+.about__nugget.is-paid .about__door:hover { border-color:var(--violet); color:var(--violet); }
+.about__nugget--unlit .about__plate { border-style:dashed; border-color:var(--hair-2); }
+.about__nugget--unlit .about__emblem { filter: blur(6px) drop-shadow(0 7px 16px rgba(0,0,0,.5)); opacity:.5; }
+.about__nugget--unlit .about__name { filter: blur(1.2px); opacity:.66; }
+.about__nugget--unlit .about__line, .about__nugget--unlit .about__micro { color: var(--faint); }
+
+/* ---------- TYPE: AUDITED (the second dial) ----------
+   Every value below is the typographer's prescription, with its reason.
+   Toggling this on/off is the whole point — the dial isolates type from paper. */
+body.type-fixed .about__micro {
+  font-size:10px; font-weight:500; letter-spacing:.24em; line-height:1.4; color:var(--t-body);
+}                                        /* cap height +18%, contrast 5.96 -> 8.55:1 — it carries the price */
+body.type-fixed .about__name  { font-size:14px; }          /* step vs the door: 1.13x -> 1.22x */
+body.type-fixed .about__line  { line-height:1.38; }        /* 3.95x x-height is ~45% too loose at 38 CPL */
+body.type-fixed .about__door  { letter-spacing:.16em; }    /* five tracked-caps styles collapse to two */
+body.type-fixed .about__nugget--unlit .about__line,
+body.type-fixed .about__nugget--unlit .about__micro { color: var(--t-meta); }   /* was 3.60:1 — an AA failure */
+/* the ghost ordinal: 74% of it sits behind an OPAQUE plate and renders at 1.29:1.
+   Mirrored into the empty gutter the alternation already creates, it is visible
+   for the first time; below 700px the gutter is gone, so it goes with it. */
+body.type-fixed .about__nugget[data-side="left"]   .about__ord { left:auto; right:clamp(8px,4vw,56px); }
+body.type-fixed .about__nugget[data-side="right"]  .about__ord { right:auto; left:clamp(8px,4vw,56px); }
+body.type-fixed .about__nugget[data-side="center"] .about__ord { left:auto; right:clamp(8px,3vw,24px); transform:none; }
+body.type-fixed .about__ord { color: rgba(233,229,220,.16); }
+@media (max-width:699px){ body.type-fixed .about__ord { display:none; } }
+
+@media (max-width:559px){
+  body { padding-top: 168px; }
+  .about__nugget[data-side] { justify-content:center; }
+  .about__nugget[data-side] .about__ord { left:50%; right:auto; transform:translateX(-50%); }
+}
+</style>
+</head>
+<body class="no-folds-unlit">
+
+<div class="bar">
+  <div class="bar__grp">
+    <span class="bar__lab">Paper</span>
+    <input id="crush" type="range" min="0" max="100" value="0" aria-label="Paper: archival fold to full crumple" />
+    <span class="bar__val" id="crushVal">archival fold</span>
+  </div>
+  <div class="bar__grp">
+    <span class="bar__lab">Type</span>
+    <button class="bar__sw" id="swType" aria-pressed="false">as shipped</button>
+  </div>
+  <div class="bar__grp">
+    <span class="bar__lab">Copy</span>
+    <button class="bar__sw" id="swCopy" aria-pressed="false">as shipped</button>
+  </div>
+  <div class="bar__grp">
+    <span class="bar__lab">Unlit sheet</span>
+    <button class="bar__sw" id="swUnlit" aria-pressed="true">unfolded</button>
+  </div>
+  <p class="bar__note" id="note"></p>
+</div>
+
+<ol class="about__rail" id="rail"></ol>
+
+<script>
+"use strict";
+
+/* ---------------- the five emblems, verbatim from app.js AB_EMBLEMS ---------------- */
+var EM = {
+codex:'<svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10 V31"/><path d="M20 10 C15 7.5 9 7.3 6 9.2 V29 C9 27.2 15 27.4 20 30"/><path d="M20 10 C25 7.5 31 7.3 34 9.2 V29 C31 27.2 25 27.4 20 30"/><path d="M9.2 14.6 H16 M9.2 18.4 H16 M9.2 22.2 H14.5 M23.8 14.6 H30.6 M23.8 18.4 H30.6 M25.3 22.2 H30.6" stroke-width=".75" opacity=".5"/></svg>',
+tarot:'<svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="12" width="13" height="20" rx="2" opacity=".42" transform="rotate(-12 13.5 22)"/><rect x="20" y="12" width="13" height="20" rx="2" opacity=".42" transform="rotate(12 26.5 22)"/><rect x="13.5" y="9.5" width="13" height="21" rx="2"/><path d="M20 15 L23.5 20 L20 25 L16.5 20 Z" stroke-width=".75"/></svg>',
+arcana:'<svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 29 L7.8 13 L14.5 19.5 L20 8 L25.5 19.5 L32.2 13 L33.5 29 Z"/><path d="M8.6 24.8 H31.4" stroke-width=".75" opacity=".5"/><circle cx="13.5" cy="27" r=".9" stroke-width=".75" opacity=".5"/><circle cx="20" cy="27" r=".9" stroke-width=".75" opacity=".5"/><circle cx="26.5" cy="27" r=".9" stroke-width=".75" opacity=".5"/></svg>',
+mint:'<svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="7.5" width="22" height="25" rx="2.2"/><path d="M10 26 L15 20 L19 24 L25 16.5 L30 22" stroke-width=".75" opacity=".5"/><circle cx="15.5" cy="15" r="2.4" stroke-width=".75" opacity=".5"/><path d="M6 6 L8 8 M34 6 L32 8 M6 34 L8 32 M34 34 L32 32" stroke-width=".75" opacity=".4"/></svg>',
+unlit:'<svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="20" cy="20" r="11"/><path d="M20 16.5 L23 20 L20 23.5 L17 20 Z" stroke-width=".75" opacity=".5"/><path d="M20 7 V4.7 M20 33 V35.3 M7 20 H4.7 M33 20 H35.3" stroke-width=".75" opacity=".4"/></svg>'
+};
+
+/* ---------------- the copy, both sets ----------------
+   SHIPPED = exactly what is live today.
+   NEW     = the fleet's set. Line budget <= 110 chars (31ch of Cormorant buys
+             ~38 characters per line, so 3 lines is the plaque's real ceiling).
+             micro now has ONE job on all five plates: the terms stamp.
+             No two doors share a CTA; each names the first act, and the Birth
+             Reading's door states its input, which is how the plate answers
+             "does this want my photo?" without spending a word on the negative. */
+var PLATES = [
+ { key:'codex', ord:'I', side:'left', cls:'is-free',
+   shipped:{ name:'The Codex',
+     line:'The whole archive of meanings — every card, sign, and rune — yours to search.',
+     micro:'Free · always open', door:'Open the Codex →' },
+   fresh:{ name:'The Codex',
+     line:'166 entries across eight systems. Every card, sign, rune and hexagram the rooms read from.',
+     micro:'Free · no account', door:'Open the Codex →' } },
+
+ { key:'tarot', ord:'II', side:'right', cls:'',
+   shipped:{ name:'Tarot Divination',
+     line:'Cut the full deck to a question — the Pull, a Sitting, or the Deep Read — and what falls is read and filed.',
+     micro:'Drawn once · not reissued.', door:'Enter the room →' },
+   fresh:{ name:'Tarot Divination',
+     line:'Three cards for a Sitting, five for the Deep Read, cut from the full 78 and filed where each fell.',
+     micro:'First sitting free · to $2.99', door:'Cut the deck →' } },
+
+ { key:'arcana', ord:'III', side:'left', cls:'is-paid',
+   shipped:{ name:'The Arcana Reading',
+     line:'A person, read by birth through six systems into a crowned name — a record kept for every reading.',
+     micro:'By birth · or a Concord of two', door:'Enter the room →' },
+   fresh:{ name:'The Birth Reading',
+     line:'Six marks from a name and birth date: astrology, numerology, runes, the I Ching, each with a record.',
+     micro:'$4.99 · $7.99 for two', door:'Give a name and date →' } },
+
+ { key:'mint', ord:'IV', side:'right', cls:'is-free',
+   shipped:{ name:'Card Mint',
+     line:'Bring a photo — it is already a card. The room only develops it.',
+     micro:'The Free Pull · the Halo Mint', door:'See a card develop →' },
+   fresh:{ name:'The Card Mint',
+     line:'One card from one photograph. The room develops what is already in it, then keeps it a page.',
+     micro:'Free · or the paid Halo Mint', door:'See a card develop →' } },
+
+ { key:'unlit', ord:'V', side:'center', cls:'about__nugget--unlit',
+   shipped:{ name:'The Unlit Room',
+     line:'Something is taking shape here — still too dim to name. The candle has not reached it yet.',
+     micro:'Not yet lit', door:'' },
+   fresh:{ name:'The Unlit Room',
+     line:'A fifth room, unbuilt. Nothing to read here yet; the candle has not reached this end of the hall.',
+     micro:'Not yet open · no date', door:'' } }
+];
+
+/* ---------------- the sheet ----------------
+   NOT noise. A crumple is a facet field: a lattice of jittered vertices, each
+   cell split on a random diagonal, each triangle given a REAL plane normal and
+   tinted by dot(normal, light). Adjacent facets sharing a fold then shade in
+   opposite directions on their own, and every fold line becomes a genuine
+   mountain or valley. That is why this reads as a sheet and why turbulence
+   never will — turbulence makes isotropic lumps, i.e. stucco.
+
+   Two authoring rules make it read as REOPENED rather than merely textured:
+   boundary vertices slide only ALONG their edge (the sheet stays rectangular),
+   and their height is damped by half (a pressed sheet is flattest at its
+   border). The fold lines are then stroked over the facets as thin highlights.
+
+   No filter anywhere. Plain fills and strokes, so this stays on the cheap
+   paint path even with the plates' opacity reveal running above it. */
+var W = 400, H = 260;
+var LIGHT = (function(){ var v=[-0.42,-0.72,0.55], m=Math.hypot(v[0],v[1],v[2]); return [v[0]/m,v[1]/m,v[2]/m]; })();
+function rng(seed){ var s = seed >>> 0; return function(){ s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; }; }
+
+/* On near-black stock a shadow does almost nothing and a highlight does
+   everything, so the two halves of a crease are NOT weighted equally. */
+var HI_GAIN = 1.0, SH_GAIN = 0.34;
+
+function sheetSVG(seed, crush) {
+  var r = rng(seed);
+  var cols = 5 + Math.round(crush * 4), rows = 4 + Math.round(crush * 3);
+  var cw = W / cols, ch = H / rows, V = [], i, j;
+
+  for (j = 0; j <= rows; j++) {
+    V[j] = [];
+    for (i = 0; i <= cols; i++) {
+      var edgeX = (i === 0 || i === cols), edgeY = (j === 0 || j === rows);
+      var jx = edgeX ? 0 : (r() - .5) * cw * .55;          // boundary slides only along its own edge
+      var jy = edgeY ? 0 : (r() - .5) * ch * .55;
+      var damp = (edgeX || edgeY) ? .5 : 1;                 // pressed flattest at the border
+      V[j][i] = { x: i * cw + jx, y: j * ch + jy, z: (r() - .5) * 46 * crush * damp };
+    }
+  }
+
+  var buckets = {}, folds = [];
+  function tri(a, b, c) {
+    var ux=b.x-a.x, uy=b.y-a.y, uz=b.z-a.z, vx=c.x-a.x, vy=c.y-a.y, vz=c.z-a.z;
+    var nx=uy*vz-uz*vy, ny=uz*vx-ux*vz, nz=ux*vy-uy*vx, m=Math.hypot(nx,ny,nz)||1;
+    if (nz < 0) { nx=-nx; ny=-ny; nz=-nz; }                 // face the viewer
+    var d = (nx*LIGHT[0] + ny*LIGHT[1] + nz*LIGHT[2]) / m - LIGHT[2];   // lit relative to a flat facet
+    var a8 = Math.round(Math.abs(d) * (d > 0 ? HI_GAIN : SH_GAIN) * 34) / 125;   // quantised into buckets
+    if (a8 < .008) return;
+    var k = (d > 0 ? 'w' : 'b') + a8.toFixed(3);
+    (buckets[k] || (buckets[k] = [])).push('M'+a.x.toFixed(1)+' '+a.y.toFixed(1)+'L'+b.x.toFixed(1)+' '+b.y.toFixed(1)+'L'+c.x.toFixed(1)+' '+c.y.toFixed(1)+'Z');
+  }
+  for (j = 0; j < rows; j++) for (i = 0; i < cols; i++) {
+    var p00=V[j][i], p10=V[j][i+1], p01=V[j+1][i], p11=V[j+1][i+1];
+    if (r() < .5) { tri(p00,p10,p11); tri(p00,p11,p01); folds.push([p00,p11]); }
+    else          { tri(p00,p10,p01); tri(p10,p11,p01); folds.push([p10,p01]); }
+  }
+
+  var out = '';
+  Object.keys(buckets).forEach(function(k){
+    out += '<path fill="'+(k[0]==='w' ? '#e9e5dc' : '#000')+'" fill-opacity="'+k.slice(1)+'" d="'+buckets[k].join('')+'"/>';
+  });
+  /* the fold lines themselves — thin, hard, always a highlight on this stock */
+  var lit = (0.030 + crush * 0.10).toFixed(3), fd = '';
+  folds.forEach(function(f){ fd += 'M'+f[0].x.toFixed(1)+' '+f[0].y.toFixed(1)+'L'+f[1].x.toFixed(1)+' '+f[1].y.toFixed(1); });
+  out += '<path fill="none" stroke="#e9e5dc" stroke-opacity="'+lit+'" stroke-width=".9" stroke-linejoin="round" d="'+fd+'"/>';
+
+  return '<svg viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="none" shape-rendering="geometricPrecision">' + out + '</svg>';
+}
+
+/* ---------------- render ---------------- */
+/* fold grammar, one per plate: fold A near-vertical (x 36-64%, tilted 2-4deg),
+   fold B a horizontal third (y ~28% or ~72%). One grammar, five histories. */
+var FOLDS = [
+  { a:'92.8deg', at:'44%',  b:'179.2deg', bt:'29%' },
+  { a:'87.4deg', at:'58%',  b:'180.6deg', bt:'71%' },
+  { a:'91.9deg', at:'39%',  b:'179.4deg', bt:'73%' },
+  { a:'88.2deg', at:'62%',  b:'180.5deg', bt:'27%' },
+  { a:'93.1deg', at:'51%',  b:'179.1deg', bt:'70%' }
+];
+
+var rail = document.getElementById('rail'), useFresh = false;
+
+function render() {
+  rail.innerHTML = PLATES.map(function(p, i){
+    var c = useFresh ? p.fresh : p.shipped, f = FOLDS[i];
+    var cls = 'about__nugget' + (p.cls ? ' ' + p.cls : '');
+    return '<li class="'+cls+'" data-side="'+p.side+'" data-nug="'+p.key+'">'
+      + '<span class="about__ord" aria-hidden="true">'+p.ord+'</span>'
+      + '<div class="about__plate" style="--foldA-ang:'+f.a+';--foldA-at:'+f.at+';--foldB-ang:'+f.b+';--foldB-at:'+f.bt+'">'
+      +   '<div class="paper" data-seed="'+(i*7919+104729)+'" aria-hidden="true"></div>'
+      +   '<span class="about__emblem" aria-hidden="true">'+EM[p.key]+'</span>'
+      +   '<p class="about__name">'+c.name+'</p>'
+      +   '<span class="about__rule" aria-hidden="true"></span>'
+      +   '<p class="about__line">'+c.line+'</p>'
+      +   '<p class="about__micro">'+c.micro+'</p>'
+      +   (c.door ? '<a class="about__door" href="#" onclick="return false">'+c.door+'</a>' : '')
+      + '</div></li>';
+  }).join('');
+  paint();
+}
+
+var crush = 0;
+function paint() {
+  var root = document.documentElement.style;
+  root.setProperty('--crush', crush.toFixed(3));
+  root.setProperty('--ridge',  (0.030 + crush*0.130).toFixed(4));
+  root.setProperty('--valley', (0.10  + crush*0.34 ).toFixed(4));
+  /* sink the stock as the creases arrive, so their highlights carry the mean
+     back to the same perceived --ink-850 and the builder's colour holds.
+     #11100d -> #0c0b09, linear on the dial. */
+  var lerp = function(a,b){ return Math.round(a + (b-a)*crush); };
+  root.setProperty('--stock', 'rgb('+lerp(17,12)+','+lerp(16,11)+','+lerp(13,9)+')');
+  [].forEach.call(document.querySelectorAll('.paper'), function(el){
+    el.style.setProperty('--crease-op', crush <= 0 ? 0 : Math.min(1, 0.30 + crush*0.70).toFixed(3));
+    el.innerHTML = crush <= 0 ? '' : sheetSVG(+el.dataset.seed, crush);
+  });
+  document.querySelectorAll('.about__nugget--unlit').forEach(function(n){
+    n.classList.toggle('no-folds', document.body.classList.contains('no-folds-unlit'));
+  });
+  var v = document.getElementById('crushVal'), n = document.getElementById('note');
+  var pct = Math.round(crush*100);
+  var facets = (5 + Math.round(crush*4)) * (4 + Math.round(crush*3)) * 2;
+  v.textContent = pct === 0 ? 'archival fold' : (pct === 100 ? 'full crumple' : pct + '%  ·  ' + facets + ' facets');
+  n.textContent = pct === 0
+    ? 'Two folds per plate, ~3% tonal lift, routed clear of the type. Folded once to be carried and filed, then pressed flat. Never crushed. Stock sits at the live #11100d.'
+    : (pct < 45
+      ? 'The facet field is arriving and the stock is sinking to compensate, so the plate colour holds while the creases lift. This is the widest part of the usable range.'
+      : 'Creases now cross the reading and the stock has sunk to #0c0b09 to keep the mean. Materially convincing — but the sheet reads as salvaged rather than archived, which is the thing the art director wanted killed.');
+}
+
+document.getElementById('crush').addEventListener('input', function(e){ crush = +e.target.value / 100; paint(); });
+document.getElementById('swType').addEventListener('click', function(e){
+  var on = document.body.classList.toggle('type-fixed');
+  e.target.setAttribute('aria-pressed', on); e.target.textContent = on ? 'audited' : 'as shipped';
+});
+document.getElementById('swCopy').addEventListener('click', function(e){
+  useFresh = !useFresh;
+  e.target.setAttribute('aria-pressed', useFresh); e.target.textContent = useFresh ? 'rewritten' : 'as shipped';
+  render();
+});
+document.getElementById('swUnlit').addEventListener('click', function(e){
+  var on = document.body.classList.toggle('no-folds-unlit');
+  e.target.setAttribute('aria-pressed', on); e.target.textContent = on ? 'unfolded' : 'folded like the rest';
+  paint();
+});
+
+render();
+
+/* deep-link a state, so a screenshot or a shared link lands on the exact dial:
+   ?crush=0..100 · ?type=1 · ?copy=1 · ?unlit=0 */
+(function seedFromURL(){
+  var q = new URLSearchParams(location.search);
+  if (q.get('type') && q.get('type') !== '0') document.getElementById('swType').click();
+  if (q.get('copy') && q.get('copy') !== '0') document.getElementById('swCopy').click();
+  if (q.get('unlit') === '0') document.getElementById('swUnlit').click();
+  if (q.has('crush')) { var s = document.getElementById('crush'); s.value = q.get('crush'); s.dispatchEvent(new Event('input')); }
+})();
+</script>
+</body>
+</html>
