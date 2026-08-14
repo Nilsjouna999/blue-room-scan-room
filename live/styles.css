@@ -3145,10 +3145,18 @@ html.is-travel .card .cardfinish { mix-blend-mode: normal; }
 /* BR-S345: one line, not a stack. The caption sits on the INSIDE and the arrow
    points outward, so the control's own shape says which way it goes. */
 .menu__go { position: absolute; z-index: 5; display: flex; flex-direction: row; align-items: center; gap: 10px; }
-.menu__go--rooms { right: clamp(12px, 2.6vw, 40px); bottom: clamp(26px, 6vh, 54px); transition: opacity 240ms ease, visibility 0s linear 0s; }
-.menu__go--desk { left: clamp(12px, 2.6vw, 40px); bottom: clamp(26px, 6vh, 54px); }
-.menu__go--reliq { right: clamp(12px, 2.6vw, 40px); bottom: clamp(26px, 6vh, 54px); }   /* BR-S204: wall→reliquary (right edge) */
-.menu__go--reliq-back { left: clamp(12px, 2.6vw, 40px); bottom: clamp(26px, 6vh, 54px); }   /* reliquary→wall (left edge) */
+/* ★★ BR-S439 — THE ARROWS COME IN OFF THE CORNERS. The builder: "or move arrows
+   close to middle so rooms button can be bottom right." That is the better fix and it
+   solves the cause rather than the symptom: the right corner had three tenants stacked
+   into 85px — the codex orbs, this arrow, and ROOMS — and every placement pass since
+   BR-S402 has been shuffling them inside a space that was simply too small.
+   Both sides move by the SAME amount so the pair stays symmetric; they are one gesture
+   read left-and-right, and an asymmetric pair reads as a mistake even when it is not.
+   The vertical is untouched — they still sit on the panel's own floor line. */
+.menu__go--rooms { right: clamp(96px, 13vw, 210px); bottom: clamp(26px, 6vh, 54px); transition: opacity 240ms ease, visibility 0s linear 0s; }
+.menu__go--desk { left: clamp(96px, 13vw, 210px); bottom: clamp(26px, 6vh, 54px); }
+.menu__go--reliq { right: clamp(96px, 13vw, 210px); bottom: clamp(26px, 6vh, 54px); }   /* BR-S204: wall→reliquary (right edge) */
+.menu__go--reliq-back { left: clamp(96px, 13vw, 210px); bottom: clamp(26px, 6vh, 54px); }   /* reliquary→wall (left edge) */
 /* the LEFT-hand controls mirror: arrow outward, caption inward. DOM order is
    caption-then-button in every one of them, so the mirror is a row-reverse rather
    than a second markup shape. */
@@ -5274,21 +5282,28 @@ body[data-devnav="1"] .devnav {
      PLUS their own height, so their top edge is near y 160. ROOMS goes in the gap the
      column actually has: right-aligned, above the arrow, below the orbs.
      BR-S401's note called this "one stack, not two floating docks" — this restores it. */
-  /* ★★ BR-S438 — AND I MEASURED THE WRONG ELEMENT TO "PROVE" IT WAS FINE.
-     BR-S437 checked .orbitbtn against #brCodexDock and reported no overlap. #brCodexDock
-     is display:none on the menu — syncCodexBall() only shows it in six ?dev= rooms
-     (app.js:1171). Its rect is 0x0 at 0,0, so the collision test passed against nothing
-     and I read the zeros as success. The orbs on THIS panel are #codexSeed and
-     #codexMiniBall (app.js:1168 says so in as many words) and nobody had measured them.
-     Real geometry at 1280x720, fixed elements only:
-         #codexMiniBall   1194-1224 x 540-570
-         #codexSeed       1189-1231 x 582-624
-         .menu__go--reliq  top 707        (absolute, scrolls with the panel)
-     The gap the column actually has is y 624 -> 707. ROOMS is ~32px tall, so it centres
-     there at bottom ~38px — under the codex seal, above the arrow, on neither.
-     ★ The lesson is not the number. A zero-size rect is not a passing test, and a
-     collision check must assert its neighbours EXIST before it believes them. */
-  position: fixed; right: 18px; left: auto; bottom: clamp(32px, 5.2vh, 46px);
+  /* ★★ BR-S439 — ROOMS JOINS THE COLUMN INSTEAD OF BEING SQUEEZED UNDER IT.
+     "not symmetric and properly weighted visually" — correct, and measurable. The orbs
+     are a stack with an exact rhythm, read out of their own rules:
+         .mini  right: calc(clamp(12px,2.6vw,40px) + 7px)  bottom: calc(--orb-bottom + 54px)  30x30
+         .seed  right: clamp(12px,2.6vw,40px)              bottom: var(--orb-bottom)          42x42
+     → centres 48px apart, on one vertical axis. ROOMS was anchored to a different edge
+     entirely (right:18px) and centred 6.2px off that axis, spaced 63px below instead of
+     48 — near enough to look like a mistake, far enough to be one.
+     Now it is expressed in the STACK'S OWN TERMS: the same right anchor minus half the
+     width difference, so the centres line up at any viewport, and one more 48px step
+     down. It is the third object in a column, not a pill parked beneath one. */
+  position: fixed;
+  right: calc(clamp(12px, 2.6vw, 40px) - 22px);   /* (86 - 42) / 2 — centred on the seal */
+  left: auto;
+  /* ★ --orb-bottom is declared on #menuView (styles.css:4681) and .orbitbtn is NOT inside
+     it — the variable resolved to nothing, calc() became invalid, `bottom` fell back to
+     auto and the button flowed to y2310, a full screen below the fold. Measured, which is
+     the only reason it was caught: the horizontal was perfect and the vertical was gone.
+     A custom property is scoped, and a calc() that references an unset one does not warn —
+     it silently drops the whole declaration. So the value is written out here instead of
+     borrowed across a scope it cannot see. Keep in step with styles.css:4681 if that moves. */
+  bottom: calc(clamp(96px, 11vh, 110px) - 44px);   /* one more 48px centre-step below the seal */
   z-index: 80;   /* BR-S294: ABOVE the sheet — it is the way out as well as the way in */
   display: inline-flex; align-items: center; gap: 9px;
   padding: 9px 14px 9px 11px;
