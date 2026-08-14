@@ -40,6 +40,15 @@
        so it costs nothing per frame once rastered — but it MUST NOT be animated
        (the house perf contract: transform and opacity only). It fades in via
        opacity on a parent that already carries the transition. */
+    /* ★★★ BR-S448 — OPAQUE. The builder, third report: "still shows through the
+       backround." He is right and the two things being asked for are incompatible:
+       a backdrop-filter needs something behind it to filter, so any alpha below 1
+       leaves the brightest object on the site — the card, peaking at 232 — partly
+       drawn, and blur spreads that remainder into a shape rather than hiding it.
+       I raised .62 -> .90 -> .985 chasing it. The honest end of that line is 1.
+       So the blur goes with it, because at full opacity it filters nothing and only
+       costs a compositing layer. What is lost is a soft room behind the doors; what
+       is gained is a sheet that does what a sheet is for. */
     /* ★★★ BR-S447 — .90 WAS STILL 10 PERCENT OF THE BRIGHTEST THING ON THE SITE.
        "when opening rooms i still see main menu backround and white card through the
        room pop up." Correct, and my arithmetic at BR-S442 was wrong in the way that
@@ -63,9 +72,8 @@
        there first and completely — the room dims at once, then the doors come. That also
        removes the only moment the page behind could ever be read. */
     + ".orbit.is-u1 .orbit__scrim{transition:none!important;opacity:1!important;animation:none!important}"
-    + ".orbit__scrim{backdrop-filter:blur(20px) saturate(.85);"
-    +   "-webkit-backdrop-filter:blur(20px) saturate(.85);"
-    +   "background:rgba(14,12,10,.985)!important}"
+    + ".orbit__scrim{"
+        +   "background:#0e0c0a!important}"
     /* the field stops being a constellation and becomes a sheet of doors */
     + ".orbit.is-u1 .orbit__field{display:flex;align-items:center;justify-content:center;"
     +   "padding:clamp(20px,4vh,54px) clamp(16px,4vw,60px)}"

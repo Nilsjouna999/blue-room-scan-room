@@ -157,9 +157,14 @@
          So the canvas takes the whole region: the codex's own bands are switched off
          (below) and everything under the line is painted here, following the contour. */
       var g = ctx.createLinearGradient(0, H * LINE_FRAC, 0, H);
-      g.addColorStop(0,   "#161411");   /* the shore, at the line */
-      g.addColorStop(0.55,"#100f0c");
-      g.addColorStop(1,   "#0a0b0d");   /* the seafloor */
+      /* ★ BR-S448 — AND IT IS BLUE. BR-S237 called this "the blue under", but its three
+         stops (#161411 / #100f0c / #0a0b0d) are warm-to-neutral — the name described an
+         intent the colours never carried, which is why restoring them at BR-S444 read as
+         "not blue anymore". These are actually blue, and dark enough to stay a threshold
+         rather than a stripe: the water under the line the codex sits on. */
+      g.addColorStop(0,   "#0e1622");   /* the shore, at the line */
+      g.addColorStop(0.55,"#0a1019");
+      g.addColorStop(1,   "#070a10");   /* the seafloor */
       maskGrad = g;
     }
     canvas.style.transform = "translate(0px,0px)";
