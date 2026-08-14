@@ -56,6 +56,18 @@
   var BAND_ON = !/[?&]cmband=0/.test(String(root.location.search || ""));
   var maskGrad = null;
 
+  /* ★★ THE LOOP RUNS ON THE FRAME'S CLOCK, NOT THE PARENT'S. Third time today this
+     exact bug has appeared (see _rooms-u1.js and _whats-coming.js): a module installed
+     FROM the parent INTO the frame must animate on the frame's own requestAnimationFrame.
+     The canvas lives in the frame; the parent may be throttled, backgrounded, or a pane
+     that has stopped compositing — a documented trap here — and then the loop never
+     ticks. Measured: canvas sized 1265x96, positioned correctly, env forced to 1, and
+     ZERO lit pixels, because frame() was never called.
+     RAF() resolves the frame's window every call rather than caching it, because the
+     document is replaced on navigation and a cached window would go stale. */
+  function RAF(fn){ return ((doc && doc.defaultView) || root).requestAnimationFrame(fn); }
+  function CAF(id){ return ((doc && doc.defaultView) || root).cancelAnimationFrame(id); }
+
   function ensure() {
     if (canvas) return;
     canvas = doc.createElement("canvas");
@@ -211,7 +223,7 @@
     env += (wantEnv - env) * Math.min(1, dt * 5.5);
 
     if (env <= 0.002 && wantEnv === 0) { if (ctx) ctx.clearRect(0, 0, W, H); last = 0; return; }
-    if (!place()) { raf = root.requestAnimationFrame(frame); return; }
+    if (!place()) { raf = RAF(frame); return; }
 
     accT += dt;
     while (accT >= STEP) {
@@ -221,13 +233,31 @@
       accT -= STEP;
     }
     draw();
-    raf = root.requestAnimationFrame(frame);
+    raf = RAF(frame);
   }
-  function kick() { if (!raf) raf = root.requestAnimationFrame(frame); }
+  function kick() { if (!raf) raf = RAF(frame); }
 
+  /* ★★ PAINT ONE FRAME SYNCHRONOUSLY, THEN ANIMATE. Diagnosed by driving it: the canvas
+     is created, sized 1898x144 and positioned correctly, the 2D context is live (a
+     control fillRect lit 1800 px) — and the line never appeared, because the FRAME'S
+     requestAnimationFrame ticked ZERO times in 600ms. The pane had stopped compositing
+     the iframe, which is this project's oldest documented trap: "the preview pane cannot
+     screenshot — it stops compositing when not displayed", and the wheel notes say the
+     same about judging motion.
+     So the loop was never the problem and neither was the drawing. But a design that is
+     INVISIBLE whenever rAF is throttled is fragile beyond the lab — so open() now sets
+     the envelope and paints a frame immediately. Worst case the line is present and
+     still; best case the loop takes over and it flows. It also removes the fade-up from
+     nothing if the first frame is late. */
   function open(on) {
     wantEnv = on ? 1 : 0;
-    if (on) { ensure(); if (!L) { place(); } }
+    if (on) {
+      ensure();
+      place();
+      env = Math.max(env, 0.001);
+      if (L) { for (var i = 0; i < L.N; i++) L.tgt[i] = flow(L.xs[i], t); integrate(); }
+      env = 1; draw(); env = 0.001;      /* one honest frame at full presence, then let the ramp own it */
+    }
     kick();
   }
 
@@ -254,7 +284,7 @@
     open: open,
     uninstall: function () {
       wantEnv = 0;
-      if (raf) { root.cancelAnimationFrame(raf); raf = 0; }
+      if (raf) { CAF(raf); raf = 0; }
       if (canvas) { canvas.remove(); canvas = null; ctx = null; L = null; W = 0; }
     }
   };
