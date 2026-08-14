@@ -2457,9 +2457,20 @@ function renderWall() {
        figure lives in the room behind each door, and again on the cut button at the
        moment it is actually owed — which is where a price belongs: at the point of
        committing, not the point of looking. */
+    /* ★ BR-S410 — "GIVEN, NOT DRAWN" WAS FALSE FOR HALF THE SIX, and it was on the front
+       door. arcana-reading.js:109, the engine's own comment: sun sign from the date,
+       animal from the year, life path from the digit sum, "the rest drawn from the
+       name+date seed" — rune, trigram and hexagram are pick(list, seed+"f"/"g"/"h").
+       "Given, not CHOSEN" is true of all six and keeps the whole point: you did not pick
+       these. See docs/CLAIM_AUDIT_V1.md. The paragraph on the M2 read (below) carried the
+       same claim and is corrected in the same pass.
+       ★ THE LESSON THAT COST MORE THAN THE FIX: every fleet was told to quote the real
+       shipped strings — normally right, since it stops agents inventing copy — and it
+       propagated this one line into a dozen prototypes, because nobody audits a string
+       that came out of the codebase. VERIFY THE CLAIM, NOT JUST THE SOURCE. */
     + '<div class="menu__door menu__door--add menu__door--birth">'
     + '<a class="menu__draw-hit" href="?dev=arcane" aria-label="The Birth Reading"></a>'
-    + '<span class="menu__door-kicker"><svg class="menu__draw-crown" viewBox="0 0 120 90" aria-hidden="true"><path d="M16 64 L26 28 L45 50 L60 18 L75 50 L94 28 L104 64" fill="none" stroke="url(#mwGold)" stroke-width="4" stroke-linejoin="round"/><path d="M15 64 H105" stroke="url(#mwGold)" stroke-width="3"/><circle cx="60" cy="18" r="5" fill="url(#mwGold)"/></svg> By Birth · Given, not drawn</span>'
+    + '<span class="menu__door-kicker"><svg class="menu__draw-crown" viewBox="0 0 120 90" aria-hidden="true"><path d="M16 64 L26 28 L45 50 L60 18 L75 50 L94 28 L104 64" fill="none" stroke="url(#mwGold)" stroke-width="4" stroke-linejoin="round"/><path d="M15 64 H105" stroke="url(#mwGold)" stroke-width="3"/><circle cx="60" cy="18" r="5" fill="url(#mwGold)"/></svg> By Birth · Given, not chosen</span>'
     + '<span class="menu__door-name">The Birth Reading</span>'
     + '<span class="menu__door-desc">Six marks. One name. The deeper reading — given at birth, read here.</span>'
     + '<span class="menu__draw-spine">Sun Sign · Year Animal · Life Path · Rune · Trigram · Hexagram</span>'
@@ -2545,7 +2556,7 @@ function renderWall() {
     /* through the same builder as every later write, or the FIRST paint would be the
        one ungraded line on the panel and nobody would see it until they flipped */
     + '<p class="m2read__meta" data-m2-meta>' + m2MetaHTML(M2_BIRTH_READ.meta) + '</p>'
-    + '<p class="m2read__mean" data-m2-mean>Six marks you were given rather than chose, read together into one crowned name. Nothing is drawn here — each mark is looked up, and read as it stands.</p>'
+    + '<p class="m2read__mean" data-m2-mean>Six marks you were given rather than chose, read together into one crowned name. Nothing is rolled here, and nothing is re-rolled on re-view.</p>'
     + '</div>'
     /* BR-S345: "Asked the same, they answer the same." is gone. It was a fixed line
        pinned under a block whose whole job is to change, so it read as a caption on
