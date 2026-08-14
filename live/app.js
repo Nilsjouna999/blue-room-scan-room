@@ -2078,9 +2078,30 @@ function renderWall() {
        and what it means, so a room title standing over it read as a caption on the card
        rather than as the name of the room. The name belongs with the things you can do
        in the room it names. */
+    /* ★★ BR-S418 — BLUE ROOM IS THE HEADLINE. THE READING ROOMS GOES DOWN TO THE DOORS.
+       The builder: "here should be blueroom, remove reading room as main headline, try
+       working to use reading room below near the boxes that lead to reading rooms."
+
+       WHY IT MATTERS MORE THAN A SWAP. This panel is the SITE ROOT — the front door of
+       the house. It was titled after the shop. docs/HOUSE_SHAPE_V1.md traced every
+       symptom in the room pass back to that one substitution: the map has no plate for
+       Blue Room because Blue Room had no surface of its own; the two products hide
+       behind a single plate standing where the house should be; and U1 carries the
+       identity line one scroll below the door, because the door was busy selling.
+       The name was never wrong — it was one level too high.
+
+       ★ THE FOCUS TARGET MOVES WITH THE TITLE, NOT WITH THE WORDS. MENU_PANELS
+       (app.js:4050) focuses `.menu__draw-title` on arrival, so the class stays on
+       whatever is now the h2. Renaming the element instead of the string would have
+       silently dropped arrival focus onto nothing.
+
+       ★ AND THE EYEBROW IS GONE, not demoted. "◆ BLUE ROOM" above a title reading
+       "Blue Room" is the same word twice, and an eyebrow whose only job was to name the
+       house has nothing left to say once the house is the headline. The ◆ moves onto
+       the title, which is where the house mark belongs. */
     + '<div class="menu__draw-mast">'
-    + '<p class="menu__wall-eyebrow"><span class="menu__wall-eyemark" aria-hidden="true">◆</span> BLUE ROOM</p>'
-    + '<h2 class="menu__draw-title" tabindex="-1">The Reading Rooms</h2>'
+    + '<h2 class="menu__draw-title" tabindex="-1">'
+    +   '<span class="menu__draw-title__mark" aria-hidden="true">&#9670;</span> Blue Room</h2>'
     /* BR-S417 — "Not every card is developed. Some are drawn." is CUT, one commit after
        the line below it went. The builder's call, and the pair is the point: BR-S411
        removed the third sentence for restating its neighbours, and with that gone this
@@ -2100,6 +2121,12 @@ function renderWall() {
        column's job is to let you choose. The rule above it stays: it was closing the
        masthead, not introducing this sentence.
        `.msample__seal` is NOT dead — L1's desk still uses it (app.js:3162). */
+    /* BR-S418 — and here is where "The Reading Rooms" lands: as the label ON the group
+       of doors that actually lead to them, in the eyebrow's own register. It stops being
+       the name of the site and becomes the name of a shelf inside it, which is what it
+       always described. ★ It is a <p>, not a heading: the doors below already carry their
+       own names, and a second heading level over two items would out-rank them. */
+    + '<p class="menu__draw-doorlabel">The Reading Rooms</p>'
     + '<div class="menu__draw-doors">'
     /* BR-S321: the "Draw a card — free" door is GONE, and its removal is the point. It
        sent you to another room to do the thing this panel now does in front of you —
