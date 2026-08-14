@@ -1,7 +1,7 @@
 <!doctype html><html lang="en" class="framed"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="color-scheme" content="dark"><meta name="theme-color" content="#100e0c"><title>The Codex · Blue Room</title><meta name="description" content="The Codex — the archive’s standing meanings, across ten systems."><script>try{if(window.self===window.top)document.documentElement.classList.remove("framed")}catch(e){}</script><style>:root{
 color-scheme:dark;
 --key-light:#1c1712;--ground:#100e0c;--ink-lintel:#100f0c;--ink-vessel:#11100d;
---ink-well:#0c0b09;--shore:#0b0b0d;--seafloor:#0a0b0d;
+--ink-well:#0c0b09;--shore:#100e0c;--seafloor:#0e0c0a;
 --t-display:#e9e5dc;--t-primary:#d7d3ca;--t-body:#b1ada4;--t-meta:#948f87;--t-ghost:#86827a;
 --hair-1:rgba(233,229,220,.14);--hair-2:rgba(233,229,220,.08);--hair-3:rgba(233,229,220,.045);
 --hair-0:rgba(233,229,220,0);--ghost-ord:rgba(233,229,220,.085);
@@ -377,14 +377,14 @@ margin-bottom:20px;padding:9px 4px 10px;z-index:1;background:var(--ground)}
 .shore{position:fixed;left:0;right:0;bottom:0;height:calc(var(--tide) + var(--cool-run));
 z-index:-1;pointer-events:none;
 background:linear-gradient(180deg,
-rgba(11,11,13,0) 0,
-rgba(11,11,13,.30) 30%,
-rgba(11,11,13,.74) 56%,
+rgba(16,14,12,0) 0,
+rgba(16,14,12,.30) 30%,
+rgba(16,14,12,.74) 56%,
 var(--shore) calc(100% - var(--tide)),
 var(--seafloor) 100%)}
 .shallows{position:fixed;left:0;right:0;bottom:var(--tide);height:9vh;height:9svh;z-index:6;pointer-events:none;
-background:linear-gradient(180deg,rgba(11,11,13,0) 0%,rgba(11,11,13,.45) 46%,
-rgba(11,11,13,.82) 78%,rgba(10,11,13,.97) 100%)}
+background:linear-gradient(180deg,rgba(16,14,12,0) 0%,rgba(16,14,12,.45) 46%,
+rgba(16,14,12,.82) 78%,rgba(10,11,13,.97) 100%)}
 body.on-prose .shallows{height:4.5vh;height:4.5svh}
 @media (max-width:640px),(max-height:700px){
 .shallows{height:5.5vh;height:5.5svh}
@@ -2047,4 +2047,4 @@ if(window.visualViewport) window.visualViewport.addEventListener('resize',functi
 order.forEach(function(k){ var u=units[k];
 if(isFloating(u)){ measure(u); place(u,parseFloat(u.el.style.left)||0,parseFloat(u.el.style.top)||0); } });
 },{passive:true});
-})();</script><script src="_codex-membrane.js?v=437"></script><script src="_codex-perks.js?v=440"></script></body></html>
+})();</script><script src="_codex-membrane.js?v=441"></script><script src="_codex-perks.js?v=441"></script></body></html>

@@ -5303,7 +5303,10 @@ body[data-devnav="1"] .devnav {
      A custom property is scoped, and a calc() that references an unset one does not warn —
      it silently drops the whole declaration. So the value is written out here instead of
      borrowed across a scope it cannot see. Keep in step with styles.css:4681 if that moves. */
-  bottom: calc(clamp(96px, 11vh, 110px) - 44px);   /* one more 48px centre-step below the seal */
+  /* BR-S441: "i want rooms button more downwards". The 48px stack step put it tight under
+     the seal; with the arrows now inboard (BR-S439) the corner below is free, so it drops
+     to roughly the floor line the arrows used to sit on. Still on the seal's axis. */
+  bottom: calc(clamp(96px, 11vh, 110px) - 74px);
   z-index: 80;   /* BR-S294: ABOVE the sheet — it is the way out as well as the way in */
   display: inline-flex; align-items: center; gap: 9px;
   padding: 9px 14px 9px 11px;

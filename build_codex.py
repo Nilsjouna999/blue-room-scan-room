@@ -608,7 +608,7 @@ CSS_TOKENS = u""":root{
 color-scheme:dark;
 /* THE GROUND - six values, top-lit, cooling to the floor */
 --key-light:#1c1712;--ground:#100e0c;--ink-lintel:#100f0c;--ink-vessel:#11100d;
---ink-well:#0c0b09;--shore:#0b0b0d;--seafloor:#0a0b0d;
+--ink-well:#0c0b09;--shore:#100e0c;--seafloor:#0e0c0a;
 /* THE INK - one warm sand ramp.  Pure white is forbidden, including SVG strokes:
    the parent's living line is the only white object on screen.
    Every tier is at or above 4.5:1 on all four page grounds, so no rank of the
@@ -1266,14 +1266,14 @@ CSS_FLOOR = u"""
 .shore{position:fixed;left:0;right:0;bottom:0;height:calc(var(--tide) + var(--cool-run));
   z-index:-1;pointer-events:none;
   background:linear-gradient(180deg,
-    rgba(11,11,13,0) 0,
-    rgba(11,11,13,.30) 30%,
-    rgba(11,11,13,.74) 56%,
+    rgba(16,14,12,0) 0,
+    rgba(16,14,12,.30) 30%,
+    rgba(16,14,12,.74) 56%,
     var(--shore) calc(100% - var(--tide)),
     var(--seafloor) 100%)}
 .shallows{position:fixed;left:0;right:0;bottom:var(--tide);height:9vh;height:9svh;z-index:6;pointer-events:none;
-  background:linear-gradient(180deg,rgba(11,11,13,0) 0%,rgba(11,11,13,.45) 46%,
-    rgba(11,11,13,.82) 78%,rgba(10,11,13,.97) 100%)}
+  background:linear-gradient(180deg,rgba(16,14,12,0) 0%,rgba(16,14,12,.45) 46%,
+    rgba(16,14,12,.82) 78%,rgba(10,11,13,.97) 100%)}
 /* On the one wall read as continuous prose, a 9vh scrim dissolves a line of the
    argument on every screenful - but removing it outright is worse: the sentence
    then meets the opaque band mid-word.  So there the fade is short and late: the
@@ -4966,9 +4966,9 @@ _BYTES = DOC.encode('utf-8')
 # BR-S431 — the reading frame's line. codex.html is a HOST of the membrane, not only
 # the thing it is drawn over: every route except the aperture navigates here, and the
 # parent that used to draw the line is gone on this page.
-HTML = HTML.replace('</body>', '<script src="_codex-membrane.js?v=437"></script></body>', 1) if '_codex-membrane.js' not in HTML else HTML
+HTML = HTML.replace('</body>', '<script src="_codex-membrane.js?v=441"></script></body>', 1) if '_codex-membrane.js' not in HTML else HTML
 # BR-S440 — the keywords take their colours from the authored bank, same as the reading.
-HTML = HTML.replace('</body>', '<script src="_codex-perks.js?v=440"></script></body>', 1) if '_codex-perks.js' not in HTML else HTML
+HTML = HTML.replace('</body>', '<script src="_codex-perks.js?v=441"></script></body>', 1) if '_codex-perks.js' not in HTML else HTML
 _f = io.open(os.path.join(SP, 'codex.html'), 'w', encoding='utf-8', newline='')
 _f.write(DOC)
 _f.close()
