@@ -305,10 +305,17 @@
          bloom's own aria-hidden is set once and is a weaker signal. */
       var host = d.getElementById("menuView");
       if (!host) return true;      /* standalone codex — no aperture to watch, open() is called directly */
-      function isOpen() {
-        return host.classList.contains("is-codex-open")
-          && !host.classList.contains("is-codex-closing");
-      }
+      /* ★★ BR-S437 — THE ENDING WAS THE BUG. The builder: "bloom ending is buggy."
+         This treated `is-codex-closing` as CLOSED, so the moment the seal was pressed the
+         line and its band began fading over ~180ms. But the aperture's own collapse is
+         `clip-path 340ms var(--ease-collapse) 120ms` (styles.css:4756) — it does not even
+         START for 120ms and runs for 340 more. So the line vanished before the iris began
+         to move, and the dark band under it went with it: for a quarter of a second you
+         were looking at the codex through a closing hole with the bottom of the page
+         suddenly bare. That is the flicker.
+         Closing is not closed. The line stays up for the whole collapse and leaves when
+         the bloom does — which is what "the line IS the edge" requires at both ends. */
+      function isOpen() { return host.classList.contains("is-codex-open"); }
       new root.MutationObserver(function () { open(isOpen()); })
         .observe(host, { attributes: true, attributeFilter: ["class"] });
       open(isOpen());

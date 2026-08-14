@@ -60,7 +60,7 @@
     + ".sx{--sx-sun:#c6a466;--sx-animal:#ad7962;--sx-path:#78838f;"
     +      "--sx-rune:#8a9184;--sx-trigram:#6e918d;--sx-hex:#9c968c;}"
     /* the marks become a control without changing how they look at rest */
-    + ".m2bface__marks li{cursor:pointer;transition:opacity 140ms ease}"
+    + ".m2bface__marks li{cursor:pointer;transition:opacity 90ms ease}"
     + ".m2bface__marks.sx-on li{opacity:.42}"
     + ".m2bface__marks.sx-on li[aria-current='true']{opacity:1}"
     + ".m2bface__marks li:focus-visible{outline:1px solid rgba(28,21,13,.5);outline-offset:3px}"
@@ -76,7 +76,7 @@
        bottom, where nothing is looking. */
     + ".m2read{justify-content:flex-start!important;align-items:stretch!important}"
     /* and reserve the tallest case, so the region below the panel does not breathe either */
-    + ".sx{transition:opacity 150ms ease;min-height:430px}"
+    + ".sx{transition:opacity 110ms ease;min-height:430px}"
     + ".sx.is-out{opacity:0}"
     /* ★ THE PANEL IS A CONSEQUENCE OF THE GESTURE, NOT A FIXTURE. Leave the card and it
        goes — and because the app's own children were HIDDEN rather than removed, they
@@ -150,8 +150,18 @@
     if(!DATA) return;
     var sp=SIX[i], idx=deal(i), e=DATA[sp.sys].entries[idx];
     var box=d.querySelector(".sx"); if(!box) return;
-    box.classList.add("is-out");
-    root.setTimeout(function(){
+    /* ★★ BR-S437 — THE LATENCY WAS MINE, AND IT WAS 280ms PER MARK.
+       "scrolling throught these options still read bit slow latency or not feeling
+       smooth enough or satisfying." Correct, and it is not performance: this faded the
+       panel OUT over 150ms, waited 130ms, then wrote the new specimen and faded it back.
+       Walking the six meant a quarter-second of blank panel at every step — and if you
+       move faster than that you are only ever looking at the fade.
+       A cross-fade is right when a thing is REPLACED and wrong when it is BROWSED. These
+       are index cards, not slides: the swap is now synchronous, and the fade survives
+       only for the panel's first arrival, where there is genuinely something to reveal.
+       Nothing is lost — the specimen still changes, it just changes at the speed of the
+       hand that asked for it. */
+    (function(){
       box.style.setProperty("--sxc","var(--sx-"+sp.c+")");
       box.style.setProperty("--rn",sp.r[0]);          /* this mark's reserved lines — so */
       box.style.setProperty("--rt",sp.r[1]);          /* every specimen WITHIN a mark    */
@@ -173,7 +183,7 @@
       });
       box.querySelector(".sx__say").textContent = String(e.meaning||"");
       box.classList.remove("is-out");
-    },130);
+    })();
 
     var ul=d.querySelector(".m2bface__marks");
     if(ul){

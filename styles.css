@@ -5262,7 +5262,19 @@ body[data-devnav="1"] .devnav {
      written and the corner has since gained an arrow. The LEFT edge at this height is
      genuinely empty: .menu__go--desk ends at y≈90 and nothing else claims it. So ROOMS
      moves across and up, out of every other control's row, and keeps the corner idea. */
-  position: fixed; left: 18px; right: auto; bottom: clamp(78px, 11vh, 104px);
+  /* ★ BR-S437 — BACK TO THE RIGHT EDGE, UNDER THE CODEX ORBS, CLEAR OF EVERYTHING.
+     The builder: "i rather have rooms button under codex but not on anything else."
+     That is the original BR-S402 intent — the orbs, then ROOMS beneath them, one
+     right-hand column — and the only reason it broke is that the column has three
+     tenants and the arithmetic was never redone when the third arrived:
+         codex orbs      right 18   bottom clamp(68, 8.5vh, 82)   (styles.css:5067)
+         .menu__go--reliq right clamp(12,2.6vw,40)  bottom clamp(26,6vh,54) + caption
+         .orbitbtn        right 18   bottom 18       <- inside the arrow's rows
+     The arrow group occupies roughly y 26-90 from the bottom. The orbs sit at 68-82
+     PLUS their own height, so their top edge is near y 160. ROOMS goes in the gap the
+     column actually has: right-aligned, above the arrow, below the orbs.
+     BR-S401's note called this "one stack, not two floating docks" — this restores it. */
+  position: fixed; right: 18px; left: auto; bottom: clamp(96px, 13vh, 120px);
   z-index: 80;   /* BR-S294: ABOVE the sheet — it is the way out as well as the way in */
   display: inline-flex; align-items: center; gap: 9px;
   padding: 9px 14px 9px 11px;

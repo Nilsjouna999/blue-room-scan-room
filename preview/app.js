@@ -2987,13 +2987,20 @@ function renderMenu(reveal) {
       <span class="l1seal__lean" aria-hidden="true"></span>
       <div class="l1seal__box">
         <span class="l1seal__mark" aria-hidden="true">&#9670;</span>
-        <p class="l1seal__k">Not open yet</p>
-        <h2 class="l1seal__t" tabindex="-1">The Forge</h2>
+        <!-- BR-S437 - "l1 should have under construction notice, so its understandable".
+             "Not open yet" says the door is shut; it does not say anyone is working on it,
+             so a sealed panel taking a third of the horizontal track reads as broken rather
+             than deliberate. "Under construction" is the one phrase everyone already knows
+             means BOTH - closed, and being made. The room's own line below now finishes the
+             sentence rather than only naming the gap.
+             And the name follows the builder's reversal of BR-S406: The Card Mint. -->
+        <p class="l1seal__k">Under construction</p>
+        <h2 class="l1seal__t" tabindex="-1">The Card Mint</h2>
         <!-- BR-S404: was "the card is already made". The builder: "photo is already
              a card" is the better slogan - and it is the desk's own thesis standing
              right behind this seal, the claim the whole product is built on. The seal
              should carry the strongest line, not a paraphrase of it. -->
-        <p class="l1seal__d">Every photo is already a card. What is missing is the room that reads one of yours.</p>
+        <p class="l1seal__d">Every photo is already a card. What is missing is the room that reads one of yours &mdash; it is being built now.</p>
         <p class="l1seal__back">Press right to go back</p>
       </div>
     </div>
