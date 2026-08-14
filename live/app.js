@@ -2209,8 +2209,24 @@ function renderWall() {
     + '<a class="menu__door menu__door--add menu__door--tarot" href="?dev=drawing-room">'
     + '<span class="menu__door-kicker">By the Draw &middot; Tarot</span>'
     + '<span class="menu__door-name">A Tarot Reading</span>'
-    + '<span class="menu__door-desc">A Sitting — three cards to one question, ' + (m2SittingUsed() ? 'your free one is spent' : 'your first free') + '. Or the Deep Read — five.</span>'
-    + '<span class="menu__draw-spine">The Ground · The Crossing · The Root · The Crown · The Turn</span>'
+    /* ★ BR-S446 — BOTH DOORS BECOME kicker → name → spine, AND NOTHING ELSE.
+       The builder: "remove and replace this with simpler, 1 question and 3 card draw,
+       and deep sitting of card setting... im trying to make both boxes sleeker."
+       BR-S445 took the description off the birth door; this takes it off tarot's, and
+       now the two boxes are the same object twice, which is what makes a pair read as
+       a choice rather than as two adverts.
+       ★ THE SPINE CHANGES WHAT IT LISTS, and that is the real move. Birth's spine names
+       the six marks — the thing you get. Tarot's named the five DEEP READ positions,
+       which describe only one of its two offerings and mean nothing to someone who has
+       not bought it. So it now names the two draws themselves, which is the choice the
+       door actually asks a visitor to make.
+       ★ And the free-state clause goes with it. "your first free" / "your free one is
+       spent" made this the one door whose text changed under the reader, and its own
+       BR-S321 note already warns that a storefront must not promise what the room
+       behind it has spent. Silence cannot contradict the room. m2SittingUsed() stays
+       defined — the Drawing Room's own landing still reads it, which is where the fact
+       belongs. */
+    + '<span class="menu__draw-spine">Three cards, one question · Five, the Deep Read</span>'
     + '</a>'
     + '</div>'
     /* BR-S321: the "Deeper draws" link retired — its whole sentence is now the tarot

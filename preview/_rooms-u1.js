@@ -40,6 +40,18 @@
        so it costs nothing per frame once rastered — but it MUST NOT be animated
        (the house perf contract: transform and opacity only). It fades in via
        opacity on a parent that already carries the transition. */
+    /* ★★ BR-S446 — THE ROOM SHOWED THROUGH WHILE THE SHEET WAS ARRIVING. The builder:
+       "room pop up mainmenu or backround visible buggily as it settles." The word that
+       matters is SETTLES — it is not the resting state, it is the entrance.
+       BR-S422 made the doors appear on the same tick (a forced reflow, no rAF), because
+       a throttled parent was leaving them invisible. That fixed one race and started
+       another: the cards now arrive at full opacity while the ORBIT'S OWN scrim is still
+       fading up, so for those frames you are looking at finished doors over a half-
+       transparent dim, with the menu and the card legible behind them.
+       A scrim has no business easing. It is the frame the content arrives INTO, so it is
+       there first and completely — the room dims at once, then the doors come. That also
+       removes the only moment the page behind could ever be read. */
+    + ".orbit.is-u1 .orbit__scrim{transition:none!important;opacity:1!important;animation:none!important}"
     + ".orbit__scrim{backdrop-filter:blur(20px) saturate(.85);"
     +   "-webkit-backdrop-filter:blur(20px) saturate(.85);"
     +   "background:rgba(14,12,10,.90)!important}"
@@ -63,13 +75,18 @@
        re-fitted, because this sheet is wider than U1's column */
     + ".u1rooms .u1doors{display:grid;gap:clamp(10px,1.4vw,18px);"
     +   "grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}"
-    /* the cards ARRIVE, the same stagger the plates used (26ms), so the gesture
-       is unchanged even though what arrives is different */
-    + ".orbit.is-u1 .u1door{opacity:0;translate:0 10px;"
-    +   "transition:opacity 320ms cubic-bezier(.2,.7,.3,1),translate 320ms cubic-bezier(.2,.7,.3,1);"
-    +   "transition-delay:var(--od,0ms)}"
-    + ".orbit.is-u1.is-in .u1door{opacity:1;translate:0 0}"
-    + "@media (prefers-reduced-motion:reduce){.orbit.is-u1 .u1door{transition:none;opacity:1;translate:0 0}}";
+    /* ★★★ BR-S446 — THE CARDS NO LONGER ANIMATE IN, AND THAT IS THE FIX.
+       They started at opacity 0 and transitioned to 1. Driven three ways now — parent
+       rAF, then a forced reflow, then this — and measured stuck at 0 for 400ms with
+       `is-in` present and the winning rule saying 1, because a transition only advances
+       while the browser is actually painting, and the one thing this project has proved
+       repeatedly is that it sometimes is not (BR-S422, BR-S426, BR-S430).
+       An entrance that CAN fail closed is worse than no entrance: the doors vanish and
+       the page behind shows through the gap they leave. So they are simply there, with
+       the scrim, at full opacity, from the first frame. The gesture that remains is the
+       dim itself — which is the part the builder actually described.
+       Three fixes for one 26ms stagger is where a nicety stops being worth its risk. */
+    + ".orbit.is-u1 .u1door{opacity:1;translate:0 0}";
 
   var docRef = null;
 

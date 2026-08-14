@@ -24,6 +24,13 @@
     + ".wcpop{position:fixed;inset:0;z-index:210;display:flex;align-items:center;"
     +   "justify-content:center;opacity:0;pointer-events:none;transition:opacity 220ms ease}"
     + ".wcpop.is-in{opacity:1;pointer-events:auto}"
+    /* BR-S446: the scrim does not ease — see the note in _rooms-u1.js. The sheet
+       fades; the dim is simply there, so the page behind is never readable. */
+    + ".wcpop{opacity:1}.wcpop:not(.is-in) .wcpop__sheet{opacity:0}"
+    + ".wcpop__sheet{transition:opacity 220ms ease}"
+    + ".wcpop:not(.is-in){pointer-events:none}"
+    + ".wcpop:not(.is-in) .wcpop__scrim{opacity:0}"
+    + ".wcpop__scrim{transition:opacity 140ms ease}"
     /* the same depth-of-field the ROOMS sheet got — composited, never animated */
     + ".wcpop__scrim{position:absolute;inset:0;background:rgba(14,12,10,.90);"
     +   "backdrop-filter:blur(20px) saturate(.85);-webkit-backdrop-filter:blur(20px) saturate(.85)}"
