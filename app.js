@@ -2435,7 +2435,14 @@ function renderWall() {
     + '<p class="menu__draw-thesis">Not every card is developed. Some are drawn.</p>'
     + '</div>'
     + '<span class="menu__draw-cutline" aria-hidden="true"></span>'
-    + '<p class="msample__seal">The deck is already cut. What remains is the turn.</p>'
+    /* BR-S411 — "The deck is already cut. What remains is the turn." is CUT. The
+       builder's call. It sat between the thesis and the doors saying a third thing
+       about the same idea the two lines above it already say — "Not every card is
+       developed. Some are drawn." is the thesis, and the doors are the turn. A line
+       that restates its neighbours in a new metaphor reads as atmosphere, and this
+       column's job is to let you choose. The rule above it stays: it was closing the
+       masthead, not introducing this sentence.
+       `.msample__seal` is NOT dead — L1's desk still uses it (app.js:3162). */
     + '<div class="menu__draw-doors">'
     /* BR-S321: the "Draw a card — free" door is GONE, and its removal is the point. It
        sent you to another room to do the thing this panel now does in front of you —

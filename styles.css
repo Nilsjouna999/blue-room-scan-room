@@ -3887,6 +3887,14 @@ html.m2-parch .m2hero {
 .menu__draw-kept { color: #8a6fb0; font-style: normal; }   /* the one violet in the room — canon literal, NEVER var(--violet) */
 .menu__draw-rail { display: flex; gap: 10px; flex-wrap: wrap; }
 .menu__draw-rail .menu__codex { margin-top: 0; align-self: auto; }
+/* BR-S411 — THE RAIL'S PILLS COME DOWN A STEP. With the seal line cut above them these
+   three were the heaviest thing left in the column, and they are the column's least
+   important: two utility links and one door, sitting under the two real products. The
+   shape is untouched — the builder kept the round ones — only the scale. 10px/.16em/
+   8-16 -> 9.5px/.14em/6-13, which is ~18% less area each and closes the stack by 12px
+   without moving anything. */
+.menu__draw-rail .menu__codex { padding: 6px 13px; font-size: 9.5px; letter-spacing: 0.14em; gap: 7px; }
+.menu__draw-rail .menu__codex__mark { font-size: 9px; }
 .menu__draw-rail .menu__codex__mark { color: var(--silver-dim); }   /* kill the app-wide violet mark drift */
 .menu__draw-foot { font-family: var(--font-mono); font-size: 8.5px; letter-spacing: .18em; text-transform: uppercase; color: var(--t-meta); margin-top: 4px; line-height: 1.7; }
 .menu__draw-cuttick { display: inline-block; width: 20px; height: 1px; vertical-align: middle; margin-right: 7px; background: linear-gradient(90deg, #c8ad70, #a2864a); opacity: .55; }
