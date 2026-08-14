@@ -43,11 +43,23 @@
   var W = 0, H = 0, DPR = 1, L = null, raf = 0, last = 0, accT = 0, t = 0;
   var env = 0, wantEnv = 0;
 
-  /* THE BAND. The canvas is only as tall as the line needs: the crest, the glow and
-     the RISE distance. A full-viewport overlay (what U1 used, because it drew two
-     lines a screen apart) would put a compositing layer over the whole codex for a
-     26px effect. */
-  var BAND = 96, RISE = 26;
+  /* ★★★ THE POSITION WAS WRONG, AND THE RIGHT ONE IS ALREADY WRITTEN DOWN.
+     The builder: "the design is badly positioned on codex." Correct — I put the line
+     on the BOTTOM EDGE of the viewport. This feature SHIPPED ONCE, as BR-S237/S238
+     "THE CODEX READING FRAME", and its contract is exact:
+
+       · ONE living white line with its baseline at  y = H * 0.955  (NOT the edge)
+       · everything BELOW filled opaque #161411 -> #100f0c -> #0a0b0d — "the blue under"
+       · drawn by the PARENT over the iframe, position:fixed, z-index 9990
+       · the TOP line was deliberately removed by the builder at BR-S238 so the codex
+         header stays visible. Do not offer it back.
+       · nothing load-bearing in the bottom ~4.5vh — it is permanently masked
+       · the codex answers with its own `.tide` in the same colours, so the two
+         documents meet at ONE colour and the only thing on that row is the line.
+         Measured seam delta: 0.000px at 900 and 1080 tall.
+
+     Fourth time today the thing already existed. LOOK FOR THE EXISTING SYSTEM FIRST. */
+  var LINE_FRAC = 0.955, RISE = 26;
 
   /* the occluding dark, and the gradient it is filled with. maskGrad is rebuilt on
      resize because it is authored in canvas space and must match the ground BELOW the
@@ -72,7 +84,7 @@
     if (canvas) return;
     canvas = doc.createElement("canvas");
     canvas.setAttribute("aria-hidden", "true");
-    canvas.style.cssText = "position:fixed;left:0;top:0;z-index:9991;pointer-events:none;";
+    canvas.style.cssText = "position:fixed;inset:0;z-index:9990;pointer-events:none;";
     doc.body.appendChild(canvas);
     ctx = canvas.getContext("2d");
   }
@@ -86,31 +98,22 @@
      That also means the open signal is not the bloom's own aria-hidden but
      `#menuView.is-codex-open` (styles.css:4748), which is what drives the iris. */
   function place() {
-    if (!target) return false;
-    var r = target.getBoundingClientRect();
-    if (r.width < 8 || r.height < 8) return false;
+    var vw = (doc.defaultView.innerWidth || 0), vh = (doc.defaultView.innerHeight || 0);
+    if (vw < 8 || vh < 8) return false;
     DPR = Math.min(2, root.devicePixelRatio || 1);
-    var w = Math.round(r.width), h = BAND;
-    if (w !== W || h !== H) {
-      W = w; H = h;
+    if (vw !== W || vh !== H) {
+      W = vw; H = vh;
       canvas.width = Math.round(W * DPR); canvas.height = Math.round(H * DPR);
       canvas.style.width = W + "px"; canvas.style.height = H + "px";
       ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
       lattice();
-      /* the band must be INVISIBLE as dark and only readable as an edge, so it is
-         filled with the Codex's own ground rather than a guessed black. Read off the
-         live bloom when possible; #11100d is the Codex's floor as a fallback. */
-      var g = ctx.createLinearGradient(0, 0, 0, H), lit = "#11100d";
-      try {
-        var frame = target && target.querySelector(".bloom__backfill");
-        var bg = frame && doc.defaultView.getComputedStyle(frame).backgroundColor;
-        if (bg && bg !== "rgba(0, 0, 0, 0)") lit = bg;
-      } catch (e) {}
-      g.addColorStop(0, lit); g.addColorStop(1, lit);
+      /* "the blue under" — the exact three stops of the shipped band, so the codex's
+         own .tide meets it at one colour instead of a seam. */
+      var g = ctx.createLinearGradient(0, H * LINE_FRAC, 0, H);
+      g.addColorStop(0, "#161411"); g.addColorStop(0.55, "#100f0c"); g.addColorStop(1, "#0a0b0d");
       maskGrad = g;
     }
-    canvas.style.transform = "translate(" + Math.round(r.left) + "px,"
-      + Math.round(r.bottom - BAND * 0.5) + "px)";
+    canvas.style.transform = "translate(0px,0px)";
     return true;
   }
 
@@ -119,7 +122,7 @@
     for (i = 0; i < N; i++) xs[i] = i * DX;
     xs[N - 1] = W;
     L = { N: N, xs: xs, y: new Float32Array(N), v: new Float32Array(N),
-          tgt: new Float32Array(N), baseY: BAND * 0.5 };
+          tgt: new Float32Array(N), baseY: H * LINE_FRAC };
   }
 
   /* integrate() — the U1 spring, with the LOWER line's clamp (outward = +y, down),
@@ -288,4 +291,27 @@
       if (canvas) { canvas.remove(); canvas = null; ctx = null; L = null; W = 0; }
     }
   };
+
+  /* ★ SELF-INSTALL IN THE APP. The builder: "i expect atleast dev host to get
+     implemented when i ask you to do something, not some random host." Correct, and
+     the fix is this block: loaded from index.html the module installs ITSELF against
+     its own document, so the effect is simply THERE on the dev site. The lab keeps
+     working because CodexMembrane.install() is still exported and idempotent — the
+     lab hands it the frame's document instead. One module, two hosts, no fork.
+     ?cm=0 turns it off. */
+  if (root.document && !root.frameElement) {
+    var boot = function () {
+      if (!/[?&]cm=0/.test(String(root.location.search || "")) && root.document.getElementById("codexBloom")) {
+        root.CodexMembrane.install(root.document);
+        return true;
+      }
+      return false;
+    };
+    if (!boot()) {
+      /* the aperture is appended by app.js at mount, so it may not exist yet */
+      var tries = 0, iv = root.setInterval(function () {
+        if (boot() || ++tries > 40) root.clearInterval(iv);
+      }, 150);
+    }
+  }
 })(window);
