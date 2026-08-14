@@ -1,0 +1,823 @@
+<!doctype html>
+<!-- THE PALETTE LAB — untracked scratch. PRUNED at the builder's word: the twenty-one
+     exploratory registers are gone and only the live line survives, plus one blue kept
+     as a reference point and the top-lit codex boxes kept so the light inversion still
+     has something to be compared against.
+
+     KEYS   0 original · 1..7 registers · D flip to last register and back
+            G grain on/off · L / M / , jump to L1 / M1 / M2
+     URL    ?r=<0-7>&g=1&go=<0-2>   — the preview pane cannot screenshot, so register
+                                      state has to be reachable from the address bar
+     The bar shows the parsed rule count. FAIL in red means the sheet did not parse and
+     nothing on screen is real. FRAME BLOCKED means the framed site is unreachable,
+     which is what opening this file over file:// does. -->
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>The Palette Lab — the surviving line</title>
+  <style>
+    html, body { margin: 0; height: 100%; background: #050506; color: #c8c4bb;
+      font-family: "IBM Plex Mono", ui-monospace, monospace; }
+    #bar {
+      position: fixed; z-index: 10; left: 50%; transform: translateX(-50%); bottom: 14px;
+      display: flex; gap: 8px; align-items: center; flex-wrap: wrap; justify-content: center;
+      max-width: 94vw; padding: 7px 14px; border-radius: 999px;
+      background: rgba(8, 9, 11, .92); border: 1px solid rgba(220,215,203,.14);
+      backdrop-filter: blur(6px); font-size: 9px; letter-spacing: .16em; text-transform: uppercase;
+    }
+    #bar button {
+      background: none; border: 1px solid rgba(220,215,203,.16); border-radius: 999px;
+      color: #b9b3a8; padding: 5px 10px; cursor: pointer; font: inherit; letter-spacing: .16em;
+    }
+    #bar button.on { color: #c9a35c; border-color: #c9a35c; }
+    #bar .sep { color: rgba(220,215,203,.28); }
+    #stat { color: rgba(220,215,203,.45); }
+    #stat.bad { color: #d98b6f; }
+    #name { color: #cfcabf; letter-spacing: .1em; text-transform: none; min-width: 150px; }
+    iframe { width: 100%; height: 100%; border: 0; display: block; }
+  </style>
+</head>
+<body>
+  <iframe id="f" src="index.html?cb=palettelab"></iframe>
+  <script src="_six-live.js"></script>
+  <script src="_codex-membrane.js"></script>
+  <script src="_rooms-u1.js"></script>
+  <div id="bar">
+    <span id="name">original</span>
+    <span class="sep">·</span>
+    <button id="sx">S · six hover</button>
+    <button id="hv">H · card hover 0</button>
+    <button id="cm">C · codex membrane</button>
+    <button id="ru">R · rooms = U1</button>
+    <span class="sep">|</span>
+    <button data-reg="0" class="on">0 orig</button>
+    <button data-reg="1">1 colour only</button>
+    <span class="sep">|</span>
+    <button data-reg="2">2 loosen</button>
+    <button data-reg="3">3 rank</button>
+    <button data-reg="4">4 unbox</button>
+    <button data-reg="5">5 tiles: all</button>
+    <span class="sep">|</span>
+    <button data-reg="6">6 rail + flip</button>
+    <button data-reg="7">7 everything</button>
+    <span class="sep">|</span>
+    <button data-reg="8">8 flat ground</button>
+    <button data-reg="9">9 all + flat</button>
+    <span class="sep">·</span>
+    <button id="g">grain</button>
+    <span class="sep">·</span>
+    <button data-go="0">L1</button>
+    <button data-go="1">M1</button>
+    <button data-go="2">M2</button>
+    <span class="sep">·</span>
+    <span id="stat">rules —</span>
+  </div>
+
+  <script>
+  /* ═══ WHAT SURVIVED THE CUT ══════════════════════════════════════════════════════
+     Twenty-one registers were built and the builder has settled on one line: the
+     Codex's own box recipe, with the light corrected for a recess. Everything that was
+     answering a question already answered is deleted — the five original concepts, the
+     three combinations, the glass and blocky-glass passes, the two polish attempts on
+     the warm original, and the codex-ground-only variants.
+
+     Two things were kept that are not the line:
+       1 BLUE REF   register 7 of the old set, the cool ground with the crowding taken
+                    out. It won an earlier round and it is the only thing that would
+                    tell us if this line has quietly drifted worse. A lab with no
+                    reference point cannot tell progress from motion.
+       2 CODEX BOXES, TOP-LIT   the version before the inversion. Kept ONLY so the light
+                    change has something to be compared against. Delete it once the
+                    inversion is settled.
+
+     ═══ THE NEW QUESTION ═════════════════════════════════════════════════════════════
+     The builder: there is light in the page that feels wrong, coming from outside — it
+     should come from inside the background outward, or from behind the boxes.
+     That is a lighting model, not a colour. Every ground in this project has used the
+     same one: a radial key light at 50% -10%, which is a lamp hung above and slightly
+     behind the viewer, shining IN. It puts the light source outside the room, off
+     screen, in the same place a stage light or a browser chrome would be — which is why
+     it reads as something shining on the page rather than the page being lit.
+     Two different answers, separated so they can be judged apart:
+       5 FROM INSIDE   the ground's own glow moves to the middle of the composition and
+                       falls off toward every edge. The room is brightest where you are
+                       looking and darkens outward, so the light belongs to the page.
+       6 FROM BEHIND   the surfaces get an outward halo instead of a drop shadow, so
+                       light appears to escape from behind each box rather than land on
+                       it. The box stops being lit and starts being backlit.
+       7 BOTH
+     6 is the one that changes what the boxes ARE: a recess with light behind it is a
+     window, not a well. Worth knowing whether that is the feeling being chased.
+
+     ═══ THE THREE TRAPS, STILL OBEYED ════════════════════════════════════════════════
+     No backticks and no CSS comments inside any literal — a backtick ends the string
+     and one malformed comment silently invalidates the ENTIRE sheet. Prose lives here.
+     The bar reports sheet.cssRules.length, so a sheet that did not parse says so. */
+
+  var CARD = `
+    .menu__draw-stage, .msample__card, .rv-cardframe {
+      filter: brightness(.9) saturate(.98);
+    }
+    .m2hero, .msample__card, .rv-cardframe {
+      box-shadow: 0 32px 70px -34px rgba(0,0,0,.95),
+                  0 0 90px -20px rgba(233,229,220,.14),
+                  0 0 0 1px rgba(233,229,220,.07) !important;
+    }
+    .menu__draw-title, .menu__reliq-title { text-shadow: none !important; }
+  `;
+
+  /* THE CARD, ONE STEP FURTHER DOWN. The builder: slightly too attention-taking and
+     strong, although important. Both halves of that matter — it must stay the thing the
+     panel is built around, so this is not a demotion, it is a cap. .90 -> .86, and the
+     halo tightens with it rather than staying wide, because a wide bloom around a
+     dimmer card is what makes something look switched off instead of quiet.
+     This is the paper's rule 5 and its measured ceiling, arrived at independently by
+     eye, twice. */
+  var CARD_SOFT = `
+    .menu__draw-stage, .msample__card, .rv-cardframe {
+      filter: brightness(.86) saturate(.96);
+    }
+    .m2hero, .msample__card, .rv-cardframe {
+      box-shadow: 0 26px 56px -30px rgba(0,0,0,.95),
+                  0 0 72px -24px rgba(233,229,220,.12),
+                  0 0 0 1px rgba(233,229,220,.06) !important;
+    }
+    .menu__draw-title, .menu__reliq-title { text-shadow: none !important; }
+  `;
+
+  /* 1 — BLUE REF. The cool ground with the crowding taken out, kept unchanged from the
+     round it won. Not a candidate any more; a ruler. */
+  var BLUE_REF = `
+    :root {
+      --t-display:#cfcabf; --t-primary:#c8c4bb; --t-body:#a8a49c;
+      --t-meta:#8b8780; --t-ghost:#696660;
+      --ink-950:#06080c; --ink-900:#0f1017; --ink-850:#12131a;
+      --ink-800:#151310; --ink-700:#191715;
+      --line-faint:rgba(228,231,238,.05); --line:rgba(228,231,238,.085);
+      --line-strong:rgba(228,231,238,.125);
+      --hair-1:rgba(228,231,238,.10); --hair-2:rgba(228,231,238,.07);
+      --hair-3:rgba(228,231,238,.045);
+      --violet:#8d85ad; --cyan:#84aeb3; --moss:#5f6a60; --moss-bright:#7c8a7c;
+      --halo-green:#8bb49c; --silver:#bdb9b1; --free-silver:#aeaaa1;
+    }
+    body {
+      background:
+        linear-gradient(to top, rgba(30,26,21,.9) 0%, rgba(22,19,15,.46) 14%, rgba(16,14,11,.13) 30%, transparent 46%),
+        radial-gradient(125% 78% at 50% -6%, #0f1620 0%, #0b1018 44%, #080b11 78%, #06080c 100%)
+        !important;
+    }
+    .menu__panel { filter: saturate(.85); }
+    .menu__panel--wall, .menu__panel--reliquary { background: none; }
+    .menu__reliq-niche, .menu__codex, .menu__reliq-preview {
+      background: linear-gradient(#141312, #100f0c) !important;
+      border: 1px solid rgba(228,231,238,.085) !important;
+      backdrop-filter: none !important;
+    }
+  ` + CARD;
+
+  /* THE CODEX'S OWN BOX, copied out of codex.html rather than approximated:
+       codex.html:422   border 1px solid --hair-1 (.14) · radius 10px · NO shadow
+                        bg = .024 cream wash to 65% + --grain + --ink-vessel #11100d
+       codex.html:104   the lintel, its other surface: .030 wash over 22px + #100f0c
+       codex.html:35    the grain itself, feTurbulence 0.9 / 2 octaves, desaturated,
+                        opacity .04 on a 160px tile
+     What it does NOT have is the interesting part: no drop shadow, no backdrop blur,
+     no fill lighter than its ground. A codex box is DARKER than the room and touches
+     it — a page, not a pane. Every surface built in this lab before it was lighter,
+     blurred and floated. */
+  var CODEX_BOXES = `
+    .menu__draw-ctrl, .menu__draw-head { position: relative; z-index: 2; }
+    .menu__draw-ctrl::before, .menu__draw-head::before {
+      content: ""; position: absolute; z-index: -1;
+      left: -26px; right: -26px; top: 50%; height: 78vh;
+      transform: translateY(-50%);
+      border: 1px solid rgba(233,229,220,.08);
+      border-radius: 10px;
+      background:
+        linear-gradient(180deg, rgba(233,229,220,.030) 0, rgba(233,229,220,0) 22px),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      background-color: #100f0c;
+    }
+    .menu__door, .menu__reliq-niche, .menu__reliq-preview,
+    .menu__reliq-door, .menu__go-btn {
+      border: 1px solid rgba(233,229,220,.14) !important;
+      border-radius: 10px !important;
+      background:
+        linear-gradient(180deg, rgba(233,229,220,.024) 0, rgba(233,229,220,0) 65%),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E") !important;
+      background-color: #11100d !important;
+      box-shadow: none !important;
+      backdrop-filter: none !important;
+      transition: border-color 200ms var(--ease-settle);
+    }
+    .menu__door:hover, .menu__reliq-door:hover, .menu__go-btn:hover {
+      border-color: rgba(233,229,220,.24) !important;
+    }
+    .menu__draw-rail { display: grid !important; grid-auto-flow: row !important; gap: 0 !important; }
+    .menu__codex {
+      width: 100% !important;
+      justify-content: flex-start !important;
+      background: none !important;
+      border: 0 !important;
+      border-top: 1px solid rgba(233,229,220,.08) !important;
+      border-radius: 0 !important;
+      box-shadow: none !important;
+      backdrop-filter: none !important;
+      padding: 11px 2px !important;
+      transition: color 200ms var(--ease-settle),
+                  border-color 200ms var(--ease-settle);
+    }
+    .menu__draw-rail .menu__codex:last-child {
+      border-bottom: 1px solid rgba(233,229,220,.08) !important;
+    }
+    .menu__codex:hover {
+      border-top-color: rgba(233,229,220,.2) !important;
+      color: var(--t-display) !important;
+    }
+  `;
+
+  /* RECESS — the correction the builder called for, in one word: inverted.
+     The Codex's wash is brightest at the top, which is right for a surface standing
+     PROUD of the page. These boxes are darker than the room, which reads as cut INTO
+     it, and a recess lit from above is dark under its top lip and lighter where the
+     light finally reaches its floor. The fill, grain, hairline and radius do not move.
+     Only the direction does. */
+  var RECESS = `
+    .menu__draw-ctrl::before, .menu__draw-head::before {
+      background-image:
+        linear-gradient(180deg, rgba(0,0,0,.22) 0, rgba(0,0,0,0) 34px),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      box-shadow: inset 0 1px 0 rgba(0,0,0,.5),
+                  inset 0 -1px 0 rgba(233,229,220,.055);
+    }
+    .menu__door, .menu__reliq-niche, .menu__reliq-preview,
+    .menu__reliq-door, .menu__go-btn {
+      background-image:
+        linear-gradient(180deg, rgba(0,0,0,.20) 0, rgba(0,0,0,0) 38%,
+                                rgba(233,229,220,.022) 100%),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E") !important;
+      box-shadow: inset 0 1px 0 rgba(0,0,0,.48),
+                  inset 0 -1px 0 rgba(233,229,220,.06) !important;
+    }
+  `;
+
+  /* CODEX_GROUND — taken verbatim from codex.html:3-4 and :62. Two differences from the
+     shipped ground and only one that matters: the Codex never reaches near-black. It
+     holds #100e0c from 62% out to the edge, so it is a warm room lit evenly rather than
+     an object floating in a void. */
+  var CODEX_GROUND = `
+    html { background: #100e0c !important; }
+    body {
+      background:
+        radial-gradient(130% 90% at 50% -8%, #1c1712 0%, #100e0c 62%, #100e0c 100%)
+        !important;
+    }
+  `;
+
+  /* 5 — LIT FROM INSIDE. Every ground in this project puts its light at 50% -10%: above
+     the page and behind the viewer, which is a lamp in the room you are sitting in, not
+     a light belonging to the archive. That is the "coming from outside" the builder can
+     feel — the source is off-screen, roughly where the browser chrome is.
+     Here the glow moves INTO the composition. It sits just above centre, behind where
+     the card stands, and falls away toward every edge including the top. The corners go
+     dark because they are furthest from the light, not because a gradient was told to
+     end there. Nothing shines onto the page; the page is where the light is. */
+  var INNER_LIGHT = `
+    html { background: #08070a !important; }
+    body {
+      background:
+        radial-gradient(78% 62% at 50% 44%,
+          #1b1712 0%, #151210 30%, #100e0c 56%, #0b0a0a 80%, #08070a 100%)
+        !important;
+    }
+  `;
+
+  /* 6 — LIT FROM BEHIND. The other half of the same complaint, and the more radical one.
+     A drop shadow says light fell on this from somewhere else. An outward halo says the
+     light is behind it and getting past the edges. So the shadows come off and every
+     surface gets a soft outward bloom instead, strongest around the plates because they
+     are the largest thing standing away from the wall.
+     Note what this does to the boxes: a recess with light behind it stops being a well
+     and becomes a WINDOW. The inner shading from RECESS is kept, so each box reads as a
+     dark aperture with light finding its way round the frame. That may be the feeling
+     being chased, and it may be one step too far — which is exactly why 5 and 6 are
+     separate switches. */
+  var BEHIND_LIGHT = `
+    .menu__draw-ctrl::before, .menu__draw-head::before {
+      box-shadow: inset 0 1px 0 rgba(0,0,0,.5),
+                  inset 0 -1px 0 rgba(233,229,220,.055),
+                  0 0 100px -12px rgba(233,229,220,.075),
+                  0 0 34px -10px rgba(233,229,220,.05);
+    }
+    .menu__door, .menu__reliq-niche, .menu__reliq-preview,
+    .menu__reliq-door, .menu__go-btn {
+      box-shadow: inset 0 1px 0 rgba(0,0,0,.48),
+                  inset 0 -1px 0 rgba(233,229,220,.06),
+                  0 0 30px -6px rgba(233,229,220,.085) !important;
+    }
+    .menu__door:hover, .menu__reliq-door:hover, .menu__go-btn:hover {
+      box-shadow: inset 0 1px 0 rgba(0,0,0,.48),
+                  inset 0 -1px 0 rgba(233,229,220,.06),
+                  0 0 38px -4px rgba(233,229,220,.13) !important;
+    }
+  `;
+
+  /* GRAIN — rule 12 of docs/PALETTE_RESEARCH_V1.md, and not decoration. Every ground
+     here is a large smooth very dark gradient, which is the exact case that breaks into
+     visible stripes on an 8-bit panel. Kept as its own toggle because it must be judged
+     separately, and because whichever register wins it almost certainly ships with it.
+     The paper's companion rule: never animate the opacity of one of these. */
+  var GRAIN = `
+    html::after {
+      content: ""; position: fixed; inset: 0; z-index: 99999; pointer-events: none;
+      opacity: .05; mix-blend-mode: overlay;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-size: 160px 160px;
+    }
+  `;
+
+  /* ═══ THE BUILDER'S CALL, AND WHAT THE LAB IS NOW FOR ═════════════════════════════
+     "something about the originals design its easy layout and design, makes sense and
+     its friendly. only could need better readings aspects and polish"
+
+     That ends the palette question. The answer after twenty-one registers is that the
+     original was right and did not need replacing — which is a real result, not a null
+     one, and it is the one thing none of the twenty-one could have told us. Every
+     register that moved the ground, the hue or the material is now a decided NO.
+     What is left is the two things actually named:
+       READING   the small text is too quiet. This is the one criticism that arrived
+                 from every direction — the builder, the outside critique, and the
+                 research paper's rule 4 — and it costs nothing to fix because it is
+                 not a design change. Nobody has to like a new idea. Words just become
+                 readable.
+       POLISH    the three refinements the evidence is unambiguous about, and nothing
+                 that alters the layout, the shapes or the friendliness:
+                   1 the card is the loudest thing on screen and glares; cap it and
+                     give the brightness back as air around it
+                   2 the ground is a large smooth dark gradient, which banding is
+                     guaranteed on an 8-bit panel; grain fixes it
+                   3 the violet is by far the most saturated colour in the room and it
+                     is on a small utility link. It is the one thing that shouts.
+     Deliberately NOT here: shapes, radii, capsules, the rail, the panels, the ground,
+     the layout. The builder called those friendly and easy, and polish is the pass
+     where nothing is decided.
+     The codex recess line survives as ONE option because the builder liked it on sight,
+     but it is now a proposal to accept or drop, not the direction. */
+
+  var READING = `
+    :root {
+      --t-meta:#a09b92;
+      --t-ghost:#837f76;
+      --line-faint:rgba(233,229,220,.085);
+      --line:rgba(233,229,220,.115);
+      --line-strong:rgba(233,229,220,.16);
+      --hair-2:rgba(233,229,220,.09);
+      --hair-3:rgba(233,229,220,.055);
+    }
+  `;
+
+  var POLISH = `
+    :root { --violet:#8d80b4; }
+    html::after {
+      content: ""; position: fixed; inset: 0; z-index: 99999; pointer-events: none;
+      opacity: .05; mix-blend-mode: overlay;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-size: 160px 160px;
+    }
+  ` + CARD_SOFT;
+
+  /* ═══ THE TILE IS THE PROBLEM, AND IT IS NOT A COLOUR ════════════════════════════
+     The builder: the boxes and buttons are off, reading them is not landing, they are
+     an eyesore rather than something you want to have around. That is the most useful
+     sentence in this whole session, because it points at the one thing twenty-one
+     registers never touched.
+
+     WHAT A READING TILE ACTUALLY IS, read out of styles.css:
+       .menu__door          grid, gap 4px, padding 11/16, border 1.5px, radius 8px
+       .menu__door-kicker   mono 9px    · tracking .26em · UPPERCASE · --t-meta
+       .menu__door-name     ui   14.5px · tracking .14em · UPPERCASE · --t-display
+       .menu__door-desc     serif 13.5px · line-height 1.5 · --silver
+       .menu__draw-spine    mono 8.5px  · tracking .16em · UPPERCASE · --t-meta,
+                            and it WRAPS TO TWO LINES
+
+     Four different type systems in ninety vertical pixels with four pixels between
+     them, and two of the four are small, very widely tracked uppercase. The paper's §5
+     is exactly this case: high-contrast quasi-periodic small forms near the ~3
+     cycles/degree band are the worst thing you can put in front of an eye, and .26em
+     tracking at 9px maximises the periodicity. At that size the caps stop being words
+     and become a texture — which is precisely "an eyesore rather than a thing you want
+     to read". Then a 1.5px border closes it, so the density reads as packed rather than
+     as spacious.
+     No ground, hue or material could ever have fixed that, which is why none of them
+     did. Three separable fixes, and the fourth is all of them:
+
+       1 LOOSEN   space only. gap 4px -> 11px, the spine given room to breathe. If the
+                  four registers simply stop touching, do they stop massing?
+       2 RANK     type only. Tracking comes down (wide tracking on 9px type is a
+                  legibility cost, not a refinement), and the spine drops to ghost so
+                  ONE thing leads instead of four competing. Nothing moves position.
+       3 UNBOX    the container only. No border, no fill — a hairline rule above each
+                  entry and space around it. This is the Codex's own grammar, and the
+                  Codex is the thing in this project that is pleasant to read.
+       4 ALL THREE
+
+     None of these changes a single colour value, a layout, or a word. */
+
+  var LOOSEN = `
+    .menu__door { gap: 11px !important; padding: 14px 16px 15px !important; }
+    .menu__draw-spine { margin-top: 3px !important; line-height: 1.75 !important; }
+    .menu__draw-doors { gap: 16px !important; }
+  `;
+
+  var RANK = `
+    .menu__door-kicker { letter-spacing: .16em !important; font-size: 9.5px !important; }
+    .menu__door-name { letter-spacing: .07em !important; }
+    .menu__draw-spine {
+      font-size: 9px !important;
+      letter-spacing: .09em !important;
+      line-height: 1.7 !important;
+      color: var(--t-ghost) !important;
+    }
+    .menu__door:hover .menu__draw-spine,
+    .menu__door:focus-within .menu__draw-spine { color: var(--t-meta) !important; }
+  `;
+
+  var UNBOX = `
+    .menu__door, .menu__door--add, .menu__door--birth, .menu__door--tarot {
+      border: 0 !important;
+      border-top: 1px solid var(--line-faint) !important;
+      border-radius: 0 !important;
+      background: none !important;
+      padding: 15px 2px 16px !important;
+      transition: border-top-color 200ms var(--ease-settle) !important;
+    }
+    .menu__door:hover, .menu__door--birth:hover {
+      transform: none !important;
+      border-top-color: var(--line-strong) !important;
+      background: none !important;
+    }
+    .menu__draw-hit { border-radius: 0 !important; }
+    .menu__codex {
+      border: 0 !important;
+      border-top: 1px solid var(--line-faint) !important;
+      border-radius: 0 !important;
+      background: none !important;
+      width: 100% !important;
+      justify-content: flex-start !important;
+      padding: 11px 2px !important;
+    }
+    .menu__draw-rail {
+      display: grid !important; grid-auto-flow: row !important; gap: 0 !important;
+    }
+    .menu__draw-rail .menu__codex:last-child {
+      border-bottom: 1px solid var(--line-faint) !important;
+    }
+    .menu__codex:hover { border-top-color: var(--line-strong) !important; }
+  `;
+
+  /* ═══ FAMILY — THE RAIL AS A SET ═════════════════════════════════════════════════
+     The builder, pointing at the three rail buttons: these should be like a family of
+     design, and hold their positioning and poise accordingly. Three things are stopping
+     that, and the first is a bug rather than a decision.
+
+     1 THE MARKS ARE FIGHTING OVER SPECIFICITY, AND THE FIX ALREADY LOST.
+       styles.css:3890 is `.menu__draw-rail .menu__codex__mark { color: silver-dim }`
+       and its own comment says "kill the app-wide violet mark drift". It does not kill
+       it: styles.css:2710 is `#menuView.is-m1a .menu__codex__mark { color: violet }`,
+       which carries an ID and outranks it. So the intended neutral mark never renders,
+       two diamonds are violet by accident, and the third is gold because
+       `#menuView .menu__codex--reliq ...` also carries an ID and wins its own fight.
+       The family reads as three unrelated objects because it literally is three
+       different rules. Restated here at ID strength so the author's intent renders:
+       neutral marks, ONE gold, on the profile, which is the door that leads to you.
+       Violet stays in this room on exactly one thing — the word KEPT, which the source
+       calls a canon literal and forbids being var(--violet). That is the register.
+
+     2 THEY HAVE THREE DIFFERENT WIDTHS. Each pill hugs its own text, so the right edge
+       is ragged and the three arrows land in three places. A family holds a line. Equal
+       width, and the arrows pushed to a shared right edge.
+
+     3 THE PRIMARY IS DISTINGUISHED FOUR TIMES OVER — gold mark, brighter text, extra
+       words, greater width. Poise is one signal held confidently, not four stacked. It
+       keeps the gold mark; the width and the ragged edge go. */
+  var FAMILY = `
+    .menu__draw-rail {
+      display: grid !important; grid-auto-flow: row !important;
+      gap: 10px !important; max-width: 360px !important;
+    }
+    .menu__codex {
+      width: 100% !important;
+      align-self: stretch !important;
+      display: flex !important;
+      align-items: center !important;
+      gap: 9px !important;
+      padding: 11px 16px !important;
+      margin-top: 0 !important;
+    }
+    .menu__codex__arr { margin-left: auto !important; }
+    #menuView .menu__draw-rail .menu__codex__mark { color: var(--silver-dim) !important; }
+    #menuView .menu__draw-rail .menu__codex--reliq .menu__codex__mark { color: #c9a35c !important; }
+  `;
+
+  /* ═══ COLD FLIP ══════════════════════════════════════════════════════════════════
+     The builder wants the Birth/Tarot switch colder. It is currently a warm object: a
+     999px pill holding a second 999px pill, both edged in cream `rgba(233,229,220,...)`,
+     with the ON state a soft raised lozenge. That is the grammar of a friendly app
+     toggle — a bubble inside a bubble.
+     Cold here means INSTRUMENT. Three moves, no new ideas:
+       · the radii come down, 999px to 4px. A switch on a machine is square. This is
+         also the one place the outside critique said a pill is legitimately earned —
+         a genuine binary control — so the shape stays a switch, it just stops being soft.
+       · the greys go cool. Every edge and fill in this control is currently the cream
+         hairline colour, which is the warmest neutral in the system. Cool ones read as
+         metal and glass instead of paper.
+       · the ON state stops rising and starts sinking. A pressed key on an instrument is
+         recessed: a shadow under its top edge and a light line at its base. Same shading
+         law the boxes just taught us — darker than its ground means shadowed at the top.
+     A hairline divider between the two halves, because a switch has a throw. */
+  var COLD_FLIP = `
+    .m2flip {
+      gap: 0 !important;
+      padding: 2px !important;
+      border: 1px solid rgba(206,214,226,.15) !important;
+      border-radius: 4px !important;
+      background: rgba(9,11,14,.55) !important;
+    }
+    .m2flip__opt {
+      border-radius: 3px !important;
+      padding: 7px 18px !important;
+      letter-spacing: .18em !important;
+      color: rgba(166,175,188,.7) !important;
+    }
+    .m2flip__opt + .m2flip__opt {
+      border-left: 1px solid rgba(206,214,226,.11) !important;
+    }
+    .m2flip__opt:hover { color: #ced5de !important; }
+    .m2flip__opt.is-on {
+      color: #e2e7ed !important;
+      background: rgba(206,214,226,.07) !important;
+      box-shadow: inset 0 1px 0 rgba(0,0,0,.55),
+                  inset 0 -1px 0 rgba(206,214,226,.10) !important;
+    }
+    .m2flip__opt:focus-visible {
+      outline: 1px solid rgba(206,214,226,.42) !important;
+      outline-offset: 2px !important;
+    }
+  `;
+
+  /* ── 8 — FLAT GROUND. The builder, on team 5: "i liked at least personally the team 5
+     dark choice of color, it felt good to read."
+     Team 5 did not choose a colour. Read its file: --ink-950 #0a0b0d, --t-display
+     #dcd7cb, --t-body #b1ada4, --t-meta #948f87, --ink-800 #151310 — every one of those
+     is the SHIPPED token, unchanged. There is no new palette in it to like.
+     What is different is one line. The shipped body paints
+       radial-gradient(110% 80% at 50% -10%, #161411 0%, --ink-900 55%, --ink-950 100%)
+     and team 5 paints a FLAT var(--ink-950). So what felt good to read was not a colour,
+     it was the ABSENCE OF THE GRADIENT — one uniform value under the text instead of a
+     warm glow leaning in from above and behind.
+     That also closes a loop from earlier today: the builder said the light felt like it
+     was "coming from outside" the page. A flat ground has no light source at all, so
+     there is nothing to come from anywhere. The two observations are the same
+     observation, arrived at from opposite directions.
+     The palette stays closed. This changes one declaration. */
+  var FLAT_GROUND = `
+    html { background: var(--ink-950) !important; }
+    body { background: var(--ink-950) !important; }
+  `;
+
+  var REG = [
+    null,
+    READING + POLISH,
+    READING + POLISH + LOOSEN,
+    READING + POLISH + RANK,
+    READING + POLISH + UNBOX,
+    READING + POLISH + LOOSEN + RANK + UNBOX,
+    READING + POLISH + FAMILY + COLD_FLIP,
+    READING + POLISH + LOOSEN + RANK + UNBOX + FAMILY + COLD_FLIP,
+    FLAT_GROUND,
+    READING + POLISH + LOOSEN + RANK + UNBOX + FAMILY + COLD_FLIP + FLAT_GROUND
+  ];
+  var NAMES = [
+    "original",
+    "1 · reading + polish (colour only)",
+    "2 · LOOSEN — space only",
+    "3 · RANK — type only",
+    "4 · UNBOX — no container",
+    "5 · tiles: all three",
+    "6 · FAMILY rail + COLD flip",
+    "7 · everything",
+    "8 · FLAT GROUND only (the team 5 ground)",
+    "9 · everything + flat ground"
+  ];
+
+  var Q = location.search,
+      qr = /[?&]r=(\d)/.exec(Q),
+      qgo = /[?&]go=(\d)/.exec(Q);
+
+  var f = document.getElementById("f"),
+      cur = qr ? +qr[1] : 0, last = qr ? +qr[1] : 2, grain = /[?&]g=1/.test(Q);
+
+  function doc() { try { return f.contentDocument; } catch (e) { return null; } }
+
+  /* The label and the rule count are written from what the sheet ACTUALLY reports. A
+     prototype that lies about which version is on screen is worse than no prototype —
+     that cost a session, and the cause was a sheet that parsed to zero rules while
+     differences were being confidently described. */
+  function apply() {
+    document.getElementById("name").textContent = NAMES[cur];
+    document.querySelectorAll("[data-reg]").forEach(function (b) {
+      b.className = (+b.dataset.reg === cur) ? "on" : "";
+    });
+    document.getElementById("g").className = grain ? "on" : "";
+
+    var stat = document.getElementById("stat");
+    var d = doc();
+    if (!d || !d.head) {
+      stat.textContent = "FRAME BLOCKED · open over http://localhost:8765/";
+      stat.className = "bad";
+      return false;
+    }
+    var el = d.getElementById("__palettelab");
+    if (el) el.remove();
+
+    var css = (REG[cur] || "") + (grain ? GRAIN : "");
+    if (!css) { stat.textContent = "rules 0 · original"; stat.className = ""; return true; }
+
+    el = d.createElement("style");
+    el.id = "__palettelab";
+    el.textContent = css;
+    d.head.appendChild(el);
+
+    var n = 0;
+    try { n = el.sheet ? el.sheet.cssRules.length : 0; } catch (e) { n = -1; }
+    stat.textContent = n > 0 ? ("rules " + n) : "PARSE FAIL";
+    stat.className = n > 0 ? "" : "bad";
+    return true;
+  }
+
+  function set(i) { if (i !== 0) last = i; cur = i; apply(); }
+
+  document.querySelectorAll("[data-reg]").forEach(function (b) {
+    b.addEventListener("click", function () { set(+b.dataset.reg); });
+  });
+  document.getElementById("g").addEventListener("click", function () { grain = !grain; apply(); });
+
+  document.querySelectorAll("[data-go]").forEach(function (b) {
+    b.addEventListener("click", function () {
+      var d = doc(); if (!d) return;
+      var want = +b.dataset.go;
+      for (var i = 0; i < 4; i++) d.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowLeft", bubbles: true }));
+      for (var j = 0; j < want; j++) d.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true }));
+    });
+  });
+
+  document.addEventListener("keydown", function (e) {
+    var k = e.key;
+    if (k >= "0" && k <= "9") { set(+k); return; }
+    if (k === "d" || k === "D") { set(cur === 0 ? last : 0); return; }
+    if (k === "g" || k === "G") { grain = !grain; apply(); return; }
+    var jump = { l: 0, L: 0, m: 1, M: 1, ",": 2 };
+    if (k in jump) { var b = document.querySelector('[data-go="' + jump[k] + '"]'); if (b) b.click(); }
+  });
+
+  /* The frame can finish loading before the listener attaches, and the first document an
+     iframe has is about:blank — inject into that and the override is real for a few
+     milliseconds, then the real page loads clean while the bar still claims a register
+     is on. So the loop never stops on success; it only asserts that the bar is telling
+     the truth. */
+  f.addEventListener("load", apply);
+  apply();
+  if (qgo) {
+    f.addEventListener("load", function () {
+      setTimeout(function () {
+        var b = document.querySelector('[data-go="' + qgo[1] + '"]'); if (b) b.click();
+      }, 400);
+    });
+  }
+  setInterval(function () {
+    var d = doc();
+    if (!d || !d.querySelector(".menu")) return;
+    var has = !!d.getElementById("__palettelab");
+    var want = cur !== 0 || grain;
+    if (want !== has) apply();
+  }, 250);
+
+  /* ── THE SIX, LIVE (_six-live.js) ────────────────────────────────────────────
+     `S` installs the hover-specimen system onto the REAL card in the frame: the six
+     marks become the control, .m2read becomes the panel. Same assert-don't-set
+     discipline as the register injector above — the app rebuilds .m2read on every
+     menu mount, so this re-installs on a loop rather than trusting one call.
+     ?sx=1 turns it on at boot. */
+  var sxOn = /[?&]sx=1/.test(location.search), sxBtn = document.getElementById("sx");
+  fetch("codex-data.json").then(function (r) { return r.json(); })
+    .then(function (d) { window.SixLive && SixLive.data(d); })
+    .catch(function () { sxBtn.textContent = "S · six hover (no data)"; });
+  /* the authored perk palette the real reading already uses — arcana-reading.js:623 */
+  fetch("arcana-build/kwcolor.json").then(function (r) { return r.json(); })
+    .then(function (m) { window.SixLive && SixLive.kwcolor(m); })
+    .catch(function () {});
+
+  function sxSync() {
+    var d = doc(); if (!d || !window.SixLive || !SixLive.ready()) return;
+    sxBtn.classList.toggle("on", sxOn);
+    if (sxOn) SixLive.install(d); else if (d.querySelector(".sx")) SixLive.uninstall(d);
+  }
+  sxBtn.addEventListener("click", function () { sxOn = !sxOn; sxSync(); });
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "s" || e.key === "S") { sxOn = !sxOn; sxSync(); }
+  });
+  setInterval(sxSync, 300);
+
+  /* ── CARD MICRO-HOVER STRENGTH (H) ───────────────────────────────────────────
+     The card's hover is made of two things, and BOTH were deliberately damped:
+       1. the engraved light — `.m2hero::before`, two soft-light lobes following the
+          pointer. Its own comment (styles.css:3646) says "at half the desk card's
+          strength — 'ever slight'". So this knob walks that halving back, it does
+          not invent a new effect.
+       2. the drop — parchment lifts by deepening its own shadow rather than by the
+          dark hero's gold ring, because BR-S289 established gold does not survive
+          on this stock. Same gesture, the deck's own colour.
+     Level 1 is ~1.4x the shipped light and a slightly deeper drop; level 2 is ~1.8x
+     with a wider lobe, so the light reads bigger rather than merely harder.
+     ★ Feel cannot be judged from a screenshot — the pane freezes rAF and a still
+     capture cannot show a settle. This exists so the builder can feel all three. */
+  var HOV = [
+    "",
+    "html.m2-parch .menu__draw:has(.menu__draw-stage:hover) .m2hero,"
+    + "html.m2-parch .menu__draw:has(.m2read:hover) .m2hero{box-shadow:0 28px 56px rgba(0,0,0,.70)!important}"
+    + ".m2hero::before{background:"
+    +   "radial-gradient(128px 128px at var(--lx,50%) calc(var(--ly,50%) + 3%), rgba(0,0,0,.105), transparent 70%),"
+    +   "radial-gradient(128px 128px at var(--lx,50%) var(--ly,50%), rgba(255,255,255,.078), transparent 70%)!important}",
+    "html.m2-parch .menu__draw:has(.menu__draw-stage:hover) .m2hero,"
+    + "html.m2-parch .menu__draw:has(.m2read:hover) .m2hero{box-shadow:0 31px 62px rgba(0,0,0,.74)!important}"
+    + ".m2hero::before{background:"
+    +   "radial-gradient(146px 146px at var(--lx,50%) calc(var(--ly,50%) + 3%), rgba(0,0,0,.135), transparent 72%),"
+    +   "radial-gradient(146px 146px at var(--lx,50%) var(--ly,50%), rgba(255,255,255,.10), transparent 72%)!important}",
+  ];
+  var hov = +((/[?&]h=(\d)/.exec(location.search) || [])[1] || 0), hvBtn = document.getElementById("hv");
+  function hvSync() {
+    var d = doc(); if (!d || !d.head) return;
+    hvBtn.textContent = "H · card hover " + hov;
+    hvBtn.classList.toggle("on", hov > 0);
+    var el = d.getElementById("__cardhover");
+    if (!hov) { if (el) el.remove(); return; }
+    if (!el) { el = d.createElement("style"); el.id = "__cardhover"; d.head.appendChild(el); }
+    if (el.textContent !== HOV[hov]) el.textContent = HOV[hov];
+  }
+  hvBtn.addEventListener("click", function () { hov = (hov + 1) % HOV.length; hvSync(); });
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "h" || e.key === "H") { hov = (hov + 1) % HOV.length; hvSync(); }
+  });
+  setInterval(hvSync, 300);
+
+  /* ── THE CODEX MEMBRANE (C) ──────────────────────────────────────────────────
+     Installs into the FRAME document, because the bloom lives there. The module
+     watches the aperture's own aria-hidden and rides its bottom edge, so opening
+     the Codex is what brings the line up — nothing here has to drive it. */
+  var cmOn = /[?&]cm=1/.test(location.search), cmBtn = document.getElementById("cm"), cmDoc = null;
+  function cmSync() {
+    var d = doc(); if (!d || !d.querySelector("#codexBloom") || !window.CodexMembrane) return;
+    cmBtn.classList.toggle("on", cmOn);
+    /* &cmf=1 — force the line up without opening the aperture. A verification hook:
+       headless cannot click the seal, and "does it draw at all" is a different
+       question from "does it feel right", which only the builder can answer live. */
+    if (cmOn && cmDoc !== d) {
+      CodexMembrane.install(d); cmDoc = d;
+      /* ★ NO HEADLESS VERIFICATION HOOK, AND THE ATTEMPT IS WORTH RECORDING.
+         The bloom is born CLOSED (inert + aria-hidden, app.js:3108) and a closed bloom
+         has no box, so place() correctly refuses to draw — forcing env alone proves
+         nothing. Clicking #codexSeed to open it does not work either: it is an
+         <a href="codex.html"> whose aperture handler loses to the plain navigation in
+         headless, so the frame simply LEAVES for the full Codex page.
+         So this effect is verified by the builder pressing C and opening the Codex,
+         and by nothing else. Which is the right answer anyway — it is motion, and
+         the pane freezes rAF (see the wheel notes): a still frame could show that it
+         draws, never that it feels right. */
+    }
+    else if (!cmOn && cmDoc) { CodexMembrane.uninstall(); cmDoc = null; }
+  }
+  cmBtn.addEventListener("click", function () { cmOn = !cmOn; cmSync(); });
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "c" || e.key === "C") { cmOn = !cmOn; cmSync(); }
+  });
+  setInterval(cmSync, 300);
+
+  /* ── ROOMS = U1 (R) ──────────────────────────────────────────────────────────
+     The orbit sheet is rebuilt on every open, so this cannot install once — it
+     converts whatever sheet is currently in the frame, on a tick. Open ROOMS
+     (bottom-right) with R armed and the constellation becomes U1's real doors. */
+  var ruOn = /[?&]ru=1/.test(location.search), ruBtn = document.getElementById("ru");
+  function ruSync() {
+    var d = doc(); if (!d || !window.RoomsU1) return;
+    ruBtn.classList.toggle("on", ruOn);
+    if (ruOn) RoomsU1.tick(d); else RoomsU1.uninstall();
+  }
+  ruBtn.addEventListener("click", function () { ruOn = !ruOn; ruSync(); });
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "r" || e.key === "R") { ruOn = !ruOn; ruSync(); }
+  });
+  setInterval(ruSync, 250);
+  </script>
+</body>
+</html>

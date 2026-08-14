@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="color-scheme" content="dark">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>The Six — hover specimens</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,400;1,500&family=Inter:wght@400;500&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════════════════════════════════════
+   ★ THE ACTUAL CARD, NOT A RECREATION OF ONE.
+
+   The builder, twice now: "cant you use same card we already have". The first
+   time was BR-S289 — "you tried to recreate but its not same card" — and that
+   note is still sitting in styles.css:3556, which is where I should have looked
+   before drawing a cream rectangle from memory.
+
+   So every value below is COPIED, not judged: the stock, the border, the drop,
+   the ticks, the head, the rules, the marks and the six mark colours are lifted
+   verbatim from styles.css .m2bface / html.m2-parch .m2hero (BR-S289/357–362).
+   ═══════════════════════════════════════════════════════════════════════════ */
+:root{
+  --bg:#0a0b0d; --t-display:#dcd7cb; --t-meta:#948f87; --t-ghost:#6e6b63;
+  --font-display:"Cormorant Garamond",Georgia,serif;
+  --font-mono:"IBM Plex Mono",Consolas,monospace;
+  --font-body:Inter,system-ui,sans-serif;
+
+  /* ★ THE SIX MARK COLOURS ALREADY EXISTED. I spent this session inventing an
+     element scale and then a five-family scale; styles.css:3793-3807 has had a
+     designed, contrast-tested per-mark palette all along, in two stocks.
+     It is also the BETTER code, for a reason worth writing down: an element
+     colour changes with the specimen — Leo warm, Pisces cool — so the same MARK
+     flickers hue as you re-hover it. These are fixed to the mark, so Sun sign is
+     one material whichever sign it deals. Identity, not temperature. */
+  /* parchment — the shipped deck (BR-S358: pigment, not tint) */
+  --p-sun:#6b4c14; --p-animal:#74402c; --p-path:#313d4c;
+  --p-rune:#465241; --p-trigram:#315854; --p-hex:#514c44;
+  /* dark stock — lighter forms of the same six materials */
+  --d-sun:#c6a466; --d-animal:#ad7962; --d-path:#78838f;
+  --d-rune:#8a9184; --d-trigram:#6e918d; --d-hex:#9c968c;
+
+  /* the card's own ink, verbatim */
+  --bf-ink:#1c150d; --bf-meta:#6a5c45; --bf-rule:rgba(28,21,13,.35);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--t-display);font-family:var(--font-body);
+  min-height:100vh;display:flex;align-items:center;justify-content:center;padding:40px 28px;}
+.stage{display:grid;grid-template-columns:248px 420px;gap:76px;align-items:center;}
+
+/* ── THE CARD ─ every value from html.m2-parch .m2hero + .m2bface ─────────── */
+.card{position:relative;width:248px;aspect-ratio:120/190;border-radius:10px;
+  background:linear-gradient(165deg,#efe9db,#dcd4c2);
+  border:1px solid rgba(20,14,8,.35);
+  box-shadow:0 20px 40px rgba(0,0,0,.6);
+  display:flex;flex-direction:column;align-items:center;
+  padding:14px 12px;text-align:center;color:var(--bf-ink);}
+.tick{position:absolute;width:10px;height:10px;border-color:rgba(28,21,13,.74)}
+.tick.tl{left:9px;top:9px;border-left:1.5px solid;border-top:1.5px solid}
+.tick.br{right:9px;bottom:9px;border-right:1.5px solid;border-bottom:1.5px solid}
+.head{width:100%;display:flex;align-items:center;justify-content:space-between}
+.head__m{font-family:var(--font-mono);font-weight:600;font-size:9.5px;letter-spacing:.14em;color:var(--bf-meta)}
+.head__g{font-family:var(--font-display);font-weight:700;font-size:11px;line-height:1;color:#8a6a42}
+.div{height:1px;background:var(--bf-rule);width:62%;max-width:104px;margin:8px 0}
+.headrule{width:100%;max-width:none;margin:10px 0 0;background:rgba(28,21,13,.22)}
+.cname{margin:auto 0 0;font-family:var(--font-display);font-weight:600;font-size:25px;line-height:1.05;color:var(--bf-ink)}
+.marks{list-style:none;margin:26px 0 0;padding:0;display:grid;gap:12px;width:100%}
+.mk{width:100%;background:none;border:0;cursor:pointer;
+  font-family:var(--font-mono);font-size:10px;font-weight:500;letter-spacing:.15em;
+  text-transform:uppercase;text-indent:.075em;color:var(--mkc);
+  padding:2px 0;transition:opacity 140ms ease;}
+.mk:hover,.mk:focus-visible{outline:none}
+/* BR-S358's rule holds: six entries, not six stripes. So the CURRENT mark is not
+   given a colour it does not already have — the other five simply step back. */
+.marks.is-picked .mk{opacity:.42}
+.marks.is-picked .mk[aria-current="true"]{opacity:1}
+.wall{width:100%;display:flex;flex-direction:column;align-items:center;margin:0 0 auto}
+.orient{font-family:var(--font-mono);font-weight:600;font-size:9px;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--bf-meta);text-indent:.08em;margin:0}
+
+/* ── THE PANEL ─────────────────────────────────────────────────────────────
+   Fixed height: the column must not jump as the pointer walks the six. */
+/* ★ TOP-ANCHORED, NOT CENTRED. Specimens differ in height — one-line name or two,
+   perks wrapping or not, a paragraph of three lines or eight. Centring shares that
+   variance out ABOVE the text too, so the first line slides on every hover: the one
+   thing that is not changing appears to move. Anchored, all the variance falls to
+   the bottom where nothing is looking. */
+.panel{min-height:470px;display:flex;flex-direction:column;justify-content:flex-start;padding-top:6px}
+.src{font-family:var(--font-mono);font-size:9px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--t-ghost);display:flex;align-items:center;gap:7px;margin-bottom:20px}
+.src b{color:var(--t-meta);font-weight:400}
+.wrap{transition:opacity 150ms ease}
+.wrap.is-out{opacity:0}
+.glyph{font-size:38px;line-height:1;margin-bottom:15px;color:var(--dc);
+  font-family:"Segoe UI Symbol","Cambria Math",var(--font-display),serif;font-variant-emoji:text}
+.label{font-family:var(--font-mono);font-size:9.5px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--t-ghost);margin-bottom:9px}
+.name{font-family:var(--font-display);font-size:31px;font-weight:600;color:var(--t-display);
+  margin:0 0 11px;line-height:1.1}
+/* font-variant-emoji: Windows hands ♎ / ☰ to Segoe UI Emoji and returns a colour tile —
+   which lands PURPLE, breaking the house colour law by font fallback. */
+.attrs{font-family:var(--font-mono);font-size:10px;letter-spacing:.1em;color:#605d55;
+  line-height:1.75;margin-bottom:14px;font-variant-emoji:text}
+.attrs .st{color:var(--t-meta)}
+
+/* ── THE PERKS ─────────────────────────────────────────────────────────────
+   The builder: "easy for the eyes and not dull for the mind." Mono uppercase is
+   neither — it is a spec sheet at 10px with tracking, on words describing a
+   person. Cormorant italic at 17px is the card's own display face: larger, so it
+   is easier to read, and it has a voice.
+   COLOUR: one band, walked around the mark's own colour rather than invented —
+   so the row flows and still shifts. A COST is set ROMAN instead of italic, so
+   the gift/cost split survives with colour switched off entirely (house rule:
+   status is never colour alone) and needs no orb, dot or badge to carry it. */
+.perks{display:flex;flex-wrap:wrap;gap:5px 17px;align-items:baseline;margin-bottom:19px}
+.pk{font-family:var(--font-display);font-style:italic;font-weight:500;font-size:17px;
+  letter-spacing:.012em;line-height:1.4;color:var(--pkc)}
+.pk--cost{font-style:normal;font-weight:400;opacity:.72}
+.say{font-family:var(--font-body);font-size:13.5px;line-height:1.64;color:var(--t-meta);
+  margin:0;max-width:37em}
+.close{margin-top:17px;padding-top:13px;border-top:1px solid rgba(233,229,220,.09);
+  display:flex;align-items:baseline;gap:9px}
+.close__m{color:var(--dc);font-size:9px;line-height:1.7}
+.close__t{font-family:var(--font-display);font-style:italic;font-size:13.5px;color:#a8a294;line-height:1.5}
+.hint{position:fixed;left:0;right:0;bottom:16px;text-align:center;
+  font-family:var(--font-mono);font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:#4a4842}
+@media (prefers-reduced-motion:reduce){.wrap,.mk{transition:none}}
+</style></head><body>
+
+<div class="stage">
+  <div class="card">
+    <span class="tick tl"></span><span class="tick br"></span>
+    <div class="head"><span class="head__m">THE BIRTH READING</span><span class="head__g">&#10022;</span></div>
+    <div class="div headrule"></div>
+    <div class="cname">The Crowned Name</div>
+    <ul class="marks" id="marks"></ul>
+    <div class="wall"><div class="div"></div><p class="orient">By birth alone</p></div>
+  </div>
+
+  <div class="panel">
+    <p class="src"><span>&#9670;</span> <span id="src">From the archive</span></p>
+    <div class="wrap" id="wrap">
+      <div class="glyph" id="glyph"></div>
+      <p class="label" id="label"></p>
+      <h2 class="name" id="name"></h2>
+      <p class="attrs" id="attrs"></p>
+      <div class="perks" id="perks"></div>
+      <p class="say" id="say"></p>
+      <div class="close"><span class="close__m">&#9670;</span>
+        <span class="close__t">Yours is this one read against your other five.</span></div>
+    </div>
+  </div>
+</div>
+<p class="hint">Hover a mark &middot; hover it again for another specimen &middot; tab + arrow keys work too</p>
+
+<script>
+/* `from` is the PROVENANCE, checked against arcana-reading.js:109 — sun sign from the
+   date, animal from the year, life path from the digit sum, and the rest drawn from the
+   name+date seed. So the last three say "from the name and date": true, still given
+   rather than chosen, and what docs/CLAIM_AUDIT_V1.md asked for. */
+var SIX = [
+  { key:"Sun sign",    from:"from the date",          sys:0, n:12, glyph:"tagfirst", c:"sun" },
+  { key:"Year animal", from:"from the year",          sys:1, n:12, glyph:"cjk",      c:"animal" },
+  { key:"Life path",   from:"the digits, reduced",    sys:2, n:12, glyph:"name",     c:"path" },
+  { key:"Rune",        from:"from the name and date", sys:6, n:24, glyph:"rune",     c:"rune" },
+  { key:"Trigram",     from:"from the name and date", sys:7, n:8,  glyph:"namefirst",c:"trigram" },
+  { key:"Hexagram",    from:"from the name and date", sys:8, n:64, glyph:"namefirst",c:"hex" }
+];
+var CJK = ["鼠","牛","虎","兔","龍","蛇","馬","羊","猴","雞","狗","猪"];
+var RUNE = "ᚠᚢᚦᚨᚱᚲᚷᚻᛁᛇᛉᛋᛏᛒᛖᛚᛞᛟᛣᛠᛦᚩᛃᛝ".split("");
+
+/* THE COST FAMILY. A keyword that names what a mark CHARGES you, not what it gives.
+   Currently a hand list, because there is no field for it in codex-data.json — the
+   honest state, and the reason the real version needs those 785 keywords classified
+   rather than pattern-matched. Anything not listed is treated as a gift. */
+var COST = ("impulsive escapist indecisive restless stubborn vain proud scattered "
+  + "nitpicking self-critical rigid aloof possessive jealous impatient reckless "
+  + "withdrawal doubt inertia excess").split(" ");
+
+var DATA = null, bags = {}, current = -1;
+function esc(s){ return String(s).replace(/[&<>]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;"}[c];}); }
+
+/* SHUFFLED BAG, NOT random(). Plain random deals the same animal twice in a row and the
+   feature looks broken exactly when someone is testing whether it works. */
+function draw(i){
+  var n = SIX[i].n;
+  if(!bags[i] || !bags[i].length){
+    var a=[]; for(var k=0;k<n;k++) a.push(k);
+    for(var j=a.length-1;j>0;j--){var r=Math.floor(Math.random()*(j+1)),t=a[j];a[j]=a[r];a[r]=t;}
+    bags[i]=a;
+  }
+  return bags[i].pop();
+}
+function glyphFor(sp,e,idx){
+  if(sp.glyph==="tagfirst")  return String(e.tag||"").trim().charAt(0);
+  if(sp.glyph==="cjk")       return CJK[idx]||"";
+  if(sp.glyph==="rune")      return RUNE[idx]||"";
+  if(sp.glyph==="name")      return String(e.name);
+  if(sp.glyph==="namefirst"){var c=String(e.name).trim().charAt(0);return /[☰-☷]/.test(c)?c:"☰";}
+  return "";
+}
+
+function show(i){
+  if(!DATA) return;
+  var sp=SIX[i], sys=DATA[sp.sys], idx=draw(i), e=sys.entries[idx];
+  var wrap=document.getElementById("wrap");
+  wrap.classList.add("is-out");
+  setTimeout(function(){
+    /* THE COLOUR IS THE MARK'S OWN, from the shipped scale — dark form for the panel,
+       parchment form for the card. Same material, two stocks. */
+    wrap.style.setProperty("--dc","var(--d-"+sp.c+")");
+    document.getElementById("src").innerHTML="From the archive &middot; <b>one of "+sp.n+"</b>";
+    var g=glyphFor(sp,e,idx);
+    document.getElementById("glyph").textContent = g&&g.length===1 ? g+"︎" : g;
+    document.getElementById("label").textContent = sp.key+" · "+sp.from;
+    document.getElementById("name").textContent = e.name;
+    document.getElementById("attrs").innerHTML = e.tag
+      ? esc(e.tag).replace(/(·[^·<]*)$/,'<span class="st">$1</span>') : "";
+
+    /* the perks, walked around the mark's colour: each one shifts a little, so the row
+       flows instead of reading as five labels. mix % is the only thing that varies. */
+    var perks=document.getElementById("perks"); perks.innerHTML="";
+    (e.keywords||[]).slice(0,5).forEach(function(k,n){
+      var cost = COST.indexOf(String(k).toLowerCase())>-1;
+      var s=document.createElement("span");
+      s.className="pk"+(cost?" pk--cost":"");
+      s.style.setProperty("--pkc", cost ? "#8b837e"
+        : "color-mix(in oklab, var(--d-"+sp.c+") "+(84-n*13)+"%, #ded8cc)");
+      s.textContent=k; perks.appendChild(s);
+    });
+
+    document.getElementById("say").textContent=String(e.meaning||"");
+    wrap.classList.remove("is-out");
+  },130);
+
+  var ms=document.getElementById("marks");
+  ms.classList.add("is-picked");
+  Array.prototype.forEach.call(ms.querySelectorAll(".mk"),function(b,k){
+    b.setAttribute("aria-current", k===i?"true":"false");
+  });
+  current=i;
+}
+
+function build(){
+  var ul=document.getElementById("marks");
+  SIX.forEach(function(sp,i){
+    var li=document.createElement("li");
+    var b=document.createElement("button");
+    b.type="button"; b.className="mk"; b.textContent=sp.key;
+    b.style.setProperty("--mkc","var(--p-"+sp.c+")");
+    b.addEventListener("pointerenter",function(){show(i);});
+    b.addEventListener("focus",function(){show(i);});
+    b.addEventListener("click",function(){show(i);});
+    li.appendChild(b); ul.appendChild(li);
+  });
+  document.addEventListener("keydown",function(e){
+    if(e.key!=="ArrowDown"&&e.key!=="ArrowUp") return;
+    var bs=document.querySelectorAll(".mk");
+    bs[(current+(e.key==="ArrowDown"?1:SIX.length-1))%SIX.length].focus();
+    e.preventDefault();
+  });
+}
+
+fetch("codex-data.json").then(function(r){return r.json();}).then(function(d){
+  DATA=d; build(); show(0);                       /* resting state: never an empty panel */
+}).catch(function(){
+  document.getElementById("say").textContent="codex-data.json did not load — serve this from the site root.";
+});
+</script>
+</body></html>
