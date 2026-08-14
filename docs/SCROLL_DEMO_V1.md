@@ -280,11 +280,15 @@ has to be *chosen*; U1 is simply *below*.
 - The descent glide (`app.js:4622`) already exists, is already the vertical twin of the
   panel slide, and already seats U1 — so the demo inherits a considered arrival instead of
   inventing one.
-- ★ **And the 8 checkpoints become a problem to solve deliberately.** U1's descent has
-  derived stops (`app.js:6820`). A scroll-driven page whose every position is meaningful
-  cannot also have a stop system that jumps between eight of them — §2's rule is that `p`
-  is continuous. Either the checkpoints go for this surface, or they become the act
-  boundaries. **They must not be left to fight the timeline.**
+- ★★ **THE 8 CHECKPOINTS ARE GONE. Builder: "forget check point of u1."** Settled the
+  moment it was raised, and it is the right call: U1's descent has derived stops
+  (`app.js:6820`), and a page whose every position is meaningful cannot also jump between
+  eight of them. §2's architecture *is* that `p` is continuous — a stop system would have
+  been a second thing deciding where the visitor is, fighting the first.
+  ★ Note what this removes as well as what it settles: the checkpoints were derived, never
+  listed (`MENU_PANELS` is the horizontal truth, `#about` the vertical one), so nothing has
+  to be re-derived. The descent glide that ARRIVES at U1 stays — it is the entrance, not a
+  stop system. What goes is the stepping once you are there.
 
 **What it does NOT settle:** whether the demo also appears on the Birth Reading's product
 page. It can. §7 stays true — the same component in two places is fine; two *designs* of it
