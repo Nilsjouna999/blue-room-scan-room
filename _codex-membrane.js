@@ -49,6 +49,13 @@
      26px effect. */
   var BAND = 96, RISE = 26;
 
+  /* the occluding dark, and the gradient it is filled with. maskGrad is rebuilt on
+     resize because it is authored in canvas space and must match the ground BELOW the
+     line — the Codex's own bottom, not the room's. `?cmband=0` turns the band off and
+     leaves the bare line, so the two can be judged against each other. */
+  var BAND_ON = !/[?&]cmband=0/.test(String(root.location.search || ""));
+  var maskGrad = null;
+
   function ensure() {
     if (canvas) return;
     canvas = doc.createElement("canvas");
@@ -78,6 +85,17 @@
       canvas.style.width = W + "px"; canvas.style.height = H + "px";
       ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
       lattice();
+      /* the band must be INVISIBLE as dark and only readable as an edge, so it is
+         filled with the Codex's own ground rather than a guessed black. Read off the
+         live bloom when possible; #11100d is the Codex's floor as a fallback. */
+      var g = ctx.createLinearGradient(0, 0, 0, H), lit = "#11100d";
+      try {
+        var frame = target && target.querySelector(".bloom__backfill");
+        var bg = frame && doc.defaultView.getComputedStyle(frame).backgroundColor;
+        if (bg && bg !== "rgba(0, 0, 0, 0)") lit = bg;
+      } catch (e) {}
+      g.addColorStop(0, lit); g.addColorStop(1, lit);
+      maskGrad = g;
     }
     canvas.style.transform = "translate(" + Math.round(r.left) + "px,"
       + Math.round(r.bottom - BAND * 0.5) + "px)";
@@ -125,11 +143,43 @@
   /* drawLine — the same two passes as the original: a feathered fill at .10 that
      gives the line a body, then the quadratic-midpoint stroke at 1.1px with the
      glow. `off` is the rise: at env 0 the whole contour sits RISE px lower. */
+  /* ★★ THE OCCLUDING BAND — the half that makes it a MEMBRANE and not a white line.
+     The builder, confirming which effect this is: "one of the older u1 design where
+     there was 2 white lines top and bottom that was moving on that design".
+     That is parked/u1-membrane.js exactly: `lines=[mk(UPPER_FRAC), mk(LOWER_FRAC)]` at
+     0.04H and 0.96H (BR-S229 pushed them near the frame), and — the part that matters —
+     drawBand() fills from each line's own contour OUT to the frame edge with a
+     background-matched gradient. Its note: "two OPAQUE occluding bands that turn the
+     living band between the lines into a SLIT you look through. Everything BEYOND each
+     line goes to the page's own dark, so a relic surfaces up out of the dark into the
+     opening and sinks back as it passes a line."
+     Without this the line decorates an edge. With it the line IS the edge, and the
+     Codex's own entries sink as they cross it. Same quadratic-midpoint contour as the
+     stroke, so the dark and the lit lip are the same curve and can never separate. */
+  function band() {
+    var N = L.N, xs = L.xs, y = L.y, base = L.baseY, i, c, pc, xm, ym;
+    var off = (1 - env) * RISE;
+    ctx.globalAlpha = 1; ctx.shadowBlur = 0;
+    ctx.beginPath();
+    ctx.moveTo(xs[0], base + y[0] + off);
+    for (i = 1; i < N; i++) {
+      pc = base + y[i - 1] + off; c = base + y[i] + off;
+      xm = (xs[i - 1] + xs[i]) / 2; ym = (pc + c) / 2;
+      ctx.quadraticCurveTo(xs[i - 1], pc, xm, ym);
+    }
+    ctx.lineTo(xs[N - 1], base + y[N - 1] + off);
+    ctx.lineTo(W, H); ctx.lineTo(0, H);        /* out to the bottom edge — this is a LOWER line */
+    ctx.closePath();
+    ctx.fillStyle = maskGrad || "#0a0b0d";
+    ctx.fill();
+  }
+
   function draw() {
     var N = L.N, xs = L.xs, y = L.y, v = L.v, base = L.baseY, i, th, c;
     var off = (1 - env) * RISE;
     ctx.clearRect(0, 0, W, H);
     if (env <= 0.002) return;
+    if (BAND_ON) band();                        /* the dark first, then the lit lip on top */
 
     ctx.beginPath();
     for (i = 0; i < N; i++) { c = base + y[i] + off; th = thick(xs[i], v[i], t); ctx.lineTo(xs[i], c - th); }
