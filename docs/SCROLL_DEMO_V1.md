@@ -255,6 +255,43 @@ understandable font."*
 
 ---
 
+## 6B. ★★ SETTLED — THIS *IS* THE NEW U1
+
+**Builder, 2026-08-14:** *"and we are on the same page new u1 is the scrollable tutorial of
+john and letter."*
+
+The two questions were being worked separately and they were one question. U1 is being
+emptied — the open doors went to the ROOMS popup, the forward ledger to the What's-coming
+popup (`docs/HOUSE_SHAPE_V1.md`) — which left a surface with no content decided. **This is
+the content.** The scroll demo is not a page that needs an address; it is the thing that
+lives at the one that just came free.
+
+★ **And it is a better fit than the product page §7 proposed.** U1 sits directly below the
+front door, reached by the descent glide rather than by a link, and a stranger arriving at
+Blue Room and scrolling down is exactly the visitor this demo is built for: someone who has
+just been told what this place is and wants to know what actually happens. A product page
+has to be *chosen*; U1 is simply *below*.
+
+**What it settles at once:**
+
+- U1's remaining job was undefined. It now has one, and only one — the door's own §7 rule
+  applies: a page must be one kind.
+- The demo needed a home that was not a product page it would have to share.
+- The descent glide (`app.js:4622`) already exists, is already the vertical twin of the
+  panel slide, and already seats U1 — so the demo inherits a considered arrival instead of
+  inventing one.
+- ★ **And the 8 checkpoints become a problem to solve deliberately.** U1's descent has
+  derived stops (`app.js:6820`). A scroll-driven page whose every position is meaningful
+  cannot also have a stop system that jumps between eight of them — §2's rule is that `p`
+  is continuous. Either the checkpoints go for this surface, or they become the act
+  boundaries. **They must not be left to fight the timeline.**
+
+**What it does NOT settle:** whether the demo also appears on the Birth Reading's product
+page. It can. §7 stays true — the same component in two places is fine; two *designs* of it
+would not be.
+
+---
+
 ## 7. WHERE IT LIVES
 
 Per `docs/HOUSE_TEMPLATE_V1.md`, this is the body of a **product page** — it says what one

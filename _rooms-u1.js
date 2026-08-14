@@ -109,10 +109,17 @@
     field.appendChild(wrap);
 
     sheet.classList.add("is-u1");
-    /* one frame later so the entrance transition has a from-state to run from */
-    root.requestAnimationFrame(function () {
-      root.requestAnimationFrame(function () { sheet.classList.add("is-in"); });
-    });
+    /* ★ THE ENTRANCE RAN ON THE WRONG WINDOW, AND IT COST THE WHOLE SHEET.
+       This used the PARENT's requestAnimationFrame to add `is-in`. The cards live in
+       the frame and start at opacity 0, so if the parent is throttled — backgrounded
+       tab, a pane that has stopped compositing, which is a documented trap in this
+       project — the class never lands and you get a blurred sheet with the plates
+       hidden and the doors invisible. Found by driving it: is-u1 true, 4 doors cloned,
+       0 plates visible, `is-in` FALSE.
+       Fixed by not depending on any rAF: force a style read so the from-state is
+       committed, then set the class on the same tick. One reflow, no timing. */
+    void sheet.offsetHeight;
+    sheet.classList.add("is-in");
     return true;
   }
 

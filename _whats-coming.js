@@ -85,9 +85,11 @@
 
     scrim.addEventListener("click", close);
     sheet.querySelector(".wcpop__x").addEventListener("click", close);
-    root.requestAnimationFrame(function () {
-      root.requestAnimationFrame(function () { if (pop) pop.classList.add("is-in"); });
-    });
+    /* same fix as _rooms-u1.js: never drive a frame's entrance from the PARENT's rAF —
+       a throttled parent leaves the popup at opacity 0 and pointer-events none, i.e.
+       invisible AND unclickable. Force the from-state, then set the class. */
+    void pop.offsetHeight;
+    pop.classList.add("is-in");
   }
 
   /* The rail link is an <a href="roadmap/"> (app.js:2492) and roadmap/ resolves to U1
