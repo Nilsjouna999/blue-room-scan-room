@@ -25,7 +25,7 @@
 
   /* ── verbatim from parked/u1-membrane.js ─────────────────────────────────── */
   var STEP = 1 / 60, FOLLOW = 0.12, TENSION = 0.13, DAMP = 0.36, VMAX = 52;
-  var EDGE_FEATHER = 90, STROKE_A = 0.78, GLOW_A = 0.40, GLOW_BLUR = 3;
+  var EDGE_FEATHER = 90, STROKE_A = 0.78, GLOW_A = 0.20, GLOW_BLUR = 2;
   var FLOW_MARGIN = 6, FRAME_MARGIN = 10, DX = 12;
 
   function flow(x, t) {
@@ -226,10 +226,18 @@
     if (env <= 0.002) return;
     if (BAND_ON) band();                        /* the dark first, then the lit lip on top */
 
-    ctx.beginPath();
-    for (i = 0; i < N; i++) { c = base + y[i] + off; th = thick(xs[i], v[i], t); ctx.lineTo(xs[i], c - th); }
-    for (i = N - 1; i >= 0; i--) { c = base + y[i] + off; th = thick(xs[i], v[i], t); ctx.lineTo(xs[i], c + th); }
-    ctx.closePath(); ctx.fillStyle = edgeGrad(0.10 * env); ctx.fill();
+    /* ★★ BR-S442 — THE CLOUD ABOVE THE LINE WAS THE LINE'S OWN BODY, IN WHITE.
+       "there still some clody blue above white line, above white line should purely be
+       the brown codex look and colors."
+       drawLine() painted TWO passes: a filled contour at 10% white — several px tall,
+       because thick() varies with x and velocity — and then the stroke. On U1's cool
+       ground that fill read as light. On the Codex's warm brown it reads as a cloud, and
+       a cool one: white does not tint warm, it DESATURATES it, so a 10% white haze over
+       #100e0c lands greyer and bluer than the page it sits on. Nothing was blue; the
+       white was taking the brown out.
+       The body fill is cut. What is left is the stroke, which is the line — and above it
+       there is now nothing but the Codex. The glow is halved and warmed for the same
+       reason: it spreads UPWARD across the content, so it must not grey it. */
 
     ctx.beginPath();
     ctx.moveTo(xs[0], base + y[0] + off);
@@ -240,7 +248,7 @@
     ctx.lineTo(xs[N - 1], base + y[N - 1] + off);
     ctx.strokeStyle = edgeGrad(STROKE_A * env);
     ctx.lineWidth = 1.1; ctx.lineJoin = "round";
-    ctx.shadowColor = "rgba(255,255,255," + (GLOW_A * env).toFixed(3) + ")";
+    ctx.shadowColor = "rgba(255,248,236," + (GLOW_A * env).toFixed(3) + ")";
     ctx.shadowBlur = GLOW_BLUR;
     ctx.stroke();
     ctx.shadowBlur = 0;

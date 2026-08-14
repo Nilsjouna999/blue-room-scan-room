@@ -26,15 +26,23 @@
 (function (root) {
   "use strict";
 
+  /* ★★ BR-S442 — THE ROOM WAS STILL READABLE THROUGH THE SCRIM. The builder: "as this
+       screen fires up you can see backround mainmenu and card lagging behid it."
+       .62 alpha leaves 38 percent of the page showing, and the thing showing through is
+       the CARD — by the palette paper's own measurement the loudest element on the site,
+       and a 14px blur spreads a bright object rather than hiding it, so it becomes a pale
+       glow drifting behind the doors. Blur softens; only alpha occludes.
+       .62 -> .90 and 14px -> 20px: the room is still THERE (you can see it dim and go
+       soft, which is the whole gesture) and nothing behind it competes for the eye. */
   var CSS = ""
     /* ── THE BLUR. The orbit already lays a scrim over the page; this gives it a
        depth-of-field instead of only a darkening. backdrop-filter is composited,
        so it costs nothing per frame once rastered — but it MUST NOT be animated
        (the house perf contract: transform and opacity only). It fades in via
        opacity on a parent that already carries the transition. */
-    + ".orbit__scrim{backdrop-filter:blur(14px) saturate(.9);"
-    +   "-webkit-backdrop-filter:blur(14px) saturate(.9);"
-    +   "background:rgba(14,12,10,.62)!important}"
+    + ".orbit__scrim{backdrop-filter:blur(20px) saturate(.85);"
+    +   "-webkit-backdrop-filter:blur(20px) saturate(.85);"
+    +   "background:rgba(14,12,10,.90)!important}"
     /* the field stops being a constellation and becomes a sheet of doors */
     + ".orbit.is-u1 .orbit__field{display:flex;align-items:center;justify-content:center;"
     +   "padding:clamp(20px,4vh,54px) clamp(16px,4vw,60px)}"
