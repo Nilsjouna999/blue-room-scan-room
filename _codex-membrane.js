@@ -61,6 +61,18 @@
      Fourth time today the thing already existed. LOOK FOR THE EXISTING SYSTEM FIRST. */
   var LINE_FRAC = 0.955, RISE = 26;
 
+  /* ★ AND THE CODEX'S OWN STATIC BANDS ARE SWITCHED OFF WHERE THIS ONE RUNS. Two
+     surfaces cannot own one edge — the CSS ones cannot follow a wave, so they go and
+     the canvas keeps it. Injected rather than edited into codex.html so the effect and
+     its suppression live in the same file and can be removed together. */
+  function suppressStatic(d) {
+    if (d.getElementById("__cmsuppress")) return;
+    var st = d.createElement("style"); st.id = "__cmsuppress";
+    st.textContent = ".tide{background:none!important}.tide::before{opacity:0!important}"
+                   + ".shore{background:none!important}";
+    d.head.appendChild(st);
+  }
+
   /* the occluding dark, and the gradient it is filled with. maskGrad is rebuilt on
      resize because it is authored in canvas space and must match the ground BELOW the
      line — the Codex's own bottom, not the room's. `?cmband=0` turns the band off and
@@ -129,18 +141,25 @@
          So the ground is read off the document the canvas is drawing on. On the menu
          that resolves to the menu's base; on codex.html to the Codex's own. One rule,
          and it cannot drift when either palette changes. */
-      var ink = "#0a0b0d";
-      try {
-        var vw2 = doc.defaultView;
-        var hb = vw2.getComputedStyle(doc.documentElement).backgroundColor;
-        if (hb && hb !== "rgba(0, 0, 0, 0)" && hb !== "transparent") ink = hb;
-        else {
-          var bb = vw2.getComputedStyle(doc.body).backgroundColor;
-          if (bb && bb !== "rgba(0, 0, 0, 0)" && bb !== "transparent") ink = bb;
-        }
-      } catch (e) {}
+      /* ★★★ BR-S444 — I HAD THE DESIGN INVERTED, AND THAT IS WHY IT NEVER SETTLED.
+         The builder: "the idea was the codex color and blue below follow the line
+         movements accordingly and nothing is revealed according to white line movements."
+             ABOVE the line : the Codex, untouched
+             BELOW the line : the blue under — BR-S237's own phrase for it
+             the boundary   : the wave itself, so nothing is revealed as it moves
+         I read the blue as a defect and spent four commits warming it away, which
+         deleted the half of the effect that was intended.
+         AND THE RESIDUE HAS THE SAME ROOT. .tide and .shore are STATIC CSS bands at a
+         fixed height; this line is a moving wave. A straight edge and a curve can never
+         agree, so wherever the wave sits away from 0.955H a strip of the static band is
+         either exposed above the line or clipped below it. That strip is the residue —
+         it was never a colour, it was a shape that does not move.
+         So the canvas takes the whole region: the codex's own bands are switched off
+         (below) and everything under the line is painted here, following the contour. */
       var g = ctx.createLinearGradient(0, H * LINE_FRAC, 0, H);
-      g.addColorStop(0, ink); g.addColorStop(1, ink);
+      g.addColorStop(0,   "#161411");   /* the shore, at the line */
+      g.addColorStop(0.55,"#100f0c");
+      g.addColorStop(1,   "#0a0b0d");   /* the seafloor */
       maskGrad = g;
     }
     canvas.style.transform = "translate(0px,0px)";
@@ -307,7 +326,7 @@
       doc = d;
       target = d.querySelector(sel || "#codexBloom") || d.documentElement;
       if (!target) return false;
-      ensure(); place();
+      ensure(); suppressStatic(d); place();
       /* ★ WATCH #menuView, NOT THE BLOOM. `is-codex-open` on the menu host is what
          drives the iris (styles.css:4748) and is set for the whole open state; the
          bloom's own aria-hidden is set once and is a weaker signal. */
