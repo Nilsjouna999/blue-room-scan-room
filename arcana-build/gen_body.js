@@ -482,8 +482,14 @@
     if(ia===ib)return "Both stand under "+WUXING[ia][0]+" — a single phase, doubled.";
     if((ia+1)%5===ib)return WUXING[ia][0]+" feeds "+WUXING[ib][0]+" — the first year nourishes the second.";
     if((ib+1)%5===ia)return WUXING[ib][0]+" feeds "+WUXING[ia][0]+" — the second year nourishes the first.";
-    if((ia+3)%5===ib)return WUXING[ia][0]+" checks "+WUXING[ib][0]+" — the first tempers the second.";
-    return WUXING[ib][0]+" checks "+WUXING[ia][0]+" — the second tempers the first.";
+    /* BR-S435: both branches were REVERSED. WUXING is [Wood, Fire, Earth, Metal, Water]
+     and X is controlled by (X+3)%5 — which this same file uses correctly at the wuxing
+     block ("and is checked by "+WUXING[(idx+3)%5][0]). So (ia+3)%5===ib means IB checks
+     IA, and the code printed the opposite: a Wood/Metal pair read "Wood checks Metal"
+     when Metal controls Wood. Fixed here AND in arcana-build/gen_body.js, which
+     build_inapp.py copies verbatim over this file. */
+    if((ia+3)%5===ib)return WUXING[ib][0]+" checks "+WUXING[ia][0]+" — the second tempers the first.";
+    return WUXING[ia][0]+" checks "+WUXING[ib][0]+" — the first tempers the second.";
   }
   function bondLine(RA,RB){
     var a=RA.crown,b=RB.crown,first,second;

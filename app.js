@@ -1507,7 +1507,10 @@ const ROOMS = [
        future change to M1's sample makes the staleness visible rather than silent. */
     leakNext: "assets/leak/m1-developed.webp",
     leakAlt: "A detail of the card on the desk. Press the right edge to see it developed.",
-    cost: "Free &middot; or the paid Halo Mint", cta: "See a card develop", href: "?view=room" },
+    /* BR-S435: href was "?view=room" — initState() (app.js:105) reads only src / t / tab,
+       so the CTA landed straight back on the menu. The desk's own sample is what it means
+       to show, and that IS addressable. */
+    cost: "Free &middot; or the paid Halo Mint", cta: "See a card develop", href: "?src=03&t=shiny" },
 
   { key: "pay", state: "bench", internal: true, name: "Paying for a reading",
     now: "Pay once for a reading. Nothing of yours is kept on file.",
@@ -6936,24 +6939,34 @@ render();
            happens to be the largest text in it. Keyed on the state class, which is
            the same key the ribbon itself uses, with a derived fallback so an
            unnamed new panel still gets a plate rather than being dropped. */
-        var NAMES = { "": "The Archive Desk", "is-wall": "The Reading Rooms", "is-reliquary": "Your Profile" };
+        var NAMES = { "is-l1": "The Archive Desk", "is-wall": "The Reading Rooms", "is-reliquary": "Your Profile" };
         /* BR-S293 — MEANING. A name alone tells you what a room is CALLED, not what it
            is for, and half of these names are not self-evident to a first visitor. One
            line each, in the room's own voice, no jargon. */
-        var SUBS = { "": "A photograph, filed",
+        var SUBS = { "is-l1": "A photograph, filed",
                      "is-wall": "Draw a card · or be read by birth",
                      "is-reliquary": "Everything you have kept" };
         /* RANK is the point of the whole layout. 0 takes the centre. Post-pivot the
            Reading Rooms sell first, and someone who opens a map is looking to LEAVE
            where they are, so the likeliest destination gets the easiest target -- not
            the room they are standing in. */
-        var RANK = { "is-wall": 0, "": 2, "is-reliquary": 3 };
-        var WING = { "is-wall": "work", "": "work", "is-reliquary": "work" };
+        /* BR-S435: these five dicts keyed on "" for the front-door panel, but BR-S400 gave it
+           the class `is-l1` (MENU_PANELS, app.js:4101). Every "" entry was unreachable and L1
+           fell through to the generic fallback below — label "Room 1", no meaning line, rank 6
+           tied last with Settings instead of its intended 2. The locked front door rendered as
+           an unnamed placeholder in the very map that exists to name things. */
+        var RANK = { "is-wall": 0, "is-l1": 2, "is-reliquary": 3 };
+        var WING = { "is-wall": "work", "is-l1": "work", "is-reliquary": "work" };
         var key = p.cls || "";
-        var MARKS = { "": ORBIT_MARKS.desk, "is-wall": AB_EMBLEMS.tarot, "is-reliquary": ORBIT_MARKS.reliquary };
+        var MARKS = { "is-l1": ORBIT_MARKS.desk, "is-wall": AB_EMBLEMS.tarot, "is-reliquary": ORBIT_MARKS.reliquary };
         out.push({ label: NAMES[key] || ("Room " + (i + 1)), sub: SUBS[key] || "",
                    mark: MARKS[key] || ORBIT_MARKS.desk, rank: RANK[key] === undefined ? 6 : RANK[key], wing: WING[key] || "work",
-                   here: key === (_menuIndex(host) === i ? key : " "), idx: i, kind: "panel" });
+                   /* BR-S435: was `key === (_menuIndex(host) === i ? key : NUL)` — a literal NUL
+                      byte, which made git and grep treat app.js as BINARY from here down and
+                      silently return no matches for the last ~500 lines. The expression was
+                      also a long way round: it compares key to key when the index matches,
+                      i.e. it is simply the index test. */
+                   here: _menuIndex(host) === i, idx: i, kind: "panel" });
       }
     } catch (e) {}
     if (host.querySelector("#about")) out.push({ label: "About Blue Room", sub: "What this is", mark: ORBIT_MARKS.about, rank: 4, wing: "house", idx: 0, kind: "about" });

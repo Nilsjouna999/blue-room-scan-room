@@ -7,12 +7,15 @@ import json, os
 BASE = os.path.dirname(os.path.abspath(__file__))  # arcana-build/
 
 # family: (colour, seed stems). First match wins; more specific families first.
+# BR-S435: the "strategy" list held "precис" — Cyrillic и and с inside a Latin word, the
+# only non-ASCII stem in the file. It could never match anything. Now "precis", which
+# also covers "precise" and "precision".
 FAMILIES = [
   ("intuition", "#9a86bd", ["intuit","instinct","psychic","subconscious","dream","imagin","visionary","mystic","inner","clairvoy","prophe","sixth"]),
   ("wisdom",    "#a9a06a", ["wise","wisdom","clarity","clear","insight","understand","knowledge","discern","sage","learned","percept","aware","truth","reason","judicious","philosoph","contempl","reflect","depth","profound"]),
   ("secrecy",   "#7f88b6", ["secret","hidden","mysteri","private","veil","silen","enigma","unseen","conceal","reserved","withdraw","reclus","introspect","shadow","occult"]),
   ("elegance",  "#c691a0", ["elegant","elegance","graceful","grace","refined","refinement","beaut","charm","poise","poised","sensual","aesthetic","tasteful","sophisticat","glamour","alluring","dignif"]),
-  ("strategy",  "#6f9bc0", ["strateg","clever","calculat","cunning","analytic","logic","wit","resourceful","shrewd","sharp","ingen","invent","intelligen","tactic","planning","method","precис","precise","astute","canny"]),
+  ("strategy",  "#6f9bc0", ["strateg","clever","calculat","cunning","analytic","logic","wit","resourceful","shrewd","sharp","ingen","invent","intelligen","tactic","planning","method","precis","precise","astute","canny"]),
   ("guard",     "#8f9068", ["suspic","wary","guard","cautio","defensive","skeptic","watchful","vigilan","distrust","protective","careful","prudent","reticent"]),
   ("calm",      "#67a89b", ["calm","peace","stillness","still","serene","tranquil","quiet","restful","compos","gentle","soothing","patien","mellow","placid","even"]),
   ("emotion",   "#6fa4b0", ["emotion","feeling","sensitiv","nurtur","nourish","compassion","empath","tender","caring","care","receptive","devot","affection","warm-heart","kind","gentle-heart","sympath","maternal","protective-love"]),

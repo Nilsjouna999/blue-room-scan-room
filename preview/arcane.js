@@ -1222,7 +1222,11 @@
       if (window.BRCeremony && typeof window.BRCeremony.mount === "function") {
         ceremony = window.BRCeremony.mount(ceremonyHost, { onExit: exitCeremony, onDone: enterReading });
       } else {
-        ceremony = ForgeCeremony(ceremonyHost, nameVal, MATERIAL, exitCeremony);
+        /* BR-S435: was `nameVal`, which is declared nowhere in this file — its only
+           occurrence. This is the fallback taken when window.BRCeremony fails to load, so
+           the fallback threw ReferenceError instead of falling back, killing the draw.
+           ForgeCeremony(host, nameMark, material, onExit) wants the entered name: `nm`. */
+        ceremony = ForgeCeremony(ceremonyHost, nm, MATERIAL, exitCeremony);
       }
     }
 

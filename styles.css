@@ -2707,7 +2707,11 @@ body[data-view="room"] .dev { display: none; }
 #menuView.is-m1a .pickmsg { margin-top: 2px; }
 #menuView.is-m1a .menu__portals { margin-top: 4px; }
 #menuView.is-m1a .menu__foot { margin-top: auto; }
-#menuView.is-m1a .menu__codex__mark { color: var(--violet); }
+/* BR-S435: was var(--violet). Purple is reserved for paid / price / kept (the builder's
+   law), and is-m1a is the DEFAULT variant — so the site's price colour was sitting on the
+   Codex, "What's coming" and Settings, all free. Two comments nearby each already claim to
+   mark "the only violet in the room"; this was a third. */
+#menuView.is-m1a .menu__codex__mark { color: var(--t-meta); }
 /* the caption goes back ABOVE the card. The markup order is unchanged (card then
    caption — correct for a screen reader in BOTH variants); only the visual order
    flips, which is exactly what CSS `order` is for. */
