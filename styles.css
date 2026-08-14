@@ -5950,6 +5950,19 @@ html.orbit-wings .orbit__field { --orbit-rx: clamp(200px, 25.5vw, 368px); --orbi
    afterline that only exists for someone already inside, so it must not compete. */
 .u1box__go { display: block; font-family: var(--font-mono, monospace); font-size: 9px; letter-spacing: .16em; text-transform: uppercase; color: #b9b3a8; text-decoration: none; }
 .u1box__go:hover, .u1box__go:focus-visible { color: var(--gold-lit, #c9a35c); outline: none; }
+/* ★ BR-S431 — THE WHOLE BOX IS THE TARGET. The builder: "also what these section be
+   clickable by whole box." A card with one destination whose only hit area is a 9px
+   line of tracked mono is a target you have to aim at; the box already looks like an
+   object, so it should behave like one.
+   The stretched-link pattern, not a wrapping <a>: the anchor stays the real control —
+   one tab stop, one announced link, the href where it was — and its ::after covers the
+   card. Nothing is duplicated, so nothing can drift out of sync.
+   `.u1box__more` is lifted above it, because the gated second door (?dev=vision#post)
+   sits INSIDE the same card and would otherwise be swallowed by the overlay. */
+.u1box--vision { position: relative; cursor: pointer; }
+.u1box__go::after { content: ""; position: absolute; inset: 0; border-radius: inherit; }
+.u1box--vision:hover .u1box__go { color: var(--gold-lit, #c9a35c); }
+.u1box__more { position: relative; z-index: 1; }
 .u1box__more {
   display: block; margin-top: 13px; padding-top: 12px;
   border-top: 1px solid rgba(220, 215, 203, .09);

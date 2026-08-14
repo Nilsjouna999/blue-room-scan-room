@@ -267,13 +267,14 @@
   root.CodexMembrane = {
     install: function (d, sel) {
       doc = d;
-      target = d.querySelector(sel || "#codexBloom");
+      target = d.querySelector(sel || "#codexBloom") || d.documentElement;
       if (!target) return false;
       ensure(); place();
       /* ★ WATCH #menuView, NOT THE BLOOM. `is-codex-open` on the menu host is what
          drives the iris (styles.css:4748) and is set for the whole open state; the
          bloom's own aria-hidden is set once and is a weaker signal. */
-      var host = d.getElementById("menuView") || d.body;
+      var host = d.getElementById("menuView");
+      if (!host) return true;      /* standalone codex — no aperture to watch, open() is called directly */
       function isOpen() {
         return host.classList.contains("is-codex-open")
           && !host.classList.contains("is-codex-closing");
@@ -301,8 +302,22 @@
      ?cm=0 turns it off. */
   if (root.document && !root.frameElement) {
     var boot = function () {
-      if (!/[?&]cm=0/.test(String(root.location.search || "")) && root.document.getElementById("codexBloom")) {
-        root.CodexMembrane.install(root.document);
+      if (/[?&]cm=0/.test(String(root.location.search || ""))) return true;
+      var d = root.document;
+      /* ★ TWO HOSTS, AND THE SECOND ONE IS WHY THE BUILDER STILL SAW NOTHING.
+         index.html has the APERTURE — a #codexBloom that irises open over the menu.
+         But every other way into the Codex is a plain <a href="codex.html"> (the two
+         orbs at app.js:1179/1181, the registry CTA at :1466, the placard at :2693),
+         which NAVIGATES. On that page there is no bloom, no menu, and no parent — so
+         a module that waits for #codexBloom installs nowhere, which is exactly what
+         happened. codex.html already carries its own `.tide` (the codex's half of the
+         BR-S237 contract); what it never had was the line above it, because the line
+         was always the parent's job and the parent is gone.
+         Standalone: install and open immediately — the page IS the opened codex. */
+      if (d.getElementById("codexBloom")) { root.CodexMembrane.install(d); return true; }
+      if (d.querySelector(".tide") || /codex/i.test(d.title || "")) {
+        root.CodexMembrane.install(d, ":root");
+        root.CodexMembrane.open(true);
         return true;
       }
       return false;

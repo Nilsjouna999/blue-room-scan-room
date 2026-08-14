@@ -4963,6 +4963,10 @@ assert_chrome(DOC)
 # out, so the file on disk is ~1.5 KB larger than the size this build reports and
 # a run on Linux cannot reproduce these bytes.
 _BYTES = DOC.encode('utf-8')
+# BR-S431 — the reading frame's line. codex.html is a HOST of the membrane, not only
+# the thing it is drawn over: every route except the aperture navigates here, and the
+# parent that used to draw the line is gone on this page.
+HTML = HTML.replace('</body>', '<script src="_codex-membrane.js?v=430"></script></body>', 1) if '_codex-membrane.js' not in HTML else HTML
 _f = io.open(os.path.join(SP, 'codex.html'), 'w', encoding='utf-8', newline='')
 _f.write(DOC)
 _f.close()
