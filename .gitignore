@@ -11,3 +11,12 @@ desktop.ini
 # it is never committed. gate_public.py FAILS rather than skips when it is absent.
 gate_identity.txt
 dist/
+
+# BR-S419: agent + build byproducts. The fleets write scratch into the repo root;
+# these are outputs, not sources, and regenerating them is one command.
+__pycache__/
+*.pyc
+corrupt_log.txt
+dupe_report.txt
+fixtures_report.txt
+allkw.txt
