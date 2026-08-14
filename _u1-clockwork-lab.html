@@ -1,0 +1,342 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>U1 — THE CLOCKWORK · scroll lab</title>
+<!--
+  ═══════════════════════════════════════════════════════════════════════════
+  U1 — THE CLOCKWORK. The builder, redirecting:
+
+    "imagine u1. as you scroll down info gets filled and you keep scrolling and
+     it transforms into readings and results in boxes 2 after another keeps
+     popping from the background. it's not a separate object, it's background
+     that works like clockwork as you scroll"
+
+  ★ WHAT CHANGED. The WET EDGE lab put a CARD on a stage and developed it. This
+  has no card. The page IS the mechanism: one fixed surface, geared to scroll,
+  and the results surface UP OUT of it rather than being drawn ON something.
+  Nothing here is an object sitting on a background — the background is the
+  object.
+
+  ★ CLOCKWORK MEANS LOCKED, NOT DECORATED. Every moving part reads the same p
+  and moves in fixed ratio to it: the ring indexes one tooth per box, the rules
+  extend on the same beat the box surfaces, the depth field parallaxes at three
+  fixed rates. Nothing eases on its own timer. Scroll back and every gear runs
+  backwards exactly — that is the difference between clockwork and animation.
+
+  ★ THE BOXES ACCUMULATE. Each one surfaces from depth, settles, and STAYS —
+  earlier boxes recede in z rather than leaving. By the end the whole reading is
+  on screen at once, assembled, which is the thing the tutorial has to deliver.
+
+  FIXTURE: John Bon, 26 July 1965 — derived against the real engine
+  (arcana-reading.js hash/pick/sunSign/lifePathNum), not written.
+  Leo · Snake · 9 · Raidho · Dui/Lake · 7 The Army → The Twice-Kindled Wayfarer.
+  ═══════════════════════════════════════════════════════════════════════════
+-->
+<style>
+  :root {
+    --paper:   #0e0c0a;
+    --blue:    #0e1622;      /* the blue under — BR-S448's corrected stops */
+    --blue-2:  #0a1019;
+    --ink:     #d6cec1;
+    --dim:     #6d6558;
+    --rule:    #2e2a24;
+    --mk:      #b9c3cf;
+    --gold:    #d8cfa8;
+    --serif:   "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+    --mono:    ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: auto; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--serif); }
+
+  /* ── THE SECTION. One tall column; the whole instrument is sticky inside it,
+       so scroll never moves a scene — it turns a mechanism. ────────────────── */
+  .clock { height: 560vh; position: relative; }
+  .vp { position: sticky; top: 0; height: 100vh; overflow: hidden; }
+
+  /* ── LAYER 0 — THE GROUND. The warm plate above, the blue under below, and a
+       horizon line between them that the whole descent is measured against. ── */
+  .ground { position: absolute; inset: 0; background:
+      linear-gradient(180deg, #14110e 0%, #100d0b 46%, var(--blue) 54%, var(--blue-2) 100%);
+  }
+  .horizon { position: absolute; left: 0; right: 0; top: 50%; height: 1px;
+             background: linear-gradient(90deg, transparent, rgba(226,232,240,.42) 18%, rgba(226,232,240,.42) 82%, transparent);
+             opacity: var(--horizon-o, 0); }
+
+  /* ── LAYER 1 — THE RULE FIELD. Three depths, three parallax rates. This is
+       what makes the surface read as HAVING a depth for boxes to come out of. ── */
+  .rules { position: absolute; inset: -20% 0; opacity: .5; }
+  .rules span { position: absolute; left: 0; right: 0; height: 1px; background: var(--rule); }
+
+  /* ── LAYER 2 — THE ESCAPEMENT. It indexes one tooth per box delivered. Not
+       decoration: its rotation IS the box count, so the mechanism is legible. ── */
+  .esc { position: absolute; left: 50%; top: 50%; width: 620px; height: 620px;
+         margin: -310px 0 0 -310px; opacity: var(--esc-o, 0); }
+  .esc svg { width: 100%; height: 100%; overflow: visible; }
+  .esc circle { fill: none; stroke: rgba(200,212,228,.13); }
+  .esc line { stroke: rgba(200,212,228,.20); }
+  .tick-lit { stroke: rgba(216,207,168,.85) !important; }
+
+  /* ── THE INTAKE. Set INTO the ground, not in a form. It is the surface
+       remembering what it was told, at the size of the room. ── */
+  .intake { position: absolute; left: 0; right: 0; top: 50%; transform: translateY(-50%);
+            text-align: center; opacity: var(--in-o, 0); }
+  .intake .lbl { font: 9px/1 var(--mono); letter-spacing: .34em; color: var(--dim); text-transform: uppercase; }
+  .intake .val { font-size: clamp(30px, 6.2vw, 62px); letter-spacing: .01em; margin: 12px 0 0; color: var(--ink); }
+  .intake .val b { font-weight: 400; border-bottom: 1px solid var(--rule); padding-bottom: 4px; }
+  .intake .date { font-size: clamp(15px, 2.4vw, 22px); color: #a89f90; margin-top: 16px; letter-spacing: .04em; }
+  .caret { display: inline-block; width: 1px; height: .82em; background: var(--gold);
+           vertical-align: -.06em; margin-left: 3px; }
+
+  /* ── THE BOXES. They SURFACE. Each starts small, far, and blurred — behind the
+       plane of the page — and comes up through it. They never slide in from an
+       edge: an edge entrance says "a thing arrived", depth says "it was always
+       in there". ── */
+  .boxes { position: absolute; inset: 0; display: grid; place-items: center; }
+  .bx {
+    position: absolute; width: min(74vw, 430px);
+    background: linear-gradient(176deg, rgba(28,26,23,.97), rgba(18,17,15,.97));
+    border: 1px solid #322d26; border-radius: 3px;
+    padding: 15px 17px 16px;
+    box-shadow: 0 30px 70px -28px #000, 0 0 0 1px rgba(0,0,0,.4);
+    will-change: transform, opacity;
+  }
+  .bx__top { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+  .bx__slot { font: 8.5px/1 var(--mono); letter-spacing: .24em; color: var(--dim); text-transform: uppercase; }
+  .bx__idx  { font: 8.5px/1 var(--mono); letter-spacing: .18em; color: #4c463d; }
+  .bx__name { font-size: 25px; margin: 11px 0 0; color: var(--mk); letter-spacing: .01em; }
+  .bx__rule { height: 1px; background: var(--rule); margin: 11px 0 9px; transform-origin: left; }
+  .bx__kw   { font: 10px/1.65 var(--mono); letter-spacing: .11em; color: #8b93a0; text-transform: lowercase; }
+  .bx__from { font: 8.5px/1 var(--mono); letter-spacing: .16em; color: #565046; margin-top: 10px; text-transform: uppercase; }
+
+  /* ── THE CROWN. The last thing the mechanism does. ── */
+  .crown { position: absolute; left: 0; right: 0; top: 50%; transform: translateY(-50%);
+           text-align: center; opacity: var(--cr-o, 0); pointer-events: none; }
+  .crown .k { font: 9px/1 var(--mono); letter-spacing: .34em; color: var(--dim); text-transform: uppercase; }
+  .crown .n { font-size: clamp(28px, 5.4vw, 54px); color: var(--gold); margin: 16px 0 0; }
+  .crown .b { font-size: clamp(13px, 1.9vw, 17px); color: #9d9484; margin-top: 12px; font-style: italic; }
+
+  /* ── the bench ── */
+  .bench { position: fixed; right: 10px; top: 10px; z-index: 40;
+           background: rgba(10,11,13,.92); border: 1px solid #23262c; border-radius: 3px;
+           padding: 9px 11px; font: 10px/1.6 var(--mono); color: #8f98a6; min-width: 176px; }
+  .bench b { color: #dfe6ef; font-weight: 400; float: right; font-variant-numeric: tabular-nums; }
+  .bench hr { border: 0; border-top: 1px solid #23262c; margin: 6px 0; }
+  .bench i { font-style: normal; color: #6d7684; letter-spacing: .1em; text-transform: uppercase; font-size: 9px; }
+  .lead { position: absolute; left: 0; right: 0; bottom: 8%; text-align: center;
+          font: 9px/1 var(--mono); letter-spacing: .3em; color: #4e483f; text-transform: uppercase;
+          opacity: var(--lead-o, 0); }
+</style>
+
+<div class="clock" id="clock">
+  <div class="vp" id="vp">
+    <div class="ground"></div>
+    <div class="rules" id="rules"></div>
+    <div class="horizon" id="horizon"></div>
+
+    <div class="esc" id="esc">
+      <svg viewBox="0 0 620 620" aria-hidden="true">
+        <circle cx="310" cy="310" r="248"></circle>
+        <circle cx="310" cy="310" r="232"></circle>
+        <g id="teeth"></g>
+      </svg>
+    </div>
+
+    <div class="intake" id="intake">
+      <div class="lbl">The reading is taken from</div>
+      <p class="val"><b id="nm"></b><span class="caret" id="caret"></span></p>
+      <p class="date" id="dt"></p>
+    </div>
+
+    <div class="boxes" id="boxes"></div>
+
+    <div class="crown" id="crown">
+      <div class="k">And the name it makes</div>
+      <p class="n">The Twice-Kindled Wayfarer</p>
+      <p class="b">bound in open water</p>
+    </div>
+
+    <div class="lead" id="lead">scroll back — it reads the same</div>
+  </div>
+</div>
+
+<div class="bench" id="bench"></div>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ── THE FIXTURE. Derived against the shipped engine, not written.
+       birth~John Bon~1965~7~26 → these six, in the engine's own slot order. ── */
+  var SIX = [
+    { slot: "Sun sign",    name: "Leo",          kw: "confident · generous · dramatic · proud · creative", from: "from the date, directly" },
+    { slot: "Year animal", name: "Snake",        kw: "wise · intuitive · private · watchful · restraint",  from: "from the year, directly" },
+    { slot: "Life path",   name: "9",            kw: "compassion · completion · idealism · letting go",    from: "from the digits of the date" },
+    { slot: "Rune",        name: "Raidho",       kw: "journey · movement · rhythm · right action",         from: "drawn from the name and date" },
+    { slot: "Trigram",     name: "☱ Duì · Lake", kw: "joy · openness · exchange · the youngest daughter",  from: "drawn from the name and date" },
+    { slot: "Hexagram",    name: "7 · The Army", kw: "discipline · organisation · the led and the leading", from: "drawn from the name and date" }
+  ];
+  var NAME = "John Bon", BORN = "born 26 July 1965";
+
+  /* ── THE GEAR TRAIN. Every window is a constant, so the whole mechanism is one
+       table you can read. Boxes occupy .30–.86, six equal teeth. ── */
+  var T = {
+    nameType:  [0.030, 0.130],
+    dateType:  [0.150, 0.235],
+    intakeOut: [0.255, 0.300],
+    boxes:     [0.300, 0.860],
+    crown:     [0.880, 0.940],
+    lead:      [0.950, 1.000]
+  };
+  var TOOTH = (T.boxes[1] - T.boxes[0]) / SIX.length;   /* one box per tooth */
+
+  function clamp01(v) { return v < 0 ? 0 : v > 1 ? 1 : v; }
+  function win(p, a, b) { return clamp01((p - a) / (b - a)); }
+  /* easeOutCubic, closed form. Positional easing must be reversible by
+     arithmetic — no springs, no timers, so running the scroll backwards runs
+     the gear backwards exactly. */
+  function eo(t) { return 1 - Math.pow(1 - t, 3); }
+
+  var elRules = document.getElementById("rules"),
+      elTeeth = document.getElementById("teeth"),
+      elBoxes = document.getElementById("boxes"),
+      elNm = document.getElementById("nm"), elDt = document.getElementById("dt"),
+      elCaret = document.getElementById("caret"),
+      elIntake = document.getElementById("intake"), elEsc = document.getElementById("esc"),
+      elHor = document.getElementById("horizon"), elCrown = document.getElementById("crown"),
+      elLead = document.getElementById("lead"), elBench = document.getElementById("bench"),
+      elClock = document.getElementById("clock");
+
+  /* ── BUILD ONCE. Nothing below is created, measured or mutated during scroll. ── */
+  var RULE_N = 26, ruleEls = [];
+  (function () {
+    var i, s;
+    for (i = 0; i < RULE_N; i++) {
+      s = document.createElement("span");
+      s.style.top = (i / RULE_N * 100).toFixed(3) + "%";
+      s.dataset.depth = (i % 3);                       /* three depths, three rates */
+      elRules.appendChild(s); ruleEls.push(s);
+    }
+    for (i = 0; i < 48; i++) {                          /* the escapement's teeth */
+      var a = (i / 48) * Math.PI * 2 - Math.PI / 2;
+      var l = document.createElementNS("http://www.w3.org/2000/svg", "line");
+      l.setAttribute("x1", (310 + Math.cos(a) * 232).toFixed(2));
+      l.setAttribute("y1", (310 + Math.sin(a) * 232).toFixed(2));
+      l.setAttribute("x2", (310 + Math.cos(a) * (i % 8 === 0 ? 210 : 222)).toFixed(2));
+      l.setAttribute("y2", (310 + Math.sin(a) * (i % 8 === 0 ? 210 : 222)).toFixed(2));
+      elTeeth.appendChild(l);
+    }
+  })();
+
+  var boxEls = SIX.map(function (m, i) {
+    var d = document.createElement("div");
+    d.className = "bx";
+    d.innerHTML =
+      '<div class="bx__top"><span class="bx__slot">' + m.slot + '</span>' +
+      '<span class="bx__idx">' + (i + 1) + " / 6" + '</span></div>' +
+      '<p class="bx__name">' + m.name + '</p>' +
+      '<div class="bx__rule"></div>' +
+      '<p class="bx__kw">' + m.kw + '</p>' +
+      '<p class="bx__from">' + m.from + '</p>';
+    elBoxes.appendChild(d);
+    return { el: d, rule: d.querySelector(".bx__rule") };
+  });
+
+  /* ── THE ONE FUNCTION. p in, every part positioned. No state is kept between
+       calls, which is what makes a cold ?p= identical to having scrolled there. ── */
+  function draw(p) {
+    /* the ground's depth field — three parallax rates, locked to p */
+    var i;
+    for (i = 0; i < ruleEls.length; i++) {
+      var depth = +ruleEls[i].dataset.depth;
+      var rate = [220, 130, 62][depth];
+      ruleEls[i].style.transform = "translate3d(0," + (-p * rate).toFixed(1) + "px,0)";
+      ruleEls[i].style.opacity = (0.16 + 0.1 * depth).toFixed(2);
+    }
+    elHor.style.setProperty("--horizon-o", (win(p, 0.24, 0.32) * 0.7).toFixed(3));
+
+    /* THE INTAKE writes itself into the surface, then sinks back into it. */
+    var tn = win(p, T.nameType[0], T.nameType[1]);
+    var td = win(p, T.dateType[0], T.dateType[1]);
+    elNm.textContent = NAME.slice(0, Math.round(tn * NAME.length));
+    elDt.textContent = BORN.slice(0, Math.round(td * BORN.length));
+    elCaret.style.opacity = (p > 0.012 && p < 0.245) ? ((Math.floor(p * 260) % 2) ? 0.25 : 0.9) : 0;
+    var io = Math.min(win(p, 0.010, 0.045), 1 - win(p, T.intakeOut[0], T.intakeOut[1]));
+    elIntake.style.setProperty("--in-o", io.toFixed(3));
+    elIntake.style.transform = "translateY(-50%) scale(" + (1 - 0.06 * win(p, T.intakeOut[0], T.intakeOut[1])).toFixed(4) + ")";
+
+    /* THE ESCAPEMENT indexes one tooth per box. Its rotation IS the count. */
+    var bp = win(p, T.boxes[0], T.boxes[1]);
+    elEsc.style.setProperty("--esc-o", (win(p, 0.27, 0.34) * (1 - win(p, 0.90, 0.97))).toFixed(3));
+    elEsc.style.transform = "rotate(" + (bp * 45).toFixed(2) + "deg)";
+
+    /* THE BOXES. Each owns one tooth and surfaces through it, then RECEDES as
+       the ones behind it come up — it never leaves, it goes back into depth. */
+    var lit = 0;
+    for (i = 0; i < boxEls.length; i++) {
+      var start = T.boxes[0] + i * TOOTH;
+      var rise = win(p, start, start + TOOTH * 0.62);      /* it comes up */
+      var sink = win(p, start + TOOTH * 0.92, T.boxes[1]); /* and settles back */
+      if (rise > 0 && rise < 1) lit = i;
+
+      var e = eo(rise);
+      var z = -170 + 170 * e - 118 * sink;                 /* depth, in px */
+      var y = 132 - 132 * e - 46 * sink;                   /* it comes UP */
+      var s = (0.9 + 0.1 * e) * (1 - 0.1 * sink);
+      var o = e * (1 - 0.62 * sink);
+
+      var b = boxEls[i];
+      b.el.style.transform = "translate3d(0," + y.toFixed(1) + "px,0) scale(" + s.toFixed(4) + ")";
+      b.el.style.opacity = o.toFixed(3);
+      b.el.style.filter = rise < 1 ? "blur(" + ((1 - e) * 7).toFixed(2) + "px)" : "none";
+      b.el.style.zIndex = 10 + i;
+      /* the rule inside the box draws on the SAME beat the box surfaces —
+         one gear, two hands, which is the whole clockwork idea */
+      b.rule.style.transform = "scaleX(" + e.toFixed(3) + ")";
+    }
+
+    /* the escapement's lit tooth follows the box being delivered */
+    for (i = 0; i < elTeeth.children.length; i++) {
+      elTeeth.children[i].classList.toggle("tick-lit", bp > 0 && bp < 1 && Math.floor(bp * 48) === i);
+    }
+
+    elCrown.style.setProperty("--cr-o", win(p, T.crown[0], T.crown[1]).toFixed(3));
+    elCrown.style.transform = "translateY(-50%) scale(" + (0.97 + 0.03 * eo(win(p, T.crown[0], T.crown[1]))).toFixed(4) + ")";
+    elLead.style.setProperty("--lead-o", win(p, T.lead[0], T.lead[1]).toFixed(3));
+
+    elBench.innerHTML =
+      "<i>p</i> <b>" + p.toFixed(3) + "</b><hr>" +
+      "<i>phase</i> <b>" + (p < T.intakeOut[0] ? "intake" : p < T.boxes[1] ? "box " + (lit + 1) + "/6" : p < T.crown[1] ? "crown" : "close") + "</b>" +
+      "<hr><i>tooth</i> <b>" + (bp > 0 && bp < 1 ? Math.floor(bp * 48) : "—") + "</b>";
+  }
+
+  /* ── p FROM SCROLL. Measured once at load and on resize, never in the handler. ── */
+  var M = { top: 0, span: 1 };
+  function measure() {
+    var r = elClock.getBoundingClientRect();
+    M.top = r.top + window.scrollY;
+    M.span = Math.max(1, elClock.offsetHeight - window.innerHeight);
+    onScroll();
+  }
+  var ticking = false;
+  function onScroll() {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(function () {
+      ticking = false;
+      draw(clamp01((window.scrollY - M.top) / M.span));
+    });
+  }
+  window.addEventListener("scroll", onScroll, { passive: true });
+  window.addEventListener("resize", function () { requestAnimationFrame(measure); });
+  measure();
+
+  /* ?p= — jump straight to any frame, so a state can be inspected without
+     scrolling to it. The repo's known blind spot: feel is not judgeable in a
+     preview pane, so every frame has to be reachable by URL in a real browser. */
+  var qp = new URLSearchParams(location.search).get("p");
+  if (qp != null) window.scrollTo(0, M.top + clamp01(+qp) * M.span);
+})();
+</script>
+</html>

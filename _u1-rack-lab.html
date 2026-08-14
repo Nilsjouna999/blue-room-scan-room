@@ -1,0 +1,515 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>U1 — THE RACK · scroll lab</title>
+<!--
+  ═══════════════════════════════════════════════════════════════════════════
+  U1 — THE RACK.  Built from the synthesis over `_u1-clockwork-lab.html`
+  (14 agents: 4 lenses, 3 designs, 3 adversarial passes, 1 synthesis).
+
+  THE BUILDER'S WORDS ARE THE SPEC:
+    "as you scroll down info gets filled and you keep scrolling and it
+     transforms into readings and results in boxes 2 after another keeps
+     popping from the background. it's not a separate object, is background
+     that works like clockwork as you scroll"
+    "like one of those fancy new type web design when you scroll wild things
+     happen, only we have a vision and plan and we like it optimized"
+
+  ★★ WHAT THE CLOCKWORK LAB GOT WRONG, AND THIS FIXES.
+    1. All six boxes ended on the IDENTICAL pixel — `.boxes{place-items:center}`
+       with every `.bx` absolute meant the assembled reading never existed.
+       Here the six seats are a CONSEQUENCE of the rack (y = THRESH - v*PITCH),
+       not a seat table.
+    2. The crown painted UNDER the stack: `.vp` is one sticky stacking context
+       and zIndex was written per-frame. Here occlusion is STRUCTURAL — the
+       crown is revealed by a static overflow:hidden clip whose bottom edge IS
+       the stack's top edge. No z-index arithmetic anywhere.
+    3. The depth premise was dead code: `z` was computed and thrown away and
+       there was no perspective on the page — so "popping from the background"
+       was the one thing it did not do. Here a plate arrives at the line
+       0.699× wide and WIDENS to full as it rises. A thing that gets bigger as
+       it emerges came from behind; a thing that keeps its width slid up a slot.
+    4. It animated `filter: blur()` on six boxes per frame. Blur re-rasters the
+       layer every frame — the opposite of composited. There is no filter here.
+
+  ★★ THE ONE IDEA: THE BACKGROUND IS DOING ARITHMETIC IN FRONT OF YOU.
+  The same 1px hairline runs at two visibly different speeds either side of one
+  visible edge — 0.74x scroll below the white line, 0.23x above it, 3.23:1, in
+  the same frame. Nobody has to be told the surface is a mechanism. That is
+  four transform writes, and it is the whole thesis.
+
+  ★★ AND THERE IS NO CARD ON THIS PAGE. No border, no radius, no shadow on a
+  plate. The reading is TYPESET INTO THE PAGE'S OWN RULING — each plate's top
+  edge lands on a half-notch of the paper field it is filed into. That deletion
+  retires "objects on a backdrop" more completely than any transform could.
+
+  ★ BUDGET: 12 property writes per frame, ceiling. Every animated property is
+  `transform`, with exactly ONE opacity in the page (the threshold hairline,
+  guarded to the crown window). Zero layout reads outside measure(). No filter,
+  no animated clip-path, no innerHTML, no classList loop, no z-index writes.
+
+  ★ REVERSIBLE BY ARITHMETIC. Every value is a closed-form function of p with
+  no state between frames, so scrolling back runs the mechanism backwards
+  exactly and a cold ?p=0.437 is byte-identical to having scrolled there.
+
+  FIXTURE: John Bon, 26 July 1965 — derived against the real engine
+  (arcana-reading.js hash/pick/sunSign/chineseAnimal/lifePathNum), not written.
+  ═══════════════════════════════════════════════════════════════════════════
+-->
+<style>
+  :root {
+    --paper:  #12100d;      /* warm plate above the line */
+    --blue:   #0e1622;      /* the blue under — BR-S448's corrected stops */
+    --blue-2: #070a10;
+    --ink:    #d6cec1;
+    --mk:     #b9c3cf;
+    --rule:   #2b3038;
+    --gold:   #d8cfa8;
+    --dim:    #8f877a;
+    --serif:  "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+    --mono:   ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--serif); }
+
+  /* 420svh with a vh fallback FIRST — mobile URL bars resize vh mid-scroll, which
+     would re-derive p under the reader's thumb. svh is the locked one. */
+  .clock { height: 420vh; height: 420svh; position: relative; }
+  .vp { position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden; }
+
+  /* ── THE GROUND. Warm plate above the line, blue under below it. The stop is
+       HARD at 62% — this is a threshold, not a gradient blend. ─────────────── */
+  .ground { position: absolute; inset: 0;
+    background: linear-gradient(180deg, #14110e 0%, #100d0b 61.999%, var(--blue) 62%, var(--blue-2) 100%); }
+
+  /* Each ruled field lives in a static overflow:hidden clip and translates INSIDE
+     it. The clips are compositor-side and never written to. */
+  .clip { position: absolute; left: 0; right: 0; overflow: hidden; }
+  .clip--paper { top: 0; height: 62%; }
+  .clip--deep  { top: 62%; bottom: 0; }
+  .field { position: absolute; left: 0; right: 0; top: -120px; height: calc(100% + 260px); }
+
+  /* PAPER — period == SHELF, so a plate lands exactly one ruling apart. */
+  .paperfield { background: repeating-linear-gradient(180deg,
+      rgba(43,48,56,.30) 0 1px, transparent 1px var(--Pp)); }
+  /* DEEP A — full bleed, cooler and brighter: the water reads as the faster gear. */
+  .deepA { background: repeating-linear-gradient(180deg,
+      rgba(150,175,205,.30) 0 1px, transparent 1px var(--Pa)); }
+  /* DEEP B — MARGIN TICKS ONLY. A second full-bleed field at a near period would
+     moire against deep-A; confining it to the margins gives a second rate with
+     nothing to beat against. Pa/Pb = 1.552, deliberately non-harmonic. */
+  .deepB { background:
+      repeating-linear-gradient(180deg, rgba(150,175,205,.20) 0 1px, transparent 1px var(--Pb));
+    left: 0; right: 0;
+    -webkit-mask-image: linear-gradient(90deg, #000 0 6%, transparent 6% 94%, #000 94% 100%);
+            mask-image: linear-gradient(90deg, #000 0 6%, transparent 6% 94%, #000 94% 100%); }
+
+  /* THE THRESHOLD. The one white line. Everything is measured against it. */
+  .thresh { position: absolute; left: 0; right: 0; top: 62%; height: 1px;
+    background: rgba(226,232,240,.92); opacity: .42; }
+
+  /* THE OCCLUDER. Opaque blue over everything below the line, so a plate waiting
+     under the water is genuinely not there. Static — zero writes. */
+  .under { position: absolute; left: 0; right: 0; top: calc(62% + 1px); bottom: 0;
+    background: linear-gradient(180deg, var(--blue), var(--blue-2)); z-index: 6; }
+
+  /* THE PINION. It never stops — one long tooth per mark past a STATIONARY gold
+     pointer. The pointer is a SIBLING, not a child, so the count is read against
+     a fixed reference rather than against a rotating one. */
+  /* ★ SIZED FROM H, NOT HARDCODED. The first build fixed this at 612px, which on a
+     416px viewport drew a wheel bigger than the room — it read as a dome across the
+     page rather than as a gear turning below the waterline. R = 0.34H, set once in
+     measure(). */
+  .pinion { position: absolute; left: 50%; top: 102%; width: var(--R2, 612px); height: var(--R2, 612px);
+    margin: calc(var(--R2, 612px) / -2) 0 0 calc(var(--R2, 612px) / -2); z-index: 7; }
+  .pinion svg { width: 100%; height: 100%; }
+  .pinion circle { fill: none; stroke: rgba(150,175,205,.16); }
+  .pinion line { stroke: rgba(150,175,205,.26); }
+  .pointer { position: absolute; left: 50%; top: calc(102% - 306px); width: 2px; height: 22px;
+    margin-left: -1px; background: var(--gold); z-index: 8; opacity: .85; }
+
+  /* THE BOW. The surface straining as a plate breaks the line. One pre-drawn
+     path, origin at its bottom, one scaleY write. */
+  .bow { position: absolute; left: 0; right: 0; top: calc(62% - 26px); height: 26px;
+    z-index: 5; transform-origin: 50% 100%; }
+  .bow svg { width: 100%; height: 100%; display: block; }
+
+  /* ── THE INTAKE. It leaves BY GEAR, not by fade: it rides the same SHELF rate
+       as the plates, so its last pixel exits the frame exactly as the sixth mark
+       seats. One transform write, ZERO opacity writes. The question is pushed
+       out by the answers. ─────────────────────────────────────────────────── */
+  .intake { position: absolute; left: 0; right: 0; top: 0; height: 55.8%;
+    display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
+    padding-bottom: 6.2%; text-align: center; z-index: 3; }
+  .intake .lbl { font: 9px/1 var(--mono); letter-spacing: .34em; color: var(--dim);
+    text-transform: uppercase; }
+  .intake .val { font-size: clamp(30px, 6vw, 58px); margin: 14px 0 0; color: var(--ink); }
+  .intake .date { font-size: clamp(14px, 2.2vw, 20px); color: #a89f90; margin-top: 14px; letter-spacing: .04em; }
+  .caret { display: inline-block; width: 1px; height: .8em; background: var(--gold);
+    vertical-align: -.05em; margin-left: 3px; }
+
+  /* ── THE STACK. Six plates. NO BORDER, NO RADIUS, NO SHADOW — a plate is a
+       patch of the page with a ruled top edge, not an object lying on it. It is
+       opaque because it must occlude its predecessor's second row during the
+       close: covered, not faded, so the close needs zero opacity writes. ──── */
+  .stack { position: absolute; inset: 0; z-index: 4; }
+  .bx { position: absolute; left: 50%; width: min(52vw, 520px); margin-left: min(-26vw, -260px);
+    top: 0; height: 11.5%;
+    background: var(--paper);
+    border-top: 1px solid rgba(43,48,56,.9);
+    transform-origin: 50% 0;                 /* ★ top edge is the anchor: it lands EXACT */
+    padding: 8px 0 0;
+  }
+  .bx__strip { display: flex; align-items: baseline; gap: 12px; }
+  /* ★ THE TYPE SCALES WITH H, LIKE EVERY OTHER CONSTANT. The first build set these
+     in fixed px against a plate measured as a fraction of H, so at H=416 the closed
+     pitch is 19px and a 22px name was sliced in half by its successor — the payoff
+     frame arrived with all six mark names cut through the middle. Both are now
+     H-derived (22px and 10px at the design's H=900) and set once in measure(). */
+  .bx__slot { font: var(--labelSize, 10px)/1 var(--mono); letter-spacing: .22em; text-transform: uppercase; color: var(--dim); }
+  .bx__name { font-family: var(--serif); font-size: var(--nameSize, 22px); color: var(--mk); flex: 1 1 auto; }
+  /* ★ THE PROVENANCE TAG IS LEGIBLE, AND THAT IS THE POINT. The clockwork lab
+     rendered this at 8.5px #565046 on #1c1a17 — 2.21:1, which means the honesty
+     disclosure was not actually present on the page. 10px at 4.6:1, and the
+     close occludes row 2 rather than this row, so it survives into the payoff. */
+  .bx__from { font: 10px/1 var(--mono); letter-spacing: .12em; color: #8a8275; text-transform: uppercase; }
+  .bx__rule { height: 1px; background: rgba(43,48,56,.9); margin: 12px 0 8px; transform-origin: left; }
+  .bx__kw { font: 11px/1.5 var(--mono); letter-spacing: .1em; color: #8b93a0; }
+
+  /* ── THE CROWN. Revealed by a STATIC clip whose bottom edge is the closed
+       stack's top edge — so it emerges top-of-letters first, out of an edge made
+       of the six. The same verb every mark used at the line, performed once more
+       at the end. Structural occlusion: no z-index, no mask animation. ────── */
+  .crownwrap { position: absolute; left: 0; right: 0; top: 14.1%; height: 20%;
+    overflow: hidden; z-index: 3; display: flex; align-items: flex-end; justify-content: center; }
+  .crown { text-align: center; padding-bottom: 10px; }
+  .crown .k { font: 9px/1 var(--mono); letter-spacing: .34em; color: var(--dim); text-transform: uppercase; }
+  .crown .n { font-size: clamp(26px, 5vw, 50px); color: var(--gold); margin: 14px 0 0; }
+  .crown .b { font-size: clamp(13px, 1.8vw, 17px); color: #9d9484; margin-top: 10px; font-style: italic; }
+
+  /* the one permanent line in the empty blue — the honesty claim, stated once,
+     never animated, present in every screenshot of the payoff */
+  .provline { position: absolute; left: 0; right: 0; top: 70%; text-align: center;
+    font: 11px/1 var(--mono); letter-spacing: .18em; color: #5d6b7e; z-index: 7; }
+
+  /* the bench */
+  .bench { position: fixed; right: 10px; top: 10px; z-index: 40;
+    background: rgba(8,10,13,.92); border: 1px solid #223; border-radius: 3px;
+    padding: 9px 11px; font: 10px/1.6 var(--mono); color: #8f98a6; min-width: 190px; }
+  .bench b { color: #dfe6ef; float: right; font-variant-numeric: tabular-nums; }
+  .bench i { font-style: normal; color: #6d7684; letter-spacing: .1em; text-transform: uppercase; font-size: 9px; }
+  .bench hr { border: 0; border-top: 1px solid #223; margin: 5px 0; }
+</style>
+
+<div class="clock" id="clock">
+  <div class="vp" id="vp">
+    <div class="ground"></div>
+
+    <div class="clip clip--paper"><div class="field paperfield" id="paperfield"></div></div>
+    <div class="clip clip--deep"><div class="field deepA" id="deepA"></div></div>
+    <div class="clip clip--deep"><div class="field deepB" id="deepB"></div></div>
+
+    <div class="bow" id="bow">
+      <svg viewBox="0 0 1000 26" preserveAspectRatio="none" aria-hidden="true">
+        <path d="M0 26 Q 500 0 1000 26" fill="none" stroke="rgba(226,232,240,.30)" stroke-width="1"/>
+      </svg>
+    </div>
+    <div class="thresh" id="thresh"></div>
+
+    <div class="intake" id="intake">
+      <div class="lbl">The reading is taken from</div>
+      <p class="val"><span id="nm"></span><span class="caret" id="caret"></span></p>
+      <p class="date" id="dt"></p>
+    </div>
+
+    <div class="crownwrap">
+      <div class="crown" id="crown">
+        <div class="k">And the name it makes</div>
+        <p class="n">The Twice-Kindled Wayfarer</p>
+        <p class="b">bound in open water</p>
+      </div>
+    </div>
+
+    <div class="stack" id="stack"></div>
+
+    <div class="under"></div>
+    <div class="provline">three read from the date · three drawn from the name and date</div>
+
+    <div class="pinion" id="pinion">
+      <svg viewBox="0 0 612 612" aria-hidden="true">
+        <circle cx="306" cy="306" r="300"></circle>
+        <circle cx="306" cy="306" r="286"></circle>
+        <g id="teeth"></g>
+      </svg>
+    </div>
+    <div class="pointer"></div>
+  </div>
+</div>
+
+<div class="bench" id="bench"></div>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ── THE FIXTURE. birth~John Bon~1965~7~26, derived against the shipped engine.
+       The card renders VALUES, not slot labels. Provenance is stated per mark and
+       it is TRUE per arcana-reading.js: sun from the date, animal from the year,
+       life path from the digit sum; rune/trigram/hexagram are pick(list, seed+f/g/h)
+       — a hash of name+date. "Looked up, not invented" is FALSE for three of six
+       and must never appear here. ─────────────────────────────────────────────── */
+  var SIX = [
+    { slot: "Sun sign",    name: "Leo",          from: "from the date",         kw: "confident · generous · dramatic · proud · creative" },
+    { slot: "Year animal", name: "Snake",        from: "from the year",         kw: "wise · intuitive · private · watchful · restraint" },
+    { slot: "Life path",   name: "9",            from: "from the digits",       kw: "compassion · completion · idealism · letting go" },
+    { slot: "Rune",        name: "Raidho",       from: "drawn · name + date",   kw: "journey · movement · rhythm · right action" },
+    { slot: "Trigram",     name: "☱ Duì · Lake", from: "drawn · name + date",   kw: "joy · openness · exchange · youngest daughter" },
+    { slot: "Hexagram",    name: "7 · The Army", from: "drawn · name + date",   kw: "discipline · organisation · the led and the leading" }
+  ];
+  var NAME = "John Bon", BORN = "born 26 July 1965";
+
+  /* ── CONSTANTS, as fractions of the LOCKED viewport height. Captured once in
+       measure(); never read in the handler. ──────────────────────────────────── */
+  var F = {
+    THRESH: 0.620,   // the white line
+    SHELF:  0.093,   // open pitch — one notch above the line, == the paper period
+    CLOSE:  0.0465,  // closed pitch = SHELF/2, so the closed stack stays in register
+    DEEP:   0.300,   // one notch below the line
+    ZFAR:   0.550,   // depth at which a plate waits under the water
+    PERSP:  1.278,   // -> projected scale 0.699 at ZFAR
+    Pp:     0.093,   // paper period  (== SHELF)
+    Pa:     0.104,   // deep-A period
+    Pb:     0.067,   // deep-B period   Pa/Pb = 1.552, non-harmonic by construction
+    RATE_A: 0.300,   // deep-A travel per mark  -> 0.74x scroll
+    RATE_B: 0.132    // deep-B travel per mark
+  };
+  var EMERGE = 1.237;   // = BXH / SHELF — notches from the line to fully clear
+
+  function clamp01(v) { return v < 0 ? 0 : v > 1 ? 1 : v; }
+  function win(p, a, b) { return clamp01((p - a) / (b - a)); }
+  function eo(t) { return 1 - Math.pow(1 - t, 3); }
+  /* a repeating gradient is identical under translation by whole periods, so the
+     translate is taken modulo its own period: the numbers stay under 100px instead
+     of running to -1900, and the clip needs no headroom. Visually exact. */
+  function wrap(v, p) { return ((v % p) + p) % p; }
+
+  var el = {
+    paper: document.getElementById("paperfield"), deepA: document.getElementById("deepA"),
+    deepB: document.getElementById("deepB"), bow: document.getElementById("bow"),
+    thresh: document.getElementById("thresh"), pinion: document.getElementById("pinion"),
+    intake: document.getElementById("intake"), stack: document.getElementById("stack"),
+    crown: document.getElementById("crown"), nm: document.getElementById("nm"),
+    dt: document.getElementById("dt"), caret: document.getElementById("caret"),
+    bench: document.getElementById("bench"), clock: document.getElementById("clock")
+  };
+
+  /* ── BUILD ONCE. Nothing below is created or mutated during scroll. ───────── */
+  (function buildTeeth() {
+    var g = document.getElementById("teeth"), i, a, l;
+    for (i = 0; i < 24; i++) {                       // 24 teeth = 15deg pitch; 60deg = one long tooth per mark
+      a = (i / 24) * Math.PI * 2 - Math.PI / 2;
+      l = document.createElementNS("http://www.w3.org/2000/svg", "line");
+      l.setAttribute("x1", (306 + Math.cos(a) * 300).toFixed(1));
+      l.setAttribute("y1", (306 + Math.sin(a) * 300).toFixed(1));
+      l.setAttribute("x2", (306 + Math.cos(a) * (i % 4 === 0 ? 272 : 284)).toFixed(1));
+      l.setAttribute("y2", (306 + Math.sin(a) * (i % 4 === 0 ? 272 : 284)).toFixed(1));
+      g.appendChild(l);
+    }
+  })();
+
+  var plates = SIX.map(function (m) {
+    var d = document.createElement("div");
+    d.className = "bx";
+    d.innerHTML =
+      '<div class="bx__strip"><span class="bx__slot">' + m.slot + '</span>' +
+      '<span class="bx__name">' + m.name + '</span>' +
+      '<span class="bx__from">' + m.from + '</span></div>' +
+      '<div class="bx__rule"></div><div class="bx__kw">' + m.kw + '</div>';
+    el.stack.appendChild(d);
+    return { el: d, rule: d.querySelector(".bx__rule") };
+  });
+
+  /* ── THE WRITE MEMO. Every write compares against its cached last value. This
+       does NOT break determinism: the memo decides WHETHER a write is issued,
+       never WHAT value is computed, and it initialises empty — so a cold
+       ?p=0.93 renders the identical frame. Say so, or a later pass deletes this
+       on principle. ────────────────────────────────────────────────────────── */
+  var memo = new WeakMap();
+  var WRITES = 0;
+  function setT(node, v) {
+    var m = memo.get(node);
+    if (m && m.t === v) return;
+    node.style.transform = v;
+    if (m) m.t = v; else memo.set(node, { t: v, o: null });
+    WRITES++;
+  }
+  function setO(node, v) {
+    var m = memo.get(node);
+    if (m && m.o === v) return;
+    node.style.opacity = v;
+    if (m) m.o = v; else memo.set(node, { t: null, o: v });
+    WRITES++;
+  }
+  /* integer device pixels — no toFixed, no sub-pixel raster on a text plate */
+  var DPR = window.devicePixelRatio || 1;
+  function px(v) { return ((v * DPR) | 0) / DPR; }
+  function ty(v) { return "translate3d(0," + px(v) + "px,0)"; }
+
+  /* ── will-change ARMED AND CLEARED BY ARITHMETIC, never by an animationend
+       handler — that is the exact leak the house law names (a hint left set for a
+       whole session on an animation that never ran). Each has a lead-in so the
+       raster exists before motion, and each flips only on its edge. ─────────── */
+  var armed = { ground: null, stack: null, crown: null };
+  function arm(key, want, nodes, hint) {
+    if (armed[key] === want) return;
+    armed[key] = want;
+    for (var i = 0; i < nodes.length; i++) nodes[i].style.willChange = want ? hint : "";
+  }
+
+  var M = { H: 900, top: 0, span: 1 };
+  var C = {};
+  function measure() {
+    var r = el.clock.getBoundingClientRect();
+    M.top = r.top + window.scrollY;
+    M.H = el.vp ? el.vp.clientHeight : window.innerHeight;
+    M.H = document.getElementById("vp").clientHeight;
+    M.span = Math.max(1, el.clock.offsetHeight - M.H);
+    for (var k in F) C[k] = F[k] * M.H;
+    /* the ruled periods are written as custom properties ONCE, here — the fields
+       are static paint after this and only ever receive a transform. */
+    el.paper.style.setProperty("--Pp", C.Pp + "px");
+    el.deepA.style.setProperty("--Pa", C.Pa + "px");
+    el.deepB.style.setProperty("--Pb", C.Pb + "px");
+    el.pinion.style.setProperty("--R2", (2 * 0.340 * M.H) + "px");   // R = 0.34H, both diameters
+    document.querySelector(".pointer").style.top = (1.02 * M.H - 0.340 * M.H) + "px";
+    DPR = window.devicePixelRatio || 1;
+    memo = new WeakMap();                 // geometry changed: every cached write is stale
+    draw(curP);
+  }
+
+  var curP = 0;
+  var REDUCED = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  function draw(p) {
+    curP = p; WRITES = 0;
+
+    /* THE TWO SCALARS. A is the tooth count, monotone 0 -> 7; the seventh tooth is
+       the crown, which is why THE PINION NEVER STOPS — the clockwork lab froze its
+       whole gear train for the final 400px, during the payoff. */
+    var Arack = win(p, 0.100, 0.860) * 6;
+    var A  = Arack + win(p, 0.860, 0.985);
+    var AG = win(p, 0.000, 0.100) * 0.6 + A;      // the water moves from p=0
+
+    /* THE GROUND. Three planes, three rates, all locked to the same scalar.
+       Above the line 0.23x scroll; below it 0.74x. Same 1px hairline either side
+       of one visible edge — the comparison is available in a single frame, and
+       that is the entire "it is a mechanism" claim. */
+    var rate = REDUCED ? 0 : 1;
+    setT(el.paper, ty(-wrap(Arack * C.Pp, C.Pp)));
+    setT(el.deepA, ty(-wrap(AG * C.RATE_A * rate, C.Pa)));
+    setT(el.deepB, ty(-wrap(AG * C.RATE_B * rate, C.Pb)));
+
+    /* THE PINION. One long tooth (60deg) per mark, past a stationary pointer. */
+    setT(el.pinion, REDUCED ? "rotate(0deg)" : "rotate(" + (A * 60).toFixed(2) + "deg)");
+
+    /* THE BOW — the surface straining as a plate breaks the line. Peaks on the
+       fractional part of the tooth, so it is a consequence of the gear, not a
+       second timeline. */
+    var frac = A - Math.floor(A);
+    /* 0.9 was a dome. The strain is a HAIRLINE bending a few px — it has to read as
+       the surface taking weight, not as an arch drawn across the room. */
+    var bow = (A > 0 && A < 6.02 && !REDUCED) ? Math.sin(frac * Math.PI) : 0;
+    setT(el.bow, "scaleY(" + (0.12 + bow * 0.28).toFixed(3) + ")");
+
+    /* THE INTAKE leaves BY GEAR: same SHELF rate as the plates, so its last pixel
+       exits exactly as the sixth mark seats. Clearance to plate 0 is constant at
+       every A, so they can never collide. Zero opacity writes. */
+    var tn = win(p, 0.000, 0.058), td = win(p, 0.058, 0.100);
+    var n1 = NAME.slice(0, Math.round(tn * NAME.length));
+    var n2 = BORN.slice(0, Math.round(td * BORN.length));
+    if (el.nm.textContent !== n1) el.nm.textContent = n1;      // char-guarded
+    if (el.dt.textContent !== n2) el.dt.textContent = n2;
+    setO(el.caret, (p > 0.004 && p < 0.104) ? "0.9" : "0");
+    setT(el.intake, ty(-Arack * C.SHELF));
+
+    /* THE PLATES. PITCH is the only thing the close changes: the six gather from
+       one notch to a half notch, still in register with the ruling, and the paper
+       field LOCKS while the water runs on — the ratio goes 3.23:1 to infinity and
+       that is the readable event: the reading is fixed, the source keeps moving. */
+    var PITCH = C.SHELF - (C.SHELF - C.CLOSE) * eo(win(p, 0.860, 0.960));
+    var live = 0;
+    for (var i = 0; i < 6; i++) {
+      var v = Arack - i;
+      /* below the line a plate waits at DEEP pitch; above it, at PITCH */
+      var yTop = C.THRESH - (v <= 0 ? v * C.DEEP : v * PITCH);
+      /* DEPTH: it arrives 0.699x wide at the line and WIDENS to full over 1.237
+         notches. transform-origin is the plate's TOP EDGE, so the top edge lands
+         exactly on its ruling at every scale and no pre-compensation is needed. */
+      var zt = REDUCED ? 1 : eo(clamp01(v / EMERGE));
+      var s  = C.PERSP / (C.PERSP + C.ZFAR * (1 - zt));
+      if (v > -0.2 && v < 7) live++;
+      setT(plates[i].el, ty(yTop) + " scale(" + s.toFixed(4) + ")");
+      /* the inner rule draws on the same beat the plate rises — one gear, two
+         hands. Guarded to the plate actually in its window. */
+      if (v > 0.2 && v < 1.1) setT(plates[i].rule, "scaleX(" + eo(win(v, 0.35, 0.90)).toFixed(3) + ")");
+      else if (v >= 1.1) setT(plates[i].rule, "scaleX(1)");
+    }
+
+    /* THE CROWN climbs out of the stack's own top edge through a STATIC clip.
+       ★ THE TRANSLATE IS A PERCENTAGE OF THE CROWN'S OWN HEIGHT, not a fraction of
+       H. Measured at H=416 the first build leaked: an H-derived offset is a fixed
+       number of pixels, and the crown block is taller than that on a short
+       viewport, so its title sat in open space through the whole rack — gold text
+       behind the plates from p=0.10. translateY(100%) is self-relative by
+       definition, so at c=0 the crown is exactly its own height below the clip's
+       bottom edge and is invisible at EVERY viewport. Still transform-only. */
+    var c = eo(win(p, 0.940, 0.985));
+    setT(el.crown, "translate3d(0," + ((1 - c) * 100).toFixed(2) + "%,0)");
+    setO(el.thresh, (0.42 + 0.43 * c).toFixed(3));
+
+    arm("ground", p > 0.001 && p < 0.995, [el.paper, el.deepA, el.deepB, el.pinion], "transform");
+    arm("stack", p > 0.080 && p < 0.995, plates.map(function (q) { return q.el; }).concat([el.intake]), "transform");
+    arm("crown", p > 0.920, [el.crown], "transform");
+
+    el.bench.innerHTML =
+      "<i>p</i> <b>" + p.toFixed(3) + "</b><hr>" +
+      "<i>tooth A</i> <b>" + A.toFixed(2) + " / 7</b>" +
+      "<hr><i>pitch</i> <b>" + (PITCH / M.H).toFixed(4) + "H</b>" +
+      "<hr><i>writes</i> <b>" + WRITES + "</b>" +
+      "<hr><i>phase</i> <b>" + (p < 0.100 ? "intake" : p < 0.860 ? "rack " + Math.min(6, (Arack | 0) + 1) + "/6"
+        : p < 0.940 ? "close" : p < 0.985 ? "crown" : "rest") + "</b>";
+  }
+
+  /* ── p FROM SCROLL. scrollY is read at FRAME TIME inside the rAF, never at
+       event time, so a coalesced burst still paints the position the reader is
+       actually at. Nothing else is read. ───────────────────────────────────── */
+  var ticking = false;
+  function onScroll() {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(function () {
+      ticking = false;
+      draw(clamp01((window.scrollY - M.top) / M.span));
+    });
+  }
+  window.addEventListener("scroll", onScroll, { passive: true });
+  var rz = false;
+  window.addEventListener("resize", function () {
+    if (rz) return; rz = true;
+    requestAnimationFrame(function () { rz = false; measure(); });
+  });
+  if (window.matchMedia) {
+    var mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    (mq.addEventListener ? mq.addEventListener.bind(mq, "change") : mq.addListener.bind(mq))(function (e) {
+      REDUCED = e.matches; memo = new WeakMap(); draw(curP);
+    });
+  }
+
+  measure();
+  var qp = new URLSearchParams(location.search).get("p");
+  if (qp != null) window.scrollTo(0, M.top + clamp01(+qp) * M.span);
+  else draw(0);
+})();
+</script>
+</html>

@@ -1,0 +1,427 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>ACT 3 — THE WET EDGE · slider lab</title>
+<!--
+  ═══════════════════════════════════════════════════════════════════════════
+  ACT 3 — THE WET EDGE, on a slider. docs/SCROLL_DEMO_SPEC_V1.md §3.
+
+  WHY A SLIDER AND NOT A SCROLL. SCROLL_DEMO_V1 §0: a slider is the same thing
+  a scroll position is — one number, 0 to 1 — so nothing here is thrown away
+  when it is wired to scroll. And it tests the only question that matters:
+  drag back and forth for ten minutes, is the turn still good?
+
+  BUILD ORDER (spec §7). 1. this harness · 2. p=.44 at the 400px FLOOR card ·
+  3. the front's art, then 3-vs-4 segments · 4. the rest of Act 3 · 5. reverse.
+  Item 2 is the gate: if the half-developed seam reads as a smear at a 229px
+  measure, the mechanism is wrong and no copy fixes it.
+
+  ★ NOTHING IS READ INSIDE THE LOOP. Every rect is measured once at load and
+  on resize, into MEAS. A single getBoundingClientRect in the p handler turns
+  this into layout thrash on every frame — spec §3.1's named failure.
+
+  ★ EVERY STATE IS ADDRESSABLE. ?p=0.437 cold-loaded is byte-identical to
+  dragging there, because everything is arithmetic on front_y which is
+  arithmetic on p. This is what sidesteps the repo's known blind spot: motion
+  feel cannot be judged in Claude's preview pane (rAF frozen), so the frames
+  have to be reachable by URL in a real browser.
+
+  FIXTURE: John Bon, 26 July 1965 — derived against the real engine
+  (arcana-reading.js hash/pick/sunSign/lifePathNum), not written.
+  ═══════════════════════════════════════════════════════════════════════════
+-->
+<style>
+  :root {
+    --paper: #0e0c0a;
+    --ink: #cfc7bb;
+    --dim: #6f675c;
+    --rule: #3a352e;
+    --mk: #b9c3cf;
+    --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+    --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  body {
+    background: #08090b; color: var(--ink);
+    font: 13px/1.4 var(--mono);
+    display: grid; grid-template-columns: 1fr 300px; height: 100vh;
+  }
+
+  /* ── the stage ─────────────────────────────────────────────────────── */
+  .stage { display: grid; place-items: center; position: relative; overflow: hidden; }
+  /* the room dims through Act 3 — one variable, driven by p */
+  .stage::before {
+    content: ""; position: absolute; inset: 0;
+    background: radial-gradient(120% 90% at 50% 40%, #171a20 0%, #0b0c0f 70%);
+    opacity: calc(1 - var(--dimming, 0) * .55);
+  }
+
+  /* ── THE CARD. Geometry from styles.css:3514 — the fluid card is the whole
+       constraint: height clamp(400,56vh,620), aspect 120/190, width auto, so
+       the text measure runs 229px at the floor to 368px at the ceiling. ── */
+  .card {
+    position: relative;
+    height: var(--card-h, 400px);
+    aspect-ratio: 120 / 190;
+    background: linear-gradient(178deg, #17161a 0%, #121116 55%, #0e0d11 100%);
+    border: 1px solid #2b2822;
+    border-radius: 3px;
+    padding: 14px 12px;                      /* styles.css:3688 */
+    display: flex; flex-direction: column;
+    box-shadow: 0 24px 60px -20px #000;
+    overflow: hidden;
+  }
+  /* the card's own light — .m2hero::before's two-lobe grammar (styles.css:3650).
+     Bright lobe at --ly, dark lobe 3% below it: a leading lip with a shadow
+     under it, which is exactly the art a developer front needs. */
+  .card::before {
+    content: ""; position: absolute; inset: 0; pointer-events: none;
+    background:
+      radial-gradient(60% 22% at var(--lx,50%) calc(var(--ly,50%) + 3%), rgba(0,0,0,.55), transparent 70%),
+      radial-gradient(55% 18% at var(--lx,50%) var(--ly,50%), rgba(214,226,240,.20), transparent 70%);
+    mix-blend-mode: soft-light;
+    opacity: var(--lit, 0);
+    z-index: 3;
+  }
+
+  .masthead { font: 8px/1 var(--mono); letter-spacing: .22em; color: var(--dim); text-align: center; }
+  .glyph { text-align: center; color: var(--dim); font-size: 11px; margin-top: 6px; }
+  .headrule { height: 1px; background: var(--rule); margin: 9px 0 0; transform: scaleX(1); transform-origin: left; }
+
+  /* the name ledge — EMPTY through the entire turn, by spec §3.7. crownOf()
+     reads only sun/chinese/rune/trigram, so six-into-one here would be a false
+     claim made by motion. An empty ledge above six risen marks is the correct
+     p=.50 frame. */
+  .name { height: 22px; margin-top: 10px; text-align: center;
+          font: 12px/22px var(--serif); color: #d8cfa8; letter-spacing: .04em; }
+
+  /* ── THE BOX. One patch of card stock, two latent images: the marks grid and
+       the letter absolutely on top of it, occupying the same rect. ── */
+  .box { position: relative; margin-top: 8px; }
+  .marks {
+    display: grid; gap: 12px;                /* styles.css:3781-3785 */
+    font: 10px/1.4 var(--mono);              /* line box 14px → pitch 26px */
+    letter-spacing: .15em; text-transform: uppercase;
+    text-align: center; color: var(--mk);
+  }
+  .marks span { will-change: auto; }
+  .prose {
+    position: absolute; inset: 0;
+    font-family: var(--serif); font-size: 15px; line-height: 26px;
+    text-align: center; color: #e6ded0;
+  }
+  .prose > div { height: 26px; }             /* six explicit blocks — flowed text re-wraps at the ceiling */
+  .prose i { font-style: normal; display: inline-block; }
+
+  /* ── THE FRONT. Drawn ONCE as a static soft band, never repainted; only
+       translateY. Bright leading lip over a darker trailing wash. ── */
+  .front {
+    position: absolute; left: -14px; right: -14px; top: 0; height: 28px;
+    pointer-events: none; z-index: 2;
+    background:
+      linear-gradient(to bottom,
+        rgba(255,252,246,.00)  0%,
+        rgba(255,252,246,.13)  22%,
+        rgba(255,252,246,.22)  38%,
+        rgba(120,110,96,.16)   62%,
+        rgba(40,36,30,.10)     86%,
+        rgba(0,0,0,0)         100%);
+    filter: blur(1px);
+  }
+
+  .wall { margin-top: auto; border-top: 1px solid var(--rule); padding-top: 7px;
+          font: 7.5px/1 var(--mono); letter-spacing: .18em; color: var(--dim); text-align: center; }
+
+  /* ── the bench ─────────────────────────────────────────────────────── */
+  .bench { background: #0b0c0e; border-left: 1px solid #1b1d22; padding: 14px; overflow-y: auto; }
+  .bench h1 { font: 10px/1 var(--mono); letter-spacing: .18em; color: #8c96a4; margin: 0 0 12px; }
+  .bench label { display: block; font-size: 10px; color: var(--dim); letter-spacing: .1em; margin: 12px 0 3px; text-transform: uppercase; }
+  .bench input[type=range] { width: 100%; }
+  .pval { font: 22px/1 var(--mono); color: #dfe6ef; }
+  .beat { font-size: 10px; letter-spacing: .12em; color: #93a2b5; margin-top: 2px; text-transform: uppercase; }
+  .jump { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
+  .jump button, .tog button {
+    background: #14161a; color: #9fa9b6; border: 1px solid #262a31;
+    border-radius: 2px; font: 10px var(--mono); padding: 4px 6px; cursor: pointer;
+  }
+  .jump button:hover, .tog button:hover { color: #e6edf6; border-color: #3b424c; }
+  .tog { display: flex; gap: 4px; }
+  .tog button[aria-pressed="true"] { background: #23303f; color: #dfeaf7; border-color: #3f5568; }
+  table.read { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 10px; }
+  table.read td { padding: 2px 0; color: #8f98a6; }
+  table.read td:last-child { text-align: right; color: #cfd8e4; font-variant-numeric: tabular-nums; }
+  .note { font-size: 10px; line-height: 1.5; color: #6d7684; margin-top: 14px; border-top: 1px solid #1b1d22; padding-top: 10px; }
+</style>
+
+<div class="stage" id="stage">
+  <div class="card" id="card">
+    <div class="masthead">THE BIRTH READING</div>
+    <div class="glyph">◇</div>
+    <div class="headrule" id="headrule"></div>
+    <div class="name" id="name"></div>
+    <div class="box" id="box">
+      <div class="marks" id="marks"></div>
+      <div class="prose" id="prose"></div>
+      <div class="front" id="front"></div>
+    </div>
+    <div class="wall">BY BIRTH ALONE</div>
+  </div>
+</div>
+
+<div class="bench">
+  <h1>ACT 3 · THE WET EDGE</h1>
+  <div class="pval" id="pv">0.440</div>
+  <div class="beat" id="beat">—</div>
+  <label>p — drag it, both ways</label>
+  <input type="range" id="slider" min="0.36" max="0.52" step="0.001" value="0.44">
+  <div class="jump">
+    <button data-p=".380">.380 plate</button>
+    <button data-p=".400">.400 lowered</button>
+    <button data-p=".440">.440 ★ seam</button>
+    <button data-p=".478">.478 swept</button>
+    <button data-p=".490">.490 lifted</button>
+    <button data-p=".500">.500 rest</button>
+  </div>
+
+  <label>card height — the floor is the constraint</label>
+  <div class="tog" id="togH">
+    <button data-h="400" aria-pressed="true">400 floor</button>
+    <button data-h="510" aria-pressed="false">510 mid</button>
+    <button data-h="620" aria-pressed="false">620 ceiling</button>
+  </div>
+
+  <label>segments per prose line — lean or steps?</label>
+  <div class="tog" id="togS">
+    <button data-s="3" aria-pressed="true">3</button>
+    <button data-s="4" aria-pressed="false">4</button>
+    <button data-s="6" aria-pressed="false">6</button>
+  </div>
+
+  <label>θ tilt — <span id="thv">2.5</span>°</label>
+  <input type="range" id="theta" min="0" max="6" step="0.1" value="2.5">
+
+  <table class="read" id="readout"></table>
+
+  <div class="note">
+    Fixture <b>John Bon · 26 July 1965</b>, derived against the real engine.<br>
+    Row 3 (<b>RAIDHO</b>) is the slowest at w=1.000 — not because it is the cost
+    mark, but because its letter line is the longest. The ink rule is
+    fixture-independent, which is why WET EDGE survives swapping the person.<br><br>
+    Measure at the floor first. Every rect is cached; nothing is read in the loop.
+  </div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ── THE FIXTURE. John Bon, 26 July 1965. Six marks re-derived from
+       codex-data.json through the shipped hash/pick/sunSign/lifePathNum —
+       Leo · Snake · 9 · Raidho · ☱ Duì · Lake · 7 · The Army.
+       Crown: The Twice-Kindled Wayfarer, bound in open water.
+       The card renders VALUES, not slot labels; Act 4 restores the labels. ── */
+  var MARKS = ["Leo", "Snake", "9", "Raidho", "☱ Duì · Lake", "7 · The Army"];
+
+  /* The letter. Six lines, six explicit blocks, one per mark row.
+     "Given, not chosen." is the shipped corrected phrasing (app.js:2471-2480).
+     The brief's "looked up, not invented" is FALSE for three of the six
+     (arcana-reading.js:120 pick(by.rune, seed+"f")) and must never appear. */
+  var LINES = [
+    "For John Bon,",
+    "born 26 July 1965.",
+    "Nothing else was asked.",
+    "And that is the whole of it.",
+    "Given, not chosen.",
+    "The same, every time."
+  ];
+
+  /* ── w_i — DWELL IS INK, NOT PIGMENT (spec §3.4). The pigment-density story
+       is dead: the two decks invert, so an L*-derived order would develop the
+       rows in a DIFFERENT order on ?m2=dark. Character count is deck-
+       independent. More silver to wash out takes longer to clear. ── */
+  var W = (function () {
+    var n = LINES.map(function (s) { return s.length; });
+    var lo = Math.min.apply(null, n), hi = Math.max.apply(null, n);
+    return n.map(function (c) { return 0.55 + 0.45 * ((c - lo) / (hi - lo)); });
+  })();
+
+  var BAND = 28;
+
+  /* E = cubic-bezier(.42,0,.58,1), lifted from @keyframes m2-flip (styles.css:3665)
+     FOR ITS SYMMETRY about the midpoint — negated time is a true mirror, which is
+     what makes the reverse scroll content-identical. Solved the way CSS does it:
+     Newton for x(t)=progress, bisection where the derivative vanishes.
+     front_y must be strictly monotone; an overshoot would make a row resolve,
+     un-resolve and re-resolve inside one continuous downward scroll. */
+  function bezier(x1, y1, x2, y2) {
+    function cx(t) { return ((1 - t) * (1 - t) * 3 * t * x1) + ((1 - t) * 3 * t * t * x2) + (t * t * t); }
+    function cy(t) { return ((1 - t) * (1 - t) * 3 * t * y1) + ((1 - t) * 3 * t * t * y2) + (t * t * t); }
+    function dx(t) { return 3 * (1 - t) * (1 - t) * x1 + 6 * (1 - t) * t * (x2 - x1) + 3 * t * t * (1 - x2); }
+    return function (p) {
+      if (p <= 0) return 0;
+      if (p >= 1) return 1;
+      var t = p, i, d;
+      for (i = 0; i < 5; i++) { var e = cx(t) - p; d = dx(t); if (Math.abs(e) < 1e-6) return cy(t); if (Math.abs(d) < 1e-6) break; t -= e / d; }
+      var lo = 0, hi = 1; t = p;
+      for (i = 0; i < 24; i++) { var v = cx(t); if (Math.abs(v - p) < 1e-6) break; if (v > p) hi = t; else lo = t; t = (lo + hi) / 2; }
+      return cy(t);
+    };
+  }
+  var E = bezier(0.42, 0, 0.58, 1);
+  function clamp01(v) { return v < 0 ? 0 : v > 1 ? 1 : v; }
+
+  var elMarks = document.getElementById("marks"),
+      elProse = document.getElementById("prose"),
+      elFront = document.getElementById("front"),
+      elBox   = document.getElementById("box"),
+      elCard  = document.getElementById("card"),
+      elStage = document.getElementById("stage");
+
+  var SEGS = 3, THETA = 2.5, P = 0.44;
+
+  /* Split a line into n word-boundary segments. Three per line = 18 elements,
+     so the 2.5° tilt reads as a LEAN and not a step. If three read as three
+     steps on the slider, go to four or shallow theta — spec §3.3, and it is
+     the second thing to check after p=.44. */
+  function segment(line, n) {
+    var words = line.split(" "), out = [], per = Math.ceil(words.length / n), i;
+    for (i = 0; i < words.length; i += per) out.push(words.slice(i, i + per).join(" "));
+    while (out.length > n) { out[n - 1] += " " + out.pop(); }
+    return out;
+  }
+
+  function build() {
+    elMarks.innerHTML = MARKS.map(function (m) { return "<span>" + m + "</span>"; }).join("");
+    elProse.innerHTML = LINES.map(function (l) {
+      return "<div>" + segment(l, SEGS).map(function (s, i) {
+        return "<i>" + (i ? "&nbsp;" : "") + s + "</i>";
+      }).join("") + "</div>";
+    }).join("");
+    measure();
+  }
+
+  /* ── MEASURE ONCE. At load, on resize, on any control change — never in the
+       p loop. y is the element's top relative to the box; xc its centre. ── */
+  var MEAS = { rows: [], segs: [], boxH: 144, cx: 0, cardH: 400 };
+  function measure() {
+    var br = elBox.getBoundingClientRect(), cr = elCard.getBoundingClientRect();
+    MEAS.boxH = br.height; MEAS.cx = br.width / 2; MEAS.cardH = cr.height;
+    MEAS.rows = [].map.call(elMarks.children, function (el) {
+      var r = el.getBoundingClientRect();
+      return { el: el, y: r.top - br.top, xc: (r.left + r.right) / 2 - br.left };
+    });
+    MEAS.segs = [];
+    [].forEach.call(elProse.children, function (row, ri) {
+      [].forEach.call(row.children, function (el) {
+        var r = el.getBoundingClientRect();
+        MEAS.segs.push({ el: el, row: ri, y: r.top - br.top, xc: (r.left + r.right) / 2 - br.left });
+      });
+    });
+    draw(P);
+  }
+
+  function beatName(p) {
+    if (p < 0.380) return "act 2 — the held letter";
+    if (p < 0.400) return "plate lowered · absolute stillness";
+    if (p < 0.478) return "the sweep";
+    if (p < 0.494) return "draining off";
+    if (p <= 0.500) return "rest";
+    return "act 4 — the six";
+  }
+
+  var elPv = document.getElementById("pv"), elBeat = document.getElementById("beat"),
+      elRead = document.getElementById("readout");
+
+  function draw(p) {
+    P = p;
+    var tanT = Math.tan(THETA * Math.PI / 180);
+
+    /* front_y: −BAND → BOX_H+BAND across .400–.478, strictly monotone. */
+    var u_raw = (p - 0.400) / 0.078;
+    var front_y = -BAND + E(clamp01(u_raw)) * (MEAS.boxH + 2 * BAND);
+
+    /* DRAINING OFF .478–.494: the front has cleared the bottom edge, its
+       opacity runs 1→0 as it slides past the card boundary. */
+    var fo = p < 0.478 ? 1 : p < 0.494 ? 1 - (p - 0.478) / 0.016 : 0;
+    if (p < 0.400) fo = 1;                                  /* parked, invisible above the edge */
+    elFront.style.transform = "translate3d(0," + front_y.toFixed(2) + "px,0)";
+    elFront.style.opacity = fo.toFixed(3);
+
+    /* the card's light RIDES the front — one property write, and the art the
+       wet edge needs already ships (spec §3.5). Lit through act 3 only. */
+    var lit = p < 0.340 ? 0 : p < 0.360 ? (p - 0.340) / 0.020 : p > 0.500 ? Math.max(0, 1 - (p - 0.500) / 0.02) : 1;
+    elCard.style.setProperty("--ly", (front_y / MEAS.cardH * 100).toFixed(2) + "%");
+    elCard.style.setProperty("--lx", "50%");
+    elCard.style.setProperty("--lit", lit.toFixed(3));
+    elStage.style.setProperty("--dimming", clamp01((p - 0.34) / 0.06).toFixed(3));
+
+    /* the six rows. Every element reads the front AT ITS OWN X, so the edge is
+       tilted rather than horizontal — the difference between a mask and a
+       liquid. Each row then divides by its own dwell w_i. */
+    var rows = [];
+    MEAS.rows.forEach(function (r, i) {
+      var u = clamp01((front_y - (r.y + tanT * (r.xc - MEAS.cx))) / BAND);
+      var v = clamp01(u / W[i]);
+      var scale = 0.988 + 0.012 * v;
+      /* the swell: on v ∈ [.80, 1.00] the scale runs 1.000 → 1.012 → 1.000.
+         A closed-form pass on v, not a spring — so it is reversible by
+         arithmetic and a cold ?p= lands identically. */
+      if (v >= 0.80) { var s = (v - 0.80) / 0.20; scale *= 1 + 0.012 * Math.sin(s * Math.PI); }
+      r.el.style.opacity = v.toFixed(3);
+      r.el.style.transform = "translate3d(0," + ((1 - v) * 2).toFixed(2) + "px,0) scale(" + scale.toFixed(4) + ")";
+      rows.push(v);
+    });
+
+    /* the letter. Opacity only — no transform. Unexposed silver WASHES OUT,
+       it does not move. This is also why zero text nodes mutate in the turn. */
+    MEAS.segs.forEach(function (s) {
+      var u = clamp01((front_y - (s.y + tanT * (s.xc - MEAS.cx))) / BAND);
+      s.el.style.opacity = (1 - u).toFixed(3);
+    });
+
+    elPv.textContent = p.toFixed(3);
+    elBeat.textContent = beatName(p);
+    elRead.innerHTML =
+      "<tr><td>front_y</td><td>" + front_y.toFixed(1) + "px</td></tr>" +
+      "<tr><td>box height</td><td>" + MEAS.boxH.toFixed(0) + "px</td></tr>" +
+      "<tr><td>prose measure</td><td>" + (MEAS.cx * 2).toFixed(0) + "px</td></tr>" +
+      MARKS.map(function (m, i) {
+        return "<tr><td>" + m + " · w " + W[i].toFixed(3) + "</td><td>v " + rows[i].toFixed(3) + "</td></tr>";
+      }).join("");
+  }
+
+  /* ── controls. ?p= is the addressability the measurement plan runs on. ── */
+  var slider = document.getElementById("slider");
+  function setP(p, push) {
+    slider.value = p;
+    draw(+p);
+    if (push) {
+      var u = new URL(location.href); u.searchParams.set("p", (+p).toFixed(3));
+      history.replaceState(null, "", u);
+    }
+  }
+  slider.addEventListener("input", function () { setP(slider.value, true); });
+  document.querySelector(".jump").addEventListener("click", function (e) {
+    var b = e.target.closest("[data-p]"); if (b) setP(b.dataset.p, true);
+  });
+  document.getElementById("togH").addEventListener("click", function (e) {
+    var b = e.target.closest("[data-h]"); if (!b) return;
+    [].forEach.call(this.children, function (c) { c.setAttribute("aria-pressed", c === b); });
+    elCard.style.setProperty("--card-h", b.dataset.h + "px");
+    requestAnimationFrame(measure);
+  });
+  document.getElementById("togS").addEventListener("click", function (e) {
+    var b = e.target.closest("[data-s]"); if (!b) return;
+    [].forEach.call(this.children, function (c) { c.setAttribute("aria-pressed", c === b); });
+    SEGS = +b.dataset.s; build();
+  });
+  document.getElementById("theta").addEventListener("input", function () {
+    THETA = +this.value; document.getElementById("thv").textContent = THETA.toFixed(1); draw(P);
+  });
+  window.addEventListener("resize", function () { requestAnimationFrame(measure); });
+
+  build();
+  var qp = new URLSearchParams(location.search).get("p");
+  setP(qp != null ? clamp01(+qp) : 0.44, false);
+})();
+</script>
