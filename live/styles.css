@@ -5274,7 +5274,21 @@ body[data-devnav="1"] .devnav {
      PLUS their own height, so their top edge is near y 160. ROOMS goes in the gap the
      column actually has: right-aligned, above the arrow, below the orbs.
      BR-S401's note called this "one stack, not two floating docks" — this restores it. */
-  position: fixed; right: 18px; left: auto; bottom: clamp(96px, 13vh, 120px);
+  /* ★★ BR-S438 — AND I MEASURED THE WRONG ELEMENT TO "PROVE" IT WAS FINE.
+     BR-S437 checked .orbitbtn against #brCodexDock and reported no overlap. #brCodexDock
+     is display:none on the menu — syncCodexBall() only shows it in six ?dev= rooms
+     (app.js:1171). Its rect is 0x0 at 0,0, so the collision test passed against nothing
+     and I read the zeros as success. The orbs on THIS panel are #codexSeed and
+     #codexMiniBall (app.js:1168 says so in as many words) and nobody had measured them.
+     Real geometry at 1280x720, fixed elements only:
+         #codexMiniBall   1194-1224 x 540-570
+         #codexSeed       1189-1231 x 582-624
+         .menu__go--reliq  top 707        (absolute, scrolls with the panel)
+     The gap the column actually has is y 624 -> 707. ROOMS is ~32px tall, so it centres
+     there at bottom ~38px — under the codex seal, above the arrow, on neither.
+     ★ The lesson is not the number. A zero-size rect is not a passing test, and a
+     collision check must assert its neighbours EXIST before it believes them. */
+  position: fixed; right: 18px; left: auto; bottom: clamp(32px, 5.2vh, 46px);
   z-index: 80;   /* BR-S294: ABOVE the sheet — it is the way out as well as the way in */
   display: inline-flex; align-items: center; gap: 9px;
   padding: 9px 14px 9px 11px;
