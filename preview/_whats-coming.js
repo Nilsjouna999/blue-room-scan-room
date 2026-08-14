@@ -25,7 +25,7 @@
     +   "justify-content:center;opacity:0;pointer-events:none;transition:opacity 220ms ease}"
     + ".wcpop.is-in{opacity:1;pointer-events:auto}"
     /* the same depth-of-field the ROOMS sheet got — composited, never animated */
-    + ".wcpop__scrim{position:absolute;inset:0;background:rgba(8,9,11,.62);"
+    + ".wcpop__scrim{position:absolute;inset:0;background:rgba(14,12,10,.62);"
     +   "backdrop-filter:blur(14px) saturate(.9);-webkit-backdrop-filter:blur(14px) saturate(.9)}"
     + ".wcpop__sheet{position:relative;width:min(1180px,92vw);max-height:86vh;overflow:auto;"
     +   "padding:clamp(18px,3vh,34px) clamp(16px,3vw,40px)}"

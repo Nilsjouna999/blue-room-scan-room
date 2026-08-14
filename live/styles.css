@@ -5252,7 +5252,17 @@ body[data-devnav="1"] .devnav {
      the orbs and the floor put it across the intake column's rule and its text; the
      corner is the emptiest ground on any page, and 'below the codex ball' is still
      exactly what it is. */
-  position: fixed; right: 18px; left: auto; bottom: 18px;
+  /* ★ BR-S436 — ROOMS WAS SITTING ON THE GO-RIGHT CONTROL. Measured, not guessed:
+     .menu__go--reliq (styles.css:3150) is `right: clamp(12px,2.6vw,40px); bottom:
+     clamp(26px,6vh,54px)` and carries its caption, so that group occupies the bottom-
+     right corner from y≈26 to y≈90. .orbitbtn was `right:18px; bottom:18px` — the same
+     column, overlapping rows. And the right edge is already three-deep: the codex orbs
+     sit above it at `bottom: clamp(68px,8.5vh,82px)` (styles.css:5067).
+     BR-S402 put ROOMS in "the emptiest ground on any page" — that was true when it was
+     written and the corner has since gained an arrow. The LEFT edge at this height is
+     genuinely empty: .menu__go--desk ends at y≈90 and nothing else claims it. So ROOMS
+     moves across and up, out of every other control's row, and keeps the corner idea. */
+  position: fixed; left: 18px; right: auto; bottom: clamp(78px, 11vh, 104px);
   z-index: 80;   /* BR-S294: ABOVE the sheet — it is the way out as well as the way in */
   display: inline-flex; align-items: center; gap: 9px;
   padding: 9px 14px 9px 11px;

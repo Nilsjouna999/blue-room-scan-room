@@ -119,10 +119,25 @@
          the menu actually shows at the height of this line is --ink-950, flat.
          Painting the top-of-screen warmth at the bottom of the page was the mismatch.
          Reading the live value rather than hardcoding it, so a palette change carries. */
+      /* ★★★ MATCH THE PAGE IT IS ACTUALLY ON, NOT THE PAGE IT CAME FROM.
+         BR-S433 pointed this at the MENU's --ink-950 (#0a0b0d = rgb 10,11,13). Measured
+         on codex.html, that is the wrong ground and it is why the builder sees a blue
+         cast: the Codex's own html background is rgb(16,14,12), a WARM dark, while
+         --ink-950 is COOL (blue 13 > red 10). A cool band inside a warm page reads blue
+         even though neither colour is blue on its own — it is the CONTRAST that has a
+         hue, not the fill.
+         So the ground is read off the document the canvas is drawing on. On the menu
+         that resolves to the menu's base; on codex.html to the Codex's own. One rule,
+         and it cannot drift when either palette changes. */
       var ink = "#0a0b0d";
       try {
-        var v = doc.defaultView.getComputedStyle(doc.documentElement).getPropertyValue("--ink-950").trim();
-        if (v) ink = v;
+        var vw2 = doc.defaultView;
+        var hb = vw2.getComputedStyle(doc.documentElement).backgroundColor;
+        if (hb && hb !== "rgba(0, 0, 0, 0)" && hb !== "transparent") ink = hb;
+        else {
+          var bb = vw2.getComputedStyle(doc.body).backgroundColor;
+          if (bb && bb !== "rgba(0, 0, 0, 0)" && bb !== "transparent") ink = bb;
+        }
       } catch (e) {}
       var g = ctx.createLinearGradient(0, H * LINE_FRAC, 0, H);
       g.addColorStop(0, ink); g.addColorStop(1, ink);
