@@ -3346,7 +3346,11 @@ html.is-travel .card .cardfinish { mix-blend-mode: normal; }
   -webkit-background-clip: text; background-clip: text;
   -webkit-text-fill-color: transparent;
   transition: --grade-a 220ms var(--ease-settle), --grade-b 220ms var(--ease-settle);
-  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 4; overflow: hidden;
+  /* BR-S451: 4 -> 5. The box's HEIGHT was already reserved for five lines
+     (--m2read-lines: 5), so the fifth line was room the layout had already paid for
+     and was refusing to use — the clamp cut at four and left one line of dead space
+     under every card. Nothing moves; the column is exactly as stable as before. */
+  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 5; overflow: hidden;
   /* FIXED at four lines, not merely capped at four. A clamp alone still lets the box
      shrink for a terse card, so the column jumped on every pull — the exact instability
      the frame is here to remove. */

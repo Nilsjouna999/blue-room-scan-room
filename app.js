@@ -2673,7 +2673,9 @@ function renderWall() {
     /* through the same builder as every later write, or the FIRST paint would be the
        one ungraded line on the panel and nobody would see it until they flipped */
     + '<p class="m2read__meta" data-m2-meta>' + m2MetaHTML(M2_BIRTH_READ.meta) + '</p>'
-    + '<p class="m2read__mean" data-m2-mean>Six marks you were given rather than chose, read together into one crowned name. Nothing is rolled here, and nothing is re-rolled on re-view.</p>'
+    /* BR-S451: byte-identical to M2_BIRTH_READ.mean — see the note there. The first
+       paint and the first flip must be the same sentence. */
+    + '<p class="m2read__mean" data-m2-mean>Six marks you were given by the time you were born, read together into one crowned name. Six old traditions, kept apart for centuries and gathered into one room. The same name and the same date return the same six, tonight and in ten years.</p>'
     + '</div>'
     /* BR-S345: "Asked the same, they answer the same." is gone. It was a fixed line
        pinned under a block whose whole job is to change, so it read as a caption on
@@ -2861,8 +2863,28 @@ const M2_BIRTH_READ = {
   meta: "By birth · one name",
   /* Trimmed from 251 characters to fit the four lines the box actually has. The old
      one measured FIVE lines at 330px and was being clipped mid-sentence — and the six
-     marks it spent two lines listing are printed on the card beside it anyway. */
-  mean: "Six marks you were given rather than chose, read together into one crowned name. Nothing is dealt here — the same name and the same date return the same six, tonight and in ten years.",
+     marks it spent two lines listing are printed on the card beside it anyway.
+     ★ BR-S451 — REWRITTEN, AND THE TWO COPIES NOW AGREE. The builder: "six marks you
+     were given by the time of your birth… since ancient times these readings were
+     known, and now all of them here." Two things were wrong beyond the words.
+       1. THE SERVED MARKUP AND THIS OBJECT SAID DIFFERENT THINGS. renderWall's first
+          paint ended "Nothing is rolled here, and nothing is re-rolled on re-view",
+          this one ended "Nothing is dealt here — the same name and the same date…".
+          The block's own note demands they agree ("a first paint that disagrees with
+          itself is a flash of the wrong product") and they had drifted apart.
+       2. "given rather than chose" is defensive — it argues with an objection the
+          reader has not raised, which the house register rules out as firmly as hype.
+          "by the time you were born" states the same fact as a fact.
+     ★ THE MIDDLE SENTENCE IS THE BUILDER'S AND IT IS TRUE AS WRITTEN. Six distinct
+     traditions — the Western zodiac, the Chinese year, numerology, the runes, the
+     trigrams, the I Ching — did develop separately and are all in the Codex. It does
+     NOT say the room looks each one up: three of the six are pick(list, seed+"f"/"g"/
+     "h"), a hash of name and date (arcana-reading.js:120), and CLAIM_AUDIT_V1 exists
+     because that exact overclaim propagated into a dozen surfaces.
+     ★ The determinism close keeps its AUDITED phrasing verbatim — "tonight and in ten
+     years" rather than "always" or "forever", which docs/CLAIM_GUARD_V1.md §10 rates
+     fragile: the seed hash has already broken once. */
+  mean: "Six marks you were given by the time you were born, read together into one crowned name. Six old traditions, kept apart for centuries and gathered into one room. The same name and the same date return the same six, tonight and in ten years.",
   accent: "#b6a06a"        // the crown's own brass — the birth reading's register
 };
 const M2_SAMPLE_READ = {
