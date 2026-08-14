@@ -3584,9 +3584,15 @@ html.m2-parch .m2hero {
    survive on parchment — which is why every mark on this face was re-pointed to ink and
    copper — and parchment is the deck that ships (BR-S306). So the parchment card lifts
    with its own drop deepened instead: same gesture, the deck's own colour. */
+/* BR-S414 — THE MICRO-HOVER COMES UP ONE STEP. The builder compared three strengths
+   live in the lab and chose 1. Both halves of the gesture move together, because the
+   drop alone reads as the card getting heavier rather than more present:
+     the drop   0 26px 52px /.68  ->  0 28px 56px /.70
+     the light  see .m2hero::before below
+   Level 2 (0 31px 62px, 146px lobes) was built and rejected as too much. */
 html.m2-parch .menu__draw:has(.menu__draw-stage:hover) .m2hero,
 html.m2-parch .menu__draw:has(.m2read:hover) .m2hero {
-  box-shadow: 0 26px 52px rgba(0, 0, 0, 0.68);
+  box-shadow: 0 28px 56px rgba(0, 0, 0, 0.70);
 }
 .m2face { display: none; }
 html.m2-parch .m2face {
@@ -3651,9 +3657,12 @@ html.m2-parch .m2face {
   content: ""; position: absolute; inset: 0; z-index: 5; pointer-events: none;
   border-radius: inherit; opacity: 0; mix-blend-mode: soft-light;
   transition: opacity 260ms var(--ease-settle);
+  /* BR-S414: the halving above is walked back partway — .075/.055 -> .105/.078 and the
+     lobe from 120 to 128px, so the light reads slightly BIGGER as well as slightly
+     stronger. Still under the desk card's full strength; "ever slight" holds. */
   background:
-    radial-gradient(120px 120px at var(--lx, 50%) calc(var(--ly, 50%) + 3%), rgba(0, 0, 0, .075), transparent 70%),
-    radial-gradient(120px 120px at var(--lx, 50%) var(--ly, 50%), rgba(255, 255, 255, .055), transparent 70%);
+    radial-gradient(128px 128px at var(--lx, 50%) calc(var(--ly, 50%) + 3%), rgba(0, 0, 0, .105), transparent 70%),
+    radial-gradient(128px 128px at var(--lx, 50%) var(--ly, 50%), rgba(255, 255, 255, .078), transparent 70%);
 }
 .m2hero.is-tilting::before { opacity: 1; }
 @media (prefers-reduced-motion: reduce) {
