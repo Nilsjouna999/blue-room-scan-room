@@ -3474,6 +3474,39 @@ html.is-travel .card .cardfinish { mix-blend-mode: normal; }
    be worse than the thing being fixed. The animations keep running underneath at zero
    cost to the eye; they are pure CSS with no timer to leak (BR-S341). */
 .menu__draw:has([data-m2-hero][data-face="birth"]) .m2asks { visibility: hidden; }
+/* BR-S463: the standing label goes with them — one rule, both parts, so the label can
+   never be left announcing a question the face does not ask. */
+.menu__draw:has([data-m2-hero][data-face="birth"]) .m2q__label { visibility: hidden; }
+
+/* ══ BR-S463 — THE STANDING WORD ═════════════════════════════════════════════
+   "elegant white font text 'question'."
+
+   ELEGANT HERE MEANS THE DISPLAY SERIF AT SIZE, NOT A MONO LABEL SHOUTING IN
+   CAPS. Every other label on this panel is 8-10px mono at .22em — correct for
+   furniture, wrong for the one word that names what the column is about. This is
+   set in the same face the questions themselves use, larger than them and lighter
+   in colour, so the eye reads WORD then thought rather than two competing labels.
+
+   AND IT IS THE ONLY NEAR-WHITE ON THE PANEL. #f2ece0 against the questions'
+   --t-body: the label is the fixed point, the thoughts are the moving one, and
+   the contrast between them is what makes the rolling lines read as passing
+   rather than as arriving. */
+.m2q { position: relative; }
+.m2q__label {
+  margin: 0 0 7px;
+  font-family: var(--font-display);
+  font-size: 19px; line-height: 1.2; letter-spacing: .012em;
+  color: #f2ece0;
+}
+/* ★ THE RESERVE GOES TO THREE LINES. .m2asks reserves 2.9em — two lines at 17px/1.45 —
+   and its spans are `inset:0` of that box, so a question that wraps to THREE simply
+   overflows it. At a wide desktop measure none of the seven do; at a squeezed column
+   "What does he actually feel." becomes three lines and ran straight through the gold
+   rule below. Reserving the real worst case costs ~25px of a column that has room and
+   removes a collision that only appears on the narrow viewports hardest to test.
+   The height stays FIXED, which is the property that mattered: this column still may
+   not resize while someone is looking at it. */
+.m2asks { height: 4.35em; }
 /* ★★ BR-S455 — AND THE HIDDEN QUESTIONS STOP ANIMATING. My own BR-S449 bug, found by
    counting document.getAnimations() on the default face: `visibility: hidden` hides an
    element but does NOT stop its animations, so SEVEN 44-second infinite opacity+transform
