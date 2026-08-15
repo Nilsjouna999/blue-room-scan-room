@@ -1568,7 +1568,10 @@ const ROOMS = [
      room beside it — the Shelf is INSIDE it, which is why this entry names the
      Profile and mentions the Shelf in its line rather than the other way round. */
   { key: "shelf", state: "open", free: true, name: "Your Profile",
-    now: "Your own page in the archive. The Shelf inside it holds every reading you have drawn.",
+    /* BR-S484: the Shelf holds readings in no browser at all — the profile module
+       has one storage read and zero writes. "Saved in this browser only" would
+       have shipped a second untrue claim, so the link is what is promised. */
+    now: "Your own page in the archive. Every reading you draw keeps its own link, and the Shelf is where they gather.",
     soon: "A page of your own, holding everything you have drawn.",
     cost: "Free &middot; this browser only", cta: "Open your Profile", href: "?dev=profile" },
   { key: "codex", state: "open", free: true, name: "The Codex",
@@ -1854,12 +1857,15 @@ var VISION = [
      entirely inside the metaphor. "Nothing here is built to make you come back" went —
      it posited an adversary and contradicted what an archive IS. What replaces it is a
      promise to the reader instead of a jab at an industry, which is §7's whole rule. */
+  /* BR-S484: "yours to keep" carries no false fact but implies filing that does
+     not exist — persistence is the reader's own browser history doing the work.
+     Naming the link keeps the promise and makes it one the site can honour. */
   "The first rule is the one everything else is built on. <em>Everything read here is " +
-  "yours to keep.</em> Looking is free and stays free. What costs money says so on its " +
-  "own door, once, in plain figures. An archive is worth returning to on its own. " +
-  "Nothing here will chase you.",
+  "yours to keep &mdash; at its own link.</em> Looking is free and stays free. What costs " +
+  "money says so on its own door, once, in plain figures. An archive is worth returning " +
+  "to on its own. Nothing here will chase you.",
 
-  "If you never open a record again, it stays there, and it stays yours.",
+  "If you never open a record again, its link still does, and it stays yours.",
 
   { label: "Open now", sub: "what can be entered today" },
 
@@ -1872,8 +1878,11 @@ var VISION = [
   /* "apologise for them" was the edgiest word on the page — it imports a cultural
      grievance. Cut; the rest is method rather than defiance, and the sentence was
      precise enough to keep. */
-  "The six marks are drawn from five systems &mdash; astrology, the Chinese year, " +
-  "numerology, the runes, and the I Ching, which gives two. Each is read on its own " +
+  /* BR-S484: "five systems" was internally coherent but disagreed with three
+     other live surfaces, one of which renders "six systems consulted" to the
+     reader. Six, counted the way the reader is shown them. */
+  "The six marks are drawn from six systems &mdash; astrology, the Chinese year, " +
+  "numerology, the runes, the eight trigrams, and the I Ching. Each is read on its own " +
   "terms, then filed beside the others. Blue Room does not rank them or blend them " +
   "into one answer.",
 
@@ -3475,8 +3484,16 @@ function renderReliquaryOpen() {
    states without the ?devnav rail: "No account" re-renders the sealed teaser in place;
    "The profile" sets the mock holdings flag and opens the real ?dev=profile route (never
    mounted here — the gate stays a pure static string). Pre-launch affordance; gate behind
-   ?devnav or remove before launch. Reuses hasHoldings()/br_holdings. */
+   ?devnav or remove before launch. Reuses hasHoldings()/br_holdings.
+   BR-S484 — THE GATE THIS COMMENT ASKED FOR, FINALLY APPLIED. Ungated, this
+   shipped to every visitor: two clicks set the holdings flag and opened a
+   profile built entirely from the hardcoded sample seeker, with no on-screen
+   marker that it was sample data — turning "it opens the moment a reading is
+   drawn and kept" into a crowned name nobody earned. It is the one finding on
+   the list that manufactures a fake record rather than mis-describing a real
+   one, so it is gated first and fails CLOSED to the sealed teaser. */
 function reliqPreviewToggle(held) {
+  if (!DEVNAV) return '';
   return '<div class="menu__reliq-preview" role="group" aria-label="Preview: account state">'
     + '<span class="menu__reliq-preview-tag" aria-hidden="true">&#9670; Preview as</span>'
     + '<button type="button" class="menu__reliq-previewbtn' + (held ? '' : ' is-on') + '" data-reliq-state="none"' + (held ? '' : ' aria-current="true"') + '>No account</button>'
@@ -3691,7 +3708,7 @@ function renderMenu(reveal) {
       </div>
     </div>
     </section>
-    <section class="menu__panel menu__panel--wall is-offstage" inert aria-hidden="true" aria-label="The Reading Rooms">
+    <section class="menu__panel menu__panel--wall is-offstage" inert aria-hidden="true" aria-label="Blue Room">
     ${ANNEX_BACK}
     ${RELIQ_GO}
     ${ANNEX_DOWNCUE}
@@ -7070,13 +7087,18 @@ function renderSourceToggle() {
 /* BR-S204 — MOCK holdings unlock (dev/testing only; real keep/claim stays offline).
    ?holdings=1 sets the gate, ?holdings=0 clears it, then self-strips the param
    (preserving dev/devnav/other params + the hash) so it never persists in the URL.
-   Runs AFTER the search parse and BEFORE mountMenu, so hasHoldings() reads it. */
+   Runs AFTER the search parse and BEFORE mountMenu, so hasHoldings() reads it.
+   BR-S484: gated to the builder alongside the M3 preview toggle. Gating the
+   visible toggle and leaving a URL that does the same thing would have closed
+   the door and left the window open. The param is still STRIPPED for everyone
+   (so it never persists), but it only acts under the builder. */
 try {
   const hu = new URL(location.href);
-  const hp = hu.searchParams.get("holdings");
+  const raw = hu.searchParams.get("holdings");
+  const hp = DEVNAV ? raw : null;
   if (hp === "1") localStorage.setItem("br_holdings", "1");
   else if (hp === "0") localStorage.removeItem("br_holdings");
-  if (hp !== null) { hu.searchParams.delete("holdings"); history.replaceState(null, "", hu.pathname + (hu.search || "") + hu.hash); }
+  if (raw !== null) { hu.searchParams.delete("holdings"); history.replaceState(null, "", hu.pathname + (hu.search || "") + hu.hash); }
 } catch (e) {}
 
 mountMenu();

@@ -5,7 +5,23 @@
 > guard. 114 claims collected. Verbatim; nothing re-summarised.
 >
 > Supersedes nothing — docs/CLAIM_AUDIT_V1.md remains the record of the first six.
-> ★ NOTHING BELOW IS FIXED YET. This is the note list.
+>
+> ★ **PART 2 IS FIXED AS OF BR-S484 (2026-08-15).** All eleven findings shipped: the
+> nine copy replacements were applied verbatim as written below, the ungated preview
+> (#1) was gated behind the builder flag rather than reworded, and the region label
+> (#11) was corrected. Verified in-browser — both edited files parse, the app boots
+> clean, and the preview toggle returns empty for a visitor. Two things did NOT change
+> and are deliberate: the U1 headline "Everything read here is yours to keep" keeps its
+> display wording (it is the house motto, and #6's verdict was fragile, not false), and
+> the `?holdings=` URL was gated alongside the toggle — it was not on this list, but
+> gating the visible control while leaving a URL that does the same thing would have
+> closed the door and left the window open.
+>
+> ★ **PART 1 IS STILL UNBUILT.** `docs/claims.json` + `check_claims.py` do not exist.
+> The eleven fixes below therefore shipped *in front of* a gate rather than against one,
+> which is the opposite of the build order this document recommends. What DOES exist as
+> of BR-S484 is the present/absent probe table in `build_public.py` — a much smaller
+> idea, covering what the build ships rather than whether its claims are true.
 
 ---
 

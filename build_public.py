@@ -168,6 +168,39 @@ DEAD_LINK_REWRITES = [
      'if (fwd) fwd.addEventListener("click", function () { location.href = "?dev=profile"; });'),
 ]
 
+# BR-S484 — THE PROBE TABLE, MOVED IN FROM THE COCKPIT.
+#
+# The cockpit (deleted at BR-S480, three things doing one job) tiled the three builds in
+# iframes and asked each rendered page a short list of direct questions, because you
+# cannot see the absence of a dev control in a thumbnail. That was its one good idea and
+# it died with it. Here it is again as a build step, so the question is asked on every
+# build instead of whenever someone remembers to open a page and look.
+#
+# WHY THIS IS NOT COVERED BY THE ASSERTS ABOVE. Those are one-way: each proves a cut
+# HAPPENED. Nothing proved the opposite direction — that what the build is supposed to
+# KEEP survived the cutting. A regex re-anchored slightly wide takes the card, the marks
+# or the specimen panel out of `live/` and every existing assert still passes, because
+# every existing assert is about removal. Half this table is `True`, and that half is the
+# new coverage.
+#
+# THE HONEST LIMIT. These are text probes over the built files, not DOM probes over a
+# rendered page — the cockpit had a browser and this does not. So this catches a control
+# whose SOURCE did not ship, not one that ships and is drawn anyway by code the build
+# left in. The dev-nav is exactly that case: its markup is stripped from index.html
+# (asserted in transform_index) but its render function is deliberately left in app.js,
+# so what is proven below is that the markup is gone, not that nothing can redraw it.
+# Closing that needs the browser battery, not this file.
+#
+# (label, file inside the build, regex, {variant: must-be-present})
+PROBES = [
+    ("dev-nav rail",   "index.html",   r'class="devnav"',     {"preview": False, "live": False}),
+    ("build pill",     "app.js",       r"\bbrBuildFlip\b",    {"preview": True,  "live": False}),
+    ("the card",       "app.js",       r"\bm2hero\b",         {"preview": True,  "live": True}),
+    ("six marks",      "app.js",       r"\bm2bface__marks\b", {"preview": True,  "live": True}),
+    ("specimen panel", "_six-live.js", r"\bsx-",              {"preview": True,  "live": True}),
+    ("roadmap box",    "app.js",       r"\brmpop\b",          {"preview": True,  "live": True}),
+]
+
 # Emitted by build_routes.py's ROUTES; re-emitted here against dist/index.html.
 sys.path.insert(0, ROOT)
 
@@ -474,6 +507,29 @@ def emit_routes(report):
         report.append("route: /%s/ -> %s" % (path, room))
 
 
+def probe_build(folder, report):
+    """Ask the finished build the cockpit's questions. Every mismatch is collected before
+    anything exits, because "the pill is still in live/" and "the card is gone from live/"
+    are different emergencies and seeing one should not hide the other."""
+    failures = []
+    for label, rel, pattern, want in PROBES:
+        expected = want[folder]
+        path = os.path.join(DIST, rel)
+        if not os.path.isfile(path):
+            failures.append("%-14s %s was never written to %s/" % (label, rel, folder))
+            continue
+        found = re.search(pattern, io.open(path, encoding="utf-8").read()) is not None
+        if found != expected:
+            failures.append("%-14s expected %s in %s/%s, found %s"
+                            % (label, "PRESENT" if expected else "ABSENT", folder, rel,
+                               "present" if found else "absent"))
+    if failures:
+        sys.exit("build_public: %s/ failed %d probe(s) — the build is not what it claims "
+                 "to be, so it fails here rather than on the host:\n    %s"
+                 % (folder, len(failures), "\n    ".join(failures)))
+    report.append("probes: %d/%d as expected for %s/" % (len(PROBES), len(PROBES), folder))
+
+
 def build(folder="preview", keep_flip=True):
     global DIST
     DIST = os.path.join(ROOT, folder)
@@ -510,6 +566,7 @@ def build(folder="preview", keep_flip=True):
 
     copy_tracked_assets(report)
     emit_routes(report)
+    probe_build(folder, report)
 
     # what was CUT — step 7 of the spec. A build that silently drops something is the same
     # class of problem as one that silently ships something.

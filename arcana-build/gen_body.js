@@ -546,7 +546,12 @@
         '<h1 style="text-align:center">A Concord</h1>'+
         '<p style="text-align:center">Two people, read together — both whole readings, and the bond the traditions draw between them.</p></section>'+
       '<div class="col cc-desk">'+fs("a","The first name borne")+fs("b","The second name borne")+
-        '<p class="cc-fine">One concord per pair. The same two names, the same dates — the same concord, always. A drawn concord is open to both names at its link, forever.</p>'+
+        /* BR-S484: "always … forever" is a promise about a hash function, and this
+           file's own change log records that it has already broken once — the seed
+           hash used a float multiply whose low bits were rounded away, and an old
+           link now replays different marks. Nothing pins the version against a
+           repeat, so the promise is scoped to the engine that makes it. */
+        '<p class="cc-fine">One concord per pair. The same two names, the same dates — the same concord, for as long as the engine that draws it stands. A drawn concord is open to both names at its link.</p>'+
         '<div data-cc-sealwrap><button type="button" class="ck-seal cc-seal" data-cc-seal>Seal the concord &middot; $7.99</button>'+
         '<p class="dr-mocknote">Dev mock &mdash; no real payment in this build.</p></div>'+
         '<p class="cc-notice" data-cc-notice role="status" aria-live="polite"></p>'+
