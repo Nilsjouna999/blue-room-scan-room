@@ -1,0 +1,160 @@
+/* =============================================================
+   M2 · THE WALL UNDER GLASS — a case around the standing card.
+   Append after the .m2bface block in styles.css. New classes only,
+   plus three overrides qualified with .m2case, so the card outside
+   the case is byte-for-byte what it is today.
+
+   THE ONE IDEA. The card is not repainted, it is LIT. .m2case__lamp is
+   the box's own light in multiply over the stock; the copper is a
+   lighting result, so ?m2=white, the dark stock, the tarot face and
+   .m2face-name.is-long all still work. Delete the lamp element and the
+   parchment card is back with no other edit.
+
+   SCALE. Values are app CSS px. The reference render was a 1.065x
+   screenshot, so anything measured off that image is /1.065 here.
+   ============================================================= */
+
+.m2case {
+  /* the box's own material, retunable in one place. The mat sits between
+     --ink-800 and --ink-700, one point warmer than either, measured off
+     the render rather than picked. */
+  --case-face-top: #232120;      /* the frame's top face, lit           */
+  --case-face-mid: #1b1917;      /* the sides, edge-on to the light     */
+  --case-face-sill: #3a3735;     /* the sill, catching the room         */
+  --case-mat-top: #151413;       /* the mat, top wall  (~--ink-800)     */
+  --case-mat-mid: #191817;
+  --case-mat-bot: #241f1e;       /* the mat, back panel (~--ink-700)    */
+  --case-copper: 214, 158, 98;   /* the aperture hairline               */
+
+  position: relative;
+  /* 16px of face on top, 15px on the sill, edge-on at the sides — which is
+     why left and right read as one copper hairline plus the shadow the box
+     throws on the wall. */
+  padding: 16px 1px 15px;
+  border-radius: 3px;            /* barely, like a plate; the card keeps the object radius */
+  /* the stage's own gap is 18px; the case asks for 24 above and 23.5 below,
+     which is the reference's rhythm around an object this size. */
+  margin: 6px 0 5.5px;
+  background: linear-gradient(180deg,
+    var(--case-face-top) 0%, var(--case-face-mid) 32%, #191716 62%, #2c2926 88%, var(--case-face-sill) 100%);
+  box-shadow:
+    -13px 2px 14px rgba(0, 0, 0, .74),      /* the wall takes the box's shadow, */
+     10px 2px 12px rgba(0, 0, 0, .58),      /* wider on the left than the right */
+      0 23px 39px rgba(0, 0, 0, .52);
+}
+
+/* the two edges the room actually lights: the top face and the sill. Both
+   centre-weighted — a frame lit from the front, not from a lamp at one corner. */
+.m2case::before,
+.m2case::after { content: ""; position: absolute; left: 0; right: 0; height: 1.5px; pointer-events: none; }
+.m2case::before { top: 0;
+  background: linear-gradient(90deg, rgba(206,170,124,0) 5%, rgba(206,170,124,.18) 26%,
+              rgba(216,180,134,.40) 50%, rgba(206,170,124,.18) 74%, rgba(206,170,124,0) 95%); }
+.m2case::after { bottom: 0;
+  background: linear-gradient(90deg, rgba(228,172,110,0) 7%, rgba(228,172,110,.26) 28%,
+              rgba(236,180,116,.66) 50%, rgba(228,172,110,.26) 72%, rgba(228,172,110,0) 93%); }
+
+/* THE MAT — the inside of the box. Dark at the corners, warm along the top
+   wall where the card's light reaches it, darkest under the card where the
+   card's shadow falls. Five layers, no photograph.
+   overflow:hidden is load-bearing: it crops the card's 40px drop at the mat's
+   edge, which is what keeps the box reading as a box and not as a card with a
+   border. */
+.m2case__cavity {
+  position: relative;
+  padding: 38px 64px 30px;
+  overflow: hidden;
+  background:
+    /* the corners fall away */
+    linear-gradient(90deg, rgba(0,0,0,.75) 0%, rgba(0,0,0,.5) 8%, rgba(0,0,0,.12) 20%,
+      rgba(0,0,0,0) 32%, rgba(0,0,0,0) 68%, rgba(0,0,0,.12) 80%, rgba(0,0,0,.5) 92%, rgba(0,0,0,.75) 100%),
+    /* the card's shadow on the back panel */
+    linear-gradient(180deg, rgba(0,0,0,0) 62%, rgba(0,0,0,.55) 100%),
+    /* the lit top wall */
+    radial-gradient(70% 26% at 50% 0%, rgba(198,144,86,.145) 0%, rgba(128,94,60,.03) 58%, rgba(0,0,0,0) 86%),
+    /* the spill that reaches the side walls at the card's height */
+    linear-gradient(180deg, rgba(190,150,112,0) 16%, rgba(190,150,112,.09) 46%, rgba(190,150,112,0) 78%),
+    linear-gradient(180deg, var(--case-mat-top) 0%, var(--case-mat-mid) 34%, #211f1e 68%, var(--case-mat-bot) 100%);
+}
+
+/* the copper hairline at the aperture. Four sides in one element, each lit its
+   own amount: brightest along the top, dimmest on the right, neutral on the sill. */
+.m2case__cavity::before {
+  content: ""; position: absolute; inset: 0; z-index: 2; pointer-events: none;
+  background:
+    linear-gradient(90deg, rgba(var(--case-copper),0) 4%, rgba(var(--case-copper),.22) 22%,
+      rgba(224,170,110,.54) 50%, rgba(var(--case-copper),.22) 78%, rgba(var(--case-copper),0) 96%) top left / 100% 1.5px no-repeat,
+    linear-gradient(180deg, rgba(210,158,104,0) 1%, rgba(210,158,104,.20) 16%,
+      rgba(216,166,112,.40) 55%, rgba(210,158,104,.16) 86%, rgba(210,158,104,0) 99%) top left / 1.5px 100% no-repeat,
+    linear-gradient(180deg, rgba(206,152,98,0) 3%, rgba(206,152,98,.13) 20%,
+      rgba(212,160,106,.34) 55%, rgba(206,152,98,.12) 86%, rgba(206,152,98,0) 98%) top right / 1.5px 100% no-repeat,
+    linear-gradient(90deg, rgba(170,160,150,0) 8%, rgba(170,160,150,.12) 28%,
+      rgba(180,170,160,.24) 50%, rgba(170,160,150,.12) 72%, rgba(170,160,150,0) 92%) bottom left / 100% 1.5px no-repeat;
+}
+
+/* THE PANE. One raking reflection across the glass, nothing more — a second
+   highlight and it stops being glass and becomes a gradient. */
+.m2case__cavity::after {
+  content: ""; position: absolute; inset: 0; z-index: 3; pointer-events: none;
+  background: linear-gradient(114deg, rgba(233,229,220,.05) 0%, rgba(233,229,220,.016) 16%,
+              rgba(233,229,220,0) 33%, rgba(233,229,220,0) 79%, rgba(233,229,220,.02) 100%);
+}
+
+/* THE CARD COMES DOWN A STEP, and that is the only thing the case asks of it.
+   The box adds 99px of height and 130px of width, so a card still at 56vh would
+   push the flip and the act off a 900px screen. 52vh puts the OUTSIDE of the box
+   where the card used to be. Delete this rule to keep the card's size and let the
+   box grow past it. */
+.m2case .m2hero { height: clamp(360px, 52vh, 520px); }
+
+/* the card gains its lit top lip: it is under glass with a light above it now.
+   Both rules are qualified with .m2case so the card outside the box is untouched,
+   and both restate the drop, because a box-shadow cannot be added to piecemeal. */
+html.m2-parch .m2case .m2hero {
+  box-shadow: 0 20px 40px rgba(0, 0, 0, .6), inset 0 1px 0 rgba(255, 246, 226, .5);
+}
+html.m2-parch .menu__draw:has(.menu__draw-stage:hover) .m2case .m2hero,
+html.m2-parch .menu__draw:has(.m2read:hover) .m2case .m2hero {
+  box-shadow: 0 26px 52px rgba(0, 0, 0, .70), inset 0 1px 0 rgba(255, 246, 226, .55);
+}
+
+/* ── THE BOX'S OWN LIGHT, laid over the stock. ─────────────────────────────
+   Two multiply layers in one element: a vertical fall (the lamp is above the
+   card) and a soft horizontal pocket (the box is deeper than it is wide).
+   background-color is white on purpose — multiply against it is a no-op, and it
+   gives the layer stack an opaque base instead of blending onto transparency.
+   z-index 1 keeps it under .m2hero::before (z 5), the tilt's light pocket. */
+.m2case__lamp {
+  position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  border-radius: inherit;
+  mix-blend-mode: multiply;
+  background-blend-mode: multiply;
+  background:
+    radial-gradient(60% 130% at 50% 40%, #ffffff 45%, #e8e4e0 68%, #cdc7c1 83%, #b9b2ab 100%),
+    linear-gradient(180deg, #f3ca9c 0%, #f3d0a8 8%, #f8dab8 20%, #f7d9b8 25%, #e6ceb5 50%,
+      #ddc4ac 58%, #cab29d 72%, #c9b098 80%, #c0a790 90%, #b39982 100%);
+  background-color: #fff;   /* AFTER the shorthand, or the shorthand resets it to transparent */
+}
+/* uncoated fibre, baked into the stock. Two frequencies: blotch, then tooth. */
+.m2case__fibre {
+  position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  border-radius: inherit; opacity: .15; mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='320' height='320'%3E%3Cfilter id='m2fib'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.03' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='320' height='320' filter='url(%23m2fib)' opacity='0.72'/%3E%3C/svg%3E");
+}
+.m2case__fibre::after {
+  content: ""; position: absolute; inset: 0; opacity: .45;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='m2gr'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23m2gr)' opacity='0.85'/%3E%3C/svg%3E");
+}
+
+/* the single column. The box loses most of its depth here: a 64px mat around a
+   300px card is a frame with a card in it; around a 220px one it is a frame with
+   a stamp in it. Height goes back to auto — the card is width-driven below 1200. */
+@media (max-width: 1199px) {
+  .m2case { padding: 11px 1px 10px; margin: 2px 0; }
+  .m2case__cavity { padding: 26px 34px 20px; }
+  .m2case .m2hero { height: auto; }
+}
+
+/* Nothing in the case animates, and that is deliberate: the develop ceremony is
+   the one choreographed moment in the house. So there is no reduced-motion
+   branch to write — noted here so the next reader stops looking for it. */

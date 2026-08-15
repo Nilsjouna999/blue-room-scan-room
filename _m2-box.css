@@ -1,0 +1,273 @@
+/* =============================================================
+   M2 · THE WALL UNDER GLASS — a case around the standing card.
+   PROTOTYPE. Loaded only on ?case=1 by _m2-box.js. Nothing here paints
+   on the normal menu, and the file is preview-only — the launch build
+   carries neither it nor its tag.
+
+   PROVENANCE. The design is the builder's, handed over as transfer/m2case.css.
+   This is that file after a three-lens review (BR-S487): integration, CSS
+   correctness, and house-fit. 28 issues, 11 of them blocker/high. What changed
+   and why is recorded at each site rather than in a changelog.
+
+   NAME. `.m2case` was already taken — _vitrine-lab.html defines it as a bare
+   flex wrapper with its own --vt-* vocabulary, and that lab is the builder's
+   current line (BR-S481..483). This is `.m2box` so the two can be discussed
+   without ambiguity.
+
+   ★★ THE ONE IDEA, AND WHY IT CHANGED SIDES.
+   The original said: "the card is not repainted, it is LIT", and carried a
+   multiply layer over the card to do it. That layer is off by default here,
+   and the reason is arithmetic rather than taste:
+     · multiply can only DARKEN, and the worst text on the shipped card is
+       already at its floor — the birth face's "By birth alone" is #6a5c45 on
+       the stock's bottom stop #dcd4c2, which computes to 4.41:1. There is no
+       headroom to spend.
+     · putting the lamp UNDER the ink is worse, not better: multiplying
+       foreground and background together preserves more ratio than
+       multiplying the background alone (~4.16:1 vs ~3.59:1).
+     · screen/lighten is not the escape either — it lifts the ink too, and a
+       239-value stock has nowhere left to go up.
+   So the box does not light the card. THE CARD LIGHTS THE BOX — which is what
+   _vitrine-lab.html concluded independently on the same ground: the card is a
+   warm emitter in a black box, and the recess walls are lit from inside the
+   hole. The mat's warm layers below ARE that bounce.
+
+   ★ THE LAMP IS STILL HERE, UNDER `.m2box.is-lamp`, and the prototype has a
+   switch for it. Every contrast figure above is COMPUTED from declared hex
+   through the WCAG formula, not sampled from a paint — the direction is not in
+   doubt but the digits were never measured, and the idea is the builder's own.
+   A judgement like this should be made by looking, not by being told.
+   ============================================================= */
+
+.m2box {
+  /* ── the box's material, retunable in one place. The mat sits a point warmer
+     than --ink-800 / --ink-700 rather than equal to them: the back panel is lit
+     by the card, so it is genuinely lighter than the token. */
+  --box-face-top:  #232120;      /* the frame's top face, lit           */
+  --box-face-mid:  #1b1917;      /* the sides, edge-on to the light     */
+  --box-face-sill: #3a3735;      /* the sill, catching the room         */
+  --box-mat-top:   #151413;      /* the mat, top wall                   */
+  --box-mat-mid:   #191817;
+  --box-mat-bot:   #241f1e;      /* the mat, back panel — lit, so above --ink-700 */
+  /* TWO warm values, both traceable, because the palette is closed. The first
+     draft introduced a new warm hue family across ~30 raw hex values; these two
+     are the card's OWN copper and that same copper lifted. No third metal. */
+  --box-copper: 201, 138, 94;    /* #c98a5e, the card's own copper      */
+  --box-lit:    222, 180, 146;   /* the same copper, lifted, for the two lit edges */
+
+  /* ── THE CHROME, AS NUMBERS THE HEIGHT RULE CAN READ. ────────────────────
+     The first draft asserted "52vh puts the OUTSIDE of the box where the card
+     used to be". That was false at every viewport — solving 0.52vh + 99 = 0.56vh
+     needs a 2475px screen, and the case ran 60-75px TALLER than the card it
+     replaced everywhere real. The chrome is declared ONCE here and the height
+     rule subtracts it, so the promise is exact instead of true at one screen
+     height. Change a padding and the card re-derives; nothing can drift. */
+  --box-frame-t: 16px;  --box-frame-b: 15px;   /* the face on top, the sill below */
+  --box-mat-t:   38px;  --box-mat-b:   30px;
+  --box-mar-t:    6px;  --box-mar-b:  5.5px;   /* stage gap is 18px -> 24 above, 23.5 below */
+  --box-mat-x: clamp(28px, 3vw, 48px);
+  --box-chrome-y: calc(var(--box-frame-t) + var(--box-frame-b)
+                     + var(--box-mat-t)   + var(--box-mat-b)
+                     + var(--box-mar-t)   + var(--box-mar-b));
+  --box-chrome-x: calc(2px + 2 * var(--box-mat-x));
+  /* the stage track, computed from .menu__draw's own grid (300px | 1fr | 330px,
+     column-gap clamp(24px,3vw,52px), width min(1180px,92vw)). The card is
+     HEIGHT-driven through its aspect-ratio, so without this the case cannot know
+     it has run out of horizontal room — and at 1200px wide the track is 402px
+     while the case wanted 458. No width compensation existed at all. */
+  --box-stage-w: calc(min(1180px, 92vw) - 630px - 2 * clamp(24px, 3vw, 52px));
+
+  position: relative;
+  padding: var(--box-frame-t) 1px var(--box-frame-b);
+  border-radius: 3px;            /* barely, like a plate; the card keeps the object radius */
+  margin: var(--box-mar-t) 0 var(--box-mar-b);
+  background: linear-gradient(180deg,
+    var(--box-face-top) 0%, var(--box-face-mid) 32%, #191716 62%, #2c2926 88%, var(--box-face-sill) 100%);
+  /* ONE drop, not three. The vitrine lab measured this ground: a drop shadow on
+     near-black returns almost nothing, so the presence cue is the two LIT EDGES
+     below lying on unlit ground, and this is only the contact. */
+  box-shadow: 0 18px 34px rgba(0, 0, 0, .55);
+}
+
+/* the two edges the room actually lights: the top face and the sill. Both
+   centre-weighted — a frame lit from the front, not from a lamp at one corner.
+   These carry the box's presence; see the note on the drop above. */
+.m2box::before,
+.m2box::after { content: ""; position: absolute; left: 0; right: 0; height: 1.5px; pointer-events: none; }
+.m2box::before { top: 0;
+  background: linear-gradient(90deg, rgba(var(--box-lit),0) 5%, rgba(var(--box-lit),.16) 26%,
+              rgba(var(--box-lit),.36) 50%, rgba(var(--box-lit),.16) 74%, rgba(var(--box-lit),0) 95%); }
+.m2box::after { bottom: 0;
+  background: linear-gradient(90deg, rgba(var(--box-lit),0) 7%, rgba(var(--box-lit),.24) 28%,
+              rgba(var(--box-lit),.58) 50%, rgba(var(--box-lit),.24) 72%, rgba(var(--box-lit),0) 93%); }
+
+/* THE MAT — the inside of the box, and the only place the "lit" idea survives,
+   because here it is true: the card IS the emitter and these walls are what it
+   reaches. Dark at the corners, warm along the top wall and at the card's own
+   height, darkest under the card where its shadow falls. Five layers, no photograph.
+   The crop is load-bearing: it cuts the card's drop at the mat's edge, which is what
+   keeps the box reading as a box and not as a card with a border.
+   `clip`, not `hidden` — same crop, but it is not a scroll container, matching the
+   house rule already stated on this element's own ancestor. */
+.m2box__cavity {
+  position: relative;
+  padding: var(--box-mat-t) var(--box-mat-x) var(--box-mat-b);
+  overflow: clip;
+  background:
+    /* the corners fall away */
+    linear-gradient(90deg, rgba(0,0,0,.75) 0%, rgba(0,0,0,.5) 8%, rgba(0,0,0,.12) 20%,
+      rgba(0,0,0,0) 32%, rgba(0,0,0,0) 68%, rgba(0,0,0,.12) 80%, rgba(0,0,0,.5) 92%, rgba(0,0,0,.75) 100%),
+    /* the card's shadow on the back panel */
+    linear-gradient(180deg, rgba(0,0,0,0) 62%, rgba(0,0,0,.55) 100%),
+    /* the top wall, lit by the card below it */
+    radial-gradient(70% 26% at 50% 0%, rgba(198,144,86,.145) 0%, rgba(128,94,60,.03) 58%, rgba(0,0,0,0) 86%),
+    /* the spill that reaches the side walls at the card's height */
+    linear-gradient(180deg, rgba(190,150,112,0) 16%, rgba(190,150,112,.09) 46%, rgba(190,150,112,0) 78%),
+    linear-gradient(180deg, var(--box-mat-top) 0%, var(--box-mat-mid) 34%, #211f1e 68%, var(--box-mat-bot) 100%);
+}
+
+/* the copper hairline at the aperture. Four sides in one element, each lit its own
+   amount: brightest along the top, dimmest on the right, neutral on the sill.
+   Held back from the first draft's .54 peak: .menu__draw already spends two warm
+   accents on this panel — the doors cutline and the read column's numerals — and the
+   house rule is that one bright mark among restrained ones lands where several
+   cancel. This is frame metal, not a third accent. */
+.m2box__cavity::before {
+  content: ""; position: absolute; inset: 0; z-index: 2; pointer-events: none;
+  background:
+    linear-gradient(90deg, rgba(var(--box-copper),0) 4%, rgba(var(--box-copper),.16) 22%,
+      rgba(var(--box-lit),.36) 50%, rgba(var(--box-copper),.16) 78%, rgba(var(--box-copper),0) 96%) top left / 100% 1.5px no-repeat,
+    linear-gradient(180deg, rgba(var(--box-copper),0) 1%, rgba(var(--box-copper),.15) 16%,
+      rgba(var(--box-copper),.28) 55%, rgba(var(--box-copper),.12) 86%, rgba(var(--box-copper),0) 99%) top left / 1.5px 100% no-repeat,
+    linear-gradient(180deg, rgba(var(--box-copper),0) 3%, rgba(var(--box-copper),.10) 20%,
+      rgba(var(--box-copper),.23) 55%, rgba(var(--box-copper),.09) 86%, rgba(var(--box-copper),0) 98%) top right / 1.5px 100% no-repeat,
+    linear-gradient(90deg, rgba(170,160,150,0) 8%, rgba(170,160,150,.12) 28%,
+      rgba(180,170,160,.24) 50%, rgba(170,160,150,.12) 72%, rgba(170,160,150,0) 92%) bottom left / 100% 1.5px no-repeat;
+}
+
+/* THE PANE. One raking reflection across the glass, nothing more — a second
+   highlight and it stops being glass and becomes a gradient.
+   THE PEAK IS A CONTRAST NUMBER, NOT A TASTE NUMBER. This is the one case layer
+   that does sit over the card, so it lifts the ink where it lands. .04 at the
+   top-left corner is under the point where the birth face's 9.5px masthead meta
+   moves measurably; past ~.05 it starts spending margin the card does not have. */
+.m2box__cavity::after {
+  content: ""; position: absolute; inset: 0; z-index: 3; pointer-events: none;
+  background: linear-gradient(114deg, rgba(233,229,220,.04) 0%, rgba(233,229,220,.014) 16%,
+              rgba(233,229,220,0) 33%, rgba(233,229,220,0) 79%, rgba(233,229,220,.018) 100%);
+}
+
+/* ── THE CARD COMES DOWN A STEP, EXACTLY ONE STEP. ──────────────────────────────
+   The box occupies the card's old footprint to the pixel, on every viewport, in
+   both axes — not "approximately, above 1107px tall".
+     height = the shipped clamp minus the chrome declared above, so the COLUMN is
+              byte-identical: the flip, the reserved act row and the placard do not
+              move by one pixel.
+     width  = capped by the stage track, because the card is height-driven and
+              would otherwise push a 458px case into a 402px track at 1200px wide
+              and lap its shadow onto both text columns. min() takes whichever binds.
+   Delete this ONE rule to keep the card at its shipped size and let the box grow
+   past it — that is the other legitimate answer (the case gets a thin sliver of mat
+   on short screens) and it is a decision, not a bug. */
+.m2box .m2hero {
+  height: min(
+    calc(clamp(400px, 56vh, 620px) - var(--box-chrome-y)),
+    calc((var(--box-stage-w) - var(--box-chrome-x)) * 190 / 120)
+  );
+}
+
+/* the card gains its lit top lip: it is under glass with a light above it now.
+   Both rules are qualified with .m2box so the card outside the box is untouched,
+   and both restate the drop, because a box-shadow cannot be added to piecemeal.
+   ★ THE HOVER VALUE IS THE SHIPPED ONE. The first draft wrote 0 26px 52px /.70 —
+   which is the value BR-S414 REPLACED. Copying it back would have silently
+   reverted that commit for anyone hovering the card inside the case. No single
+   review lens caught this; it turned up on a line-by-line diff against the
+   stylesheet's own record of what it had superseded. */
+html.m2-parch .m2box .m2hero {
+  box-shadow: 0 20px 40px rgba(0, 0, 0, .6), inset 0 1px 0 rgba(255, 246, 226, .5);
+}
+html.m2-parch .menu__draw:has(.menu__draw-stage:hover) .m2box .m2hero,
+html.m2-parch .menu__draw:has(.m2read:hover) .m2box .m2hero {
+  box-shadow: 0 28px 56px rgba(0, 0, 0, .70), inset 0 1px 0 rgba(255, 246, 226, .55);
+}
+/* the dark deck takes the frame with no shadow override at all, so it keeps its own
+   gold inset ring. The box is a box on both decks; only the parchment card, which
+   has a drop to deepen, gets the lit lip. */
+
+/* ── THE SINGLE COLUMN. ────────────────────────────────────────────────────────
+   The box loses most of its depth here: a 48px mat around a 300px card is a frame
+   with a card in it; around a 200px one it is a frame with a stamp in it. So the mat
+   is charged to the VIEWPORT, not to the card: the card keeps its shipped size and
+   the box grows outward into the room the panel has. The width term is what the
+   panel can actually give — and because the menu clips overflow rather than
+   scrolling it, getting this wrong CUTS the right-hand hairline off at the viewport
+   edge instead of producing a scrollbar anyone would notice.
+   Height goes back to auto — the card is width-driven below 1200. */
+@media (max-width: 1199px) {
+  .m2box {
+    --box-frame-t: 11px; --box-frame-b: 10px;
+    --box-mat-t:   26px; --box-mat-b:   20px;
+    --box-mar-t:    2px; --box-mar-b:    2px;
+    --box-mat-x: clamp(12px, 12vw - 24px, 34px);
+  }
+  .m2box .m2hero { height: auto; }
+}
+
+/* NO REDUCED-MOTION BRANCH IS NEEDED, and with the lamp off that is actually true.
+   The original claimed it while carrying two mix-blend-mode layers inside .m2hero,
+   whose confinement depends entirely on that element's transform — and the
+   stylesheet REMOVES that transform under prefers-reduced-motion. So the one
+   condition the blend relied on was the one condition the file had already
+   promised not to need. With the lamp off nothing blends against a backdrop and
+   nothing animates: the frame, the mat, the hairline and the pane are four static
+   paints. The card still leans inside them and the case does not lean with it —
+   that registration error is the thing to judge live. */
+
+/* ══ THE LAMP — OFF BY DEFAULT, AND THE PROTOTYPE HAS A SWITCH FOR IT ══════════
+   Everything below paints only under `.m2box.is-lamp`. It is the builder's original
+   idea, kept intact so the call can be made by looking rather than by reading a
+   contrast table computed from declared hex. If it wins, the honest follow-up is to
+   raise the card's weakest ink first and then re-measure — not to delete the
+   measurement.
+   Two multiply layers in one element: a vertical fall (the lamp is above the card)
+   and a soft horizontal pocket (the box is deeper than it is wide). The white
+   background-color is deliberate — multiply against white is a no-op, and it gives
+   the stack an opaque base instead of blending onto transparency. */
+.m2box.is-lamp .m2box__lamp {
+  position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  border-radius: inherit;
+  mix-blend-mode: multiply;
+  background-blend-mode: multiply;
+  background:
+    radial-gradient(60% 130% at 50% 40%, #ffffff 45%, #e8e4e0 68%, #cdc7c1 83%, #b9b2ab 100%),
+    linear-gradient(180deg, #f3ca9c 0%, #f3d0a8 8%, #f8dab8 20%, #f7d9b8 25%, #e6ceb5 50%,
+      #ddc4ac 58%, #cab29d 72%, #c9b098 80%, #c0a790 90%, #b39982 100%);
+  background-color: #fff;   /* AFTER the shorthand, or the shorthand resets it to transparent */
+}
+/* uncoated fibre, baked into the stock. Two frequencies: blotch, then tooth. */
+.m2box.is-lamp .m2box__fibre {
+  position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  border-radius: inherit; opacity: .15; mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='320' height='320'%3E%3Cfilter id='m2fib'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.03' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='320' height='320' filter='url(%23m2fib)' opacity='0.72'/%3E%3C/svg%3E");
+}
+.m2box.is-lamp .m2box__fibre::after {
+  content: ""; position: absolute; inset: 0; opacity: .45;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='m2gr'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23m2gr)' opacity='0.85'/%3E%3C/svg%3E");
+}
+/* the two spans exist in the DOM only while the lamp is on, so with it off there is
+   nothing to paint and nothing to compose — see _m2-box.js. */
+
+/* ══ THE BENCH — prototype furniture, never product. ═══════════════════════════ */
+.m2box-bench {
+  position: fixed; right: 12px; bottom: 12px; z-index: 400;
+  background: rgba(8,10,13,.94); border: 1px solid #262a31; border-radius: 3px;
+  padding: 10px 12px; font: 10px/1.7 var(--font-mono, ui-monospace, Menlo, Consolas, monospace);
+  color: #8f98a6; letter-spacing: .08em; min-width: 176px;
+}
+.m2box-bench b { display: block; color: #dfe6ef; letter-spacing: .22em; font-weight: 500;
+  text-transform: uppercase; font-size: 9px; margin-bottom: 7px; }
+.m2box-bench label { display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 2px 0; }
+.m2box-bench input { accent-color: #c98a5e; margin: 0; }
+.m2box-bench i { font-style: normal; color: #5f6773; display: block; margin-top: 7px;
+  letter-spacing: .02em; line-height: 1.5; text-transform: none; font-size: 9.5px; }

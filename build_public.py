@@ -154,6 +154,10 @@ COPY_FILES = [
     # BR-S484 — U1's middle. index.html loads it, so leaving it off this list would ship
     # the same broken host the note above describes.
     "_u1-rack.js",
+    # BR-S487 — the M2 case prototype. The .css is fetched BY the .js rather than by a
+    # tag, so it has no index.html reference to strip — it still has to be copied, and
+    # still has to be kept out of live/, which is why both are named in both lists.
+    "_m2-box.js", "_m2-box.css",
 ]
 
 # <head>/<body> lines pulled out of index.html: the surfaces those files serve are cut.
@@ -177,7 +181,7 @@ STRIP_TAGS = ["ceremony.css", "ceremony.js"]
 # (the dev-nav, the dev-route links, the M1 A/B toggle, the tuning params) stay where they
 # are. Each is a judgement about what the public site publishes and each deserves its own
 # look, rather than being swept in behind a mechanism that was added for one file.
-PREVIEW_ONLY = ["_u1-rack.js"]
+PREVIEW_ONLY = ["_u1-rack.js", "_m2-box.js", "_m2-box.css"]
 
 # Links into a room this build removed. Deleting the LISTENER leaves a button that looks
 # alive and does nothing, which is worse than a dead link — so these are re-pointed at the
@@ -231,6 +235,9 @@ PROBES = [
     # "tag kept, file cut" — a 404 in the launch site's own <head>.
     ("U1 rack",        "_u1-rack.js",  r"\bu1rack__vp\b",     {"preview": True,  "live": False}),
     ("U1 rack tag",    "index.html",   r"_u1-rack\.js",       {"preview": True,  "live": False}),
+    ("M2 case",        "_m2-box.js",   r"\bm2box__cavity\b",  {"preview": True,  "live": False}),
+    ("M2 case css",    "_m2-box.css",  r"\.m2box__cavity\b",  {"preview": True,  "live": False}),
+    ("M2 case tag",    "index.html",   r"_m2-box\.js",        {"preview": True,  "live": False}),
 ]
 
 # Emitted by build_routes.py's ROUTES; re-emitted here against dist/index.html.
