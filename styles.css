@@ -3499,6 +3499,20 @@ html.is-travel .card .cardfinish { mix-blend-mode: normal; }
    light with the card) expressed in the property that is actually painting them. */
 .menu__draw:has(.menu__draw-stage:hover) .m2read__mean,
 .menu__draw:has(.m2read:hover) .m2read__mean { --grade-a: #ece4d2; --grade-b: #bdb8ad; }
+
+/* ★★ BR-S453 — THE BLOOM. One beat of light when the read changes under a click.
+   Both stops go up together and the meta line lifts with them, so the whole block
+   brightens as one object rather than the sentence flashing on its own. The ramp UP
+   is fast (140ms) and the fall is the 220ms the block already carries — a bloom that
+   fades in slowly reads as a loading state, where one that arrives and settles reads
+   as a light being caught. .is-bloom is added on the write and removed by a timer at
+   420ms; it must win over the hover grade above, hence the later position and the
+   equal-specificity ordering rather than !important. */
+.menu__draw .m2read.is-bloom .m2read__mean {
+  --grade-a: #fff6e2; --grade-b: #ded7c8;
+  transition: --grade-a 140ms var(--ease-settle), --grade-b 140ms var(--ease-settle);
+}
+.menu__draw .m2read.is-bloom .m2read__meta { color: #efe3c4; transition: color 140ms var(--ease-settle); }
 /* the pair-hover lifts each segment by one step and keeps their order — the grade
    is the point, so brightening them all to one colour would undo it on hover */
 .menu__draw:has(.menu__draw-stage:hover) .m2read__seg--0,

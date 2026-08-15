@@ -1176,9 +1176,9 @@ function syncCodexBall() {
     dock.id = "brCodexDock";
     // the two-ball pair — orange (mini codex) stacked on top of the white (full codex)
     dock.innerHTML =
-      '<a class="br-ball br-ball--orange" href="codex.html?v=449" aria-label="Search the Codex">' +
+      '<a class="br-ball br-ball--orange" href="codex.html?v=453" aria-label="Search the Codex">' +
         '<span class="br-ball-core" aria-hidden="true"></span><span class="br-ball-tip" aria-hidden="true">Search</span></a>' +
-      '<a class="br-ball br-ball--yellow" href="codex.html?v=449" aria-label="Open the Codex — the archive of meanings">' +
+      '<a class="br-ball br-ball--yellow" href="codex.html?v=453" aria-label="Open the Codex — the archive of meanings">' +
         '<span class="br-ball-core" aria-hidden="true"></span><span class="br-ball-tip" aria-hidden="true">The Codex</span></a>';
     document.body.appendChild(dock);
   }
@@ -1419,7 +1419,7 @@ const ROOMS = [
   { key: "codex", state: "open", free: true, name: "The Codex",
     now: "222 entries across ten systems. Every card, sign, rune and hexagram the rooms read from.",
     soon: "Every mark the rooms read from, gathered and defined in one place.",
-    cost: "Free &middot; no account", cta: "Open the Codex", href: "codex.html?v=449" },
+    cost: "Free &middot; no account", cta: "Open the Codex", href: "codex.html?v=453" },
 
   { key: "tarot", state: "open", free: true, name: "Tarot Divination",
     now: "Three cards for a Sitting, five for the Deep Read, cut from the full 78 and filed where each fell.",
@@ -2194,7 +2194,13 @@ function renderWall() {
        spine naming all six marks underneath. "Six marks. One name." restates the spine
        and "the deeper reading" ranks a product the panel no longer ranks that way.
        A door that says what it is three times is not clearer, it is slower. */
-    + '<span class="menu__draw-spine">Sun Sign · Year Animal · Life Path · Rune · Trigram · Hexagram</span>'
+    /* BR-S449 — THE SEPARATOR IS BOUND TO THE WORD BEFORE IT. Both spines wrap to two
+       lines at this column width, and a naked "· " lets the break fall BEFORE the dot —
+       so line 2 opened "· Trigram · Hexagram", a list continuing with a bullet hanging
+       in the left margin. &nbsp; welds each dot to the word it follows, so a break can
+       only ever happen AFTER a separator. Costs nothing, and it is the difference
+       between a set line and a wrapped one. */
+    + '<span class="menu__draw-spine">Sun Sign&nbsp;· Year Animal&nbsp;· Life Path&nbsp;· Rune&nbsp;· Trigram&nbsp;· Hexagram</span>'
     + '</div>'
     /* ── BR-S342 — THE CONCORD LEAVES M2 ENTIRELY; IT LIVES ON THE BIRTH PAGE. ───
        BR-S328 pulled it out of the birth door and gave it its own line here, which
@@ -2207,7 +2213,25 @@ function renderWall() {
        That is the better door, and two doors to one room from two different rooms
        is how a building starts lying about its own shape. This one goes. */
     + '<a class="menu__door menu__door--add menu__door--tarot" href="?dev=drawing-room">'
-    + '<span class="menu__door-kicker">By the Draw &middot; Tarot</span>'
+    /* ★ BR-S449 — THE TAROT DOOR GETS ITS MARK, AND THE PAIR IS FINALLY ONE SHAPE.
+       BR-S446 made both doors kicker → name → spine and called them "the same object
+       twice". They were not: birth carried a gold crown in its kicker and tarot carried
+       nothing, so one door had a mark slot and the other had a blank where it should be
+       — the single loudest asymmetry left in the pair.
+
+       ★ THE MARK IS DRAWN IN INK, NOT GOLD, AND THAT IS THE WHOLE DESIGN. Gold is the
+       crown register (docs: crown + hairline ink), and the crown on the birth door is
+       EARNED — a birth reading literally produces a crowned name. Minting a gold mark
+       for tarot to make the pair match would be decoration claiming a thing the room
+       does not do. So tarot gets the same slot, the same 15px, the same 6px gap — two
+       cut cards in `url(#mwInk)`, the ink gradient already defined at the top of
+       renderWall. Same shape, different material: which is what a CHOICE looks like,
+       where two identical doors would look like two adverts. */
+    + '<span class="menu__door-kicker"><svg class="menu__draw-crown menu__draw-cut" viewBox="0 0 120 90" aria-hidden="true">'
+    +   '<rect x="20" y="16" width="40" height="60" rx="4" fill="none" stroke="url(#mwInk)" stroke-width="4" transform="rotate(-10 40 46)"/>'
+    +   '<rect x="60" y="16" width="40" height="60" rx="4" fill="none" stroke="url(#mwInk)" stroke-width="4" transform="rotate(10 80 46)"/>'
+    +   '<path d="M60 34 L70 46 L60 58 L50 46 Z" fill="url(#mwInk)"/>'
+    + '</svg> By the Draw &middot; Tarot</span>'
     + '<span class="menu__door-name">A Tarot Reading</span>'
     /* ★ BR-S446 — BOTH DOORS BECOME kicker → name → spine, AND NOTHING ELSE.
        The builder: "remove and replace this with simpler, 1 question and 3 card draw,
@@ -2226,7 +2250,12 @@ function renderWall() {
        behind it has spent. Silence cannot contradict the room. m2SittingUsed() stays
        defined — the Drawing Room's own landing still reads it, which is where the fact
        belongs. */
-    + '<span class="menu__draw-spine">Three cards, one question · Five, the Deep Read</span>'
+    /* BR-S449 — "Five, the Deep Read" → "Five for the Deep Read". The builder's call,
+       and the comma was doing real damage: it read as an apposition, so the line looked
+       like "three cards" and "five" were two names for one offering. "for" makes it a
+       count OF something, which is what the other half of the line already does
+       ("Three cards, one question"). One word, and both halves finally parse alike. */
+    + '<span class="menu__draw-spine">Three cards, one question&nbsp;· Five for the Deep Read</span>'
     + '</a>'
     + '</div>'
     /* BR-S321: the "Deeper draws" link retired — its whole sentence is now the tarot
@@ -2289,11 +2318,20 @@ function renderWall() {
     /* BR-S340: the served markup is the BIRTH state, because that is the face the panel
        opens on. These three lines and the caption below must agree with data-face on the
        hero — a first paint that disagrees with itself is a flash of the wrong product. */
-    + '<p class="m2read__label">The reading in question</p>'
+    /* BR-S453 — "The reading in question" is CUT. The builder's call, and it is the
+       same subtraction as BR-S411/417/445 in the column to the left: the block below
+       it already says what it is in its own first words, and the meta line under it
+       already names the product ("By birth · one name"). A label whose only job is to
+       announce the thing directly beneath it is a caption on a caption.
+       m2WriteRead's `set(".m2read__label", …)` at :3007 is guarded by `if (el)`, so it
+       simply no-ops now — left in place because it is one line and a later render that
+       wants a label gets it working rather than silently blank. */
     /* through the same builder as every later write, or the FIRST paint would be the
        one ungraded line on the panel and nobody would see it until they flipped */
     + '<p class="m2read__meta" data-m2-meta>' + m2MetaHTML(M2_BIRTH_READ.meta) + '</p>'
-    + '<p class="m2read__mean" data-m2-mean>Six marks you were given rather than chose, read together into one crowned name. Nothing is rolled here, and nothing is re-rolled on re-view.</p>'
+    /* BR-S451: byte-identical to M2_BIRTH_READ.mean — see the note there. The first
+       paint and the first flip must be the same sentence. */
+    + '<p class="m2read__mean" data-m2-mean>Six marks you were given by the time you were born, read together into one crowned name. Six old traditions, kept apart for centuries and gathered into one room. The same name and the same date return the same six, tonight and in ten years.</p>'
     + '</div>'
     /* BR-S345: "Asked the same, they answer the same." is gone. It was a fixed line
        pinned under a block whose whole job is to change, so it read as a caption on
@@ -2385,7 +2423,13 @@ function renderWall() {
        reads as though the sample itself is the product. The card demonstrates; the
        door sells. Only the tarot side keeps a control, because "Pull another" changes
        the card you are looking at rather than sending you somewhere. */
-    + '<a class="menu__draw-placard" href="codex.html?v=449" data-codex-open><span class="menu__draw-placard-mark" aria-hidden="true">✦</span>The Codex — where every mark is defined &rarr;</a>'
+    /* BR-S453 — the Codex placard is CUT. The builder's call, and it is the third road
+       to the same room: the white orb sits permanently in the corner of this exact
+       screen and opens the Codex in place (BR-S450 made it unmistakable), and the
+       Rooms map carries a Codex plate of its own. A link under the card competing with
+       a control that is already on screen is what the panel keeps being trimmed for —
+       the same subtraction as BR-S343 six lines up, which removed the birth side's act
+       for standing where the left column already had a full door. */
     + '</section>'
     + '<span class="menu__draw-wm" aria-hidden="true"><svg viewBox="0 0 120 190" preserveAspectRatio="xMidYMid meet"><g stroke="url(#mwInk)" fill="none"><circle cx="60" cy="98" r="31" stroke-width=".8"/><circle cx="60" cy="98" r="23" stroke-width=".6"/><path d="M60 69 L64.6 86.9 L80.5 77.5 L71.1 93.4 L89 98 L71.1 102.6 L80.5 118.5 L64.6 109.1 L60 127 L55.4 109.1 L39.5 118.5 L48.9 102.6 L31 98 L48.9 93.4 L39.5 77.5 L55.4 86.9 Z" stroke-width=".9"/></g></svg></span>'
     + '</div>';
@@ -2481,8 +2525,28 @@ const M2_BIRTH_READ = {
   meta: "By birth · one name",
   /* Trimmed from 251 characters to fit the four lines the box actually has. The old
      one measured FIVE lines at 330px and was being clipped mid-sentence — and the six
-     marks it spent two lines listing are printed on the card beside it anyway. */
-  mean: "Six marks you were given rather than chose, read together into one crowned name. Nothing is dealt here — the same name and the same date return the same six, tonight and in ten years.",
+     marks it spent two lines listing are printed on the card beside it anyway.
+     ★ BR-S451 — REWRITTEN, AND THE TWO COPIES NOW AGREE. The builder: "six marks you
+     were given by the time of your birth… since ancient times these readings were
+     known, and now all of them here." Two things were wrong beyond the words.
+       1. THE SERVED MARKUP AND THIS OBJECT SAID DIFFERENT THINGS. renderWall's first
+          paint ended "Nothing is rolled here, and nothing is re-rolled on re-view",
+          this one ended "Nothing is dealt here — the same name and the same date…".
+          The block's own note demands they agree ("a first paint that disagrees with
+          itself is a flash of the wrong product") and they had drifted apart.
+       2. "given rather than chose" is defensive — it argues with an objection the
+          reader has not raised, which the house register rules out as firmly as hype.
+          "by the time you were born" states the same fact as a fact.
+     ★ THE MIDDLE SENTENCE IS THE BUILDER'S AND IT IS TRUE AS WRITTEN. Six distinct
+     traditions — the Western zodiac, the Chinese year, numerology, the runes, the
+     trigrams, the I Ching — did develop separately and are all in the Codex. It does
+     NOT say the room looks each one up: three of the six are pick(list, seed+"f"/"g"/
+     "h"), a hash of name and date (arcana-reading.js:120), and CLAIM_AUDIT_V1 exists
+     because that exact overclaim propagated into a dozen surfaces.
+     ★ The determinism close keeps its AUDITED phrasing verbatim — "tonight and in ten
+     years" rather than "always" or "forever", which docs/CLAIM_GUARD_V1.md §10 rates
+     fragile: the seed hash has already broken once. */
+  mean: "Six marks you were given by the time you were born, read together into one crowned name. Six old traditions, kept apart for centuries and gathered into one room. The same name and the same date return the same six, tonight and in ten years.",
   accent: "#b6a06a"        // the crown's own brass — the birth reading's register
 };
 const M2_SAMPLE_READ = {
@@ -2600,9 +2664,45 @@ function m2Excerpt(text, lines, cols) {
   out = out.trim();
   return out || t;                       // one very long sentence: let the clamp have it
 }
+/* ★★ BR-S453 — THE READ BLOOMS WHEN IT CHANGES.
+   The builder: "clicking these on the card lacks that touch of experience and class,
+   when the example changes on the right when clicking a reading example… it should
+   have slight bloomy effect of the text."
+
+   THE DEFECT IS THAT THE SWAP HAD NO DURATION AT ALL. m2WriteRead replaced three text
+   nodes in one synchronous pass, so a click landed the new sentence on the same frame
+   the old one left. Nothing was wrong with the words; there was simply no MOMENT — and
+   a card you chose to turn owes you one. The card beside it takes 640ms to turn and its
+   words changed in zero.
+
+   IT REUSES THE GRADING MACHINERY THAT IS ALREADY THERE. .m2read__mean is painted
+   through a --grade-a/--grade-b gradient clipped to the text (styles.css:3343-3348),
+   both @property-registered at :3278 so they genuinely interpolate, already carrying a
+   220ms transition, and already re-graded on hover. The bloom lifts the same two stops
+   to a brighter pair for one beat and lets the transition that already exists carry
+   them back down. No new keyframes, no new element, nothing per-frame.
+
+   ★ CLEARED BY TIMEOUT, NOT BY animationend. BR-S326 is the cautionary tale in this
+   file: a handler that never fired left two will-change hints set for a whole session.
+   A timer always fires. The token is stored on the node so a rapid second click
+   restarts the beat rather than stacking two. */
+const M2_BLOOM_MS = 420;
+function m2Bloom(root) {
+  const block = root.querySelector(".m2read");
+  if (!block) return;
+  const reduced = window.BRMotion ? window.BRMotion.prefersReduced()
+    : !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+  if (reduced) return;                       // the text still changes; it just does not glow
+  clearTimeout(block._bloomT);
+  block.classList.remove("is-bloom");
+  void block.offsetWidth;                    // one forced reflow, on a click, so the restart is real
+  block.classList.add("is-bloom");
+  block._bloomT = setTimeout(function () { block.classList.remove("is-bloom"); }, M2_BLOOM_MS);
+}
 function m2WriteRead(root, r) {
   const set = (sel, txt) => { const el = root.querySelector(sel); if (el) el.textContent = txt; };
   set(".m2read__label", r.label);
+  m2Bloom(root);
   /* the accent rides on the block, so one property change re-tints the whole read */
   const block = root.querySelector(".m2read");
   if (block) {
@@ -2831,13 +2931,13 @@ function onMenuAnnexKey(e) {
    whole document, and a returning visitor holding the cached old one would otherwise read a
    page that no longer exists. Bump all of them together or none. */
 const CX_LEAVES =
-  '<a class="seed" id="codexSeed" href="codex.html?v=449" role="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="codexBloom" aria-label="Open the Codex">'
+  '<a class="seed" id="codexSeed" href="codex.html?v=453" role="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="codexBloom" aria-label="Open the Codex">'
   + '<span class="seed__glyph seed__open" aria-hidden="true">&#9670;</span>'
   + '<span class="seed__glyph seed__close" aria-hidden="true">&#10005;</span>'
   + '</a>'
   + '<div class="bloom" id="codexBloom" role="dialog" aria-modal="true" aria-label="The Codex" inert aria-hidden="true">'
   + '<div class="bloom__backfill"></div>'
-  + '<iframe class="bloom__frame" data-src="codex.html?v=449" title="The Codex" tabindex="-1"></iframe>'
+  + '<iframe class="bloom__frame" data-src="codex.html?v=453" title="The Codex" tabindex="-1"></iframe>'
   + '<div class="bloom__sheen" aria-hidden="true"></div>'
   + '</div>'
   + '<div class="bloom__ink" aria-hidden="true"></div>'
@@ -2854,7 +2954,7 @@ const MINI_LEAVES =
   + '<div class="mini__panel" role="dialog" aria-label="Mini Codex — search" inert aria-hidden="true">'
   + '<input class="mini__input" type="search" autocomplete="off" spellcheck="false" placeholder="Search the Codex…" aria-label="Search the Codex" />'
   + '<div class="mini__results" aria-live="polite"></div>'
-  + '<a class="mini__more" href="codex.html?v=449" data-codex-open>Open the full Codex &#8594;</a>'
+  + '<a class="mini__more" href="codex.html?v=453" data-codex-open>Open the full Codex &#8594;</a>'
   + '</div></div>';
 
 function renderMenu(reveal) {
@@ -2922,7 +3022,7 @@ function renderMenu(reveal) {
         </div>
 
         <div class="menu__portals">
-          <a class="menu__codex" href="codex.html?v=449" data-codex-open><span class="menu__codex__mark" aria-hidden="true">◆</span> The Codex <span class="menu__codex__arr" aria-hidden="true">→</span></a>
+          <a class="menu__codex" href="codex.html?v=453" data-codex-open><span class="menu__codex__mark" aria-hidden="true">◆</span> The Codex <span class="menu__codex__arr" aria-hidden="true">→</span></a>
           <a class="menu__codex" href="?dev=settings"><span class="menu__codex__mark" aria-hidden="true">◆</span> Settings <span class="menu__codex__arr" aria-hidden="true">→</span></a>
           <button type="button" class="menu__codex menu__codex--rooms" data-annex-go><span class="menu__codex__mark" aria-hidden="true">◆</span> The Reading Rooms <span class="menu__codex__arr" aria-hidden="true">→</span></button>
         </div>
@@ -3153,12 +3253,12 @@ function wireMenuCodex(host) {
 
   function open() {
     if (isOpen) return;
-    if (!ok) { location.href = "codex.html?v=449"; return; }           // no clip-path: the seal is a real door
+    if (!ok) { location.href = "codex.html?v=453"; return; }           // no clip-path: the seal is a real door
     if (!loaded) {                                              // M4.3: cold click — wait for the frame, don't navigate
       warmFrame(); pendingOpen = true;
       clearTimeout(coldT);                                      // ...but a frame that never arrives must not leave a dead control:
       coldT = setTimeout(function () {                          // after 6s the seal becomes the real door again, as it always was
-        if (pendingOpen && !loaded) { pendingOpen = false; location.href = "codex.html?v=449"; }
+        if (pendingOpen && !loaded) { pendingOpen = false; location.href = "codex.html?v=453"; }
       }, 6000);
       return;
     }
@@ -3229,7 +3329,7 @@ function wireMenuCodex(host) {
     if (e.key === "Enter") { e.stopPropagation(); }        // shield the global menu Enter→room; the anchor's activation fires the click
     else if (e.key === " " || e.key === "Spacebar") {      // anchors don't activate on Space natively
       e.stopPropagation(); e.preventDefault();
-      if (ok) toggle(); else location.href = "codex.html?v=449";
+      if (ok) toggle(); else location.href = "codex.html?v=453";
     }
   });
 
@@ -3242,7 +3342,7 @@ function wireMenuCodex(host) {
       if (e.key === "Enter") { e.stopPropagation(); }        // shield the global menu Enter→room; the anchor's activation fires the click
       else if (e.key === " " || e.key === "Spacebar") {      // anchors don't activate on Space natively
         e.stopPropagation(); e.preventDefault();
-        if (!ok) { location.href = "codex.html?v=449"; return; }
+        if (!ok) { location.href = "codex.html?v=453"; return; }
         open();
       }
     });
@@ -4486,6 +4586,66 @@ function _u1CanGlide(target) {
   if (_menuIndex(host) !== MENU_HOME) return false;                  // BR-S405: HOME only — L1/M2 are horizontal, they have no depth
   return true;
 }
+/* ★★ BR-S449 — THE HORIZONTAL AXIS HAD NO OWNER, AND THE BROWSER TOOK IT.
+   The builder: "when evoking go left on my touchpad from m1 it open codex instead l1."
+
+   THE CAUSE IS NOT IN THE CODEX. Nothing in this file has ever read `deltaX` — the
+   handler below is deltaY-only, and every other menu path (arrows, Esc, the annex
+   buttons) is a key or a click. So a two-finger horizontal swipe fell all the way
+   through to Chrome, which converts sustained horizontal overscroll into a HISTORY
+   NAVIGATION. And the aperture takes exactly one history entry when it opens
+   (app.js:3517, "BACK BELONGS TO THE APERTURE") — so Back is a documented way to land
+   on the Codex. The gesture was never opening the Codex; it was going backwards into
+   it. Which means no amount of work inside wireMenuCodex could have fixed this.
+
+   THE FIX IS TO CLAIM THE AXIS. Horizontal now moves the panel track, which is the
+   gesture the track has always deserved: the three panels ARE a horizontal filmstrip
+   (L1 ← M1 → M3) and were reachable by every input except the one that literally
+   means "sideways".
+
+   ★ preventDefault RUNS EVEN AT THE ENDS. This is the actual bug-kill and it is easy
+   to get wrong: if we only swallowed the gesture when a slide was available, a swipe
+   left while already ON L1 would still hand Chrome a history-back and still walk out
+   of the room. The axis is ours whenever the menu owns the screen — including when the
+   answer is "there is nothing further this way".
+
+   ★ ONE GESTURE = ONE STEP. A trackpad emits a continuous stream of wheel events for a
+   single flick, so without a latch one swipe would run the whole track end to end. The
+   latch closes on the step and only re-arms after the stream has genuinely RESTED
+   (below the jitter floor for _MX_REST ms) — the same "one deliberate push" discipline
+   the vertical boundary already uses, rather than a blind cooldown that would eat a
+   real second swipe from an impatient hand.
+
+   ★ THE DOMINANCE TEST IS STRICT. |deltaX| must beat |deltaY| outright: a diagonal
+   drift during a vertical scroll must never slide the panel sideways, and the descent
+   glide below is the more delicate of the two motions. */
+const _MX_FLOOR = 12;                     // jitter floor: below this the axis is noise, not intent
+const _MX_REST  = 220;                    // ms of quiet before a new swipe is allowed to count
+let _mxLatched = false, _mxRestT = null;
+function _mxCanSlide(target) {
+  if (state.view !== "menu" || _cxOpen || _navBlocked(target)) return false;
+  const host = document.getElementById("menuView");
+  if (!host || host.classList.contains("is-fullview")) return false;
+  /* never steal from something that genuinely scrolls sideways (a wide table, a rail).
+     The codex lives in an iframe and consumes its own wheel events, so it needs no
+     guard here — this is for horizontal panes inside our own document. */
+  if (target && target.closest && target.closest("[data-hscroll], .orbit, .mini")) return false;
+  return true;
+}
+window.addEventListener("wheel", function (e) {
+  if (e.ctrlKey || e.metaKey || e.altKey || e.shiftKey) return;       // pinch-zoom and browser gestures stay the browser's
+  const ax = Math.abs(e.deltaX);
+  if (ax <= _MX_FLOOR || ax <= Math.abs(e.deltaY)) return;            // not a horizontal gesture
+  if (!_mxCanSlide(e.target)) return;
+  e.preventDefault();                                                 // ★ ours even at the ends — this is what stops history-back
+  clearTimeout(_mxRestT);
+  _mxRestT = setTimeout(function () { _mxLatched = false; }, _MX_REST);
+  if (_mxLatched) return;                                             // the rest of this one flick is already spent
+  _mxLatched = true;
+  const host = document.getElementById("menuView");
+  menuSlideTo(_menuIndex(host) + (e.deltaX > 0 ? 1 : -1));            // right swipe → next panel, left → previous
+}, { passive: false });
+
 /* WHEEL — one deliberate push at either edge of the boundary. */
 window.addEventListener("wheel", function (e) {
   /* MID-GLIDE, ANY DIRECTION: hand control straight back. The gesture is NOT
@@ -6078,7 +6238,7 @@ render();
       }
     } catch (e) {}
     if (host.querySelector("#about")) out.push({ label: "About Blue Room", sub: "What this is", mark: ORBIT_MARKS.about, rank: 4, wing: "house", idx: 0, kind: "about" });
-    out.push({ label: "The Codex", sub: "Every mark, defined", mark: AB_EMBLEMS.codex, rank: 1, wing: "work", href: "codex.html?v=449", kind: "link" });
+    out.push({ label: "The Codex", sub: "Every mark, defined", mark: AB_EMBLEMS.codex, rank: 1, wing: "work", href: "codex.html?v=453", kind: "link" });
     /* BR-S339 — THE SEVENTH PLATE. Discovery is this archive's best argument, and it
        could only be made by the rooms that already exist. The Roadmap is in the HOUSE
        wing with About and Settings — the building explaining itself — and ranks below
