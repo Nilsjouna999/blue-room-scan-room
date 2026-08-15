@@ -3386,6 +3386,14 @@ function mountMenu() {
   const canReveal = !!(window.BRReveal && typeof window.BRReveal.mount === "function");
   host.classList.toggle("menurev", canReveal);
   host.classList.remove("is-fullview");   // clean state on (re)mount
+  /* ★★ BR-S494 — THE APERTURE'S CLASSES ARE STATE TOO, and this line was one word short.
+     `is-fullview` was cleaned here; the two codex classes were not — while wireMenuCodex
+     resets its own _cxOpen/isOpen flags on every mount, so the class and the state
+     disagreed by exactly this. A remount taken while the Codex was open (a holdings flip,
+     a draft pick) left a brand-new, born-inert, born-aria-hidden bloom painted fully open
+     at z-index 200 over a menu that no longer existed: unscrollable, unclickable, and the
+     seal's first press only re-added a class it already had. */
+  host.classList.remove("is-codex-open", "is-codex-closing", "is-cx-blooming");
   host.innerHTML = renderMenu(canReveal);
   if (canReveal) wireMenuReveal(host);
   wireMenuAnnex(host);   // BR-S192: the desk↔wall slide (works with or without the reveal)
@@ -3440,6 +3448,11 @@ function wireMenuAbout(host) {
    codex.html. Module-level _cxOpen shields the ribbon/reveal/global-Enter Esc &
    Enter handlers; _cxTeardown tears a prior mount's wiring so nothing stacks. */
 let _cxOpen = false, _cxTeardown = null, _cxResize = null;
+/* BR-S494 — hoisted out of wireMenuCodex. The ONE history entry the aperture pushes
+   outlives a remount; the closure that pushed it does not, so a remount taken mid-open
+   stranded the entry and cost the reader a dead Back press. Module scope means the new
+   mount inherits it: open() will not push a second, and the next close() consumes it. */
+let cxPushed = false, cxUnwind = false;
 
 function wireMenuCodex(host) {
   if (_cxTeardown) { _cxTeardown(); _cxTeardown = null; }   // defensive: never stack across remounts
@@ -3451,7 +3464,7 @@ function wireMenuCodex(host) {
 
   let loaded = false, isOpen = false, busy = false, bgInert = [];
   let pendingOpen = false;                 // M4.3: a click landed before the frame did — open the moment it lands
-  let cxPushed = false, cxUnwind = false;  // M4.2: our one history entry, and the pop that consumes it
+  /* BR-S494: cxPushed / cxUnwind moved to module scope — the entry outlives this closure. */
   let wcT = null, homeT = null, closeT = null, busyT = null, focusT = null, coldT = null;
   const ok = (function () { try { return window.CSS && CSS.supports("clip-path", "circle(0px)"); } catch (e) { return false; } })();
   const reduced = function () { return window.BRMotion ? window.BRMotion.prefersReduced() : (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches); };
@@ -3491,12 +3504,28 @@ function wireMenuCodex(host) {
   function bg(on) {
     if (on) {
       bgInert = [];
-      for (let i = 0; i < host.children.length; i++) {
-        const el = host.children[i];
-        if (el === seed || el === bloom) continue;
-        bgInert.push(el);                                               // track ALWAYS — the last close must win
-        if (!el.hasAttribute("inert")) el.setAttribute("inert", "");    // write only what isn't already written
-      }
+      const mark = function (list, keep) {
+        for (let i = 0; i < list.length; i++) {
+          const el = list[i];
+          if (keep.indexOf(el) !== -1) continue;
+          bgInert.push(el);                                             // track ALWAYS — the last close must win
+          if (!el.hasAttribute("inert")) el.setAttribute("inert", "");  // write only what isn't already written
+        }
+      };
+      mark(host.children, [seed, bloom]);
+      /* ★ BR-S494 — THE TAB TRAP, deferred at BR-S205 and no longer hypothetical.
+         This walked #menuView's children only, so nothing outside the menu was ever
+         inerted — and two body-level controls survive behind the opaque aperture:
+         .lightbox__x, whose container is opacity:0 with pointer-events:none (neither of
+         which removes it from the tab order), and .orbitbtn, which is display:inline-flex
+         and opacity:1 on the menu view. Enter on the second one opens the ROOMS field
+         from behind a z-200 aperture.
+         Body level closes both and adds no markup, no focus handlers and no Shift-Tab
+         direction tracking — which is why this was taken over the sentinel pair the
+         original note proposed. Every other inert writer in this file works on menu
+         children or on the reveal, never on a direct child of body, so the track-always/
+         write-once bookkeeping cannot collide with another feature's. */
+      mark(document.body.children, [host]);
     } else { bgInert.forEach(function (el) { el.removeAttribute("inert"); }); bgInert = []; }
   }
 
@@ -3547,14 +3576,22 @@ function wireMenuCodex(host) {
     // force a style commit of the closed clip before opening (mirror the proto reflow)
     void bloom.offsetWidth;
     host.classList.add("is-codex-open");
+    host.classList.add("is-cx-blooming");                 // BR-S494: the transacting window — carries will-change and the blend group, stripped by arithmetic below
     seed.setAttribute("aria-expanded", "true");
     seed.setAttribute("aria-label", "Close the Codex");
     focusFrame();
     clearTimeout(focusT);                                 // re-land on the search bar after the bloom settles (the codex page can steal focus on load)
-    focusT = setTimeout(function () { if (isOpen) focusFrame(); }, reduced() ? 40 : 720);
+    /* BR-S494: 720 -> 790. The clip is `var(--edge-dur) ... 90ms` and --edge-dur is 680ms,
+       so the aperture lands at 770 — this beat was firing 50ms BEFORE the thing it says it
+       waits for. +20ms of slack, the same margin the close already uses (clip home 460,
+       homeT 480). It is the one step in the choreography that missed its own stated mark. */
+    focusT = setTimeout(function () { if (isOpen) focusFrame(); }, reduced() ? 40 : 790);
     document.addEventListener("keydown", onEsc, true);
     clearTimeout(wcT);
-    wcT = setTimeout(function () { bloom.style.willChange = ""; }, reduced() ? 60 : 1000);
+    wcT = setTimeout(function () {
+      bloom.style.willChange = "";
+      host.classList.remove("is-cx-blooming");            // 1500ms = 20ms past the sheen's 1480ms end
+    }, reduced() ? 60 : 1500);
   }
 
   /* fromPop === true when a popstate already consumed our entry (Back); anything else —
@@ -3563,6 +3600,7 @@ function wireMenuCodex(host) {
     if (!isOpen) return;
     isOpen = false; _cxOpen = false;
     pendingOpen = false;
+    host.classList.remove("is-cx-blooming");   // BR-S494: a close before the 1500ms timer must not leave three layers promoted
     if (cxPushed && !fromPop) { cxPushed = false; cxUnwind = true; try { history.back(); } catch (e) { cxUnwind = false; } }
     clearTimeout(wcT); clearTimeout(focusT);
     document.removeEventListener("keydown", onEsc, true);
@@ -3632,11 +3670,25 @@ function wireMenuCodex(host) {
   /* iframe: pre-warm from data-src (rIC + setTimeout shim so it fires on every engine), painted
      under the opaque backfill; on load, mark loaded + neutralize codex's .back + route its Escape. */
   function onFrameLoad() {
+    /* ★ BR-S494 — THE SPEC-MANDATED about:blank LOAD WAS COUNTING AS THE CODEX.
+       CX_LEAVES ships this iframe with NO src and sets the real one later from data-src on
+       an idle callback. Per HTML's "process the iframe attributes", a src-less iframe queues
+       a load event on the DOM manipulation task source — which runs after this script and
+       long before any idle callback. So `loaded` went true for about:blank, and the cold-
+       click path below (which waits for the frame and opens the moment it lands) could
+       never run: a seal press in that window irised open onto an empty near-black frame
+       and filled in a beat later. One guard restores the behaviour that was built. */
+    if (!frame.getAttribute("src")) return;
     loaded = true;
     try {
       const d = frame.contentDocument;
       if (d) {
-        const back = d.querySelector(".back");
+        /* BR-S494: every other selector aimed into the frame degrades softly; this one
+           failed destructively and silently. An un-intercepted .back navigates the IFRAME
+           to index.html, so the whole app boots nested inside the aperture with the
+           parent's seal floating over it — and no console error. */
+        const back = d.querySelector(".back") || d.querySelector('a[href="index.html"], a[href^="index.html?"]');
+        if (!back && window.console && console.warn) console.warn("[BR-S494] codex frame: no back link matched — the in-frame back will navigate the frame, not close the aperture.");
         if (back && !back._cxBound) { back._cxBound = true; back.addEventListener("click", function (ev) { ev.preventDefault(); close(); }); }
         if (!d._cxEscBound) { d._cxEscBound = true; d.addEventListener("keydown", function (ev) { if (ev.key === "Escape") { ev.preventDefault(); close(); } }); }
       }
@@ -3658,6 +3710,10 @@ function wireMenuCodex(host) {
     clearTimeout(wcT); clearTimeout(homeT); clearTimeout(closeT); clearTimeout(busyT); clearTimeout(focusT); clearTimeout(coldT);
     pendingOpen = false;
     _cxOpen = false;
+    /* BR-S494: the 1500ms timer that strips this class was just cleared, so a teardown
+       taken inside the transacting window would otherwise leave the promotion set on a
+       host that is about to be rebuilt. */
+    try { host.classList.remove("is-cx-blooming"); } catch (e) {}
   };
 }
 

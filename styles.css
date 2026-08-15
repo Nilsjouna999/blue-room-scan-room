@@ -4996,9 +4996,8 @@ body[data-devnav="1"] .devnav {
   border: 1.5px solid rgba(224,138,66,.92); box-shadow: 0 0 6px 0 rgba(230,120,50,.34);
   mix-blend-mode: screen; transform: scale(.981); opacity: 0; }
 #menuView .bloom__sheen { position: absolute; inset: -60%; z-index: 3; pointer-events: none; opacity: 0;
-  mix-blend-mode: screen;
   background: linear-gradient(135deg, transparent 0 44%, rgba(255,246,228,.05) 47.5%, rgba(255,249,235,.16) 50%, rgba(255,246,228,.05) 52.5%, transparent 56% 100%);
-  transform: translate3d(70%, 70%, 0); }
+  transform: translate3d(45%, 45%, 0); }   /* BR-S494: was 70% — see the keyframes note. mix-blend-mode moved to the transacting state below. */
 
 /* OPEN — seal charge→swallow→re-form as ✕; aperture slow-burn leap to land; ink frontier; ember; sheen */
 #menuView.is-codex-open .seed { animation: seedToClose 660ms var(--ease-bloom); }
@@ -5006,10 +5005,26 @@ body[data-devnav="1"] .devnav {
 #menuView.is-codex-open .seed__close { opacity: 1; transform: rotate(0deg); transition-delay: 340ms; }
 #menuView.is-codex-open .bloom { clip-path: circle(var(--r, 1400px) at var(--cx) var(--cy));
   transition: clip-path var(--edge-dur) var(--ease-edge) 90ms; }
-#menuView.is-codex-open .bloom__ink, #menuView.is-codex-closing .bloom__ink { will-change: transform, opacity; }
+#menuView.is-codex-closing .bloom__ink { will-change: transform, opacity; }   /* the CLOSING half is bounded — the class is stripped at 840ms */
 #menuView.is-codex-open .bloom__ink { animation: inkOpen var(--edge-dur) var(--ease-edge) 90ms forwards; }
-#menuView.is-codex-open .bloom__ember { will-change: transform, opacity; animation: emberBurn var(--ember-dur) linear 560ms forwards; }
-#menuView.is-codex-open .bloom__sheen { will-change: transform, opacity; animation: codexSheen 680ms cubic-bezier(.4,.1,.2,1) 800ms forwards; }
+#menuView.is-codex-open .bloom__ember { animation: emberBurn var(--ember-dur) linear 560ms forwards; }
+#menuView.is-codex-open .bloom__sheen { animation: codexSheen 680ms linear 800ms forwards; }   /* BR-S494: linear, so progress% == keyframe% */
+
+/* ★ BR-S494 — will-change IS ARMED AND CLEARED BY ARITHMETIC, and the CSS half was
+   breaking the law the JS half already obeyed twelve lines away. `.is-codex-open` lives
+   for as long as the reader keeps the Codex open — minutes — while the last animation
+   ends at 1480ms. So three layers were held promoted for the whole session: the ink and
+   the ember are calc(var(--r)*2) square (~3160px at 1440x900) and the sheen is 2.2x the
+   viewport. `.is-cx-blooming` is added with the open and stripped at 1500ms, 20ms past
+   the sheen's end. Freeze-safe: if that timer never runs, the behaviour is exactly what
+   shipped before this commit.
+   The blend group rides the same class for the same reason — a viewport-and-a-bit of
+   screen-blended layer must not sit over a scrolling iframe all session. The sheen ends
+   at opacity 0, so dropping the blend at rest is a visual no-op. */
+#menuView.is-cx-blooming .bloom__ink,
+#menuView.is-cx-blooming .bloom__ember,
+#menuView.is-cx-blooming .bloom__sheen { will-change: transform, opacity; }
+#menuView.is-cx-blooming .bloom__sheen { mix-blend-mode: screen; }
 
 /* REVERSE — content-frame collapse via clip; ink irises home; the seal is CAUGHT by a damped ring-out + echo-ping */
 #menuView.is-codex-closing .bloom { clip-path: circle(0px at var(--cx) var(--cy));
@@ -5043,11 +5058,32 @@ body[data-devnav="1"] .devnav {
   95%  { transform: scale(1.0);    opacity: .14; }
   100% { transform: scale(1.0);    opacity: 0; }
 }
+/* ★★ BR-S494 — THE SHEEN WAS A STROBE HERE TOO, AND THIS IS THE SURFACE IT SPREAD FROM.
+   BR-S477 found and fixed this on the card's specimen panel, which had copied these exact
+   parameters from this block. Nobody came back to fix the original.
+
+   MEASURED, not guessed. `.bloom` is fixed inset:0, so `inset:-60%` makes this layer
+   2.2x viewport per axis; a 135deg gradient line on that box is 1.5556(W+H), and the
+   44%->56% band is 12% of it = 0.18667(W+H). translate3d(70%) projects to 1.0889(W+H)
+   each way, so travel was 2.1778(W+H) = 11.667 band-widths, aspect-independent. The band
+   overlaps the viewport only while |displacement| < 0.44689(W+H) — 41% of travel, so
+   59% OFF-PANEL. Under the old cubic-bezier that window solved to 173.8ms..295.4ms:
+   121.6ms of light out of a 680ms animation, 17.9%. And both opacity ramps landed
+   outside it, so the band was switched on at the full .9 plateau at one screen edge and
+   off at the full plateau at the other. Peak advance was 0.76 full-band-widths per frame
+   — but the bright core is only the 47.5-52.5% stops, and that advanced 1.83 core-widths
+   per frame. It painted disjoint positions. That is a flash, not a rake.
+
+   THE FIX IS THE ONE ALREADY SHIPPED: +/-45% = 7.50 band-widths of travel, 63.8% of it
+   on-panel, and LINEAR timing makes progress% equal keyframe% — so the band enters at
+   18.1% and leaves at 81.9% and both ramps land where they can actually be seen. The
+   plateau drops .9 -> .62 because a band that is now visible for its whole ramp does not
+   need to shout, and 78% -> 72% keeps the fade inside the window. */
 @keyframes codexSheen {
-  0%   { transform: translate3d(70%, 70%, 0);   opacity: 0; }
-  22%  { opacity: .9; }
-  78%  { opacity: .9; }
-  100% { transform: translate3d(-70%, -70%, 0); opacity: 0; }
+  0%   { transform: translate3d(45%, 45%, 0);   opacity: 0; }
+  22%  { opacity: .62; }
+  72%  { opacity: .62; }
+  100% { transform: translate3d(-45%, -45%, 0); opacity: 0; }
 }
 @keyframes inkClose {
   0%   { transform: scale(1); opacity: 0; }
