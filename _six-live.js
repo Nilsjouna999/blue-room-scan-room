@@ -117,7 +117,9 @@
        14px still escaped. Set past the real worst case, not at it: the panel's own
        per-mark line reserves (the `r:` column in SIX) already stop it varying BETWEEN
        marks, so this only has to clear the tallest one that exists. */
-    + ".m2read{min-height:486px}"
+    + ".m2read{min-height:518px}"
+
+
     + ".sx{transition:opacity 110ms ease;position:absolute;top:0;left:0;right:0}"
     + ".sx:not(.is-ready){display:none}"
     + ".sx.is-out{opacity:0}"
@@ -171,10 +173,18 @@
     +   "34%{opacity:1}62%{opacity:.94}100%{opacity:1;transform:none}}"
     /* the 62% dip is the irregularity — one beat where the ink is not yet settled.
        Monotonic reads as a machine; this reads as something drying. */
-    + "@keyframes sx-edge-a{0%{opacity:0;transform:translate3d(0,-10%,0)}"
-    +   "7%{opacity:1}86%{opacity:1}100%{opacity:0;transform:translate3d(0,104%,0)}}"
-    + "@keyframes sx-edge-b{0%{opacity:0;transform:translate3d(0,-10%,0)}"
-    +   "7%{opacity:1}86%{opacity:1}100%{opacity:0;transform:translate3d(0,104%,0)}}"
+    /* ★★ BR-S466 — THE WHOLE BOX BLOOMS, NOT A LINE FRONT. The builder drew it: a box,
+       the text inside it, and diagonal strokes across the ENTIRE panel — "i was more
+       thinking whole chat box blooms like codex's ending".
+       That is the aperture's SHEEN (styles.css:4968), not its ink frontier: a 135°
+       band travelling corner to corner over the whole surface, screen-blended, which is
+       the last thing the Codex does when it opens. BR-S464 built the horizontal edge —
+       the right grammar, the wrong axis and the wrong scale. The panel is a sheet being
+       turned to the light, not a line being drawn down it. */
+    + "@keyframes sx-edge-a{0%{opacity:0;transform:translate3d(70%,70%,0)}"
+    +   "18%{opacity:.9}78%{opacity:.9}100%{opacity:0;transform:translate3d(-70%,-70%,0)}}"
+    + "@keyframes sx-edge-b{0%{opacity:0;transform:translate3d(70%,70%,0)}"
+    +   "18%{opacity:.9}78%{opacity:.9}100%{opacity:0;transform:translate3d(-70%,-70%,0)}}"
     + ".sx{--sx-ease:cubic-bezier(.22,.50,.16,1)}"          /* the aperture's own leap-then-crawl */
     + ".sx>*{transform-origin:0 60%;--sx-amp:1}"
     + ".sx__glyph,.sx__name{--sx-amp:var(--sx-scale,1)}"    /* only the two large marks take the spread */
@@ -188,12 +198,20 @@
     +   " calc(var(--g,0) * var(--sx-step,26ms)) both}"
     + ".sx.is-print-b>*{animation:sx-print-b var(--sx-dur,230ms) var(--sx-ease)"
     +   " calc(var(--g,0) * var(--sx-step,26ms)) both}"
-    /* THE EDGE. A soft band the width of the panel, brighter than what it reveals. */
-    + ".sx{position:absolute}"
-    + ".sx::after{content:'';position:absolute;left:-6px;right:-6px;top:0;height:26px;"
-    +   "pointer-events:none;opacity:0;border-radius:2px;"
-    +   "background:linear-gradient(180deg,rgba(255,252,244,0) 0%,rgba(255,252,244,.10) 34%,"
-    +   "rgba(255,252,244,.16) 52%,rgba(120,112,98,.09) 74%,rgba(0,0,0,0) 100%)}"
+    /* ★★ THE SHEEN, LIFTED FROM THE APERTURE VERBATIM — "same concepts that we built on
+       codex". Same 135° band, same four stops, same screen blend, same corner-to-corner
+       travel. Not "like" it: the identical grammar, applied to a smaller sheet, so the
+       two surfaces are the same gesture at two scales rather than two effects that
+       resemble each other.
+       ★ inset:-60% is what lets the band cross the corners rather than start inside the
+       box, which is why .sx must clip — without overflow:hidden the sheen paints 60% of
+       the panel's size out into the room on every mark. */
+    + ".sx{position:absolute;overflow:hidden}"
+    + ".sx::after{content:'';position:absolute;inset:-60%;"
+    +   "pointer-events:none;opacity:0;mix-blend-mode:screen;"
+    +   "transform:translate3d(70%,70%,0);"
+    +   "background:linear-gradient(135deg,transparent 0 44%,rgba(255,246,228,.05) 47.5%,"
+    +   "rgba(255,249,235,.16) 50%,rgba(255,246,228,.05) 52.5%,transparent 56% 100%)}"
     + ".sx.is-print-a::after{animation:sx-edge-a var(--sx-edge,300ms) var(--sx-ease) both}"
     + ".sx.is-print-b::after{animation:sx-edge-b var(--sx-edge,300ms) var(--sx-ease) both}"
     /* ★ THE MARK YOU TOUCHED ACKNOWLEDGES IT — the aperture's fifth property. Nothing
@@ -202,6 +220,8 @@
     + "@media (prefers-reduced-motion:reduce){"
     +   ".sx.is-print-a>*,.sx.is-print-b>*{animation:none}"
     +   ".sx.is-print-a::after,.sx.is-print-b::after{animation:none;opacity:0}}"
+
+
     + ".sx__src{font-family:var(--font-mono);font-size:9px;letter-spacing:.2em;"
     +   "text-transform:uppercase;color:#6e6b63;margin:0 0 16px;display:flex;gap:7px}"
     + ".sx__src b{color:#948f87;font-weight:400}"
@@ -237,7 +257,42 @@
     + ".sx__close{margin-top:15px;padding-top:12px;border-top:1px solid rgba(233,229,220,.09);"
     +   "display:flex;align-items:baseline;gap:9px}"
     + ".sx__close i{color:var(--sxc);font-size:9px;font-style:normal;line-height:1.7}"
-    + ".sx__close span{font-family:var(--font-display);font-style:italic;font-size:13px;color:#a8a294}";
+    + ".sx__close span{font-family:var(--font-display);font-style:italic;font-size:13px;color:#a8a294}"
+
+    /* ══ BR-S466 — THE VERTICAL RHYTHM. Measured down the panel, the gaps between
+       consecutive blocks ran 16, 13, 8, 10, 13, 17, 15 — SEVEN values, no two the same
+       for a reason, and close enough together that they read as accidental rather than
+       as a scale. Nothing was broken; it simply had no rhythm, which is what "spacing
+       issues" feels like before you can name it.
+
+       ★ THE SCALE IS 6 / 8 / 12 / 16 / 20 and every gap is one of them. But the numbers
+       are not the point — the GROUPING is. Spacing is the only thing on this panel that
+       says what belongs to what:
+
+           sx__src        the eyebrow — its own thing            20 below
+           sx__glyph      the mark                               12
+           sx__label       ┐ a label belongs to the name          6   <- tightest gap
+           sx__name        │ under it, so it is bound to it       8       on the panel
+           sx__attrs       ┘ and the attributes describe it      16
+           sx__perks      the keywords                           20
+           sx__say        the meaning                            20
+           sx__close      the closing line
+
+       The 6px between label and name is the smallest gap here on purpose: it is the one
+       pair where the top item is meaningless without the bottom one. Before, that pair
+       (8) was barely tighter than the perks-to-meaning break (17) — so the eye had no
+       way to tell a caption from a section.
+
+       ★ COST CHECKED, NOT ASSUMED: +10px on the tallest specimen, 466 -> ~476, against a
+       486 reserve. It still clears, with 10px to spare. */
+    + ".sx__src{margin:0 0 20px}"
+    + ".sx__glyph{margin:0 0 12px}"
+    + ".sx__label{margin:0 0 6px}"
+    + ".sx__name{margin:0 0 8px}"
+    + ".sx__attrs{margin:0 0 16px}"
+    + ".sx__perks{margin:0 0 20px}"
+    + ".sx__say{margin:0}"
+    + ".sx__close{margin:20px 0 0}";
 
   function esc(s){ return String(s).replace(/[&<>]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;"}[c];}); }
 

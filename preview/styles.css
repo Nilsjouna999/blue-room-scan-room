@@ -3598,22 +3598,31 @@ html.is-travel .card .cardfinish { mix-blend-mode: normal; }
   62%  { opacity: .94; }
   100% { opacity: 1; transform: none; }
 }
+/* ★★ BR-S466 — THE WHOLE BLOCK BLOOMS, AND IT IS THE APERTURE'S OWN SHEEN. The builder
+   drew a box with diagonal strokes across all of it: "whole chat box blooms like codex's
+   ending… same concepts that we built on codex."
+   So this is not a cousin of `codexSheen` (styles.css:4990) — it is the same keyframe
+   shape, the same 135° band, the same four stops and the same corner-to-corner travel,
+   applied to a smaller sheet. Two surfaces, one gesture, two scales. BR-S464's
+   horizontal front was the right grammar on the wrong axis: a sheet turned to the light,
+   not a line drawn down it. */
 @keyframes m2read-edge {
-  0%   { opacity: 0; transform: translate3d(0, -12%, 0); }
-  7%   { opacity: 1; }
-  86%  { opacity: 1; }
-  100% { opacity: 0; transform: translate3d(0, 108%, 0); }
+  0%   { opacity: 0; transform: translate3d(70%, 70%, 0); }
+  18%  { opacity: .9; }
+  78%  { opacity: .9; }
+  100% { opacity: 0; transform: translate3d(-70%, -70%, 0); }
 }
-.menu__draw .m2read { --m2-ease-edge: cubic-bezier(.22, .50, .16, 1); position: relative; }
+.menu__draw .m2read { --m2-ease-edge: cubic-bezier(.22, .50, .16, 1); position: relative; overflow: hidden; }
 .menu__draw .m2read.is-bloom .m2read__meta { animation: m2read-arrive 260ms var(--m2-ease-edge) both; }
 .menu__draw .m2read.is-bloom .m2read__mean { animation: m2read-arrive 300ms var(--m2-ease-edge) 60ms both; }
 .menu__draw .m2read::after {
-  content: ""; position: absolute; left: -8px; right: -8px; top: 0; height: 30px;
-  pointer-events: none; opacity: 0; border-radius: 2px;
-  background: linear-gradient(180deg, rgba(255,252,244,0) 0%, rgba(255,252,244,.09) 34%,
-              rgba(255,252,244,.15) 52%, rgba(120,112,98,.08) 74%, rgba(0,0,0,0) 100%);
+  content: ""; position: absolute; inset: -60%;
+  pointer-events: none; opacity: 0; mix-blend-mode: screen;
+  transform: translate3d(70%, 70%, 0);
+  background: linear-gradient(135deg, transparent 0 44%, rgba(255,246,228,.05) 47.5%,
+              rgba(255,249,235,.16) 50%, rgba(255,246,228,.05) 52.5%, transparent 56% 100%);
 }
-.menu__draw .m2read.is-bloom::after { animation: m2read-edge 340ms var(--m2-ease-edge) both; }
+.menu__draw .m2read.is-bloom::after { animation: m2read-edge 420ms var(--m2-ease-edge) both; }
 @media (prefers-reduced-motion: reduce) {
   .menu__draw .m2read.is-bloom::after { animation: none; opacity: 0; }
 }
