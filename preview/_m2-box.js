@@ -39,12 +39,15 @@
   if (arg === "0" || arg === "off") return;
 
   var doc = root.document;
-  var MODE = (arg === "vitrine" || arg === "v") ? "vitrine" : "box";
+  var MODE = (arg === "vitrine" || arg === "v") ? "vitrine"
+           : (arg === "pod") ? "pod" : "box";
   var wantCase = true;
   var wantLamp = (arg === "lamp");                  // box only — the removed lit layer
   var wantLap  = false;                             // box only — frame laps the card
   var wantGold = true;                              // vitrine only — as GPT authored it
   var wantSeat = true;                              // vitrine only — GPT says seated
+  var wantStir = false;                             // pod only — the bubbles, off by default
+  var wantFull = false;                             // pod only — card at full height
 
   /* stylesheets are fetched only once a mode is actually wanted */
   function style(id, href) {
@@ -54,22 +57,26 @@
     (doc.head || doc.documentElement).appendChild(l);
   }
   function styles() {
-    if (MODE === "box") style("m2box-css", "_m2-box.css?v=489");
-    else style("m2vit-css", "_m2-vitrine.css?v=489");
+    if (MODE === "box") style("m2box-css", "_m2-box.css?v=491");
+    else if (MODE === "pod") style("m2pod-css", "_m2-pod.css?v=491");
+    else style("m2vit-css", "_m2-vitrine.css?v=491");
   }
 
   function hero() { return doc.querySelector(".menu__draw-stage [data-m2-hero]"); }
-  function shell() { return doc.querySelector(".m2box, .br-vitrine"); }
+  function shell() { return doc.querySelector(".m2box, .br-vitrine, .m2pod"); }
 
   function el(tag, cls) { var n = doc.createElement(tag); if (cls) n.className = cls; n.setAttribute("aria-hidden", "true"); return n; }
 
   function wrap() {
     var h = hero();
-    if (!h || h.closest(".m2box, .br-vitrine")) return false;
+    if (!h || h.closest(".m2box, .br-vitrine, .m2pod")) return false;
     var box, inner;
     if (MODE === "box") {
       box = doc.createElement("div"); box.className = "m2box";
       inner = doc.createElement("div"); inner.className = "m2box__cavity";
+    } else if (MODE === "pod") {
+      box = doc.createElement("div"); box.className = "m2pod";
+      inner = doc.createElement("div"); inner.className = "m2pod__fluid";
     } else {
       box = doc.createElement("div"); box.className = "br-vitrine";
       inner = box;                                  // the vitrine is one grid cell
@@ -79,7 +86,43 @@
        the delegated menu handlers read that order. */
     h.parentNode.insertBefore(box, h);
     if (inner !== box) box.appendChild(inner);
+
+    /* ── THE POD'S CHAMBER. Order is load-bearing, and it is the builder's own note:
+       what sits BEHIND the card goes in before it, what sits IN FRONT after it, and
+       the three blend layers go INSIDE the hero appended after its own children —
+       which is what puts the bath above the faces and below the tilt's light pocket.
+       The stylesheet now enforces that with a direct-child selector, so a bath in the
+       wrong parent fails visibly instead of silently painting nothing. */
+    if (MODE === "pod") {
+      inner.appendChild(el("span", "m2pod__swell"));
+      ["", " m2pod__mote--lit", "", " m2pod__mote--lit", ""].forEach(function (v) {
+        inner.appendChild(el("span", "m2pod__mote" + v));
+      });
+      inner.appendChild(el("span", "m2pod__cradle"));
+    }
+
     inner.appendChild(h);
+
+    if (MODE === "pod") {
+      /* the three that ride the card itself, after its own children */
+      h.appendChild(el("span", "m2pod__bath"));
+      h.appendChild(el("span", "m2pod__wet"));
+      h.appendChild(el("span", "m2pod__fibre"));
+      /* and the furniture that stands in front of it */
+      inner.appendChild(el("span", "m2pod__stay m2pod__stay--l"));
+      inner.appendChild(el("span", "m2pod__stay m2pod__stay--r"));
+      for (var t = 1; t <= 6; t++) {
+        var tk = el("span", "m2pod__tick" + (t % 2 === 0 ? " m2pod__tick--s" : ""));
+        tk.style.setProperty("--i", t);
+        inner.appendChild(tk);
+      }
+      inner.appendChild(el("span", "m2pod__spec"));
+      inner.appendChild(el("span", "m2pod__cheek"));
+      /* NO ETCHED CAPTION. The proposal shipped one — "Sealed in fluid · Not
+         decanted" — and it is new user-facing copy that no one has written. The rule
+         for it is in the stylesheet and the slot stays empty; a prototype may borrow
+         a design, it may not let storefront copy in through the side door. */
+    }
 
     if (MODE === "vitrine") {
       /* the vitrine's own furniture. The lamp goes UNDER the card, the returns and the
@@ -151,12 +194,33 @@
     }
   }
 
+  /* the bubbles exist only while stirred. Four idle full-size animated layers handed
+     to the compositor for a chamber the author describes as SEALED AND STILL is both a
+     cost and a contradiction — the review found the pod's own essay convicts them:
+     rising bubbles read as escaping gas, which is the incubator its second paragraph
+     rejects. Off by default; the switch is there because that is a judgement to make
+     by looking. */
+  function stir(on) {
+    var box = doc.querySelector(".m2pod");
+    var fluid = box && box.querySelector(".m2pod__fluid");
+    if (!box || !fluid) return;
+    box.classList.toggle("is-astir", !!on);
+    var have = fluid.querySelectorAll(".m2pod__bubble");
+    if (on && !have.length) {
+      var cradle = fluid.querySelector(".m2pod__cradle");   // bubbles before the spec
+      for (var i = 0; i < 4; i++) fluid.insertBefore(el("span", "m2pod__bubble"), cradle);
+    } else if (!on) {
+      [].forEach.call(have, function (b) { b.remove(); });
+    }
+  }
+
   function apply() {
     if (!wantCase) { unwrap(); return; }
     wrap();
     var box = shell();
     if (!box) return;
     if (MODE === "box") { lamp(wantLamp); box.classList.toggle("is-lap", wantLap); }
+    else if (MODE === "pod") { stir(wantStir); box.classList.toggle("is-full", wantFull); }
     else { box.classList.toggle("is-gold", wantGold); box.classList.toggle("is-seated", wantSeat); }
   }
 
@@ -176,12 +240,20 @@
       + '<i>Gold stock is as authored, and is why review would not ship it: the '
       + 'card&rsquo;s faintest line falls 4.41:1 &rarr; 2.82:1. Seated vs leaning is '
       + 'the one call only you can make.</i>';
+    var podRows =
+        '<label><input type="checkbox" data-mb="stir"' + (wantStir ? " checked" : "") + '> the bubbles</label>'
+      + '<label><input type="checkbox" data-mb="full"' + (wantFull ? " checked" : "") + '> card at full height</label>'
+      + '<i>The only one of the three whose lighting survived measurement &mdash; six '
+      + 'marks 5.2&ndash;7.1:1. Bubbles are off: the chamber is sealed, and rising gas '
+      + 'is the incubator this design rejects. Full height grows the column ~106px.</i>';
+    var title = MODE === "box" ? "The case" : MODE === "pod" ? "The pod" : "The vitrine";
     b.innerHTML =
-        '<b>' + (MODE === "box" ? "The case" : "The vitrine") + ' &middot; prototype</b>'
+        '<b>' + title + ' &middot; prototype</b>'
       + '<label><input type="checkbox" data-mb="case"' + (wantCase ? " checked" : "") + '> in the case</label>'
       + '<label><input type="radio" name="mbmode" data-mb="mode" value="box"' + (MODE === "box" ? " checked" : "") + '> the case</label>'
       + '<label><input type="radio" name="mbmode" data-mb="mode" value="vitrine"' + (MODE === "vitrine" ? " checked" : "") + '> the vitrine</label>'
-      + (MODE === "box" ? boxRows : vitRows);
+      + '<label><input type="radio" name="mbmode" data-mb="mode" value="pod"' + (MODE === "pod" ? " checked" : "") + '> the pod</label>'
+      + (MODE === "box" ? boxRows : MODE === "pod" ? podRows : vitRows);
     if (b._wired) return;
     b._wired = true;
     b.addEventListener("change", function (e) {
@@ -199,6 +271,8 @@
       if (k === "lap")  wantLap  = e.target.checked;
       if (k === "gold") wantGold = e.target.checked;
       if (k === "seat") wantSeat = e.target.checked;
+      if (k === "stir") wantStir = e.target.checked;
+      if (k === "full") wantFull = e.target.checked;
       apply();
     });
   }
