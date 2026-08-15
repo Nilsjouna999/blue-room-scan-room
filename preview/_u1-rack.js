@@ -157,13 +157,31 @@
        year, life path from the digit sum; rune, trigram and hexagram are a hash of name
        and date. "Looked up, not invented" is FALSE for three of six and must never
        appear here — that exact sentence is what docs/CLAIM_AUDIT_V1.md exists for. ── */
+  /* ★★ BR-S500 — FOUR OF THESE SIX ROWS WERE INVENTING THE CODEX'S OWN WORDS, directly
+     under a comment warning that this is the one thing that must never happen here.
+     Checked row by row against codex-data.json:
+       · Snake      — the codex holds intuitive, wise, secretive, elegant, strategic,
+                      suspicious. The row printed "private · watchful · restraint", none
+                      of which are Snake's — and RESTRAINT IS HEXAGRAM 7's KEYWORD, sitting
+                      two rows below on this same card.
+       · Raidho     — "rhythm" is not in journey, movement, travel, life path, right action.
+       · ☱ Duì      — "exchange" is not in lake, joy, openness, pleasure, youngest daughter.
+       · Hexagram 7 — "the led and the leading" is prose, not a keyword, and "organisation"
+                      is a spelling the bank does not use.
+     Leo's and Life path 9's rows were already true subsets and are untouched.
+     Every row is now a strict subset of what the codex actually holds for that mark, in
+     the codex's own spelling. The whole page's argument is that these marks are LOOKED UP
+     rather than made up; a slot that invents the lookup's own content refutes the page it
+     is printed on. Same class as the eleven claims fixed at BR-S484.
+     ★ AND THE NAME WAS TRUNCATED: the entry is "7 · The Army (Shī)". The record page
+     prints it in full, so the tutorial and the thing it teaches disagreed. */
   var SIX = [
-    { slot: "Sun sign",    name: "Leo",          from: "from the date",       kw: "confident · generous · dramatic · proud · creative" },
-    { slot: "Year animal", name: "Snake",        from: "from the year",       kw: "wise · intuitive · private · watchful · restraint" },
-    { slot: "Life path",   name: "9",            from: "from the digits",     kw: "compassion · completion · idealism · letting go" },
-    { slot: "Rune",        name: "Raidho",       from: "drawn · name + date", kw: "journey · movement · rhythm · right action" },
-    { slot: "Trigram",     name: "☱ Duì · Lake", from: "drawn · name + date", kw: "joy · openness · exchange · youngest daughter" },
-    { slot: "Hexagram",    name: "7 · The Army", from: "drawn · name + date", kw: "discipline · organisation · the led and the leading" }
+    { slot: "Sun sign",    name: "Leo",                from: "from the date",       kw: "confident · generous · dramatic · proud · creative" },
+    { slot: "Year animal", name: "Snake",              from: "from the year",       kw: "intuitive · wise · secretive · strategic" },
+    { slot: "Life path",   name: "9",                  from: "from the digits",     kw: "compassion · completion · idealism · letting go" },
+    { slot: "Rune",        name: "Raidho",             from: "drawn · name + date", kw: "journey · movement · travel · right action" },
+    { slot: "Trigram",     name: "☱ Duì · Lake",       from: "drawn · name + date", kw: "lake · joy · openness · youngest daughter" },
+    { slot: "Hexagram",    name: "7 · The Army (Shī)", from: "drawn · name + date", kw: "discipline · organization · leadership · collective effort" }
   ];
   var NAME = "John Bon", BORN = "born 26 July 1965";
 
@@ -363,12 +381,18 @@
     /* THE INTAKE leaves BY GEAR: the same shelf rate as the plates, so its last pixel
        exits exactly as the sixth mark seats. Clearance to plate 0 is constant at every
        A, so they can never collide. Zero opacity writes on the block itself. */
-    var tn = win(p, 0.000, 0.058), td = win(p, 0.058, 0.100);
-    var n1 = NAME.slice(0, Math.round(tn * NAME.length));
-    var n2 = BORN.slice(0, Math.round(td * BORN.length));
-    if (el.nm.textContent !== n1) el.nm.textContent = n1;      // char-guarded
-    if (el.dt.textContent !== n2) el.dt.textContent = n2;
-    setO(el.caret, (p > 0.004 && p < 0.104) ? "0.9" : "0");
+    /* ★★ BR-S500 — THE DESCENT LANDED ON AN EMPTY LABEL, and it was the first thing below
+       the fold. The name and the date typed themselves in from p=0, so at the top of the
+       scroll the page read "The reading is taken from" standing over nothing at all — the
+       given, which the whole descent then derives from, was absent at the exact moment the
+       reader arrived. Not a timing problem to retune: a beat that has to be SCROLLED INTO
+       before it says anything is not a beat, and the typing was buying a flourish at the
+       cost of the page's opening statement.
+       The given is now composed at rest. It still leaves BY GEAR — the transform below is
+       untouched, so its last pixel still exits exactly as the sixth mark seats. */
+    if (el.nm.textContent !== NAME) el.nm.textContent = NAME;
+    if (el.dt.textContent !== BORN) el.dt.textContent = BORN;
+    setO(el.caret, "0");                                       // the caret belonged to the typing
     setT(el.intake, ty(-Arack * C.SHELF));
 
     /* THE PLATES. PITCH is the only thing the close changes: the six gather from one
