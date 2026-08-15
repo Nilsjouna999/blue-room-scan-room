@@ -4997,7 +4997,7 @@ assert_chrome(DOC)
 # BR-S431 — the reading frame's line. codex.html is a HOST of the membrane, not only
 # the thing it is drawn over: every route except the aperture navigates here, and the
 # parent that used to draw the line is gone on this page.
-DOC = DOC.replace('</body>', '<script src="_codex-membrane.js?v=464"></script></body>', 1) if '_codex-membrane.js' not in DOC else DOC
+DOC = DOC.replace('</body>', '<script src="_codex-membrane.js?v=465"></script></body>', 1) if '_codex-membrane.js' not in DOC else DOC
 # BR-S440 — the keywords take their colours from the authored bank, same as the reading.
 DOC = DOC.replace('</body>', '<script src="_codex-perks.js?v=441"></script></body>', 1) if '_codex-perks.js' not in DOC else DOC
 # the byte count is taken AFTER the two appends, or the size this build reports is

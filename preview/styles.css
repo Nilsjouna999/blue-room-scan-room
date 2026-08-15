@@ -3577,13 +3577,46 @@ html.is-travel .card .cardfinish { mix-blend-mode: normal; }
    The stagger is DELAY, not duration — both finish inside the 300ms the JS timer holds
    the class for, so the whole gesture is over before the card's own 480ms turn has
    settled and the read is never still moving under a finished card. */
+/* ★★ BR-S464 — THE CARD-FLIP READ TAKES THE SAME GRAMMAR AS THE SPECIMEN PANEL.
+   The builder: "then bloom both tarot tab and birth." Two surfaces were blooming two
+   different ways — the overlay panel by one rule, this by another — which is exactly
+   how a house ends up with two dialects of the same gesture.
+
+   THREE THINGS CHANGE, all from docs/BLOOM_GRAMMAR_V1.md:
+     1. THE EASING IS ASYMMETRIC. --ease-settle is an ease-out; the aperture's own
+        --ease-edge is "a real leap, then a slow-burn crawl to the land", and that
+        asymmetry is the single biggest reason the Codex bloom reads as an EVENT while
+        this one read as a state change.
+     2. THE SETTLE IS NOT MONOTONIC. One beat at 62% where the ink is not quite down.
+        Smooth reads as mechanical; a hesitation reads as something drying.
+     3. THERE IS AN EDGE, AND IT LEAVES WHEN IT LANDS. A soft band crosses the block
+        and hits opacity 0 at the instant it arrives, so nothing is left over to
+        explain. A reveal with no edge is a crossfade — which is what this was. */
 @keyframes m2read-arrive {
   0%   { opacity: .22; transform: translate3d(0, 4px, 0); }
-  60%  { opacity: 1; }
+  34%  { opacity: 1; }
+  62%  { opacity: .94; }
   100% { opacity: 1; transform: none; }
 }
-.menu__draw .m2read.is-bloom .m2read__meta { animation: m2read-arrive 260ms var(--ease-settle) both; }
-.menu__draw .m2read.is-bloom .m2read__mean { animation: m2read-arrive 300ms var(--ease-settle) 60ms both; }
+@keyframes m2read-edge {
+  0%   { opacity: 0; transform: translate3d(0, -12%, 0); }
+  7%   { opacity: 1; }
+  86%  { opacity: 1; }
+  100% { opacity: 0; transform: translate3d(0, 108%, 0); }
+}
+.menu__draw .m2read { --m2-ease-edge: cubic-bezier(.22, .50, .16, 1); position: relative; }
+.menu__draw .m2read.is-bloom .m2read__meta { animation: m2read-arrive 260ms var(--m2-ease-edge) both; }
+.menu__draw .m2read.is-bloom .m2read__mean { animation: m2read-arrive 300ms var(--m2-ease-edge) 60ms both; }
+.menu__draw .m2read::after {
+  content: ""; position: absolute; left: -8px; right: -8px; top: 0; height: 30px;
+  pointer-events: none; opacity: 0; border-radius: 2px;
+  background: linear-gradient(180deg, rgba(255,252,244,0) 0%, rgba(255,252,244,.09) 34%,
+              rgba(255,252,244,.15) 52%, rgba(120,112,98,.08) 74%, rgba(0,0,0,0) 100%);
+}
+.menu__draw .m2read.is-bloom::after { animation: m2read-edge 340ms var(--m2-ease-edge) both; }
+@media (prefers-reduced-motion: reduce) {
+  .menu__draw .m2read.is-bloom::after { animation: none; opacity: 0; }
+}
 @media (prefers-reduced-motion: reduce) {
   /* the JS already returns before adding the class; this is the belt for a preference
      that changes after the class is on, so nothing is left mid-rise */

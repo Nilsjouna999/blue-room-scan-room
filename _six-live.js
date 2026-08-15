@@ -113,6 +113,72 @@
        "correct" are the same screenshot until you hover. */
     + ".sx-hide.is-back{visibility:visible!important;animation:sxfade 180ms ease both}"
     + "@keyframes sxfade{from{opacity:0}to{opacity:1}}"
+
+    /* ══ BR-S464 — THE PRINT. The specimen is laid, it does not switch on. ═════════
+       Two sources, and the graft is deliberate:
+         · the fifteen-agent pass chose THE PRINT — ink laid top-to-bottom in groups,
+           left-edge registration, no vertical travel, and a rate clamp so the gesture
+           gets SHORTER under speed instead of stacking.
+         · the builder named the Codex aperture as the reference that satisfies, and
+           docs/BLOOM_GRAMMAR_V1.md pulls it apart: asymmetric easing (a leap, then a
+           crawl), an EDGE drawn as its own object that hits opacity 0 exactly as it
+           lands, an irregular non-monotonic settle, and staggered layers.
+       The bloom shipped at BR-S453/455 had none of the first three, which is why it
+       read as "the text got brighter" rather than as something happening.
+
+       ★ THE EDGE IS THE MISSING IDEA, AND IT IS A PSEUDO-ELEMENT ON PURPOSE. render()
+       rewrites the panel's contents, so a real <div> edge would be destroyed on every
+       specimen. ::after survives, costs no node, and cannot be caught mid-write. It
+       travels the panel and is GONE at the instant it lands — a reveal with a lingering
+       edge is a border; one with no edge at all is a crossfade.
+
+       ★ TWO KEYFRAME NAMES, ALTERNATED. This is the restart, and it is the one thing
+       the agents' first draft got wrong: toggling a class that only carries COLOUR does
+       not restart an animation. The class must carry the animation itself, and there
+       must be two, or a re-fire on the same mark does nothing at all — which does not
+       look broken, it looks like nothing happened.
+
+       ★ ORIGIN IS THE LEFT EDGE (0 60%), NEVER CENTRED. A centred origin drifts each
+       line's left edge by a subpixel in opposite directions and the column reads as
+       shivering. The registration mark of a printed sheet is its left edge. */
+    + "@property --sx-ink{syntax:'<color>';inherits:false;initial-value:#dcd7cb}"
+    + "@keyframes sx-print-a{0%{opacity:var(--sx-o,.30);transform:scale(var(--sx-amp,1))}"
+    +   "34%{opacity:1}62%{opacity:.94}100%{opacity:1;transform:none}}"
+    + "@keyframes sx-print-b{0%{opacity:var(--sx-o,.30);transform:scale(var(--sx-amp,1))}"
+    +   "34%{opacity:1}62%{opacity:.94}100%{opacity:1;transform:none}}"
+    /* the 62% dip is the irregularity — one beat where the ink is not yet settled.
+       Monotonic reads as a machine; this reads as something drying. */
+    + "@keyframes sx-edge-a{0%{opacity:0;transform:translate3d(0,-10%,0)}"
+    +   "7%{opacity:1}86%{opacity:1}100%{opacity:0;transform:translate3d(0,104%,0)}}"
+    + "@keyframes sx-edge-b{0%{opacity:0;transform:translate3d(0,-10%,0)}"
+    +   "7%{opacity:1}86%{opacity:1}100%{opacity:0;transform:translate3d(0,104%,0)}}"
+    + ".sx{--sx-ease:cubic-bezier(.22,.50,.16,1)}"          /* the aperture's own leap-then-crawl */
+    + ".sx>*{transform-origin:0 60%;--sx-amp:1}"
+    + ".sx__glyph,.sx__name{--sx-amp:var(--sx-scale,1)}"    /* only the two large marks take the spread */
+    /* four groups, one pass of the nib. Eight staggered elements outrun any readable
+       window; four is a stroke. */
+    + ".sx__src,.sx__glyph,.sx__label{--g:0}"
+    + ".sx__name,.sx__attrs{--g:1}"
+    + ".sx__perks{--g:2}"
+    + ".sx__say,.sx__close{--g:3}"
+    + ".sx.is-print-a>*{animation:sx-print-a var(--sx-dur,230ms) var(--sx-ease)"
+    +   " calc(var(--g,0) * var(--sx-step,26ms)) both}"
+    + ".sx.is-print-b>*{animation:sx-print-b var(--sx-dur,230ms) var(--sx-ease)"
+    +   " calc(var(--g,0) * var(--sx-step,26ms)) both}"
+    /* THE EDGE. A soft band the width of the panel, brighter than what it reveals. */
+    + ".sx{position:absolute}"
+    + ".sx::after{content:'';position:absolute;left:-6px;right:-6px;top:0;height:26px;"
+    +   "pointer-events:none;opacity:0;border-radius:2px;"
+    +   "background:linear-gradient(180deg,rgba(255,252,244,0) 0%,rgba(255,252,244,.10) 34%,"
+    +   "rgba(255,252,244,.16) 52%,rgba(120,112,98,.09) 74%,rgba(0,0,0,0) 100%)}"
+    + ".sx.is-print-a::after{animation:sx-edge-a var(--sx-edge,300ms) var(--sx-ease) both}"
+    + ".sx.is-print-b::after{animation:sx-edge-b var(--sx-edge,300ms) var(--sx-ease) both}"
+    /* ★ THE MARK YOU TOUCHED ACKNOWLEDGES IT — the aperture's fifth property. Nothing
+       on the control moved before, so the panel appeared to change on its own. */
+    + ".m2bface__marks li[aria-current='true']{transition:color 160ms var(--sx-ease,ease)}"
+    + "@media (prefers-reduced-motion:reduce){"
+    +   ".sx.is-print-a>*,.sx.is-print-b>*{animation:none}"
+    +   ".sx.is-print-a::after,.sx.is-print-b::after{animation:none;opacity:0}}"
     + ".sx__src{font-family:var(--font-mono);font-size:9px;letter-spacing:.2em;"
     +   "text-transform:uppercase;color:#6e6b63;margin:0 0 16px;display:flex;gap:7px}"
     + ".sx__src b{color:#948f87;font-weight:400}"
@@ -239,7 +305,39 @@
        `.sx:not(.is-ready){display:none}`, this makes BR-S459's fix structural rather than
        conditional: no path, present or future, can reveal an unwritten specimen. */
     if(box) box.classList.add("is-ready");
+
+    /* ══ BR-S464 — FIRE THE PRINT, AT A RATE SET BY THE HAND ══════════════════════
+       ★ THE CLAMP IS THE ANSWER TO SIX-IN-TWO-SECONDS. A gesture that is lovely once
+       is nauseating six times, and the fix is not to suppress it but to SHORTEN it:
+       k runs 1 at rest down to .34 on a fast sweep, and every duration, the stagger,
+       the spread and the opacity floor ride it. At sweep speed the stagger is under a
+       frame — the nib has no visible front — and the floor is .80, so every frame of
+       the sweep is readable text rather than a flash. Continuous, so it cannot land on
+       a threshold edge the way a two-bucket step can.
+       ★ AND THE LIT STATE BECOMES A CONDITION, NOT AN EVENT. The class is stripped by
+       a timer that a sweep clears and re-arms before it ever fires — so six marks do
+       not produce six flashes, they produce one continuous lit panel that decays only
+       when the hand stops. */
+    if(box){
+      var now = (root.performance && root.performance.now) ? root.performance.now() : +new Date();
+      var dt  = now - (LAST_PRINT || 0); LAST_PRINT = now;
+      var k   = Math.max(0.34, Math.min(1, dt / 260));
+      box.style.setProperty("--sx-dur",  Math.round(230 * k) + "ms");
+      box.style.setProperty("--sx-edge", Math.round(300 * k) + "ms");
+      box.style.setProperty("--sx-step", Math.round(26  * k) + "ms");
+      box.style.setProperty("--sx-scale", (1 + 0.012 * k).toFixed(4));
+      box.style.setProperty("--sx-o", (0.30 + 0.50 * (1 - k)).toFixed(2));
+      /* alternate the NAME, which is the only restart that costs no reflow */
+      var a = box.classList.contains("is-print-a");
+      box.classList.remove(a ? "is-print-a" : "is-print-b");
+      box.classList.add(a ? "is-print-b" : "is-print-a");
+      if(PRINT_T) root.clearTimeout(PRINT_T);
+      PRINT_T = root.setTimeout(function(){
+        box.classList.remove("is-print-a","is-print-b");
+      }, Math.round(230 * k) + 3 * Math.round(26 * k) + 40);
+    }
   }
+  var LAST_PRINT = 0, PRINT_T = null;
 
   function install(d){
     if(!d || !d.querySelector(".m2bface__marks") || !d.querySelector(".m2read")) return false;
