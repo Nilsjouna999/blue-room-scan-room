@@ -1,0 +1,157 @@
+/* =============================================================
+   M2 · THE RECESS — the artifact sealed into the Blue Room wall.
+   Append after the .m2bface block in styles.css.
+
+   THE ONE IDEA. This is a hole, not an object. There is NO exterior
+   shadow anywhere: depth comes from four inward returns whose value
+   order is the illusion — the head catches the wall's light, the sill
+   catches most of it, the cheeks are edge-on and nearly black, and the
+   darkest value on the screen is INSIDE the opening. The glass plane is
+   flush with the plaster.
+
+   THE CAVITY IS BLUE-BLACK, NOT AMBER. The card owns the only warmth in
+   the room; the only amber inside is what bounces off it.
+
+   THE CARD IS LIT, NOT REPAINTED. .m2recess__light is a multiply layer
+   over the shipped parchment, pulled ~30% toward cream.
+
+   SCALE. App CSS px (the reference render was 1.065x).
+   ============================================================= */
+
+.m2recess {
+  --rec-head: #23262c;      /* the return that faces the light      */
+  --rec-cheek: #1a1d23;     /* edge-on, so nearly the wall's shadow */
+  --rec-sill: #262a31;      /* catches the most                     */
+  --rec-cavity-1: #0e131a;  /* blue-black, the room's own colour    */
+  --rec-cavity-2: #080c12;
+  --rec-board: #121821;     /* the archival backboard               */
+
+  position: relative;
+  width: max-content;
+  margin: 15px 0 0;
+  /* a rectangle with a barely arched head: architectural, not organic */
+  border-radius: 208px 208px 4px 4px / 41px 41px 4px 4px;
+  background: #0c0e13;
+  box-shadow: inset 0 1px 0 rgba(233, 229, 220, .05);   /* the ONLY shadow is inset */
+  padding: 18px 14px 16px;                              /* the returns */
+}
+.m2recess::before {
+  content: ""; position: absolute; left: 0; right: 0; top: 0; height: 18px;
+  border-radius: 208px 208px 0 0 / 41px 41px 0 0; pointer-events: none;
+  background: linear-gradient(180deg, var(--rec-head) 0%, #161a20 60%, #0d1015 100%);
+}
+.m2recess::after {
+  content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 16px; pointer-events: none;
+  background: linear-gradient(0deg, var(--rec-sill) 0%, #191d23 58%, #0e1116 100%);
+}
+.m2recess__cheekL,
+.m2recess__cheekR { position: absolute; top: 13px; bottom: 0; width: 14px; pointer-events: none; }
+.m2recess__cheekL { left: 0;  background: linear-gradient(90deg,  var(--rec-cheek) 0%, #101318 55%, #0a0c11 100%); }
+.m2recess__cheekR { right: 0; background: linear-gradient(270deg, #171a20 0%, #0e1116 55%, #0a0c11 100%); }
+
+/* THE CAVITY. Padding suspends the card: 78 above, 79 below, 65 each side. */
+.m2recess__cavity {
+  position: relative;
+  padding: 78px 65px 79px;
+  overflow: hidden;
+  background:
+    radial-gradient(58% 40% at 50% 46%, rgba(226,150,86,.075) 0%, rgba(226,150,86,.02) 52%, rgba(0,0,0,0) 76%),
+    radial-gradient(84% 70% at 50% 42%, rgba(0,0,0,0) 30%, rgba(0,0,0,.72) 100%),
+    linear-gradient(180deg, var(--rec-cavity-1) 0%, #0b1017 44%, var(--rec-cavity-2) 100%);
+}
+.m2recess__board {
+  position: absolute; left: 51px; top: 69px; right: 51px; bottom: 70px; z-index: 1;
+  border-radius: 3px; pointer-events: none;
+  background: linear-gradient(180deg, var(--rec-board) 0%, #0d1219 100%);
+  box-shadow: inset 0 0 0 1px rgba(233, 229, 220, .035);
+}
+/* the mounts it rests against: BEHIND the card and clear of its silhouette */
+.m2recess__mount { position: absolute; width: 9px; height: 9px; z-index: 2; pointer-events: none; }
+.m2recess__mount--tl { left: 54px;  top: 68px;
+  border-left: 1px solid rgba(233,229,220,.16); border-top: 1px solid rgba(233,229,220,.16); }
+.m2recess__mount--br { right: 54px; bottom: 69px;
+  border-right: 1px solid rgba(233,229,220,.16); border-bottom: 1px solid rgba(233,229,220,.16); }
+
+/* THE ARTIFACT. Tight contact shadow, no cloud, no bloom. */
+.m2recess .m2hero { position: relative; z-index: 3; isolation: isolate; height: clamp(300px, 44vh, 440px); }
+html.m2-parch .m2recess .m2hero {
+  border: 1px solid rgba(20, 14, 8, .4);
+  box-shadow: 0 7px 15px rgba(0,0,0,.72), 0 2px 4px rgba(0,0,0,.8), inset 0 1px 0 rgba(255,246,226,.5);
+}
+html.m2-parch .menu__draw:has(.menu__draw-stage:hover) .m2recess .m2hero,
+html.m2-parch .menu__draw:has(.m2read:hover) .m2recess .m2hero {
+  box-shadow: 0 9px 19px rgba(0,0,0,.75), 0 2px 4px rgba(0,0,0,.82), inset 0 1px 0 rgba(255,246,226,.55);
+}
+.m2recess__light {
+  position: absolute; inset: 0; z-index: 1; pointer-events: none; border-radius: inherit;
+  mix-blend-mode: multiply; background-blend-mode: multiply;
+  background:
+    radial-gradient(60% 130% at 50% 40%, #ffffff 45%, #f1ebe2 68%, #dcd4c9 83%, #cbc1b4 100%),
+    linear-gradient(180deg, #edd6b5 0%, #edd9be 10%, #e8d3b9 26%, #ddc9b1 46%, #d0bca4 66%, #bfac96 84%, #b19d89 100%);
+  background-color: #fff;   /* AFTER the shorthand, or it resets to transparent */
+}
+.m2recess__fibre {
+  position: absolute; inset: 0; z-index: 1; pointer-events: none; border-radius: inherit;
+  opacity: .15; mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='320' height='320'%3E%3Cfilter id='rfib'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.03' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='320' height='320' filter='url(%23rfib)' opacity='0.72'/%3E%3C/svg%3E");
+}
+
+/* ── THE PANE. Absorption veil + wide raking band + a FEATHERED streak +
+   thickness shading. The streak stays in front of the card (a reflection
+   physically is) but spread over ~32% of the axis at .055 — at 3% and .125
+   it was a light shaft across the artifact's face. ─────────────────────── */
+.m2recess__glass {
+  position: absolute; inset: 0; z-index: 5; pointer-events: none;
+  background:
+    linear-gradient(116deg, rgba(220,234,244,.075) 0%, rgba(220,234,244,.02) 13%,
+      rgba(220,234,244,0) 27%, rgba(220,234,244,0) 78%, rgba(220,234,244,.03) 100%),
+    linear-gradient(180deg, rgba(148,178,204,.055) 0%, rgba(148,178,204,.018) 42%, rgba(120,150,178,.04) 100%);
+  box-shadow:
+    inset 0 0 0 1px rgba(200, 220, 236, .11),
+    inset 0 14px 20px -14px rgba(0, 0, 0, .55),
+    inset 0 -9px 15px -11px rgba(0, 0, 0, .42);
+}
+.m2recess__streak {
+  position: absolute; inset: 0; z-index: 6; pointer-events: none;
+  background: linear-gradient(116deg, rgba(0,0,0,0) 18%, rgba(232,242,250,.014) 25%,
+    rgba(240,247,252,.042) 31%, rgba(255,255,255,.055) 34%, rgba(240,247,252,.038) 37%,
+    rgba(232,242,250,.012) 43%, rgba(0,0,0,0) 50%);
+}
+.m2recess__paneEdge {
+  position: absolute; left: 0; right: 0; bottom: 0; height: 1px; z-index: 6; pointer-events: none;
+  background: linear-gradient(90deg, rgba(214,230,240,0) 4%, rgba(214,230,240,.18) 40%,
+              rgba(214,230,240,.20) 60%, rgba(214,230,240,0) 96%);
+}
+.m2recess__seam {
+  position: absolute; left: 13px; right: 13px; top: 17px; bottom: 15px; pointer-events: none;
+  box-shadow: inset 0 0 0 1px rgba(200, 173, 112, .16);   /* the only gold in the assembly */
+}
+
+/* THE SILL. The face selector lives here, not bolted to the app bar. */
+.m2recess__sill {
+  position: relative; width: 235px; height: 34px; margin: -1px auto 0;
+  border-radius: 0 0 3px 3px;
+  background: linear-gradient(180deg, #22262c 0%, #171a1f 40%, #101317 100%);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, .5), inset 0 1px 0 rgba(233, 229, 220, .11);
+  display: flex; align-items: center; justify-content: center; gap: 11px;
+}
+.m2recess__sill .m2flip { margin: 0; padding: 0; border: 0; }
+.m2recess__sill .m2flip__opt { min-height: 0; padding: 5px 10px; border-radius: 3px; font-size: 9px; }
+.m2recess__showing {
+  font-family: var(--font-mono); font-size: 8px; letter-spacing: .3em;
+  text-transform: uppercase; color: var(--t-meta);
+}
+
+/* the marks are controls: ink darkens, nothing moves, no pill */
+.m2bface__marks li { cursor: pointer; transition: color 160ms var(--ease-settle, cubic-bezier(.2,.7,.2,1)); }
+.m2recess .m2bface__marks li:hover { filter: brightness(.72); }
+.m2recess .m2bface__marks li:focus-visible { outline: 1px solid rgba(28,21,13,.45); outline-offset: 3px; }
+
+@media (max-width: 1199px) {
+  .m2recess { padding: 12px 9px 11px; margin: 8px 0 0; }
+  .m2recess__cavity { padding: 34px 26px 34px; }
+  .m2recess .m2hero { height: auto; }
+  .m2recess__board { left: 18px; right: 18px; top: 22px; bottom: 22px; }
+  .m2recess__mount, .m2recess__streak { display: none; }
+  .m2recess__sill { width: 215px; }
+}

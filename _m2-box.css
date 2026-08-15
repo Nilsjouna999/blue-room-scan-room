@@ -147,14 +147,30 @@
 
 /* THE PANE. One raking reflection across the glass, nothing more — a second
    highlight and it stops being glass and becomes a gradient.
-   THE PEAK IS A CONTRAST NUMBER, NOT A TASTE NUMBER. This is the one case layer
-   that does sit over the card, so it lifts the ink where it lands. .04 at the
-   top-left corner is under the point where the birth face's 9.5px masthead meta
-   moves measurably; past ~.05 it starts spending margin the card does not have. */
+
+   ★★ BR-S493 — THE REFLECTION NOW STOPS AT THE CARD'S EDGE, AND THAT IS A CONTRAST
+   FIX, NOT A TASTE ONE. The earlier note here said .04 at the corner was "under the
+   point where the masthead meta moves measurably". A fourth review measured the thing
+   that note assumed: the shipped card's faintest line is **4.49:1 against the stock's
+   bottom stop with nothing over it at all** — a margin of 0.
+   Recomputed for this pane: a veil of rgba(233,229,220,.04) lifts ink #6a5c45 to
+   ~(111,98,75) and stock #ded6c4 to ~(222,215,197), giving L 0.1246 and 0.6816 →
+   **4.19:1**. Even the ~.02 the card's own top-left actually saw comes out ~4.34.
+   Both are under AA, on the treatment four reviews just recommended shipping.
+
+   A white veil over a light stock lifts the INK proportionally more than the paper,
+   so on this card any reflection at any alpha is a contrast cost. The finding is
+   general and it is the durable one from the whole series: NOTHING MAY BE LAID OVER
+   THIS CARD.
+
+   So the band decays to zero inside the mat — 8% in, 92% out, against a mat that is
+   28-48px of a ~335px cavity (8-14% of the gradient's axis at either end). The
+   highlight now rakes the frame's glass and stops where the specimen begins, which is
+   also the more honest reading: it is the case that is glazed, not the card. */
 .m2box__cavity::after {
   content: ""; position: absolute; inset: 0; z-index: 3; pointer-events: none;
-  background: linear-gradient(114deg, rgba(233,229,220,.04) 0%, rgba(233,229,220,.014) 16%,
-              rgba(233,229,220,0) 33%, rgba(233,229,220,0) 79%, rgba(233,229,220,.018) 100%);
+  background: linear-gradient(114deg, rgba(233,229,220,.055) 0%, rgba(233,229,220,.02) 4%,
+              rgba(233,229,220,0) 8%, rgba(233,229,220,0) 92%, rgba(233,229,220,.024) 100%);
 }
 
 /* ══ FROM THE GPT VITRINE (BR-S489) ═══════════════════════════════════════════════
