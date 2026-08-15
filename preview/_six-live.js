@@ -181,10 +181,13 @@
        the last thing the Codex does when it opens. BR-S464 built the horizontal edge —
        the right grammar, the wrong axis and the wrong scale. The panel is a sheet being
        turned to the light, not a line being drawn down it. */
+    /* ★ BR-S468 — THE PLATEAU NARROWS, 18/78 -> 24/70. The band was sitting at full
+       brightness for 60% of its travel, which on a sheet this size reads as a WASH
+       moving across rather than a light crossing it. 46% is a pass. */
     + "@keyframes sx-edge-a{0%{opacity:0;transform:translate3d(70%,70%,0)}"
-    +   "18%{opacity:.9}78%{opacity:.9}100%{opacity:0;transform:translate3d(-70%,-70%,0)}}"
+    +   "24%{opacity:.9}70%{opacity:.9}100%{opacity:0;transform:translate3d(-70%,-70%,0)}}"
     + "@keyframes sx-edge-b{0%{opacity:0;transform:translate3d(70%,70%,0)}"
-    +   "18%{opacity:.9}78%{opacity:.9}100%{opacity:0;transform:translate3d(-70%,-70%,0)}}"
+    +   "24%{opacity:.9}70%{opacity:.9}100%{opacity:0;transform:translate3d(-70%,-70%,0)}}"
     + ".sx{--sx-ease:cubic-bezier(.22,.50,.16,1)}"          /* the aperture's own leap-then-crawl */
     + ".sx>*{transform-origin:0 60%;--sx-amp:1}"
     + ".sx__glyph,.sx__name{--sx-amp:var(--sx-scale,1)}"    /* only the two large marks take the spread */
@@ -212,8 +215,20 @@
     +   "transform:translate3d(70%,70%,0);"
     +   "background:linear-gradient(135deg,transparent 0 44%,rgba(255,246,228,.05) 47.5%,"
     +   "rgba(255,249,235,.16) 50%,rgba(255,246,228,.05) 52.5%,transparent 56% 100%)}"
-    + ".sx.is-print-a::after{animation:sx-edge-a var(--sx-edge,300ms) var(--sx-ease) both}"
-    + ".sx.is-print-b::after{animation:sx-edge-b var(--sx-edge,300ms) var(--sx-ease) both}"
+    /* ★★ BR-S468 — TWO CORRECTIONS TO THE SHEEN, both of them errors rather than taste.
+       1. ITS OWN CURVE. It was running on --sx-ease, the EDGE curve — a leap then a long
+          crawl, which is right for a thing ARRIVING and wrong for a thing PASSING
+          THROUGH. A glint that lingers stops being a glint. The aperture uses a
+          different curve for its sheen than for its ink frontier (styles.css:4982,
+          cubic-bezier(.4,.1,.2,1)) and that distinction is the reason it works.
+       2. IT COMES AFTER THE TEXT, NOT WITH IT. In the Codex the sheen fires at 800ms —
+          LAST, once the ink and the ember have settled. Here both started on the same
+          frame, so the light and the words competed for one instant. 70ms is small in
+          absolute terms and it is the whole difference between "a specimen appeared and
+          was then lit" and "two things happened at once". */
+    + ".sx{--sx-sheen-ease:cubic-bezier(.4,.1,.2,1)}"
+    + ".sx.is-print-a::after{animation:sx-edge-a var(--sx-edge,300ms) var(--sx-sheen-ease) 70ms both}"
+    + ".sx.is-print-b::after{animation:sx-edge-b var(--sx-edge,300ms) var(--sx-sheen-ease) 70ms both}"
     /* ★ THE MARK YOU TOUCHED ACKNOWLEDGES IT — the aperture's fifth property. Nothing
        on the control moved before, so the panel appeared to change on its own. */
     + ".m2bface__marks li[aria-current='true']{transition:color 160ms var(--sx-ease,ease)}"
@@ -283,6 +298,19 @@
        belonging to the name rather than floating between two blocks. */
     + ".sx__name{font-size:33px;color:#f4eee1}"
     + ".sx__glyph{font-size:30px;opacity:.82}"
+
+    /* ★★ BR-S468 — WHICH OF THE SIX YOU ARE LOOKING AT, MADE READABLE.
+       "Year animal" was set at the same 9.5px / #6e6b63 as the provenance clause beside
+       it and the eyebrow above it — three different jobs at one luminance (0.044), so
+       the only line that answers "which mark is this" was indistinguishable from
+       furniture. It is now the second-brightest thing on the panel, well under the
+       specimen's name so BR-S467's order survives, and clearly over everything else.
+       ★ THE PROVENANCE STAYS QUIET ON PURPOSE. "· from the year" is a qualifier, not a
+       heading, and it is the honest half — it says the mark came from the date rather
+       than from a hash. Making it loud would put a footnote in the same rank as a title;
+       leaving it dim keeps it findable without competing. Available, not announced. */
+    + ".sx__slot{font-weight:600;font-size:11px;letter-spacing:.19em;color:#c9c1b1}"
+    + ".sx__from{font-weight:400;color:#6e6b63;letter-spacing:.14em}"
 
     /* ══ BR-S466 — THE VERTICAL RHYTHM. Measured down the panel, the gaps between
        consecutive blocks ran 16, 13, 8, 10, 13, 17, 15 — SEVEN values, no two the same
@@ -380,7 +408,20 @@
       box.querySelector(".sx__src").innerHTML='<span>&#9670;</span><span>From the archive &middot; <b>one of '+sp.n+'</b></span>';
       var g=glyphFor(sp,e,idx);
       box.querySelector(".sx__glyph").textContent = g&&g.length===1 ? g+"︎" : g;
-      box.querySelector(".sx__label").textContent = sp.key+" · "+sp.from;
+      /* ★★ BR-S468 — THE SLOT NAME AND ITS PROVENANCE STOP SHARING ONE WEIGHT.
+         The builder: 'name of the mark ... aka "the animal" "the sun sign" its hard to
+         spot currently since that too is dim.'
+         This line was one text node — "Year animal · from the year" — set entirely at
+         9.5px in #6e6b63, which measured a relative luminance of 0.044, the same as the
+         eyebrow above it. So the thing that says WHICH OF THE SIX you are looking at was
+         rendered at footnote weight, indistinguishable from an actual footnote.
+         They are two different jobs and they now look like it: the slot NAMES the mark
+         and is read; the provenance QUALIFIES it and is available. Two spans, one node,
+         no layout change. */
+      box.querySelector(".sx__label").innerHTML =
+        '<b class="sx__slot"></b><span class="sx__from"></span>';
+      box.querySelector(".sx__slot").textContent = sp.key;
+      box.querySelector(".sx__from").textContent = " · "+sp.from;
       box.querySelector(".sx__name").textContent  = e.name;
       box.querySelector(".sx__attrs").innerHTML   = e.tag ? esc(e.tag) : "";
       var pk=box.querySelector(".sx__perks"); pk.innerHTML="";
@@ -425,8 +466,16 @@
       var now = (root.performance && root.performance.now) ? root.performance.now() : +new Date();
       var dt  = now - (LAST_PRINT || 0); LAST_PRINT = now;
       var k   = Math.max(0.34, Math.min(1, dt / 260));
+      /* ★★ BR-S468 — THE SHEEN FLOORS HIGHER THAN THE TEXT, and they should never have
+         shared a floor. The text is per-line ink and genuinely SHOULD compress under
+         speed — that is the whole point of the clamp. The sheen is ONE OBJECT crossing a
+         box, and below roughly 120ms a moving light stops reading as movement at all and
+         becomes a flicker. At k=.34 it was 102ms: the effect evaporated exactly when the
+         reader was moving fast enough to need it most. Floored at .55 it never drops
+         under 165ms and stays a gesture. */
+      var kS = Math.max(0.55, Math.min(1, dt / 260));
       box.style.setProperty("--sx-dur",  Math.round(230 * k) + "ms");
-      box.style.setProperty("--sx-edge", Math.round(300 * k) + "ms");
+      box.style.setProperty("--sx-edge", Math.round(300 * kS) + "ms");
       box.style.setProperty("--sx-step", Math.round(26  * k) + "ms");
       box.style.setProperty("--sx-scale", (1 + 0.012 * k).toFixed(4));
       box.style.setProperty("--sx-o", (0.30 + 0.50 * (1 - k)).toFixed(2));

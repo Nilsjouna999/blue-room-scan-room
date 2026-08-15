@@ -3608,8 +3608,8 @@ html.is-travel .card .cardfinish { mix-blend-mode: normal; }
    not a line drawn down it. */
 @keyframes m2read-edge {
   0%   { opacity: 0; transform: translate3d(70%, 70%, 0); }
-  18%  { opacity: .9; }
-  78%  { opacity: .9; }
+  24%  { opacity: .9; }        /* BR-S468: 18/78 -> 24/70. 60% of the travel at full */
+  70%  { opacity: .9; }        /* brightness reads as a wash; 46% reads as a pass. */
   100% { opacity: 0; transform: translate3d(-70%, -70%, 0); }
 }
 .menu__draw .m2read { --m2-ease-edge: cubic-bezier(.22, .50, .16, 1); position: relative; overflow: hidden; }
@@ -3622,7 +3622,14 @@ html.is-travel .card .cardfinish { mix-blend-mode: normal; }
   background: linear-gradient(135deg, transparent 0 44%, rgba(255,246,228,.05) 47.5%,
               rgba(255,249,235,.16) 50%, rgba(255,246,228,.05) 52.5%, transparent 56% 100%);
 }
-.menu__draw .m2read.is-bloom::after { animation: m2read-edge 420ms var(--m2-ease-edge) both; }
+/* BR-S468 — its own curve, and it comes AFTER the words. --m2-ease-edge is the arrival
+   curve (a leap, then a crawl); a light passing through wants to cross and leave, which
+   is why the aperture gives its sheen cubic-bezier(.4,.1,.2,1) and its ink frontier a
+   different one. The 70ms delay is the aperture's layering order at this scale: the
+   specimen lands, and THEN it is turned to the light. */
+.menu__draw .m2read.is-bloom::after {
+  animation: m2read-edge 420ms cubic-bezier(.4, .1, .2, 1) 70ms both;
+}
 @media (prefers-reduced-motion: reduce) {
   .menu__draw .m2read.is-bloom::after { animation: none; opacity: 0; }
 }
