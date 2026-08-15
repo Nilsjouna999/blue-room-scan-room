@@ -8,6 +8,12 @@ answer. This document is the thing that should outlive it: the clearest statemen
 the builder wants U1 to BE, so that any future design can be judged against something
 other than taste.
 
+**★ ITS COMPANION IS `docs/U1_MOTION_V1.md`, and that one is the more specific
+authority.** This file says what U1 is FOR. That file says what it DOES — the builder's
+own four-beat description of the descent: the given, the fill, the letter written in
+parallel, and the travel that resolves into a record. Where the two touch, the motion
+document is the later and closer statement of intent and wins.
+
 **HOW TO READ IT.** Three registers, kept deliberately separate, because the difference
 matters more than the content:
 
