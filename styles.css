@@ -2896,8 +2896,32 @@ html.land-detent2 .menu__track { --track-ease: cubic-bezier(.55, -0.28, .12, 1);
    harmless non-paint property (outline-color) cost 9.9ms; the same rule with the elements
    NAMED cost 0.2ms. Naming them takes the replayed synchronous block 10.6ms -> 5.6ms.
    Specificity (1 id + 1 class) still beats the base .photo__tag / .cardqr rules. */
+/* ★★ BR-S499 — .l1seal WAS MISSING FROM THIS LIST, AND IT IS THE M1->L1 LAG.
+   The builder, for the third time and this time with "for real now": the switch to the
+   Desk is laggy. Measured in the live DOM rather than reasoned about, which is the whole
+   lesson of BR-S271 and I nearly repeated the mistake.
+
+   With the travel classes applied by hand, the Desk's blend load correctly collapses
+   1,422,614 px -> 83,502 px and its backdrop-filters 5 -> 1. ONE survives:
+
+       .l1seal   backdrop-filter: saturate(.35) blur(3px)   93,613 px   opacity 1
+
+   It is a direct child of the sliding panel, it is L1's own seal, and it is exactly the
+   thing this rule exists to suppress. BR-S270 named two targets and was right to name
+   rather than use `*`; the cost of naming is that a target added LATER has to be added
+   here too, and BR-S400 added the seal months afterwards without it.
+
+   That is why the symptom is specifically M1<->L1 and not M2<->M3: this is the only
+   panel carrying a live backdrop-filter into the travel, and a backdrop-filter must
+   re-sample what is behind it on every frame of a 640ms slide — the one cost a promoted,
+   flatly-translating layer cannot absorb.
+
+   (The single blend survivor, .rv-scanline at 83,502 px, is left alone deliberately: it
+   rests at opacity 0, so it is the same case as .card__halo two rules down and touching
+   it buys nothing.) */
 #menuView.is-sliding .photo__tag,
-#menuView.is-sliding .cardqr { backdrop-filter: none; -webkit-backdrop-filter: none; }
+#menuView.is-sliding .cardqr,
+#menuView.is-sliding .l1seal { backdrop-filter: none; -webkit-backdrop-filter: none; }
 
 /* BR-S276 — NOTHING BLENDS WHILE IT TRAVELS.  Companion to the rule above, and the
    larger half of it.  A backdrop-filter and a mix-blend-mode fail the same way: both
