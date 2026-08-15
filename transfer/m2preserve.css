@@ -1,0 +1,281 @@
+/* =============================================================
+   M2 · THE BIRTH PRESERVE — a labelled preserving jar in a shallow
+   blue-black niche, replacing the Birth face's object and nothing else.
+   Namespaced under .birth-preserve / .pickle-jar per the master sheet.
+   Append after the .m2bface block in styles.css.
+
+   GOVERNING SENTENCE. The six marks were given once, preserved together,
+   and labelled without revision.
+
+   THE LABEL IS THE READING; the jar is the preserving body. The sticker is
+   an OPAQUE conservation film on the EXTERIOR glass — every reflection is
+   positioned in the exposed bands or on the shoulder so nothing crosses it.
+   If a highlight crosses the label, the label reads as floating inside the
+   jar and the whole illusion goes.
+
+   FOOTPRINT IS LAW. 460x522 — the exact box the parchment card occupied, so
+   the Birth/Tarot selector does not move. Do not grow it to fit the jar.
+
+   SCALE. Values below are the exhibit's own px at the export's 1.065x
+   reference scale. At app CSS px divide by 1.065.
+   ============================================================= */
+
+.birth-preserve {
+  --niche-back-1: #0c1319;   /* blue-black, cooler than the brine */
+  --niche-back-2: #070b10;
+  --glass-edge: #152420;     /* deep bottle green at the jar's edges */
+  --brine-light: #9b8b52;    /* transmitted light, in the EXPOSED bands */
+  --brine-dark: #26301f;
+  --label-cream: #eadcbd;
+  --label-ink: #251b12;
+  --gold: #c1a669;
+
+  position: relative;
+  width: 460px; height: 522px;
+  padding: 14px;
+  box-sizing: border-box;
+  border-radius: 4px;
+  background: #0b1015;
+  /* NO exterior shadow. The niche supplies the contact shadow; the jar
+     never hovers, and a drop here would turn the hole into an object. */
+}
+/* the four returns: shallow (10/8/9), so the depth points INWARD. A heavier
+   bevel makes the exhibit read as a framed picture. */
+.birth-preserve__head,
+.birth-preserve__sill,
+.birth-preserve__cheekL,
+.birth-preserve__cheekR { position: absolute; pointer-events: none; }
+.birth-preserve__head  { left: 0; right: 0; top: 0; height: 10px; border-radius: 4px 4px 0 0;
+  background: linear-gradient(180deg, #1d222a 0%, #12171d 62%, #0b1015 100%); }
+.birth-preserve__sill  { left: 0; right: 0; bottom: 0; height: 9px;
+  background: linear-gradient(0deg, #20262e 0%, #151a21 60%, #0b1015 100%); }
+.birth-preserve__cheekL { left: 0; top: 7px; bottom: 0; width: 8px;
+  background: linear-gradient(90deg, #161b22 0%, #0d1218 58%, #090d12 100%); }
+.birth-preserve__cheekR { right: 0; top: 7px; bottom: 0; width: 8px;
+  background: linear-gradient(270deg, #141a20 0%, #0c1116 58%, #090d12 100%); }
+
+/* the cavity: blue-black, with one local warm bounce off the jar's own light */
+.birth-preserve__cavity {
+  position: absolute; left: 8px; right: 8px; top: 10px; bottom: 9px; overflow: hidden;
+  background:
+    radial-gradient(56% 34% at 50% 62%, rgba(150,132,78,.10) 0%, rgba(150,132,78,.03) 54%, rgba(0,0,0,0) 78%),
+    radial-gradient(82% 66% at 50% 46%, rgba(0,0,0,0) 26%, rgba(0,0,0,.82) 100%),
+    linear-gradient(180deg, var(--niche-back-1) 0%, #0a1016 46%, var(--niche-back-2) 100%);
+}
+.birth-preserve__seam { /* one thin antique-gold interior seam */
+  position: absolute; left: 1px; right: 1px; top: 1px; bottom: 1px; pointer-events: none;
+  box-shadow: inset 0 0 0 1px rgba(168,140,80,.16);
+}
+/* the internal sill: the jar's contact shadow and one caustic */
+.birth-preserve__contact,
+.birth-preserve__caustic { position: absolute; left: 50%; transform: translateX(-50%);
+  border-radius: 50%; pointer-events: none; }
+.birth-preserve__contact { bottom: 10px; width: 272px; height: 14px;
+  background: radial-gradient(50% 50% at 50% 50%, rgba(0,0,0,.72) 0%, rgba(0,0,0,.34) 58%, rgba(0,0,0,0) 100%); }
+.birth-preserve__caustic { bottom: 8px; width: 160px; height: 7px;
+  background: radial-gradient(50% 50% at 50% 50%, rgba(178,152,94,.20) 0%, rgba(178,152,94,0) 100%); }
+
+/* ── THE JAR. 338 x 469, ratio .721 — lid 40 (9%) · neck 60 (6% visible) ·
+   shoulder 30 · body 320 (68%) · foot 44 (9%). Straight-sided; corners
+   present but never capsule. The silhouette must survive the label being
+   hidden, which is why the lid is NARROWER than the body and sits on a
+   visible neck. ─────────────────────────────────────────────────────── */
+.pickle-jar { position: absolute; left: 53px; top: 10px; width: 338px; height: 469px; }
+
+.pickle-jar__neck {
+  position: absolute; left: 69px; top: 32px; width: 200px; height: 60px;
+  border-radius: 5px 5px 0 0; pointer-events: none;
+  background: linear-gradient(90deg, #0b1317 0%, #132126 22%, #1b2c32 50%, #132126 78%, #0b1317 100%);
+  box-shadow: inset 0 1px 0 rgba(196,220,228,.10);
+}
+.pickle-jar__neck-lip {
+  position: absolute; left: 69px; top: 32px; width: 200px; height: 5px; pointer-events: none;
+  background: linear-gradient(90deg, rgba(196,220,228,0), rgba(196,220,228,.18), rgba(196,220,228,0));
+}
+
+/* THE BRINE. The light is in the EXPOSED bands (20-30% and 70-80%), not at
+   the centre — the centre is under an opaque label, so a champagne core
+   there is light you never see and the visible liquid goes muddy. */
+.pickle-jar__brine {
+  position: absolute; left: 0; top: 84px; right: 0; bottom: 0; overflow: hidden; pointer-events: none;
+  border-radius: 38px 38px 14px 14px / 30px 30px 18px 18px;
+  background:
+    linear-gradient(90deg, var(--glass-edge) 0%, #22301f 10%, #6f6a40 20%, var(--brine-light) 30%,
+      #6a6338 42%, #4a4a2c 50%, #6a6338 58%, var(--brine-light) 70%, #6f6a40 80%, #22301f 90%, var(--glass-edge) 100%),
+    linear-gradient(180deg, #39402a 0%, var(--brine-dark) 100%);
+  box-shadow: inset 0 0 22px rgba(0,0,0,.55);
+}
+.pickle-jar__meniscus { /* level, thin, unmistakable — 2px line, 5px falloff */
+  position: absolute; left: 8px; right: 8px; top: 26px; height: 2px; border-radius: 50%;
+  background: linear-gradient(90deg, rgba(226,214,168,.12), rgba(232,222,180,.62), rgba(226,214,168,.12));
+}
+.pickle-jar__meniscus-fall { position: absolute; left: 8px; right: 8px; top: 28px; height: 5px;
+  border-radius: 50%; background: linear-gradient(180deg, rgba(226,214,168,.10), rgba(226,214,168,0)); }
+.pickle-jar__shoulder-shade { position: absolute; left: 0; right: 0; top: 0; height: 30px;
+  background: linear-gradient(180deg, rgba(9,13,18,.92) 0%, rgba(9,13,18,.72) 46%, rgba(9,13,18,.18) 100%); }
+
+/* ONE cucumber: tapered, leaning 3.5deg, four unequal radii, dark centre with
+   a thin transmitted edge light, three surface bumps, brine over it. It must
+   be discovered as organic matter, never mistaken for a lit tube. */
+.pickle-jar__cuke {
+  position: absolute; left: 26px; top: 66px; width: 36px; height: 206px; transform: rotate(3.5deg);
+  border-radius: 19px 15px 22px 17px / 44px 34px 40px 30px;
+  background: linear-gradient(100deg, #1f2917 0%, #33401f 26%, #465428 48%, #2c3a1c 74%, #1b2413 100%);
+  box-shadow: inset 0 0 14px rgba(0,0,0,.6);
+}
+.pickle-jar__cuke-edge { position: absolute; left: 27px; top: 74px; width: 4px; height: 184px;
+  transform: rotate(3.5deg); border-radius: 4px;
+  background: linear-gradient(180deg, rgba(150,166,104,0), rgba(150,166,104,.34) 22%, rgba(150,166,104,.20) 76%, rgba(150,166,104,0)); }
+.pickle-jar__cuke-bump { position: absolute; border-radius: 50%; background: rgba(20,28,14,.46); }
+.pickle-jar__cuke-occl { position: absolute; left: 20px; top: 60px; width: 52px; height: 220px; pointer-events: none;
+  background: radial-gradient(50% 50% at 50% 50%, rgba(26,34,20,.4) 0%, rgba(26,34,20,0) 76%); }
+
+/* dill: one main stem, three branches at unequal spacing, three leaf
+   fragments. Without the branching logic it reads as surface scratches. */
+.pickle-jar__dill-stem { position: absolute; right: 26px; top: 52px; width: 1.5px; height: 176px;
+  background: linear-gradient(180deg, rgba(96,112,84,.85), rgba(52,67,55,.3)); }
+.pickle-jar__dill-branch { position: absolute; height: 1.5px; background: rgba(88,104,76,.6); }
+.pickle-jar__dill-leaf { position: absolute; width: 3px; height: 1.5px; border-radius: 50%;
+  background: rgba(112,128,94,.5); }
+.pickle-jar__seed { position: absolute; border-radius: 50%; background: #9c8748; }
+.pickle-jar__accum { position: absolute; left: 0; right: 0; bottom: 0; height: 38px;
+  background: linear-gradient(180deg, rgba(24,32,22,.35) 0%, rgba(16,22,16,.72) 100%); }
+.pickle-jar__salt { position: absolute; border-radius: 50%; background: rgba(226,220,196,.42); }
+
+/* the foot: transparent thick glass with a lit inner surface — NOT an opaque
+   bar (an opaque band reads as a UI overlay and crops the sticker) */
+.pickle-jar__foot {
+  position: absolute; left: 0; right: 0; bottom: 0; height: 44px; pointer-events: none;
+  border-radius: 0 0 14px 14px / 0 0 20px 20px;
+  background: linear-gradient(180deg, rgba(190,214,220,.10) 0%, rgba(120,150,158,.06) 30%,
+    rgba(20,38,42,.32) 72%, rgba(9,16,20,.58) 100%);
+  box-shadow: inset 0 1px 0 rgba(214,236,242,.22), inset 0 -1px 0 rgba(0,0,0,.5);
+}
+/* refraction and reflections: exposed glass only, never across the sticker */
+.pickle-jar__refractL { position: absolute; left: 0; top: 84px; width: 24px; bottom: 0; pointer-events: none;
+  border-radius: 38px 0 0 14px / 30px 0 0 18px;
+  background: linear-gradient(90deg, rgba(196,220,228,.16) 0%, rgba(196,220,228,.04) 46%, rgba(196,220,228,0) 100%); }
+.pickle-jar__refractR { position: absolute; right: 0; top: 84px; width: 16px; bottom: 0; pointer-events: none;
+  border-radius: 0 38px 14px 0 / 0 30px 18px 0;
+  background: linear-gradient(270deg, rgba(196,220,228,.10) 0%, rgba(196,220,228,0) 100%); }
+.pickle-jar__mould-seam { position: absolute; left: 88px; top: 104px; bottom: 44px; width: 1px; pointer-events: none;
+  background: linear-gradient(180deg, rgba(214,232,238,0), rgba(214,232,238,.07) 30%, rgba(214,232,238,.05) 70%, rgba(214,232,238,0)); }
+.pickle-jar__shoulder-hl { position: absolute; left: 40px; top: 88px; width: 100px; height: 9px;
+  border-radius: 50%; pointer-events: none;
+  background: linear-gradient(90deg, rgba(214,232,238,0), rgba(214,232,238,.20), rgba(214,232,238,0)); }
+.pickle-jar__edge-hl { position: absolute; left: 12px; top: 110px; width: 20px; height: 250px;
+  border-radius: 50%; pointer-events: none; filter: blur(5px);
+  background: linear-gradient(180deg, rgba(226,240,246,0) 0%, rgba(226,240,246,.10) 26%, rgba(226,240,246,.12) 62%, rgba(226,240,246,0) 100%); }
+.pickle-jar__edge-hl--r { left: auto; right: 14px; top: 150px; width: 8px; height: 160px; filter: blur(4px);
+  background: linear-gradient(180deg, rgba(226,240,246,0), rgba(226,240,246,.07) 50%, rgba(226,240,246,0)); }
+
+/* ── THE STICKER. Opaque, matte, adhered. A flex column: the closing line
+   rides margin-top:auto so the reserved foot is a real constraint — with it
+   absolutely positioned the flow overran and clipped the closing statement. */
+.pickle-jar__label {
+  position: absolute; left: 54px; top: 120px; width: 230px; height: 300px;
+  box-sizing: border-box; padding: 13px 13px 18px; border-radius: 6px; text-align: center;
+  display: flex; flex-direction: column;
+  background: linear-gradient(168deg, var(--label-cream) 0%, #e5d5b4 46%, #dfcfad 100%);
+  /* a hairline of adhesive, and NO drop shadow — a shadow floats it */
+  box-shadow: 0 0 0 1px rgba(52,40,24,.22), inset 0 0 12px rgba(120,96,56,.10);
+}
+.pickle-jar__label-fibre { position: absolute; inset: 0; border-radius: 6px; pointer-events: none;
+  opacity: .12; mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='280' height='280'%3E%3Cfilter id='pfib'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.04' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='280' height='280' filter='url(%23pfib)' opacity='0.7'/%3E%3C/svg%3E"); }
+.pickle-jar__label-adhesion { position: absolute; inset: 0; border-radius: 6px; pointer-events: none;
+  box-shadow: inset 0 0 5px rgba(74,56,30,.22); }
+/* the outer 6% of each side is shaded: the film bends with the glass */
+.pickle-jar__label-curve { position: absolute; inset: 0; border-radius: 6px; pointer-events: none;
+  background: linear-gradient(90deg, rgba(58,42,20,.20) 0%, rgba(58,42,20,.05) 6%, rgba(58,42,20,0) 12%,
+    rgba(58,42,20,0) 88%, rgba(58,42,20,.05) 94%, rgba(58,42,20,.20) 100%); }
+.pickle-jar__label-air { position: absolute; left: 52px; top: 38px; width: 3px; height: 3px;
+  border-radius: 50%; pointer-events: none; background: rgba(120,98,58,.18); }   /* one trapped bubble, at most */
+/* spot varnish over the six marks only */
+.pickle-jar__varnish { position: absolute; left: 34px; top: 110px; right: 34px; height: 112px;
+  border-radius: 3px; pointer-events: none;
+  background: linear-gradient(112deg, rgba(255,252,242,.10) 0%, rgba(255,252,242,.02) 34%, rgba(255,252,242,0) 60%); }
+
+.pickle-jar__inst { position: relative; display: flex; align-items: baseline; justify-content: space-between;
+  font-family: var(--font-mono); font-size: 8px; letter-spacing: .22em; text-transform: uppercase; color: #6b573a; }
+.pickle-jar__product { position: relative; display: flex; align-items: center; justify-content: space-between;
+  margin-top: 9px; font-family: var(--font-mono); font-size: 9.5px; font-weight: 600;
+  letter-spacing: .14em; text-transform: uppercase; color: var(--label-ink); }
+.pickle-jar__product-mark { font-family: var(--font-display); font-weight: 700; font-size: 11px; color: #a88c50; }
+.pickle-jar__rule { position: relative; height: 1px; margin-top: 8px; pointer-events: none; background: rgba(52,40,24,.30); }
+.pickle-jar__name { position: relative; margin-top: 10px; font-family: var(--font-display);
+  font-weight: 600; font-size: 24px; line-height: 1.04; color: var(--label-ink); }
+.pickle-jar__marks { position: relative; margin-top: 10px; display: grid; gap: 7px; justify-items: center; }
+.pickle-jar__mark {
+  all: unset; cursor: pointer; padding: 1px 6px; border-radius: 2px;
+  font-family: var(--font-mono); font-size: 9.5px; font-weight: 500; letter-spacing: .15em;
+  text-transform: uppercase; text-indent: .075em;
+  transition: color 160ms var(--ease-settle, cubic-bezier(.2,.7,.2,1)),
+              background 160ms var(--ease-settle, cubic-bezier(.2,.7,.2,1));
+}
+.pickle-jar__mark:focus-visible { outline: 1px solid rgba(52,40,24,.5); outline-offset: 2px; }
+/* the six material pigments, on cream. All clear 4.5:1. */
+.pickle-jar__mark--sun     { color: #6b4c14; } .pickle-jar__mark--sun:hover     { color: #472f06; background: rgba(107,76,20,.09); }
+.pickle-jar__mark--animal  { color: #74402c; } .pickle-jar__mark--animal:hover  { color: #50261a; background: rgba(116,64,44,.09); }
+.pickle-jar__mark--path    { color: #313d4c; } .pickle-jar__mark--path:hover    { color: #1c2530; background: rgba(49,61,76,.09); }
+.pickle-jar__mark--rune    { color: #465241; } .pickle-jar__mark--rune:hover    { color: #2b3527; background: rgba(70,82,65,.09); }
+.pickle-jar__mark--trigram { color: #315854; } .pickle-jar__mark--trigram:hover { color: #1b3b37; background: rgba(49,88,84,.09); }
+.pickle-jar__mark--hex     { color: #514c44; } .pickle-jar__mark--hex:hover     { color: #332f29; background: rgba(81,76,68,.09); }
+.pickle-jar__ledge { position: relative; width: 64px; height: 1px; margin: 11px auto 0; pointer-events: none;
+  background: rgba(52,40,24,.32); }
+.pickle-jar__closing-mark { position: relative; margin-top: 9px; font-family: var(--font-mono); font-size: 9px;
+  font-weight: 600; letter-spacing: .16em; text-transform: uppercase; color: #4a3a24; text-indent: .08em; }
+.pickle-jar__sealed { position: relative; margin-top: auto; padding-top: 10px; font-family: var(--font-mono);
+  font-size: 8px; letter-spacing: .14em; text-transform: uppercase; color: #6b573a; }
+
+/* ── THE LID: dark enamel, narrower than the body, sitting ON the neck.
+   Six notches (one per mark) and a tamper strip that crosses the lid's front
+   edge onto the neck and terminates in the seal — with a contact shadow at
+   each material boundary, or it reads as a hanging ornament. ─────────────── */
+.pickle-jar__lid {
+  position: absolute; left: 49px; top: 0; width: 240px; height: 40px; overflow: hidden; pointer-events: none;
+  border-radius: 6px 6px 2px 2px;
+  background: linear-gradient(180deg, #1b2026 0%, #12161b 44%, #0d1116 78%, #181d23 100%);
+  box-shadow: inset 0 1px 0 rgba(214,232,238,.12), 0 4px 10px rgba(0,0,0,.65);
+}
+.pickle-jar__lid-grooves { position: absolute; inset: 0; opacity: .5;
+  background: repeating-linear-gradient(90deg, rgba(214,232,238,.05) 0 1px, rgba(0,0,0,0) 1px 5px); }
+.pickle-jar__lid-seam { position: absolute; left: 0; right: 0; bottom: 8px; height: 1px;
+  background: linear-gradient(90deg, rgba(168,140,80,0), rgba(193,166,105,.55) 22%, rgba(193,166,105,.55) 78%, rgba(168,140,80,0)); }
+/* one notch per mark. NO transition: it must light on the same frame the
+   bubble mounts and clear on the frame it ends, or the 700ms law is a lie. */
+.pickle-jar__notch {
+  position: absolute; top: 3px; width: 12px; height: 5px; border-radius: 0 0 3px 3px; transition: none;
+  background: rgba(9,13,18,.9); box-shadow: inset 0 -1px 0 rgba(214,232,238,.10);
+}
+.pickle-jar__notch.is-lit {
+  background: rgba(214,190,130,.85);
+  box-shadow: 0 0 6px rgba(214,190,130,.55), inset 0 -1px 0 rgba(255,246,222,.5);
+}
+.pickle-jar__strip { position: absolute; left: 50%; top: 4px; width: 9px; height: 84px;
+  transform: translateX(-50%); pointer-events: none;
+  background: linear-gradient(180deg, #c9ae70 0%, #a98d4e 34%, var(--gold) 44%, #8e7440 62%, #6f5a2e 100%);
+  box-shadow: 0 0 0 1px rgba(0,0,0,.45); }
+.pickle-jar__strip-fold { position: absolute; left: 50%; top: 36px; width: 13px; height: 5px;
+  transform: translateX(-50%); pointer-events: none;
+  background: linear-gradient(180deg, rgba(0,0,0,.55), rgba(0,0,0,.15)); }
+.pickle-jar__seal { position: absolute; left: 50%; top: 88px; width: 7px; height: 7px;
+  transform: translateX(-50%) rotate(45deg); pointer-events: none; background: var(--gold);
+  box-shadow: 0 0 0 1px rgba(0,0,0,.5), 1px 1px 2px rgba(0,0,0,.5); }
+
+/* ── the one motion in the exhibit: a single bubble, on demand, 700ms. No
+   idle animation anywhere. ─────────────────────────────────────────────── */
+.pickle-jar__bubble {
+  position: absolute; bottom: 52px; width: 4px; height: 4px; border-radius: 50%; pointer-events: none;
+  background: radial-gradient(circle at 34% 28%, rgba(255,248,228,.9) 0%, rgba(226,214,168,.25) 46%, rgba(226,214,168,0) 74%);
+  box-shadow: inset 0 0 0 .5px rgba(255,246,222,.3);
+  animation: preserve-bubble 700ms cubic-bezier(.2,.7,.2,1) forwards;
+}
+@keyframes preserve-bubble {
+  0%   { transform: translate3d(0,0,0) scale(.7); opacity: 0; }
+  18%  { opacity: .55; }
+  100% { transform: translate3d(3px,-96px,0) scale(1); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pickle-jar__bubble { animation: none; opacity: 0; }
+}

@@ -2438,7 +2438,16 @@ function renderAbout() {
     + '<header class="u1head">'
     +   '<p class="u1head__eyebrow"><span class="u1head__mark" aria-hidden="true">&#9670;</span> BLUE ROOM</p>'
     +   '<h2 class="u1head__title">Everything read here<br>is yours to keep.</h2>'
-    +   '<p class="u1head__ident">The archive draws tarot and birth readings, develops a card from a photograph, '
+    /* ★ BR-S495 — THE IDENTITY LINE PROMISED A ROOM THAT IS NOT OPEN. It read "develops
+       a card from a photograph", but The Forge is `state: "drawn"` in the registry below,
+       and this file's own legend says `state: "open"` means "finished and unlocked". The
+       count line two lines down DERIVES from that same registry, so the paragraph and the
+       numbers directly under it were disagreeing about what exists — the exact defect
+       the derived count line was introduced to end.
+       Nothing here now names a room that is not a door. Found by the U1 redesign fleet,
+       which had to enumerate every true thing the page could say before it could write
+       copy, and tripped over this on the way. */
+    +   '<p class="u1head__ident">The archive draws tarot and birth readings, '
     +     'and&nbsp;files&nbsp;each one on a page of its own.</p>'
     /* The count line is DERIVED from the registry, so it can never disagree with
        the doors beneath it. The old header said "Five rooms" in a hardcoded
