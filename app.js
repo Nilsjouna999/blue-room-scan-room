@@ -1258,8 +1258,18 @@ function brBuildSides() {
    Anything with a secret in it stays on the cut list, where it belongs.
 
    The visibility test is its own function so the build can assert the gate exists,
-   rather than trusting a line of code to keep its shape. */
-function brFlipVisible() { return DEVNAV; }
+   rather than trusting a line of code to keep its shape.
+
+   ★ BR-S488 — IT READS THE LIVE STATE, NOT THE BOOT CONSTANT. This returned `DEVNAV`,
+   which is a const from a load-time IIFE and therefore cannot change for the life of
+   the page — while the backtick key toggles the flag all session. The two disagreed
+   the moment anyone used the switch. The body attribute is the one thing kept current
+   by every path that changes the flag, and it is already set before the first call at
+   boot, so it is the honest source to ask. */
+function brFlipVisible() {
+  var b = document.body;
+  return !!(b && b.dataset.devnav === "1");
+}
 function syncBuildFlip() {
   if (!brFlipVisible()) return;
   var s = brBuildSides();
@@ -1743,6 +1753,16 @@ document.addEventListener("click", function (e) {
     wrap.classList.add("is-open");
     pop.removeAttribute("inert"); pop.removeAttribute("aria-hidden");
     btn.setAttribute("aria-expanded", "true");
+    /* ★★ BR-S488 — STOPPING HERE IS THE WHOLE FIX FOR A DOUBLE POPUP.
+       `_whats-coming.js` registers its OWN capture listener on document for the same
+       anchor, and it is loaded after app.js, so it runs second on the same node.
+       preventDefault only cancels the navigation — it does not stop the other
+       listener — so one click opened BOTH the small inline box and the full-screen
+       ledger, stacked. Worse, Escape stops propagation on ITS capture pass, which
+       kills the other module's bubble listener: the box you could see stayed and the
+       one you could close went. This branch has already committed to handling the
+       click by the time it gets here, so it says so. */
+    e.stopPropagation();
     return;
   }
   if (_rmpopOpen && !(e.target.closest && e.target.closest(".rmpop"))) _rmpopClose();
@@ -1839,8 +1859,13 @@ var VISION = [
 
   /* Split. Shelf, crown, gem, ring arriving in one breath turns prose into a manual;
      the break is what converts a catalogue into accumulation. */
+  /* BR-S488: this one survived BR-S484's claim pass while the paragraph 26 lines above
+     it was rewritten — the same array, the same false promise, the same session. The
+     profile module has one storage READ and no write anywhere, so nothing a visitor
+     draws is stored. Corrected to the framing the fixed sentence already uses. */
   "What you keep gathers into a place of your own. A profile here is your page in the " +
-  "archive, not a settings screen. Its Shelf holds everything you have drawn.",
+  "archive, not a settings screen. Every reading you draw keeps its own link, and the " +
+  "Shelf is where they gather.",
 
   "Over time the page starts to carry its own marks. A gem for what you have read. A " +
   "ring for someone you have read for.",
@@ -7090,6 +7115,15 @@ document.addEventListener("keydown", function (e) {
   try { on ? localStorage.removeItem("br_devnav") : localStorage.setItem("br_devnav", "1"); } catch (_) {}
   if (on) { delete document.body.dataset.devnav; if (el) el.setAttribute("hidden", ""); }
   else { document.body.dataset.devnav = "1"; if (el) { el.innerHTML = renderDevnav(); el.removeAttribute("hidden"); } }
+  /* BR-S488 — THE PILL HAS TO FOLLOW THE SWITCH IT IS GATED ON. `DEVNAV` is a const
+     from a load-time IIFE and syncBuildFlip() runs exactly once at boot, so toggling
+     here left the two disagreeing for the rest of the session: switch it off and the
+     pill stayed on screen, switch it on and no pill appeared until a reload. It only
+     became visible when BR-S486 made the pill conditional on this flag at all.
+     Re-derived from the DOM rather than from DEVNAV, which cannot change after boot. */
+  var pill = document.getElementById("brBuildFlip");
+  if (pill) pill.remove();
+  if (!on && typeof syncBuildFlip === "function") syncBuildFlip();
 });
 if (state.view === "dev") mountDev();
 /* BR-S266 — THE SHELF IS A DESTINATION, NOT A STATE. The reported bug was "hard refresh

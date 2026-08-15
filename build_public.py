@@ -114,11 +114,51 @@ PROFILE_GUARD = ('    // Public build: the Profile opens only once something is 
 # an anchor kept for a cut nobody performs is a re-anchoring chore forever, paid on every
 # edit to a block the build no longer touches.
 
+# ★★ BR-S488 — THE M3 PREVIEW TOGGLE IS REMOVED FROM THE BUILD, NOT GATED INSIDE IT.
+#
+# BR-S484 gated `reliqPreviewToggle` behind the dev flag, which stopped a visitor seeing
+# the control. An audit then showed the gate is not a boundary: the dev flag is settable
+# from a URL param, from localStorage, AND from an unauthenticated backtick keypress on
+# the launch build itself. Two clicks after that keypress still reach the fabricated
+# sample profile. The impact is bounded — the data is a hardcoded mock, not anyone's
+# record — but the shape is wrong, and BR-S486's own note reasoned that the flag "fails
+# open leaks nothing" on the strength of the pill's three links, without accounting for
+# what else the same flag un-gates.
+#
+# So the rule this file already states is applied instead: a static site can only hide
+# what it never copies. The callers are stripped, then the functions are cut, and the
+# build's existing "no live reference survives" assert proves it.
+#
+# The ?holdings= writer goes too. Gating the visible control and leaving a URL that sets
+# the same flag was exactly the door/window pairing BR-S486 claimed to have closed.
+PUBLIC_STRIPS = [
+    ("    + reliqPreviewToggle(false)\n", ""),
+    ("    + reliqPreviewToggle(true)\n", ""),
+    ('  host.removeEventListener("click", onReliqPreviewClick);'
+     '   // BR-S230: M3 preview state toggle — single-bind across remounts\n'
+     '  host.addEventListener("click", onReliqPreviewClick);\n', ""),
+    ('  const hp = DEVNAV ? raw : null;\n'
+     '  if (hp === "1") localStorage.setItem("br_holdings", "1");\n'
+     '  else if (hp === "0") localStorage.removeItem("br_holdings");\n',
+     "  // Public build: no code path here can write the holdings flag.\n"),
+    # The dev rail's own holdings flip. Its BUTTON is already gone from the public
+    # builds — transform_index strips the rail's markup — so this is unreachable rather
+    # than dangerous. It is stripped anyway, because "the trigger does not ship" is a
+    # weaker claim than "the writer does not exist", and the whole point of this pass
+    # was that the weaker claim is the one that kept being wrong.
+    ('  else if (kind === "holdings") { try { localStorage.getItem("br_holdings") === "1"'
+     ' ? localStorage.removeItem("br_holdings") : localStorage.setItem("br_holdings", "1"); }'
+     ' catch (e) {} mountMenu(); return; }',
+     '  // Public build: the dev rail\'s holdings flip is not part of it.'),
+]
+
 # Top-level functions reachable ONLY from a cut branch. Verified one call site each, all
 # inside a removed branch — re-verify with `grep -c` before adding to this list.
+# BR-S488: the two M3 preview functions join it, their callers stripped just above.
 CUT_FUNCTIONS = ["renderProtoCards", "renderVault", "wireVault", "renderReviewMap",
                  "renderBeforeAfter", "renderHaloGateMock", "renderUploadedScanResultDev",
-                 "renderVision", "wireVision", "u1Aside"]
+                 "renderVision", "wireVision", "u1Aside",
+                 "reliqPreviewToggle", "onReliqPreviewClick"]
 
 # mountDev's tail is the fallthrough for ?dev=uploaded-result / uploaded-blocked. With
 # both rooms cut it is unreachable, but it is a STATEMENT rather than an if-block, so the
@@ -355,6 +395,19 @@ def transform_app(src, report, is_preview=True):
         src = src.replace(dead, live)
         assert dead not in src and live in src
         report.append("dead link re-pointed: %s" % live[live.index("?dev="):].split('"')[0])
+
+    # 2a-ii-b. BR-S488 — strip the callers of the M3 preview toggle and the ?holdings=
+    # writer, BEFORE the function cut below, so "no live reference survives" can prove
+    # the removal instead of tripping on it. Each pair is asserted present: a strip that
+    # silently matched nothing would ship the exact code it exists to remove.
+    for dead, live in PUBLIC_STRIPS:
+        if dead not in src:
+            sys.exit("build_public: a PUBLIC_STRIPS anchor is no longer in app.js:\n"
+                     "    %s\nThis would ship the M3 preview toggle or the holdings "
+                     "writer to the public builds, so it fails instead. Re-anchor it."
+                     % dead.strip()[:90])
+        src = src.replace(dead, live)
+        report.append("stripped: %s" % dead.strip().split("\n")[0][:64])
 
     # 2a-iii. the Profile gate (see PROFILE_GUARD). Fails the build rather than shipping
     # an ungated members' page, on the same principle as the resolver above.

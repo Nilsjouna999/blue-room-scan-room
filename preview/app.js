@@ -1258,8 +1258,18 @@ function brBuildSides() {
    Anything with a secret in it stays on the cut list, where it belongs.
 
    The visibility test is its own function so the build can assert the gate exists,
-   rather than trusting a line of code to keep its shape. */
-function brFlipVisible() { return DEVNAV; }
+   rather than trusting a line of code to keep its shape.
+
+   ★ BR-S488 — IT READS THE LIVE STATE, NOT THE BOOT CONSTANT. This returned `DEVNAV`,
+   which is a const from a load-time IIFE and therefore cannot change for the life of
+   the page — while the backtick key toggles the flag all session. The two disagreed
+   the moment anyone used the switch. The body attribute is the one thing kept current
+   by every path that changes the flag, and it is already set before the first call at
+   boot, so it is the honest source to ask. */
+function brFlipVisible() {
+  var b = document.body;
+  return !!(b && b.dataset.devnav === "1");
+}
 function syncBuildFlip() {
   if (!brFlipVisible()) return;
   var s = brBuildSides();
@@ -1743,6 +1753,16 @@ document.addEventListener("click", function (e) {
     wrap.classList.add("is-open");
     pop.removeAttribute("inert"); pop.removeAttribute("aria-hidden");
     btn.setAttribute("aria-expanded", "true");
+    /* ★★ BR-S488 — STOPPING HERE IS THE WHOLE FIX FOR A DOUBLE POPUP.
+       `_whats-coming.js` registers its OWN capture listener on document for the same
+       anchor, and it is loaded after app.js, so it runs second on the same node.
+       preventDefault only cancels the navigation — it does not stop the other
+       listener — so one click opened BOTH the small inline box and the full-screen
+       ledger, stacked. Worse, Escape stops propagation on ITS capture pass, which
+       kills the other module's bubble listener: the box you could see stayed and the
+       one you could close went. This branch has already committed to handling the
+       click by the time it gets here, so it says so. */
+    e.stopPropagation();
     return;
   }
   if (_rmpopOpen && !(e.target.closest && e.target.closest(".rmpop"))) _rmpopClose();
@@ -1839,8 +1859,13 @@ var VISION = [
 
   /* Split. Shelf, crown, gem, ring arriving in one breath turns prose into a manual;
      the break is what converts a catalogue into accumulation. */
+  /* BR-S488: this one survived BR-S484's claim pass while the paragraph 26 lines above
+     it was rewritten — the same array, the same false promise, the same session. The
+     profile module has one storage READ and no write anywhere, so nothing a visitor
+     draws is stored. Corrected to the framing the fixed sentence already uses. */
   "What you keep gathers into a place of your own. A profile here is your page in the " +
-  "archive, not a settings screen. Its Shelf holds everything you have drawn.",
+  "archive, not a settings screen. Every reading you draw keeps its own link, and the " +
+  "Shelf is where they gather.",
 
   "Over time the page starts to carry its own marks. A gem for what you have read. A " +
   "ring for someone you have read for.",
@@ -3107,7 +3132,6 @@ function renderReliquaryTeaser() {
     +   '<a class="menu__reliq-door" href="?dev=arcane">Draw a Birth Reading — the form is free &rarr;</a>'
     + '</div>'
     + '<p class="menu__reliq-foot">Sealed · held in conservation · Blue Room Archive</p>'
-    + reliqPreviewToggle(false)
     + '</div>';
 }
 function renderReliquaryOpen() {
@@ -3122,7 +3146,6 @@ function renderReliquaryOpen() {
     +   '<a class="menu__reliq-door menu__reliq-door--enter" href="?dev=profile">Open your Profile &rarr;</a>'
     + '</div>'
     + '<p class="menu__reliq-foot">Filed &amp; sealed · Blue Room Archive</p>'
-    + reliqPreviewToggle(true)
     + '</div>';
 }
 /* BR-S230 — a visible dev/preview toggle on M3, so the builder can SEE both account
@@ -3137,28 +3160,9 @@ function renderReliquaryOpen() {
    drawn and kept" into a crowned name nobody earned. It is the one finding on
    the list that manufactures a fake record rather than mis-describing a real
    one, so it is gated first and fails CLOSED to the sealed teaser. */
-function reliqPreviewToggle(held) {
-  if (!DEVNAV) return '';
-  return '<div class="menu__reliq-preview" role="group" aria-label="Preview: account state">'
-    + '<span class="menu__reliq-preview-tag" aria-hidden="true">&#9670; Preview as</span>'
-    + '<button type="button" class="menu__reliq-previewbtn' + (held ? '' : ' is-on') + '" data-reliq-state="none"' + (held ? '' : ' aria-current="true"') + '>No account</button>'
-    + '<span class="menu__reliq-preview-sep" aria-hidden="true">·</span>'
-    + '<button type="button" class="menu__reliq-previewbtn' + (held ? ' is-on' : '') + '" data-reliq-state="profile"' + (held ? ' aria-current="true"' : '') + '>The profile &rarr;</button>'
-    + '</div>';
-}
 function renderReliquary(held) { return held ? renderReliquaryOpen() : renderReliquaryTeaser(); }
 /* delegated click for the M3 preview toggle — module-level named handler so it never
    stacks across menu remounts (bound once via remove+add in mountMenu). */
-function onReliqPreviewClick(e) {
-  var b = e.target.closest("[data-reliq-state]");
-  if (!b) return;
-  e.preventDefault();
-  var st = b.getAttribute("data-reliq-state");
-  try { st === "profile" ? localStorage.setItem("br_holdings", "1") : localStorage.removeItem("br_holdings"); } catch (_) {}
-  if (st === "profile") { location.href = "?dev=profile"; return; }
-  var cur = e.currentTarget.querySelector(".menu__reliq");   // re-render M3 in place — stays on slide 3
-  if (cur) cur.outerHTML = renderReliquary(false);
-}
 /* BR-S233 — annex nav (data-annex-go/back) as ONE delegated listener on host, bound
    once in mountMenu. Survives in-place DOM swaps (e.g. the M3 preview toggle's outerHTML
    re-render) that per-element listeners did NOT — a freshly-rendered back/forward control
@@ -3388,8 +3392,6 @@ function mountMenu() {
   wireMenuAbout(host);   // BR-S203: the About surface scroll-reveal
   wireMenuCodex(host);   // BR-S205: the bottom-right Codex aperture (seal → in-page codex.html)
   wireMiniCodex(host);   // BR-S226: the orange mini-codex ball (drag + in-room search)
-  host.removeEventListener("click", onReliqPreviewClick);   // BR-S230: M3 preview state toggle — single-bind across remounts
-  host.addEventListener("click", onReliqPreviewClick);
   host.removeEventListener("click", onMenuAnnexClick);      // BR-S233: annex nav delegated (survives DOM swaps like the M3 toggle re-render)
   host.addEventListener("click", onMenuAnnexClick);
   host.removeEventListener("keydown", onMenuAnnexKey);      // BR-S338: the face radiogroup's arrow keys, delegated the same way
@@ -5912,7 +5914,7 @@ document.addEventListener("click", (e) => {
   else if (kind === "treat") { state.treatment = val; if (val !== "mint") state.labMaterial = null; state.view = "room"; render(); window.scrollTo(0, 0); }
   else if (kind === "src") { state.source = Number(val); state.view = "room"; render(); window.scrollTo(0, 0); }
   else if (kind === "tab") { state.tab = val; state.view = "room"; render(); window.scrollTo(0, 0); }
-  else if (kind === "holdings") { try { localStorage.getItem("br_holdings") === "1" ? localStorage.removeItem("br_holdings") : localStorage.setItem("br_holdings", "1"); } catch (e) {} mountMenu(); return; }   // BR-S204: MOCK holdings flip — always remount so the gated slide 3 never goes stale behind another view
+  // Public build: the dev rail's holdings flip is not part of it.   // BR-S204: MOCK holdings flip — always remount so the gated slide 3 never goes stale behind another view
   else if (kind === "dev") { const u = new URL(location.href); u.searchParams.set("dev", val); u.searchParams.set("devnav", "1"); location.href = u.toString(); }
 });
 
@@ -6173,9 +6175,7 @@ function renderSourceToggle() {
 try {
   const hu = new URL(location.href);
   const raw = hu.searchParams.get("holdings");
-  const hp = DEVNAV ? raw : null;
-  if (hp === "1") localStorage.setItem("br_holdings", "1");
-  else if (hp === "0") localStorage.removeItem("br_holdings");
+  // Public build: no code path here can write the holdings flag.
   if (raw !== null) { hu.searchParams.delete("holdings"); history.replaceState(null, "", hu.pathname + (hu.search || "") + hu.hash); }
 } catch (e) {}
 
@@ -6217,6 +6217,15 @@ document.addEventListener("keydown", function (e) {
   try { on ? localStorage.removeItem("br_devnav") : localStorage.setItem("br_devnav", "1"); } catch (_) {}
   if (on) { delete document.body.dataset.devnav; if (el) el.setAttribute("hidden", ""); }
   else { document.body.dataset.devnav = "1"; if (el) { el.innerHTML = renderDevnav(); el.removeAttribute("hidden"); } }
+  /* BR-S488 — THE PILL HAS TO FOLLOW THE SWITCH IT IS GATED ON. `DEVNAV` is a const
+     from a load-time IIFE and syncBuildFlip() runs exactly once at boot, so toggling
+     here left the two disagreeing for the rest of the session: switch it off and the
+     pill stayed on screen, switch it on and no pill appeared until a reload. It only
+     became visible when BR-S486 made the pill conditional on this flag at all.
+     Re-derived from the DOM rather than from DEVNAV, which cannot change after boot. */
+  var pill = document.getElementById("brBuildFlip");
+  if (pill) pill.remove();
+  if (!on && typeof syncBuildFlip === "function") syncBuildFlip();
 });
 if (state.view === "dev") mountDev();
 /* BR-S266 — THE SHELF IS A DESTINATION, NOT A STATE. The reported bug was "hard refresh

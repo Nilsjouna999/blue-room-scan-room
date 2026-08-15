@@ -275,10 +275,32 @@
   }
 
   var el = null, plates = null, M = { H: 900, top: 0, span: 1 }, C = {}, curP = 0;
+  var dirty = false;
   var REDUCED = root.matchMedia && root.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* the scroll fraction, derived fresh. Every caller reads THIS rather than the cached
+     curP — see the note in measure() about what happens when a resize repaints at a
+     fraction computed under the previous viewport. */
+  function scrollP() {
+    return clamp01(((root.scrollY || root.pageYOffset || 0) - M.top) / M.span);
+  }
 
   function measure() {
     if (!el) return;
+    /* ★★ BR-S488 — NEVER MEASURE A RACK THAT IS NOT LAID OUT. This is the defect an
+       audit found and it was the worst thing in the module: U1 is inside `.menu`, and
+       the menu is display:none in room and dev views, and `#about` itself is hidden
+       while the reliquary panel is open. Any of those boots the module against a node
+       whose offsetHeight is 0 — so span collapsed to Math.max(1, -H) = 1, and p became
+       1 for any scroll past a single pixel. The rack then stood permanently at its
+       final payoff frame: every plate seated, the crown up, the whole scroll spent
+       before the reader arrived. And because mount() returns early once the box is
+       standing, nothing ever measured it again — only a real window resize recovered
+       it, for the rest of the session.
+       Measuring is now refused rather than fudged, and the refusal is remembered so
+       the reveal path can re-enter. */
+    if (!el.rack.offsetHeight) { dirty = true; return; }
+    dirty = false;
     var r = el.rack.getBoundingClientRect();
     M.top  = r.top + (root.scrollY || root.pageYOffset || 0);
     M.H    = el.vp.clientHeight || root.innerHeight;
@@ -291,11 +313,19 @@
     el.deepB.style.setProperty("--rk-Pb", C.Pb + "px");
     el.pinion.style.setProperty("--rk-R2", (2 * 0.340 * M.H) + "px");
     el.pointer.style.top = (1.02 * M.H - 0.340 * M.H) + "px";
-    el.stack.style.setProperty("--rk-nameSize", (0.0244 * M.H).toFixed(2) + "px");
-    el.stack.style.setProperty("--rk-label",    (0.0111 * M.H).toFixed(2) + "px");
+    /* BR-S488: floors. Every other size in this file is a clamp(); these two were bare
+       fractions of H, so a 700px viewport put the slot label at 7.8px and a 400px one
+       at 4.4px — a legend nobody can read, on the row that carries the provenance. */
+    el.stack.style.setProperty("--rk-nameSize", Math.max(13, 0.0244 * M.H).toFixed(2) + "px");
+    el.stack.style.setProperty("--rk-label",    Math.max(9,  0.0111 * M.H).toFixed(2) + "px");
     DPR = root.devicePixelRatio || 1;
     if (typeof WeakMap === "function") memo = new WeakMap();   // geometry changed: every cached write is stale
-    draw(curP);
+    lastP = -1;                                                // and so is the loop's cached fraction
+    /* BR-S488: repaint at the fraction the reader is ACTUALLY at, not the cached one.
+       curP is only ever written inside draw(), so measuring after a resize used to
+       repaint the frame computed under the OLD viewport and hold it until the next
+       real scroll event. */
+    draw(scrollP());
   }
 
   function draw(p) {
@@ -404,6 +434,9 @@
     armed = { ground: null, stack: null, crown: null };
     if (typeof WeakMap === "function") memo = new WeakMap();
     measure();
+    /* the visibility watch is re-pointed per mount, because a remount hands us a new
+       rack node and an observer still watching the old one watches nothing */
+    watchVisibility();
     return true;
   }
 
@@ -426,21 +459,92 @@
     root.requestAnimationFrame(function () {
       ticking = false;
       if (!el) return;
-      draw(clamp01(((root.scrollY || root.pageYOffset || 0) - M.top) / M.span));
+      draw(scrollP());
     });
   }
+
+  /* ── THE DRIVE. ───────────────────────────────────────────────────────────────────
+     BR-S488. The module was driven purely by scroll EVENTS, and a measured check found
+     a fresh window-scroll listener receiving zero of them while the scroll offset was
+     plainly changing — so the rack stood at one frame no matter where the reader was.
+     Binding the document in capture did not recover it either.
+
+     Rather than keep guessing which node dispatches, the drive no longer depends on an
+     event at all: while the rack is ON SCREEN a rAF loop reads the scroll offset each
+     frame, and while it is off screen there is no loop. An IntersectionObserver decides
+     which. That is the standard shape for a scroll-linked effect that has to be right,
+     and it costs nothing when the rack is not being looked at — which is the whole
+     budget this module was written to respect.
+
+     The events stay bound as well. They are not the drive any more, but when they DO
+     fire they update the frame a few milliseconds sooner, and draw() writes only what
+     changed, so the pair collapses to one write per frame. */
+  /* ★ onScreen STARTS TRUE, and the observer's job is to turn it OFF.
+     Written the other way round — false until an observer says otherwise — a silent
+     IntersectionObserver leaves the loop permanently unstarted and the rack frozen at
+     one frame, which is the exact failure this whole block exists to remove. Starting
+     true costs an idle rAF on a page where the observer never reports; starting false
+     costs the feature. Fail toward working. */
+  var io = null, rafId = 0, onScreen = true, lastP = -1;
+
+  function frame() {
+    rafId = 0;
+    if (!el || !onScreen) return;
+    var p = scrollP();
+    if (p !== lastP) { lastP = p; draw(p); }
+    rafId = root.requestAnimationFrame(frame);
+  }
+  function startLoop() { if (!rafId && onScreen && el) rafId = root.requestAnimationFrame(frame); }
+  function stopLoop() { if (rafId) { root.cancelAnimationFrame(rafId); rafId = 0; } }
+
+  function watchVisibility() {
+    onScreen = true;
+    startLoop();                                  // run first, refine second
+    if (!el || !root.IntersectionObserver) return;
+    if (io) io.disconnect();
+    io = new root.IntersectionObserver(function (entries) {
+      onScreen = entries[entries.length - 1].isIntersecting;
+      if (onScreen) { measureIfDirty(); startLoop(); } else stopLoop();
+    }, { rootMargin: "120px 0px" });
+    io.observe(el.rack);
+  }
+  function measureIfDirty() { if (dirty) measure(); }
 
   var wired = false;
   function wire() {
     if (wired) return;
     wired = true;
+    /* ★★ BR-S488 — BIND ON THE DOCUMENT, IN CAPTURE, NOT JUST ON THE WINDOW.
+       `window` only receives scroll from the VIEWPORT scroller. This app gives <body>
+       its own `overflow-y: auto`, so depending on how the browser resolves that, the
+       scroll event can target the element and never reach the window at all — and a
+       measured check here found a fresh window-scroll listener receiving exactly zero
+       events while the scroll offset was plainly changing.
+       Scroll does not bubble, but it DOES capture, so a capture listener on the
+       document sees it wherever it fires. Both are bound: the window for the ordinary
+       case, the document for the element-scroller case, and onScroll's own rAF gate
+       collapses the pair to one draw per frame when both deliver.
+       ★ AND THIS IS WHY BR-S485's VERIFICATION PASSED WHILE THE FEATURE DID NOT WORK.
+       That pass proved the engine computes the right frame when it is CALLED — it
+       dispatched events and called tick() by hand. It never established that real
+       scrolling calls it. Proving the arithmetic is not proving the wiring. */
     root.addEventListener("scroll", onScroll, { passive: true });
+    if (root.document) root.document.addEventListener("scroll", onScroll, { passive: true, capture: true });
     var rz = false;
     root.addEventListener("resize", function () {
       if (rz || !el) return;
       rz = true;
       root.requestAnimationFrame(function () { rz = false; measure(); });
     });
+    /* ★ BR-S488 — THE INVALIDATION SET WAS INCOMPLETE, AND app.js ALREADY KNEW.
+       The identical cached-geometry pattern elsewhere in this repo invalidates on
+       resize, LOAD and a menu remount, and says so in its own comment; this module
+       reproduced the pattern and kept only the first. Load matters here specifically:
+       the page loads its display serif with `display=swap`, so the webfont lands
+       AFTER the first measure and reflows the very column being measured. */
+    root.addEventListener("load", measure);
+    var d = root.document;
+    if (d && d.fonts && d.fonts.ready && d.fonts.ready.then) d.fonts.ready.then(function () { measure(); });
     if (root.matchMedia) {
       var mq = root.matchMedia("(prefers-reduced-motion: reduce)");
       var onMQ = function (e) {
@@ -469,18 +573,52 @@
       if (!d) return false;
       style(d);
       var ok = mount(d);
+      /* BR-S488: a rack that refused to measure because it was hidden must be re-entered
+         when it is revealed. mount() returns early once the box is standing, so without
+         this the refusal was permanent. */
+      if (ok && dirty) measure();
       if (ok) { wire(); jump(); onScroll(); }
       return ok;
     }
   };
 
-  /* Self-install, like the sibling overlay modules. It ticks because U1 does not exist
-     until the menu has been built, and stops re-measuring once it is standing — mount()
-     returns early on an existing node, so the interval costs one querySelector. */
+  /* ── SELF-INSTALL. ────────────────────────────────────────────────────────────────
+     BR-S488: this was a 400ms interval with no clearInterval, running for the life of
+     every page — including `?dev=` routes where U1 never exists at all. It is now three
+     narrower signals, each matched to the thing it is actually waiting for:
+       · a SHORT poll, only until the menu first exists (boot timing), then cancelled
+       · a childList observer on the menu host, because a remount replaces the whole
+         subtree and takes the rack with it
+       · an attribute observer on the menu itself, because the panel that hides `#about`
+         does it with a class — which no childList change would ever report, and which
+         is precisely the path that used to leave the rack measured at zero forever */
   if (root.document && !root.frameElement) {
-    root.setInterval(function () {
-      if (/[?&]rk=0/.test(String(root.location.search || ""))) return;
-      root.U1Rack.tick(root.document);
+    var off = function () { return /[?&]rk=0/.test(String(root.location.search || "")); };
+    var host = root.document.getElementById("menuView");
+    var poll = root.setInterval(function () {
+      if (off()) return;
+      /* mounted is not enough — a rack that mounted while hidden has not been MEASURED,
+         and stopping here would retire the poll in exactly the state it exists to escape */
+      if (root.U1Rack.tick(root.document) && !dirty) { root.clearInterval(poll); poll = null; }
     }, 400);
+    /* a page with no menu at all should not poll forever waiting for one */
+    root.setTimeout(function () { if (poll) { root.clearInterval(poll); poll = null; } }, 8000);
+    if (root.MutationObserver) {
+      var re = function () { if (!off()) root.U1Rack.tick(root.document); };
+      /* the host's children are replaced wholesale on a remount, which takes the rack
+         with it and needs a fresh mount */
+      if (host) new root.MutationObserver(re).observe(host, { childList: true });
+      /* ★ AND THE VIEW ATTRIBUTE, which is the signal that was missing and cost a round.
+         Leaving the room for the menu does NOT remount anything and does NOT touch the
+         menu's class — it flips one attribute on <body>, and the CSS visibility matrix
+         does the rest. So a rack that correctly refused to measure while hidden had no
+         way to learn it had been revealed, and stayed blank until something else
+         happened to tick it. Watch the attribute that actually changes. */
+      new root.MutationObserver(re).observe(root.document.documentElement, {
+        attributes: true, attributeFilter: ["data-view"], subtree: true
+      });
+      var menu = root.document.querySelector(".menu");
+      if (menu) new root.MutationObserver(re).observe(menu, { attributes: true, attributeFilter: ["class"] });
+    }
   }
 })(window);
