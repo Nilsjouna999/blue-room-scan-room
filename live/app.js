@@ -1176,9 +1176,9 @@ function syncCodexBall() {
     dock.id = "brCodexDock";
     // the two-ball pair — orange (mini codex) stacked on top of the white (full codex)
     dock.innerHTML =
-      '<a class="br-ball br-ball--orange" href="codex.html?v=457" aria-label="Search the Codex">' +
+      '<a class="br-ball br-ball--orange" href="codex.html?v=459" aria-label="Search the Codex">' +
         '<span class="br-ball-core" aria-hidden="true"></span><span class="br-ball-tip" aria-hidden="true">Search</span></a>' +
-      '<a class="br-ball br-ball--yellow" href="codex.html?v=457" aria-label="Open the Codex — the archive of meanings">' +
+      '<a class="br-ball br-ball--yellow" href="codex.html?v=459" aria-label="Open the Codex — the archive of meanings">' +
         '<span class="br-ball-core" aria-hidden="true"></span><span class="br-ball-tip" aria-hidden="true">The Codex</span></a>';
     document.body.appendChild(dock);
   }
@@ -1419,7 +1419,7 @@ const ROOMS = [
   { key: "codex", state: "open", free: true, name: "The Codex",
     now: "222 entries across ten systems. Every card, sign, rune and hexagram the rooms read from.",
     soon: "Every mark the rooms read from, gathered and defined in one place.",
-    cost: "Free &middot; no account", cta: "Open the Codex", href: "codex.html?v=457" },
+    cost: "Free &middot; no account", cta: "Open the Codex", href: "codex.html?v=459" },
 
   { key: "tarot", state: "open", free: true, name: "Tarot Divination",
     now: "Three cards for a Sitting, five for the Deep Read, cut from the full 78 and filed where each fell.",
@@ -1568,6 +1568,86 @@ window.BR_ROOMS = ROOMS;
 window.BR_HORIZONS = U1_HORIZONS;
 
 const U1_ROMAN = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X"];
+
+/* ── BR-S458 — THE ROADMAP, AS A BOX ────────────────────────────────────────────
+   Built from the SAME two registries the full roadmap page reads (U1_HORIZONS +
+   ROOMS), so the box and the page can never disagree — the anti-drift rule that
+   BR-S457 applied to the room doors, applied again here.
+
+   ★ IT SHOWS NAMES AND NOTHING ELSE. Each room carries a `soon` paragraph, and
+   putting six of them in a popup would rebuild the board that just left U1 in a
+   smaller container. The box answers "what is coming" — six names under three
+   headings is that answer entire. Anyone who wants the reasoning has the page,
+   linked at the foot.
+
+   ★ EMPTY HORIZONS DROP OUT. There is nothing on the bench today (all six coming
+   rooms are `drawn` or `named`), and a heading over an empty list reads as a
+   rendering fault, not as an honest zero. Same `.filter()` discipline the old
+   board used for its columns.
+
+   ★ NO DATES, AND THE FOOT SAYS SO. The retired board's lede carried "Nothing here
+   carries a date, because no date here would be true" — the one sentence in it
+   worth keeping, and the one thing a roadmap is normally lying about. */
+function renderRoadmapPop() {
+  var coming = u1Public().filter(function (r) { return r.state !== "open"; });
+  var groups = U1_HORIZONS.map(function (h) {
+    var rooms = coming.filter(function (r) { return r.state === h.state; });
+    if (!rooms.length) return "";
+    return '<div class="rmpop__g">'
+      + '<p class="rmpop__gh"><span class="rmpop__mark" aria-hidden="true">' + h.mark + '</span>'
+      +   esc(h.name) + '<span class="rmpop__n">' + rooms.length + '</span></p>'
+      + '<ul class="rmpop__l">' + rooms.map(function (r) {
+          return '<li>' + r.name + '</li>';        // registry strings carry entities; not escaped, same as u1Door
+        }).join('') + '</ul>'
+      + '</div>';
+  }).filter(Boolean).join('');
+
+  return '<div class="rmpop" role="dialog" aria-label="What is coming" inert aria-hidden="true">'
+    + '<p class="rmpop__t">' + coming.length + ' still to come</p>'
+    + groups
+    + '<a class="rmpop__more" href="roadmap/">The whole roadmap &rarr;</a>'
+    + '<p class="rmpop__foot">No dates. No date here would be true.</p>'
+    + '</div>';
+}
+
+/* One delegated handler for the whole document, bound once — the menu remounts and a
+   per-render listener would stack. Closes on outside click, on Escape, and on a second
+   press of the button it opened from. */
+let _rmpopOpen = null;
+function _rmpopClose() {
+  if (!_rmpopOpen) return;
+  var w = _rmpopOpen; _rmpopOpen = null;
+  var pop = w.querySelector(".rmpop"), btn = w.querySelector("[data-rmpop]");
+  w.classList.remove("is-open");
+  if (pop) { pop.setAttribute("inert", ""); pop.setAttribute("aria-hidden", "true"); }
+  if (btn) btn.setAttribute("aria-expanded", "false");
+}
+document.addEventListener("click", function (e) {
+  var btn = e.target.closest && e.target.closest("[data-rmpop]");
+  if (btn) {
+    var wrap = btn.closest(".rmpop-wrap"), pop = wrap && wrap.querySelector(".rmpop");
+    if (!pop) return;                                   // no box built → the anchor stays a door
+    if (_rmpopOpen === wrap) { e.preventDefault(); _rmpopClose(); return; }
+    _rmpopClose();
+    e.preventDefault();                                 // only now — the navigation is replaced by something real
+    _rmpopOpen = wrap;
+    wrap.classList.add("is-open");
+    pop.removeAttribute("inert"); pop.removeAttribute("aria-hidden");
+    btn.setAttribute("aria-expanded", "true");
+    return;
+  }
+  if (_rmpopOpen && !(e.target.closest && e.target.closest(".rmpop"))) _rmpopClose();
+  /* ★ CAPTURE, NOT BUBBLE — and this was a real bug, not a preference. Bound on the
+     bubble phase the handler never ran at all: something between the rail and document
+     stops click propagation (the box's content was correct and `defaultPrevented` came
+     back true, while `_rmpopOpen` stayed null even synchronously — the signature of a
+     listener that is never reached, next to another that is). Capture runs document-down,
+     before anything downstream can stop it, which is the same discipline the repo's other
+     outside-click handlers already use (`onQROutside`, `onMintOutside`, both `true`). */
+}, true);
+document.addEventListener("keydown", function (e) {
+  if (e.key === "Escape" && _rmpopOpen) { e.stopPropagation(); _rmpopClose(); }
+}, true);
 
 /* Every public view reads through this. `internal` work is real and stays in the
    registry; it just never reaches a page a visitor sees. */
@@ -2266,7 +2346,20 @@ function renderWall() {
        standing doors out of M2; the roadmap joins them because the storefront is exactly
        where "there is more of this coming" is worth saying, and it is the one claim this
        panel could not make with an object. */
-    + '<a class="menu__codex" href="roadmap/"><span class="menu__codex__mark" aria-hidden="true">◆</span> What&rsquo;s coming <span class="menu__codex__arr" aria-hidden="true">→</span></a>'
+    /* ★★ BR-S458 — WHAT'S COMING OPENS AS A BOX, AT THE BUTTON. The builder: "roadmap
+       pop up on button in main menu small… as a box." BR-S457 took the roadmap board off
+       U1; this is where it lands. Small, anchored to the control that opens it, so the
+       answer arrives where the question was asked instead of costing a whole page.
+       ★ IT STAYS A REAL <a href>. Front-door law, the same discipline as the Codex seal:
+       the anchor is the door, the popup is an enhancement over it. preventDefault fires
+       only once the box has actually opened, so with JS dead the button still reaches
+       roadmap/ — and the full page is linked from inside the box for anyone who wants it. */
+    + '<span class="rmpop-wrap">'
+    +   '<a class="menu__codex" href="roadmap/" data-rmpop aria-haspopup="dialog" aria-expanded="false">'
+    +     '<span class="menu__codex__mark" aria-hidden="true">◆</span> What&rsquo;s coming '
+    +     '<span class="menu__codex__arr" aria-hidden="true">→</span></a>'
+    +   renderRoadmapPop()
+    + '</span>'
     + '<a class="menu__codex" href="?dev=settings"><span class="menu__codex__mark" aria-hidden="true">◆</span> Settings <span class="menu__codex__arr" aria-hidden="true">→</span></a>'
     + '</div>'
     + '<p class="menu__draw-foot"><span class="menu__draw-cuttick" aria-hidden="true"></span> Drawn once. Not reissued.</p>'
@@ -2935,13 +3028,13 @@ function onMenuAnnexKey(e) {
    whole document, and a returning visitor holding the cached old one would otherwise read a
    page that no longer exists. Bump all of them together or none. */
 const CX_LEAVES =
-  '<a class="seed" id="codexSeed" href="codex.html?v=457" role="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="codexBloom" aria-label="Open the Codex">'
+  '<a class="seed" id="codexSeed" href="codex.html?v=459" role="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="codexBloom" aria-label="Open the Codex">'
   + '<span class="seed__glyph seed__open" aria-hidden="true">&#9670;</span>'
   + '<span class="seed__glyph seed__close" aria-hidden="true">&#10005;</span>'
   + '</a>'
   + '<div class="bloom" id="codexBloom" role="dialog" aria-modal="true" aria-label="The Codex" inert aria-hidden="true">'
   + '<div class="bloom__backfill"></div>'
-  + '<iframe class="bloom__frame" data-src="codex.html?v=457" title="The Codex" tabindex="-1"></iframe>'
+  + '<iframe class="bloom__frame" data-src="codex.html?v=459" title="The Codex" tabindex="-1"></iframe>'
   + '<div class="bloom__sheen" aria-hidden="true"></div>'
   + '</div>'
   + '<div class="bloom__ink" aria-hidden="true"></div>'
@@ -2958,7 +3051,7 @@ const MINI_LEAVES =
   + '<div class="mini__panel" role="dialog" aria-label="Mini Codex — search" inert aria-hidden="true">'
   + '<input class="mini__input" type="search" autocomplete="off" spellcheck="false" placeholder="Search the Codex…" aria-label="Search the Codex" />'
   + '<div class="mini__results" aria-live="polite"></div>'
-  + '<a class="mini__more" href="codex.html?v=457" data-codex-open>Open the full Codex &#8594;</a>'
+  + '<a class="mini__more" href="codex.html?v=459" data-codex-open>Open the full Codex &#8594;</a>'
   + '</div></div>';
 
 function renderMenu(reveal) {
@@ -3026,7 +3119,7 @@ function renderMenu(reveal) {
         </div>
 
         <div class="menu__portals">
-          <a class="menu__codex" href="codex.html?v=457" data-codex-open><span class="menu__codex__mark" aria-hidden="true">◆</span> The Codex <span class="menu__codex__arr" aria-hidden="true">→</span></a>
+          <a class="menu__codex" href="codex.html?v=459" data-codex-open><span class="menu__codex__mark" aria-hidden="true">◆</span> The Codex <span class="menu__codex__arr" aria-hidden="true">→</span></a>
           <a class="menu__codex" href="?dev=settings"><span class="menu__codex__mark" aria-hidden="true">◆</span> Settings <span class="menu__codex__arr" aria-hidden="true">→</span></a>
           <button type="button" class="menu__codex menu__codex--rooms" data-annex-go><span class="menu__codex__mark" aria-hidden="true">◆</span> The Reading Rooms <span class="menu__codex__arr" aria-hidden="true">→</span></button>
         </div>
@@ -3257,12 +3350,12 @@ function wireMenuCodex(host) {
 
   function open() {
     if (isOpen) return;
-    if (!ok) { location.href = "codex.html?v=457"; return; }           // no clip-path: the seal is a real door
+    if (!ok) { location.href = "codex.html?v=459"; return; }           // no clip-path: the seal is a real door
     if (!loaded) {                                              // M4.3: cold click — wait for the frame, don't navigate
       warmFrame(); pendingOpen = true;
       clearTimeout(coldT);                                      // ...but a frame that never arrives must not leave a dead control:
       coldT = setTimeout(function () {                          // after 6s the seal becomes the real door again, as it always was
-        if (pendingOpen && !loaded) { pendingOpen = false; location.href = "codex.html?v=457"; }
+        if (pendingOpen && !loaded) { pendingOpen = false; location.href = "codex.html?v=459"; }
       }, 6000);
       return;
     }
@@ -3333,7 +3426,7 @@ function wireMenuCodex(host) {
     if (e.key === "Enter") { e.stopPropagation(); }        // shield the global menu Enter→room; the anchor's activation fires the click
     else if (e.key === " " || e.key === "Spacebar") {      // anchors don't activate on Space natively
       e.stopPropagation(); e.preventDefault();
-      if (ok) toggle(); else location.href = "codex.html?v=457";
+      if (ok) toggle(); else location.href = "codex.html?v=459";
     }
   });
 
@@ -3346,7 +3439,7 @@ function wireMenuCodex(host) {
       if (e.key === "Enter") { e.stopPropagation(); }        // shield the global menu Enter→room; the anchor's activation fires the click
       else if (e.key === " " || e.key === "Spacebar") {      // anchors don't activate on Space natively
         e.stopPropagation(); e.preventDefault();
-        if (!ok) { location.href = "codex.html?v=457"; return; }
+        if (!ok) { location.href = "codex.html?v=459"; return; }
         open();
       }
     });
@@ -6255,7 +6348,7 @@ render();
       }
     } catch (e) {}
     if (host.querySelector("#about")) out.push({ label: "About Blue Room", sub: "What this is", mark: ORBIT_MARKS.about, rank: 4, wing: "house", idx: 0, kind: "about" });
-    out.push({ label: "The Codex", sub: "Every mark, defined", mark: AB_EMBLEMS.codex, rank: 1, wing: "work", href: "codex.html?v=457", kind: "link" });
+    out.push({ label: "The Codex", sub: "Every mark, defined", mark: AB_EMBLEMS.codex, rank: 1, wing: "work", href: "codex.html?v=459", kind: "link" });
     /* BR-S339 — THE SEVENTH PLATE. Discovery is this archive's best argument, and it
        could only be made by the rooms that already exist. The Roadmap is in the HOUSE
        wing with About and Settings — the building explaining itself — and ranks below

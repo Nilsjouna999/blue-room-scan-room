@@ -6474,3 +6474,53 @@ html.orbit-wings .orbit__field { --orbit-rx: clamp(200px, 25.5vw, 368px); --orbi
   .menu.is-l1.is-edgeL .menu__track { transform: translateX(0); transition: none; }
   .menu.is-edgeL::before { animation: none; opacity: .85; }
 }
+
+/* ══ BR-S458 — THE ROADMAP BOX ═══════════════════════════════════════════════
+   "roadmap pop up on button in main menu small… as a box."
+
+   Anchored to its own button so the answer lands where the question was asked.
+   The wrapper is the positioning context and nothing else — the rail's flex
+   layout is untouched, which is why the button does not move when the box opens.
+
+   OPENS UPWARD BY DEFAULT because the rail sits low in the panel; `bottom: 100%`
+   means the box grows away from the fold rather than through it. It is small
+   enough (six names) that a flip-below case has not been needed — if a shorter
+   viewport ever clips it, that is a max-height on .rmpop__l, not a JS measurer.
+
+   MOTION: opacity + transform only, 180ms, and the closed state is `inert` so a
+   keyboard never reaches a box nobody can see. ════════════════════════════════ */
+.rmpop-wrap { position: relative; display: inline-flex; }
+.rmpop {
+  position: absolute; bottom: calc(100% + 8px); left: 0; z-index: 40;
+  width: max-content; min-width: 190px; max-width: min(268px, 78vw);
+  padding: 11px 13px 9px;
+  background: linear-gradient(180deg, #17140f 0%, #100e0b 100%);
+  border: 1px solid rgba(198,155,99,.26); border-radius: 10px;
+  box-shadow: 0 14px 38px rgba(0,0,0,.55), inset 0 1px 0 rgba(233,226,213,.05);
+  opacity: 0; transform: translateY(4px) scale(.985); transform-origin: bottom left;
+  pointer-events: none; text-align: left;
+  transition: opacity 180ms var(--ease-settle), transform 180ms var(--ease-settle);
+}
+.rmpop-wrap.is-open .rmpop { opacity: 1; transform: none; pointer-events: auto; }
+.rmpop__t { margin: 0 0 8px; font-family: var(--font-mono); font-size: 8.5px;
+  letter-spacing: .22em; text-transform: uppercase; color: var(--t-meta); }
+.rmpop__g { margin-top: 9px; }
+.rmpop__g:first-of-type { margin-top: 0; }
+.rmpop__gh { display: flex; align-items: baseline; gap: 6px; margin: 0 0 3px;
+  font-family: var(--font-mono); font-size: 8.5px; letter-spacing: .18em;
+  text-transform: uppercase; color: #8c8175; }
+.rmpop__mark { color: var(--cx-gold); font-size: 9px; }
+.rmpop__n { margin-left: auto; color: #554e45; font-variant-numeric: tabular-nums; }
+.rmpop__l { list-style: none; margin: 0; padding: 0; }
+.rmpop__l li { font-family: var(--font-display); font-size: 13px; line-height: 1.5;
+  color: #d3cabb; }
+.rmpop__more { display: block; margin-top: 10px; padding-top: 8px;
+  border-top: 1px solid #241f1a; font-family: var(--font-mono); font-size: 10px;
+  letter-spacing: .04em; color: var(--cx-gold); text-decoration: none; }
+.rmpop__more:hover { color: #e0b070; }
+.rmpop__foot { margin: 6px 0 0; font-family: var(--font-mono); font-size: 8px;
+  letter-spacing: .08em; color: #554e45; }
+@media (prefers-reduced-motion: reduce) {
+  .rmpop { transition: none; transform: none; }
+  .rmpop-wrap.is-open .rmpop { transform: none; }
+}
