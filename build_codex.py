@@ -84,15 +84,28 @@ WALLS = [
     dict(k='numerology', pre='NU', spine='x', title='Numerology',
          eyebrow='the core & master numbers',
          furn=u'12 marks of 222 · nine core numbers, three master numbers'),
-    dict(k='tarot-guide', pre='TG', spine='x', title='The Antechamber',
-         eyebrow='reading the tarot',
-         furn=u'8 sections · read in place'),
-    dict(k='tarot-major', pre='MA', spine='x', title='The Major Arcana',
-         eyebrow='the twenty-two',
-         furn=u'22 marks of 222 · nought to twenty-one'),
-    dict(k='tarot-minor', pre='MI', spine='y', title='The Minor Arcana',
-         eyebrow='the fifty-six',
-         furn=u'56 marks of 222 · four suits × fourteen ranks'),
+    # ★★ BR-S460 — THE TAROT MOVED TO THE BACK, TOGETHER. The builder: "the tarot
+    # stuff on codex should be clustered together, and ... adding them after the other
+    # read[ings] so its not sandwiched."
+    #
+    # The three tarot walls were already contiguous — but they sat at plates IV-VI,
+    # between numerology and the runes, which SPLIT the six systems a birth reading
+    # actually draws from. Someone walking the wall to understand their own six had to
+    # cross seventy-eight cards belonging to a different product to get from the life
+    # path to the runes. The deck was not badly placed so much as placed THROUGH
+    # something.
+    #
+    # So the order is now: the six birth systems in the order the reading itself uses
+    # them (zodiac, Chinese, numerology, runes, trigrams, I Ching), then the whole deck,
+    # then the house's own lexicon last as it always was. The Codex now reads in the two
+    # products' own shapes rather than in an order nothing chose.
+    #
+    # ★ THE ROMAN NUMERALS MOVE WITH THE PLATES, and that is a real consequence, not a
+    # cosmetic one: `roman` is assigned by POSITION (ROMAN[wi], ~:4173), so the Major
+    # Arcana goes from plate V to plate VIII and an old `#pl-v` link now lands somewhere
+    # else. The `k`-keyed anchors (#tarot-major, #runes, ...) are unaffected, which is
+    # what every link out of the app actually uses. Nothing is stored or sold against a
+    # #pl- hash, so this is the cheapest this change will ever be.
     dict(k='runes', pre='RN', spine='x', title='The Elder Futhark',
          eyebrow='the twenty-four runes',
          furn=u'24 marks of 222 · three ættir of eight'),
@@ -102,6 +115,16 @@ WALLS = [
     dict(k='iching', pre='HX', spine='x', title='The I Ching',
          eyebrow='the sixty-four hexagrams',
          furn=u'64 marks of 222 · the upper trigram across, the lower down'),
+    # BR-S460 — the deck, whole and unbroken, after the six a birth reading reads.
+    dict(k='tarot-guide', pre='TG', spine='x', title='The Antechamber',
+         eyebrow='reading the tarot',
+         furn=u'8 sections · read in place'),
+    dict(k='tarot-major', pre='MA', spine='x', title='The Major Arcana',
+         eyebrow='the twenty-two',
+         furn=u'22 marks of 222 · nought to twenty-one'),
+    dict(k='tarot-minor', pre='MI', spine='y', title='The Minor Arcana',
+         eyebrow='the fifty-six',
+         furn=u'56 marks of 222 · four suits × fourteen ranks'),
     # C6.  The page never said its own name: round one deleted the masthead and
     # the footer and nothing replaced them, so the one document that catalogues
     # ten systems of meaning never told you what it was.  The quiet option, and
@@ -4962,13 +4985,24 @@ assert_chrome(DOC)
 # newline='' - otherwise Windows text mode translates every \n to \r\n on the way
 # out, so the file on disk is ~1.5 KB larger than the size this build reports and
 # a run on Linux cannot reproduce these bytes.
-_BYTES = DOC.encode('utf-8')
+# ★★ BR-S460 — THIS GENERATOR HAS NOT RUN SINCE THESE TWO LINES WERE WRITTEN.
+# They referenced `HTML`, a name that does not exist anywhere in this file — the
+# document is `DOC` (built above, written below). So `python build_codex.py` has
+# died with `NameError: name 'HTML' is not defined` on every invocation since,
+# and codex.html has been maintained by some other route while the file that is
+# supposed to be its source of truth could not produce it.
+# Confirmed pre-existing: the same failure occurs on a clean checkout of this file
+# with no local changes.
+#
 # BR-S431 — the reading frame's line. codex.html is a HOST of the membrane, not only
 # the thing it is drawn over: every route except the aperture navigates here, and the
 # parent that used to draw the line is gone on this page.
-HTML = HTML.replace('</body>', '<script src="_codex-membrane.js?v=459"></script></body>', 1) if '_codex-membrane.js' not in HTML else HTML
+DOC = DOC.replace('</body>', '<script src="_codex-membrane.js?v=459"></script></body>', 1) if '_codex-membrane.js' not in DOC else DOC
 # BR-S440 — the keywords take their colours from the authored bank, same as the reading.
-HTML = HTML.replace('</body>', '<script src="_codex-perks.js?v=441"></script></body>', 1) if '_codex-perks.js' not in HTML else HTML
+DOC = DOC.replace('</body>', '<script src="_codex-perks.js?v=441"></script></body>', 1) if '_codex-perks.js' not in DOC else DOC
+# the byte count is taken AFTER the two appends, or the size this build reports is
+# a document it did not write.
+_BYTES = DOC.encode('utf-8')
 _f = io.open(os.path.join(SP, 'codex.html'), 'w', encoding='utf-8', newline='')
 _f.write(DOC)
 _f.close()
