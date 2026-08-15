@@ -918,7 +918,21 @@
      It waits for .m2bface__marks, which app.js writes at menu mount, and re-asserts on
      a slow tick because the app rebuilds .m2read on every mount and would otherwise
      drop the panel. ?sx=0 turns it off. */
-  if (root.document && !root.frameElement) {
+  /* ★★ BR-S479 — THE FRAME GUARD GETS AN OPT-IN, AND ONLY AN OPT-IN.
+     `!root.frameElement` is right as a DEFAULT and stays the default: this module was
+     born as a parent-injected overlay, and a copy of it starting up inside a frame it
+     does not own is how you get two installs fighting over one .m2read.
+
+     But the cockpit (_cockpit.html) runs the three builds as live panes, and a pane
+     where the six marks are inert is not a copy of the build — it is a photograph of
+     one. `?sx=1` is the caller saying "this frame is mine, run in it", which is exactly
+     the case the guard was never meant to cover.
+
+     ★ IT IS AN OPT-IN, NOT A RELAXATION. Nothing changes for any frame that does not ask,
+     so an embed somewhere else in the site still gets the safe behaviour by default. And
+     it reads as the mirror of `?sx=0` two lines below, which already turns the module off
+     — one parameter, one axis, off and on. */
+  if (root.document && (!root.frameElement || /[?&]sx=1/.test(String(root.location.search || "")))) {
     /* ★★ THE BUG THE BUILDER SAW: THE PANEL OPENED EMPTY AND ATE THE COLUMN.
        install() only wires the DOM. The archive and the perk palette were fetched by
        the LAB (_palette-lab.html did SixLive.data() / .kwcolor()), and when the module
