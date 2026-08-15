@@ -1,0 +1,1265 @@
+<!doctype html>
+<html lang="en" class="m2-parch is-case">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>THE CASE — vitrine lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet"
+  href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" />
+<style>
+/* ═════════════════════════════════════════════════════════════════════════════
+   THE CASE — A LAB, NOT A PATCH.                    _vitrine-lab.html
+
+   This file touches NOTHING. It does not import styles.css and it does not
+   import app.js; it re-declares only the tokens and rules the M2 stage column
+   actually uses, copied value-for-value from the live sheet with the source
+   line noted beside each one. That is deliberate: importing styles.css would
+   drag 4900 lines of unrelated state in and make every measurement below an
+   argument about which rule won, and a lab whose readings you have to defend
+   is not a lab.
+
+   WHY A LAB AT ALL. m1-rank-reversal: a redesign was argued for at length and
+   rejected in seconds the moment the builder could compare it live. The rule
+   that came out of that is "build the toggle before arguing for a redesign."
+   So the toggle is the first thing in this file, not the last.
+
+   WHAT IS BEING TESTED. The concept is "card inside background and glass
+   patched on the hole so the card is like inside some showcase" — a vitrine.
+   A vitrine is carried by exactly three cues:
+     1  OCCLUSION      the surface comes forward over the object's outline.
+                       The only cue here that is PROOF and not evidence.
+     2  THE CAST       the opening throws a DIRECTIONAL, ASYMMETRIC shadow
+                       onto the object. Its LENGTH is the declaration of depth.
+                       Equal alpha on four sides is a vignette, and a vignette
+                       is a lens artefact — it reads as a photo filter, never
+                       as a recess. Hence the depth slider.
+     3  PATCH > HOLE   the pane's outline and the hole's outline are two
+                       DIFFERENT rectangles a few px apart. Two outlines, two
+                       planes. Flush, and the glass collapses into varnish
+                       painted on the card.
+
+   ★★ AND THE INVERSION THAT MAKES THIS ROOM SPECIAL. The ground is L=0.003 —
+   about nine 8-bit levels above black. The standard vitrine playbook is
+   therefore unavailable, every item for a different reason:
+     · a cavity gradient has nowhere to darken TO   -> CARVE WITH LIGHT
+     · a drop shadow on near-black returns ~2 levels-> prove the pane's overlap
+                                                       with a LIT EDGE lying on
+                                                       UNLIT ground, never with
+                                                       a shadow
+     · a dark room reflects nothing. There is no window and no lamp; inventing
+       one reads as stock art. THE CARD IS THE ONLY LAMP — a warm emitter at
+       239 in a black box — and the recess walls are lit FROM INSIDE THE HOLE.
+     · soda-lime green is out (the palette is CLOSED) but the other half of the
+       same physics is free: glass is COOLER than what it covers. Every glass
+       value here is cool — rgb(240,242,246) for the lit faces, rgb(210,216,226)
+       for the clip bodies, rgb(124,127,134) for the clip metal — against the
+       card's rgb(233,229,220). About +6 blue over red. Temperature without hue.
+     · backdrop-filter is FORBIDDEN. Behind this pane there are exactly two
+       things and neither is filterable: the brightest object on the site
+       (parchment at 239 on a ground of 13), or nothing at all. BR-S448 chased
+       that same bug .62 -> .90 -> .985 -> solid and deleted the blur.
+
+   ★ THE THESIS: the glass is visible ONLY WHERE THE CARD IS NOT. Over
+   parchment at 239 the .045 bloom moves the pixel by +0.1 and a .22 mote by
+   -1.2 — invisible. Over the mat at 5 the same bloom moves it +9 and the mote
+   +44. That is not a legibility compromise; it is what a clean pane over a lit
+   specimen actually does. The specimen is seen cleanly, and the glass is
+   proved in the FRAME around it and at its own CUT EDGE.
+   ⚠ WITH ONE DELIBERATE EXCEPTION, AND IT IS CUE 1. The two glazing clips DO
+   cross onto the specimen, 5px, in the blank padding — because a design that
+   is invisible over the object has no OCCLUSION, and occlusion is the only cue
+   here that is proof rather than evidence. See THE TWO GLAZING CLIPS below.
+
+   EVERYTHING IN THE VITRINE IS STATIC PAINT. No JS in the effect, no
+   per-frame work, no new compositing layer, no filter, no mix-blend-mode,
+   no backdrop-filter, and NO ANIMATION EXCEPT ONE: the pane's opacity
+   transition, declared and defended at its own rule below. That single
+   exception is stated here rather than only there, because a blanket "no
+   animation" in a header is the kind of claim CLAIM_AUDIT_V1 exists for.
+
+   The lab's JS drives the CONTROLS, and it also reproduces two things that
+   belong to the CARD and not to the vitrine: the live lean and the engraved
+   light (app.js:7098-7219, styles.css:3858-3869). They are here because the
+   cast paints OVER the engraved light and because the lean is continuous, not
+   a snapshot — see .m2hero::before and THE LIVE LEAN below.
+
+   ★ EVERY LUMINANCE FIGURE QUOTED FOR .m2vit--pane AND ITS ::after IS STATED
+   AT ITS SHIPPED opacity: .88 — i.e. with .88 already folded into the literal
+   alpha. On hover the pane goes to opacity 1 and every one of those figures
+   rises by about 12%. Where that matters it is said twice.
+════════════════════════════════════════════════════════════════════════════ */
+
+
+/* ── TOKENS — copied from styles.css:8-69, only what this column reads ────── */
+:root {
+  --t-display: #dcd7cb;      /* styles.css:12 */
+  --t-primary: #d7d3ca;
+  --t-body:    #b1ada4;
+  --t-meta:    #948f87;
+  --t-ghost:   #6e6b63;
+  --faint:     var(--t-ghost);
+
+  --ink-950: #0a0b0d;        /* styles.css:26 — the LOCKED shadow floor */
+  --ink-900: #100f0c;        /* styles.css:27 */
+  --line-faint: rgba(233, 229, 220, 0.07);
+
+  --font-display: "Cormorant Garamond", "Times New Roman", serif;
+  --font-ui: "Inter", -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "IBM Plex Mono", "Consolas", monospace;
+
+  --ease-settle: cubic-bezier(0.2, 0.7, 0.2, 1);   /* styles.css:4846 */
+
+  /* the six materials, PARCHMENT set — styles.css:4005-4006 */
+  --mk-sun: #6b4c14; --mk-animal: #74402c; --mk-path: #313d4c;
+  --mk-rune: #465241; --mk-trigram: #315854; --mk-hex: #514c44;
+
+  /* the birth face's register-agnostic ink — styles.css:3897-3898, parch set */
+  --bf-ink: #1c150d; --bf-meta: #6a5c45; --bf-rule: rgba(28, 21, 13, .35);
+}
+
+* { box-sizing: border-box; }
+
+/* THE GROUND — styles.css:81, verbatim. L = 0.003. Nine levels above black.
+   Everything above is designed against THIS number and not against a guess. */
+body {
+  margin: 0; min-height: 100vh;
+  background: radial-gradient(110% 80% at 50% -10%, #161411 0%, var(--ink-900) 55%, var(--ink-950) 100%);
+  background-attachment: fixed;
+  color: var(--t-body); font-family: var(--font-ui);
+  display: flex; align-items: center; justify-content: center;
+  padding: 60px 380px 60px 60px;   /* right pad reserves the control rail's lane */
+}
+/* MAT ONLY — strips the radial to a flat floor. Not decoration: the radial's
+   own vertical falloff is a confound when you are judging whether the pane's
+   lit rim is brighter than the ground it lies on. */
+html.is-flat body { background: var(--ink-950); }
+
+
+/* ═══ THE STAGE COLUMN — reproduced, not approximated ═════════════════════ */
+/* styles.css:3254. THE CARD IS THIRD OF FIVE and sits 68px down behind two
+   wrapping text blocks — which is the whole reason no top:/bottom: value can
+   anchor a hole to it, and the whole reason .m2case exists.
+   align-items is flex-start, not centre, because the geometry that was
+   MEASURED (300x475) is the <=1199px form — see .m2hero below. */
+.menu__draw-stage {
+  display: flex; flex-direction: column; align-items: flex-start; gap: 18px;
+  position: relative; z-index: 2;
+}
+.msample__cap   { display: flex; align-items: center; gap: 11px; }                    /* styles.css:2551 */
+.msample__label { font-family: var(--font-mono); font-size: 8.5px; letter-spacing: .3em;
+                  text-transform: uppercase; color: var(--faint); }                   /* styles.css:2552 */
+.menu__draw-herosub { font-family: var(--font-display); font-style: italic; font-size: 14px;
+                      line-height: 1.5; color: var(--t-body); text-align: left; margin: 0; } /* :3255 + :4140 */
+
+/* THE CARD. styles.css:3716 gives it height:clamp(400px,56vh,620px) with
+   aspect-ratio 120/190 — but styles.css:4141, inside @media (max-width:1199px),
+   replaces that with height:auto; width:min(72vw,300px). 300 x (300*190/120) =
+   300 x 475, which is exactly the geometry that was measured. Pinned here so
+   the lab is stable at any window size. */
+.m2hero {
+  position: relative; width: 300px; aspect-ratio: 120 / 190; height: auto;
+  border-radius: 12px;
+  /* styles.css:3780 — the SHIPPED parchment stock, BR-S289. Note the end stop
+     is #dcd4c2. The brief for this lab quoted #dcd4c7; the live sheet is c2,
+     and the live sheet wins. Five levels of blue on the darkest corner of the
+     stock — invisible on its own, but it is the value the cast is measured
+     against, so it is not a value to paraphrase. */
+  background: linear-gradient(165deg, #efe9db, #dcd4c2);
+  border: 1px solid rgba(20, 14, 8, 0.35);                                            /* styles.css:3781 */
+  /* THE SHIPPED DROP — styles.css:3782. Geometry for an object floating 40px
+     above a distant page. Its blur alone spills 20px: past a 9px reveal, over
+     the hole's rim, onto the pane. This is the value THE CASE has to replace,
+     and the A/B swaps it (see .is-case .m2hero). */
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+  /* the lean — styles.css:3849. perspective() rides INSIDE the transform
+     because a `perspective` PROPERTY would make this a containing block for
+     fixed descendants, which styles.css:2751/3828-3840 forbid by name. */
+  transform: perspective(1200px) rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg));
+  /* styles.css:3850-3851 — value for value, INCLUDING the `filter` leg. It was
+     dropped here once, which quietly meant html.ab-snap's suppression was being
+     validated against a shorter list than ships. */
+  transition: transform 420ms var(--ease-settle),
+              filter 220ms var(--ease-settle),
+              box-shadow 220ms var(--ease-settle);
+}
+/* while the pointer drives it, a transition is just lag in the hand — styles.css:3853 */
+.m2hero.is-tilting { transition: none; }
+
+/* ★ THE ENGRAVED LIGHT — styles.css:3858-3869, verbatim, INCLUDING z-index:5.
+   Absent from the first cut of this lab, and its absence flattered the design
+   in the one state the design is judged in. Why it is structural, not garnish:
+   .m2hero carries a transform, so it is its own stacking context and this z:5
+   pseudo is CONFINED INSIDE THE CARD — while .m2vit--cast is a SIBLING at z 2
+   inside .m2case. Therefore THE CAST PAINTS OVER THE ENGRAVED LIGHT. The card's
+   entire hover feedback (BR-S283, walked back up at BR-S414) takes the cast's
+   .34 -> 0 warm wash on top of it across the top --cd px, and a soft-light lobe
+   that is supposed to say "light ON this stock" ends up under a shadow that says
+   "this stock is behind glass". That is a real question and it only exists
+   during hover, which is exactly when the vitrine is being looked at.
+   THE QUESTION THE LAB NOW ASKS: does the cast belong above the engraved light,
+   or should it move INSIDE .m2hero, below z 5? Do not answer it from the CSS —
+   turn the lean on, hover the card, and look. */
+.m2hero::before {
+  content: ""; position: absolute; inset: 0; z-index: 5; pointer-events: none;
+  border-radius: inherit; opacity: 0; mix-blend-mode: soft-light;
+  transition: opacity 260ms var(--ease-settle);
+  background:
+    radial-gradient(128px 128px at var(--lx, 50%) calc(var(--ly, 50%) + 3%), rgba(0, 0, 0, .105), transparent 70%),
+    radial-gradient(128px 128px at var(--lx, 50%) var(--ly, 50%), rgba(255, 255, 255, .078), transparent 70%);
+}
+.m2hero.is-tilting::before { opacity: 1; }
+@media (prefers-reduced-motion: reduce) {
+  .m2hero { transform: none; transition: none; }
+  .m2hero::before { display: none; }
+}
+
+/* THE BIRTH FACE — the default face (app.js:2817 serves data-face="birth").
+   styles.css:3899-3932, 3953-3959, 3991-4002, 4031. */
+.m2bface {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
+  padding: 14px 12px; text-align: center; color: var(--bf-ink);
+  border-radius: inherit;
+  /* A FACE IS SCENERY; ITS CHILDREN ARE NOT — styles.css:3891-3892. Stated as
+     a rule rather than as a JS list of elements to skip, because a list is a
+     thing you have to remember to update and forgetting is silent. */
+  pointer-events: none;
+}
+.m2bface > * { pointer-events: auto; }
+.m2face-head  { width: 100%; display: flex; align-items: center; justify-content: space-between; }
+.m2face-meta  { font-family: var(--font-mono); font-weight: 600; font-size: 9.5px;
+                letter-spacing: .14em; color: var(--bf-meta); }
+.m2face-glyph { font-family: var(--font-display); font-weight: 700; font-size: 11px;
+                line-height: 1; color: #8a6a42; }                                     /* :3812 BR-S326 contrast */
+.m2face-div   { width: 26px; height: 1px; background: var(--bf-rule); margin: 8px 0; }
+.m2bface .m2face-div { width: 62%; max-width: 104px; }                                /* :3913 + :3956 */
+.m2bface__headrule { width: 100% !important; max-width: none !important;
+                     margin: 10px 0 0; background: rgba(28, 21, 13, .22); }           /* :3925 + :3955 */
+.m2face-name  { margin: auto 0 0; font-family: var(--font-display); font-weight: 600;
+                line-height: 1.05; color: var(--bf-ink); }
+.m2bface__name{ font-size: 25px; }                                                    /* :4031 */
+.m2bface__marks {
+  list-style: none; margin: 26px 0 0; padding: 0;
+  display: grid; gap: 12px;
+  font-family: var(--font-mono); font-size: 10px; font-weight: 500;
+  letter-spacing: .15em; text-transform: uppercase; color: var(--bf-meta);
+}
+.m2bface__marks li { text-indent: .075em; }                                           /* :3953 optical centring */
+.m2bface__marks li:nth-child(1) { color: var(--mk-sun); }
+.m2bface__marks li:nth-child(2) { color: var(--mk-animal); }
+.m2bface__marks li:nth-child(3) { color: var(--mk-path); }
+.m2bface__marks li:nth-child(4) { color: var(--mk-rune); }
+.m2bface__marks li:nth-child(5) { color: var(--mk-trigram); }
+.m2bface__marks li:nth-child(6) { color: var(--mk-hex); }
+.m2bface__wall { width: 100%; display: flex; flex-direction: column; align-items: center; }
+.m2bface__wall--bot { margin: 0 0 auto; }
+.m2bface__wall--bot .m2face-div { margin: 16px 0 13px; }
+.m2bface .m2face-orient { margin: 0; text-indent: .08em; color: var(--bf-meta);
+  font-family: var(--font-mono); font-weight: 600; font-size: 9px; letter-spacing: .16em;
+  text-transform: uppercase; }
+.m2tick    { position: absolute; width: 10px; height: 10px; border-color: rgba(28, 21, 13, .74); }
+.m2tick.tl { left: 9px; top: 9px; border-left: 1.5px solid; border-top: 1.5px solid; }
+.m2tick.br { right: 9px; bottom: 9px; border-right: 1.5px solid; border-bottom: 1.5px solid; }
+
+/* the face control and the reserved act — styles.css:4034-4051. Present
+   because the plan's clearance table depends on them being real: the pane
+   bleeds 14px DOWN into the gap that .m2flip sits across. */
+.m2flip { display: inline-flex; gap: 2px; margin-top: 10px; padding: 3px;
+          border: 1px solid var(--line-faint); border-radius: 999px; }
+.m2flip__opt { background: none; border: 0; border-radius: 999px; cursor: pointer;
+  padding: 7px 16px; min-height: 34px; font-family: var(--font-mono); font-size: 9.5px;
+  font-weight: 500; letter-spacing: .16em; text-transform: uppercase; color: var(--t-ghost);
+  transition: color 160ms var(--ease-settle), background 160ms var(--ease-settle); }
+.m2flip__opt.is-on { color: var(--t-display); background: rgba(233, 229, 220, .06); }
+.menu__draw-act { min-height: 38px; display: flex; align-items: center; }             /* :4051 */
+.menu__draw-pull { background: none; border: 1px solid var(--line-faint); border-radius: 999px;
+  padding: 9px 20px; color: var(--t-meta); font-family: var(--font-mono); font-size: 9.5px;
+  letter-spacing: .16em; text-transform: uppercase; }
+
+
+/* ══════════════════════════════════════════════════════════════════════════
+   THE CASE — BR-S###
+   ══════════════════════════════════════════════════════════════════════════
+   THE CASE IS SCENERY, AND SCENERY HAS NO CHILDREN.
+   The same form as styles.css:3888-3892, minus its second clause. Stated once
+   as a RULE rather than distributed across four selectors where one could be
+   missed. NEVER toggled by state: the failure is silent, it breaks the six
+   marks and the specimen latch, and it only reproduces with a real pointer —
+   which the preview pane cannot exercise. The readout in the rail is here to
+   catch exactly that.
+   NEVER write this selector with `*`: styles.css:2892-2898 measured the
+   universal form at 8.1-9.9ms of style recalc per toggle against 0.2ms named. */
+.m2vit { pointer-events: none; position: absolute; display: block; }
+
+/* THE WRAPPER. Its box IS the card's box — that is its entire job, and it is
+   why every layer below can be inset off it and can never disagree with the
+   card at any viewport or either breakpoint.
+   NO transform, NO filter, NO opacity, NO contain, NO overflow, EVER:
+     transform/filter  -> containing block for fixed (styles.css:2751, 3828-3840)
+     overflow/contain  -> would clip the card's drop, its only separation
+     opacity           -> flattens the card's drop into the group and greys the stock */
+.m2case { position: relative; display: flex; align-items: flex-start; --vt-r: 9px; }
+
+/* THE A/B. One class on <html>. Off = the shipped panel, byte for byte.
+   No reload, no reflow of the column: the vitrine spans are absolute and the
+   wrapper is a shrink-to-fit flex box either way, so the card does not move
+   by one pixel between A and B. That is the only way the comparison is
+   honest — a card that jumps is a card you cannot compare. */
+html:not(.is-case) .m2vit { display: none; }
+/* ⚠ AND THE A/B HAS TO BE INSTANT, WHICH IT IS NOT FOR FREE. .m2hero carries
+   `transition: box-shadow 220ms` (styles.css:3850-3851) and THE CASE replaces
+   that box-shadow — so without this the swap RAMPS, and a ramp is a small
+   dishonesty in a comparison: it makes B read as a transition rather than as
+   a different design, which is precisely the failure m1-rank-reversal is
+   about. Suppressed for the one synchronous frame of the flip only; the
+   hover's own 220ms ramp is untouched. */
+html.ab-snap .m2hero, html.ab-snap .m2vit { transition: none !important; }
+
+/* ── LAYER 1 · THE HOLE ─────────────────────────────────── z 0, behind ──── */
+.m2vit--hole {
+  inset: calc(-1 * var(--vt-r));
+  z-index: 0;
+  border-radius: calc(12px + var(--vt-r));          /* concentric with the card's 12 */
+  /* THE FLOOR — cooler than the ground and only ~7 levels darker. #05060b is
+     --cx-frontier territory (styles.css:4844), already an approved value for
+     "the ink at an edge". Cool-in-the-cut against warm-on-the-surface is the
+     depth cue that costs no new hue. Going darker is pointless: the ground is
+     already at L=0.003 and there is nowhere left to go.
+     ⚠ THE CENTRE IS AT 74% 86%, NOT 50% 6%. Every other layer in this file
+     declares ONE light, HIGH AND LEFT: the top wall is the darkest value on the
+     page, the near-wall shadows fall across the top and down the left, the
+     cast's top run is the deepest. A floor whose bright spot is at top centre
+     and which is left/right symmetric contradicts all of it. Light entering
+     high and left lands low and right. It is only a 3-level move (8 vs 5), but
+     it is the layer the whole recess sits on and the one nothing above it can
+     correct. */
+  background: radial-gradient(130% 95% at 74% 86%, #080910 0%, #05060b 100%);
+  box-shadow:
+    /* THE FRONTIER — the cut edge itself. FIRST in the list so it paints over
+       the walls' outer pixel. box-shadow paints first-listed on top; this is
+       load-bearing order, not tidiness. This ring is precisely what makes a
+       bloom read as an OPENING rather than an overlay (styles.css:4980-4990). */
+    inset  0    0   0 1px rgba(5, 6, 10, .92),
+    /* THE FOUR WALLS, hard strips. ONE LIGHT, HIGH AND LEFT — and the four are
+       consistent with it, which is the whole of why this reads as a cut and not
+       as a border: a wall's inner face is lit if it points back toward the
+       source. top points DOWN (away, darkest), left points RIGHT (away), right
+       points LEFT (toward, half-lit), bottom points UP (toward, the lit one).
+       Break one of these four and the recess inverts.
+       ⚠ THE FRONTIER, LISTED FIRST, EATS THE OUTERMOST 1px OF ALL FOUR — the
+       two LIT ones included. That is the cost of the ordering above and it is
+       paid knowingly, but it has to be sized for, not discovered:
+         right  3px strip -> 1px under the frontier, 2px visible at 13
+         bottom 2px strip -> 1px under the frontier, 1px visible at 22
+       The right wall is widened to 3px because nothing competes for that band.
+       THE BOTTOM LEDGE IS NOT, and cannot be: widening it to 3px moves its
+       inner face from 7px to 6px below the card, and the card's own hover drop
+       already reaches 7px. A 3px ledge would be a ledge the card sits on top of.
+       The 1px that survives is the depth cue; the budget is the reveal. */
+    inset  0    3px 0      rgba(3, 4, 8, .95),          /* top:    faces down — darkest on the page */
+    inset  3px  0   0      rgba(5, 6, 11, .80),         /* left:   faces away from the source */
+    inset -3px  0   0      rgba(233, 229, 220, .035),   /* right:  faces the source, half-lit */
+    inset  0   -2px 0      rgba(233, 229, 220, .075),   /* bottom ledge: faces up — the lit one */
+    /* the near walls throwing down onto the floor. Softness comes from the
+       gradient, NEVER from blur() — the same choice styles.css:2986-2991 made
+       for the counterweight, and the same reason: a filter is a compositing
+       layer and a re-raster, a box-shadow is paint. */
+    inset  0    6px 9px -3px rgba(0, 0, 0, .90),
+    inset  5px  0   8px -4px rgba(0, 0, 0, .55),
+    /* OUTSIDE — THE ARRIS, where the lit front surface turns down into the
+       cut. Parchment-coloured, never white: white would fight the one white
+       line the house already owns. rgba(233,229,220,.075) over the ground
+       (#0d0c0c, 13) computes to 29.5 — a +16-level hairline, and the
+       brightest structure on the panel outside the card and the pane.
+       ON A GROUND AT L=0.003 THIS LINE IS THE DEPTH CUE. A drop shadow here
+       would return about two levels and be a lie you cannot see. */
+    0 -1px 0 rgba(233, 229, 220, .075),
+   -1px  0 0 rgba(233, 229, 220, .045),
+    0  1px 0 rgba(0, 0, 0, .75),
+    1px  0 0 rgba(0, 0, 0, .60);
+}
+/* the card's own machining (styles.css:421-425) at the frame scale — a rounded
+   hole reads as a sticker, a chamfered one reads as CUT. Guarded because
+   corner-shape is new; without it the radius above is simply round. */
+@supports (corner-shape: bevel) { .m2vit--hole { corner-shape: bevel; } }
+
+/* ── LAYER 2 · THE CARD ─────────────── unchanged except two shadow values ── */
+/* `0 20px 40px rgba(0,0,0,.6)` is geometry for an object floating 40px above a
+   distant page. An object RESTING on a floor a few px down casts short and
+   tight, and if it does not, the recess is contradicted by the one element
+   inside it. This is not a polish step — it is the second half of the hole.
+     reach at rest, below: 4 + 4.5 - 3 = 5.5px, sides 1.5px, above nothing.
+
+     ★ THE CONSTRAINT, STATED ONCE AND CHECKED IN BOTH STATES:
+         reach_below = dy + blur/2 - spread   MUST STAY BELOW   vt_r - 2
+       — because the hole's lit bottom ledge is `inset 0 -2px`, so its INNER
+       FACE is 2px inside the reveal, not at the reveal. The clean floor before
+       the ledge is vt_r - 2 - reach_below, which at rest is 9 - 2 - 5.5 = 1.5px.
+       NOT 3.5px: 9 - 5.5 measures to the hole's outer edge, and the ledge is
+       not there. That 2px is the whole margin, and the hover consumes it. */
+html.is-case .m2hero {
+  box-shadow: 0 4px 9px -3px rgba(0, 0, 0, .85), 0 1px 2px rgba(0, 0, 0, .70);
+}
+/* THE PAIR-HOVER MUST MOVE IN THE SAME COMMIT (styles.css:3795-3798).
+   box-shadow is replaced WHOLESALE, not composited, so a mismatch makes the
+   recess blink off the instant the pointer arrives — exactly while the reader
+   is looking at it. Same gesture, same single owner, one step deeper.
+   ⚠ THE REST STATE WAS CHECKED AND THE HOVER PAIR WAS NOT. `0 6px 13px -3px`
+   reaches 6 + 6.5 - 3 = 9.5px: it covers the lit ledge ENTIRELY and spills
+   0.5px past the hole onto the ground — i.e. on hover the design buries the
+   brightest structure in the recess and the one the whole "carve with light"
+   inversion rests on, at the exact moment the reader is looking. Retuned to
+   5 + 5 - 3 = 7px, which lands exactly on the ledge's inner face at vt_r:9.
+   ⚠ AND IT IS STILL NOT SAFE AT EVERY TUNE. At the <=1199px reveal (vt_r:7px)
+   the ledge's inner face is at 5px and even the REST state's 5.5px is on it.
+   The rail prints this live under the reveal slider — read it before shipping
+   a reveal value, and do not read it only in the rest state. */
+html.is-case .menu__draw-stage:hover .m2hero {
+  box-shadow: 0 5px 10px -3px rgba(0, 0, 0, .90), 0 1px 3px rgba(0, 0, 0, .75);
+}
+/* and the shipped one, so A/B compares hover against hover — styles.css:3797 */
+html:not(.is-case) .menu__draw-stage:hover .m2hero {
+  box-shadow: 0 28px 56px rgba(0, 0, 0, 0.70);
+}
+
+/* ── LAYER 3 · THE CAST ─────────────────── z 2, in front of the card ────── */
+/* ★ THE DECISIVE LAYER. This is the whole idea in four gradients and one
+   shadow. If the card does not read as UNDER the surface from this alone,
+   nothing downstream rescues it — which is why the rail can show it alone.
+   The opening's walls falling ACROSS the object. Deliberately asymmetric:
+   the light is high and left, so top is deepest, left second, right and
+   bottom are ambient contact only. EQUAL ALPHA ON FOUR SIDES IS A VIGNETTE,
+   and a vignette reads as a lens artefact — never as a recess. That single
+   sentence is why the four runs below are four different numbers.
+
+   THE RUNS ARE PARAMETERISED OFF --cd (the depth). The plan fixes the top run
+   at 16px; the lab makes it a slider because the LENGTH of the cast is the
+   honest declaration of depth — 7px says tray, 22px says case — and that is a
+   judgement, not a calculation. The four ratios are the plan's own numbers
+   held constant against the top run:
+       top 1.000   left 0.9375   right 0.5625   bottom 0.4375
+       mid stop    0.4375 of the top run (the plan's 7px at --cd:16px)
+   At --cd:16px every stop below evaluates to the plan's value exactly.
+
+   ★ THE GUARD RAIL ON THIS SLIDER. The card's padding is 14px and the
+   masthead sits at 14-26px (styles.css:3799-3805). At --cd:16px the top
+   gradient is at alpha .029 where the masthead begins — the masthead is
+   untouched. LENGTHEN THE TOP RUN AND THAT NUMBER RISES. The rail prints it
+   live as you drag; do not ship a value without reading it. */
+.m2vit--cast {
+  --cd: 16px;
+  --cd-mid:  calc(var(--cd) * .4375);
+  --cd-l:    calc(var(--cd) * .9375);
+  --cd-r:    calc(var(--cd) * .5625);
+  --cd-b:    calc(var(--cd) * .4375);
+  /* the card's own light on the mat — see below. Slider-backed for the same
+     reason as --cd: it is the only thing lighting the floor. */
+  --cast-glow: 12px;
+  --cast-glow-a: .055;
+
+  inset: 0;                        /* exactly the card's box */
+  z-index: 2;
+  border-radius: 12px;
+  background:
+    linear-gradient(180deg, rgba(6,5,4,.34) 0px, rgba(6,5,4,.13) var(--cd-mid), rgba(6,5,4,0) var(--cd)),
+    linear-gradient(90deg,  rgba(6,5,4,.26) 0px, rgba(6,5,4,.10) var(--cd-mid), rgba(6,5,4,0) var(--cd-l)),
+    linear-gradient(270deg, rgba(6,5,4,.11) 0px, rgba(6,5,4,0) var(--cd-r)),
+    linear-gradient(0deg,   rgba(6,5,4,.09) 0px, rgba(6,5,4,0) var(--cd-b));
+  /* ★ THE CARD IS THE ONLY LAMP. Its own light washing the mat around it — an
+     OUTER shadow from the card's exact box, drawn on the floor. This is what
+     gives the contact drop something to sit against on a floor that has no
+     range of its own, and it is why the mat reads as LIT MATERIAL rather than
+     as a void. Warm parchment, diffuse, no direction — because a directional
+     glow would imply a second light and this room has one.
+     ⚠ AND THE OVERSPILL CLAIM THAT WAS HERE WAS WRONG, BY A FACTOR OF TWO.
+     A box-shadow's blur transitions over ~the blur radius CENTRED on the
+     shadow's edge, so its outward reach is blur/2 — which is the arithmetic
+     this same file already uses for the card's own drop ("4 + 4.5 - 3"). At
+     the default 12px blur the glow reaches 6px, INSIDE a 9px reveal: there is
+     no overspill, and there is none at the <=1199px tune (7px) either. It does
+     not begin until glow > 18 at reveal 9, or glow > 14 at reveal 7. The rail
+     used the wrong formula and printed "3px onto the frontier" in warn — a
+     measurement that was an artefact of its own instrument, steering the
+     builder away from a value that is fine. Fixed in overspill() below. */
+  box-shadow: 0 0 var(--cast-glow) rgba(239, 233, 219, var(--cast-glow-a));
+}
+/* ⚠ NO corner-shape ON THE CAST. It was here, and it was the one place the
+   bevel could not go: the cast is inset:0 on .m2case — the CARD's exact box —
+   and the card ships a plain 12px border-radius and is not bevelled. A 12px
+   quarter-circle bulges r(1 - 1/√2) = 3.5px past its 45° chord, so under
+   shipping Chrome the bevelled cast was up to 3.5px SMALLER than the round
+   card at every corner. At the two TOP corners, where the two casts composite
+   to alpha 1-(1-.34)(1-.26) = .512, that left a bright ~3.5px parchment wedge
+   against a half-darkened field — on THE DECISIVE LAYER, in the proof-or-kill
+   view. Bevelling the card instead would have "fixed" it by changing the
+   shipped card, which is not a thing a lab gets to do.
+   The hole and the pane keep their bevel: neither registers against the card's
+   outline, so neither can disagree with it. */
+/* THE SHADOW IS WARM (rgba(6,5,4)), NOT COOL. A blue-grey shadow on warm
+   parchment reads as a Photoshop layer; a warm one reads as this room's light.
+
+   CONTRAST, MEASURED, because this layer sits on the one card every visitor
+   sees. At the .m2tick.tl corner (left 9px, top 9px — styles.css:3818-3820,
+   raised to .74 alpha by BR-S326 to clear 3:1) the two casts sum to a ~= .175
+   and darken BOTH the mark and its background. Full sRGB relative-luminance:
+   6.99:1 today -> 5.75:1 with the cast. BR-S326's 3:1 floor holds with nearly
+   twice the margin.
+
+   CORNER-OCCLUSION RADIALS ARE DELIBERATELY OMITTED. They are correct physics,
+   but a 90px radial at the top corners lands directly on .m2tick.tl and would
+   eat the margin computed above. Restraint here is not taste, it is the
+   accessibility budget.
+
+   ⚠ THE ONE REGISTRATION ERROR IN THE DESIGN, and the lab exists partly to
+   show it: the cast is inset:0 on .m2case and does NOT lean, while .m2hero
+   carries perspective(1200px) rotateX/rotateY (styles.css:3849). At rest both
+   are identity and they register exactly.
+   ★ AND IT IS A MOVING ERROR, NOT A DISPLACEMENT. This was modelled as a
+   static ±1° checkbox, which is the most flattering possible frame of it: it
+   shows the endpoint and never the swim. Live, app.js:7140-7219 writes
+   --tilt-x/--tilt-y EVERY FRAME from a smoothed pointer target, with
+   .m2hero.is-tilting{transition:none} so it tracks the hand directly. So the
+   real thing to judge is the card sliding continuously inside a nailed-down
+   cast, for the whole duration of every hover. The lab now drives it from a
+   real pointermove with app.js's own hero tune (deg 1.0, kt .105, kl .070 —
+   app.js:7100) and it is ON by default, because at rest the live card is in a
+   state it only occupies when nobody is looking at it.
+   IF THE SWIM IS JUDGED BAD, the two structural answers are: put the cast
+   INSIDE .m2hero (it then leans with the card — physically wrong, visually
+   welded), or move --tilt-* up onto .m2case so hole + cast + pane lean as one
+   assembly. Both are one-line moves; neither should be picked from the CSS. */
+
+/* ── LAYER 4 · THE PANE ────────────────────────── z 3, the glass itself ──── */
+/* ★ THE PATCH IS BIGGER THAN THE HOLE. inset is -(reveal + proud): the pane
+   stands `proud` px past the hole's own outline on every side, so the two
+   outlines are two different rectangles. Two outlines, two planes. Flush, and
+   the glass collapses into varnish on the card. This is the fabrication cue —
+   "patched on" is a fabrication word — and it is the only cue in the design
+   that is PROOF rather than evidence. */
+.m2case { --vt-proud: 5px; }
+.m2vit--pane {
+  /* the frame band the pane owns outside the card, and how far the clips reach
+     back over the specimen. Held as custom properties so the LAP SURVIVES THE
+     SLIDERS: hardcode a clip height and the occlusion silently vanishes the
+     moment the builder drags reveal or proud past it. */
+  --vt-band: calc(var(--vt-r) + var(--vt-proud));
+  --vt-lap: 5px;
+
+  inset: calc(-1 * var(--vt-band));
+  z-index: 3;
+  border-radius: calc(12px + var(--vt-band));    /* concentric */
+  background-image:
+    /* ★★ THE TWO GLAZING CLIPS — AND THEY LAP THE SPECIMEN. THIS IS CUE 1.
+       The brief names OCCLUSION as the only cue here that is PROOF and not
+       evidence: if the surface visibly comes forward OVER the object's
+       outline, the object is behind it, full stop. It was missing. Every
+       structure the pane owned — five rim shadows, the seam, both clips, all
+       six motes — landed in the frame band and never touched the card, and the
+       only thing that reached the specimen was the bloom, at 239 -> 239.04. A
+       twenty-fifth of one level. So the card was proved to be behind glass by
+       a SHADOW (the cast) and by nothing else, and a shadow is evidence.
+       So each clip now runs the full band and 5px past it, onto the stock.
+
+       ★ AND IT IS ONE MATERIAL, NOT TWO. The temptation is a light value over
+       the dark band and a dark value over the parchment — two alphas, which is
+       a painting, not an object. A clip is a piece of metal: ONE value, and it
+       is the GROUNDS that differ. rgb(124,127,134) at .33 (effective .29 under
+       the pane's .88) computes to
+           over the frame band, ground 13   ->  45      +32 levels, LIT
+           over the specimen,   parchment 239 -> 206     -33 levels, DARK
+       Same pixel value, opposite sign, because the card is the only lamp in
+       the room and the clip is lying half on it and half off it. That is the
+       whole vitrine argument in one 14px tab. It is also cool (b-r = +10),
+       which keeps it on the glass side of the temperature line.
+
+       ★ WHERE THE LAP LANDS, and why it is safe. The clips sit at 22% / 78%
+       along the top / bottom of the pane — 55px and 231px in from the card's
+       left edge — and reach 5px onto the card. The card's padding is 14px
+       (styles.css:3903), so both feet land on blank stock: the tl foot stops
+       9px above the masthead, the br foot 9px below .m2face-orient. .m2tick.tl
+       is at 9,9 and is 46px away horizontally. BR-S326's contrast margins on
+       the masthead and the six marks are untouched — nothing the clips cover
+       has ink on it.
+
+       TWO, never four: four reads hardware store, not museum. On the tl/br
+       diagonal because that is the card's own tick convention
+       (styles.css:3819-3820) — the same registrar's gesture one scale up.
+       Drawn as background LAYERS, so the DOM stays flat and the
+       pointer-events rule above has nothing new to cover.
+       NOT L-brackets: the card already carries .m2tick.tl/.br at 9px and
+       .card__plate carries four .corner marks at 9px (styles.css:427-434).
+       Repeating that shape at the frame scale gives brackets inside brackets,
+       which is the skeuomorphic-gadget end of this. */
+    linear-gradient(180deg, rgba(240,242,246,.20) 0 1px,     /* its lit top arris */
+                            rgba(124,127,134,.33) 1px 100%), /* the metal, all the way onto the card */
+    linear-gradient(0deg,   rgba(240,242,246,.14) 0 1px,     /* the br clip, from its outer edge in */
+                            rgba(124,127,134,.26) 1px 100%),
+    /* THE BLOOM — the card's own light picked up in reflection, biased to its
+       hot corner (the 165deg stock is brightest top-and-slightly-left). NOT a
+       streak from an imagined window: there IS no window. Over the mat this
+       lifts 5 -> 14.4; over the parchment 239 -> 239.1. It declares the pane
+       in the frame and is arithmetically invisible on the specimen. That
+       asymmetry is the thesis, expressed in one gradient. */
+    radial-gradient(120% 88% at 34% 20%, rgba(240,242,246,.045) 0%,
+                    rgba(240,242,246,.012) 44%, transparent 70%);
+  background-position: 22% 0, 78% 100%, 0 0;
+  /* the clip's height is band + lap, so the 5px of occlusion is invariant under
+     both sliders. At the defaults that is 14 + 5 = 19px. */
+  background-size: 14px calc(var(--vt-band) + var(--vt-lap)),
+                   14px calc(var(--vt-band) + var(--vt-lap)),
+                   100% 100%;
+  background-repeat: no-repeat;
+  /* background-color stays FULLY TRANSPARENT. Every visible pixel of this
+     element is a gradient or a shadow. THE VEIL IS REFUSED: a wash tinting
+     the whole pane is the honest thing people reach for backdrop-filter to
+     get, and here it is the one thing that would reopen BR-S326's contrast
+     fixes on the card every visitor sees — to buy ~1 L* of "compression"
+     nobody can see. */
+  box-shadow:
+    /* THE CUT EDGE OF THE SLAB. Every glass value here is COOLER than the
+       card's warm parchment whites: rgb(240,242,246) / rgb(210,216,226)
+       against rgb(233,229,220), about +6 blue over red. That delta is what
+       makes the pane read as a different MATERIAL, and it is the whole of the
+       "green, refused" trade — temperature without hue, palette still closed.
+       All figures below are AT opacity .88, and rise ~12% on hover.
+
+       ★ ALL FOUR CUT EDGES CATCH LIGHT, and this is not a contradiction of the
+       one-light rule. Only the FRAME's arrises are directional — an arris is a
+       surface turning away from the source, and half of them turn away. A slab
+       of glass sitting proud of that frame is a different thing: its four cut
+       edges are all perpendicular to the sheet, all in the open, all catching
+       the card's light, and the design's own "prove the overlap with a LIT
+       EDGE on UNLIT ground" only works on sides where the edge is lit.
+       ⚠ IT WAS ONLY WORKING ON TWO. With the bottom rim at .055 and the right
+       edge dark, the outward walk read: bottom — lit ledge 22, hole outset 3,
+       ground, pane rim 24. TWO LEVELS APART, 4px apart, i.e. one soft 6px band
+       and not two edges. Right — lit wall 13, hole outset 5, ground, pane edge
+       7. Also two levels. "Two outlines, two planes" was being delivered on
+       half the perimeter. Retuned so all four register: */
+    inset  0  1px 0      rgba(240,242,246,.15),    /* front face, top:    13 -> 43 */
+    /* ★ THE BACK FACE — the pane's THICKNESS, the whole reason a slab reads as
+       a slab. It was written `inset 0 3px 0 -2px`, whose band is offsetY +
+       spread = 1px thick and, like every inset shadow, STARTS AT THE PADDING
+       EDGE — so it was y 0..1, not "3px down", and the front rim above it
+       occupies exactly y 0..1 and is listed first, which by this file's own
+       stated ordering rule paints over it. It rendered nowhere. A single inset
+       shadow cannot begin a band at a nonzero offset, so the intent as written
+       was unreachable. Spread 0 gives a 3px band whose outer 1px the front rim
+       covers, leaving y 1..3 as the back face: 13 -> 24 against the front rim's
+       43, a 19-level step. That is what thickness costs on this ground. */
+    inset  0  3px 0  0   rgba(210,216,226,.065),   /* back face, y1..3:   13 -> 24 */
+    inset  1px 0  0      rgba(240,242,246,.07),    /* left,   toward the light: 13 -> 27 */
+    inset -1px 0  0      rgba(190,198,212,.09),    /* right:  13 -> 27, clear of the hole outset's 5 */
+    inset  0 -1px 0      rgba(240,242,246,.10),    /* bottom: 13 -> 33, clear of the lit ledge's 22 */
+    /* ★ THE SEAM IS GONE, AND ITS ABSENCE IS THE POINT.
+       It was `0 0 0 1px rgba(18,16,14,.90)` — an outset ring, so it lay
+       entirely on the ground, and it was named as "the matte, unlit bedding
+       line ... THIS is what says PATCHED". On this ground it says nothing: the
+       body radial computes to rgb(13,13,12) at the card's mid and rgb(10,11,13)
+       at the pane's bottom, so the ring composited to rgb(18,16,14) at the top
+       — a ZERO-level line — and to rgb(16,15,14) at the bottom, a faint WARM
+       HIGHLIGHT. The named fabrication cue was carried on a shadow, its sign
+       flipped top-to-bottom along its own ring, and it was invisible for most
+       of its length. That is precisely the failure this file's doctrine names
+       at the top: on a ground with nine levels left below it, prove an overlap
+       with a LIT EDGE, never with a shadow.
+       IT IS NOT REPLACED WITH A LIT RING EITHER. A second lit ring 1px outside
+       the four lit rims above is a 2px lit band — one soft edge, not two
+       planes — which loses the cue it was supposed to carry. The bedding line
+       has no value available to it here, so it is refused, and the two
+       rectangles do the work they were always doing: the hole's arris/ledge and
+       the pane's rim, 5px apart, both lit, both on unlit ground.
+       A token drop is kept, and it is NOT doing the work — on a ground at
+       L=0.003 a shadow returns about 2 levels. Do not raise it trying to make
+       it visible; that is the exact instinct this room punishes. */
+    0 3px 8px -4px rgba(0,0,0,.55);
+  /* the one optional motion in the whole design (plan 3.7). One property,
+     opacity only, inside the existing pair-hover so the reading column still
+     lights with the card (BR-S324: the card and its words are one object).
+     220ms matches the card's own box-shadow transition at styles.css:3532.
+     If it is cut, the design loses nothing structural. */
+  opacity: .88; transition: opacity 220ms var(--ease-settle);
+}
+.menu__draw-stage:hover .m2vit--pane { opacity: 1; }
+@media (prefers-reduced-motion: reduce) { .m2vit--pane { opacity: 1; transition: none; } }
+
+/* THE DUST — the cheapest conservation cue there is, and in a dark room it is
+   not garnish: A CLEAN PANE IS INVISIBLE, and scattering is the primary
+   evidence that a sheet exists at all. Hand-placed, never random-per-load, so
+   it is stable and tunable. Six motes — more than about six reads as neglect,
+   and the register is HELD, not abandoned. Anchored in px to the edges so
+   they land in the frame; any that drift onto the card are invisible by
+   construction (.22 alpha of 233 over 239, at the pane's .88, = 238). Radii >= 0.8px or they
+   alias on fractional DPR.
+   NOT ANIMATED. Drifting motes turn a museum into a screensaver. */
+.m2vit--pane::after {
+  content: ""; position: absolute; inset: 0; border-radius: inherit;
+  background-image:
+    radial-gradient(circle 0.9px at 7px 23%,              rgba(233,229,220,.22), transparent),
+    radial-gradient(circle 0.8px at 12px 62%,             rgba(233,229,220,.14), transparent),
+    radial-gradient(circle 1px   at calc(100% - 9px) 37%, rgba(233,229,220,.18), transparent),
+    radial-gradient(circle 0.8px at calc(100% - 6px) 75%, rgba(233,229,220,.12), transparent),
+    radial-gradient(circle 0.9px at 36% 9px,              rgba(233,229,220,.16), transparent),
+    radial-gradient(circle 0.8px at 68% calc(100% - 8px), rgba(233,229,220,.13), transparent);
+}
+@supports (corner-shape: bevel) { .m2vit--pane, .m2vit--pane::after { corner-shape: bevel; } }
+
+/* ── THE LAYER TOGGLES ────────────────────────────────────────────────────
+   display:none, not opacity:0 — opacity would leave a compositing hint and
+   opacity:0 on the pane would still let its ::after count. And the CAST alone
+   is the named proof-or-kill view, so it has to be genuinely alone. */
+html.off-hole  .m2vit--hole  { display: none; }
+html.off-cast  .m2vit--cast  { display: none; }
+html.off-pane  .m2vit--pane  { display: none; }
+html.off-motes .m2vit--pane::after { display: none; }
+/* With the hole off, the card's recessed drop is a lie — a 5.5px contact
+   shadow with no floor under it — so put the shipped drop back and make "hole
+   off" a fair view rather than a broken one.
+   ⚠ THIS WAS WRITTEN AS A COMPOUND, .off-hole.off-cast.off-pane, which is the
+   one combination where it is least needed and never the one the builder
+   reaches. Unchecking `hole` alone did not match it; neither did `cast alone`,
+   which sets hole/pane off with cast on. The rule that was written to prevent
+   the broken view was unreachable from every control that produces it.
+   It keys on the FLOOR being gone, and nothing else.
+   AND THE CALL IT DECIDES, SAID OUT LOUD: `cast alone` therefore judges the
+   cast against the SHIPPED drop, not the recessed one. That is deliberate. The
+   proof-or-kill question is "does adding this ONE layer to the card AS IT
+   SHIPS make it read as behind a surface" — judging it against a contact
+   shadow that only makes sense inside a recess would be lending the cast the
+   recess's help, and the recess is not what is on trial. */
+html.is-case.off-hole .m2hero { box-shadow: 0 20px 40px rgba(0,0,0,.6); }
+
+
+/* ═══ THE SIX-MARKS STANDIN — the pointer contract, made visible ═══════════
+   _six-live.js binds pointerenter/focus/click on each <li> inside
+   .m2bface__marks and sets ul.style.pointerEvents = "auto" (:712, :744-746),
+   and it releases the specimen on pointerleave of .m2hero (:874).
+   THAT SECOND ONE IS THE KILLER IF THE GLASS EATS POINTERS: a pane over the
+   card means the pointer never leaves the card, release() never runs, and the
+   panel latches open forever. The failure is silent and it only reproduces
+   with a real pointer — the preview pane cannot exercise it. So the readout
+   below is not a nicety; it is the acceptance test, on screen.
+
+   ★★ AND AN ACCEPTANCE TEST THAT CANNOT FAIL IS NOT ONE. The first cut of this
+   readout had a single "ok" path on every handler and a placeholder that
+   claimed "if the glass eats pointers this box says so" — which was false, and
+   false in a live readout, in a repo that keeps a CLAIM_AUDIT because comments
+   asserted things the code did not do. Trace the actual failure: if .m2vit
+   ever loses pointer-events:none, the pane (inset -14px, z3) covers the whole
+   card, so the pointer never ENTERS .m2hero and therefore never LEAVES it. No
+   event fires. Nothing prints. Silence is bit-identical to "you have not moved
+   the mouse yet." The box could only ever go green.
+   Two things fix it and both are below: the readout is ARMED — it starts red,
+   with every row unticked, and each row earns its green — and there is a
+   NEGATIVE CONTROL, so the builder can see what dead looks like and know that
+   green means something. This one rule is the whole control. */
+html.glass-solid .m2vit { pointer-events: auto; }
+
+.m2bface__marks { pointer-events: auto; }
+.m2bface__marks li { cursor: pointer; transition: color 140ms var(--ease-settle),
+                     text-shadow 140ms var(--ease-settle); }
+.m2bface__marks li:hover, .m2bface__marks li.is-lit {
+  color: #1c150d; text-shadow: 0 0 8px rgba(201, 138, 94, .55);
+}
+
+
+/* ═══ THE RAIL — lab furniture. Nothing here is part of the design. ════════
+   position:fixed and OUTSIDE .menu__draw-stage, so it can never enter the
+   :hover subject that drives the pair-hover, and can never affect layout. */
+.rail {
+  position: fixed; top: 0; right: 0; bottom: 0; width: 320px; overflow-y: auto;
+  padding: 20px 22px 40px; background: rgba(8,9,11,.94);
+  border-left: 1px solid rgba(233,229,220,.10);
+  font-family: var(--font-mono); font-size: 10.5px; color: var(--t-meta);
+  letter-spacing: .02em; line-height: 1.5;
+}
+.rail h1 { font-family: var(--font-display); font-size: 20px; font-weight: 600;
+           color: var(--t-display); margin: 0 0 2px; letter-spacing: .01em; }
+.rail h2 { font-size: 8.5px; letter-spacing: .3em; text-transform: uppercase;
+           color: var(--t-ghost); margin: 22px 0 8px; font-weight: 500; }
+.rail p  { margin: 0 0 14px; color: var(--t-ghost); font-size: 9.5px; line-height: 1.6; }
+.rail label { display: flex; align-items: center; gap: 8px; padding: 3px 0; cursor: pointer;
+              color: var(--t-body); }
+.rail input[type=range] { width: 100%; accent-color: #8a6a42; }
+.rail .row { display: flex; justify-content: space-between; align-items: baseline;
+             color: var(--t-body); margin-top: 8px; }
+.rail .row b { color: var(--t-display); font-weight: 500; }
+.ab {
+  display: block; width: 100%; margin: 6px 0 0; padding: 14px; cursor: pointer;
+  font-family: var(--font-mono); font-size: 11px; letter-spacing: .22em;
+  text-transform: uppercase; border-radius: 4px;
+  border: 1px solid rgba(233,229,220,.20); background: rgba(233,229,220,.05);
+  color: var(--t-display);
+}
+html.is-case .ab { border-color: rgba(201,138,94,.55); background: rgba(201,138,94,.12); }
+.mini { display: inline-block; margin: 4px 4px 0 0; padding: 5px 9px; cursor: pointer;
+  font-family: var(--font-mono); font-size: 8.5px; letter-spacing: .14em; text-transform: uppercase;
+  border: 1px solid rgba(233,229,220,.16); background: none; color: var(--t-meta); border-radius: 3px; }
+.read { margin-top: 8px; padding: 9px 10px; border-radius: 3px; font-size: 9.5px;
+        background: rgba(233,229,220,.04); border: 1px solid rgba(233,229,220,.09);
+        color: var(--t-body); min-height: 74px; white-space: pre-wrap; }
+.ok   { color: #7e937f; }
+.bad  { color: #c96a5e; }
+.warn { color: #c6a466; }
+</style>
+</head>
+<body>
+
+<!-- ═══ THE STAGE — five children, in the app's own order (app.js:2814-2913) ═
+     0  .msample__cap        "By Birth"
+     1  .menu__draw-herosub  "Six marks. One name."
+     2  .m2case > .m2hero    THE CARD, third of five, 68px down the column
+     3  .m2flip              BIRTH / TAROT
+     4  .menu__draw-act      the reserved seat                                -->
+<section class="menu__draw-stage">
+
+  <div class="msample__cap"><span class="msample__label">By Birth</span></div>
+  <p class="menu__draw-herosub">Six marks. One name.</p>
+
+  <!-- THE WRAPPER. In the app this is one new div and three empty spans in a
+       template string — no listener, no rAF, no custom property, no logic.
+       Verified independently before proposing it: no selector uses a child
+       combinator from the stage to the card, and nothing queries the card's
+       parentElement, so wrapping is safe. -->
+  <div class="m2case">
+    <span class="m2vit m2vit--hole" aria-hidden="true"></span>
+
+    <div class="m2hero" data-m2-hero data-face="birth">
+      <div class="m2bface" aria-hidden="true">
+        <div class="m2face-head">
+          <span class="m2face-meta">THE BIRTH READING</span>
+          <span class="m2face-glyph">&#10022;</span>
+        </div>
+        <div class="m2face-div m2bface__headrule"></div>
+        <div class="m2face-name m2bface__name">The Crowned Name</div>
+        <ul class="m2bface__marks">
+          <li>Sun sign</li><li>Year animal</li><li>Life path</li>
+          <li>Rune</li><li>Trigram</li><li>Hexagram</li>
+        </ul>
+        <div class="m2bface__wall m2bface__wall--bot">
+          <div class="m2face-div"></div>
+          <div class="m2face-orient">By birth alone</div>
+        </div>
+        <span class="m2tick tl"></span><span class="m2tick br"></span>
+      </div>
+    </div>
+
+    <span class="m2vit m2vit--cast" aria-hidden="true"></span>
+    <span class="m2vit m2vit--pane" aria-hidden="true"></span>
+  </div>
+
+  <div class="m2flip" role="radiogroup" aria-label="What the card shows">
+    <button type="button" class="m2flip__opt is-on" role="radio" aria-checked="true">Birth</button>
+    <button type="button" class="m2flip__opt" role="radio" aria-checked="false">Tarot</button>
+  </div>
+
+  <div class="menu__draw-act">
+    <button type="button" class="menu__draw-pull">Pull another</button>
+  </div>
+</section>
+
+
+<aside class="rail">
+  <h1>THE CASE</h1>
+  <p>A lab. styles.css and app.js are untouched.</p>
+
+  <h2>A / B</h2>
+  <button type="button" class="ab" id="ab">THE CASE &mdash; ON</button>
+  <p>Same card, same position, no reload. Key <b>V</b>.</p>
+
+  <h2>Layers</h2>
+  <label><input type="checkbox" id="l-hole"  checked> hole &mdash; floor, walls, arris</label>
+  <label><input type="checkbox" id="l-cast"  checked> cast &mdash; <b>the proof-or-kill</b></label>
+  <label><input type="checkbox" id="l-pane"  checked> pane &mdash; rim, bloom, clips, <b>the lap</b></label>
+  <label><input type="checkbox" id="l-motes" checked> motes &mdash; six, none over 1.5px</label>
+  <button type="button" class="mini" id="only-cast">cast alone</button>
+  <button type="button" class="mini" id="all-on">all on</button>
+
+  <h2>Depth &mdash; the cast's length</h2>
+  <input type="range" id="cd" min="0" max="40" step="1" value="16">
+  <div class="row"><span>top run</span><b><span id="cd-v">16</span>px</b></div>
+  <div class="row"><span>reads as</span><b id="cd-says">case</b></div>
+  <div class="row"><span>&alpha; at the 14px padding</span><b id="cd-a">.029</b></div>
+  <p id="cd-warn">7px says tray, 22px says case. The masthead sits at 14&ndash;26px; keep the padding-line &alpha; low or the cast starts eating the card's own header.</p>
+
+  <h2>The reveal &mdash; <code>--vt-r</code></h2>
+  <input type="range" id="vr" min="3" max="20" step="1" value="9">
+  <div class="row"><span>hole past the card</span><b><span id="vr-v">9</span>px</b></div>
+  <div class="row"><span>clean floor, at rest</span><b id="vr-rest">1.5px</b></div>
+  <div class="row"><span>clean floor, on hover</span><b id="vr-hov">0.0px</b></div>
+  <p>The lit bottom ledge is <code>inset&nbsp;0&nbsp;-2px</code>, so its inner face is <b>2px inside</b> the reveal. Clean floor = <code>vt-r &minus; 2 &minus; reach</code>, and <b>reach</b> is <code>dy + blur/2 &minus; spread</code>: 5.5px at rest, 7px on hover. Below zero the card's own drop is lying on the brightest structure in the recess.</p>
+
+  <h2>Proud &mdash; patch past hole</h2>
+  <input type="range" id="vp" min="0" max="14" step="1" value="5">
+  <div class="row"><span>pane past the hole</span><b><span id="vp-v">5</span>px</b></div>
+  <div class="row"><span>clearance to BIRTH/TAROT</span><b id="vp-clr">14px</b></div>
+  <p>At <b>0</b> the two outlines coincide and the glass collapses into varnish. That is the control that proves the cue. The clearance is <code>28 &minus; (r + proud)</code> &mdash; 18px stage gap plus <code>.m2flip</code>'s 10px margin. At <b>0</b> or below the pane is lying across the radiogroup.</p>
+
+  <h2>The card's own light on the mat</h2>
+  <input type="range" id="cg" min="0" max="28" step="1" value="12">
+  <div class="row"><span>glow blur</span><b><span id="cg-v">12</span>px</b></div>
+  <div class="row"><span>reach (blur/2)</span><b id="cg-reach">6px</b></div>
+  <div class="row"><span>overspill past the reveal</span><b id="cg-over">none</b></div>
+  <p>A box-shadow's blur reaches <b>blur/2</b> outward, not blur &mdash; the same arithmetic the card's own drop uses. Break-even is glow <b>18</b> at reveal 9, <b>14</b> at reveal 7.</p>
+
+  <h2>State</h2>
+  <label><input type="checkbox" id="lean" checked> live lean + engraved light (as shipped)</label>
+  <label><input type="checkbox" id="flat"> flat mat (kill the radial)</label>
+  <p>The lean is <b>not</b> a snapshot. app.js writes <code>--tilt-*</code> every frame from a smoothed pointer target, so the card <i>swims</i> inside a nailed-down cast for the whole of every hover. Hover the card and watch the registration, not the endpoint. Off = the rest state, which live is the state nobody is looking at.</p>
+
+  <h2>Pointer contract</h2>
+  <p>Armed: every row starts <span class="bad">red</span> and has to earn its green. Hover the six marks, then leave the card.</p>
+  <div class="read" id="out"></div>
+  <button type="button" class="mini" id="solid">negative control: glass solid</button>
+  <button type="button" class="mini" id="rearm">re-arm</button>
+  <p id="solid-note">Turns <code>pointer-events</code> back <b>on</b> for all three vitrine layers and re-arms. The rows must go dead &mdash; that is what a failure looks like, and it is the only way to know the green above means anything.</p>
+
+  <h2>elementFromPoint</h2>
+  <button type="button" class="mini" id="probe">probe 6 marks + 4 frame</button>
+  <div class="read" id="probe-out">not run.</div>
+</aside>
+
+<script>
+/* ─────────────────────────────────────────────────────────────────────────
+   LAB WIRING ONLY. Nothing here belongs in the app: the vitrine itself is
+   four rules of static paint with zero JS, zero listeners and zero per-frame
+   work. Everything below drives the CONTROLS.
+   No template literals anywhere — this repo has been burned by backticks
+   travelling through shells (see parallel-session-hazards).
+──────────────────────────────────────────────────────────────────────────── */
+(function () {
+  "use strict";
+  var root  = document.documentElement;
+  var out   = document.getElementById("out");
+  var caseEl = document.querySelector(".m2case");
+  var cast  = document.querySelector(".m2vit--cast");
+  var hero  = document.querySelector(".m2hero");
+  var marks = Array.prototype.slice.call(document.querySelectorAll(".m2bface__marks li"));
+
+  function num(id) { return document.getElementById(id); }
+  function txt(id, v) { num(id).textContent = v; }
+
+  /* ── A/B ─────────────────────────────────────────────────────────────── */
+  function paintAB() {
+    var on = root.classList.contains("is-case");
+    num("ab").textContent = on ? "THE CASE — ON" : "THE CASE — OFF";
+  }
+  function toggleAB() {
+    /* transition suppressed, class flipped, layout READ to force a style
+       flush, suppression lifted — all in one synchronous block, so the swap
+       lands on the same frame. No timer: this pane freezes rAF and a
+       setTimeout-based unlock is a coin toss here. */
+    root.classList.add("ab-snap");
+    root.classList.toggle("is-case");
+    void document.body.offsetHeight;
+    root.classList.remove("ab-snap");
+    paintAB();
+  }
+  num("ab").addEventListener("click", toggleAB);
+  window.addEventListener("keydown", function (e) {
+    /* guarded: unguarded, Ctrl+V flipped the design under the builder mid-paste,
+       in a file whose whole premise is that the comparison has to be honest. */
+    if (e.ctrlKey || e.metaKey || e.altKey) { return; }
+    if (e.key === "v" || e.key === "V") { toggleAB(); }
+  });
+
+  /* ── layer checkboxes ────────────────────────────────────────────────── */
+  var LAYERS = [["l-hole", "off-hole"], ["l-cast", "off-cast"],
+                ["l-pane", "off-pane"], ["l-motes", "off-motes"]];
+  LAYERS.forEach(function (p) {
+    num(p[0]).addEventListener("change", function () {
+      root.classList.toggle(p[1], !this.checked);
+    });
+  });
+  function setLayers(h, c, p, m) {
+    var want = [h, c, p, m];
+    LAYERS.forEach(function (pair, i) {
+      num(pair[0]).checked = want[i];
+      root.classList.toggle(pair[1], !want[i]);
+    });
+  }
+  /* THE NAMED PROOF-OR-KILL VIEW. The plan: "this is the whole idea in two
+     gradients and one shadow. If the card does not read as under the surface
+     from this alone, nothing downstream rescues it." */
+  num("only-cast").addEventListener("click", function () { setLayers(false, true, false, false); });
+  num("all-on").addEventListener("click",    function () { setLayers(true, true, true, true); });
+
+  /* ── depth ───────────────────────────────────────────────────────────── */
+  /* the top gradient is  .34 @0  ->  .13 @ (cd*.4375)  ->  0 @ cd.
+     the padding line is 14px, where the masthead begins (styles.css:3803). */
+  function alphaAt(px, cd) {
+    var mid = cd * 0.4375;
+    if (cd <= 0) { return 0; }
+    if (px <= 0) { return 0.34; }
+    if (px <= mid) { return 0.34 + (px / mid) * (0.13 - 0.34); }
+    if (px >= cd) { return 0; }
+    return 0.13 * (1 - (px - mid) / (cd - mid));
+  }
+  num("cd").addEventListener("input", function () {
+    var cd = +this.value;
+    cast.style.setProperty("--cd", cd + "px");
+    txt("cd-v", cd);
+    txt("cd-says", cd === 0 ? "flat — no case" : cd <= 9 ? "tray" : cd <= 18 ? "case" : "deep case");
+    var a = alphaAt(14, cd);
+    var el = num("cd-a");
+    el.textContent = a.toFixed(3).replace(/^0/, "");
+    /* .06 is the lab's own line, not the plan's: at .06 over parchment the
+       masthead's #5c503c ink and its ground are both pulled about 8 levels,
+       which is where the 4.5:1 the masthead currently clears starts to move. */
+    el.className = a > 0.06 ? "bad" : a > 0.04 ? "warn" : "ok";
+  });
+
+  /* ── reveal / proud / glow ───────────────────────────────────────────── */
+  /* THE THREE NUMBERS A TUNE CAN BREAK, AND THE ONE ARITHMETIC THEY SHARE.
+     A box-shadow's blur transitions over ~the blur radius CENTRED on the
+     shadow's edge, so its outward reach is dy + blur/2 - spread. That is the
+     formula the card's own drop comment uses, and it was NOT the formula this
+     rail used: overspill() computed `blur - reveal`, i.e. double, and printed a
+     warn at the defaults where there is in fact no overspill at all. One file,
+     one physics, one formula — here it is, used by all three readouts. */
+  function reach(dy, blur, spread) { return dy + blur / 2 - spread; }
+  var REST_REACH  = reach(4, 9, 3);    /* 5.5px — html.is-case .m2hero            */
+  var HOVER_REACH = reach(5, 10, 3);   /* 7.0px — the pair-hover                  */
+  var LEDGE = 2;                       /* the lit ledge is `inset 0 -2px`         */
+
+  function px(v) { return (Math.round(v * 10) / 10) + "px"; }
+  function grade(el, v, warnAt, badAt) {
+    if (badAt === undefined) { badAt = 0; }
+    el.className = v <= badAt ? "bad" : v <= warnAt ? "warn" : "ok";
+  }
+
+  function readouts() {
+    var r = +num("vr").value, p = +num("vp").value, g = +num("cg").value;
+
+    /* the card's own drop against the hole's lit bottom ledge, BOTH states —
+       the check the rest-state comment modelled and the hover never got. */
+    var restClear = r - LEDGE - REST_REACH;
+    var hovClear  = r - LEDGE - HOVER_REACH;
+    /* zero is TANGENT, not overlap — the shadow's outer edge just meets the
+       ledge's inner face, which is where the hover is deliberately tuned. So
+       zero is warn and only negative is bad. */
+    txt("vr-rest", px(restClear)); grade(num("vr-rest"), restClear, 1, -0.001);
+    txt("vr-hov",  px(hovClear));  grade(num("vr-hov"),  hovClear,  1, -0.001);
+
+    /* the pane's bottom edge against .m2flip: 18px stage gap + 10px margin. */
+    var clr = 28 - (r + p);
+    txt("vp-clr", px(clr)); grade(num("vp-clr"), clr, 4);
+
+    /* the glow, at blur/2. Break-even: glow > 2r. */
+    var reachOut = g / 2;
+    txt("cg-reach", px(reachOut));
+    var o = reachOut - r;
+    var el = num("cg-over");
+    el.textContent = o > 0 ? px(o) + " onto the frontier" : "none (break-even at glow " + (2 * r) + ")";
+    el.className = o > 0 ? "warn" : "ok";
+  }
+  num("vr").addEventListener("input", function () {
+    caseEl.style.setProperty("--vt-r", this.value + "px");
+    txt("vr-v", this.value); readouts();
+  });
+  num("vp").addEventListener("input", function () {
+    caseEl.style.setProperty("--vt-proud", this.value + "px");
+    txt("vp-v", this.value); readouts();
+  });
+  num("cg").addEventListener("input", function () {
+    cast.style.setProperty("--cast-glow", this.value + "px");
+    txt("cg-v", this.value); readouts();
+  });
+
+  /* ── THE LIVE LEAN ───────────────────────────────────────────────────────
+     app.js:7098-7219, reduced to the one card. This is lab furniture only in
+     the sense that the app already ships it; it is here because a STATIC ±1°
+     checkbox is the most flattering possible frame of the design's one
+     registration error. The error is not "the face sits a few px off" — it is
+     the card SWIMMING inside a nailed-down cast for the whole of every hover,
+     and a snapshot shows the endpoint and never the swim.
+     Same tune as the app: TUNE.hero = deg 1.0, kt .105, kl .070 (app.js:7100),
+     EPS 0.0009 (app.js:7104). The light lags the lean deliberately — that split
+     is the app's, not a simplification. */
+  var TILT = { deg: 1.0, kt: 0.105, kl: 0.070 }, EPS = 0.0009;
+  var tx = 0, ty = 0, cx = 0, cy = 0, glx = 0, gly = 0;
+  var raf = 0, over = false, box = null;
+
+  function park() {
+    hero.classList.remove("is-tilting");
+    hero.style.removeProperty("--tilt-x"); hero.style.removeProperty("--tilt-y");
+    hero.style.removeProperty("--lx");     hero.style.removeProperty("--ly");
+    cx = cy = glx = gly = tx = ty = 0; box = null;
+  }
+  function frame() {
+    raf = 0;
+    cx  += (tx - cx)  * TILT.kt;  cy  += (ty - cy)  * TILT.kt;
+    glx += (tx - glx) * TILT.kl;  gly += (ty - gly) * TILT.kl;
+    hero.style.setProperty("--tilt-y", (cx * TILT.deg).toFixed(2) + "deg");
+    hero.style.setProperty("--tilt-x", (-cy * TILT.deg).toFixed(2) + "deg");
+    hero.style.setProperty("--lx", ((glx * 0.5 + 0.5) * 100).toFixed(1) + "%");
+    hero.style.setProperty("--ly", ((gly * 0.5 + 0.5) * 100).toFixed(1) + "%");
+    var still = Math.abs(tx - cx) < EPS && Math.abs(ty - cy) < EPS &&
+                Math.abs(tx - glx) < EPS && Math.abs(ty - gly) < EPS;
+    if (over || !still) { raf = requestAnimationFrame(frame); return; }
+    park();
+  }
+  hero.addEventListener("pointermove", function (e) {
+    if (!num("lean").checked || e.pointerType === "touch") { return; }
+    if (!over) { box = hero.getBoundingClientRect(); hero.classList.add("is-tilting"); }
+    if (!box || !box.width) { return; }
+    var fx = (e.clientX - box.left) / box.width, fy = (e.clientY - box.top) / box.height;
+    fx = fx < 0 ? 0 : fx > 1 ? 1 : fx;
+    fy = fy < 0 ? 0 : fy > 1 ? 1 : fy;
+    tx = fx * 2 - 1; ty = fy * 2 - 1; over = true;
+    if (!raf) { raf = requestAnimationFrame(frame); }
+  }, { passive: true });
+  function leanHome() {
+    over = false; tx = 0; ty = 0;
+    if (!raf) { raf = requestAnimationFrame(frame); }
+  }
+  hero.addEventListener("pointerleave", leanHome);
+  num("lean").addEventListener("change", function () { if (!this.checked) { leanHome(); } });
+
+  num("flat").addEventListener("change", function () {
+    root.classList.toggle("is-flat", this.checked);
+  });
+
+  /* ── THE POINTER CONTRACT, ARMED ─────────────────────────────────────────
+     _six-live.js:867 releases the latched specimen on pointerleave of .m2hero
+     (and holds/releases on focus/blur of each <li>, :882-885 — see the gap
+     noted at the bottom of this file). If .m2vit ever loses pointer-events
+     :none, the pane covers the whole card, the pointer never ENTERS .m2hero,
+     so it never LEAVES it, so nothing fires and nothing prints.
+     ★ THEREFORE SILENCE MUST BE LOUD. Every row starts red and earns its
+     green; nothing here has a pass-only path. And the negative control below
+     lets the builder SEE the rows go dead, which is the only thing that makes
+     the green mean anything. */
+  var seen = [false, false, false, false, false, false], leftHero = false;
+  function paintContract() {
+    var rows = [], i;
+    for (i = 0; i < 6; i++) {
+      rows.push("<span class='" + (seen[i] ? "ok" : "bad") + "'>" +
+        (seen[i] ? "✓" : "·") + " enter mark " + (i + 1) + "  " +
+        (seen[i] ? "seen" : "not yet") + "</span>");
+    }
+    rows.push("<span class='" + (leftHero ? "ok" : "bad") + "'>" +
+      (leftHero ? "✓" : "·") + " pointerleave .m2hero  " +
+      (leftHero ? "seen — release() would run" : "NOT YET SEEN") + "</span>");
+    out.innerHTML = rows.join("\n");
+  }
+  function rearm() {
+    seen = [false, false, false, false, false, false];
+    leftHero = false;
+    marks.forEach(function (li) { li.classList.remove("is-lit"); });
+    paintContract();
+  }
+  marks.forEach(function (li, i) {
+    li.addEventListener("pointerenter", function () {
+      li.classList.add("is-lit"); seen[i] = true; paintContract();
+    });
+    li.addEventListener("pointerleave", function () { li.classList.remove("is-lit"); });
+  });
+  hero.addEventListener("pointerleave", function () { leftHero = true; paintContract(); });
+
+  /* THE NEGATIVE CONTROL. One class, one CSS rule, and the readout goes dead —
+     which is what the failure looks like. Re-arms on every flip, because a
+     readout still green from the previous state is the same lie in a new hat. */
+  num("solid").addEventListener("click", function () {
+    var on = root.classList.toggle("glass-solid");
+    this.className = on ? "mini bad" : "mini";
+    this.textContent = on ? "glass SOLID — rows must die" : "negative control: glass solid";
+    rearm();
+  });
+  num("rearm").addEventListener("click", rearm);
+
+  /* elementFromPoint. Six inside the specimen — the plan's acceptance test #6 —
+     plus FOUR IN THE FRAME BAND, which nothing tested and which is where the
+     vitrine's new geometry actually lives. Those four matter behaviourally:
+     _six-live.js:865-869 installs a capture-phase pointerdown that dismisses
+     the latched specimen unless the target closest()s .m2hero or .sx. Every
+     .m2vit is pointer-transparent, so a press in the band falls THROUGH — and
+     measured here it does not even land on .m2case: top and bottom resolve to
+     .menu__draw-stage, left and right to <body>, because .m2case is
+     shrink-to-fit at the card's 300px and the band is outside its box on those
+     two sides. All four therefore DISMISS. Which they do today too — except
+     THE CASE makes the card LOOK 14px bigger on every side while the dismiss
+     boundary stays at the card's real edge, so on touch there is now a visible
+     band of "card" that closes the panel.
+     THE OPEN CALL, stated so it is not forgotten: should closest(".m2hero") at
+     _six-live.js:867 become closest(".m2case") when THE CASE ships? Note that
+     .m2case alone does not cover it either — see the measurement above. */
+  num("probe").addEventListener("click", function () {
+    var bad = 0, lines = [], pane = document.querySelector(".m2vit--pane");
+    function name(el) {
+      if (!el) { return "null"; }
+      return el.tagName.toLowerCase() +
+        (el.className ? "." + String(el.className).split(" ")[0] : "");
+    }
+    marks.forEach(function (li, i) {
+      var r = li.getBoundingClientRect();
+      var el = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
+      var hit = el === li;
+      if (!hit) { bad++; }
+      lines.push((hit ? "✓" : "✗") + " mark " + (i + 1) + " → " + name(el));
+    });
+    var b = pane.getBoundingClientRect(), h = hero.getBoundingClientRect();
+    var band = [
+      ["band top",    (b.left + b.right) / 2, (b.top + h.top) / 2],
+      ["band left",   (b.left + h.left) / 2,  (b.top + b.bottom) / 2],
+      ["band right",  (b.right + h.right) / 2, (b.top + b.bottom) / 2],
+      ["band bottom", (b.left + b.right) / 2, (b.bottom + h.bottom) / 2]
+    ];
+    band.forEach(function (t) {
+      var el = document.elementFromPoint(t[1], t[2]);
+      var blocked = el && el.classList && el.classList.contains("m2vit");
+      if (blocked) { bad++; }
+      lines.push((blocked ? "✗" : "·") + " " + t[0] + " → " + name(el));
+    });
+    num("probe-out").innerHTML = "<span class='" + (bad ? "bad" : "ok") + "'>" +
+      (bad ? bad + " of 10 hit a .m2vit — the glass is eating pointers"
+           : "10 of 10 — the glass is transparent to the pointer") +
+      "</span>\n" + lines.join("\n");
+  });
+
+  paintAB();
+  readouts();
+  rearm();
+}());
+
+/* ═════════════════════════════════════════════════════════════════════════
+   ★ WHAT THIS LAB STILL CANNOT SHOW. Written down rather than left implicit,
+   because a lab's blind spots are the part a reader will otherwise assume
+   were covered.
+
+   1  THE KEYBOARD HALF OF THE CONTRACT. _six-live.js:882-885 binds focus/blur
+      on every <li> — the same hold/release latch the pointer drives — and :67
+      paints li:focus-visible with a .5-alpha ink outline at outline-offset:3px.
+      The marks here have no tabindex, no focus/blur, and no focus-visible
+      rule, so two things go untested: whether that ring survives under the
+      cast and the pane, and whether the specimen still holds and releases on
+      Tab. Also untested: _six-live.js:65 drops every li to opacity:.42 while
+      .sx-on is set, which is the real worst-case legibility state under the
+      glass, and this lab never enters it.
+
+   2  THE CAST vs THE ENGRAVED LIGHT. Both layers are now present and the
+      stacking is settled (cast over ::before, for the reason given at
+      .m2hero::before). Whether that is RIGHT is a judgement and it is not in
+      the CSS. Hover the card with the lean on and look at the top 16px.
+
+   3  THE SWIM. Same: the lab now reproduces it faithfully instead of
+      snapshotting it. Whether continuous mis-registration reads as "the
+      opening holds still while the object tips" or as "the shadow is stuck to
+      the wrong thing" is the builder's call, and the two structural answers
+      are named at the cast.
+
+   4  THE PANE AGAINST A REAL PANEL EDGE. The pane bleeds vt_r + vt_proud =
+      14px LEFT of a column whose other four children are flush at x=0. Here
+      body has 60px of padding and it is invisible. In the app the stage sits
+      inside a padded panel: check the M2 panel's left padding against 15px
+      before this ships. This lab as built cannot exercise it.
+
+   5  FEEL, AT ALL, IN THE PREVIEW PANE. It freezes rAF, so the live lean, the
+      pane's opacity ramp and the A/B snap are all unjudgeable there. Open this
+      file in a real browser or the readings are theatre.
+════════════════════════════════════════════════════════════════════════════ */
+</script>
+</body>
+</html>
