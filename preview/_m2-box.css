@@ -157,6 +157,47 @@
               rgba(233,229,220,0) 33%, rgba(233,229,220,0) 79%, rgba(233,229,220,.018) 100%);
 }
 
+/* ══ FROM THE GPT VITRINE (BR-S489) ═══════════════════════════════════════════════
+   A second proposal for this same problem was reviewed head-to-head against this file.
+   It was not adopted — it repainted the card's stock gold, which drops the faintest
+   line from 4.41:1 to 2.82:1 and five of the six marks below AA: the SAME outcome the
+   lamp was removed for, reached by a different mechanism, by an author who never saw
+   the first attempt. Two independent proposals converging on one mistake is worth
+   recording, because it is evidence about the ground rather than about either author.
+
+   These are the ideas from it that were better than what was here. */
+
+/* ── P1. THE PANE ANSWERS THE TURN. ───────────────────────────────────────────────
+   A reflection is what HIDES a specimen. When the card goes edge-on the glass should
+   stop competing, then come back as the new face settles. This file had no reaction to
+   the flip at all, and a case whose glass ignores the specimen turning is furniture.
+   `is-turning` is app.js's own class and is never set under reduced motion (the
+   function returns before it), so no reduce branch is needed and none is written.
+   Opacity only — nothing here is a paint property. */
+.m2box__cavity::after { transition: opacity 200ms var(--ease-settle); }
+.m2box:has(.m2hero.is-turning) .m2box__cavity::after { opacity: .34; }
+
+/* ── P2. THE SEATED CARD DOES NOT LIFT. ───────────────────────────────────────────
+   The shipped hover is brightness(1.035) plus a big external drop — the response of a
+   card standing FREE on the panel. Inside the case the drop is cropped by the mat and
+   the brightening is answered by nothing. The shadow was already restated for both
+   hover branches below; this cancels the remaining filter, and it does it on BOTH,
+   because hovering the reading column is a normal thing to do and a card that lights
+   differently depending on which column the pointer is in is two designs.
+   It also removes a filter, which the house performance budget lists as dangerous. */
+.menu__draw:has(.menu__draw-stage:hover) .m2box .m2hero,
+.menu__draw:has(.m2read:hover)           .m2box .m2hero { filter: none; }
+
+/* ── P4. THE FRAME LAPS THE CARD — ON THE BENCH, NOT ON BY DEFAULT. ───────────────
+   Occlusion is the only PROOF the card is behind something; everything else in the box
+   is evidence. The builder's own earlier vitrine lab lapped its glazing onto the
+   specimen for exactly this reason. The top edge only: the eye reads depth from the
+   near edge, and crossing all four turns a case into a passe-partout.
+   Left off by default because this one cannot be settled by arithmetic — it is the
+   cheapest experiment on the list and the one most likely to be either the whole thing
+   or nothing. That makes it a switch, not a decision taken on the builder's behalf. */
+.m2box.is-lap .m2box__cavity::before { top: calc(var(--box-mat-t) - 4px); }
+
 /* ── THE CARD COMES DOWN A STEP, EXACTLY ONE STEP. ──────────────────────────────
    The box occupies the card's old footprint to the pixel, on every viewport, in
    both axes — not "approximately, above 1107px tall".

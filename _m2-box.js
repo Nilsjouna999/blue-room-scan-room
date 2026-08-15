@@ -120,6 +120,7 @@
       '<b>The case &middot; prototype</b>'
       + '<label><input type="checkbox" data-mb="case" checked> in the case</label>'
       + '<label><input type="checkbox" data-mb="lamp"' + (wantLamp ? " checked" : "") + '> the lamp</label>'
+      + '<label><input type="checkbox" data-mb="lap"> frame laps the card</label>'
       + '<i>The lamp is the original idea. Review removed it: multiply only darkens, '
       + 'and the card&rsquo;s faintest line is already at its floor. Judge it yourself.</i>';
     doc.body.appendChild(b);
@@ -128,6 +129,8 @@
       if (!k) return;
       if (k === "case") wantCase = e.target.checked;
       if (k === "lamp") wantLamp = e.target.checked;
+      /* the lap is a pure class — no nodes to build, so it does not go through apply() */
+      if (k === "lap") { var bx = doc.querySelector(".m2box"); if (bx) bx.classList.toggle("is-lap", e.target.checked); }
       apply();
     });
   }

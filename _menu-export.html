@@ -188,7 +188,13 @@
         + "background-attachment:fixed}\n"
         + "</style>\n"
         + "<body class=\"menu menurev\">\n"
-        + "<div id=\"menuView\" class=\"menu menurev is-wall is-m1a\">\n"
+        /* BR-S489 — `is-wall` DROPPED, and it had broken every export ever handed out.
+         `.menu.is-wall .menu__track` translates the track a full -100%, which on a
+         single-panel export slides the whole menu off screen. The file looked empty on
+         arrival, so each recipient had to discover it and write their own workaround
+         before they could even see what they had been sent. Found by reviewing what
+         came back from one of them: the workaround was in the returned file. */
+      + "<div id=\"menuView\" class=\"menu menurev is-m1a\">\n"
         + "<div class=\"menu__track\">\n"
         + html + "\n"
         + "</div>\n</div>\n</body>\n</html>\n";
