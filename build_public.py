@@ -152,6 +152,9 @@ COPY_FILES = [
     # broken host, not a missing feature.
     "_codex-membrane.js", "_six-live.js", "_rooms-u1.js", "_whats-coming.js",
     "_codex-perks.js",
+    # BR-S484 — U1's middle. index.html loads it, so leaving it off this list would ship
+    # the same broken host the note above describes.
+    "_u1-rack.js",
 ]
 
 # <head>/<body> lines pulled out of index.html: the surfaces those files serve are cut.
@@ -199,6 +202,7 @@ PROBES = [
     ("six marks",      "app.js",       r"\bm2bface__marks\b", {"preview": True,  "live": True}),
     ("specimen panel", "_six-live.js", r"\bsx-",              {"preview": True,  "live": True}),
     ("roadmap box",    "app.js",       r"\brmpop\b",          {"preview": True,  "live": True}),
+    ("U1 rack",        "_u1-rack.js",  r"\bu1rack__vp\b",     {"preview": True,  "live": True}),
 ]
 
 # Emitted by build_routes.py's ROUTES; re-emitted here against dist/index.html.
