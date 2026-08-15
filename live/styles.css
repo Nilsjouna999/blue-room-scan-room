@@ -3606,11 +3606,25 @@ html.is-travel .card .cardfinish { mix-blend-mode: normal; }
    applied to a smaller sheet. Two surfaces, one gesture, two scales. BR-S464's
    horizontal front was the right grammar on the wrong axis: a sheet turned to the light,
    not a line drawn down it. */
+/* ★★ BR-S470 — THE DIRECTION IS REVERSED, AND NOW IT HAS A REASON. The builder: "i see
+   bloom is from right bottom to left top, is this planned or reasoned". It was neither —
+   it was INHERITED. The aperture travels bottom-right to top-left and that IS reasoned
+   there: the wax seal sits in the screen's bottom-right corner, the iris opens outward
+   from it, and the sheen follows the way the aperture just opened — away from the thing
+   you pressed.
+   None of that transfers here. There is no seal in this block's bottom-right. So the
+   inherited vector ran backwards on both counts: away from where the eye enters, and
+   toward the control instead of away from it.
+   Top-left to bottom-right gives it two reasons instead of none — it begins at the edge
+   nearest the mark just touched, so the light reads as CAUSED by the touch, and it moves
+   the way the eye is about to travel down the block, so it leads the reading rather than
+   cutting across it. Copying the vector instead of the reason is how a house ends up
+   with a convention nobody can explain. */
 @keyframes m2read-edge {
-  0%   { opacity: 0; transform: translate3d(70%, 70%, 0); }
+  0%   { opacity: 0; transform: translate3d(-70%, -70%, 0); }
   24%  { opacity: .9; }        /* BR-S468: 18/78 -> 24/70. 60% of the travel at full */
   70%  { opacity: .9; }        /* brightness reads as a wash; 46% reads as a pass. */
-  100% { opacity: 0; transform: translate3d(-70%, -70%, 0); }
+  100% { opacity: 0; transform: translate3d(70%, 70%, 0); }
 }
 .menu__draw .m2read { --m2-ease-edge: cubic-bezier(.22, .50, .16, 1); position: relative; overflow: hidden; }
 .menu__draw .m2read.is-bloom .m2read__meta { animation: m2read-arrive 260ms var(--m2-ease-edge) both; }

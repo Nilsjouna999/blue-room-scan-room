@@ -84,7 +84,20 @@
        on every hover. That is what reads as unsleek: the thing you are not changing
        appears to move. Anchor the column to its top and the whole variance falls to the
        bottom, where nothing is looking. */
-    + ".m2read{justify-content:flex-start!important;align-items:stretch!important;position:relative}"
+    /* ★★ BR-S470 — align-content, AND IT IS THE ONE THAT WAS ACTUALLY MISSING.
+       The builder, on the tarot face: "this spacing and layout is odd."
+       .m2read is a GRID (styles.css:3298). `justify-content` on the line above governs
+       the INLINE axis and does nothing to row distribution; the block axis is
+       `align-content`, which defaults to stretch. So the moment BR-S465 gave this block a
+       518px reserve for the specimen panel, the tarot face — which has no panel, the
+       overlay stands down there — distributed its two remaining rows across all 518px
+       and opened a ~250px hole between the meta line and the meaning.
+       The reserve was right and the distribution was never specified. `start` stacks the
+       rows at the top and drops the whole surplus to the bottom, which is the same law
+       the panel itself follows two rules down: the variance goes where nothing is
+       looking. It applies on both faces because both want it. */
+    + ".m2read{justify-content:flex-start!important;align-items:stretch!important;"
+    +   "align-content:start!important;position:relative}"
     /* ★★ BR-S461 — THE PANEL IS TAKEN OUT OF FLOW, AND min-height:430px IS DELETED.
        That reservation was the second half of the same defect: it forced .m2read to a
        height the app's own text never has, so the head jumped even before a specimen
@@ -184,10 +197,10 @@
     /* ★ BR-S468 — THE PLATEAU NARROWS, 18/78 -> 24/70. The band was sitting at full
        brightness for 60% of its travel, which on a sheet this size reads as a WASH
        moving across rather than a light crossing it. 46% is a pass. */
-    + "@keyframes sx-edge-a{0%{opacity:0;transform:translate3d(70%,70%,0)}"
-    +   "24%{opacity:.9}70%{opacity:.9}100%{opacity:0;transform:translate3d(-70%,-70%,0)}}"
-    + "@keyframes sx-edge-b{0%{opacity:0;transform:translate3d(70%,70%,0)}"
-    +   "24%{opacity:.9}70%{opacity:.9}100%{opacity:0;transform:translate3d(-70%,-70%,0)}}"
+    + "@keyframes sx-edge-a{0%{opacity:0;transform:translate3d(-70%,-70%,0)}"
+    +   "24%{opacity:.9}70%{opacity:.9}100%{opacity:0;transform:translate3d(70%,70%,0)}}"
+    + "@keyframes sx-edge-b{0%{opacity:0;transform:translate3d(-70%,-70%,0)}"
+    +   "24%{opacity:.9}70%{opacity:.9}100%{opacity:0;transform:translate3d(70%,70%,0)}}"
     + ".sx{--sx-ease:cubic-bezier(.22,.50,.16,1)}"          /* the aperture's own leap-then-crawl */
     + ".sx>*{transform-origin:0 60%;--sx-amp:1}"
     + ".sx__glyph,.sx__name{--sx-amp:var(--sx-scale,1)}"    /* only the two large marks take the spread */
@@ -212,7 +225,7 @@
     + ".sx{position:absolute;overflow:hidden}"
     + ".sx::after{content:'';position:absolute;inset:-60%;"
     +   "pointer-events:none;opacity:0;mix-blend-mode:screen;"
-    +   "transform:translate3d(70%,70%,0);"
+    +   "transform:translate3d(-70%,-70%,0);"
     +   "background:linear-gradient(135deg,transparent 0 44%,rgba(255,246,228,.05) 47.5%,"
     +   "rgba(255,249,235,.16) 50%,rgba(255,246,228,.05) 52.5%,transparent 56% 100%)}"
     /* ★★ BR-S468 — TWO CORRECTIONS TO THE SHEEN, both of them errors rather than taste.
