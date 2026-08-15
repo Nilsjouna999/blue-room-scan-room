@@ -371,7 +371,28 @@
        Value goes to #aaa69d — the app's own read value, which it can now afford: at
        13px sans it had to stay dim to avoid noise; as the panel's body text it should
        be the second-brightest thing here, under the name and over everything else. */
-    + ".sx__say{font-family:var(--font-display);font-size:16px;line-height:1.5;color:#aaa69d}"
+    /* ★★ BR-S473 — "i like the font but something about reading it still feels off".
+       Two causes, and the first one is a straight defect.
+
+       1. THE WEIGHT WAS NOT LOADED. index.html requests Cormorant Garamond at
+          wght@0,500;0,600;0,700 — 400 IS NOT AMONG THEM — and this rule inherited 400.
+          So every line of the explanation was a browser-SYNTHESISED weight: the 500 cut
+          algorithmically thinned, which is precisely the mush that reads as "off"
+          without looking obviously wrong. Asking for 500 asks for a real file.
+
+       2. CORMORANT IS A DISPLAY CUT AND 16px WAS UNDER ITS FLOOR. Measured, "xxxxx" at
+          16px Cormorant occupies 35.1px — the same width as 13px Inter at 35.5px. Its
+          x-height runs ~19% short, so nominal 16px was reading at about 13px, with
+          thinner strokes, on a dark ground where thin serifs thin further still. That
+          is why the app's own read sets this same kind of prose at 19px and not at 16.
+          18px puts the letterforms back over the floor and still measures 59 characters
+          a line, inside the comfortable 60-70 band.
+
+       ★ AND IT STAYS SOLID, which was the builder's constraint. Leading goes to 1.52 —
+       up two points to carry the taller ascenders, not up to the app's 1.6, because
+       that is the setting that turns a block into a poem. */
+    + ".sx__say{font-family:var(--font-display);font-size:18px;font-weight:500;"
+    +   "line-height:1.52;color:#aaa69d}"
 
     /* ══ BR-S466 — THE VERTICAL RHYTHM. Measured down the panel, the gaps between
        consecutive blocks ran 16, 13, 8, 10, 13, 17, 15 — SEVEN values, no two the same
