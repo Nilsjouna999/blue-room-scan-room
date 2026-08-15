@@ -173,9 +173,9 @@
      rendered this at 8.5px #565046 on #1c1a17 — 2.21:1, which means the honesty
      disclosure was not actually present on the page. 10px at 4.6:1, and the
      close occludes row 2 rather than this row, so it survives into the payoff. */
-  .bx__from { font: 10px/1 var(--mono); letter-spacing: .12em; color: #8a8275; text-transform: uppercase; }
+  .bx__from { font: var(--labelSize, 10px)/1 var(--mono); letter-spacing: .12em; color: #8a8275; text-transform: uppercase; }
   .bx__rule { height: 1px; background: rgba(43,48,56,.9); margin: 12px 0 8px; transform-origin: left; }
-  .bx__kw { font: 11px/1.5 var(--mono); letter-spacing: .1em; color: #8b93a0; }
+  .bx__kw { font: var(--labelSize, 11px)/1.5 var(--mono); letter-spacing: .1em; color: #8b93a0; }
 
   /* ── THE CROWN. Revealed by a STATIC clip whose bottom edge is the closed
        stack's top edge — so it emerges top-of-letters first, out of an edge made
@@ -383,6 +383,12 @@
     el.deepB.style.setProperty("--Pb", C.Pb + "px");
     el.pinion.style.setProperty("--R2", (2 * 0.340 * M.H) + "px");   // R = 0.34H, both diameters
     document.querySelector(".pointer").style.top = (1.02 * M.H - 0.340 * M.H) + "px";
+    /* ★ THE PLATE TYPE IS DERIVED, NOT DECLARED. 22px and 10px at the design's H=900.
+       Written here and nowhere else: the CSS carries only the fallback, so a plate
+       measured as a fraction of H can never again be filled with fixed-px type — which
+       is what sliced all six mark names through the middle at the closed pitch. */
+    el.stack.style.setProperty("--nameSize", (0.0244 * M.H).toFixed(2) + "px");
+    el.stack.style.setProperty("--labelSize", (0.0111 * M.H).toFixed(2) + "px");
     DPR = window.devicePixelRatio || 1;
     memo = new WeakMap();                 // geometry changed: every cached write is stale
     draw(curP);
