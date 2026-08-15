@@ -75,7 +75,7 @@
 
   /* 420svh with a vh fallback FIRST — mobile URL bars resize vh mid-scroll, which
      would re-derive p under the reader's thumb. svh is the locked one. */
-  .clock { height: 420vh; height: 420svh; position: relative; }
+  .rack { height: 420vh; height: 420svh; position: relative; }
   .vp { position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden; }
 
   /* ── THE GROUND. Warm plate above the line, blue under below it. The stop is
@@ -202,7 +202,7 @@
   .bench hr { border: 0; border-top: 1px solid #223; margin: 5px 0; }
 </style>
 
-<div class="clock" id="clock">
+<div class="rack" id="rack">
   <div class="vp" id="vp">
     <div class="ground"></div>
 
@@ -225,7 +225,15 @@
 
     <div class="crownwrap">
       <div class="crown" id="crown">
-        <div class="k">And the name it makes</div>
+        <!-- ★★ BR-S456 — THE CLAIM. This read "And the name it makes", standing directly
+             over a stack of SIX and asserting the six make the crown. crownOf()
+             (arcana-reading.js:100-101) reads sun, chinese, rune and trigram — FOUR. Life
+             path and hexagram contribute nothing to the name, and fragment() returns null
+             for exactly those two. This is the shape of the "given, not drawn" failure
+             docs/CLAIM_AUDIT_V1.md exists for, placed in the one frame people screenshot.
+             Naming the four is not a defence, it is the fact — and the house register
+             forbids adding a clause that argues with an objection nobody raised. -->
+        <div class="k">Sun · animal · rune · trigram make the name</div>
         <p class="n">The Twice-Kindled Wayfarer</p>
         <p class="b">bound in open water</p>
       </div>
@@ -301,7 +309,7 @@
     intake: document.getElementById("intake"), stack: document.getElementById("stack"),
     crown: document.getElementById("crown"), nm: document.getElementById("nm"),
     dt: document.getElementById("dt"), caret: document.getElementById("caret"),
-    bench: document.getElementById("bench"), clock: document.getElementById("clock")
+    bench: document.getElementById("bench"), rack: document.getElementById("rack")
   };
 
   /* ── BUILD ONCE. Nothing below is created or mutated during scroll. ───────── */
@@ -370,11 +378,11 @@
   var M = { H: 900, top: 0, span: 1 };
   var C = {};
   function measure() {
-    var r = el.clock.getBoundingClientRect();
+    var r = el.rack.getBoundingClientRect();
     M.top = r.top + window.scrollY;
     M.H = el.vp ? el.vp.clientHeight : window.innerHeight;
     M.H = document.getElementById("vp").clientHeight;
-    M.span = Math.max(1, el.clock.offsetHeight - M.H);
+    M.span = Math.max(1, el.rack.offsetHeight - M.H);
     for (var k in F) C[k] = F[k] * M.H;
     /* the ruled periods are written as custom properties ONCE, here — the fields
        are static paint after this and only ever receive a transform. */
@@ -411,8 +419,14 @@
        Above the line 0.23x scroll; below it 0.74x. Same 1px hairline either side
        of one visible edge — the comparison is available in a single frame, and
        that is the entire "it is a mechanism" claim. */
+    /* ★★ BR-S456 — `rate` WAS APPLIED TO TWO OF THE THREE PLANES. Under reduced motion
+       the two deep fields froze and the paper kept crawling, so the ratio went from
+       3.23:1 to 0:1 — WATER SLOWER THAN PAPER, the thesis inverted, and the readers
+       least tolerant of drift got the one guaranteed moving plane with nothing faster in
+       frame to explain it. The ground is now rigid as a whole under REDUCED, which is
+       what "reduced" should have meant here from the start. */
     var rate = REDUCED ? 0 : 1;
-    setT(el.paper, ty(-wrap(Arack * C.Pp, C.Pp)));
+    setT(el.paper, ty(-wrap(Arack * C.Pp * rate, C.Pp)));
     setT(el.deepA, ty(-wrap(AG * C.RATE_A * rate, C.Pa)));
     setT(el.deepB, ty(-wrap(AG * C.RATE_B * rate, C.Pb)));
 
@@ -458,8 +472,15 @@
       setT(plates[i].el, ty(yTop) + " scale(" + s.toFixed(4) + ")");
       /* the inner rule draws on the same beat the plate rises — one gear, two
          hands. Guarded to the plate actually in its window. */
+      /* ★★ BR-S456 — THE MISSING BRANCH. There was no case for v <= 0.2, so the rule kept
+         whatever was last written: scroll back up past a plate and its rule stayed at
+         ~scaleX(0.19) forever, while a COLD load at the same p left style.transform unset
+         — browser-default scaleX(1), a fully drawn rule on a plate still at the waterline.
+         Three different renderings of one value of p, in a file whose header claims a cold
+         ?p= is byte-identical to having scrolled there. The claim was false; now it is not. */
       if (v > 0.2 && v < 1.1) setT(plates[i].rule, "scaleX(" + eo(win(v, 0.35, 0.90)).toFixed(3) + ")");
       else if (v >= 1.1) setT(plates[i].rule, "scaleX(1)");
+      else setT(plates[i].rule, "scaleX(0)");
     }
 
     /* THE CROWN climbs out of the stack's own top edge through a STATIC clip.
