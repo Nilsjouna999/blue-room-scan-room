@@ -6606,3 +6606,26 @@ html.orbit-wings .orbit__field { --orbit-rx: clamp(200px, 25.5vw, 368px); --orbi
   .rmpop { transition: none; transform: none; }
   .rmpop-wrap.is-open .rmpop { transform: none; }
 }
+
+/* ══ BR-S469 — THE TAROT FACE'S MISSING FURNITURE ════════════════════════════
+   Mirrors .m2bface's own parts rather than inventing a second set: the headrule
+   that closes the masthead and gives the card its top edge (BR-S360), and the
+   foot wall that says how the card was come by (BR-S359). The birth face says
+   "BY BIRTH ALONE"; this one says "CUT FROM THE FULL 78" — the same sentence in
+   the same place about a different provenance.
+   `margin-top:auto` on the wall is what makes the field between name and foot
+   distribute, so the pair reads as ledges with the card strung between them
+   instead of a list trailing off — the exact behaviour the birth face has. */
+.m2face__headrule {
+  width: 100%; margin: 9px 0 0;
+  background: currentColor; opacity: .16;
+}
+.m2face__wall { margin-top: auto; width: 100%; text-align: center; }
+.m2face__wallrule {
+  display: block; height: 1px; width: 100%;
+  background: currentColor; opacity: .16; margin: 0 0 7px;
+}
+.m2face__walltext {
+  font-family: var(--font-mono); font-size: 7.5px; letter-spacing: .18em;
+  text-transform: uppercase; opacity: .55;
+}

@@ -1176,9 +1176,9 @@ function syncCodexBall() {
     dock.id = "brCodexDock";
     // the two-ball pair — orange (mini codex) stacked on top of the white (full codex)
     dock.innerHTML =
-      '<a class="br-ball br-ball--orange" href="codex.html?v=468" aria-label="Search the Codex">' +
+      '<a class="br-ball br-ball--orange" href="codex.html?v=469" aria-label="Search the Codex">' +
         '<span class="br-ball-core" aria-hidden="true"></span><span class="br-ball-tip" aria-hidden="true">Search</span></a>' +
-      '<a class="br-ball br-ball--yellow" href="codex.html?v=468" aria-label="Open the Codex — the archive of meanings">' +
+      '<a class="br-ball br-ball--yellow" href="codex.html?v=469" aria-label="Open the Codex — the archive of meanings">' +
         '<span class="br-ball-core" aria-hidden="true"></span><span class="br-ball-tip" aria-hidden="true">The Codex</span></a>';
     document.body.appendChild(dock);
   }
@@ -1419,7 +1419,7 @@ const ROOMS = [
   { key: "codex", state: "open", free: true, name: "The Codex",
     now: "222 entries across ten systems. Every card, sign, rune and hexagram the rooms read from.",
     soon: "Every mark the rooms read from, gathered and defined in one place.",
-    cost: "Free &middot; no account", cta: "Open the Codex", href: "codex.html?v=468" },
+    cost: "Free &middot; no account", cta: "Open the Codex", href: "codex.html?v=469" },
 
   { key: "tarot", state: "open", free: true, name: "Tarot Divination",
     now: "Three cards for a Sitting, five for the Deep Read, cut from the full 78 and filed where each fell.",
@@ -2335,7 +2335,15 @@ function renderWall() {
        like "three cards" and "five" were two names for one offering. "for" makes it a
        count OF something, which is what the other half of the line already does
        ("Three cards, one question"). One word, and both halves finally parse alike. */
-    + '<span class="menu__draw-spine">Three cards, one question&nbsp;· Five for the Deep Read</span>'
+    /* ★ BR-S469 — "the Deep Read" -> "the deep glimpse" on this door only, the builder's
+       call, and set as PROSE rather than as a product name. The door's job is to say
+       what the choice IS; the room behind it names what you buy. Worth recording the
+       cost so a later pass does not read it as drift: the Drawing Room (drawing-room.js:85),
+       Settings (settings.js:340) and the ROOMS registry (:1469) all still say "The Deep
+       Read", which is the SKU. A description on the door and a name in the room is a
+       normal thing for a storefront to do — but if the name is meant to change, it
+       changes in four places, not one. */
+    + '<span class="menu__draw-spine">Three cards, one question&nbsp;· Five for the deep glimpse</span>'
     + '</a>'
     + '</div>'
     /* BR-S321: the "Deeper draws" link retired — its whole sentence is now the tarot
@@ -2459,12 +2467,35 @@ function renderWall() {
     + '<div class="m2hero" data-m2-hero data-face="birth">'
     + '<svg class="m2hero__back" viewBox="0 0 120 190" aria-hidden="true" preserveAspectRatio="xMidYMid meet"><rect x="7" y="7" width="106" height="176" rx="7" fill="none" stroke="url(#mwInk)" stroke-width="1"/><rect x="13" y="13" width="94" height="164" rx="5" fill="none" stroke="url(#mwInk)" stroke-width=".5" opacity=".6"/><g stroke="url(#mwInk)" stroke-width=".6" fill="none" opacity=".7"><path d="M60 42 L86 95 L60 148 L34 95 Z"/><path d="M60 64 L74 95 L60 126 L46 95 Z"/><circle cx="60" cy="95" r="4.5"/></g></svg>'
     + '<svg class="m2hero__face" viewBox="0 0 120 190" role="img" aria-label="XVII — The Star" preserveAspectRatio="xMidYMid meet"><rect x="11" y="11" width="98" height="168" rx="5" fill="none" stroke="url(#mwGold)" stroke-width=".6" opacity=".55"/><text x="60" y="30" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9" letter-spacing="2.5" fill="url(#mwGold)">XVII</text><g stroke="url(#mwGold)" fill="none"><circle cx="60" cy="98" r="31" stroke-width=".8" opacity=".5"/><circle cx="60" cy="98" r="23" stroke-width=".6" opacity=".35"/><path d="M60 69 L64.6 86.9 L80.5 77.5 L71.1 93.4 L89 98 L71.1 102.6 L80.5 118.5 L64.6 109.1 L60 127 L55.4 109.1 L39.5 118.5 L48.9 102.6 L31 98 L48.9 93.4 L39.5 77.5 L55.4 86.9 Z" stroke-width=".9" opacity=".8"/><circle class="m2pip-glow" cx="60" cy="98" r="6.5" fill="url(#mwGold)" stroke="none"/><circle cx="60" cy="98" r="3.2" fill="url(#mwGold)" stroke="none"/></g></svg>'
+    /* ★★ BR-S469 — THE TAROT FACE GETS THE FURNITURE THE BIRTH FACE ALREADY HAD.
+       The builder: "tarots side dont seems finished." Measured, it was eight elements
+       and three of them were ticks and a divider — a parchment sheet with a name and
+       "UPRIGHT" floating in the middle of it, beside a card carrying a masthead, a
+       headrule, a crowned name, six marks and a closing wall. Not a difference of style;
+       a difference of completeness.
+
+       So it takes the SAME parts, in the same order: the headrule that closes the
+       masthead and gives the card its top edge (BR-S360), and a foot wall that says how
+       the card was come by (BR-S359) — "CUT FROM THE FULL 78" answering "BY BIRTH ALONE"
+       exactly. Nothing new is invented; the two faces become the same object twice, the
+       discipline BR-S449 applied to the doors.
+
+       ★★ AND IT DELIBERATELY DOES NOT SHOW A SPREAD. The builder ruled that out in one
+       line: "you could cheat by getting a read for free." A sample face showing three or
+       five cards WITH their meanings is a Sitting, given away on the storefront — and it
+       is the one thing this panel must not do, because the tarot product IS the spread.
+       The birth face is safe from this by construction: its six marks are specimens
+       drawn from the archive, not a reading OF anyone. One card, finished, is the honest
+       object here. */
     + '<div class="m2face" aria-hidden="true">'
     +   '<div class="m2face-head"><span class="m2face-meta" data-m2-facemeta>ARCANA &middot; XVII</span>'
     +   '<span class="m2face-glyph">&#9670;</span></div>'
+    +   '<div class="m2face-div m2face__headrule"></div>'
     +   '<div class="m2face-name" data-m2-facename>The Star</div>'
     +   '<div class="m2face-div"></div>'
     +   '<div class="m2face-orient" data-m2-faceorient>Upright</div>'
+    +   '<div class="m2face__wall"><span class="m2face__wallrule"></span>'
+    +     '<span class="m2face__walltext">Cut from the full 78</span></div>'
     +   '<span class="m2tick tl"></span><span class="m2tick br"></span>'
     + '</div>'
     /* ── BR-S338 — THE MONUMENT SHOWS BOTH PRODUCTS. ─────────────────────────────
@@ -3048,13 +3079,13 @@ function onMenuAnnexKey(e) {
    whole document, and a returning visitor holding the cached old one would otherwise read a
    page that no longer exists. Bump all of them together or none. */
 const CX_LEAVES =
-  '<a class="seed" id="codexSeed" href="codex.html?v=468" role="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="codexBloom" aria-label="Open the Codex">'
+  '<a class="seed" id="codexSeed" href="codex.html?v=469" role="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="codexBloom" aria-label="Open the Codex">'
   + '<span class="seed__glyph seed__open" aria-hidden="true">&#9670;</span>'
   + '<span class="seed__glyph seed__close" aria-hidden="true">&#10005;</span>'
   + '</a>'
   + '<div class="bloom" id="codexBloom" role="dialog" aria-modal="true" aria-label="The Codex" inert aria-hidden="true">'
   + '<div class="bloom__backfill"></div>'
-  + '<iframe class="bloom__frame" data-src="codex.html?v=468" title="The Codex" tabindex="-1"></iframe>'
+  + '<iframe class="bloom__frame" data-src="codex.html?v=469" title="The Codex" tabindex="-1"></iframe>'
   + '<div class="bloom__sheen" aria-hidden="true"></div>'
   + '</div>'
   + '<div class="bloom__ink" aria-hidden="true"></div>'
@@ -3071,7 +3102,7 @@ const MINI_LEAVES =
   + '<div class="mini__panel" role="dialog" aria-label="Mini Codex — search" inert aria-hidden="true">'
   + '<input class="mini__input" type="search" autocomplete="off" spellcheck="false" placeholder="Search the Codex…" aria-label="Search the Codex" />'
   + '<div class="mini__results" aria-live="polite"></div>'
-  + '<a class="mini__more" href="codex.html?v=468" data-codex-open>Open the full Codex &#8594;</a>'
+  + '<a class="mini__more" href="codex.html?v=469" data-codex-open>Open the full Codex &#8594;</a>'
   + '</div></div>';
 
 function renderMenu(reveal) {
@@ -3139,7 +3170,7 @@ function renderMenu(reveal) {
         </div>
 
         <div class="menu__portals">
-          <a class="menu__codex" href="codex.html?v=468" data-codex-open><span class="menu__codex__mark" aria-hidden="true">◆</span> The Codex <span class="menu__codex__arr" aria-hidden="true">→</span></a>
+          <a class="menu__codex" href="codex.html?v=469" data-codex-open><span class="menu__codex__mark" aria-hidden="true">◆</span> The Codex <span class="menu__codex__arr" aria-hidden="true">→</span></a>
           <a class="menu__codex" href="?dev=settings"><span class="menu__codex__mark" aria-hidden="true">◆</span> Settings <span class="menu__codex__arr" aria-hidden="true">→</span></a>
           <button type="button" class="menu__codex menu__codex--rooms" data-annex-go><span class="menu__codex__mark" aria-hidden="true">◆</span> The Reading Rooms <span class="menu__codex__arr" aria-hidden="true">→</span></button>
         </div>
@@ -3370,12 +3401,12 @@ function wireMenuCodex(host) {
 
   function open() {
     if (isOpen) return;
-    if (!ok) { location.href = "codex.html?v=468"; return; }           // no clip-path: the seal is a real door
+    if (!ok) { location.href = "codex.html?v=469"; return; }           // no clip-path: the seal is a real door
     if (!loaded) {                                              // M4.3: cold click — wait for the frame, don't navigate
       warmFrame(); pendingOpen = true;
       clearTimeout(coldT);                                      // ...but a frame that never arrives must not leave a dead control:
       coldT = setTimeout(function () {                          // after 6s the seal becomes the real door again, as it always was
-        if (pendingOpen && !loaded) { pendingOpen = false; location.href = "codex.html?v=468"; }
+        if (pendingOpen && !loaded) { pendingOpen = false; location.href = "codex.html?v=469"; }
       }, 6000);
       return;
     }
@@ -3446,7 +3477,7 @@ function wireMenuCodex(host) {
     if (e.key === "Enter") { e.stopPropagation(); }        // shield the global menu Enter→room; the anchor's activation fires the click
     else if (e.key === " " || e.key === "Spacebar") {      // anchors don't activate on Space natively
       e.stopPropagation(); e.preventDefault();
-      if (ok) toggle(); else location.href = "codex.html?v=468";
+      if (ok) toggle(); else location.href = "codex.html?v=469";
     }
   });
 
@@ -3459,7 +3490,7 @@ function wireMenuCodex(host) {
       if (e.key === "Enter") { e.stopPropagation(); }        // shield the global menu Enter→room; the anchor's activation fires the click
       else if (e.key === " " || e.key === "Spacebar") {      // anchors don't activate on Space natively
         e.stopPropagation(); e.preventDefault();
-        if (!ok) { location.href = "codex.html?v=468"; return; }
+        if (!ok) { location.href = "codex.html?v=469"; return; }
         open();
       }
     });
@@ -6368,7 +6399,7 @@ render();
       }
     } catch (e) {}
     if (host.querySelector("#about")) out.push({ label: "About Blue Room", sub: "What this is", mark: ORBIT_MARKS.about, rank: 4, wing: "house", idx: 0, kind: "about" });
-    out.push({ label: "The Codex", sub: "Every mark, defined", mark: AB_EMBLEMS.codex, rank: 1, wing: "work", href: "codex.html?v=468", kind: "link" });
+    out.push({ label: "The Codex", sub: "Every mark, defined", mark: AB_EMBLEMS.codex, rank: 1, wing: "work", href: "codex.html?v=469", kind: "link" });
     /* BR-S339 — THE SEVENTH PLATE. Discovery is this archive's best argument, and it
        could only be made by the rooms that already exist. The Roadmap is in the HOUSE
        wing with About and Settings — the building explaining itself — and ranks below
