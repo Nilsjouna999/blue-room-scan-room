@@ -197,7 +197,6 @@ COPY_FILES = [
     # BR-S487 — the M2 case prototype. The .css is fetched BY the .js rather than by a
     # tag, so it has no index.html reference to strip — it still has to be copied, and
     # still has to be kept out of live/, which is why both are named in both lists.
-    "_m2-box.js", "_m2-box.css", "_m2-vitrine.css", "_m2-pod.css",
 ]
 
 # <head>/<body> lines pulled out of index.html: the surfaces those files serve are cut.
@@ -221,7 +220,26 @@ STRIP_TAGS = ["ceremony.css", "ceremony.js"]
 # (the dev-nav, the dev-route links, the M1 A/B toggle, the tuning params) stay where they
 # are. Each is a judgement about what the public site publishes and each deserves its own
 # look, rather than being swept in behind a mechanism that was added for one file.
-PREVIEW_ONLY = ["_u1-rack.js", "_m2-box.js", "_m2-box.css", "_m2-vitrine.css", "_m2-pod.css"]
+PREVIEW_ONLY = ["_u1-rack.js"]
+
+# ★★ BR-S492 — DEV ONLY. THE PROTOTYPES ARE NOT PUBLISHED ANYWHERE.
+# The builder: "do not ship prototypes just build."
+#
+# The four M2 treatment prototypes (the case, the GPT vitrine, the pod, and the shared
+# mounter/bench) were on the copy list as preview-only. That was the wrong tier for
+# them, and this file's own rule says why: preview/ is "where semi-finished work is
+# CONNECTED into a coherent page". Four competing answers to one question, behind a URL
+# switch, with a bench of toggles for comparing them, is not connected work — it is the
+# workshop, and the workshop is what dev/ is for.
+#
+# A file on this list is never copied to ANY public build, and its tag is pulled from
+# both index.html outputs. It exists at the repo root, it runs on the dev site, and it
+# reaches nobody. The probe table asserts the absence in both directions so a prototype
+# that quietly starts shipping again fails the build.
+#
+# THIS IS NOT A CUT. Nothing is deleted and nothing is disabled: every prototype still
+# stands at its own ?case= switch on the dev site, which is where they are looked at.
+DEV_ONLY = ["_m2-box.js", "_m2-box.css", "_m2-vitrine.css", "_m2-pod.css"]
 
 # Links into a room this build removed. Deleting the LISTENER leaves a button that looks
 # alive and does nothing, which is worse than a dead link — so these are re-pointed at the
@@ -275,9 +293,14 @@ PROBES = [
     # "tag kept, file cut" — a 404 in the launch site's own <head>.
     ("U1 rack",        "_u1-rack.js",  r"\bu1rack__vp\b",     {"preview": True,  "live": False}),
     ("U1 rack tag",    "index.html",   r"_u1-rack\.js",       {"preview": True,  "live": False}),
-    ("M2 case",        "_m2-box.js",   r"\bm2box__cavity\b",  {"preview": True,  "live": False}),
-    ("M2 case css",    "_m2-box.css",  r"\.m2box__cavity\b",  {"preview": True,  "live": False}),
-    ("M2 case tag",    "index.html",   r"_m2-box\.js",        {"preview": True,  "live": False}),
+    # BR-S492 — the prototypes are dev-only, so every one of these is ABSENT everywhere.
+    # Asserting a negative in both builds is the whole point: this is the direction the
+    # build has never been able to check, and it is the direction a prototype leaks in.
+    ("M2 mounter",     "_m2-box.js",     r"\bm2box__cavity\b", {"preview": False, "live": False}),
+    ("M2 case css",    "_m2-box.css",    r"\.m2box__cavity\b", {"preview": False, "live": False}),
+    ("M2 vitrine css", "_m2-vitrine.css", r"\.br-vitrine\b",   {"preview": False, "live": False}),
+    ("M2 pod css",     "_m2-pod.css",    r"\.m2pod__cavity|\.m2pod\b", {"preview": False, "live": False}),
+    ("M2 mounter tag", "index.html",     r"_m2-box\.js",       {"preview": False, "live": False}),
 ]
 
 # Emitted by build_routes.py's ROUTES; re-emitted here against dist/index.html.
@@ -493,7 +516,9 @@ def transform_index(src, report, is_preview=True):
     # mentions reveal/stage-controller.js, and a substring test drops the site's main
     # stylesheet on the strength of a footnote.
     # BR-S485: for live/, the preview-only files' tags go with the files themselves.
-    drop = list(STRIP_TAGS) + ([] if is_preview else list(PREVIEW_ONLY))
+    # BR-S492: the dev-only prototypes' tags go from BOTH builds, for the same reason —
+    # a tag whose file was never copied is a 404 in the public site's own <head>.
+    drop = list(STRIP_TAGS) + list(DEV_ONLY) + ([] if is_preview else list(PREVIEW_ONLY))
     out = []
     for line in src.splitlines(True):
         ref = re.search(r'(?:src|href)="([^"]+)"', line)
