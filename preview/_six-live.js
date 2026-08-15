@@ -95,6 +95,29 @@
        ★ AND NOTHING UNHIDES AN UNWRITTEN PANEL. render() sets .is-ready at its end, so
        even a future path that reveals early shows the app's text rather than a void —
        the belt behind BR-S459's fix. */
+    /* ★★ BR-S465 — THE RESERVE COMES BACK, BUT UNCONDITIONALLY. BR-S461 deleted
+       `min-height:430px` because it was the thing forcing the head to move — and that
+       was half right. The head moved because the reserve applied ONLY while the panel
+       was up: 173px at rest, 430px on hover, and .menu__draw's grid re-centres the head
+       on any change. The defect was never the reserve, it was that it CHANGED.
+
+       Deleting it fixed the jump and created a worse bug the builder caught immediately:
+       with .sx absolutely positioned inside a 173px box, a 445px specimen hung 271px
+       BELOW the whole column. The fleet's synthesis said the variance would "fall into
+       the column's own air below .m2read" — there is no air. The header ends where
+       .m2read ends.
+
+       A CONSTANT reserve satisfies both at once. The height never changes, so the head
+       cannot re-centre; and it is tall enough that no specimen escapes it. The cost is
+       real and worth naming: the read column now reserves this height even at rest and
+       on the tarot face, where the overlay stands down. That is air under the text
+       rather than a control jumping under the reader's eye, and against a card that is
+       400-620px tall it reads as the column matching the card rather than as a gap. */
+    /* 452 was measured off one specimen and the tallest of the six came in at 466 —
+       14px still escaped. Set past the real worst case, not at it: the panel's own
+       per-mark line reserves (the `r:` column in SIX) already stop it varying BETWEEN
+       marks, so this only has to clear the tallest one that exists. */
+    + ".m2read{min-height:486px}"
     + ".sx{transition:opacity 110ms ease;position:absolute;top:0;left:0;right:0}"
     + ".sx:not(.is-ready){display:none}"
     + ".sx.is-out{opacity:0}"
