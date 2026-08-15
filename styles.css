@@ -5254,7 +5254,16 @@ body[data-devnav="1"] .devnav {
 #menuView .mini__panel { position: absolute; bottom: calc(100% + 10px); right: -4px;
   width: min(300px, 78vw); max-height: min(56vh, 380px);
   display: flex; flex-direction: column;
-  background: linear-gradient(180deg, #1b1611 0%, var(--cx-bg) 100%);
+  /* ★ BR-S501 — THE MINI NOW WEARS THE CODEX'S OWN GROUND, not an approximation of it.
+     It was a LINEAR gradient from a hardcoded #1b1611 down to --cx-bg. The real codex page
+     paints `radial-gradient(130% 90% at 50% -8%, var(--key-light) 0%, var(--ground) 62%,
+     var(--ground) 100%)` with --key-light #1c1712 and --ground #100e0c — so the mini was
+     off by one level in every channel AND lit from the wrong geometry: a top-to-bottom
+     fall instead of a key light hanging above the centre.
+     Both values already existed here as --cx-bg2 / --cx-bg and carry the codex's numbers
+     exactly; the panel simply was not using them. Same construction, same stops, same
+     origin, so the little window and the room it searches are lit by one lamp. */
+  background: radial-gradient(130% 90% at 50% -8%, var(--cx-bg2) 0%, var(--cx-bg) 62%, var(--cx-bg) 100%);
   border: 1px solid rgba(198,155,99,.28); border-radius: 12px;
   box-shadow: 0 16px 42px rgba(0,0,0,.52), inset 0 1px 0 rgba(233,226,213,.05);
   padding: 10px; opacity: 0; transform: translateY(6px) scale(.98); transform-origin: bottom right;
@@ -6575,9 +6584,25 @@ html.orbit-wings .orbit__field { --orbit-rx: clamp(200px, 25.5vw, 368px); --orbi
 .menu__panel--desk { position: relative; }
 .l1seal__box { max-width: 34ch; text-align: center; }
 .l1seal__mark { display: block; font-size: 15px; color: var(--gold, #c9a35c); margin-bottom: 14px; }
+/* ★ BR-S501 — "UNDER CONSTRUCTION" BECOMES A STAMP, because a caption was not carrying it.
+   BR-S437 added this line for a stated reason: a sealed panel taking a third of the track
+   reads as BROKEN unless something says someone is working on it. But it shipped as 9px of
+   mono sitting above a 38px display title, so the one word doing that job was the smallest
+   thing in the box and the eye went straight past it to the title — which names a room that
+   does not open, and lands as a dead end all over again.
+   A ruled chip, not a bigger shout. The seal is a sealed crate; a stamp is the vocabulary
+   that surface already speaks, and it is what makes the notice read as DELIBERATE rather
+   than as apologetic small print. Still gold, still mono, still quiet — the register does
+   not allow urgency and does not need it. Size up one step, a hairline box, a whisper of
+   warm ground behind it, and room to breathe underneath. */
 .l1seal__k {
-  font-family: var(--font-mono, monospace); font-size: 9px; letter-spacing: .24em;
-  text-transform: uppercase; color: var(--gold, #c9a35c); margin: 0 0 10px;
+  display: inline-block;
+  font-family: var(--font-mono, monospace); font-size: 10px; letter-spacing: .26em;
+  text-transform: uppercase; color: var(--gold, #c9a35c);
+  margin: 0 0 18px; padding: 6px 12px 5px;
+  border: 1px solid rgba(201,163,92,.42); border-radius: 2px;
+  background: rgba(201,163,92,.055);
+  text-indent: .26em;   /* the tracking's trailing space, given back so the box reads centred */
 }
 .l1seal__t {
   font-family: var(--font-display, serif); font-weight: 400;
