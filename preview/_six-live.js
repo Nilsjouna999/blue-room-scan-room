@@ -350,6 +350,29 @@
        it and .sx__attrs below. One stop, not two. */
     + ".sx__label{color:#7c766c}"
 
+    /* ══ BR-S472 — THE MEANING JOINS THE PANEL'S OWN FAMILY, WITHOUT GOING AIRY ══════
+       The builder: the explanation "is weakest visually of what we have around" —
+       "although it should stay stabilising and solidish".
+
+       ★ THE MEASUREMENT THAT EXPLAINS THE FEELING. This panel takes over a column that
+       was holding the app's own read: Cormorant, 19px, rgb(177,173,164). What replaced
+       it in the same slot, doing the same job, was Inter at 13px in rgb(148,143,135) —
+       smaller, dimmer, and in a THIRD typeface that nothing else here uses for reading.
+       The panel's name is Cormorant, its labels are Plex Mono, and the longest text on
+       it belonged to neither. Not a colour problem: a family problem.
+
+       ★ AND THE SANS WAS DOING A REAL JOB, WHICH IS WHY THIS IS NOT JUST A SWAP. Inter
+       sets an even, low-contrast grey mass — it was the solid base the composition
+       stood on, and a display serif at the app's own 19px/1.6 would trade that for
+       something sparse and elegant, which is the opposite of what this block is for.
+       So the family moves and the DENSITY is defended: 16px rather than 19, and 1.5
+       leading rather than 1.6. Same block, same weight on the page, one voice fewer.
+
+       Value goes to #aaa69d — the app's own read value, which it can now afford: at
+       13px sans it had to stay dim to avoid noise; as the panel's body text it should
+       be the second-brightest thing here, under the name and over everything else. */
+    + ".sx__say{font-family:var(--font-display);font-size:16px;line-height:1.5;color:#aaa69d}"
+
     /* ══ BR-S466 — THE VERTICAL RHYTHM. Measured down the panel, the gaps between
        consecutive blocks ran 16, 13, 8, 10, 13, 17, 15 — SEVEN values, no two the same
        for a reason, and close enough together that they read as accidental rather than
