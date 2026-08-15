@@ -1,0 +1,167 @@
+/* =============================================================
+   M2 · THE POD — the artifact sealed in fluid, on the main menu.
+   Append after the .m2bface block in styles.css.
+
+   THE TENSE MATTERS. This is the storefront, and the birth reading is
+   GIVEN, not made — so the pod is a specimen jar, not an incubator. It is
+   filled and sealed: no waterline, no air, nothing half-poured. Four
+   bubbles on four long clocks are the only movement.
+
+   THE CARD IS LIT, NOT REPAINTED — same contract as the wall case.
+   IT IS A TINT, NOT A DIMMER: an early bath darkened toward the foot and
+   took the six marks with it (HEXAGRAM 3.72:1, BY BIRTH ALONE 2.73:1).
+   Holding luminance high and letting hue work puts every mark at 5.3-7.3.
+
+   SCALE. App CSS px (the reference render was 1.065x).
+   ============================================================= */
+
+.m2pod {
+  --pod-shell-top: #2b2723;
+  --pod-shell-mid: #181513;
+  --pod-shell-foot: #332d27;
+  --pod-fluid-1: #1c110d;
+  --pod-fluid-2: #33190f;
+  --pod-fluid-3: #160c0a;
+
+  position: relative;
+  width: max-content;
+  margin: 4px 0 0;
+  border-radius: 50% / 26%;          /* a capsule: 50% across, 26% down */
+  background: linear-gradient(180deg,
+    var(--pod-shell-top) 0%, #1e1a17 20%, var(--pod-shell-mid) 54%, #221e1a 82%, var(--pod-shell-foot) 100%);
+  box-shadow:
+    0 38px 70px rgba(0, 0, 0, .66),
+    0 0 38px rgba(214, 150, 86, .05),   /* a tight bloom, never a cloud */
+    inset 0 1px 0 rgba(233, 229, 220, .07),
+    inset 0 0 0 1px rgba(233, 229, 220, .055);
+}
+.m2pod::before {                        /* the pod is two halves */
+  content: ""; position: absolute; left: 0; right: 0; top: 50%; height: 1px; pointer-events: none;
+  background: linear-gradient(90deg, rgba(0,0,0,0) 6%, rgba(0,0,0,.45) 24%, rgba(0,0,0,.5) 76%, rgba(0,0,0,0) 94%);
+}
+
+/* THE CHAMBER. Padding is what suspends the card: 92 above, 104 below, 72 each
+   side. Those three numbers are the composition. */
+.m2pod__fluid {
+  position: relative;
+  padding: 92px 72px 104px;
+  border-radius: inherit;
+  overflow: hidden;
+  background:
+    radial-gradient(56% 30% at 50% 6%, rgba(244,176,102,.22) 0%, rgba(210,132,74,.06) 52%, rgba(0,0,0,0) 78%),
+    radial-gradient(44% 34% at 50% 50%, rgba(228,124,62,.17) 0%, rgba(0,0,0,0) 78%),
+    radial-gradient(74% 58% at 50% 50%, rgba(0,0,0,0) 38%, rgba(0,0,0,.74) 100%),
+    linear-gradient(180deg, var(--pod-fluid-1) 0%, #2a1610 16%, var(--pod-fluid-2) 40%, #26130d 70%, var(--pod-fluid-3) 100%);
+}
+.m2pod__fluid::after {                  /* the acrylic: one sheen, two rim lights */
+  content: ""; position: absolute; inset: 0; z-index: 4; pointer-events: none; border-radius: inherit;
+  background: linear-gradient(112deg, rgba(233,229,220,.085) 0%, rgba(233,229,220,.025) 13%,
+              rgba(233,229,220,0) 27%, rgba(233,229,220,0) 82%, rgba(233,229,220,.03) 100%);
+  box-shadow: inset 0 2px 5px rgba(233,229,220,.05), inset 0 -3px 8px rgba(240,190,130,.10);
+}
+
+/* the case wanted 52vh; the pod wants 46 — the fluid needs somewhere to be */
+.m2pod .m2hero { position: relative; z-index: 3; isolation: isolate; height: clamp(320px, 46vh, 470px); }
+html.m2-parch .m2pod .m2hero {
+  box-shadow: 0 28px 60px rgba(0,0,0,.55), 0 6px 15px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,246,226,.5);
+}
+html.m2-parch .menu__draw:has(.menu__draw-stage:hover) .m2pod .m2hero,
+html.m2-parch .menu__draw:has(.m2read:hover) .m2pod .m2hero {
+  box-shadow: 0 34px 70px rgba(0,0,0,.62), 0 6px 15px rgba(0,0,0,.42), inset 0 1px 0 rgba(255,246,226,.55);
+}
+/* one ink step, this line only: under the bath it measured 4.0:1 at #6a5c45 */
+.m2pod .m2bface .m2face-orient { color: #5a4b33; }
+
+/* ── THE BATH. Vertical fall for the light through the fluid, radial for the
+   rim — the rim is where the copper lives, being the only part of the card
+   with no text on it. background-color AFTER the shorthand. ─────────────── */
+.m2pod__bath {
+  position: absolute; inset: 0; z-index: 1; pointer-events: none; border-radius: inherit;
+  mix-blend-mode: multiply; background-blend-mode: multiply;
+  background:
+    radial-gradient(58% 126% at 50% 34%, #ffffff 44%, #f2e6d5 64%, #dbb896 84%, #c2966d 100%),
+    linear-gradient(180deg, #fff0d6 0%, #fdecd0 20%, #f9e4c6 44%, #f4dbba 62%, #eed2ae 80%, #e7c9a4 100%);
+  background-color: #fff;
+}
+.m2pod__wet {                            /* one pool of light from above */
+  position: absolute; inset: 0; z-index: 1; pointer-events: none; border-radius: inherit;
+  mix-blend-mode: soft-light;
+  background: radial-gradient(52% 26% at 46% 10%, rgba(255,252,244,.30) 0%, rgba(255,252,244,0) 74%);
+}
+.m2pod__fibre {                          /* uncoated fibre, baked in */
+  position: absolute; inset: 0; z-index: 1; pointer-events: none; border-radius: inherit;
+  opacity: .15; mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='320' height='320'%3E%3Cfilter id='podfib'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.03' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='320' height='320' filter='url(%23podfib)' opacity='0.72'/%3E%3C/svg%3E");
+}
+
+/* ── the furniture of the chamber ─────────────────────────────────────────── */
+.m2pod__stay {
+  position: absolute; top: 13px; width: 1px; height: 86px; pointer-events: none;
+  background: linear-gradient(180deg, rgba(233,229,220,0), rgba(233,229,220,.16));
+}
+.m2pod__stay--l { left: 90px; }
+.m2pod__stay--r { right: 90px; }
+.m2pod__cradle {
+  position: absolute; left: 50%; bottom: 98px; width: 128px; height: 5px;
+  transform: translateX(-50%); border-radius: 3px; pointer-events: none; z-index: 2;
+  background: linear-gradient(90deg, rgba(214,158,98,0) 0%, rgba(214,158,98,.30) 22%,
+              rgba(226,170,110,.42) 50%, rgba(214,158,98,.30) 78%, rgba(214,158,98,0) 100%);
+  box-shadow: 0 1px 0 rgba(0,0,0,.5);
+}
+.m2pod__tick { position: absolute; left: 15px; height: 1px; background: rgba(233,229,220,.13); pointer-events: none; }
+.m2pod__tick:nth-of-type(odd)  { width: 10px; }
+.m2pod__tick:nth-of-type(even) { width: 7px; background: rgba(233,229,220,.10); }
+.m2pod__spec {
+  position: absolute; left: 90px; top: 17px; width: 131px; height: 30px; z-index: 4;
+  pointer-events: none; border-radius: 50%; filter: blur(5px);
+  background: radial-gradient(50% 50% at 50% 50%, rgba(255,250,240,.13) 0%, rgba(255,250,240,0) 72%);
+}
+.m2pod__cheek {
+  position: absolute; left: 22px; top: 122px; width: 13px; height: 263px; z-index: 4;
+  pointer-events: none; border-radius: 50%; filter: blur(6px);
+  background: linear-gradient(180deg, rgba(255,250,240,0) 0%, rgba(255,250,240,.055) 30%,
+              rgba(255,250,240,.07) 60%, rgba(255,250,240,0) 100%);
+}
+.m2pod__etch {
+  position: absolute; left: 0; right: 0; bottom: 24px; text-align: center; pointer-events: none;
+  font-family: var(--font-mono); font-size: 8.5px; letter-spacing: .3em;
+  text-transform: uppercase; color: rgba(233,229,220,.62);
+}
+
+/* ── the only movement in the room ───────────────────────────────────────── */
+.m2pod__bubble {
+  position: absolute; bottom: 34px; z-index: 2; opacity: 0; pointer-events: none;
+  border-radius: 50%;
+  background: radial-gradient(circle at 34% 28%, rgba(255,244,224,.85) 0%, rgba(255,228,190,.20) 44%,
+              rgba(255,228,190,.05) 72%, rgba(255,228,190,0) 74%);
+  box-shadow: inset 0 0 0 .5px rgba(255,238,210,.24);
+  animation: pod-rise var(--dur, 36s) linear var(--delay, 0s) infinite;
+}
+@keyframes pod-rise {
+  0%   { transform: translate3d(0, 0, 0) scale(.86); opacity: 0; }
+  7%   { opacity: var(--peak, .35); }
+  50%  { transform: translate3d(var(--dx, 6px), calc(var(--rise, -440px) * .5), 0) scale(1); }
+  84%  { opacity: var(--peak, .35); }
+  100% { transform: translate3d(0, var(--rise, -440px), 0) scale(1.06); opacity: 0; }
+}
+.m2pod__swell {
+  position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background: radial-gradient(42% 30% at 50% 56%, rgba(236,166,92,.10) 0%, rgba(236,166,92,0) 76%);
+  animation: pod-swell 11s cubic-bezier(.4, 0, .6, 1) infinite;
+}
+@keyframes pod-swell { 0%, 100% { opacity: .74; } 50% { opacity: 1; } }
+/* motes: matter held in the preservative. No clock — the fluid is still. */
+.m2pod__mote { position: absolute; z-index: 2; border-radius: 50%; pointer-events: none;
+  background: rgba(240,215,180,.13); }
+.m2pod__mote--lit { background: radial-gradient(circle at 34% 30%, rgba(255,240,214,.42), rgba(233,200,160,.08) 70%); }
+
+@media (prefers-reduced-motion: reduce) {
+  .m2pod__bubble, .m2pod__swell { animation: none; }
+  .m2pod__bubble { opacity: var(--peak, .35); }
+}
+@media (max-width: 1199px) {
+  .m2pod__fluid { padding: 46px 34px 52px; }
+  .m2pod .m2hero { height: auto; }
+  .m2pod__stay, .m2pod__cheek, .m2pod__tick { display: none; }
+  .m2pod__cradle { bottom: 48px; }
+}

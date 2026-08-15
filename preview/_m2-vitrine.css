@@ -1,0 +1,222 @@
+/* =============================================================
+   M2 · THE BIRTH VITRINE — team 2's prototype.  `_m2-vitrine.css`
+
+   The GPT proposal, mounted on the real menu so it can be compared against the
+   `.m2box` case standing in the same place. Loaded only on ?case=vitrine.
+   Preview-only; the launch build carries neither this file nor its tag.
+
+   ★ THIS IS THE PROPOSAL AS AUTHORED, not the review's preferred version. The
+   review's verdict was adopt-in-part, do-not-graft — but a verdict is not a
+   thing you can look at, and the builder asked to see it. Three departures from
+   the source file, and only three, each because it would damage something that
+   already ships rather than because it was judged worse:
+
+     1. THE SIX MARKS ARE NOT REWRITTEN AS BUTTONS. The original promotes them to
+        <button> with its own click behaviour. Those elements are owned by the
+        shipped specimen module, which puts tabindex on the <li> and resolves the
+        active mark by finding the focused <li> among its siblings — a focused
+        inner button returns -1, so keyboard navigation dead-ends, and the module's
+        focus handler never fires because focus does not bubble. The affordance it
+        replaces already ships and is richer. Dropped entirely, with its CSS.
+     2. THE GLASS SLIDES BY TRANSFORM, NOT background-position. The original
+        transitions background-position on a ~495×601 layer and rewrites it on
+        every pointermove: a main-thread paint property animated at pointer rate,
+        with the transition restarted before it can ever reach its curve. Same
+        movement, composited, no transition.
+     3. NO 141-LINE DEMO HARNESS. It invents eight user-facing strings that exist
+        nowhere in this repo. A prototype may borrow a design; it may not invent
+        copy and let it in through the side door.
+
+   ★ TWO SWITCHES ON THE BENCH, BOTH ARGUMENTS THIS FILE CANNOT SETTLE:
+     · THE GOLD STOCK is ON by default because it is what GPT designed and the
+       point here is to see that. It is also the reason the review would not ship
+       it: repainting the parchment drops the card's faintest line from 4.41:1 to
+       2.82:1 and five of the six marks below AA. Both proposals for this card
+       independently tried to relight it and both measured the same wall. Look at
+       it, then turn it off and look again.
+     · SEATED vs LEANING is the one question the review said only the builder can
+       answer, and GPT answered it: `transform:none`, the card sits still behind
+       glass. `.m2box` leaves the card leaning inside a frame that does not lean
+       with it. The switch is here because it is two states one keystroke apart
+       and no amount of arithmetic decides it.
+   ============================================================= */
+
+.br-vitrine {
+  --br-card-h: clamp(400px, 56vh, 620px);
+  /* the gold is NOT a new hue — it is the shipped menu cutline's own pair, which
+     was the right pick and is why this file introduces no metal of its own */
+  --br-gold: #c8ad70;
+  --br-gold-deep: #a2864a;
+  --br-blue: #101d29;
+  --br-blue-deep: #070d13;
+  --br-glass: rgba(198, 216, 226, .105);
+  --br-gx: 0;
+  --br-gy: 0;
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  /* ★ AS AUTHORED, AND IT DOES NOT COMPENSATE ITS OWN CHROME. The review measured
+     this: the case is 600.8px around a 504px card at 1440×900, so the flip row and
+     the act row below it move down by ~97px, and the width can exceed the stage
+     track by ~32px — worse as the viewport gets TALLER, because the card is
+     height-driven. Left as written, because the column moving is a visible
+     consequence and the builder should see it rather than read about it. */
+  width: min(calc(var(--br-card-h) * .983), calc(100% + 58px));
+  height: calc(var(--br-card-h) * 1.192);
+  display: grid;
+  place-items: center;
+  background: var(--ink-950);
+  border: 1px solid rgba(0, 0, 0, .88);
+  box-shadow:
+    inset 0 34px 36px rgba(0, 0, 0, .88),
+    inset 27px 0 31px rgba(0, 0, 0, .72),
+    inset -27px 0 31px rgba(0, 0, 0, .72),
+    inset 0 -31px 35px rgba(0, 0, 0, .82),
+    0 0 0 1px color-mix(in srgb, var(--br-gold) 18%, transparent),
+    0 0 84px rgba(13, 29, 43, .11);
+}
+
+/* the reveal wall — the recess the card stands in */
+.br-vitrine::before {
+  content: ""; position: absolute; z-index: 1; inset: 3.15%; pointer-events: none;
+  border: 1px solid color-mix(in srgb, var(--br-gold) 28%, transparent);
+  background:
+    radial-gradient(ellipse at 50% 17%, color-mix(in srgb, var(--br-gold) 12%, transparent), transparent 38%),
+    radial-gradient(ellipse at 50% 69%, rgba(25, 38, 50, .34), transparent 57%),
+    radial-gradient(ellipse at 50% 50%, transparent 0 43%, rgba(255,255,255,.011) 45% 48%, transparent 50%) 0 0/18px 14px,
+    radial-gradient(ellipse at 50% 50%, transparent 0 43%, rgba(0,0,0,.055) 45% 48%, transparent 50%) 9px 7px/18px 14px,
+    linear-gradient(180deg, var(--br-blue-deep), var(--br-blue) 54%, #080d12);
+  box-shadow:
+    0 0 32px rgba(0, 0, 0, .78),
+    inset 0 22px 30px color-mix(in srgb, var(--br-gold) 7%, transparent),
+    inset 0 -30px 38px rgba(0, 0, 0, .48);
+}
+/* the case's own inner edge */
+.br-vitrine::after {
+  content: ""; position: absolute; z-index: 5; inset: 0; pointer-events: none;
+  box-shadow:
+    inset 3px 3px 5px rgba(0, 0, 0, .88),
+    inset -2px -2px 4px rgba(148, 155, 160, .11),
+    inset 0 0 0 1px color-mix(in srgb, var(--br-gold) 16%, transparent),
+    0 1px 0 rgba(220, 216, 206, .035);
+}
+
+/* the lamp at the top of the case. Both earlier precedents rejected an independent
+   light source on this ground — the card is the emitter — so this is the clearest
+   single point of disagreement between the two proposals, and it is visible. */
+.br-vitrine__light {
+  position: absolute; z-index: 1; top: 3.2%; left: 11%; right: 11%; height: 16%;
+  pointer-events: none; opacity: .88;
+  background: radial-gradient(ellipse, color-mix(in srgb, var(--br-gold) 22%, transparent), transparent 71%);
+  filter: blur(13px);
+  transition: opacity 180ms ease;
+}
+
+/* ── THE RETURN WALLS. The genuinely novel geometry: four trapezoids whose clip
+   paths converge inward, so the frame reads as having DEPTH rather than being a
+   border. This is the idea the review called worth stealing. ─────────────────── */
+.br-vitrine__return { position: absolute; z-index: 5; pointer-events: none; }
+.br-vitrine__return--top {
+  left: 0; right: 0; top: 0; height: 3.2%;
+  clip-path: polygon(0 0, 100% 0, 96.8% 100%, 3.2% 100%);
+  background: linear-gradient(180deg, #020304 0%, #0b1117 72%, rgba(31, 43, 52, .38) 100%);
+  border-bottom: 1px solid color-mix(in srgb, var(--br-gold) 17%, transparent);
+}
+.br-vitrine__return--right {
+  top: 0; right: 0; bottom: 0; width: 3.2%;
+  clip-path: polygon(0 3.2%, 100% 0, 100% 100%, 0 96.8%);
+  background: linear-gradient(90deg, #0b1116, #020304 74%);
+  border-left: 1px solid rgba(150, 164, 174, .035);
+}
+.br-vitrine__return--bottom {
+  left: 0; right: 0; bottom: 0; height: 3.2%;
+  clip-path: polygon(3.2% 0, 96.8% 0, 100% 100%, 0 100%);
+  background: linear-gradient(180deg, rgba(37, 48, 56, .24), #050708 48%, #020304);
+  border-top: 1px solid color-mix(in srgb, var(--br-gold) 14%, transparent);
+}
+.br-vitrine__return--left {
+  top: 0; left: 0; bottom: 0; width: 3.2%;
+  clip-path: polygon(0 0, 100% 3.2%, 100% 96.8%, 0 100%);
+  background: linear-gradient(90deg, #020304 24%, #0d141a);
+  border-right: 1px solid rgba(150, 164, 174, .025);
+}
+
+/* ── THE GLASS. ────────────────────────────────────────────────────────────────
+   Departure 2. The original slid the raking highlight by animating
+   background-position — a paint property, on a large layer, rewritten at pointer
+   rate with a transition that restarts before it resolves. Here the layer is
+   oversized so the slide can never uncover an edge, and it MOVES BY TRANSFORM.
+   No transition on the movement: the tilt loop's own smoothing is the easing, and
+   a transition on top of a per-frame value is just latency. */
+.br-vitrine__glass {
+  position: absolute; z-index: 6; inset: -12px; pointer-events: none; opacity: .82;
+  border-top: 1px solid var(--br-glass);
+  border-left: 1px solid rgba(198, 216, 226, .035);
+  background:
+    radial-gradient(circle at 18% 14%, rgba(222, 235, 242, .035), transparent 18%),
+    linear-gradient(112deg, transparent 0 57%, rgba(210,229,239,.009) 63%, rgba(210,229,239,.042) 67%, rgba(210,229,239,.008) 71%, transparent 79%);
+  box-shadow: inset 0 1px rgba(211, 227, 236, .045), inset 1px 0 rgba(211, 227, 236, .018);
+  transform: translate3d(calc(var(--br-gx) * 7px), calc(var(--br-gy) * 4px), 0);
+  transition: opacity 180ms ease;
+}
+.br-vitrine__glass::after {
+  content: ""; position: absolute; inset: 14px;
+  border: 1px solid rgba(198, 216, 226, .02);
+  box-shadow: inset 0 0 22px rgba(185, 216, 232, .01), inset 0 -1px rgba(0, 0, 0, .36);
+}
+
+/* the card sits in the single grid cell, at the case's own height */
+.br-vitrine > .m2hero { z-index: 4; grid-area: 1/1; height: var(--br-card-h); width: auto; }
+
+/* SEATED — GPT's answer to the open question. Toggled from the bench. */
+.br-vitrine.is-seated > .m2hero { transform: none; }
+
+/* ── THE GOLD STOCK. On by default because it is the design; the bench turns it
+   off. This is the single declaration the review would not ship: it repaints the
+   card's parchment, and every ink on that card is measured against the old one. */
+html.m2-parch .br-vitrine.is-gold > .m2hero {
+  background:
+    radial-gradient(ellipse at 50% 18%, rgba(255, 247, 222, .24), transparent 46%),
+    radial-gradient(ellipse at 50% 50%, transparent 0 43%, rgba(80,57,29,.018) 45% 48%, transparent 50%) 0 0/16px 12px,
+    radial-gradient(ellipse at 50% 50%, transparent 0 43%, rgba(255,255,255,.022) 45% 48%, transparent 50%) 8px 6px/16px 12px,
+    linear-gradient(165deg,
+      color-mix(in srgb, var(--t-display) 64%, var(--br-gold)),
+      color-mix(in srgb, var(--t-primary) 46%, var(--br-gold-deep)));
+  border-color: rgba(28, 21, 13, .31);
+  box-shadow:
+    0 19px 28px rgba(0, 0, 0, .55),
+    0 3px 7px rgba(0, 0, 0, .38),
+    inset 0 1px rgba(255, 251, 235, .34);
+}
+
+/* the seated card does not lift — GPT reached this independently, and it is the
+   same judgement the .m2box case took from it. BOTH hover branches, because the
+   original named only one and the reading column re-fired the free-standing design. */
+html.m2-parch .menu__draw:has(.menu__draw-stage:hover) .br-vitrine > .m2hero,
+html.m2-parch .menu__draw:has(.m2read:hover) .br-vitrine > .m2hero {
+  filter: none;
+  box-shadow: 0 19px 28px rgba(0,0,0,.55), 0 3px 7px rgba(0,0,0,.38), inset 0 1px rgba(255,251,235,.34);
+}
+html.m2-parch .menu__draw:has(.br-vitrine:hover) .br-vitrine > .m2hero {
+  filter: brightness(1.012);
+  box-shadow: 0 21px 31px rgba(0,0,0,.57), 0 3px 7px rgba(0,0,0,.38), inset 0 1px rgba(255,251,235,.38);
+}
+
+/* the case answers the turn — the lamp and the glass both stand down while the
+   card is edge-on. The same instinct the .m2box case took as P1. */
+.br-vitrine:has(.m2hero.is-turning) .br-vitrine__light { opacity: .24; }
+.br-vitrine:has(.m2hero.is-turning) .br-vitrine__glass { opacity: .42; }
+
+@media (max-width: 1199px) {
+  .br-vitrine { width: min(92vw, 420px); height: auto; aspect-ratio: .82; }
+  .br-vitrine > .m2hero { height: auto; width: 64%; }
+}
+@media (max-width: 520px) {
+  .br-vitrine { width: min(calc(100vw - 48px), 370px); }
+  .br-vitrine > .m2hero { width: 66%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .br-vitrine__light, .br-vitrine__glass { transition: none; }
+  /* the glass's pointer slide is driven by the tilt loop, which already stands
+     itself down under reduced motion, so there is nothing further to pin here */
+}
