@@ -40,8 +40,36 @@
        display:grid;grid-template-columns:1fr 288px;min-height:100vh}
 
   .stage{padding:36px 30px 60px;background:var(--ground);overflow-y:auto}
-  .panel{width:520px;max-width:100%;margin:0 auto 46px}
-  .panel + .panel{border-top:1px solid #1c1a17;padding-top:34px}
+
+  /* ★★ THE CARD IS IN THE ROOM, AND WITHOUT IT THIS BENCH LIES. Measured on the live
+     page: a 300x475 parchment slab — linear-gradient(165deg,#efe9db,#dcd4c7) — sits
+     immediately left of the panel, occupying a third of the view. The eye adapts to the
+     brightest thing present, so beside that slab the same grey text reads dimmer and its
+     strokes read thinner. Judging faces on a plain black field flatters ALL of them
+     equally and predicts none of them. The card is not decoration here; it is the
+     experiment's control. */
+  /* ★ THE MEASURE IS NOT NEGOTIABLE. As a flex child the panel was shrinking to 123px
+     and every face was being judged at 11 characters a line — a bench that changes the
+     thing it is measuring. Both children are now rigid and the stage scrolls sideways if
+     the window is too narrow, because a wrong measure invalidates the comparison and a
+     scrollbar does not. */
+  .row2{display:flex;gap:40px;align-items:flex-start;justify-content:center;margin:0 0 46px;
+        min-width:max-content}
+  .row2 + .row2{border-top:1px solid #1c1a17;padding-top:34px}
+  .card{flex:0 0 300px;height:475px;border-radius:3px;
+        background:linear-gradient(165deg,#efe9db,#dcd4c7);
+        display:flex;flex-direction:column;align-items:center;padding:16px 14px;
+        color:#2a2417;font-family:var(--display)}
+  .card.is-off{display:none}
+  .card__meta{font-family:var(--mono);font-size:7.5px;letter-spacing:.22em;opacity:.62;text-transform:uppercase}
+  .card__rule{width:100%;height:1px;background:currentColor;opacity:.16;margin:9px 0 0}
+  .card__name{font-size:19px;margin:26px 0 0;font-weight:600}
+  .card__marks{margin:22px 0 0;font-family:var(--mono);font-size:10px;letter-spacing:.15em;
+               line-height:2.05;text-transform:uppercase;text-align:center;opacity:.75}
+  .card__wall{margin-top:auto;width:100%;text-align:center}
+  .card__wall span{font-family:var(--mono);font-size:7.5px;letter-spacing:.18em;
+                   text-transform:uppercase;opacity:.55}
+  .panel{flex:0 0 520px;width:520px}
 
   /* ── the shipped panel, value for value (BR-S466/467/468/472/473/474) ── */
   .sx__src{font-family:var(--mono);font-size:9px;letter-spacing:.2em;text-transform:uppercase;
@@ -104,6 +132,11 @@
   <label>Leading — <span id="lhv">1.52</span></label>
   <input type="range" id="lh" min="1.3" max="1.75" step="0.01" value="1.52">
 
+  <h2>The card beside it</h2>
+  <div class="row">
+    <button id="cardToggle" aria-pressed="true">Card ON — the real setting</button>
+  </div>
+
   <h2>The necessary lenses</h2>
   <table id="metrics"></table>
 
@@ -148,9 +181,20 @@
     { k: "Cormorant (now)",   css: '"Cormorant Garamond",Georgia,serif',note: "the incumbent — the control" }
   ];
 
+  /* the card, reproduced from the live one: same 300x475, same gradient, same parts in
+     the same order (BR-S469's furniture), so the panel is judged beside the object it
+     actually sits beside. */
+  var CARD = '<div class="card">'
+    + '<div class="card__meta">The Birth Reading</div>'
+    + '<div class="card__rule"></div>'
+    + '<div class="card__name">The Crowned Name</div>'
+    + '<div class="card__marks">Sun sign<br>Year animal<br>Life path<br>Rune<br>Trigram<br>Hexagram</div>'
+    + '<div class="card__wall"><span>By birth alone</span></div>'
+    + '</div>';
+
   var stage = document.getElementById("stage");
   stage.innerHTML = SPECIMENS.map(function (s) {
-    return '<div class="panel">'
+    return '<div class="row2">' + CARD + '<div class="panel">'
       + '<p class="sx__src">◆ ' + s.src + '</p>'
       + '<div class="sx__glyph">' + s.glyph + '</div>'
       + '<p class="sx__label">' + s.label + '</p>'
@@ -159,7 +203,7 @@
       + '<p class="sx__perks">' + s.kw.map(function (w) { return '<b>' + w + '</b>'; }).join(' · ') + '</p>'
       + '<p class="sx__say">' + s.say + '</p>'
       + '<p class="sx__close">Yours is this one read against your other five.</p>'
-      + '</div>';
+      + '</div></div>';
   }).join("");
 
   function mkRow(id, prop, initial) {
@@ -259,6 +303,17 @@
       return "<tr><td>" + t[0] + "</td><td" + cls + ">" + t[1] + "</td></tr>";
     }).join("");
   }
+
+  /* ★ THE TOGGLE IS THE POINT, not a convenience. Flipping the card off and on with the
+     same face selected is the fastest way to see how much of "this face reads thin" is
+     the face and how much is the slab beside it. On the live page the card is never off. */
+  var ct = document.getElementById("cardToggle");
+  ct.addEventListener("click", function () {
+    var on = ct.getAttribute("aria-pressed") !== "true";
+    ct.setAttribute("aria-pressed", String(on));
+    ct.textContent = on ? "Card ON — the real setting" : "Card OFF — isolated (flatters everything)";
+    [].forEach.call(document.querySelectorAll(".card"), function (c) { c.classList.toggle("is-off", !on); });
+  });
 
   document.fonts.ready.then(measure);
   measure();
