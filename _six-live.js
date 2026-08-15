@@ -197,10 +197,41 @@
     /* ★ BR-S468 — THE PLATEAU NARROWS, 18/78 -> 24/70. The band was sitting at full
        brightness for 60% of its travel, which on a sheet this size reads as a WASH
        moving across rather than a light crossing it. 46% is a pass. */
-    + "@keyframes sx-edge-a{0%{opacity:0;transform:translate3d(-70%,-70%,0)}"
-    +   "24%{opacity:.9}70%{opacity:.9}100%{opacity:0;transform:translate3d(70%,70%,0)}}"
-    + "@keyframes sx-edge-b{0%{opacity:0;transform:translate3d(-70%,-70%,0)}"
-    +   "24%{opacity:.9}70%{opacity:.9}100%{opacity:0;transform:translate3d(70%,70%,0)}}"
+    /* ★★★ BR-S477 — THE BAND WAS A STROBE, NOT A WASH, AND THAT IS WHY EVERY RETUNING
+       FAILED. Found by a twelve-agent pass and then re-derived here against the real
+       boxes rather than taken on trust:
+
+           panel                520 x 401
+           ::after box          1144 x 883   (inset:-60%)
+           135deg gradient span 1433px
+           the band itself      172px  (stops 44%..56%)
+           travel at +/-70%     2007px = 11.67 BAND-WIDTHS
+           fraction of that travel spent OVER the panel:  0.41
+
+       So 59% of the animation happened off-screen, and during the fast phase of
+       cubic-bezier(.4,.1,.2,1) the band advanced more than its own width per frame —
+       successive frames did not overlap. The reader was not seeing a light cross a
+       sheet; they were seeing a few disjoint diagonal bars flashed at the full .9
+       plateau. Halving the alpha only ever halved a flicker, and a dim flicker still
+       recruits attention. Which is exactly the "it announces itself" complaint.
+
+       ★ +/-45% AND LINEAR FIX BOTH AT ONCE, and the arithmetic is checkable:
+           travel  2007 -> 1290px = 7.5 band-widths
+           step    0.65 band-widths/frame, UNIFORM — 58% overlap frame to frame
+           on-panel fraction  0.41 -> 0.64
+       Linear is not a reversal of BR-S468. That correction said a thing PASSING THROUGH
+       must not use the ARRIVAL curve, and nothing that passes through accelerates.
+       Linear is the only easing whose rate is the same on every frame rather than on
+       average, which is what continuity actually requires.
+
+       ★ AND THE OPACITY RAMP FINALLY HAPPENS ON THE SHEET. At +/-70% both the fade-in
+       and the fade-out occurred beyond the panel's edges, so BLOOM_GRAMMAR's second
+       property — an edge that hits opacity 0 exactly as it lands — was never once
+       visible. Now it is on-panel where it can be seen. */
+    + "@keyframes sx-edge-a{0%{opacity:0;transform:translate3d(-45%,-45%,0)}"
+    +   "22%{opacity:.62}72%{opacity:.62}100%{opacity:0;transform:translate3d(45%,45%,0)}}"
+    + "@keyframes sx-edge-b{0%{opacity:0;transform:translate3d(-45%,-45%,0)}"
+    +   "22%{opacity:.62}72%{opacity:.62}100%{opacity:0;transform:translate3d(45%,45%,0)}}"
     + ".sx{--sx-ease:cubic-bezier(.22,.50,.16,1)}"          /* the aperture's own leap-then-crawl */
     + ".sx>*{transform-origin:0 60%;--sx-amp:1}"
     + ".sx__glyph,.sx__name{--sx-amp:var(--sx-scale,1)}"    /* only the two large marks take the spread */
@@ -210,9 +241,22 @@
     + ".sx__name,.sx__attrs{--g:1}"
     + ".sx__perks{--g:2}"
     + ".sx__say,.sx__close{--g:3}"
-    + ".sx.is-print-a>*{animation:sx-print-a var(--sx-dur,230ms) var(--sx-ease)"
+    /* ★★ BR-S477 — THE CHILDREN ARE NAMED, NOT STARRED. docs memory records the measured
+       cost of this exact shape on this exact page: `#menuView.is-sliding .menu__panel *`
+       cost 8.1-9.9ms of style recalc against 0.2ms for the identical rule with the
+       elements listed, because Blink cannot build a class invalidation set for `*` and
+       marks the whole subtree instead. This subtree is ~18 nodes rather than 427, so the
+       cost here is small — but it is 100% avoidable at zero cost, and the note in that
+       file is flat: never scope a state class with `*` on this page. */
+    + ".sx.is-print-a>.sx__src,.sx.is-print-a>.sx__glyph,.sx.is-print-a>.sx__label,"
+    +   ".sx.is-print-a>.sx__name,.sx.is-print-a>.sx__attrs,.sx.is-print-a>.sx__perks,"
+    +   ".sx.is-print-a>.sx__say,.sx.is-print-a>.sx__close"
+    +   "{animation:sx-print-a var(--sx-dur,230ms) var(--sx-ease)"
     +   " calc(var(--g,0) * var(--sx-step,26ms)) both}"
-    + ".sx.is-print-b>*{animation:sx-print-b var(--sx-dur,230ms) var(--sx-ease)"
+    + ".sx.is-print-b>.sx__src,.sx.is-print-b>.sx__glyph,.sx.is-print-b>.sx__label,"
+    +   ".sx.is-print-b>.sx__name,.sx.is-print-b>.sx__attrs,.sx.is-print-b>.sx__perks,"
+    +   ".sx.is-print-b>.sx__say,.sx.is-print-b>.sx__close"
+    +   "{animation:sx-print-b var(--sx-dur,230ms) var(--sx-ease)"
     +   " calc(var(--g,0) * var(--sx-step,26ms)) both}"
     /* ★★ THE SHEEN, LIFTED FROM THE APERTURE VERBATIM — "same concepts that we built on
        codex". Same 135° band, same four stops, same screen blend, same corner-to-corner
@@ -239,14 +283,24 @@
           frame, so the light and the words competed for one instant. 70ms is small in
           absolute terms and it is the whole difference between "a specimen appeared and
           was then lit" and "two things happened at once". */
-    + ".sx{--sx-sheen-ease:cubic-bezier(.4,.1,.2,1)}"
+    /* BR-S477: linear. See the keyframes above — a rate that is uniform per FRAME, not
+       merely per average, is the whole continuity requirement. */
+    + ".sx{--sx-sheen-ease:linear}"
     + ".sx.is-print-a::after{animation:sx-edge-a var(--sx-edge,300ms) var(--sx-sheen-ease) 70ms both}"
     + ".sx.is-print-b::after{animation:sx-edge-b var(--sx-edge,300ms) var(--sx-sheen-ease) 70ms both}"
     /* ★ THE MARK YOU TOUCHED ACKNOWLEDGES IT — the aperture's fifth property. Nothing
        on the control moved before, so the panel appeared to change on its own. */
     + ".m2bface__marks li[aria-current='true']{transition:color 160ms var(--sx-ease,ease)}"
     + "@media (prefers-reduced-motion:reduce){"
-    +   ".sx.is-print-a>*,.sx.is-print-b>*{animation:none}"
+    /* BR-S477: named here too. It is inside a media query and only ever matches under
+       reduced motion — but the rule in this repo is flat rather than conditional, and a
+       `*` left in one place is the one a later pass copies. */
+    +   ".sx.is-print-a>.sx__src,.sx.is-print-a>.sx__glyph,.sx.is-print-a>.sx__label,"
+    +   ".sx.is-print-a>.sx__name,.sx.is-print-a>.sx__attrs,.sx.is-print-a>.sx__perks,"
+    +   ".sx.is-print-a>.sx__say,.sx.is-print-a>.sx__close,"
+    +   ".sx.is-print-b>.sx__src,.sx.is-print-b>.sx__glyph,.sx.is-print-b>.sx__label,"
+    +   ".sx.is-print-b>.sx__name,.sx.is-print-b>.sx__attrs,.sx.is-print-b>.sx__perks,"
+    +   ".sx.is-print-b>.sx__say,.sx.is-print-b>.sx__close{animation:none}"
     +   ".sx.is-print-a::after,.sx.is-print-b::after{animation:none;opacity:0}}"
 
 
@@ -607,7 +661,16 @@
       box.style.setProperty("--sx-edge", Math.round(300 * kS) + "ms");
       box.style.setProperty("--sx-step", Math.round(26  * k) + "ms");
       box.style.setProperty("--sx-scale", (1 + 0.012 * k).toFixed(4));
-      box.style.setProperty("--sx-o", (0.30 + 0.50 * (1 - k)).toFixed(2));
+      /* ★★ BR-S477 — THE FLOOR WAS INVERTED, AND IT WAS THE LOUDEST THING IN THE EFFECT.
+         `0.30 + 0.50*(1-k)` means at REST (k=1) the text started at .30 — a 70% opacity
+         swing on the slow, deliberate hover — and under speed it rose to .80, a 20%
+         swing. So the biggest animation was handed to the reader who was moving slowest
+         and looking hardest, and the smallest to the sweep it was designed for. Exactly
+         backwards.
+         `0.56 + 0.24*(1-k)` gives a 44% swing at rest falling to 20% at speed: still
+         visibly an arrival, roughly a third quieter, and it now RECEDES as the hand
+         moves faster rather than growing. */
+      box.style.setProperty("--sx-o", (0.56 + 0.24 * (1 - k)).toFixed(2));
       /* alternate the NAME, which is the only restart that costs no reflow */
       var a = box.classList.contains("is-print-a");
       box.classList.remove(a ? "is-print-a" : "is-print-b");
