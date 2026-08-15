@@ -130,7 +130,7 @@
        14px still escaped. Set past the real worst case, not at it: the panel's own
        per-mark line reserves (the `r:` column in SIX) already stop it varying BETWEEN
        marks, so this only has to clear the tallest one that exists. */
-    + ".m2read{min-height:518px}"
+    + ".m2read{min-height:548px}"
 
 
     + ".sx{transition:opacity 110ms ease;position:absolute;top:0;left:0;right:0}"
@@ -394,6 +394,48 @@
     + ".sx__say{font-family:var(--font-display);font-size:18px;font-weight:500;"
     +   "line-height:1.52;color:#aaa69d}"
 
+    /* ══ BR-S474 — THE PERKS AND THE MEANING BECOME ONE BLOCK ══════════════════════
+       The builder: "the perk and text should be somehow more connected, or at least
+       placed and positioned in a way that show undercurrent of connectedness or link…
+       one is the extension of another." And explicitly NOT a complaint about the perks
+       themselves — "i like perks designs and color and all, its not about that."
+
+       ★ THE SPACING WAS SAYING THE OPPOSITE. BR-S474's own scale put perks -> meaning at
+       20px, the LARGEST gap on the panel, the same one used for meaning -> closing line.
+       So the two things that are the same thought — the keywords, and those keywords in
+       prose — were separated by the panel's strongest "different section" signal. They
+       were not merely un-linked; they were actively parted.
+
+       ★ SO THE LINK IS LITERAL: ONE UNBROKEN RULE DOWN THEIR LEFT EDGE. Proximity alone
+       would only have made them near each other. A single hairline running from the
+       first keyword to the last line of the meaning says they are one column of thought
+       — the "undercurrent" made into an actual line. It is continuous because the gap
+       between them is closed to ZERO and the space is moved INSIDE as padding: two
+       elements, one uninterrupted stroke.
+
+       ★ AND IT INDENTS ONLY THIS PAIR. Everything else on the panel keeps the flush left
+       edge, so the indent itself is the second signal — this pair is set in from the
+       column, the way a quoted passage is. 10px is small enough to read as a tie rather
+       than as a nested list.
+
+       ★ THE RULE IS DIM ON PURPOSE (.of the mark's own colour at low alpha). It should
+       be felt when you look for it and invisible when you are reading — an undercurrent,
+       which is the builder's word and the right one. It borrows --sxc, so it carries the
+       mark's colour without adding a new one to the palette. */
+    + ".sx__perks{margin:0;padding:0 0 12px 10px;border-left:1px solid color-mix(in srgb,var(--sxc,#8a8479) 34%,transparent)}"
+    + ".sx__say{margin:0;padding:0 0 0 10px;border-left:1px solid color-mix(in srgb,var(--sxc,#8a8479) 34%,transparent)}"
+    /* the gap the pair used to hold now sits under the pair, restoring the 20px break
+       before the closing line so the BLOCK still reads as separate from what follows */
+    + ".sx__close{margin:20px 0 0}"
+
+    /* ★★ AND THE PROSE GETS ITS WEIGHT — "the text should somehow feel heavier or more
+       solid". 500 -> 600, and 600 is a loaded cut (wght@0,500;0,600;0,700), so this is a
+       real file rather than the synthesis BR-S473 just removed. Weight is the honest
+       lever here: size is already at 18px and larger would start to compete with the
+       name, and a brighter value would lift it above the name's rank. A heavier stroke
+       makes the same block denser on the page without making it bigger or louder. */
+    + ".sx__say{font-weight:600}"
+
     /* ══ BR-S466 — THE VERTICAL RHYTHM. Measured down the panel, the gaps between
        consecutive blocks ran 16, 13, 8, 10, 13, 17, 15 — SEVEN values, no two the same
        for a reason, and close enough together that they read as accidental rather than
@@ -425,7 +467,12 @@
     + ".sx__label{margin:0 0 6px}"
     + ".sx__name{margin:0 0 8px}"
     + ".sx__attrs{margin:0 0 16px}"
-    + ".sx__perks{margin:0 0 20px}"
+    /* BR-S474: perks -> meaning is now ZERO. The 20px that used to sit here was the
+       panel's strongest "different section" signal, applied to the two things that are
+       the same thought. The space it held moves INSIDE the pair as padding, so the left
+       rule that ties them can run unbroken. The break before the closing line keeps its
+       20px, so the bound pair still reads as separate from what follows. */
+    + ".sx__perks{margin:0}"
     + ".sx__say{margin:0}"
     + ".sx__close{margin:20px 0 0}";
 
