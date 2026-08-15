@@ -3474,6 +3474,15 @@ html.is-travel .card .cardfinish { mix-blend-mode: normal; }
    be worse than the thing being fixed. The animations keep running underneath at zero
    cost to the eye; they are pure CSS with no timer to leak (BR-S341). */
 .menu__draw:has([data-m2-hero][data-face="birth"]) .m2asks { visibility: hidden; }
+/* ★★ BR-S455 — AND THE HIDDEN QUESTIONS STOP ANIMATING. My own BR-S449 bug, found by
+   counting document.getAnimations() on the default face: `visibility: hidden` hides an
+   element but does NOT stop its animations, so SEVEN 44-second infinite opacity+transform
+   loops were running forever on a block nobody can see — on the face the panel OPENS on,
+   for the whole time the page is up. `display: none` would stop them and also collapse
+   46px of header, which is the reflow BR-S449 chose visibility to avoid.
+   animation-play-state gets both: the box keeps its height, the compositor stops.
+   Measured before: 7 running. After: 7 paused. */
+.menu__draw:has([data-m2-hero][data-face="birth"]) .m2asks__q { animation-play-state: paused; }
 
 /* ── BR-S324 — THE CARD AND ITS WORDS LIGHT TOGETHER. ────────────────────────
    They sit in different grid columns with a whole card between them, so nothing about
@@ -3513,6 +3522,41 @@ html.is-travel .card .cardfinish { mix-blend-mode: normal; }
   transition: --grade-a 140ms var(--ease-settle), --grade-b 140ms var(--ease-settle);
 }
 .menu__draw .m2read.is-bloom .m2read__meta { color: #efe3c4; transition: color 140ms var(--ease-settle); }
+
+/* ★★ BR-S455 — THE BLOOM POLISHED: THE WORDS NOW ARRIVE, THEY DO NOT ONLY BRIGHTEN.
+   The builder: "polish the bloomy effect of new text."
+
+   WHAT WAS MISSING IS MOTION, AND THE REASON IS TIMING. A colour lift alone reads as
+   a highlight passing over text that was already sitting there — but this text is NEW,
+   written on the same frame, and nothing said so. A few pixels of rise is the whole
+   difference between "that got brighter" and "that just landed".
+
+   IT IS A KEYFRAME, NOT A TRANSITION, AND THAT IS NOT A STYLE CHOICE. A class-driven
+   transition would have to hold the displaced state for the whole 420ms and only slide
+   back when the class is REMOVED — the arrival would play backwards, at the end. An
+   animation runs once, in the right direction, and cleans itself up.
+
+   THE TWO LINES ARE STAGGERED BY 60ms, meta first. They are one block and they carry
+   different weights: the meta line is the label of the thing, the sentence is the thing,
+   so the label landing a beat early reads as a cascade instead of a flash. Both are
+   opacity + transform only.
+
+   The stagger is DELAY, not duration — both finish inside the 300ms the JS timer holds
+   the class for, so the whole gesture is over before the card's own 480ms turn has
+   settled and the read is never still moving under a finished card. */
+@keyframes m2read-arrive {
+  0%   { opacity: .22; transform: translate3d(0, 4px, 0); }
+  60%  { opacity: 1; }
+  100% { opacity: 1; transform: none; }
+}
+.menu__draw .m2read.is-bloom .m2read__meta { animation: m2read-arrive 260ms var(--ease-settle) both; }
+.menu__draw .m2read.is-bloom .m2read__mean { animation: m2read-arrive 300ms var(--ease-settle) 60ms both; }
+@media (prefers-reduced-motion: reduce) {
+  /* the JS already returns before adding the class; this is the belt for a preference
+     that changes after the class is on, so nothing is left mid-rise */
+  .menu__draw .m2read.is-bloom .m2read__meta,
+  .menu__draw .m2read.is-bloom .m2read__mean { animation: none; }
+}
 /* the pair-hover lifts each segment by one step and keeps their order — the grade
    is the point, so brightening them all to one colour would undo it on hover */
 .menu__draw:has(.menu__draw-stage:hover) .m2read__seg--0,
