@@ -6482,6 +6482,42 @@ html.orbit-wings .orbit__field { --orbit-rx: clamp(200px, 25.5vw, 368px); --orbi
 .br-flip__side.is-on { color: var(--t-display, #e9e5dc); pointer-events: none; cursor: default; }
 @media (max-width: 560px) { #brBuildFlip { bottom: 8px; padding: 4px 10px; font-size: 8px; } }
 
+/* ══ BR-S480 — THE BUILD PEEK ════════════════════════════════════════════════
+   The pill opens the other build IN PLACE instead of navigating to it. The page
+   you were on is still mounted behind this — nothing was unloaded, no history
+   entry was taken, and closing returns you to it exactly as you left it.
+   The frame renders at a real 1440px desktop width and is SCALED, never squeezed:
+   a 1440px page shown in a 900px box is a mobile layout, and judging the public
+   build by its mobile layout is judging a different design. */
+#brBuildPeek {
+  position: fixed; inset: 0; z-index: 300; display: none;
+  background: rgba(6, 7, 9, .82);
+  padding: clamp(10px, 3vh, 34px);
+}
+#brBuildPeek.is-open { display: flex; flex-direction: column; }
+.br-peek__bar {
+  display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+  padding: 0 2px 10px;
+  font-family: var(--font-mono); font-size: 10px; letter-spacing: .18em;
+  text-transform: uppercase; color: #7d8794;
+}
+.br-peek__key { color: #e6edf6; letter-spacing: .26em; }
+.br-peek__note { color: #5f6773; letter-spacing: .08em; text-transform: none; font-size: 10.5px; }
+.br-peek__go { margin-left: auto; color: var(--cx-gold, #c69b63); text-decoration: none;
+               letter-spacing: .08em; text-transform: none; font-size: 11px; }
+.br-peek__go:hover { color: #e0b070; }
+.br-peek__x { background: none; border: 1px solid #2b3038; border-radius: 2px; cursor: pointer;
+              color: #9fa9b6; font-size: 11px; line-height: 1; padding: 5px 8px; }
+.br-peek__x:hover { color: #e6edf6; border-color: #3f4650; }
+/* the frame's own box is the viewport it thinks it has; the wrapper clips the scaled picture */
+.br-peek__view {
+  flex: 1; min-height: 0; position: relative; overflow: hidden;
+  border: 1px solid #23262c; border-radius: 3px; background: #0a0b0d;
+}
+.br-peek__frame { position: absolute; top: 0; left: 0; border: 0; transform-origin: 0 0; }
+@media (prefers-reduced-motion: reduce) { #brBuildPeek { transition: none; } }
+
+
 /* ── BR-S400 — L1's SEAL. The desk behind it stays legible: this is a locked-room
    PREVIEW, so the visitor sees the real surface and sees that it is shut. The seal
    covers the panel and takes the pointer, which is what actually stops the desk from

@@ -100,9 +100,20 @@ PROFILE_GUARD = ('    // Public build: the Profile opens only once something is 
 # cut. The CSS block goes too: it would be inert with no element to style, but shipping
 # the rules for a control that does not exist is a signpost to a door.
 FLIP_CALL = "syncBuildFlip();   // BR-S377 — the dev⇄public flip, once, on every room\n"
-FLIP_FUNCTIONS = ["brBuildSides", "syncBuildFlip"]
+# BR-S480 — the PEEK goes with the pill. It opens the other builds in a frame from the
+# pill itself, so with the pill cut it is unreachable code — and unreachable code that
+# still names the control is exactly the signpost the note above says not to ship. All
+# five are reachable only from syncBuildFlip (via _peekWire) or from each other; the
+# "no live reference survives" assert below is what proves it rather than this comment.
+FLIP_FUNCTIONS = ["brBuildSides", "syncBuildFlip",
+                  "_peekWire", "_peekBuild", "_peekFit", "_peekClose", "_peekEsc"]
 FLIP_CSS_OPEN = "/* BR-S377 — THE BUILD FLIP"
-FLIP_CSS_LAST = "@media (max-width: 560px) { #brBuildFlip"
+# BR-S480 — the anchor moves to the END of the peek's rules, and the peek's CSS was moved
+# in the stylesheet to sit directly after the flip's, so the two are ONE contiguous block.
+# Leaving the peek's rules in live/ would have shipped styling for a control that does not
+# exist there — precisely the "signpost to a door" the note above forbids. The styles for
+# a cut thing are part of the cut thing.
+FLIP_CSS_LAST = "@media (prefers-reduced-motion: reduce) { #brBuildPeek"
 
 # Top-level functions reachable ONLY from a cut branch. Verified one call site each, all
 # inside a removed branch — re-verify with `grep -c` before adding to this list.
