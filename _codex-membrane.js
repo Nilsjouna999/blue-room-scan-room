@@ -65,11 +65,36 @@
      surfaces cannot own one edge — the CSS ones cannot follow a wave, so they go and
      the canvas keeps it. Injected rather than edited into codex.html so the effect and
      its suppression live in the same file and can be removed together. */
+  /* ★★ BR-S502 — .shallows AND .floorlight WERE MISSING FROM THIS LIST, AND THEY ARE THE
+     RESIDUE THE BUILDER KEEPS SEEING ABOVE THE LINE.
+     The builder: "it still feels or seems like there is blue residue above white line...
+     it does not read smooth and definate."
+
+     The diagnosis was already written twenty lines below this one — "a straight edge and
+     a curve can never agree, so wherever the wave sits away from 0.955H a strip of the
+     static band is either exposed above the line or clipped below it... it was never a
+     colour, it was a shape that does not move." That reasoning was right. The list built
+     from it was incomplete: it named .tide and .shore, and the codex has FOUR bands at
+     that edge, not two.
+
+     Measured in the live document at H=900, line at y=860:
+       .shallows    fixed, z 6, bottom:var(--tide) -> its bottom edge sits EXACTLY on 860,
+                    an 81px gradient ending in a straight line the wave crosses all day.
+       .floorlight  fixed, z 8, bottom:calc(var(--tide) - 4px) -> it deliberately STRADDLES
+                    the line by 4px, and it is a pale radial (233,229,220) — so where the
+                    wave dips below the baseline, a cool strip of it is left standing above
+                    the white line against the dark band. On a near-black ground a faint
+                    warm-white haze reads exactly as the blue-grey residue reported.
+
+     Both suppressed on the same terms as the other two, and only while this canvas runs:
+     one surface owns one edge. Removing the module removes the suppression with it. */
   function suppressStatic(d) {
     if (d.getElementById("__cmsuppress")) return;
     var st = d.createElement("style"); st.id = "__cmsuppress";
     st.textContent = ".tide{background:none!important}.tide::before{opacity:0!important}"
-                   + ".shore{background:none!important}";
+                   + ".shore{background:none!important}"
+                   + ".shallows{background:none!important}"
+                   + ".floorlight{opacity:0!important}";
     d.head.appendChild(st);
   }
 
