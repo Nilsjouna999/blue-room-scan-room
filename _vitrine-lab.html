@@ -592,10 +592,29 @@ html:not(.is-case) .menu__draw-stage:hover .m2hero {
        .card__plate carries four .corner marks at 9px (styles.css:427-434).
        Repeating that shape at the frame scale gives brackets inside brackets,
        which is the skeuomorphic-gadget end of this. */
+    /* ★★★ BR-S482 — THE LAP IS WARM DARK, AND THIS IS THE WHOLE CUE.
+       The builder, looking at the first build: "i cant see". Correct, and the reviewers
+       had already computed why — the clips DID lap 5px over the card, but they lapped in
+       light grey. Over parchment at 239, rgba(124,127,134,.26) lands at 209: a 30-level
+       step, soft enough to read as part of the frame rather than as something ON the
+       specimen. Everything else the glass draws lands OUTSIDE the card entirely, so its
+       whole contribution over the card was +0.04 of 255. That is why it read as a card
+       with a frame drawn round it: every cue was at the edge and none was on top.
+
+       Occlusion is the one cue the plan calls PROOF rather than evidence — shading can
+       be argued with, something passing IN FRONT cannot. So the part of the clip that
+       crosses the card is now a warm dark: 239 -> 184, a 55-level step that cannot be
+       read as anything but in front. The part in the frame keeps its cool metal, because
+       out there it is glass over a dark mat and the physics is the other way round.
+
+       ONE MATERIAL, TWO GROUNDS, TWO VALUES — split exactly at --vt-band, which is the
+       card's own edge. Nothing else changes. */
     linear-gradient(180deg, rgba(240,242,246,.20) 0 1px,     /* its lit top arris */
-                            rgba(124,127,134,.33) 1px 100%), /* the metal, all the way onto the card */
+                            rgba(124,127,134,.33) 1px var(--vt-band),                    /* the metal, in the frame */
+                            rgba(58,48,38,.34) var(--vt-band) 100%),      /* THE LAP — see below */
     linear-gradient(0deg,   rgba(240,242,246,.14) 0 1px,     /* the br clip, from its outer edge in */
-                            rgba(124,127,134,.26) 1px 100%),
+                            rgba(124,127,134,.26) 1px var(--vt-band),
+                            rgba(58,48,38,.30) var(--vt-band) 100%),
     /* THE BLOOM — the card's own light picked up in reflection, biased to its
        hot corner (the 165deg stock is brightest top-and-slightly-left). NOT a
        streak from an imagined window: there IS no window. Over the mat this
