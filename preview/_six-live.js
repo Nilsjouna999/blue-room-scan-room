@@ -322,8 +322,33 @@
        heading, and it is the honest half — it says the mark came from the date rather
        than from a hash. Making it loud would put a footnote in the same rank as a title;
        leaving it dim keeps it findable without competing. Available, not announced. */
-    + ".sx__slot{font-weight:600;font-size:11px;letter-spacing:.19em;color:#c9c1b1}"
-    + ".sx__from{font-weight:400;color:#6e6b63;letter-spacing:.14em}"
+    /* ★★ BR-S471 — BACK TO THE ORIGINAL SHAPE, ONE STOP BRIGHTER. The builder, after
+       BR-S468 rebuilt this line as a bold 11px label: "the brighter name of marks is
+       stealing the focus… i want the one that was originally but just slightly more
+       readable."
+
+       WHAT I GOT WRONG WAS THE SIZE OF THE FIX, NOT THE DIAGNOSIS. The line WAS too dim
+       to find. But I answered that by re-ranking it — 11px, weight 600, near-white — and
+       small bold letterforms at wide tracking punch far above their point size, so an
+       11px label was pulling the eye BEFORE the 33px specimen name under it. That is
+       BR-S467's ranking error again with the roles swapped, and two commits after
+       committing the lesson.
+
+       The original was right in FORM and one stop too dark in VALUE. So the form comes
+       back exactly — 9.5px mono, weight 400, .2em, the slot and its provenance reading
+       as one line again — and only the value moves, #6e6b63 -> #8a8479. Readable, still
+       furniture, and nothing on the panel changes rank.
+
+       The two spans stay in the markup and style identically. They cost nothing, and a
+       later pass that does want to separate the slot from its provenance has the hooks
+       without another render change. */
+    + ".sx__slot,.sx__from{font-weight:400;font-size:inherit;letter-spacing:inherit;color:inherit}"
+    /* ★ AND IT STAYS IN THE GREY FAMILY — "but still fits in with grey thing nearby".
+       #8a8479 was a +28 step per channel off the eyebrow beside it, far enough to read
+       as a different colour rather than as the same one turned up. #7c766c is +14: a
+       clear lift against #6e6b63, and still unmistakably the same grey as .sx__src above
+       it and .sx__attrs below. One stop, not two. */
+    + ".sx__label{color:#7c766c}"
 
     /* ══ BR-S466 — THE VERTICAL RHYTHM. Measured down the panel, the gaps between
        consecutive blocks ran 16, 13, 8, 10, 13, 17, 15 — SEVEN values, no two the same
