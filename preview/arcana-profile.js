@@ -71,7 +71,19 @@
     readings: [{
       reading_id: "BR-3F9A2C",
       name: "The Twice-Kindled Giver",
-      spine: "Aries · Snake · Life Path 7",
+      /* ★★ BR-S498 — THE SAMPLE CONTRADICTED THE ENGINE THAT WOULD HAVE PRODUCED IT.
+         The stated birth is 1 January 2000, and the shipped derivation for that date
+         returns something else on all three marks. Hand-run against arcana-reading.js:
+           · sunSign(1,1)      — 1 Jan is inside the Capricorn band, not Aries
+           · chineseAnimal(2000) — 2000 is the Dragon; the Snake is 2001
+           · lifePathNum(2000,1,1) — 2+0+0+0+0+1+0+1 = 4, which does not reduce further
+         And "birth~The Seeker~2000~1~1" is the DEFAULT seed when no ?seed= is present,
+         so a visitor who opened the default Birth Reading and then this sample profile
+         saw two different spines for one stated identity.
+         The builder's standing law for showcase data, 2026-08-16: "mathematically
+         accurate not reality, its tutorial showcase". A sample may be invented; its
+         arithmetic may not be wrong. */
+      spine: "Capricorn · Dragon · Life Path 4",
       inputs_provided: ["name", "birth date", "birthplace"],
       /* BR-S382: was 3, which matched nothing. The Birth Reading draws SIX marks
          (astrology, the Chinese year, numerology, runes, the I Ching, and the
@@ -93,9 +105,10 @@
     // What the Showcase can feature: the seeker's OWN reading results, and minted cards.
     reading_results: [
       { kind: "Reading", name: "The Twice-Kindled Giver" },
-      { kind: "Sun sign", name: "Aries" },
-      { kind: "Year animal", name: "Snake" },
-      { kind: "Life path", name: "Life Path 7" },
+      /* BR-S498: corrected with the spine above — same three marks, same reason. */
+      { kind: "Sun sign", name: "Capricorn" },
+      { kind: "Year animal", name: "Dragon" },
+      { kind: "Life path", name: "Life Path 4" },
       { kind: "Rune", name: "Gebo" }
     ],
     minted_cards: [],   // none yet — minting is not open

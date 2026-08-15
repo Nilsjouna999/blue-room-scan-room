@@ -65,10 +65,19 @@
     root.setTimeout(function () { if (p && p.parentNode) p.remove(); }, 240);
   }
 
+  /* ★★ BR-S498 — open() REPORTS whether it opened, and the caller now believes it.
+     This already returned early when the board was missing, with the right comment —
+     "let the link do its job" — but the caller had ALREADY called preventDefault and
+     stopPropagation by then, so the link never got its job back. And the board has not
+     existed since U1 was emptied: `grep -c u1board app.js` is 0.
+     Net effect on the live site: "The whole roadmap →" swallowed the click and did
+     nothing at all. Not a slow link, not a wrong destination — no response.
+     This is the pattern app.js already uses for the same shape of control one file over
+     ("no box built → the anchor stays a door"). */
   function open(d) {
-    if (pop) return;
+    if (pop) return false;
     var src = d.querySelector("#about .u1board");
-    if (!src) return;                       /* U1 not mounted — let the link do its job */
+    if (!src) return false;                 /* U1 not mounted — let the link do its job */
 
     pop = d.createElement("div");
     pop.className = "wcpop";
@@ -97,6 +106,7 @@
        invisible AND unclickable. Force the from-state, then set the class. */
     void pop.offsetHeight;
     pop.classList.add("is-in");
+    return true;                            /* BR-S498: it opened — the caller may swallow the click */
   }
 
   /* The rail link is an <a href="roadmap/"> (app.js:2492) and roadmap/ resolves to U1
@@ -110,8 +120,9 @@
       var a = e.target.closest && e.target.closest('a[href="roadmap/"], a[href="roadmap"]');
       if (!a) return;
       if (e.metaKey || e.ctrlKey || e.shiftKey || e.button === 1) return;
-      e.preventDefault(); e.stopPropagation();
-      open(d);
+      /* BR-S498: swallow the click ONLY if something opened. Unconditional interception
+         is what turned this control into a dead button when the board went away. */
+      if (open(d)) { e.preventDefault(); e.stopPropagation(); }
     }, true);
     d.addEventListener("keydown", function (e) { if (e.key === "Escape") close(); });
   }

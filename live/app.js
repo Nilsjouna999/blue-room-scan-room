@@ -1528,12 +1528,24 @@ const ROOMS = [
      one a returning visitor opens most, so it takes door I. The Shelf is not a
      room beside it — the Shelf is INSIDE it, which is why this entry names the
      Profile and mentions the Shelf in its line rather than the other way round. */
-  { key: "shelf", state: "open", free: true, name: "Your Profile",
+  /* ★★ BR-S498 — THIS DOOR IS DERIVED NOW, AND IT IS A REGRESSION I CAUSED.
+     BR-S488 removed every writer of the holdings flag from the public builds — which was
+     correct, the flag was being used as an authorization boundary and was self-grantable.
+     What nobody re-checked is the door that depends on it. The public build adds a guard
+     that sends a visitor without holdings to the sealed niche, and with zero writers left
+     no visitor can ever have holdings. So on the launch build the FIRST-LISTED room,
+     hardcoded `state: "open"`, redirected every visitor every time: the front door's
+     primary entry was a bounce.
+     `state` is the one word this registry's own header says everything follows from, so
+     the fix is to stop asserting it. hasHoldings() is the same question the public guard
+     asks, so the door and the route can no longer disagree — and on the dev build, where
+     the flag is still settable, it opens exactly as before. */
+  { key: "shelf", state: hasHoldings() ? "open" : "soon", free: true, name: "Your Profile",
     /* BR-S484: the Shelf holds readings in no browser at all — the profile module
        has one storage read and zero writes. "Saved in this browser only" would
        have shipped a second untrue claim, so the link is what is promised. */
     now: "Your own page in the archive. Every reading you draw keeps its own link, and the Shelf is where they gather.",
-    soon: "A page of your own, holding everything you have drawn.",
+    soon: "A page of your own. It opens the first time a reading is kept.",
     cost: "Free &middot; this browser only", cta: "Open your Profile", href: "?dev=profile" },
   { key: "codex", state: "open", free: true, name: "The Codex",
     now: "222 entries across ten systems. Every card, sign, rune and hexagram the rooms read from.",
@@ -3706,7 +3718,14 @@ function wireMenuCodex(host) {
     if (pendingOpen) { pendingOpen = false; open(); }   // M4.3: the cold click that waited for us
   }
   frame.addEventListener("load", onFrameLoad);
-  if (ok && !frame.getAttribute("src")) {
+  /* ★ BR-S498 — THE PRE-WARM WAS GATED ON CAPABILITY, NOT ON ROUTE. `ok` asks whether the
+     browser supports clip-path; it says nothing about whether the menu is on screen.
+     mountMenu() runs unconditionally at boot, and setting an iframe src fetches even when
+     the ancestor is display:none — so every ?dev= route pulled and parsed the whole codex
+     (measured: 433,664 bytes) for a menu the CSS had hidden and a seal nobody could reach.
+     The cold-click path already handles a press that lands before the frame does, so this
+     gate costs nothing it was buying. */
+  if (ok && state.view === "menu" && !frame.getAttribute("src")) {
     (window.requestIdleCallback || function (cb) { return setTimeout(cb, 200); })(warmFrame);
   }
 
@@ -5979,7 +5998,13 @@ document.addEventListener("click", (e) => {
   else if (kind === "treat") { state.treatment = val; if (val !== "mint") state.labMaterial = null; state.view = "room"; render(); window.scrollTo(0, 0); }
   else if (kind === "src") { state.source = Number(val); state.view = "room"; render(); window.scrollTo(0, 0); }
   else if (kind === "tab") { state.tab = val; state.view = "room"; render(); window.scrollTo(0, 0); }
-  // Public build: the dev rail's holdings flip is not part of it.   // BR-S204: MOCK holdings flip — always remount so the gated slide 3 never goes stale behind another view
+  /* BR-S498: RELOAD, not remount. BR-S204 remounted so the gated M3 slide could not go
+     stale — that was right when the flag only drove hasHoldings() at render time. The
+     ROOMS registry now DERIVES the Profile's state from the same flag, and ROOMS is a
+     top-level array evaluated once at load, so a remount would leave M3 updated and the
+     U1 door stale: the two surfaces would disagree about the same fact, which is exactly
+     what deriving it was meant to end. A reload re-evaluates the registry. Dev-only path. */
+  // Public build: the dev rail's holdings flip is not part of it.
   else if (kind === "dev") { const u = new URL(location.href); u.searchParams.set("dev", val); u.searchParams.set("devnav", "1"); location.href = u.toString(); }
 });
 
@@ -6194,9 +6219,20 @@ document.addEventListener("keydown", (e) => {
      WHAT IS MOUNTED ON TOP OWNS THE KEY FIRST. The QR pop-out and the Mint showcase
      bind at capture and stop propagation; the lightbox now stops it too. So Escape
      dismisses the innermost thing, and only an empty room hands it to the exit. */
+  /* ★★ BR-S498 — ONE GUARD FOR THE WHOLE HANDLER, because two of them drifted apart.
+     The Escape branch below carried a modifier check and a typing check; the single-letter
+     branches beneath it carried neither and called no preventDefault. `e.key` under a
+     modifier is still the bare letter, so Ctrl+F / Cmd+F and Ctrl+S / Cmd+S mutated
+     state.treatment and re-rendered the room WHILE the browser's Find bar or Save dialog
+     opened on top of it. Reachable by any visitor who pressed Enter on the front door.
+     Hoisted here so the two branches cannot disagree again — a guard duplicated is a
+     guard that will eventually only be updated once. */
+  if (e.ctrlKey || e.metaKey || e.altKey) return;
+  if (_navBlocked(e.target)) return;                      // never yank a typist out of a field
+
   if (e.key === "Escape") {
-    if (e.ctrlKey || e.metaKey || e.altKey || e.shiftKey) return;
-    if (_cxOpen || _navBlocked(e.target)) return;         // the Codex aperture owns Esc; never yank a typist out of a field
+    if (e.shiftKey) return;
+    if (_cxOpen) return;                                  // the Codex aperture owns Esc
     e.preventDefault();
     if (state.dev) { state.dev = null; _devUrlStrip(); }   // same shared helper the click path uses — it cannot drift
     state.view = "menu"; applyView(); window.scrollTo(0, 0);

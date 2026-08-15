@@ -50,9 +50,22 @@ watched being derived from two facts you were shown first is a derivation.
 ### BEAT 2 — THE FILL
 
 **WHAT.** Boxes filling with **actual accurate information** — the marks themselves. The
-sun sign, the year animal, the life path, the rune, the trigram, the hexagram. Real
-values, and — this is the builder's emphasis — *accurate*: what the engine genuinely
-returns for those inputs, not decorative text arranged to look like data.
+sun sign, the year animal, the life path, the rune, the trigram, the hexagram.
+
+> **★ RULED, 2026-08-16.** *"mathematically accurate not reality, its tutorial showcase,
+> and keep john."*
+>
+> So "accurate" means **the arithmetic is right**, not that the reading belongs to a real
+> visitor. This is a **worked example** — a tutorial — and the fixture stays: John Bon,
+> born 26 July 1965. The reader is being shown how the machine works on a specimen, and
+> the specimen is labelled as one.
+>
+> This settles the largest open question on this surface and it settles it the cheap way,
+> which is also the right way: no intake form, no engine call at page load, no per-visitor
+> state, nothing to go wrong on a first visit. What it demands in exchange is exact: every
+> sum on the page must genuinely check out for *those* inputs. A tutorial that teaches a
+> wrong derivation is worse than no tutorial, and it is the one failure this design cannot
+> absorb — see "What this demands", item 1.
 
 **HOW.** They fill **as you scroll**. Scroll is the clock. You are not watching an
 animation that plays at you; you are driving the derivation at your own rate, and it
@@ -173,9 +186,9 @@ Consequences that follow from the description, not additions to it.
 
 - Whether the boxes show their working, or only their results.
 - How literal the letter is, and how it is written in.
-- Whose reading this is — a worked example, plainly labelled, or the reader's own if they
-  give a name and a date. The second is far stronger and far more expensive, and it
-  changes what U1 is for.
+- ~~Whose reading this is~~ — **RULED 2026-08-16: a worked example, a tutorial showcase,
+  and the fixture stays (John Bon, 26 July 1965). Mathematically accurate, not the
+  reader's own.**
 - What the result boxes at the floor actually are: the reading itself, or a record *of*
   the reading with a way to open it.
 - How much of the scroll each beat is worth.

@@ -146,9 +146,14 @@ PUBLIC_STRIPS = [
     # than dangerous. It is stripped anyway, because "the trigger does not ship" is a
     # weaker claim than "the writer does not exist", and the whole point of this pass
     # was that the weaker claim is the one that kept being wrong.
+    # BR-S498: re-anchored — the flip now reloads instead of remounting, because the ROOMS
+    # registry derives the Profile door from this same flag and a remount would leave the
+    # two surfaces disagreeing. The guard caught the edit and refused to build, which is
+    # the behaviour it was written for: an anchor that drifts must stop the build, not
+    # quietly ship the writer it exists to remove.
     ('  else if (kind === "holdings") { try { localStorage.getItem("br_holdings") === "1"'
      ' ? localStorage.removeItem("br_holdings") : localStorage.setItem("br_holdings", "1"); }'
-     ' catch (e) {} mountMenu(); return; }',
+     ' catch (e) {} location.reload(); return; }',
      '  // Public build: the dev rail\'s holdings flip is not part of it.'),
 ]
 
