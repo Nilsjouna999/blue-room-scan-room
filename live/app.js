@@ -1205,55 +1205,113 @@ function syncCodexBall() {
    same public build with the flip cut out, which is the only one a launch would keep.
    Order here is the order in the pill, and each entry's `seg` is the single path
    segment that distinguishes it. */
+var BR_BUILDS = [
+  { key: "dev",     seg: "" },
+  { key: "preview", seg: "preview/" },
+  { key: "live",    seg: "live/" }
+];
+function brBuildSides() {
+  var src = "", i, ss = document.scripts;
+  for (i = 0; i < ss.length; i++) if (/\/app\.js(\?|$)/.test(ss[i].src)) { src = ss[i].src; break; }
+  if (!src) return null;
+  var root = new URL(src).pathname.replace(/app\.js.*$/, "");   // "/", "/preview/", "/live/"
+  var here = "dev", devRoot = root, seg;
+  for (i = 1; i < BR_BUILDS.length; i++) {
+    seg = BR_BUILDS[i].seg;
+    if (root.slice(-seg.length) === seg) { here = BR_BUILDS[i].key; devRoot = root.slice(0, -seg.length); break; }
+  }
+  var rest = location.pathname.indexOf(root) === 0 ? location.pathname.slice(root.length) : "";
+  var tail = rest + location.search + location.hash;
+  return {
+    here: here,
+    links: BR_BUILDS.map(function (b) { return { key: b.key, href: devRoot + b.seg + tail }; })
+  };
+}
+/* ══ BR-S486 — THE PILL SURVIVES THE TRIP TO live/, AND live/ STILL HAS NO PILL ═══
+   The builder: "i dont want peek buttons disapear once i click live one cuz 'well live
+   dont have it' no. buttons stay, and real live stays without buttons so i dont know
+   what you need to do to close that gap."
 
-/* ══ BR-S480 — THE PILL SHOWS THE OTHER BUILDS INSTEAD OF LEAVING FOR THEM ═══════
-   The builder: "the page actually turns to those, but i want rather the screen is
-   cockpit that shows what dev, preview and live are, not actually turning in to them…
-   i want pill system so i can see and interact."
+   ★ THE GAP, STATED PLAINLY. The pill was CUT from live/ at build time, on the sound
+   rule that a launch site must not carry a labelled door into the workshop. The cost
+   was that clicking "live" was a one-way trip: the control that got you there did not
+   exist once you arrived, so inspecting the launch build meant losing the ability to
+   leave it. Both halves of what the builder wants were true separately and never
+   together.
 
-   ★ THE PROBLEM WITH A SWITCH. Clicking a side used to navigate, so checking whether
-   the public build still looks right meant LEAVING the thing you were looking at. You
-   then compare a page against your memory of a page — which is exactly how a build that
-   quietly stopped stripping something goes unnoticed.
+   ★ WHAT CLOSES IT: THE THREE BUILDS SHARE AN ORIGIN. dev, preview/ and live/ are three
+   folders on ONE Pages deploy, so they share one localStorage. The builder's own dev
+   flag is therefore already readable from inside live/ — it rides along with them,
+   which is the same property the note above relies on for the holdings flag.
 
-   ★ SO IT OPENS THE BUILD IN PLACE, LIVE AND USABLE. Not a screenshot: a real frame at a
-   real desktop width, scaled to fit, that you can hover and click inside. The page you
-   were on is still behind it, unnavigated, and closing the panel returns you to it with
-   nothing lost — no history entry, no reload, no scroll position thrown away.
+   So the pill now SHIPS to every build and RENDERS for nobody but the builder. A
+   visitor has never set the flag, so the launch site they load has no buttons on it —
+   which is the requirement, and it is met by what the page draws rather than by what
+   the build copied. Turn the flag on once and the pill follows you through all three.
 
-   ★ AND IT KEEPS TRUE TO THE ORIGINAL. Exactly two parameters are added to the frame's
-   URL: `sx=1`, which tells the specimen module "this frame is mine" (BR-S479 — without
-   it the six marks are inert and the pane is a photograph rather than a copy), and a
-   cache-buster, because this repo's version tokens are per-asset and a stale index.html
-   inside the pane would show a build that is not the one on disk. Nothing that alters
-   layout, no dev overrides, no forced route. A viewer that quietly modifies what it
-   displays is worse than no viewer.
+   ★ THE COST, AND IT IS REAL. This is the first time the workshop's own chrome ships
+   inside the launch build, and it moves that control from a build-time guarantee to a
+   runtime one — weaker by construction, and against the grain of "a static site can
+   only hide what it never copies". It is defensible for THIS control and should not be
+   read as a precedent: the pill's whole content is three links to three directories
+   that are already public, so a flag that fails open leaks nothing that was hidden.
+   Anything with a secret in it stays on the cut list, where it belongs.
 
-   ★ THE ANCHOR STAYS AN ANCHOR. Front-door law, the same as the Codex seal and the
-   roadmap box: the sides are still real <a href> elements, preventDefault fires only
-   once the panel has actually opened, and the panel carries a plain "open it properly"
-   link for when seeing is not enough. With JS dead the pill behaves exactly as it
-   always did.
+   The visibility test is its own function so the build can assert the gate exists,
+   rather than trusting a line of code to keep its shape. */
+function brFlipVisible() { return DEVNAV; }
+function syncBuildFlip() {
+  if (!brFlipVisible()) return;
+  var s = brBuildSides();
+  if (!s) return;
+  var el = document.getElementById("brBuildFlip");
+  if (!el) {
+    el = document.createElement("div");
+    el.id = "brBuildFlip";
+    document.body.appendChild(el);
+  }
+  // The side you are ON is stated, not linked; the others are the controls. Nothing
+  // clickable points at where you already are, so the pill can never be mistaken for
+  // a form with a selected option.
+  var html = '<span class="br-flip__lab" aria-hidden="true">BUILD</span>';
+  s.links.forEach(function (b, i) {
+    if (i) html += '<span class="br-flip__sep" aria-hidden="true">·</span>';
+    var on = b.key === s.here;
+    html += '<a class="br-flip__side' + (on ? ' is-on' : '') + '" href="' + b.href + '"' +
+      (on ? ' aria-current="page"' : '') + '>' + b.key + '</a>';
+  });
+  el.innerHTML = html;
+  /* BR-S486: the label states what the control now does. It used to promise the other
+     builds "without leaving this page", which stopped being true the moment the peek
+     came out — and a stale aria-label is a lie told only to the people who cannot see
+     the control to check it against. */
+  el.setAttribute("aria-label", "Build: " + s.here + " — the others open that build");
+}
 
-   ★ THE PANEL IS BUILT ONCE, LAZILY, and its frame src is cleared on close so a hidden
-   build is never left running rAF and timers behind the page you are actually using. */
-var _peekEl = null, _peekOpen = false;
-window.addEventListener("resize", function () { if (_peekOpen) _peekFit(); });
-/* ★★ THE LISTENER LIVES ON THE PILL, NOT ON THE DOCUMENT — and the build taught me why.
-   The first version was a delegated handler on `document` whose selector named the pill's
-   id. build_public.py CUTS the pill from the live build and then asserts that no live
-   reference to it survives, so that selector tripped the guard, the build aborted
-   mid-write, and live/ was left half-deleted. The guard was right, and the builder had
-   already said the same thing in plain words: live has no pill, so pill code has no
-   business being in it.
-   (This comment deliberately does not spell that id, because the guard greps the source
-   without stripping comments — it caught my prose twice today. Describe, do not name.)
+/* ══ BR-S486 — THE PILL GOES TO THE BUILD, FULL SCREEN ═══════════════════════════
+   The builder: "fix the pop up thing when i click from dev live or preview — i dont
+   want it like that, i want full screen that shows each of them naturally."
 
-   Bound to the element instead, inside the function that creates the pill, the peek is
-   part of the pill: it is cut when the pill is cut, with no name left behind for a guard
-   to find. Which is also just better — a delegated document listener for a control that
-   exists in exactly one place was always a heavier tool than the job needed. */
+   ★ WHAT WAS HERE, AND WHY IT WENT. BR-S480 opened each build in a scaled iframe so
+   that checking the public build never meant leaving the page you were looking at.
+   The reasoning was sound and the result was not: a build rendered at a fixed 1440px
+   and scaled into a panel is not the build anyone sees. It is a picture of it at some
+   other size, framed by a bar telling you which one it is — and the whole reason three
+   builds exist is to look at each one AS ITSELF, at the size it will actually be met.
+   A viewer you have to mentally correct for is worse than no viewer.
 
+   ★ WHAT REPLACES IT IS NOTHING. The sides were always real <a href> elements — the
+   peek worked by intercepting them. Removing the interception is the entire fix: the
+   browser goes to the build, full screen, at the reader's own width, with the URL in
+   the bar and the back button pointing home. Every property the panel was engineering
+   its way toward, the anchor had by default.
+
+   ★ AND IT DELETES A WHOLE CLASS OF UPKEEP: no frame lifecycle, no scale-on-resize, no
+   src cleared on close so a hidden build stops running timers behind the visible one,
+   no focus trap, no Escape handler, no second set of rules in the stylesheet. The five
+   functions and their CSS block are gone rather than disabled — the styles for a
+   removed control are part of the removed control, and build_public.py's cut lists are
+   re-anchored to match in the same commit. */
 /* BR-S266 — ONE PLACE THAT KEEPS THE ADDRESS BAR HONEST.
    The URL is this app's boot truth (`?dev=` is parsed at load to decide what mounts),
    so any disagreement between the URL and what is on screen comes back as a "random"
@@ -6122,6 +6180,7 @@ try {
 } catch (e) {}
 
 mountMenu();
+syncBuildFlip();   // BR-S377 — the dev⇄public flip, once, on every room
 wireU1Leak();      // BR-S399 — the found fragment, viewing only
 warmL1();          // BR-S401 — the desk is no longer the boot panel; warm what it needs
 wireL1Back();      // BR-S401 — the right half of the seal is the way back
@@ -6131,8 +6190,19 @@ renderSourceToggle();
 if (DEVNAV) {
   document.body.dataset.devnav = "1";
   const devnavEl = document.getElementById("devnav");
-  devnavEl.innerHTML = renderDevnav();
-  devnavEl.removeAttribute("hidden");
+  /* ★ BR-S486 — NULL IN THE PUBLIC BUILDS, AND IT USED TO TAKE THE WHOLE BOOT WITH IT.
+     transform_index strips the rail's markup from preview/ and live/, so this lookup
+     returns null there — and this line is at TOP LEVEL, so the TypeError aborted every
+     init line after it. The flag lives in localStorage and the three builds share an
+     origin, so any builder who had ever switched it on was carrying it into the public
+     builds already; it stayed hidden because nothing invited you to stand in live/ with
+     it on. BR-S486 makes that the normal way to inspect the launch build, which turned a
+     latent crash into the first thing you would hit. The rail is dev-only markup; its
+     absence is correct, and only the assumption that it is always there was wrong. */
+  if (devnavEl) {
+    devnavEl.innerHTML = renderDevnav();
+    devnavEl.removeAttribute("hidden");
+  }
 }
 /* BR-S213: press ` (backtick) anywhere to toggle the dev nav live — the builder's
    always-on switch for the state toggles (M3 Lock, view, source, routes). Persisted

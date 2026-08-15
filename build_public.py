@@ -43,20 +43,20 @@ ROOT = os.path.dirname(os.path.abspath(__file__))
 #   live     (/live/)     MASTERCLASS QUALITY ONLY. If it is not finished to that bar,
 #                         it does not appear.
 #
-# ★ THIS FILE DOES NOT YET IMPLEMENT THAT RULE. Today preview/ and live/ differ by ONE
-# thing, the build flip; everything else ships to both. The rule needs a third tier —
-# a PREVIEW_ONLY list cut from live/ but kept in preview/ — and two populations move
-# into it the moment it exists:
+# ★ BR-S485 — THE THIRD TIER EXISTS NOW. PREVIEW_ONLY (below) is the list this note spent
+# two sessions asking for: files kept in preview/ and cut from live/, tag and all. It was
+# built the moment an unfinished surface reached the launch build, which is what the rule
+# was written to prevent.
+#
+# STILL OUTSTANDING, and each is a judgement about what the public site publishes rather
+# than a mechanism that is missing:
 #   · the vision room, currently in CUT_ROOMS (semi-finished: a draft text and a
 #     POST_TARGET of null) — under the rule it is preview/ material, not dev-only
-#   · the 101 gate hits that fail live/ today: the dev-nav (38), the dev-route links
-#     (49), the M1 A/B toggle (4) and the tuning params (10). The dev-nav and the
-#     tuning params are workshop tools and belong to dev alone; the M1 toggle's own
-#     comment says to remove it once chosen.
-# Doing that properly is its own task, because it changes what is published. Recorded
-# here rather than half-done, so the next session inherits the rule and not a guess.
+#   · the gate hits that fail live/ today: the dev-nav, the dev-route links, the M1 A/B
+#     toggle and the tuning params. The dev-nav and the tuning params are workshop tools
+#     and belong to dev alone; the M1 toggle's own comment says to remove it once chosen.
 #
-# (folder, keeps the flip)
+# (folder, is_preview — drives PREVIEW_ONLY, and nothing else)
 VARIANTS = [("preview", True), ("live", False)]
 
 # Set per variant by build(); every helper writes through it.
@@ -95,25 +95,24 @@ PROFILE_MOUNT = ('    if (window.BRArcanaProfile && typeof window.BRArcanaProfil
 PROFILE_GUARD = ('    // Public build: the Profile opens only once something is kept.\n'
                  '    if (!hasHoldings()) { location.replace("./#reliquary"); return; }\n')
 
-# BR-S378 — the flip, cut from `live/` only. The call goes first and the functions after,
-# so the removal is checked by the same "no live reference survives" rule as every other
-# cut. The CSS block goes too: it would be inert with no element to style, but shipping
-# the rules for a control that does not exist is a signpost to a door.
-FLIP_CALL = "syncBuildFlip();   // BR-S377 — the dev⇄public flip, once, on every room\n"
-# BR-S480 — the PEEK goes with the pill. It opens the other builds in a frame from the
-# pill itself, so with the pill cut it is unreachable code — and unreachable code that
-# still names the control is exactly the signpost the note above says not to ship. All
-# five are reachable only from syncBuildFlip (via _peekWire) or from each other; the
-# "no live reference survives" assert below is what proves it rather than this comment.
-FLIP_FUNCTIONS = ["brBuildSides", "syncBuildFlip",
-                  "_peekWire", "_peekBuild", "_peekFit", "_peekClose", "_peekEsc"]
-FLIP_CSS_OPEN = "/* BR-S377 — THE BUILD FLIP"
-# BR-S480 — the anchor moves to the END of the peek's rules, and the peek's CSS was moved
-# in the stylesheet to sit directly after the flip's, so the two are ONE contiguous block.
-# Leaving the peek's rules in live/ would have shipped styling for a control that does not
-# exist there — precisely the "signpost to a door" the note above forbids. The styles for
-# a cut thing are part of the cut thing.
-FLIP_CSS_LAST = "@media (prefers-reduced-motion: reduce) { #brBuildPeek"
+# ★ BR-S486 — THE FLIP IS NO LONGER CUT, AND THIS IS THE ONE PLACE THAT SAYS WHY.
+# BR-S378 cut the build pill from live/ so a launch site would not carry a labelled door
+# into the workshop. The cost was that clicking "live" was a one-way trip — the control
+# that took you there did not exist once you arrived. The builder's requirement is both
+# halves at once: the buttons stay while inspecting, and the real launch site has none.
+#
+# The three builds share an ORIGIN, so they share a localStorage, so the builder's dev
+# flag is readable from inside live/. The pill therefore ships everywhere and renders
+# only for the builder (app.js#brFlipVisible). The guarantee moves from build time to
+# run time, which is weaker, and that is accepted for THIS control alone because its
+# entire content is three links to three already-public directories — a flag that fails
+# open leaks nothing. Anything carrying a secret stays in CUT_ROOMS / PREVIEW_ONLY.
+#
+# What replaced the cut is a PROBE that the gate exists (see PROBES). Deleting the guard
+# now fails the build, which is the property the cut was really providing.
+# The FLIP_CALL / FLIP_FUNCTIONS / FLIP_CSS_* anchors and cut_flip() are gone with it:
+# an anchor kept for a cut nobody performs is a re-anchoring chore forever, paid on every
+# edit to a block the build no longer touches.
 
 # Top-level functions reachable ONLY from a cut branch. Verified one call site each, all
 # inside a removed branch — re-verify with `grep -c` before adding to this list.
@@ -160,6 +159,26 @@ COPY_FILES = [
 # <head>/<body> lines pulled out of index.html: the surfaces those files serve are cut.
 STRIP_TAGS = ["ceremony.css", "ceremony.js"]
 
+# ★ BR-S485 — THE THIRD TIER, FINALLY BUILT. The note at the top of this file has said
+# since BR-S396 that the builder's rule needs a PREVIEW_ONLY list — semi-finished work
+# kept in preview/ and cut from live/ — and that without it "today preview/ and live/
+# differ by ONE thing, the build flip; everything else ships to both". That gap shipped
+# an unfinished surface to the launch build, which is the failure the rule exists to
+# prevent, so here is the list.
+#
+# A FILE ON THIS LIST IS NOT COPIED TO live/, AND ITS TAG IS PULLED FROM live/index.html.
+# Both halves are required and neither is optional: copying it without the tag ships dead
+# weight, and pulling the tag without the copy is fine — but copying nothing while LEAVING
+# the tag is a 404 in the <head> of the launch site, which is exactly the broken host the
+# COPY_FILES note above records. The probe table asserts the absence, so a file that
+# quietly starts shipping again fails the build.
+#
+# Note what is NOT here. The vision room stays in CUT_ROOMS and the gate's standing hits
+# (the dev-nav, the dev-route links, the M1 A/B toggle, the tuning params) stay where they
+# are. Each is a judgement about what the public site publishes and each deserves its own
+# look, rather than being swept in behind a mechanism that was added for one file.
+PREVIEW_ONLY = ["_u1-rack.js"]
+
 # Links into a room this build removed. Deleting the LISTENER leaves a button that looks
 # alive and does nothing, which is worse than a dead link — so these are re-pointed at the
 # nearest public room, not cut. (from, to) pairs, both asserted present/absent.
@@ -197,12 +216,21 @@ DEAD_LINK_REWRITES = [
 # (label, file inside the build, regex, {variant: must-be-present})
 PROBES = [
     ("dev-nav rail",   "index.html",   r'class="devnav"',     {"preview": False, "live": False}),
-    ("build pill",     "app.js",       r"\bbrBuildFlip\b",    {"preview": True,  "live": False}),
+    # BR-S486 — the pill ships to BOTH now, so the meaningful assertion moved: not
+    # "is it absent from live" but "is the gate that hides it from a visitor still
+    # there". Deleting brFlipVisible() is what would put buttons on the launch site,
+    # and that is the failure this pair exists to catch.
+    ("build pill",     "app.js",       r"\bbrBuildFlip\b",       {"preview": True, "live": True}),
+    ("pill gate",      "app.js",       r"function brFlipVisible", {"preview": True, "live": True}),
     ("the card",       "app.js",       r"\bm2hero\b",         {"preview": True,  "live": True}),
     ("six marks",      "app.js",       r"\bm2bface__marks\b", {"preview": True,  "live": True}),
     ("specimen panel", "_six-live.js", r"\bsx-",              {"preview": True,  "live": True}),
     ("roadmap box",    "app.js",       r"\brmpop\b",          {"preview": True,  "live": True}),
-    ("U1 rack",        "_u1-rack.js",  r"\bu1rack__vp\b",     {"preview": True,  "live": True}),
+    # BR-S485 — both halves of the preview-only cut, stated separately. The module and
+    # the tag that loads it fail independently, and the pairing that actually hurts is
+    # "tag kept, file cut" — a 404 in the launch site's own <head>.
+    ("U1 rack",        "_u1-rack.js",  r"\bu1rack__vp\b",     {"preview": True,  "live": False}),
+    ("U1 rack tag",    "index.html",   r"_u1-rack\.js",       {"preview": True,  "live": False}),
 ]
 
 # Emitted by build_routes.py's ROUTES; re-emitted here against dist/index.html.
@@ -275,53 +303,7 @@ def _code_only(src):
     return "".join(out)
 
 
-def cut_flip(src, report):
-    """Remove the build flip — `live/` only. Anchored and asserted like every other cut:
-    a flip that survived into the launch site would be a labelled door into the workshop,
-    so a missed anchor fails the build instead."""
-    if FLIP_CALL not in src:
-        sys.exit("build_public: the syncBuildFlip() boot call no longer matches, so the "
-                 "flip cannot be cut from live/. That would ship a door into the dev "
-                 "build. Re-anchor FLIP_CALL against the current app.js.")
-    src = src.replace(FLIP_CALL, "")
-    i = src.find("var BR_BUILDS = [")
-    if i < 0:
-        sys.exit("build_public: BR_BUILDS is gone from app.js — re-anchor the flip cut.")
-    src = src[:i] + src[src.index("];", i) + 3:]
-    for fn in FLIP_FUNCTIONS:
-        anchor = "function %s(" % fn
-        if anchor not in src:
-            sys.exit("build_public: %s() is gone from app.js — re-anchor the flip cut." % fn)
-        j = src.index(anchor)
-        end = _match_block(src, j)
-        line_start = src.rfind("\n", 0, j) + 1
-        src = src[:line_start] + src[end + 1:]
-    live = [ln for ln in _code_only(src).splitlines()
-            if re.search(r"\b(brBuildSides|syncBuildFlip|BR_BUILDS|brBuildFlip)\b", ln)]
-    if live:
-        sys.exit("build_public: the flip still has %d live reference(s) in live/:\n    %s"
-                 % (len(live), live[0].strip()[:90]))
-    report.append("flip removed: dev/preview/live pill is not in this build")
-    return src
-
-
-def transform_styles(src, report, keep_flip):
-    """styles.css is copied verbatim for `preview/`; for `live/` the flip's rules go too."""
-    if keep_flip:
-        return src
-    i = src.find(FLIP_CSS_OPEN)
-    j = src.find(FLIP_CSS_LAST)
-    if i < 0 or j < i:
-        sys.exit("build_public: the #brBuildFlip CSS block no longer matches its anchors. "
-                 "Re-anchor FLIP_CSS_OPEN / FLIP_CSS_LAST against the current styles.css.")
-    end = src.index("\n", j) + 1
-    src = src[:i] + src[end:]
-    assert "brBuildFlip" not in src and "br-flip__" not in src
-    report.append("styles.css: the flip's rules removed with it")
-    return src
-
-
-def transform_app(src, report, keep_flip=True):
+def transform_app(src, report, is_preview=True):
     # 1. the resolver — the lock
     m = re.search(r'if \(\[("(?:[a-z-]+)"(?:,\s*"[a-z-]+")+)\]\.includes\(dev\)\)', src)
     if not m:
@@ -433,9 +415,9 @@ def transform_app(src, report, keep_flip=True):
             sys.exit("build_public: %s still has %d live reference(s) after removal — it "
                      "would throw at runtime:\n    %s" % (fn, len(live), live[0].strip()[:90]))
 
-    # 4. the flip — kept in preview/, cut from live/
-    if not keep_flip:
-        src = cut_flip(src, report)
+    # 4. BR-S486: the flip is no longer cut from either build. It ships to all three and
+    # renders only for the builder — see the note beside PREVIEW_ONLY, and the probe that
+    # asserts the gate is still there.
 
     # the asserts that make a bad build fail here rather than on the live site
     for room in CUT_ROOMS:
@@ -446,14 +428,16 @@ def transform_app(src, report, keep_flip=True):
     return src
 
 
-def transform_index(src, report):
+def transform_index(src, report, is_preview=True):
     # Match the href/src VALUE, never the whole line: styles.css's cache-bust comment
     # mentions reveal/stage-controller.js, and a substring test drops the site's main
     # stylesheet on the strength of a footnote.
+    # BR-S485: for live/, the preview-only files' tags go with the files themselves.
+    drop = list(STRIP_TAGS) + ([] if is_preview else list(PREVIEW_ONLY))
     out = []
     for line in src.splitlines(True):
         ref = re.search(r'(?:src|href)="([^"]+)"', line)
-        if ref and any(t in ref.group(1) for t in STRIP_TAGS):
+        if ref and any(t in ref.group(1) for t in drop):
             report.append("index.html: dropped %s" % ref.group(1))
             continue
         out.append(line)
@@ -468,7 +452,7 @@ def transform_index(src, report):
 
     # assert on what the page actually LOADS, not on what its comments mention
     loaded = re.findall(r'(?:src|href)="([^"]+)"', src)
-    for t in STRIP_TAGS:
+    for t in drop:
         assert not any(t in u for u in loaded), t
     return src
 
@@ -520,6 +504,11 @@ def probe_build(folder, report):
         expected = want[folder]
         path = os.path.join(DIST, rel)
         if not os.path.isfile(path):
+            # A file that is not there at all is the STRONGEST form of absent, so for a
+            # preview-only cut this is the pass, not an error. Only an expected-present
+            # file going missing is a failure.
+            if not expected:
+                continue
             failures.append("%-14s %s was never written to %s/" % (label, rel, folder))
             continue
         found = re.search(pattern, io.open(path, encoding="utf-8").read()) is not None
@@ -534,7 +523,7 @@ def probe_build(folder, report):
     report.append("probes: %d/%d as expected for %s/" % (len(PROBES), len(PROBES), folder))
 
 
-def build(folder="preview", keep_flip=True):
+def build(folder="preview", is_preview=True):
     global DIST
     DIST = os.path.join(ROOT, folder)
     report = []
@@ -547,6 +536,12 @@ def build(folder="preview", keep_flip=True):
         src = os.path.join(ROOT, rel)
         if not os.path.isfile(src):
             sys.exit("build_public: %s is on the copy list but not in the repo." % rel)
+        # BR-S485 — the third tier. Checked AFTER the exists test on purpose: a
+        # preview-only file that has been deleted is still a stale list, and skipping
+        # it here would hide that from the one build that does not carry it.
+        if not is_preview and rel in PREVIEW_ONLY:
+            report.append("preview-only: %s kept out of live/" % rel)
+            continue
         dst = os.path.join(DIST, rel)
         d = os.path.dirname(dst)
         if d and not os.path.isdir(d):
@@ -554,19 +549,16 @@ def build(folder="preview", keep_flip=True):
         if rel == "app.js":
             text = io.open(src, encoding="utf-8").read()
             before = len(text)
-            text = transform_app(text, report, keep_flip)
+            text = transform_app(text, report, is_preview)
             io.open(dst, "w", encoding="utf-8", newline="").write(text)
             report.append("app.js: %d -> %d bytes (-%d)" % (before, len(text), before - len(text)))
-        elif rel == "styles.css":
-            text = transform_styles(io.open(src, encoding="utf-8").read(), report, keep_flip)
-            io.open(dst, "w", encoding="utf-8", newline="").write(text)
         else:
             shutil.copy2(src, dst)
         src_bytes += os.path.getsize(dst)
 
     idx = io.open(os.path.join(ROOT, "index.html"), encoding="utf-8").read()
     io.open(os.path.join(DIST, "index.html"), "w", encoding="utf-8", newline="").write(
-        transform_index(idx, report))
+        transform_index(idx, report, is_preview))
 
     copy_tracked_assets(report)
     emit_routes(report)
@@ -592,8 +584,8 @@ def build(folder="preview", keep_flip=True):
 
 
 if __name__ == "__main__":
-    for _folder, _keep in VARIANTS:
-        build(_folder, _keep)
+    for _folder, _is_preview in VARIANTS:
+        build(_folder, _is_preview)
         print("")
     if "--no-gate" in sys.argv[1:]:
         print("--no-gate: neither output is cleared for deploy.")
@@ -601,7 +593,7 @@ if __name__ == "__main__":
     # Every output is gated on its own. live/ is the one a launch would serve, but a leak
     # in preview/ is still a leak on the same public host, so neither gets a pass.
     _rc = 0
-    for _folder, _keep in VARIANTS:
+    for _folder, _is_preview in VARIANTS:
         print("gate: %s/" % _folder)
         _rc |= subprocess.call([sys.executable, os.path.join(ROOT, "gate_public.py"),
                                 "--target", os.path.join(ROOT, _folder)], cwd=ROOT)

@@ -6454,6 +6454,47 @@ html.orbit-wings .orbit__field { --orbit-rx: clamp(200px, 25.5vw, 368px); --orbi
   color: var(--t-display, #e9e5dc); margin: 0 0 14px; max-width: 46ch;
 }
 
+/* BR-S377 — THE BUILD FLIP (#brBuildFlip, injected by app.js#syncBuildFlip).
+   A builder's instrument, not part of the room: it sits bottom-CENTRE because both
+   bottom corners are taken (#brCodexDock right, the ROOMS dock left), and centred it
+   reads as belonging to the window rather than to the page. Mono, small, dim at rest
+   and lit on hover — the same restraint as the dev rail, so it never competes with
+   anything the design is actually about. The side you are on is stated in cream and
+   is not a link; the other side is the only thing that moves under the cursor. */
+#brBuildFlip {
+  position: fixed; left: 50%; transform: translateX(-50%); bottom: 12px; z-index: 41;
+  display: flex; align-items: center; gap: 8px;
+  padding: 5px 12px; border-radius: 999px;
+  border: 1px solid rgba(220, 215, 203, .12);
+  background: rgba(10, 11, 13, .82);
+  font-family: var(--font-mono, "IBM Plex Mono", monospace);
+  font-size: 9px; letter-spacing: .18em; text-transform: uppercase;
+  -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+}
+.br-flip__lab { color: rgba(220, 215, 203, .34); }
+.br-flip__sep { color: rgba(220, 215, 203, .28); }
+.br-flip__side {
+  color: rgba(220, 215, 203, .46); text-decoration: none;
+  transition: color .18s ease;      /* colour only — nothing here earns a repaint */
+}
+.br-flip__side:hover, .br-flip__side:focus-visible { color: var(--gold-lit, #c9a35c); outline: none; }
+/* the side you are already on: stated, inert, and visibly not the control */
+.br-flip__side.is-on { color: var(--t-display, #e9e5dc); pointer-events: none; cursor: default; }
+/* ══ BR-S486 — THE PEEK IS GONE; THE PILL GOES TO THE BUILD ══════════════════
+   The builder: "i dont want it like that, i want full screen that shows each of
+   them naturally."
+
+   BR-S480 opened each build in a scaled frame so you never left the page. The
+   cost of that was the thing being judged: a build shown at 1440px scaled into a
+   panel is never the build a visitor sees, it is a picture of it at some other
+   size, inside a bar that says which one you are looking at. The point of three
+   builds is to see each one AS ITSELF.
+
+   So the sides are plain anchors again and the browser does what it is for —
+   full screen, real URL, real width, back button returns you. There is nothing
+   left to style, which is why this block is a comment and not a ruleset: the
+   styles for a removed control are part of the removed control. */
+@media (max-width: 560px) { #brBuildFlip { bottom: 8px; padding: 4px 10px; font-size: 8px; } }
 
 
 /* ── BR-S400 — L1's SEAL. The desk behind it stays legible: this is a locked-room
