@@ -259,6 +259,31 @@
     + ".sx__close i{color:var(--sxc);font-size:9px;font-style:normal;line-height:1.7}"
     + ".sx__close span{font-family:var(--font-display);font-style:italic;font-size:13px;color:#a8a294}"
 
+    /* ══ BR-S467 — THE MARK'S NAME IS THE THING, AND IT WAS RANKING THIRD ══════════
+       The builder: "the name of the mark could be more visible or brighter and not
+       hidden of there."
+
+       MEASURED, THE PANEL'S OWN ORDER OF LOUDNESS PUT IT THIRD. The name was #dcd7cb at
+       29px; the glyph directly above it was 34px AND carried the mark's own colour, and
+       colour outranks size for the eye. So the loudest thing on the panel was a symbol,
+       the second was a coloured field, and the ANSWER — the word the whole gesture
+       exists to deliver — sat between two small grey lines looking like a middle row.
+       It was not dim in the absolute; it was dim RELATIVE to everything around it, which
+       is why it reads as hidden rather than as faint.
+
+       Three changes, all to rank rather than to volume:
+         · #f4eee1 — now the brightest text on the panel, above the meaning paragraph
+           and above the glyph. It also matches the "Question" label across the column,
+           so the two hero words in this whole region share one register.
+         · 33px, so it beats the glyph on size as well as on brightness.
+         · the glyph steps back to 30px and .82 opacity. It is the mark's SIGN, not its
+           name — it should be recognised, not read first. Nothing is taken away; the
+           order is simply corrected.
+       The label above stays 6px away (BR-S466's tightest gap), so it still reads as
+       belonging to the name rather than floating between two blocks. */
+    + ".sx__name{font-size:33px;color:#f4eee1}"
+    + ".sx__glyph{font-size:30px;opacity:.82}"
+
     /* ══ BR-S466 — THE VERTICAL RHYTHM. Measured down the panel, the gaps between
        consecutive blocks ran 16, 13, 8, 10, 13, 17, 15 — SEVEN values, no two the same
        for a reason, and close enough together that they read as accidental rather than
