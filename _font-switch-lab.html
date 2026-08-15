@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>THE SPECIMEN PANEL — font switcher</title>
+<!--
+  ═══════════════════════════════════════════════════════════════════════════
+  FIVE FACES ON THE REAL PANEL. Built because the question — "what would fly
+  with younger people" — cannot be settled by argument, only by looking at real
+  text at real size on the real ground.
+
+  ★ WHAT IS REAL HERE, AND IT MATTERS: the content is lifted verbatim out of
+  codex-data.json (Berkano, Snake, hexagram 26) — not lorem, not a paraphrase.
+  The sizes, colours, spacing scale, left-rule tie and the 520px measure are the
+  shipped values from _six-live.js as of BR-S474. Change nothing but the face and
+  the comparison is honest.
+
+  ★ THE NAME AND THE BODY SWITCH SEPARATELY, on purpose. The panel has two typographic
+  jobs — one display word and a 330-character paragraph — and trying to serve both from
+  one family is what produced the compromise being judged. The split is the point.
+
+  ★ THE NECESSARY LENSES ARE ON SCREEN, not in a doc: measured x-height, characters per
+  line, and whether the weight you are looking at is a LOADED cut or a browser-synthesised
+  one. That last row is the defect BR-S473 found and it is invisible to the eye.
+  ═══════════════════════════════════════════════════════════════════════════
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,300;6..72,400;6..72,500;6..72,600&family=Literata:opsz,wght@7..72,300;7..72,400;7..72,500;7..72,600&family=Source+Serif+4:opsz,wght@8..60,300;8..60,400;8..60,500;8..60,600&family=Fraunces:SOFT,WONK,opsz,wght@0..100,0..1,9..144,300..700&family=Inter:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ground:#0f0d0b;            /* the panel's real ground */
+    --mono:"IBM Plex Mono",ui-monospace,monospace;
+    --sxc:#8a9184;               /* the rune mark's colour, as shipped */
+    --body:"Newsreader",Georgia,serif;
+    --display:"Newsreader",Georgia,serif;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:#08090b;color:#d6cec1;font-family:var(--mono);
+       display:grid;grid-template-columns:1fr 288px;min-height:100vh}
+
+  .stage{padding:36px 30px 60px;background:var(--ground);overflow-y:auto}
+  .panel{width:520px;max-width:100%;margin:0 auto 46px}
+  .panel + .panel{border-top:1px solid #1c1a17;padding-top:34px}
+
+  /* ── the shipped panel, value for value (BR-S466/467/468/472/473/474) ── */
+  .sx__src{font-family:var(--mono);font-size:9px;letter-spacing:.2em;text-transform:uppercase;
+           color:#6e6b63;margin:0 0 20px}
+  .sx__glyph{font-size:30px;line-height:1;opacity:.82;color:var(--sxc);margin:0 0 12px;
+             font-family:"Segoe UI Symbol","Apple Symbols","Noto Sans Symbols 2",serif}
+  .sx__label{font-family:var(--mono);font-size:9.5px;letter-spacing:.2em;text-transform:uppercase;
+             color:#7c766c;margin:0 0 6px}
+  .sx__name{font-family:var(--display);font-size:33px;font-weight:600;line-height:1.1;
+            color:#f4eee1;margin:0 0 8px}
+  .sx__attrs{font-family:var(--mono);font-size:10px;letter-spacing:.1em;line-height:1.75;
+             color:#605d55;margin:0 0 16px;font-variant-numeric:tabular-nums lining-nums}
+  .sx__perks{margin:0;padding:0 0 12px 10px;font-family:var(--mono);font-size:11px;
+             letter-spacing:.11em;line-height:1.7;
+             border-left:1px solid color-mix(in srgb,var(--sxc) 34%,transparent)}
+  .sx__perks b{font-weight:400;color:#9aa08f}
+  .sx__say{margin:0;padding:0 0 0 10px;font-family:var(--body);font-size:18px;font-weight:600;
+           line-height:1.52;color:#aaa69d;
+           border-left:1px solid color-mix(in srgb,var(--sxc) 34%,transparent)}
+  .sx__close{margin:20px 0 0;padding-top:12px;border-top:1px solid rgba(233,229,220,.09);
+             font-family:var(--display);font-style:italic;font-size:13px;color:#a8a294}
+
+  /* ── the bench ── */
+  .bench{background:#0b0c0e;border-left:1px solid #1b1d22;padding:16px 14px;overflow-y:auto;
+         position:sticky;top:0;max-height:100vh}
+  h1{font:10px/1.4 var(--mono);letter-spacing:.18em;color:#8c96a4;margin:0 0 4px;text-transform:uppercase}
+  .sub{font:10px/1.5 var(--mono);color:#5f6773;margin:0 0 16px}
+  h2{font:9px/1 var(--mono);letter-spacing:.16em;color:#6d7684;margin:16px 0 6px;text-transform:uppercase}
+  .row{display:flex;flex-direction:column;gap:4px}
+  button{background:#14161a;color:#9fa9b6;border:1px solid #262a31;border-radius:2px;
+         font:11px var(--mono);padding:6px 8px;cursor:pointer;text-align:left}
+  button:hover{color:#e6edf6;border-color:#3b424c}
+  button[aria-pressed="true"]{background:#23303f;color:#dfeaf7;border-color:#3f5568}
+  label{display:block;font:9px var(--mono);letter-spacing:.1em;color:#5f6773;margin:12px 0 3px;text-transform:uppercase}
+  input[type=range]{width:100%}
+  table{width:100%;border-collapse:collapse;margin-top:6px;font:10px var(--mono)}
+  td{padding:2px 0;color:#8f98a6;vertical-align:top}
+  td:last-child{text-align:right;color:#cfd8e4;font-variant-numeric:tabular-nums}
+  .warn{color:#d59a6a}
+  .ok{color:#8fae86}
+  .note{font:10px/1.55 var(--mono);color:#5f6773;margin-top:14px;border-top:1px solid #1b1d22;padding-top:10px}
+</style>
+
+<div class="stage" id="stage"></div>
+
+<div class="bench">
+  <h1>Specimen panel · five faces</h1>
+  <p class="sub">Real entries from codex-data.json. Shipped sizes, colours and spacing.</p>
+
+  <h2>Body — the meaning</h2>
+  <div class="row" id="bodyRow"></div>
+
+  <h2>Name — the display word</h2>
+  <div class="row" id="dispRow"></div>
+
+  <label>Body size — <span id="szv">18</span>px</label>
+  <input type="range" id="sz" min="14" max="22" step="0.5" value="18">
+  <label>Body weight — <span id="wtv">600</span></label>
+  <input type="range" id="wt" min="300" max="700" step="100" value="600">
+  <label>Leading — <span id="lhv">1.52</span></label>
+  <input type="range" id="lh" min="1.3" max="1.75" step="0.01" value="1.52">
+
+  <h2>The necessary lenses</h2>
+  <table id="metrics"></table>
+
+  <p class="note">
+    <b>x-height ratio</b> — measured, not claimed. Under ~0.70 is a display cut and will
+    read small at any nominal size.<br><br>
+    <b>chars/line</b> — 60–70 is the comfortable band at this 520px measure.<br><br>
+    <b>weight loaded</b> — if this says SYNTHESISED the browser is faking the cut and the
+    strokes are wrong. That is the defect that reads as "off" without looking wrong.
+  </p>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  /* verbatim from codex-data.json — three different shapes: a short name, a long
+     attribute run, and a hexagram whose name is a whole clause. If a face only works
+     on one of these it does not work. */
+  var SPECIMENS = [
+    { src: "From the archive · one of 24", glyph: "ᛒ", label: "Rune · from the name and date",
+      name: "Berkano", attrs: "B · birch",
+      kw: ["growth","fertility","new beginnings","nurturing","renewal"],
+      say: "Berkano is named for the birch tree, one of the first to grow leaves in spring, and represents fertility, growth, and new beginnings. It signals nurturing energy, family matters, birth, and the careful tending needed for something new to flourish. The rune reflects the feminine, protective, and regenerative forces of nature." },
+    { src: "From the archive · one of 12", glyph: "蛇", label: "Year animal · from the year",
+      name: "Snake", attrs: "2025, 2013, 2001, 1989, 1977, 1965 · Fixed element: Fire",
+      kw: ["intuitive","wise","secretive","elegant","strategic"],
+      say: "The Snake represents wisdom, intuition, and quiet strategic depth. Snakes are perceptive and elegant, preferring to observe and plan rather than act rashly, and they often possess sharp business or intellectual instincts. Their shadow is secretiveness and suspicion, sometimes curdling into jealousy or manipulation." },
+    { src: "From the archive · one of 64", glyph: "䷙", label: "Hexagram · from the name and date",
+      name: "26 · The Taming Power of the Great (Dà Xù)", attrs: "Mountain over Heaven",
+      kw: ["restraint","accumulated strength","discipline","stored potential"],
+      say: "The mountain holds heaven's creative power within it, symbolizing great strength that is restrained, cultivated, and stored rather than spent at once. The figure favors firm containment of energy through discipline and the study of past experience, building capacity for a great undertaking. What is held back now gathers force for a crossing of great waters later." }
+  ];
+
+  /* the five, plus the incumbent so the comparison has a control */
+  var FACES = [
+    { k: "Newsreader",        css: '"Newsreader",Georgia,serif',        note: "screen-native text serif" },
+    { k: "Literata",          css: '"Literata",Georgia,serif',          note: "built for long reading" },
+    { k: "Source Serif 4",    css: '"Source Serif 4",Georgia,serif',    note: "sturdiest on dark" },
+    { k: "Fraunces",          css: '"Fraunces",Georgia,serif',          note: "character, variable wonk" },
+    { k: "Inter",             css: '"Inter",system-ui,sans-serif',      note: "the modern default" },
+    { k: "Cormorant (now)",   css: '"Cormorant Garamond",Georgia,serif',note: "the incumbent — the control" }
+  ];
+
+  var stage = document.getElementById("stage");
+  stage.innerHTML = SPECIMENS.map(function (s) {
+    return '<div class="panel">'
+      + '<p class="sx__src">◆ ' + s.src + '</p>'
+      + '<div class="sx__glyph">' + s.glyph + '</div>'
+      + '<p class="sx__label">' + s.label + '</p>'
+      + '<p class="sx__name">' + s.name + '</p>'
+      + '<p class="sx__attrs">' + s.attrs + '</p>'
+      + '<p class="sx__perks">' + s.kw.map(function (w) { return '<b>' + w + '</b>'; }).join(' · ') + '</p>'
+      + '<p class="sx__say">' + s.say + '</p>'
+      + '<p class="sx__close">Yours is this one read against your other five.</p>'
+      + '</div>';
+  }).join("");
+
+  function mkRow(id, prop, initial) {
+    var row = document.getElementById(id);
+    row.innerHTML = FACES.map(function (f, i) {
+      return '<button data-css=\'' + f.css + '\' aria-pressed="' + (i === initial) + '">'
+        + f.k + '<span style="color:#5f6773"> · ' + f.note + '</span></button>';
+    }).join("");
+    row.addEventListener("click", function (e) {
+      var b = e.target.closest("button"); if (!b) return;
+      [].forEach.call(row.children, function (c) { c.setAttribute("aria-pressed", c === b); });
+      document.documentElement.style.setProperty(prop, b.dataset.css);
+      measure();
+    });
+  }
+  mkRow("bodyRow", "--body", 0);
+  mkRow("dispRow", "--display", 0);
+
+  function bind(id, out, fn) {
+    var el = document.getElementById(id);
+    el.addEventListener("input", function () {
+      document.getElementById(out).textContent = el.value;
+      fn(el.value); measure();
+    });
+  }
+  bind("sz", "szv", function (v) { setAll(".sx__say", "fontSize", v + "px"); });
+  bind("wt", "wtv", function (v) { setAll(".sx__say", "fontWeight", v); });
+  bind("lh", "lhv", function (v) { setAll(".sx__say", "lineHeight", v); });
+  function setAll(sel, prop, val) {
+    [].forEach.call(document.querySelectorAll(sel), function (e) { e.style[prop] = val; });
+  }
+
+  /* ── THE NECESSARY LENSES, MEASURED ON WHAT IS ACTUALLY ON SCREEN ────────────
+     x-height ratio is taken by rendering an 'x' and dividing by the em box; the
+     loaded-weight check compares the rendered width of the requested weight against
+     the same string at 400 — a synthesised bold is geometrically derived and lands
+     suspiciously close, which is exactly what BR-S473 could not see by eye. */
+  function px(fam, size, weight, text) {
+    var p = document.createElement("span");
+    p.textContent = text || "x";
+    p.style.cssText = "position:absolute;visibility:hidden;line-height:1;white-space:pre;"
+      + "font-family:" + fam + ";font-size:" + size + "px;font-weight:" + weight;
+    document.body.appendChild(p);
+    var r = p.getBoundingClientRect(); p.remove();
+    return { w: r.width, h: r.height };
+  }
+
+  /* ★ THE x-HEIGHT HAS TO COME FROM CANVAS, NOT FROM A SPAN. A span with line-height:1
+     reports the FONT'S LINE BOX, which is ~1.0em for every face — so the first version
+     of this probe printed 1.000 for Cormorant and 1.000 for Newsreader and would have
+     "proved" they were identical. actualBoundingBoxAscent on a lowercase x is the real
+     glyph height, which is the number that decides whether a face reads small. */
+  var _cv = document.createElement("canvas").getContext("2d");
+  function xHeightRatio(fam, weight) {
+    _cv.font = weight + " 100px " + fam;
+    var m = _cv.measureText("x");
+    if (!m.actualBoundingBoxAscent) return null;
+    return m.actualBoundingBoxAscent / 100;
+  }
+  function capRatio(fam, weight) {
+    _cv.font = weight + " 100px " + fam;
+    var m = _cv.measureText("H");
+    return m.actualBoundingBoxAscent ? m.actualBoundingBoxAscent / 100 : null;
+  }
+
+  function measure() {
+    var say = document.querySelector(".sx__say"), cs = getComputedStyle(say);
+    var fam = cs.fontFamily, size = parseFloat(cs.fontSize), wt = cs.fontWeight;
+    var xh = xHeightRatio(fam, wt);
+    var cap = capRatio(fam, wt);
+
+    /* chars per line, from the real rendered block */
+    var r = document.createRange(); r.selectNodeContents(say);
+    var rects = r.getClientRects(), lines = 0;
+    for (var i = 0; i < rects.length; i++) if (rects[i].height > 5) lines++;
+    var cpl = Math.round((say.textContent || "").trim().length / Math.max(1, lines));
+
+    /* is this weight a real file? compare against neighbouring cuts */
+    var wNow = px(fam, 40, wt, "Handgloves").w;
+    var w400 = px(fam, 40, 400, "Handgloves").w;
+    var w700 = px(fam, 40, 700, "Handgloves").w;
+    var synth = (wt !== "400" && Math.abs(wNow - w400) < 0.5) ||
+                (wt === "700" && Math.abs(w700 - w400) < 0.5);
+
+    var rows = [
+      ["face", fam.split(",")[0].replace(/"/g, "")],
+      ["x-height ratio", xh == null ? "n/a" : xh.toFixed(3) + (xh < 0.47 ? "  ⚠ display cut" : "  ok")],
+      ["cap ratio", cap == null ? "n/a" : cap.toFixed(3)],
+      ["optical size at 18px", xh == null ? "n/a" : Math.round(xh * size * 100) / 100 + "px of x"],
+      ["chars / line", cpl + (cpl >= 58 && cpl <= 72 ? "  ok" : "  ⚠ outside 60–70")],
+      ["lines", lines],
+      ["weight", wt + (synth ? "  ⚠ SYNTHESISED" : "  loaded")],
+      ["size", size + "px"]
+    ];
+    document.getElementById("metrics").innerHTML = rows.map(function (t) {
+      var cls = /⚠/.test(String(t[1])) ? ' class="warn"' : (/ok|loaded/.test(String(t[1])) ? ' class="ok"' : "");
+      return "<tr><td>" + t[0] + "</td><td" + cls + ">" + t[1] + "</td></tr>";
+    }).join("");
+  }
+
+  document.fonts.ready.then(measure);
+  measure();
+})();
+</script>
+</html>
