@@ -977,6 +977,16 @@ html.is-case .ab { border-color: rgba(201,138,94,.55); background: rgba(201,138,
     paintAB();
   }
   num("ab").addEventListener("click", toggleAB);
+  /* ★ BR-S483 — "v dont do anything". The handler was fine; the PAGE was not focused.
+     Key events only reach a document once it has focus, and a tab you have just opened
+     — or clicked into from a file listing — often has not got it, so every press went to
+     the browser instead. Nothing about that is discoverable: the shortcut simply appears
+     broken.
+     Focusing the button on load fixes it, and it also puts the keyboard on the control
+     the shortcut duplicates, so Space and Enter work for free. The button was always
+     there and always worked; the key is the convenience, and a convenience that needs
+     explaining is a defect. */
+  try { num("ab").focus({ preventScroll: true }); } catch (e) { }
   window.addEventListener("keydown", function (e) {
     /* guarded: unguarded, Ctrl+V flipped the design under the builder mid-paste,
        in a file whose whole premise is that the comparison has to be honest. */
