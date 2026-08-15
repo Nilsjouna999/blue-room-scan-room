@@ -122,8 +122,33 @@
     var sheet = d.querySelector(".orbit");
     if (!sheet || sheet.classList.contains("is-u1")) return false;
 
-    var src = d.querySelector("#about .u1doors");
-    if (!src) return false;                       /* U1 not mounted — leave the orbit alone */
+    /* ★★ BR-S457 — THE ROOMS NO LONGER BORROW U1'S DOM, BECAUSE U1 NO LONGER HAS ONE.
+       The builder: "current u1 those rooms deleted, only exist at room button."
+
+       This module was built to CLONE `#about .u1doors` — the right call while U1 owned
+       the list, because two renderings of one registry can drift and a clone cannot. But
+       the list is leaving U1 entirely, and a clone of a node that no longer exists is not
+       a graceful degradation: `convert()` would return false forever and the ROOMS button
+       — now the ONLY place the rooms live — would open an empty sheet.
+
+       So it renders from the registry directly. `u1Open()` (app.js:1619) and `u1Door()`
+       (:1625) are top-level functions in the same window, and they are the SAME two
+       functions U1 called — so this is not a second authoring of the doors, it is the
+       original one, called from here instead. The anti-drift property is kept; only the
+       borrowing is dropped.
+
+       THE CLONE PATH STAYS AS THE FALLBACK. If the globals are ever not there — a load
+       order change, a build that strips them — the old behaviour still runs rather than
+       the sheet coming up blank. Fail toward the thing that worked. */
+    var src = null;
+    if (typeof u1Open === "function" && typeof u1Door === "function") {
+      src = d.createElement("ol");
+      src.className = "u1doors";
+      src.innerHTML = u1Open().map(u1Door).join("");
+    } else {
+      src = d.querySelector("#about .u1doors");
+    }
+    if (!src || !src.children.length) return false;   /* nothing to show — leave the orbit alone */
 
     var field = sheet.querySelector(".orbit__field");
     if (!field) return false;

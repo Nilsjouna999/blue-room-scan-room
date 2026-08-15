@@ -345,12 +345,28 @@ def transform_app(src, report, keep_flip=True):
 
     # 2c. the U1 aside's CALL, before its function is cut below — otherwise the "no live
     # reference survives" check fires on a call site this build meant to remove.
-    if ASIDE_CALL not in src:
-        sys.exit("build_public: the u1Aside() call in renderAbout no longer matches. It "
-                 "would leave the public roadmap with a third track opening a room this "
-                 "build removes. Re-anchor ASIDE_CALL against the current app.js.")
-    src = src.replace(ASIDE_CALL, "")
-    report.append("U1: the vision / idea boxes removed with the room they open")
+    # BR-S457: renderAbout no longer lays out the roadmap board at all — the room list and
+    # the roadmap both left U1 — so there may be no call site to strip. That is a legitimate
+    # state, not a drift, and the guard must tell the two apart or it either blocks a correct
+    # build or waves through the failure it exists for.
+    #
+    # The guard's REAL question was never "does this exact string appear" — it was "will a
+    # live call to u1Aside() survive into a build that cuts the room it opens". So ask that:
+    # the anchor missing is fine ONLY IF no call to u1Aside() remains anywhere outside its
+    # own definition. If a call is still there under different whitespace, that is exactly
+    # the drift the guard was written for and it stays fatal.
+    if ASIDE_CALL in src:
+        src = src.replace(ASIDE_CALL, "")
+        report.append("U1: the vision / idea boxes removed with the room they open")
+    else:
+        stray = [m.start() for m in re.finditer(r"u1Aside\s*\(", src)]
+        defn = re.search(r"function\s+u1Aside\s*\(", src)
+        calls = [p for p in stray if not (defn and p == defn.start() + len("function "))]
+        if calls:
+            sys.exit("build_public: ASIDE_CALL did not match, but %d call(s) to u1Aside() "
+                     "remain in app.js. That would leave the public roadmap with a track "
+                     "opening a room this build removes. Re-anchor ASIDE_CALL." % len(calls))
+        report.append("U1: no u1Aside() call site — renderAbout no longer builds the board")
 
     # 3. the functions those branches were the only callers of
     for fn in CUT_FUNCTIONS:

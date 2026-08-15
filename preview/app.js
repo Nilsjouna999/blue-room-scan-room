@@ -1176,9 +1176,9 @@ function syncCodexBall() {
     dock.id = "brCodexDock";
     // the two-ball pair — orange (mini codex) stacked on top of the white (full codex)
     dock.innerHTML =
-      '<a class="br-ball br-ball--orange" href="codex.html?v=455" aria-label="Search the Codex">' +
+      '<a class="br-ball br-ball--orange" href="codex.html?v=457" aria-label="Search the Codex">' +
         '<span class="br-ball-core" aria-hidden="true"></span><span class="br-ball-tip" aria-hidden="true">Search</span></a>' +
-      '<a class="br-ball br-ball--yellow" href="codex.html?v=455" aria-label="Open the Codex — the archive of meanings">' +
+      '<a class="br-ball br-ball--yellow" href="codex.html?v=457" aria-label="Open the Codex — the archive of meanings">' +
         '<span class="br-ball-core" aria-hidden="true"></span><span class="br-ball-tip" aria-hidden="true">The Codex</span></a>';
     document.body.appendChild(dock);
   }
@@ -1463,7 +1463,7 @@ const ROOMS = [
   { key: "codex", state: "open", free: true, name: "The Codex",
     now: "222 entries across ten systems. Every card, sign, rune and hexagram the rooms read from.",
     soon: "Every mark the rooms read from, gathered and defined in one place.",
-    cost: "Free &middot; no account", cta: "Open the Codex", href: "codex.html?v=455" },
+    cost: "Free &middot; no account", cta: "Open the Codex", href: "codex.html?v=457" },
 
   { key: "tarot", state: "open", free: true, name: "Tarot Divination",
     now: "Three cards for a Sitting, five for the Deep Read, cut from the full 78 and filed where each fell.",
@@ -1968,32 +1968,32 @@ function renderAbout() {
     +     '<span>' + coming + ' still to come</span></p>'
     + '</header>'
 
-    + '<section class="u1sect u1sect--open" aria-labelledby="u1-open">'
-    +   '<div class="u1sect__head">'
-    +     '<span class="u1sect__mark" aria-hidden="true">&#9679;</span>'
-    +     '<h3 class="u1sect__t" id="u1-open">Open today</h3>'
-    +   '</div>'
-    +   '<p class="u1sect__lede">Finished, unlocked, and free where it says free. '
-    +     'This is the whole of what exists right now.</p>'
-    +   '<ol class="u1doors">' + open.map(u1Door).join('') + '</ol>'
-    + '</section>'
+    /* ★★ BR-S457 — THE ROOM LIST AND THE ROADMAP BOTH LEAVE U1. The builder:
+       "current u1 those rooms deleted, only exist at room button. and road map on
+        button pop up where the button is."
 
-    + '<section class="u1sect u1sect--made" aria-labelledby="u1-made">'
-    +   '<div class="u1sect__head">'
-    +     '<span class="u1sect__mark u1sect__mark--quiet" aria-hidden="true">&#9671;</span>'
-    +     '<h3 class="u1sect__t" id="u1-made">What is still being made</h3>'
-    +   '</div>'
-    +   '<p class="u1sect__lede">In the order it is being made, nearest first. '
-    +     'Nothing here carries a date, because no date here would be true.</p>'
-    /* The track count follows how many horizons actually rendered. A three-track grid
-     holding two columns leaves a visible hole where a third used to be, and the
-     bench column empties itself the day the last launch blocker is paid. */
-  +   (function () {
-        var cols = U1_HORIZONS.map(u1Column).filter(function (h) { return h; });
-        return '<div class="u1board" data-cols="' + cols.length + '">' + cols.join('') + '</div>';
-      })()
-    + '</section>'
+       WHY THIS IS A SUBTRACTION AND NOT A LOSS. U1 was carrying three jobs — say what
+       Blue Room IS, list every open room, and lay out the roadmap — and the second and
+       third both had a better address already built. The rooms have the ROOMS button,
+       which opens a map of them; U1 was a second, longer list of the same doors, one
+       scroll below the first. The roadmap has its own page at `roadmap/`, and a
+       three-column board of unbuilt things sitting under the identity line answered a
+       question nobody had reached yet. What is left is the one job only U1 can do.
 
+       ★ THE ROOMS' DEPENDENCY WAS HANDLED FIRST, DELIBERATELY. `_rooms-u1.js` CLONED
+       `#about .u1doors` to build the ROOMS sheet. Deleting this section without touching
+       that module would not have degraded — it would have emptied the one surface the
+       rooms were being moved TO. BR-S457 re-points it at `u1Open()`/`u1Door()`, the same
+       two functions this line called, before this line goes.
+
+       The roadmap's own column builders stay defined — the popup at the button is next
+       and it wants exactly those. `open`/`free`/`coming` above are still read by the
+       header's spec line, so the registry still governs what U1 says about itself.
+
+       (Naming those builders in prose here is enough to trip build_public's "no live
+       reference survives" check, which greps the source without stripping comments —
+       so they are described rather than named. A comment that fails the build is a
+       comment that will be deleted by whoever hits it at 2am.) */
     + '<footer class="u1foot">'
     +   '<p class="u1foot__line">One archive. Every door kept.</p>'
     +   '<span class="u1foot__seal" aria-hidden="true">&#9670;</span>'
@@ -2979,13 +2979,13 @@ function onMenuAnnexKey(e) {
    whole document, and a returning visitor holding the cached old one would otherwise read a
    page that no longer exists. Bump all of them together or none. */
 const CX_LEAVES =
-  '<a class="seed" id="codexSeed" href="codex.html?v=455" role="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="codexBloom" aria-label="Open the Codex">'
+  '<a class="seed" id="codexSeed" href="codex.html?v=457" role="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="codexBloom" aria-label="Open the Codex">'
   + '<span class="seed__glyph seed__open" aria-hidden="true">&#9670;</span>'
   + '<span class="seed__glyph seed__close" aria-hidden="true">&#10005;</span>'
   + '</a>'
   + '<div class="bloom" id="codexBloom" role="dialog" aria-modal="true" aria-label="The Codex" inert aria-hidden="true">'
   + '<div class="bloom__backfill"></div>'
-  + '<iframe class="bloom__frame" data-src="codex.html?v=455" title="The Codex" tabindex="-1"></iframe>'
+  + '<iframe class="bloom__frame" data-src="codex.html?v=457" title="The Codex" tabindex="-1"></iframe>'
   + '<div class="bloom__sheen" aria-hidden="true"></div>'
   + '</div>'
   + '<div class="bloom__ink" aria-hidden="true"></div>'
@@ -3002,7 +3002,7 @@ const MINI_LEAVES =
   + '<div class="mini__panel" role="dialog" aria-label="Mini Codex — search" inert aria-hidden="true">'
   + '<input class="mini__input" type="search" autocomplete="off" spellcheck="false" placeholder="Search the Codex…" aria-label="Search the Codex" />'
   + '<div class="mini__results" aria-live="polite"></div>'
-  + '<a class="mini__more" href="codex.html?v=455" data-codex-open>Open the full Codex &#8594;</a>'
+  + '<a class="mini__more" href="codex.html?v=457" data-codex-open>Open the full Codex &#8594;</a>'
   + '</div></div>';
 
 function renderMenu(reveal) {
@@ -3070,7 +3070,7 @@ function renderMenu(reveal) {
         </div>
 
         <div class="menu__portals">
-          <a class="menu__codex" href="codex.html?v=455" data-codex-open><span class="menu__codex__mark" aria-hidden="true">◆</span> The Codex <span class="menu__codex__arr" aria-hidden="true">→</span></a>
+          <a class="menu__codex" href="codex.html?v=457" data-codex-open><span class="menu__codex__mark" aria-hidden="true">◆</span> The Codex <span class="menu__codex__arr" aria-hidden="true">→</span></a>
           <a class="menu__codex" href="?dev=settings"><span class="menu__codex__mark" aria-hidden="true">◆</span> Settings <span class="menu__codex__arr" aria-hidden="true">→</span></a>
           <button type="button" class="menu__codex menu__codex--rooms" data-annex-go><span class="menu__codex__mark" aria-hidden="true">◆</span> The Reading Rooms <span class="menu__codex__arr" aria-hidden="true">→</span></button>
         </div>
@@ -3301,12 +3301,12 @@ function wireMenuCodex(host) {
 
   function open() {
     if (isOpen) return;
-    if (!ok) { location.href = "codex.html?v=455"; return; }           // no clip-path: the seal is a real door
+    if (!ok) { location.href = "codex.html?v=457"; return; }           // no clip-path: the seal is a real door
     if (!loaded) {                                              // M4.3: cold click — wait for the frame, don't navigate
       warmFrame(); pendingOpen = true;
       clearTimeout(coldT);                                      // ...but a frame that never arrives must not leave a dead control:
       coldT = setTimeout(function () {                          // after 6s the seal becomes the real door again, as it always was
-        if (pendingOpen && !loaded) { pendingOpen = false; location.href = "codex.html?v=455"; }
+        if (pendingOpen && !loaded) { pendingOpen = false; location.href = "codex.html?v=457"; }
       }, 6000);
       return;
     }
@@ -3377,7 +3377,7 @@ function wireMenuCodex(host) {
     if (e.key === "Enter") { e.stopPropagation(); }        // shield the global menu Enter→room; the anchor's activation fires the click
     else if (e.key === " " || e.key === "Spacebar") {      // anchors don't activate on Space natively
       e.stopPropagation(); e.preventDefault();
-      if (ok) toggle(); else location.href = "codex.html?v=455";
+      if (ok) toggle(); else location.href = "codex.html?v=457";
     }
   });
 
@@ -3390,7 +3390,7 @@ function wireMenuCodex(host) {
       if (e.key === "Enter") { e.stopPropagation(); }        // shield the global menu Enter→room; the anchor's activation fires the click
       else if (e.key === " " || e.key === "Spacebar") {      // anchors don't activate on Space natively
         e.stopPropagation(); e.preventDefault();
-        if (!ok) { location.href = "codex.html?v=455"; return; }
+        if (!ok) { location.href = "codex.html?v=457"; return; }
         open();
       }
     });
@@ -4432,8 +4432,21 @@ function _navStops() {
        This line IS that definition; _u1Seat() reads it back out as stops[1], and
        BR-S308 pointed the boot and the orbit at _u1Seat() so nothing re-derives it. */
     ys.push(Math.round(about.getBoundingClientRect().top + window.scrollY));
-    [].forEach.call(about.querySelectorAll(".about__nugget"), (n) => seat(n.querySelector(".about__plate") || n));
-    seat(about.querySelector(".about__close"));
+    /* ★★ BR-S457 — THE CHECKPOINTS ARE GONE, AND MOST OF THEM WENT BY ATTRITION.
+       The builder: "delete check points."
+
+       They were already dead and nobody had noticed. This walked `.about__nugget` and
+       `.about__close`, and BR-S416 stopped rendering both — grep finds only CONSUMERS of
+       those two classes, no producer anywhere. So `_navStops()` has been returning TWO
+       stops, not eight, for some time, and these lines were querying for nothing on every
+       key press. Deleting them changes no behaviour; it removes the appearance of a
+       feature that stopped existing.
+
+       ★ WHAT DOES NOT GO IS ys[1] — THE SEAT, one line above. It is `_u1Seat()`, and the
+       M1->U1 descent glide, the boot seat and the Orbit all read it. Killing the WALK is
+       what was asked for; killing the THRESHOLD would be a different and much worse
+       change, and the two are one line apart. `seat()` above is retained for the same
+       reason a hook is: the next thing U1 wants to stop at will need it. */
   }
   const floor = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
   return ys.map((y) => Math.min(Math.max(0, y), floor))             // clamp into the real scroll range…
@@ -6287,7 +6300,7 @@ render();
       }
     } catch (e) {}
     if (host.querySelector("#about")) out.push({ label: "About Blue Room", sub: "What this is", mark: ORBIT_MARKS.about, rank: 4, wing: "house", idx: 0, kind: "about" });
-    out.push({ label: "The Codex", sub: "Every mark, defined", mark: AB_EMBLEMS.codex, rank: 1, wing: "work", href: "codex.html?v=455", kind: "link" });
+    out.push({ label: "The Codex", sub: "Every mark, defined", mark: AB_EMBLEMS.codex, rank: 1, wing: "work", href: "codex.html?v=457", kind: "link" });
     /* BR-S339 — THE SEVENTH PLATE. Discovery is this archive's best argument, and it
        could only be made by the rooms that already exist. The Roadmap is in the HOUSE
        wing with About and Settings — the building explaining itself — and ranks below
