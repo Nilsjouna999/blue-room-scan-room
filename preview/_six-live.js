@@ -66,7 +66,16 @@
     + ".m2bface__marks li:focus-visible{outline:1px solid rgba(28,21,13,.5);outline-offset:3px}"
     /* the panel, inserted into .m2read. The app's own children are hidden, not
        removed — it rewrites them on every mount and would throw if they vanished. */
-    + ".sx-hide{display:none!important}"
+    /* ★★ BR-S461 — visibility, NOT display. `display:none` REMOVED the app's own three
+       children from layout, so .m2read collapsed from its natural ~193px to whatever the
+       panel reserved — and .menu__draw's grid centres the head against the card with
+       `1fr auto 1fr`, so the head's top edge lifted by up to ~127px the instant a pointer
+       crossed the card, then dropped back on leave. The file's own 14-line law directly
+       below says the top edge must not move; the rule written to defend it targets
+       .m2read's flex alignment, which was never what moved it.
+       With visibility the app's text keeps its exact box whether the panel is up or not,
+       the `auto` grid row never changes height, and the head cannot re-centre. */
+    + ".sx-hide{visibility:hidden!important}"
     /* ★ THE TOP EDGE DOES NOT MOVE. Every specimen is a different height — the name is
        one or two lines, the perks wrap or do not, the paragraph runs three to eight
        lines. If the block is centred (or the column is), that variation is shared out
@@ -74,9 +83,19 @@
        on every hover. That is what reads as unsleek: the thing you are not changing
        appears to move. Anchor the column to its top and the whole variance falls to the
        bottom, where nothing is looking. */
-    + ".m2read{justify-content:flex-start!important;align-items:stretch!important}"
-    /* and reserve the tallest case, so the region below the panel does not breathe either */
-    + ".sx{transition:opacity 110ms ease;min-height:430px}"
+    + ".m2read{justify-content:flex-start!important;align-items:stretch!important;position:relative}"
+    /* ★★ BR-S461 — THE PANEL IS TAKEN OUT OF FLOW, AND min-height:430px IS DELETED.
+       That reservation was the second half of the same defect: it forced .m2read to a
+       height the app's own text never has, so the head jumped even before a specimen
+       varied. Absolutely positioned over the (now visibility-hidden, still full-size)
+       text, the panel occupies exactly the app's own box; every specimen's own variance
+       falls DOWNWARD into the column's air below, which is what the law two rules up
+       actually asks for — "where nothing is looking".
+       ★ AND NOTHING UNHIDES AN UNWRITTEN PANEL. render() sets .is-ready at its end, so
+       even a future path that reveals early shows the app's text rather than a void —
+       the belt behind BR-S459's fix. */
+    + ".sx{transition:opacity 110ms ease;position:absolute;top:0;left:0;right:0}"
+    + ".sx:not(.is-ready){display:none}"
     + ".sx.is-out{opacity:0}"
     /* ★ THE PANEL IS A CONSEQUENCE OF THE GESTURE, NOT A FIXTURE. Leave the card and it
        goes — and because the app's own children were HIDDEN rather than removed, they
@@ -193,6 +212,10 @@
       });
     }
     current=i;
+    /* BR-S461 — the panel is only allowed to exist once it has been written. Paired with
+       `.sx:not(.is-ready){display:none}`, this makes BR-S459's fix structural rather than
+       conditional: no path, present or future, can reveal an unwritten specimen. */
+    if(box) box.classList.add("is-ready");
   }
 
   function install(d){
@@ -230,10 +253,41 @@
         li.addEventListener("focus",function(){ render(d,i); });
         li.addEventListener("click",function(){ render(d,i); });
       });
-      d.addEventListener("keydown",function(e){
+      /* ★★ BR-S461 — THIS WAS BOUND ON `document`, AND IT STACKED. Three faults in six
+         lines, all from the same choice of host:
+
+         1. IT HIJACKED THE DESCENT. app.js:4783 owns ArrowDown/ArrowUp for the M1->U1
+            glide and guards them on `state.view`, the panel index and `_navBlocked`.
+            This had none of those and preventDefault'd every arrow press anywhere in the
+            document — so one press both glided the page toward U1 AND focused a mark,
+            which fired render+hold and popped the panel open over a column the reader
+            was scrolling away from. Neither handler stops propagation, so both ran.
+         2. IT FIRED ON L1 AND M2, where the marks are in the DOM but off-stage.
+         3. IT STACKED. The listener lives inside the one-shot `!ul.dataset.sx` block but
+            uninstall() never removed it, so every menu remount added another copy.
+
+         Bound on `ul` instead, all three go at once: keydown BUBBLES from the focused
+         li, so the six still arrow-navigate; the handler cannot fire unless focus is
+         already inside the six, which is the only state it was ever for; and it dies
+         with the node instead of outliving it.
+
+         ★ The index comes from the DOM, not from the module's `current`. `current` is the
+         RENDERED specimen, which pointer hover also moves — so arrowing after a hover
+         used to jump from wherever the mouse had last been rather than from the focused
+         mark. ★ And focus() takes preventScroll: without it the browser issues its own
+         scroll write in the same frame as the glide, which is two things moving the page
+         at once. ★ role="button" at :228 promises activation; Enter and Space now
+         actually do it. */
+      ul.addEventListener("keydown",function(e){
+        var ls=ul.children, n=ls.length; if(!n) return;
+        var at=Array.prototype.indexOf.call(ls, d.activeElement);
+        if(e.key==="Enter"||e.key===" "||e.key==="Spacebar"){
+          if(at<0) return;
+          render(d,at); e.preventDefault(); return;
+        }
         if(e.key!=="ArrowDown"&&e.key!=="ArrowUp") return;
-        var ls=d.querySelectorAll(".m2bface__marks li"); if(!ls.length) return;
-        ls[(current+(e.key==="ArrowDown"?1:SIX.length-1)+SIX.length)%SIX.length].focus();
+        if(at<0) return;                       /* focus is not on a mark — the page keys stay the page's */
+        ls[(at+(e.key==="ArrowDown"?1:n-1))%n].focus({preventScroll:true});
         e.preventDefault();
       });
 
