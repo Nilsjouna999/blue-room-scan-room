@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MAIN MENU — export for hand-off</title>
+<!--
+  ═══════════════════════════════════════════════════════════════════════════
+  THE MAIN MENU, AS ONE SELF-CONTAINED FILE, FOR HANDING TO ANOTHER MODEL.
+
+  The builder: "give copy code of our main menu. im gonna give it gpt and let it
+  implement its design on it."
+
+  ★ WHY THIS IS A TOOL AND NOT A PASTED SNIPPET. The menu's markup does not exist
+  anywhere as source — renderWall() (app.js) BUILDS it as a string at runtime from
+  the ROOMS registry, the horizon table and half a dozen state reads. Copying the
+  JS would hand over a builder, not a page. So this opens the real app, takes the
+  markup the app actually produced, and welds it to the styles that actually
+  match it.
+
+  ★ AND THE CSS IS EXTRACTED, NOT SHIPPED WHOLE. styles.css is 409KB / 1,653 rules;
+  the menu uses 289 of them. `_menu-export.css` is those 289, produced by matching
+  every selector against the class and id tokens present in the rendered panel,
+  keeping :root, @font-face, @property, @keyframes and the @media blocks that
+  wrap them. 41KB instead of 409KB — the difference between something another
+  model can hold in context and something it cannot.
+
+  ★ WHAT IS DELIBERATELY NOT INCLUDED: all JavaScript. The panel slide, the card
+  flip, the specimen overlay and the roadmap popup are behaviour, and the brief is
+  design. What comes out is the M1 panel in its rest state, static, complete.
+  ═══════════════════════════════════════════════════════════════════════════
+-->
+<style>
+  :root{--mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace}
+  *{box-sizing:border-box}
+  body{margin:0;background:#0a0b0d;color:#cfd8e4;font:13px/1.5 var(--mono);
+       display:grid;grid-template-rows:auto 1fr;height:100vh}
+  header{padding:14px 18px;border-bottom:1px solid #1b1d22;display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+  h1{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:#8c96a4;margin:0}
+  .stat{font-size:11px;color:#5f6773}
+  .stat b{color:#dfe6ef;font-weight:400}
+  button{background:#14161a;color:#9fa9b6;border:1px solid #262a31;border-radius:2px;
+         font:11px var(--mono);padding:7px 11px;cursor:pointer}
+  button:hover{color:#e6edf6;border-color:#3b424c}
+  button.primary{background:#23303f;color:#dfeaf7;border-color:#3f5568}
+  main{display:grid;grid-template-columns:1fr 1fr;min-height:0}
+  .pane{display:flex;flex-direction:column;min-height:0;min-width:0}
+  .pane + .pane{border-left:1px solid #1b1d22}
+  .pane h2{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:#6d7684;
+           margin:0;padding:10px 14px;border-bottom:1px solid #1b1d22}
+  textarea{flex:1;min-height:0;width:100%;border:0;resize:none;background:#08090b;color:#9aa4b2;
+           font:11px/1.45 var(--mono);padding:12px 14px;white-space:pre;overflow:auto}
+  iframe{flex:1;min-height:0;width:100%;border:0;background:#0a0b0d}
+  .msg{padding:10px 14px;font-size:11px;color:#8fae86;border-top:1px solid #1b1d22}
+  .msg.err{color:#d59a6a}
+</style>
+
+<header>
+  <h1>Main menu · export</h1>
+  <button id="build" class="primary">Build the file</button>
+  <button id="copy">Copy to clipboard</button>
+  <span class="stat" id="stat">not built yet</span>
+</header>
+
+<main>
+  <div class="pane">
+    <h2>The single file — paste this</h2>
+    <textarea id="out" spellcheck="false" readonly>Press "Build the file".</textarea>
+  </div>
+  <div class="pane">
+    <h2>Live preview of exactly that file</h2>
+    <iframe id="prev" title="preview"></iframe>
+    <div class="msg" id="msg">—</div>
+  </div>
+</main>
+
+<script>
+(function () {
+  "use strict";
+
+  var out = document.getElementById("out"),
+      prev = document.getElementById("prev"),
+      stat = document.getElementById("stat"),
+      msg = document.getElementById("msg");
+
+  function say(t, bad) { msg.textContent = t; msg.className = "msg" + (bad ? " err" : ""); }
+
+  /* ★ THE MARKUP IS TAKEN FROM THE RUNNING APP, because it does not exist as source.
+     A hidden iframe boots index.html, we wait for the panel to appear, and we lift it.
+     Polling rather than onload: the menu is mounted by app.js after load, and the
+     panel we want is built during that mount. */
+  function grabMarkup() {
+    return new Promise(function (resolve, reject) {
+      var f = document.createElement("iframe");
+      f.style.cssText = "position:absolute;left:-9999px;width:1440px;height:900px;border:0";
+      f.src = "index.html?export=1";
+      document.body.appendChild(f);
+      var n = 0;
+      var iv = setInterval(function () {
+        var d;
+        try { d = f.contentDocument; } catch (e) { }
+        var panel = d && d.querySelector(".menu__panel--wall");
+        if (panel) {
+          clearInterval(iv);
+          var clone = panel.cloneNode(true);
+          /* strip the runtime overlays: the specimen panel is injected by
+             _six-live.js and is not part of the menu's own design. */
+          var sx = clone.querySelector(".sx"); if (sx) sx.remove();
+          Array.prototype.forEach.call(clone.querySelectorAll(".sx-hide"), function (e) {
+            e.classList.remove("sx-hide", "is-back");
+          });
+          Array.prototype.forEach.call(clone.querySelectorAll("[style]"), function (e) {
+            var s = e.getAttribute("style") || "";
+            if (/--sx|animation|pointer-events/.test(s)) e.removeAttribute("style");
+          });
+          /* the panel is one of three in a slid track; standalone it is simply visible */
+          clone.removeAttribute("inert"); clone.removeAttribute("aria-hidden");
+          clone.classList.remove("is-offstage");
+          resolve(clone.outerHTML);
+          f.remove();
+          return;
+        }
+        if (++n > 120) { clearInterval(iv); f.remove(); reject(new Error("panel never appeared")); }
+      }, 120);
+    });
+  }
+
+  function grabCss() {
+    return fetch("_menu-export.css").then(function (r) {
+      if (!r.ok) throw new Error("_menu-export.css missing (" + r.status + ")");
+      return r.text();
+    });
+  }
+
+  var FONTS = '<link rel="preconnect" href="https://fonts.googleapis.com">\n'
+    + '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n'
+    + '<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">';
+
+  var NOTE = ""
+    + "<!--\n"
+    + "  BLUE ROOM — THE MAIN MENU (M1, \"The Draw\"), exported as one static file.\n"
+    + "\n"
+    + "  WHAT THIS IS. The front door of an archive that draws readings and develops\n"
+    + "  cards. Left column: the two product doors. Middle: a standing sample card.\n"
+    + "  Right: the reading that card is showing. This is its REST state.\n"
+    + "\n"
+    + "  WHAT IS HERE: the exact markup the app produced, and the 289 CSS rules that\n"
+    + "  match it, lifted out of a 1,653-rule stylesheet.\n"
+    + "\n"
+    + "  WHAT IS NOT HERE: all JavaScript. The panel slide, the card flip, the\n"
+    + "  hover-specimen system and the roadmap popup are behaviour, not design.\n"
+    + "  Elements belonging to them are present but inert.\n"
+    + "\n"
+    + "  HOUSE CONSTRAINTS, if you are redesigning it:\n"
+    + "    · the palette is closed — warm near-black ground, warm parchment card,\n"
+    + "      one white threshold line, a blue under. No new hues.\n"
+    + "    · animate transform and opacity only. No animated filter or blur.\n"
+    + "    · tone: holding your excitement, in knowing reassurance it will deliver.\n"
+    + "      No hype, no urgency, and no defensiveness either.\n"
+    + "    · the six mark slots inside the card are interactive controls in the real\n"
+    + "      app — anything laid over the card must not take pointer events.\n"
+    + "-->";
+
+  function build() {
+    say("building…");
+    Promise.all([grabMarkup(), grabCss()]).then(function (r) {
+      var html = r[0], css = r[1];
+      /* ★★ TWO FIDELITY BUGS THE FIRST BUILD SHIPPED, both caught by inspecting the
+         preview's computed styles rather than by looking at it:
+
+         1. NO GROUND. The app paints its near-black radial on the page itself, and the
+            extraction did not carry a body background — so the export rendered the menu
+            on nothing. Every value in this design is tuned against L=0.003; handing GPT
+            a version floating on white would have it "fix" contrast that was never wrong.
+         2. THE CARD CAME OUT IN ITS DARK STOCK. `html.m2-parch` is the SHIPPED DEFAULT
+            (app.js adds it unless ?m2=dark), and without it .m2hero fell back to
+            linear-gradient(178deg,#171b22,…) — near-black — instead of the parchment.
+            The card is the only bright object in the room and the export was rendering
+            it as another dark rectangle. */
+      var doc = "<!doctype html>\n<html lang=\"en\" class=\"m2-parch\">\n<meta charset=\"utf-8\">\n"
+        + "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n"
+        + "<title>Blue Room — the main menu</title>\n"
+        + NOTE + "\n"
+        + FONTS + "\n"
+        + "<style>\n" + css + "\n"
+        + "/* the room itself — the app paints this on the page, not in a component */\n"
+        + "html,body{min-height:100%}\n"
+        + "body{margin:0;background:radial-gradient(120% 90% at 50% 32%,#161411 0%,#100f0c 55%,#0a0b0d 100%);"
+        + "background-attachment:fixed}\n"
+        + "</style>\n"
+        + "<body class=\"menu menurev\">\n"
+        + "<div id=\"menuView\" class=\"menu menurev is-wall is-m1a\">\n"
+        + "<div class=\"menu__track\">\n"
+        + html + "\n"
+        + "</div>\n</div>\n</body>\n</html>\n";
+
+      out.value = doc;
+      stat.innerHTML = "<b>" + Math.round(doc.length / 1024) + "</b> KB · markup <b>"
+        + Math.round(html.length / 1024) + "</b> KB · css <b>" + Math.round(css.length / 1024) + "</b> KB";
+      prev.srcdoc = doc;
+      say("built — the right pane is that exact file rendering. If it looks right there, it will look right for GPT.");
+    }).catch(function (e) {
+      say(String(e.message || e), true);
+    });
+  }
+
+  document.getElementById("build").addEventListener("click", build);
+  document.getElementById("copy").addEventListener("click", function () {
+    out.select();
+    try {
+      /* the sandbox can block navigator.clipboard; execCommand still works off a
+         real selection, and if both fail the textarea is already selected to copy by hand */
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(out.value).then(function () { say("copied."); },
+          function () { document.execCommand("copy"); say("copied (fallback)."); });
+      } else { document.execCommand("copy"); say("copied (fallback)."); }
+    } catch (e) { say("select-all is done — press Ctrl+C", true); }
+  });
+
+  build();
+})();
+</script>
+</html>
