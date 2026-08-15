@@ -24,7 +24,8 @@
     { key: "Life path",   from: "the digits, reduced",    sys: 2, n: 12, g: "name",      c: "path",    r: [1, 1, 2] },
     { key: "Rune",        from: "from the name and date", sys: 6, n: 24, g: "rune",      c: "rune",    r: [1, 1, 2] },
     { key: "Trigram",     from: "from the name and date", sys: 7, n: 8,  g: "namefirst", c: "trigram", r: [1, 2, 2] },
-    { key: "Hexagram",    from: "from the name and date", sys: 8, n: 64, g: "namefirst", c: "hex",     r: [3, 1, 3] }
+    /* BR-S462: its own glyph branch — it is not a trigram and it never was. See glyphFor. */
+    { key: "Hexagram",    from: "from the name and date", sys: 8, n: 64, g: "hexagram",  c: "hex",     r: [3, 1, 3] }
   ];
   var CJK  = ["鼠","牛","虎","兔","龍","蛇","馬","羊","猴","雞","狗","猪"];
   var RUNE = "ᚠᚢᚦᚨᚱᚲᚷᚻᛁᛇᛉᛋᛏᛒᛖᛚᛞᛟᛣᛠᛦᚩᛃᛝ".split("");
@@ -103,7 +104,14 @@
        instead of emptying. `display:none` and not just opacity, or the 430px reserve
        would hold a gap open under nothing. */
     + ".sx.is-away{display:none}"
-    + ".sx-hide.is-back{display:revert!important;animation:sxfade 180ms ease both}"
+    /* ★ BR-S462 — visibility, to match .sx-hide. BR-S461 changed the hide from `display`
+       to `visibility` (so the column stops changing height and the head stops jumping)
+       and this line was left reverting `display` — which un-hides nothing when the
+       element was never display:none. Net effect: the app's own three children became
+       permanently invisible, so the read column was blank at rest. Caught by measuring
+       `visibility` at rest rather than by looking at the page, where "blank" and
+       "correct" are the same screenshot until you hover. */
+    + ".sx-hide.is-back{visibility:visible!important;animation:sxfade 180ms ease both}"
     + "@keyframes sxfade{from{opacity:0}to{opacity:1}}"
     + ".sx__src{font-family:var(--font-mono);font-size:9px;letter-spacing:.2em;"
     +   "text-transform:uppercase;color:#6e6b63;margin:0 0 16px;display:flex;gap:7px}"
@@ -161,6 +169,21 @@
     if(sp.g==="cjk")       return CJK[idx]||"";
     if(sp.g==="rune")      return RUNE[idx]||"";
     if(sp.g==="name")      return String(e.name);
+    /* ★★ BR-S462 — THE HEXAGRAM HAD BEEN SHOWING ☰ FOR ALL SIXTY-FOUR, AND IT IS FALSE
+       FOR SIXTY-THREE OF THEM. The hexagram ran through this trigram branch, which looks
+       for a ☰-☷ character at the head of the name — and every hexagram in codex-data.json
+       is King Wen order named "1 · The Creative (Qián)" … "64 · Before Completion", i.e.
+       every one begins with a DIGIT. So the test failed 64 times out of 64 and the
+       hardcoded fallback fired every time: a specific mark asserting a specific and wrong
+       thing, in the deepest system in the archive. Verified on the live page — the panel
+       showed ☰ beside "35 · Progress (Jìn)".
+       U+4DC0-4DFF IS the King Wen block, in order, and `idx` is the entries index, so the
+       two align exactly with no table. ★ The fallback is the hexagram NUMBER, which is
+       true of the specimen — never a fixed trigram, which is how this got here. */
+    if(sp.g==="hexagram"){
+      var h=String.fromCodePoint(0x4DC0+idx);
+      return h || String(idx+1);
+    }
     if(sp.g==="namefirst"){var c=String(e.name).trim().charAt(0);return /[☰-☷]/.test(c)?c:"☰";}
     return "";
   }
@@ -245,13 +268,40 @@
       /* .m2bface is pointer-events:none with `> *` set back to auto (styles.css:3680),
          so the <li>s do not take the pointer by default — grant it explicitly. */
       ul.style.pointerEvents="auto";
+
+      /* ★★ BR-S462 (M4) — THE PANEL OPENS ON A MARK, NOT ON THE CARD. The builder:
+         "remove hovering card shows last example and have it vanilla."
+         hold() used to be bound to .m2hero — a 324x513 card whose six marks occupy a
+         narrow band across its middle, so you entered through empty stock and the
+         takeover fired before you had touched anything. The sentence it deleted is the
+         only one on this surface that says what a birth reading IS, and it went
+         mid-clause, by a control the reader never knowingly used. Crossing the card is
+         now inert: the page stays exactly as it was until a mark is touched.
+         ask() is the single funnel — it also OPENS the panel, so one gesture on one mark
+         both fills the column and takes it, in that order and never the reverse. */
+      function ask(i, force){
+        if(i===current && !force) { hold(); return; }
+        render(d,i);
+        hold();
+      }
+
       Array.prototype.forEach.call(ul.children,function(li,i){
         li.style.pointerEvents="auto";
         li.setAttribute("tabindex","0");
         li.setAttribute("role","button");
-        li.addEventListener("pointerenter",function(){ render(d,i); });
-        li.addEventListener("focus",function(){ render(d,i); });
-        li.addEventListener("click",function(){ render(d,i); });
+        /* ★★ BR-S462 (M6) — ONE GESTURE WAS RENDERING UP TO THREE TIMES, AND EACH
+           RENDER BURNS A DRAW. tabindex="0" is set two lines up, so a single click on a
+           mark fires pointerenter, then focus, then click — three calls to render(), and
+           render() pops a card off that mark's shuffled bag. On Trigram (8 entries) two
+           clicks used to exhaust and reshuffle the bag, which defeats the entire point of
+           the without-replacement dealer.
+           One funnel. Hover and focus ASK for a mark and no-op if it is already showing;
+           click FORCES, which turns the click into "deal me another" — the affordance the
+           six were missing anyway, and the one thing that keeps touch working, since a
+           tap has no hover to arrive through. */
+        li.addEventListener("pointerenter",function(){ ask(i,false); });
+        li.addEventListener("focus",function(){ ask(i,false); });
+        li.addEventListener("click",function(){ ask(i,true); });
       });
       /* ★★ BR-S461 — THIS WAS BOUND ON `document`, AND IT STACKED. Three faults in six
          lines, all from the same choice of host:
@@ -353,10 +403,34 @@
         if(current < 0) render(d, 0);
         if(awayT){ root.clearTimeout(awayT); awayT=null; } away(false);
       }
-      function release(){ if(awayT) root.clearTimeout(awayT); awayT=root.setTimeout(function(){ away(true); },140); }
+      /* ★★ BR-S462 (M5) — ON TOUCH THE SPECIMEN USED TO ERASE ITSELF 140ms LATER.
+         A touch pointer is DESTROYED at finger-lift, so pointerleave fires as part of
+         the tap itself and this put the panel straight back. M1 is the front door; on a
+         phone the whole thing read as the page blinking.
+         A latch, not pointer-type sniffing — sniffing would need `pointerType!=="mouse"`
+         in the enter path, and combined with the click funnel that leaves touch with no
+         route to render() at all. The latch asks the only question that matters: does
+         this device have a real hover? If not, a tap HOLDS the panel until the reader
+         puts it away by touching somewhere else, which is also the way back. */
+      var LATCH=false;
+      function hoverless(){ return !(root.matchMedia && root.matchMedia("(hover:hover)").matches); }
+      function release(){
+        if(LATCH) return;
+        if(awayT) root.clearTimeout(awayT);
+        awayT=root.setTimeout(function(){ away(true); },140);
+      }
+      ul.addEventListener("click",function(){ if(hoverless()) LATCH=true; });
+      d.addEventListener("pointerdown",function(e){
+        if(!LATCH) return;
+        if(e.target.closest && (e.target.closest(".m2hero") || e.target.closest(".sx"))) return;
+        LATCH=false; away(true);
+      }, true);
 
       var card=d.querySelector(".m2hero"), box=d.querySelector(".sx");
-      [card,box].forEach(function(el){
+      /* the CARD keeps pointerLEAVE only — the 140ms grace between marks is unchanged,
+         and leaving the card still puts the panel away. It no longer opens anything. */
+      if(card) card.addEventListener("pointerleave",release);
+      [box].forEach(function(el){
         if(!el) return;
         el.addEventListener("pointerenter",hold);
         el.addEventListener("pointerleave",release);
