@@ -2937,8 +2937,32 @@ html.land-detent2 .menu__track { --track-ease: cubic-bezier(.55, -0.28, .12, 1);
    ties this rule on specificity; source order is what wins it.
    .card__halo is deliberately absent: it rests at opacity 0 and touching it buys
    nothing.  ?flat=0 turns the whole thing off. */
-html.is-travel .photo__tone,
-html.is-travel .photo__grain,
+/* ★★ BR-S503 — .photo__tone AND .photo__grain COME OUT OF THIS LIST. THEY WERE THE
+   SECOND STEP. The builder: "still 2 stepped lag m1 to l1 and vice verca."
+
+   The travel was never two movements. It is one glide, and then — one frame after the
+   motion stops, by BR-S278's deliberate design — _menuUnprime drops `is-travel` and every
+   flattened layer snaps back to its blend mode at once. If any of those layers is
+   VISIBLE, that snap is a second event on the frame the eye has just settled on. Which is
+   exactly the shape of "two stepped": glide, land, and then the card changes.
+
+   MEASURED, live, and it corrects a number I had wrong myself. The five named layers do
+   not carry 1.42M px of visible blend between them — three of them are switched off:
+
+       photo__tone      multiply  opacity .60  rgba(40,48,42,.2)   ~90k px   VISIBLE
+       photo__grain     overlay   opacity .45  svg noise           ~90k px   VISIBLE
+       photo__foil      screen    opacity 0                        free
+       photo__shimmer   screen    opacity 0    (276k px, all of it at zero)  free
+       cardfinish       —         opacity 0    already `normal`    free
+
+   So the rule was buying about 180k px of blend inside an already-isolated group on an
+   already-promoted layer — cheap work — and paying for it with a visible pop. That is a
+   bad trade in both directions, and the far larger win was BR-S499's: one backdrop-filter
+   at 93,613 px, which must RE-SAMPLE its backdrop every frame and genuinely cannot ride
+   a translating layer.
+
+   The three at opacity 0 stay listed. They cost nothing either way today, and if one is
+   ever switched on it should be flat during travel — the entry is the note that says so. */
 html.is-travel .photo__foil,
 html.is-travel .photo__shimmer,
 html.is-travel .cardfinish { mix-blend-mode: normal; }
