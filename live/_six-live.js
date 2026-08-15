@@ -275,7 +275,30 @@
          app's own text during it is the same blank column in miniature — so the panel
          simply does not come forward until DATA exists. Nothing is lost: the page
          shows what it always showed until the moment the specimen is ready. */
-      function hold(){ if(!onBirth() || !DATA) return; if(awayT){ root.clearTimeout(awayT); awayT=null; } away(false); }
+      /* ★★ BR-S459 — AND IT MAY NOT TAKE THE COLUMN EMPTY EITHER. The guard above
+         covers the window BEFORE the archive lands. It does not cover the one after it
+         lands with nothing rendered behind it, and on a first visit that is the window
+         a visitor is actually in.
+
+         THE TRACE. index.html loads this file, install() runs at once, reaches
+         `if (DATA) render(d,0)` at the foot of the one-shot block — and DATA is still
+         null, because the fetch two hundred lines below is a network round trip. But
+         `ul.dataset.sx` is now "1", so the 700ms re-assert can never re-enter that block
+         to try again, and mountMenu() only re-fires on a draft save or the holdings flip,
+         neither of which a first-time visitor triggers. So `current` stays -1 for the
+         whole session. Then the pointer crosses the card edge, THIS function passes its
+         !DATA guard because by now the fetch has landed, away(false) hides the app's own
+         three children — and the column holds a 430px void with one line floating in it,
+         while the only sentence on the page saying what a birth reading IS sits deleted
+         behind it. Worse than not installing the module at all.
+
+         One condition. If nothing has been rendered, render before revealing — the panel
+         is never allowed to be the thing on screen until it has something to be. */
+      function hold(){
+        if(!onBirth() || !DATA) return;
+        if(current < 0) render(d, 0);
+        if(awayT){ root.clearTimeout(awayT); awayT=null; } away(false);
+      }
       function release(){ if(awayT) root.clearTimeout(awayT); awayT=root.setTimeout(function(){ away(true); },140); }
 
       var card=d.querySelector(".m2hero"), box=d.querySelector(".sx");
