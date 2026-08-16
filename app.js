@@ -3506,7 +3506,11 @@ function onReliqPreviewClick(e) {
   if (!b) return;
   e.preventDefault();
   var st = b.getAttribute("data-reliq-state");
-  try { st === "profile" ? localStorage.setItem("br_holdings", "1") : localStorage.removeItem("br_holdings"); } catch (_) {}
+  /* BR-S522: OFF must be genuinely off. hasHoldings() now also counts br_has_reading,
+     so clearing only br_holdings would leave the builder unable to see the no-account
+     state on any machine that has ever completed a reading. Both keys move together. */
+  try { if (st === "profile") localStorage.setItem("br_holdings", "1");
+        else { localStorage.removeItem("br_holdings"); localStorage.removeItem("br_has_reading"); } } catch (_) {}
   if (st === "profile") { location.href = "?dev=profile"; return; }
   var cur = e.currentTarget.querySelector(".menu__reliq");   // re-render M3 in place — stays on slide 3
   if (cur) cur.outerHTML = renderReliquary(false);
@@ -4594,7 +4598,18 @@ const MENU_PANELS = [
 let _menuPushed = 0;     // COUNT of synthetic history entries we pushed (never assign the index)
 let _menuSettle = null;
 
-function hasHoldings() { try { return localStorage.getItem("br_holdings") === "1"; } catch (e) { return false; } }
+/* ★ BR-S522 — TWO KEYS MEANT A PAID READING NEVER UNLOCKED ANYTHING. Finishing a Birth
+   Reading writes `br_has_reading` (arcane.js:1205). This predicate, and the Profile's own
+   `held()` (arcana-profile.js:137), read `br_holdings` — a key nothing in either product
+   ever sets. It is written only by the M3 preview toggle, the devnav rail and `?holdings=`,
+   all builder-side. So a customer who completed a reading was still shown "NO CROWN YET ·
+   DRAW A READING — a crown is earned by taking a reading": the Profile invited the buyer
+   to buy the thing they had just bought.
+   Either key now counts. The builder's toggle keeps working; a real reading counts too. */
+function hasHoldings() {
+  try { return localStorage.getItem("br_holdings") === "1" || localStorage.getItem("br_has_reading") === "1"; }
+  catch (e) { return false; }
+}
 
 /* ── BR-S259: M1's sample source, in ONE place ────────────────────────────────
    The desk shows SRC-03 "Shore Dispatch". Two separate mount paths render it —
@@ -6931,7 +6946,8 @@ document.addEventListener("click", (e) => {
      top-level array evaluated once at load, so a remount would leave M3 updated and the
      U1 door stale: the two surfaces would disagree about the same fact, which is exactly
      what deriving it was meant to end. A reload re-evaluates the registry. Dev-only path. */
-  else if (kind === "holdings") { try { localStorage.getItem("br_holdings") === "1" ? localStorage.removeItem("br_holdings") : localStorage.setItem("br_holdings", "1"); } catch (e) {} location.reload(); return; }
+  else if (kind === "holdings") { try { if (hasHoldings()) { localStorage.removeItem("br_holdings"); localStorage.removeItem("br_has_reading"); }
+                                        else localStorage.setItem("br_holdings", "1"); } catch (e) {} location.reload(); return; }   // BR-S522: the rail toggles the STATE, which is now either key
   else if (kind === "dev") { const u = new URL(location.href); u.searchParams.set("dev", val); u.searchParams.set("devnav", "1"); location.href = u.toString(); }
 });
 
@@ -7205,7 +7221,7 @@ try {
   const raw = hu.searchParams.get("holdings");
   const hp = DEVNAV ? raw : null;
   if (hp === "1") localStorage.setItem("br_holdings", "1");
-  else if (hp === "0") localStorage.removeItem("br_holdings");
+  else if (hp === "0") { localStorage.removeItem("br_holdings"); localStorage.removeItem("br_has_reading"); }   // BR-S522: clears the state, not one of its two keys
   if (raw !== null) { hu.searchParams.delete("holdings"); history.replaceState(null, "", hu.pathname + (hu.search || "") + hu.hash); }
 } catch (e) {}
 

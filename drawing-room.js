@@ -59,6 +59,45 @@
   function pick(list, seed) { return list && list.length ? list[hash(seed) % list.length] : null; }
   function norm(s) { return String(s == null ? "" : s).toLowerCase().replace(/[^a-z0-9]+/g, " ").trim(); }
   function inApp() { return /[?&]dev=/.test(location.search); }
+
+  /* ═══ BR-S522 — THE ROOM HAS TWO ADDRESSES AND ONLY ONE OF THEM WORKED ═══════════
+     `inApp()` answers "am I on a ?dev= route", and three things were gated behind it
+     that have nothing to do with dev: writing the reading's own URL, writing the
+     landing's URL, and the doors out. At `/tarot/` — the address the public build
+     exists to serve — `location.search` is empty, so all three silently did nothing.
+
+     ★ THE COST WAS NOT COSMETIC. The finished reading prints "Kept at this link" and
+     "This reading lives at the address in your bar" while the bar still reads `/tarot/`.
+     Meanwhile the line that spends the free sitting is NOT gated, so a refresh took the
+     reading away, kept the sitting spent, and offered the replacement at $1.99. The page
+     destroyed the reading, said it was kept, and priced the replacement.
+
+     The seal token is `Date.now()+Math.random()` — once the URL is lost the reading is
+     unrecoverable, so this could not be fixed by the reader.
+
+     `siteRoot()` resolves the folder the site is served from, which is not always "/" —
+     on Pages it is "/blue-room-scan-room/". `addr()` builds the reading's address in the
+     form that belongs to wherever it is running. `reopen()` needs no change: it reads
+     `read`/`t` out of `location.search`, which works at either address. */
+  function siteRoot() {
+    var p = location.pathname.replace(/[^/]*$/, "");     // drop any filename
+    /* `window`, not `root` — this module's IIFE takes no parameter, unlike _m2-accord.js.
+       Written as `root.BR_ROOM` first, which threw a ReferenceError inside the delegated
+       click handler and silently killed the doors again, in a fix whose whole purpose was
+       to make the doors work. The URL writing kept working throughout because it never
+       touches this helper, which is exactly why it looked fixed. */
+    if (window.BR_ROOM) p = p.replace(/[^/]+\/$/, "");   // drop the room's own segment
+    return p || "/";
+  }
+  function addr(query) {
+    var base = inApp() ? "?dev=drawing-room" : location.pathname;
+    if (!query) return base;
+    return base + (inApp() ? "&" : "?") + query;
+  }
+  function doorHref(d) {
+    if (inApp()) return d === "profile" ? "?dev=profile" : location.pathname;
+    return d === "profile" ? siteRoot() + "profile/" : siteRoot();
+  }
   /* BR-S314 — TWO CUTS IN THE SAME MINUTE WERE THE SAME READING. The seal was
      minute-granular, and the seed is "read~<spread>~<normalised question>~<seal>" —
      so asking the same question twice inside one minute produced an identical seed,
@@ -465,7 +504,7 @@
   function announce(m) { var l = HOST.querySelector("[data-dr-live]"); if (l) l.textContent = m; }
   function firstSentence(s) { var m = String(s || "").match(/^[^.]+\./); return m ? m[0] : String(s || ""); }
 
-  function showLanding() { STATE.view = "landing"; stage().innerHTML = landingHTML(); if (inApp() && history.replaceState) history.replaceState(null, "", "?dev=drawing-room"); }
+  function showLanding() { STATE.view = "landing"; stage().innerHTML = landingHTML(); if (history.replaceState) history.replaceState(null, "", addr()); }
   function startReading(key) {
     STATE.view = "intake"; STATE.spread = key;
     STATE.drawn = []; STATE.revealed = 0; STATE.question = ""; STATE.seed = "";
@@ -481,7 +520,10 @@
     if (sp.key === "sitting") { try { localStorage.setItem("br_dr_sitting_used", "1"); } catch (e) {} }   // the cut consumes the free sitting — the cut closes the question
     STATE.drawn = drawSpread(STATE.seed, sp.n).map(function (d) { d.shown = false; return d; });
     STATE.revealed = 0; STATE.view = "reading";
-    if (inApp() && history.replaceState) history.replaceState(null, "", "?dev=drawing-room&read=" + sp.key + "&t=" + encodeURIComponent(t) + (STATE.question ? "&q=" + encodeURIComponent(STATE.question) : ""));
+    /* BR-S522: the receipt is written at whatever address this room is being served
+       from. This used to be gated behind inApp(), so at /tarot/ it never ran and the
+       reading the page promised was "kept at this link" had no link. */
+    if (history.replaceState) history.replaceState(null, "", addr("read=" + sp.key + "&t=" + encodeURIComponent(t) + (STATE.question ? "&q=" + encodeURIComponent(STATE.question) : "")));
     /* BR-S318: nothing is replaced here any more. The intake prose is emptied out of a
        region that stays, the cards are laid into the spread that was always there, and
        the deck the reader has been looking at is the deck they just cut. */
@@ -572,7 +614,11 @@
       if (!el) return;
       ev.preventDefault();
       if (SHUFFLING && el.hasAttribute("data-dr-home")) return;   // BR-S319: the escape stays visible but waits out the 820ms
-      if (el.hasAttribute("data-door")) { var d = el.getAttribute("data-door"); if (inApp()) location.href = d === "profile" ? "?dev=profile" : location.pathname; return; }
+      /* BR-S522: the doors work at both addresses. Gated behind inApp() they were
+         preventDefault-ed and then did nothing at /tarot/, and Escape could not rescue it
+         (app.js's handler bails unless the view is "room"), so a visitor who typed the
+         public address was trapped in the room with no way out but the codex balls. */
+      if (el.hasAttribute("data-door")) { location.href = doorHref(el.getAttribute("data-door")); return; }
       if (el.hasAttribute("data-dr-read")) return startReading(el.getAttribute("data-dr-read"));
       if (el.hasAttribute("data-dr-shuffle")) return shuffle();
       if (el.hasAttribute("data-dr-cut")) return cut();
