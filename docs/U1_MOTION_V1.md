@@ -249,3 +249,45 @@ landing, keep the writing.
 > Watch it with the sound of the idea in mind: can a stranger, scrolling once, say what
 > the product does and what they would receive? If the boxes were full before they
 > arrived, the answer is no and the build has failed regardless of what it measures.
+
+---
+
+# ★★ AND THE DESIGN FAILED SEPARATELY — "wack · underwhelming · trashy"
+
+The missing fill above is the MECHANISM failure. This is the second one, and it is
+independent: fixing the filling and re-shipping the same surface would earn the same
+three words.
+
+**Underwhelming is the precise complaint.** Not broken, not wrong — beneath the house.
+U1 is where a stranger is told what Blue Room is, and it looked like a form.
+
+## What it actually looked like
+
+A flat cream rectangle in the centre with type on it. No depth, no material, no light.
+Set it beside the builder's own cologne reference — same slot, same job — and one is an
+object in a room and the other is a page element.
+
+## The bar it has to clear, and the bar already exists in this repo
+
+Nothing here needs inventing. The house has surfaces that pass:
+
+| surface | what it does that U1 did not |
+|---|---|
+| the Codex chamber | real geometry, a membrane you can read, depth you can feel |
+| the card | material — foil, grain, tone, an object under glass |
+| the Accord socket | three depth planes, transmission, a closure that means something |
+
+★ **The test is comparative, not absolute.** Put the new U1 next to the codex and the
+card. If it is the weakest thing on the shelf, it is not finished — regardless of how
+correct its mechanism is.
+
+## The trap that produced it
+
+The scrapped build was measured, verified and correct on every number it could check —
+ratios, derivations, delivery paths, defect closures — and none of those numbers say
+anything about whether it is worth looking at. **A build optimises what it can measure.**
+Given a plan, a fixture and a motion brief but no eye in the loop, a fleet returns
+scaffolding that passes every check and fails the only test that matters.
+
+So: the eye goes in the loop, or the surface does not get built. Objects first, mechanism
+second — the order the Accord socket was built in, and the order this one was not.
