@@ -144,8 +144,31 @@
 
   /* the BINDING line — the light synthesis, woven from the drawn cards' OWN
      first keywords + the positions. Fully deterministic; no AI. */
+  /* ★ BR-S527 — IT WAS ORIENTATION-BLIND, AND IT CONTRADICTED THE CARD TWO INCHES ABOVE.
+     `firstKw()` reads `keywords[0]`, which is the UPRIGHT keyword, and nothing here ever
+     looked at `.reversed`. So a Sitting whose Crossing fell reversed printed "is crossed
+     by choices" directly beneath a face already reading "Reversed — inward, not yet"
+     (`:214`). The binding line is the one sentence that claims to read the three together;
+     a reader who checks it against the faces finds the synthesis disagreeing with the
+     draw, which is the fastest way to lose an experienced visitor.
+
+     The repair is the doctrine's own first word, appended rather than substituted —
+     reversed is inward, blocked, not yet expressed, and never the opposite, so the
+     keyword stands and the orientation qualifies it: "is crossed by choices, inward."
+
+     ★ THE HONEST COST: this changes what an ALREADY-FILED link displays. The seed still
+     deals identical cards in identical seats, so the record itself is untouched — what
+     changed is the prose rendered around it. That distinction belongs in a commit
+     message and never on the page. */
   function bindingLine(sp, drawn) {
-    function kw(i) { return firstKw(drawn[i] && drawn[i].card); }
+    function kw(i) {
+      var d = drawn[i], w = firstKw(d && d.card);
+      /* "held inward", not ", inward". The bare appositive interrupts the clause — "is
+         crossed by choices, inward, and tends toward" — and a five-card with three
+         reversals becomes a stutter of parentheticals. "held inward" is one phrase, reads
+         aloud, and stays true to the doctrine on the face: inward, not yet expressed. */
+      return d && d.reversed ? w + " held inward" : w;
+    }
     if (sp.n === 3) return "Read as one — the matter rests on " + kw(0) + ", is crossed by " + kw(1) + ", and tends toward " + kw(2) + ".";
     return "Read as one — it rests on " + kw(0) + ", is crossed by " + kw(1) + ", grew from " + kw(2) + ", reaches for " + kw(3) + ", and tends toward " + kw(4) + ".";
   }
@@ -420,7 +443,15 @@
     if (st.revealed < sp.n) return '<p class="dr-draw__cue">Turn each card.</p><a class="dr-intake__back" href="#" data-dr-home>&larr; the deck</a>';
     return '<div class="dr-filed" data-dr-filed>' +
       '<p class="dr-binding">' + esc(bindingLine(sp, st.drawn)) + '</p>' +
-      '<p class="dr-read__frame">Drawn to the matter you laid down — a reflection to sit with, not a forecast.</p>' +
+      /* ★ BR-S527 — this printed unconditionally, so a visitor who left the field empty
+         was told at the emotional close that the cards were "drawn to the matter you laid
+         down" when they had laid nothing down. The frame is the last authored sentence
+         before the seal; being told a small untruth there costs more than the sentence is
+         worth. The half that is true of every reading is kept for everyone. */
+      '<p class="dr-read__frame">' +
+        (st.question ? 'Drawn to the matter you laid down — a reflection to sit with, not a forecast.'
+                     : 'A reflection to sit with, not a forecast.') +
+      '</p>' +
       /* ── BR-S351 — IT SAID FILED AND IT FILED NOTHING. ──────────────────────
          The only thing this room writes is `br_dr_sitting_used` — one flag saying
          the free Sitting is spent. The reading itself is not stored anywhere: it
