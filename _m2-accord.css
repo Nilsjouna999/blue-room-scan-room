@@ -104,9 +104,14 @@
   --acc-dense:      #0b0b06;    /* the walls and heel — near-black, faintly olive */
   --acc-warm:       #221b0c;    /* the heel's warmth, sitting in the pool's light */
 
-  --acc-stock: #d8cdb4;         /* label cream at its lightest — NOT white */
-  --acc-stock-2: #c9bda0;       /* falling toward the bottom */
-  --acc-ink:   #2a2118;         /* label ink — 8.9:1 on the cream above */
+  /* ★ AGED, NOT NEW. Beside the reference the stock was reading as fresh paper — too
+     light and too neutral, which made the label look printed today and stuck on rather
+     than filed years ago. The reference's stock is a deeper oatmeal with the yellow
+     already in it. It is still the brightest thing in the box; it is just no longer
+     the whitest thing imaginable. */
+  --acc-stock: #cfc0a0;         /* label stock at its lightest — NOT white */
+  --acc-stock-2: #bcab89;       /* falling toward the bottom */
+  --acc-ink:   #2a2118;         /* label ink — 7.4:1 on the stock above */
 
   position: relative;
   width: 100%;
@@ -259,7 +264,15 @@
 .m2acc__core {
   top: 22%;
   mix-blend-mode: screen;
+  /* ★ AND THE THIRD STOP IS THE LABEL'S HALO. The label is stuck to the FRONT of the
+     glass, so light crossing the bottle behind it scatters out around its edges — the
+     reference has a soft lift in the glass framing the label on all four sides, and its
+     absence is most of why this body read as evenly-lit rather than deep. It is placed
+     on the label's own centre (which sits at ~50% of this layer's box, the layer
+     starting at 22%) and is deliberately WIDER than the label, so what shows is the
+     spill, never a rectangle behind it. */
   background:
+    radial-gradient(52% 30% at 50% 50%, rgba(112,120,66,.30), rgba(112,120,66,.09) 62%, transparent 82%),
     radial-gradient(56% 36% at 46% 31%, rgba(84,92,50,.40), rgba(84,92,50,.10) 56%, transparent 76%),
     radial-gradient(34% 19% at 53% 66%, rgba(70,78,42,.15), transparent 72%);
 }

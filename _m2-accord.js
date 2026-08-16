@@ -96,19 +96,27 @@
      jar's rolled edge rather than a flask's slope. */
   var SIL_ID = "m2accSil";
   var SIL_PATH =
-    "M .416 .133 L .584 .133 L .584 .197 " +  /* neck: a real straight run, then the slope */
-    /* ★ THE SHOULDER IS A LONG SLOPE, NOT A CORNER. The first curve put its control
-       points far out (x .70 and .898 while y had barely moved), so the bottle reached
-       nearly full width in the first third of the shoulder's vertical run and read as a
-       rounded rectangle with a spout. Holding the curve close to the neck at the start
-       and letting it sweep out late is what makes the reference a flask. */
-    "C .626 .205 .878 .232 .966 .274 " +      /* right shoulder, curving out to the wall */
-    "L .966 .970 " +                          /* right wall */
-    "C .966 .989 .951 .998 .930 .998 " +      /* heel, right */
-    "L .070 .998 " +
-    "C .049 .998 .034 .989 .034 .970 " +      /* heel, left */
-    "L .034 .274 " +                          /* left wall */
-    "C .122 .232 .374 .205 .416 .197 Z";      /* left shoulder, back up to the neck */
+    /* ★ THE SHAPE TARGET CHANGED. A chamfered shoulder was briefly correct — the FIRST
+       reference is a moulded flask with a bevelled corner. The builder's second and
+       better reference (2026-08-16) is a different bottle: soft, generously rounded
+       corners, shoulders curving smoothly into a SHORT neck, and no straight run
+       anywhere on the silhouette. The chamfer is reverted rather than tuned, because
+       the two references disagree about what the object IS, not about a value.
+
+       ★★ AND THIS PATH MAY NOT SURVIVE AT ALL — see the note in _accord-lab.html. If the
+       bottle ships as an exported illustration, everything below is replaced by an image
+       and only the label stays live. Do not invest further in these coordinates until
+       that call is made. */
+    "M .430 .128 L .570 .128 L .570 .176 " +  /* a short neck, per the second reference */
+    "C .676 .190 .880 .224 .948 .286 " +      /* shoulder: one continuous round */
+    "C .964 .306 .968 .330 .968 .360 " +
+    "L .968 .944 " +
+    "C .968 .976 .944 .996 .906 .996 " +      /* generous heel radius */
+    "L .094 .996 " +
+    "C .056 .996 .032 .976 .032 .944 " +
+    "L .032 .360 " +
+    "C .032 .330 .036 .306 .052 .286 " +
+    "C .120 .224 .324 .190 .430 .176 Z";      /* left shoulder, back up to the neck */
 
   /* One <defs> per document. The SVG carries no size and no paint — it exists only to
      own the clipPath, so it is pulled out of layout entirely rather than hidden with
