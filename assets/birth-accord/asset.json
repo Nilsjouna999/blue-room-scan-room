@@ -1,0 +1,50 @@
+{
+  "name": "Birth Accord showcase",
+  "version": 2,
+  "canvas": {
+    "width": 875,
+    "height": 1182,
+    "aspectRatio": "875 / 1182",
+    "colorSpace": "sRGB",
+    "alpha": false
+  },
+  "files": {
+    "withSticker": {
+      "master": "birth-accord-showcase-final.png",
+      "web": "birth-accord-showcase-final.webp",
+      "intent": "finished static showcase; card artwork is baked in"
+    },
+    "noSticker": {
+      "master": "birth-accord-showcase-no-sticker.png",
+      "web": "birth-accord-showcase-no-sticker.webp",
+      "intent": "clean-glass plate for the existing interactive HTML card"
+    }
+  },
+  "regions": {
+    "card": {
+      "pixels": { "x": 276, "y": 442, "width": 318, "height": 472 },
+      "normalized": { "x": 0.3154, "y": 0.3740, "width": 0.3634, "height": 0.3993 }
+    },
+    "cap": {
+      "pixels": { "x": 338, "y": 106, "width": 199, "height": 156 },
+      "normalized": { "x": 0.3863, "y": 0.0897, "width": 0.2274, "height": 0.1320 }
+    },
+    "bottle": {
+      "pixels": { "x": 156, "y": 203, "width": 568, "height": 875 },
+      "normalized": { "x": 0.1783, "y": 0.1717, "width": 0.6491, "height": 0.7403 }
+    }
+  },
+  "recommendedDisplay": {
+    "desktopWidthPx": { "min": 430, "max": 464 },
+    "mobileMaxWidthCss": "min(390px, calc(100vw - 20px))",
+    "objectFit": "contain"
+  },
+  "htmlOutsideImage": [
+    "existing interactive card when using noSticker",
+    "Birth/Tarot control",
+    "navigation",
+    "focus states",
+    "accessible labels",
+    "click and keyboard behavior"
+  ]
+}

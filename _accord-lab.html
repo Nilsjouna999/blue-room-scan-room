@@ -86,49 +86,43 @@
      test, be selectable and scale with the type system. Baking it into a PNG hardcodes
      exactly the thing BR-S500 already got wrong once.
 
-     ★ EVERY NUMBER BELOW WAS MEASURED OFF THE PIXELS, NOT EYEBALLED. A first pass guessed
-     the crop and the label rectangle and both were visibly wrong — the live label sat
-     beside the printed one instead of on it, which is the one failure that would sink
-     this approach. They now come from a canvas pass over the source: the vitrine's frame
-     found by scanning the middle row and column for where the page-black stops, and the
-     label found by a cream-density profile INSIDE that frame (a min/max search caught the
-     nav type at the top of the render and had to be thrown out).
+     ★★ AND THE NUMBERS ARE NOW THE ASSET'S OWN, NOT MINE. The builder delivered a proper
+     handoff — `assets/birth-accord/`, a matched pair at 875x1182 with `asset.json`
+     carrying the interaction regions, plus a README stating the invariants. Every
+     coordinate below is read out of that file. All four images verify against the
+     supplied `CHECKSUMS.sha256`.
 
-       source            1580 x 996
-       vitrine frame     x 401->1176, y 105->877   =  775 x 772, ratio 1.004
-       label             x 654->895,  y 421->762   =  241 x 341
-       label, of frame   left 32.65%  top 40.93%  w 31.10%  h 44.17%
-       stock, sampled    rgb(212,199,169)
+       canvas         875 x 1182  (ratio 0.7402)
+       card region    x 0.3154  y 0.3740  w 0.3634  h 0.3993
+       display        430-464px desktop; min(390px, 100vw - 20px) narrow
 
-     Two earlier attempts at the frame were wrong and both are worth knowing. Scanning the
-     middle row and column for where page-black stops caught the BIRTH/TAROT pill BELOW
-     the vitrine and stretched the box to 858 tall. Walking outward from the image centre
-     instead stopped early, because the centre of this image is the bottle's own dark
-     glass. What works is a NON-BLACK DENSITY PROFILE over the whole image: the frame is
-     the only structure both wide and tall, so nav type and the pill fall out on their own.
+     ★ AND THE PAIR IS THE POINT. `no-sticker` is clean continuous glass with no label
+     printed on it, so the live node is the ONLY label in the frame — no overlay
+     registration to get wrong, and no printed text to peek out from behind a plate that
+     is a pixel small. Everything I measured off the earlier render by canvas — frame
+     edges, label rectangle, stock colour — is superseded and has been deleted rather than
+     kept, because two sets of coordinates for one job is how they drift apart.
 
-     ★★ AND THE RATIO IS THE FINDING. This vitrine is 1.004 — SQUARE. The Accord recess is
-     locked at 0.808. The render and the socket disagree about the shape of the hole, and
-     that is a decision for the builder, not something to average. */
+     Per the README, the region hosts the REAL card node, reparented and not cloned. The
+     lab stands a plain label in it as a placeholder; the shipping build moves the actual
+     component in, which is the same law `docs/READING_PANELS_V1.md` sets for U1. */
   .lab__illo {
     position: relative;
     width: var(--lab-w);
-    height: calc(var(--lab-w) / 1.004);   /* the RENDER's frame ratio, measured */
-    overflow: hidden; border-radius: 2px; background: #000;
-    /* the label's measured rectangle, as a fraction of the frame */
-    --lab-lab-x: 32.52%;
-    --lab-lab-w: 34.84%;
-    --lab-lab-y: 40.93%;
-    --lab-lab-h: 48.96%;
+    aspect-ratio: 875 / 1182;             /* the asset's own canvas ratio */
+    border-radius: 2px; background: #000;
+    /* asset.json → regions.card.normalized */
+    --lab-lab-x: 31.54%;
+    --lab-lab-w: 36.34%;
+    --lab-lab-y: 37.40%;
+    --lab-lab-h: 39.93%;
     container-type: inline-size;
   }
-  /* the source render, cropped to its vitrine so this pane frames the same rectangle the
-     other two do */
+  /* the plate is a passive stage — the card above it takes every event */
   .lab__illo img {
-    position: absolute; display: block; height: auto;
-    width:       calc(var(--lab-w) * 1580 / 775);
-    left:        calc(var(--lab-w) * -401 / 775);
-    top:         calc(var(--lab-w) * -105 / 775);
+    display: block; width: 100%; height: auto;
+    aspect-ratio: 875 / 1182;
+    pointer-events: none; user-select: none;
   }
   /* the live label, sitting on the printed one */
   .lab__illolabel {
@@ -139,23 +133,42 @@
        printed one are the same material rather than two creams that nearly agree */
     background: linear-gradient(180deg, #d8cbad 0%, #d4c7a9 46%, #c9bb9b 100%);
     border-radius: 5px;
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    /* space-between, not centre. In the master the kicker sits near the top edge and
+       "BY BIRTH ALONE" near the bottom, with the marks breathing in between — the block
+       is distributed across the plate rather than pooled in its middle, and centring it
+       was what made the live version look bunched and short beside the master. */
+    display: flex; flex-direction: column; align-items: center; justify-content: space-between;
     font-family: "IBM Plex Mono", ui-monospace, Menlo, monospace;
     color: #2a2118;
-    font-size: 2.9cqw;
+    /* sized so the block fills the plate the way the labelled master does — the type is
+       the label's content, not a caption floating in the middle of it */
+    font-size: 3.4cqw;
+    /* 4% at the sides, not 8%: "The Crowned Name" sets on ONE line in the labelled
+       master and spans about 94% of the plate. At 8% the inner width fell just under the
+       serif's own measure and it wrapped to three lines, which is the single most
+       visible way this label can look wrong. */
+    padding: 6% 4%;
     text-align: center;
     /* the printed label carries a contact shadow against the glass; without it the live
        plate floats a millimetre off the bottle and the eye catches it immediately */
     box-shadow: 0 1px 3px rgba(0,0,0,.34), inset 0 1px 0 rgba(255,250,238,.42);
   }
-  .lab__illolabel .k { letter-spacing: .15em; font-size: .40em; }
+  .lab__illolabel .k { letter-spacing: .15em; font-size: .46em; }
   .lab__illolabel .n {
     font-family: "Cormorant Garamond", Georgia, serif;
-    font-size: 1.05em; line-height: 1.1; margin: .34em 0 .42em;
+    /* ONE line, always — it is one line in the master, and a wrapped display serif is the
+       loudest possible tell that the type is not the type it is imitating. nowrap makes
+       the line a fact rather than a hope that the measure happens to fit. */
+    /* 1.02em, measured rather than chosen: at 1.15em the line came out 170px inside a
+       163px plate. Cormorant Garamond is not loaded here, so this is Georgia's measure,
+       which is wider — a reminder that the display face has to be resolved before this
+       number is final. In the master the line spans about 94% of the plate. */
+    font-size: 1.02em; line-height: 1.1; margin: .42em 0 .5em; white-space: nowrap;
   }
-  .lab__illolabel .m { letter-spacing: .13em; font-size: .40em; line-height: 2.0; }
-  .lab__illolabel .r { width: 44%; height: 1px; background: rgba(42,33,24,.5); margin: .5em 0 .42em; }
-  .lab__illolabel .f { letter-spacing: .13em; font-size: .38em; }
+  /* the six are generously leaded in the master — they carry the middle of the plate */
+  .lab__illolabel .m { letter-spacing: .13em; font-size: .46em; line-height: 2.4; }
+  .lab__illolabel .r { width: 46%; height: 1px; background: rgba(42,33,24,.5); margin: 0 0 .5em; }
+  .lab__illolabel .f { letter-spacing: .13em; font-size: .44em; }
 
   /* the socket's own host, at the same width as the reference beside it */
   .lab__host { width: var(--lab-w); }
@@ -177,8 +190,16 @@
 
 <div class="lab__pair">
   <div class="lab__pane">
-    <div class="lab__cap">THE REFERENCE <i>— what it has to become</i></div>
-    <div class="lab__ref"><img src="transfer/cologne-reference.webp" alt="the reference bottle"></div>
+    <!-- ★ THE TARGET IS NOW THE LABELLED MASTER, not the old screenshot. It is the same
+         render as the no-sticker plate beside it, with the label baked in, so comparing
+         the two is comparing the live type against the type it is meant to reproduce —
+         same bottle, same light, same plate, one variable. The old cropped screenshot
+         compared against a different bottle in a different vitrine and is retired. -->
+    <div class="lab__cap">THE MASTER <i>— label baked in; the type to match</i></div>
+    <div class="lab__illo">
+      <img src="assets/birth-accord/birth-accord-showcase-final.webp"
+           width="875" height="1182" alt="the labelled master">
+    </div>
   </div>
   <div class="lab__pane">
     <div class="lab__cap">THE BUILD <i>— the real socket, real stylesheet</i></div>
@@ -188,9 +209,10 @@
   </div>
 
   <div class="lab__pane">
-    <div class="lab__cap">THE ILLUSTRATION <i>— rendered bottle, LIVE label</i></div>
+    <div class="lab__cap">THE ILLUSTRATION <i>— no-sticker plate, LIVE label</i></div>
     <div class="lab__illo">
-      <img src="transfer/cologne-reference-v2.png" alt="the rendered bottle in its vitrine">
+      <img src="assets/birth-accord/birth-accord-showcase-no-sticker.webp"
+           width="875" height="1182" alt="" aria-hidden="true">
       <div class="lab__illolabel">
         <span class="k">THE BIRTH READING</span>
         <span class="n">The Crowned Name</span>
