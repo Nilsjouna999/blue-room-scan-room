@@ -6678,6 +6678,42 @@ html.orbit-wings .orbit__field { --orbit-rx: clamp(200px, 25.5vw, 368px); --orbi
 .l1seal__half { background: none; opacity: 1; }
 .l1seal__half--l { left: 0; cursor: default; }
 .l1seal__half--r { right: 0; cursor: pointer; }
+/* ★★ BR-S508 — IT HAD TO COMMIT TO A SIDE. The builder: "i was more thinking the shadow
+   hover or visual of hovering on side makes one of the sides equally darker accordingly."
+
+   BR-S406's architecture was already the right one and none of it changes: ONE layer,
+   moved by TRANSFORM, so the seam stays continuous and a low-alpha ramp over near-black
+   is never re-rasterised into bands. What was wrong was the AMOUNT. A core 58% as wide
+   as its box, shifted 16%, still has its dense middle sitting over the middle — so the
+   whole vignette drifted and neither half ever became "the dark one". It read as the
+   image sliding, which is a different sentence from the one the builder is asking for.
+
+   ★ AND THE FIRST ANSWER I WROTE WAS WRONG, WHICH THE ARITHMETIC CAUGHT BEFORE THE EYE
+   DID. I pushed the travel 16% -> 34% on the reasoning that the core should clear the
+   midline. Evaluating the gradient at each half's centre says it does the opposite:
+
+       travel 16%   left a .675   right a .069   differential .61
+       travel 34%   left a .385   right a 0      differential .385
+
+   Past a point the core slides off the panel entirely and takes its own contrast with
+   it. The shipped travel was not too small. So the numbers go back, and the actual
+   fault gets named instead: A CENTRED VIGNETTE IS ALWAYS DARKEST IN THE MIDDLE. Whatever
+   it does on hover, the middle is the dark part and the two halves are its shoulders —
+   so the effect can only ever read as the shadow SLIDING, never as one side becoming
+   the dark one. That is the sentence the builder is describing, and no amount of travel
+   fixes it because it is the shape, not the distance.
+
+   ★★ SO BOTH READINGS ARE BUILT AND NEITHER IS ARGUED FOR — the house rule from the M1
+   rank reversal, where a redesign was talked about for a session and then lost to the
+   original the moment the two stood side by side. `?lean=band` swaps the shape; the URL
+   carries it, so a refresh keeps whichever you are judging. Default is unchanged.
+
+   ★ THE TYPE IS UNTOUCHED IN BOTH, AND THAT IS STRUCTURAL RATHER THAN CAREFUL. The
+   builder: "text unaffected" and "readable". This layer is z-index 0; .l1seal__box
+   carries the copy at z-index 1, so every word sits ABOVE the shadow and none of it is
+   dimmed. And the copy is light on near-black, so ink gathering behind it can only RAISE
+   contrast — the hovered half is the more legible half, never the less. Nothing here can
+   move the type's own colour, because nothing here is in front of it. */
 .l1seal__lean {
   position: absolute; inset: -12% -22%; z-index: 0; pointer-events: none;
   background: radial-gradient(58% 70% at 50% 50%, rgba(0, 0, 0, .62), transparent 72%);
@@ -6687,6 +6723,25 @@ html.orbit-wings .orbit__field { --orbit-rx: clamp(200px, 25.5vw, 368px); --orbi
 }
 .l1seal__half--l:hover ~ .l1seal__lean { transform: translateX(-16%) scale(1.02); }
 .l1seal__half--r:hover ~ .l1seal__lean { transform: translateX(16%) scale(1.02); }
+
+/* ── THE BAND, `?lean=band` ────────────────────────────────────────────────────────
+   The other reading of the same sentence. One layer still, transform still, but the
+   shape is a PAIR OF EDGES with a clear middle instead of a core with shoulders:
+   the layer is three times the seal wide, so at rest the seal sees only the flat
+   transparent centre and there is NO resting vignette at all. Sliding it exactly one
+   third brings one dark edge across the seal, and the ramp runs the full width of the
+   half — so the hovered side genuinely IS the dark side and the other is genuinely
+   clear. Same magnitude either way by construction.
+   Whether losing the resting vignette is a gain or a loss is the builder's call, which
+   is the entire reason both exist rather than one being argued for. */
+.l1seal--band .l1seal__lean {
+  inset: -12% -100%;
+  background: linear-gradient(90deg,
+    rgba(0, 0, 0, .60) 0%, rgba(0, 0, 0, .52) 10%, transparent 33.33%,
+    transparent 66.67%, rgba(0, 0, 0, .52) 90%, rgba(0, 0, 0, .60) 100%);
+}
+.l1seal--band .l1seal__half--l:hover ~ .l1seal__lean { transform: translateX(33.333%) scale(1.02); }
+.l1seal--band .l1seal__half--r:hover ~ .l1seal__lean { transform: translateX(-33.333%) scale(1.02); }
 /* the way back earns a hairline as well as a wash; the edge does not, because there is
    nothing on the other side of it yet */
 /* the way back keeps one hairline, and it GROWS from the centre rather than fading up

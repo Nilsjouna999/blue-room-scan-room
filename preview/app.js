@@ -3351,7 +3351,7 @@ function renderMenu(reveal) {
          stumbles left sees the real thing AND sees that it is not open. It covers the
          panel and takes the pointer, which is what stops the desk's own controls from
          selling a card nothing can mint yet. -->
-    <div class="l1seal">
+    <div class="l1seal${BR_LEAN_BAND ? " l1seal--band" : ""}">
       <!-- BR-S403: two REAL halves, not pseudo-elements - a pseudo cannot answer to
            :hover on its own, and each side needs to say what it does before it is
            pressed. Left is the edge (no L2 yet); right is the way back. -->
@@ -4390,6 +4390,11 @@ let _menuPrimeTok = 0;
    against.  So it ships with an off-switch — ?flat=0 restores every blend — and the
    builder decides by looking, not by reading this comment. */
 const _FLATTRAVEL = !/[?&]flat=0/.test(String(location.search || ""));
+/* BR-S508 — the L1 seal's hover shadow, second reading. `?lean=band` swaps the centred
+   vignette for a pair of edges with a clear middle; see styles.css. Read once at boot
+   like every other tuning switch here, because the seal is re-rendered on every mount
+   and a per-render read would let the two disagree mid-session. */
+const BR_LEAN_BAND = /[?&]lean=band/.test(String(location.search || ""));
 /* BR-S280 — the landing A/B; see styles.css. One class, read once, no persistence:
    this is a probe to look at, not a setting to live with. */
 (function () {
