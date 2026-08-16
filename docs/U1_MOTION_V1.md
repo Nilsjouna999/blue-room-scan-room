@@ -199,3 +199,53 @@ Consequences that follow from the description, not additions to it.
 every quoted phrase are his. The unpacking — what each beat proves and what follows from
 it — is the writing-out he asked for, and any of it can be struck without disturbing the
 description it came from.*
+
+---
+
+# ★★ THE LAW THAT WAS MISSED — added 2026-08-16, after the first build was scrapped
+
+The builder, on why the fleet's U1 was thrown: **"it was missing info writing on each box
+filling it out like the product need to work."**
+
+## The filling IS the demonstration
+
+Each box **writes itself out as you scroll**, with its real information, and the writing
+is the thing the reader is watching. A box that arrives already full has shown them
+nothing. This is not an embellishment on the tutorial — it is the tutorial.
+
+The reader is not being told how the product works. They are watching it work.
+
+## How it was lost, so it is not lost again
+
+The scrapped build stated its own failure in its header, as a virtue:
+
+> "Here NOTHING TYPES: beat 1 is composed at p=0 and rides out by gear. **Zero
+> textContent writes in the whole module.**"
+
+The reasoning was locally sound. The RACK before it had a defect where the descent landed
+on an empty label, so the rebuild removed typing altogether to make that class of bug
+impossible. It traded away the feature to kill the bug — and the feature was the point.
+
+★ **A defect in HOW something fills is never a reason to stop it filling.** Fix the
+landing, keep the writing.
+
+## What a correct build must do
+
+- every box fills with its **actual, accurate** information — the same derivation the
+  real reading uses, never a plausible-looking stand-in
+- the fill is **driven by scroll position**, so the reader controls it and can stop,
+  reverse, and re-watch any beat
+- the letter is written **on the same scalar**, at the same time — one number drives the
+  boxes and the letter together, which is what makes it read as translation rather than
+  as two animations
+- when the writing completes, the filled boxes **travel and transform into the readable
+  result** — the finished record is the same material, moved, not a different screen
+- a reader with no JS, reduced motion, or a narrow viewport still gets the complete
+  filled-out document. Static-first stays; it is the FALLBACK, never the default
+  experience for someone who can see the motion.
+
+## The test
+
+> Watch it with the sound of the idea in mind: can a stranger, scrolling once, say what
+> the product does and what they would receive? If the boxes were full before they
+> arrived, the answer is no and the build has failed regardless of what it measures.
