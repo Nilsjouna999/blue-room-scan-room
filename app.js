@@ -7205,7 +7205,6 @@ try {
 } catch (e) {}
 
 mountMenu();
-syncBuildFlip();   // BR-S377 — the dev⇄public flip, once, on every room
 wireU1Leak();      // BR-S399 — the found fragment, viewing only
 warmL1();          // BR-S401 — the desk is no longer the boot panel; warm what it needs
 wireL1Back();      // BR-S401 — the right half of the seal is the way back
@@ -7229,6 +7228,23 @@ if (DEVNAV) {
     devnavEl.removeAttribute("hidden");
   }
 }
+/* ★★ BR-S506 — AFTER THE FLAG IS WRITTEN, NOT EIGHT LINES BEFORE IT.
+   The builder, standing in live/: "where is peek". The pill was not there — and it had
+   not been drawing at boot on ANY of the three builds, for anyone.
+
+   This call used to sit immediately after mountMenu(), which was correct while
+   brFlipVisible() read the DEVNAV const (settled at line 112, long before either).
+   BR-S488 moved that gate onto body[data-devnav] because the const cannot follow the
+   backtick key, which was the right call for the toggle and quietly wrong for the boot:
+   the attribute is written inside the block ABOVE, so the read now ran eight lines
+   before the write and the gate answered "no" every time. The only path that still
+   produced a pill was the backtick handler, which calls this again — so it looked
+   present whenever anyone tested it by toggling, and absent whenever anyone simply
+   loaded a URL with the flag on. That is why ?devnav=1 alone appeared to do nothing.
+
+   Moved rather than re-pointed at DEVNAV: one source of truth for this flag is the
+   whole point of BR-S488, and ordering is the cheaper half of the fix. */
+syncBuildFlip();   // BR-S377 — the dev⇄public flip, once, on every room
 /* BR-S213: press ` (backtick) anywhere to toggle the dev nav live — the builder's
    always-on switch for the state toggles (M3 Lock, view, source, routes). Persisted
    (localStorage br_devnav); ignored while typing in a field. OK on live (no customers). */
