@@ -254,20 +254,31 @@
      Without this the line decorates an edge. With it the line IS the edge, and the
      Codex's own entries sink as they cross it. Same quadratic-midpoint contour as the
      stroke, so the dark and the lit lip are the same curve and can never separate. */
-  function band() {
-    var N = L.N, xs = L.xs, y = L.y, base = L.baseY, i, c, pc, xm, ym;
-    var off = (1 - env) * RISE;
-    ctx.globalAlpha = 1; ctx.shadowBlur = 0;
+  /* ★ BR-S509 — ONE definition of where the line runs, used by the band, the glow's clip
+     and the stroke. It was written out three times; three copies of a curve that must
+     agree to the pixel is how a seam drifts apart without anyone editing it. */
+  function pathAlong(off) {
+    var N = L.N, xs = L.xs, y = L.y, base = L.baseY, i, pcy, ccy;
     ctx.beginPath();
     ctx.moveTo(xs[0], base + y[0] + off);
     for (i = 1; i < N; i++) {
-      pc = base + y[i - 1] + off; c = base + y[i] + off;
-      xm = (xs[i - 1] + xs[i]) / 2; ym = (pc + c) / 2;
-      ctx.quadraticCurveTo(xs[i - 1], pc, xm, ym);
+      pcy = base + y[i - 1] + off; ccy = base + y[i] + off;
+      ctx.quadraticCurveTo(xs[i - 1], pcy, (xs[i - 1] + xs[i]) / 2, (pcy + ccy) / 2);
     }
     ctx.lineTo(xs[N - 1], base + y[N - 1] + off);
+  }
+  /* the region STRICTLY below the line: the same curve, closed out to the bottom corners.
+     Used as a fill for the band and as a CLIP for the glow, so the two can never disagree
+     about which side of the line they are on. */
+  function belowPath(off) {
+    pathAlong(off);
     ctx.lineTo(W, H); ctx.lineTo(0, H);        /* out to the bottom edge — this is a LOWER line */
     ctx.closePath();
+  }
+  function band() {
+    var off = (1 - env) * RISE;
+    ctx.globalAlpha = 1; ctx.shadowBlur = 0;
+    belowPath(off);
     ctx.fillStyle = maskGrad || "#0a0b0d";
     ctx.fill();
   }
@@ -292,19 +303,47 @@
        there is now nothing but the Codex. The glow is halved and warmed for the same
        reason: it spreads UPWARD across the content, so it must not grey it. */
 
-    ctx.beginPath();
-    ctx.moveTo(xs[0], base + y[0] + off);
-    for (i = 1; i < N; i++) {
-      var pcy = base + y[i - 1] + off, ccy = base + y[i] + off;
-      ctx.quadraticCurveTo(xs[i - 1], pcy, (xs[i - 1] + xs[i]) / 2, (pcy + ccy) / 2);
-    }
-    ctx.lineTo(xs[N - 1], base + y[N - 1] + off);
+    /* ★★ BR-S509 — THE GLOW ONLY GOES DOWN NOW, AND THAT IS THE HAZE.
+       The builder: "the white line shouldnt let a pixel of blue above it and same
+       shoudnt let pixed of codex brown below it... im certain im sensing or seeing
+       somethin above white line that is not crispy clean codex brown, it something hazy
+       or blurry... it dont look clean."
+
+       BR-S442 already found and cut one cloud above this line — the stroke's own body
+       fill — and its note ends "above it there is now nothing but the Codex". That was
+       one line short of true. `ctx.shadowBlur` spreads a shadow in EVERY direction, so
+       the warm glow left behind by that fix was still climbing a few pixels UP into the
+       codex. Warm or not, an alpha wash over #100e0c is a wash: it lifts the black,
+       softens an edge that is supposed to be the crispest thing on the page, and it is
+       exactly a "hazy or blurry" band sitting where clean brown should be. Halving it at
+       BR-S442 made it fainter and kept it.
+
+       A glow cannot be aimed, but it CAN be clipped. The region below the line is
+       already computed for the band, so the glow is stroked once inside that clip —
+       where it lands on the dark band and reads as the lit lip it was drawn for — and
+       the line itself is then stroked again with no shadow at all. Above the line there
+       is now nothing but the Codex, and this time the sentence is checkable: sample any
+       row above the curve and it is the codex's own brown, unmodified.
+
+       ★ AND THE OTHER HALF OF THE BUILDER'S RULE IS THE SAME PATH. "no pixel of codex
+       brown below it" holds because the band is filled from THIS curve to the bottom
+       corners — one definition, used by the fill and the clip, so the two edges cannot
+       drift apart. */
+    ctx.save();
+    belowPath(off); ctx.clip();                 /* the glow may not cross the line */
+    pathAlong(off);
     ctx.strokeStyle = edgeGrad(STROKE_A * env);
     ctx.lineWidth = 1.1; ctx.lineJoin = "round";
     ctx.shadowColor = "rgba(255,248,236," + (GLOW_A * env).toFixed(3) + ")";
     ctx.shadowBlur = GLOW_BLUR;
     ctx.stroke();
+    ctx.restore();
+
+    pathAlong(off);                             /* the line itself: crisp, unhaloed */
+    ctx.strokeStyle = edgeGrad(STROKE_A * env);
+    ctx.lineWidth = 1.1; ctx.lineJoin = "round";
     ctx.shadowBlur = 0;
+    ctx.stroke();
   }
 
   /* FIXED TIMESTEP. Variable dt is what makes a spring explode on a slow frame —
