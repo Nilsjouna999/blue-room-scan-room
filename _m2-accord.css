@@ -6,468 +6,144 @@
    commits of correct CSS have already been invisible in a browser for exactly that
    reason. Bump the token in the JS when this file changes.
 
-   ═══ BR-S513 — THE REWRITE, AND WHY ═══════════════════════════════════════════════
-   The first version built the bottle out of absolutely-positioned rectangles: a body
-   box, a liquid box, a thickness box, a shoulder wedge, each with its own radius. Put
-   beside the builder's reference at matched size, it did not read as a bottle at all —
-   it read as a label floating on a dark green panel. That was not a tuning problem. A
-   stack of rectangles has no arrangement in which the shoulder curves out of the neck,
-   so the silhouette the reference depends on was unreachable from that structure.
+   ═══ BR-S524 — THE BOTTLE IS AN ILLUSTRATION, AND THIS FILE LOST FOUR FIFTHS ═══════
+   What was here: a silhouette clip and its inner twin, a transmission layer, a thickness
+   layer, six facets, a rim gradient, an overcap, a pump collar, a lift seam, a stem, a
+   heel light, recess walls, a floor pool, a pane and a gleam. All of it is gone. One
+   <img> replaced the lot.
 
-   So the geometry moved OUT of this file and into ONE clip-path, declared in the JS in
-   objectBoundingBox units and applied to `.m2acc__vessel`. Every glass layer now lives
-   inside that clip and inherits the outline. This file's job is no longer shape — it is
-   LIGHT. Which is the right division: shape is a fact, light is the craft.
+   ★ WHY, PLAINLY. Two sessions went into measuring those gradients against the builder's
+   render, and the gap never closed — because the gap was raytraced glass and CSS has
+   none. Every pass got closer and none of them arrived. The asset arrives by definition.
 
-   Three consequences worth knowing before editing:
-     1. Glass layers can be `inset: 0`. They do not need their own geometry any more,
-        and giving them any is how the layers start disagreeing again.
-     2. The silhouette changes in ONE place (SIL_PATH in the JS), never here.
-     3. Type is sized in `cqw` with NO minimum. The old `clamp(4px, …)` floor was the
-        actual cause of the label overflowing the bottle at menu scale — at 145px the
-        floor won, the label kept 4px type it had no room for, and the text ran past the
-        glass. A pure ratio is legible at 462px and merely small at 145px, which is what
-        the reference also does. Never restore a px floor here.
+   ★ AND THE RECESS WENT WITH IT, which is the less obvious half. The render carries its
+   own vitrine: the frame, the inner shadow, the brass hairline, the one diagonal
+   reflection. Painting the CSS recess behind it would double every depth cue the render
+   already resolved, and two sets of shadows disagreeing is worse than either alone. So
+   `--acc-rec-ar: 0.808` is not re-tuned to fit the asset — it is retired here. `.m2acc`
+   is now a plain sized box holding a plate.
 
-   ★★ EVERYTHING DERIVES FROM TWO RATIOS. The reference's section 5 says the recess at
-   0.808 and the bottle body at 0.582 carry the whole silhouette, and that a bottle even
-   10% narrower stops reading as a flask. They are declared once and everything else is
-   computed from them.
+   ★★ THE 0.808 RECESS IS NOT DEAD, IT IS JUST NOT THIS SURFACE'S. Its three-plane depth
+   model — inner occlusion, a pane flush with the surrounding surface, no drawn frame —
+   is what `docs/U1_SHOWCASE_V1.md` reuses, where the occupant is a LIVE CARD rather than
+   a render and therefore has no vitrine of its own. Two containers, two occupants, two
+   legitimately different ratios. The ratio was only ever disputed because one number was
+   being asked to serve both.
 
-   ★ THE VALUE RANGE IS THE OTHER HARD RULE. Recess, ground and bottle all live inside
-   about 25 levels of near-black. Every colour below is written with its L* in a comment
-   so the range stays checkable by reading rather than by rendering.
+   Recover the whole glass build from BR-S523 if this is ever reversed.
+
+   ★ WHAT IS STILL LIVE HERE: the label, and only the label. It is the one surface making
+   a claim about a person — it has to come from the reading engine, survive the drift
+   test, be selectable, and scale with the type system. Baking it into the PNG would
+   hardcode precisely the thing BR-S500 already got wrong once.
    ═══════════════════════════════════════════════════════════════════════════════ */
 
 .m2acc {
-  /* ── the two governing ratios ─────────────────────────────────────────────── */
-  --acc-rec-ar: 0.808;          /* recess w/h  — LOCKED, see the note above */
-  --acc-body-ar: 0.582;         /* bottle body w/h — LOCKED */
-  --acc-bottle-h: 0.900;        /* measured off the reference: 299/332 of recess height */
-  /* ★ RE-MEASURED against the reference at MATCHED SIZE, which is the only way this
-     number can be trusted. The earlier .617 came from reading the vitrine's edges off a
-     scaled screenshot and was too wide by a tenth — enough that the bottle filled its
-     recess and lost the dark margin that makes it look held rather than packed. The
-     reference bottle takes about .53 of the recess width. */
-  --acc-body-w: 0.548;
+  /* ── the asset's own canvas, from assets/birth-accord/asset.json ──────────────
+     Never independently stretched: the asset's README forbids it, and a bottle scaled
+     on one axis stops being the object that was approved. */
+  --acc-canvas-w: 875;
+  --acc-canvas-h: 1182;
 
-  /* ── the closure, as fractions of TOTAL bottle height ──────────────────────────
-     Measured off the reference and agreeing with SIL_PATH in _m2-accord.js, whose neck
-     begins at .133. The collar deliberately OVERLAPS that top edge so metal and glass
-     meet with no seam of background showing through the joint — a 2% gap there reads as
-     a broken object and was visible in the first render.
+  /* ── the card region, from asset.json → regions.card.normalized ───────────────
+     Read out of the file, never typed from a screenshot. These four numbers are the
+     entire contract between the illustration and the live node standing in it. */
+  --acc-card-x: 31.54%;
+  --acc-card-y: 37.40%;
+  --acc-card-w: 36.34%;
+  --acc-card-h: 39.93%;
 
-     The cap is also NARROWER than the first pass: .217 of the body's width, against the
-     .31 that was guessed. V2 §1 says the closure must not read as a broad crown, and a
-     wide cap is the single thing that made the first render look like a decanter. */
-  /* ★ AND THE CAP WAS OVER-CORRECTED. Told that V2 wanted it quieter, the last pass took
-     it to .216 of the body's width — half the reference's .28 — and a cap that small
-     stops reading as a closure at all: it became a stub with a bright bar under it, and
-     the bar read as detached hardware. "Not a broad crown" is not "barely there". */
-  --acc-cap-h: 0.108;           /* V2 §1: 0.112 is the CEILING — this sits just under it */
-  --acc-cap-x: 36%;             /* inset from each side → cap is .28 of the body */
-  --acc-collar-x: 35.2%;
-  --acc-collar-t: 0.108;
-  --acc-collar-b: 0.146;
-
-  /* ── the palette. L* in comments; the whole set spans ~9 levels. ──────────── */
-  --acc-page:  #0a0908;         /* L*  3.4  the ground around the recess */
-  --acc-rec-1: #141210;         /* L*  6.6  the recess top face */
-  --acc-rec-2: #0d0c0b;         /* L*  4.4  settling lower */
-  --acc-rec-3: #080807;         /* L*  2.6  the bottom corners */
-  --acc-cap:   #141414;         /* L*  7.0  near-black cylinder */
-  --acc-brass: #8a6a3a;         /* the cap band */
-  --acc-gold:  #9a7a45;         /* the collar's lit upper edge */
-
-  /* ★★ V2 §4 — BOTANICAL GREEN, AND IT IS A TRANSMISSION SET, NOT A FILL RAMP.
-     --glass-* are what you see looking THROUGH the bottle; --dense is the colour at the
-     edges and heel where the light crosses more glass. The old four-stop vertical olive
-     is gone: a bottle whose colour only varies top-to-bottom is a painted cylinder,
-     because real glass varies with THICKNESS, which is a horizontal fact first. */
-     ★ AND IT IS DARK. The first pass of this rewrite got the structure right and the
-     VALUE badly wrong — a bright flat olive that looked like poster paint next to the
-     reference. Sampling the reference: the lit glass beside the label is about #333a1f,
-     the body mid-tone about #262c18, the walls near #0a0d07. The label is the brightest
-     thing in the box by a wide margin and everything else is a dark object it is stuck
-     to. If the green is the first thing you notice, it is wrong. */
-     ★ AND IT IS WARM. Beside the reference the first dark pass read cool and grey — a
-     bottle-green rather than a botanical one. The reference sits closer to olive-brown:
-     the hue leans yellow, not blue, all the way down the ramp. */
-     ★ AND DARKER STILL. Side by side the body was reading as a mid-olive slab: the gap
-     between the glass and the label had closed, and it is that GAP that makes the label
-     look lit and the bottle look like glass. On the reference the label is far and away
-     the brightest thing in the box and the body sits well below it. Value separation is
-     doing more work here than hue. */
-  --acc-glass-core: #434626;    /* the lit centre, where the glass is thinnest */
-  --acc-glass-mid:  #212210;
-  --acc-glass-low:  #141308;
-  --acc-dense:      #0b0b06;    /* the walls and heel — near-black, faintly olive */
-  --acc-warm:       #221b0c;    /* the heel's warmth, sitting in the pool's light */
-
-  /* ★ AGED, NOT NEW. Beside the reference the stock was reading as fresh paper — too
-     light and too neutral, which made the label look printed today and stuck on rather
-     than filed years ago. The reference's stock is a deeper oatmeal with the yellow
-     already in it. It is still the brightest thing in the box; it is just no longer
-     the whitest thing imaginable. */
-  --acc-stock: #cfc0a0;         /* label stock at its lightest — NOT white */
-  --acc-stock-2: #bcab89;       /* falling toward the bottom */
-  --acc-ink:   #2a2118;         /* label ink — 7.4:1 on the stock above */
+  /* ── the label stock. Sampled from the master, not guessed. ─────────────────── */
+  --acc-stock:   #d8cbad;
+  --acc-stock-2: #c9bb9b;
+  --acc-ink:     #2a2118;
 
   position: relative;
-  width: 100%;
-  max-width: 462px;
-  aspect-ratio: var(--acc-rec-ar);
+  /* asset.json recommends 430–464px on desktop; this sits inside that and still fills a
+     narrow viewport with the 20px gutter the README asks for */
+  width: min(464px, calc(100% - 20px));
+  aspect-ratio: var(--acc-canvas-w) / var(--acc-canvas-h);
   margin: 0 auto;
-  /* the container the type scales against — see the cqw note in the header */
   container-type: inline-size;
-  background:
-    radial-gradient(120% 100% at 50% 0%, var(--acc-rec-1) 0%, var(--acc-rec-2) 62%, var(--acc-rec-3) 100%);
-  /* the reference is explicit: no visible border, under 4px radius. The recess is
-     defined by VALUE, not by a line. */
-  border-radius: 2px;
-  overflow: hidden;
-  isolation: isolate;
+  /* the render is a tightly cropped opaque rectangle — no radius, no frame, no shadow of
+     our own. Everything that would go here is already inside the image. */
 }
 
-/* ═══ PLANE 1 — THE HOLE ═══════════════════════════════════════════════════════════
-   V2 §5: the recess occludes from the INSIDE, never with a decorative external frame.
-   __wall is that inner occlusion — the corners and sides going dark because they are
-   deeper in, not because something is drawn on top of them. */
-.m2acc__wall {
-  position: absolute; inset: 0;
-  background:
-    /* the four inner faces, strongest in the corners */
-    radial-gradient(120% 88% at 50% 112%, rgba(0,0,0,.72), transparent 66%),
-    linear-gradient(90deg, rgba(0,0,0,.58) 0%, transparent 20%, transparent 80%, rgba(0,0,0,.58) 100%),
-    linear-gradient(180deg, rgba(0,0,0,.44) 0%, transparent 26%);
-}
-/* the warm pool the base stands in — wider than the bottle, low contrast, warm rather
-   than white. This is the only light source in the box and the heel is lit BY it, which
-   is why --acc-warm exists as its own stop. */
-.m2acc__floor {
-  position: absolute; left: 50%; bottom: 2.5%;
-  width: 86%; height: 15%;
-  transform: translateX(-50%);
-  background:
-    radial-gradient(closest-side, rgba(154,122,69,.26), rgba(154,122,69,.07) 58%, transparent 78%);
-}
-
-/* ═══ PLANE 2 — THE BOTTLE ═════════════════════════════════════════════════════════ */
-.m2acc__bottle {
-  /* it stands ON the floor, with the floor visible beneath it. At 4.5% the heel ran
-     almost into the recess's bottom edge and the bottle read as cropped rather than
-     placed — the reference leaves a clear band of lit floor under the base. */
-  position: absolute; left: 50%; bottom: 6.2%;
-  /* ★ THE TYPE SCALES OFF THE BOTTLE, NOT THE RECESS. It used to size against `.m2acc`,
-     so narrowing the body left the label's width behind while its type stayed put — and
-     "The Crowned Name", which is one line on the reference, wrapped to two. Anchoring
-     the container here makes the label's proportions independent of --acc-body-w, so a
-     silhouette change can never again break the typography inside it. */
-  container-type: inline-size;
-  width: calc(var(--acc-body-w) * 100%);
-  height: calc(var(--acc-bottle-h) * 100%);
-  transform: translateX(-50%);
-}
-
-/* ★★ THE VESSEL — the one clip every glass layer obeys. Nothing inside it carries its
-   own geometry; the outline is SIL_PATH in the JS. The drop-shadow is on the wrapper
-   rather than a child so it follows the silhouette rather than boxing it — a rectangular
-   shadow under a curved bottle is the tell that gives away a stack of divs. */
-.m2acc__vessel {
-  position: absolute; inset: 0;
-  clip-path: url(#m2accSil);
-  filter: drop-shadow(0 2px 6px rgba(0,0,0,.55));
-}
-/* ★★ THE RIM — and it is on a ::before, not on the vessel itself. Painting it as the
-   vessel's own background meant any mask that shaped the rim also masked `__inner` and
-   faded the whole bottle away at its ends. On a pseudo-element the rim can be shaped
-   freely while the material layers, which are real children stacked above it, are left
-   alone.
-
-   What survives is a lit edge tracing the true silhouette: both walls, the shoulder
-   curve, and both sides of the NECK — the part the old box-pinned highlights could
-   never reach. See the long note in _m2-accord.js.
-
-   Asymmetric by construction rather than by two elements agreeing: bright and near
-   continuous down the left, soft and dim on the right. Symmetry reads as a CSS
-   gradient; asymmetry reads as glass, and the reference's own ranking puts this fourth
-   of the six things that make or break the object. The vertical mask stops the rim
-   running dead into the cap or the floor, which would read as a drawn line rather than
-   as light falling on a curved surface. */
-.m2acc__vessel::before {
-  content: ""; position: absolute; inset: 0;
-  /* ★ AND IT STAYS LIT ACROSS THE MIDDLE. The first version of this gradient fell to
-     .08 alpha through the centre, on the reasoning that the centre is not an edge. But
-     the NECK's two edges sit at .416 and .584 — dead centre of the box — so the dim
-     middle erased exactly the piece of rim this whole mechanism was built to draw, and
-     the cap went on floating. The asymmetry is now a tilt across a lit rim, not a fade
-     to nothing: brightest at the left wall, still clearly present at the neck. */
-  /* brighter now that the body behind it is darker — on the reference these two vertical
-     lines are the most conspicuous thing about the glass after the label itself */
-  background: linear-gradient(90deg,
-    rgba(240,244,226,.92) 0%,
-    rgba(222,230,204,.62) 10%,
-    rgba(196,204,176,.44) 42%,
-    rgba(190,198,170,.40) 68%,
-    rgba(216,224,196,.54) 94%,
-    rgba(232,238,216,.70) 100%);
-  -webkit-mask-image: linear-gradient(180deg, transparent 1%, #000 8%, #000 94%, transparent 100%);
-          mask-image: linear-gradient(180deg, transparent 1%, #000 8%, #000 94%, transparent 100%);
-}
-/* the same outline, inset — the difference between the two IS the rim. Inset in px
-   rather than % so the hairline stays a hairline at 145px and at 462px alike. */
-.m2acc__inner {
-  position: absolute; inset: 1.5px;
-  clip-path: url(#m2accSil);
-}
-.m2acc__inner > * { position: absolute; inset: 0; }
-/* ★ THE HEEL IS LIT FROM BELOW, because the floor pool is the only lamp in the box and
-   the base is the part standing in it. Without this the heel and the recess floor are
-   the same value and the bottle appears to be cut off at the bottom rather than resting
-   on something — which is exactly how it read before this rule existed. Screen, so it
-   adds the pool's warmth to the glass instead of painting over it. */
-.m2acc__inner::after {
-  content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 17%;
-  mix-blend-mode: screen; pointer-events: none;
-  /* ★ AND IT IS A GLOW, NOT A FLOODLIGHT. At .38 it washed the whole lower third to a
-     pale tan and the bottle lost its base entirely. The reference keeps the heel DARK —
-     it is the thickest glass on the object — with only a narrow lift right at the floor
-     line. The light has to say "standing in something", not "lit from inside". */
-  background: linear-gradient(180deg,
-    transparent 0%, rgba(120,92,50,.07) 62%, rgba(150,122,74,.15) 90%, rgba(170,142,92,.21) 100%);
-}
-
-/* the base body: dark, and only just green. Everything luminous is added ON TOP of
-   this, never mixed into it, so the bottle is dark by default and lit by exception. */
-.m2acc__glass {
-  background: linear-gradient(180deg, #12150c 0%, #0e1108 62%, #090b06 100%);
-}
-
-/* the fill of colour. It stops BELOW the shoulder because a bottle filled to the cap is
-   a bottle of nothing — the air gap at the top is what makes it read as containing a
-   liquid at all. */
-.m2acc__liquid {
-  top: 22%;
-  background: linear-gradient(180deg,
-    var(--acc-glass-mid) 0%,
-    var(--acc-glass-mid) 34%,
-    var(--acc-glass-low) 78%,
-    var(--acc-warm) 100%);
-  transition: opacity 420ms cubic-bezier(.2,.7,.2,1);
-}
-
-/* ★★ THE TRANSMISSION. This is the layer that decides whether the object is glass. It
-   is the light coming through where the bottle is thinnest — a broad soft core, placed
-   slightly ABOVE centre and slightly left, because a highlight centred in its own box
-   reads as a gradient rather than as light arriving from somewhere. `screen` so it adds
-   light instead of painting over the colour beneath. */
-.m2acc__core {
-  top: 22%;
-  mix-blend-mode: screen;
-  /* ★ AND THE THIRD STOP IS THE LABEL'S HALO. The label is stuck to the FRONT of the
-     glass, so light crossing the bottle behind it scatters out around its edges — the
-     reference has a soft lift in the glass framing the label on all four sides, and its
-     absence is most of why this body read as evenly-lit rather than deep. It is placed
-     on the label's own centre (which sits at ~50% of this layer's box, the layer
-     starting at 22%) and is deliberately WIDER than the label, so what shows is the
-     spill, never a rectangle behind it. */
-  background:
-    radial-gradient(52% 30% at 50% 50%, rgba(112,120,66,.30), rgba(112,120,66,.09) 62%, transparent 82%),
-    radial-gradient(56% 36% at 46% 31%, rgba(84,92,50,.40), rgba(84,92,50,.10) 56%, transparent 76%),
-    radial-gradient(34% 19% at 53% 66%, rgba(70,78,42,.15), transparent 72%);
-}
-
-/* ★★ THE THICKNESS. Where you look through MORE glass it goes dark: both walls, and the
-   heel where the base is solid. This is the counterpart to __core and the pair is the
-   whole of V2 §4 — clear through the centre, dense at the edges, warmer near the base.
-   `multiply` so it darkens what is under it rather than greying it. */
-.m2acc__thick {
-  mix-blend-mode: multiply;
-  background:
-    linear-gradient(90deg,
-      var(--acc-dense) 0%, rgba(16,22,12,.78) 7%, transparent 30%,
-      transparent 70%, rgba(16,22,12,.72) 93%, var(--acc-dense) 100%),
-    linear-gradient(180deg, transparent 70%, rgba(16,22,12,.55) 92%, rgba(16,22,12,.78) 100%);
-}
-
-/* the wet line where the fill stops — the single cue that says "liquid in a container"
-   rather than "green object". Bright on top, shadowed under, as a meniscus is. */
-.m2acc__fillline {
-  top: 21.4%; bottom: auto; height: 1.4%;
-  background: linear-gradient(180deg, rgba(196,206,150,.30), rgba(0,0,0,.26));
-}
-
-/* the two hand-placed `__edge--l/--r` highlights that used to live here are GONE. They
-   were pinned to the bottle's box, so the clip erased them across the neck and shoulder —
-   the exact places the object most needed an edge. The rim on `.m2acc__vessel::before`
-   replaces both, and does it by following the silhouette instead of guessing at it. */
-
-/* the stem and dip tube, inside the glass and clipped with it — V2 §1 lists them as part
-   of what settles the category. Faint: they are seen THROUGH the fill, not in front. */
-.m2acc__stem {
-  left: 49.4%; right: 49%; top: 15%; bottom: 9%; inset: auto;
-  position: absolute;
-  background: linear-gradient(180deg,
-    rgba(198,196,178,.26), rgba(150,148,132,.11) 26%, rgba(120,120,104,.07));
-}
-
-/* ═══ V2 §3 — THE SIX ARE PHYSICAL ════════════════════════════════════════════════
-   Two shoulder, two side, two heel. At rest they are NEARLY INVISIBLE — never six
-   bright lines, never a legible hexagon. They become sequentially perceptible as the
-   pointer arrives, staggered by --i, so the metaphor is discovered rather than
-   announced: six separate structures alter the light, and together they define one
-   vessel. Opacity and transform only; nothing pulses or repeats. */
-.m2acc__facet {
+/* THE PLATE — a passive stage. `pointer-events: none` is load-bearing: the card above it
+   has to receive every click, hover and focus, and an <img> that swallows them would take
+   the interactivity the illustration route exists to preserve. */
+.m2acc__plate {
+  display: block; width: 100%; height: auto;
+  aspect-ratio: var(--acc-canvas-w) / var(--acc-canvas-h);
   pointer-events: none;
-  opacity: .05;
-  mix-blend-mode: screen;
-  background: linear-gradient(118deg, transparent 34%, rgba(214,222,190,.40) 50%, transparent 66%);
-}
-/* ★ ARMED A FRAME AFTER MOUNT, and this is a real bug that was measured, not a
-   precaution. The stylesheet is fetched by a <link> the mounter appends, so the facets
-   exist at the browser's default opacity 1 BEFORE the rule above arrives. Declaring a
-   transition on the base selector therefore turns the arrival of the resting state into
-   an animation FROM fully visible — six bright lines fading down, which is precisely
-   the thing V2 says must never happen. Measured on the socket: computed opacity 1 with
-   a running transition, seconds after mount. Arming one frame later means the resting
-   value is simply the value, and only the hover moves. */
-.m2acc.is-armed .m2acc__facet {
-  transition: opacity 300ms cubic-bezier(.2,.7,.2,1);
-  transition-delay: calc(var(--i, 0) * 55ms);
-}
-.m2acc__facet--sh { inset: 15% auto auto 0; height: 12%; width: 30%; }
-.m2acc__facet--sd { inset: 40% auto auto 0; height: 30%; width: 11%; }
-.m2acc__facet--hl { inset: auto auto 3% 0; height: 10%; width: 26%; }
-.m2acc__facet--a  { left: 2%; }
-.m2acc__facet--b  { left: auto; right: 2%; transform: scaleX(-1); }
-
-/* ═══ V2 §1 — THE CLOSURE CONTROLS THE CATEGORY ═══════════════════════════════════
-   A glass body alone shares territory with spirits, bitters and apothecary jars. The
-   overcap, the narrow brass PUMP collar and the lift seam are what settle it. All three
-   sit OUTSIDE the vessel clip — they are metal, not glass, and the cap has to rise clear
-   of the silhouette on activation. The collar spans .100→.156 of bottle height so it
-   overlaps the vessel's neck top at .150 and no background shows through the joint. */
-.m2acc__pump {
-  position: absolute; left: var(--acc-collar-x); right: var(--acc-collar-x);
-  top: calc(var(--acc-collar-t) * 100%);
-  height: calc((var(--acc-collar-b) - var(--acc-collar-t)) * 100%);
-  /* a turned metal ring, not a flat gold bar: lit along its upper third, falling to a
-     dark underside. The first render's collar was one bright tan slab, which is the
-     other half of why the closure read as a decanter stopper. */
-  /* aged brass in a dark room, not polished gold under a lamp: the lit band is narrow
-     and sits near the top, and most of the ring is already falling away. The previous
-     values put a bright yellow bar under the cap that read as loose hardware. */
-  background: linear-gradient(180deg,
-    #8f7345 0%, #7d6339 26%, #5f4a2b 54%, #3d2f1c 82%, #241c11 100%);
-  box-shadow: inset 0 1px 0 rgba(214,186,132,.30);
-}
-.m2acc__seam {                                   /* the lift seam — where it comes off */
-  position: absolute; left: var(--acc-cap-x); right: var(--acc-cap-x);
-  top: calc(var(--acc-cap-h) * 100%); height: 1px;
-  background: rgba(0,0,0,.62);
-  box-shadow: 0 1px 0 rgba(198,196,178,.09);
-  z-index: 2;
-}
-.m2acc__overcap {                                /* removable — the one moving part */
-  position: absolute; left: var(--acc-cap-x); right: var(--acc-cap-x); top: 0;
-  height: calc(var(--acc-cap-h) * 100%);
-  /* the repeating-gradient is the knurl on the reference's cap — very low contrast, and
-     it is what stops a black rectangle from reading as a black rectangle */
-  background:
-    repeating-linear-gradient(90deg,
-      rgba(255,255,255,.028) 0 1px, transparent 1px 3px),
-    linear-gradient(90deg, rgba(0,0,0,.5) 0%, transparent 18%, transparent 64%, rgba(0,0,0,.56) 100%),
-    linear-gradient(180deg, #262626 0%, var(--acc-cap) 44%, #0c0c0c 100%);
-  /* the reference's cap crowns — its top edge is visibly rounded where the light catches
-     it, and a flat-topped rectangle is the thing that made this read as a plug */
-  border-radius: 24% 24% 2px 2px / 12% 12% 2px 2px;
-  transform: translateY(0);
-  transition: transform 340ms cubic-bezier(.2,.7,.2,1);
+  -webkit-user-select: none; user-select: none;
+  -webkit-user-drag: none;
 }
 
-/* ═══ V2 §6 — REST / HOVER / ACTIVATION, and nothing else ═════════════════════════
-   At rest the original menu keeps priority: the bottle is still, the facets are
-   nearly invisible, the cap is closed, the pane reflection is faint. No idle bobbing,
-   no rotation, no cloud, no particles. */
-.m2acc:hover .m2acc__facet,
-.m2acc:focus-within .m2acc__facet { opacity: .26; }
-.m2acc:hover .m2acc__core,
-.m2acc:focus-within .m2acc__core { opacity: 1; }
-.m2acc:hover .m2acc__overcap,
-.m2acc:focus-within .m2acc__overcap { transform: translateY(-2.5px); }   /* separates 2-3px */
-.m2acc:hover .m2acc__label,
-.m2acc:focus-within .m2acc__label { --acc-ink: #211a12; }                 /* contrast rises subtly */
-.m2acc:hover .m2acc__gleam,
-.m2acc:focus-within .m2acc__gleam { transform: translate(3px, 2px); }     /* the pane moves a few px */
+/* THE SLOT — where the live node stands. Per the asset's README this is meant to hold the
+   REAL card, reparented and never cloned; the label below is the placeholder until the
+   reading panel exists (docs/READING_PANELS_V1.md). */
+.m2acc__slot {
+  position: absolute;
+  left: var(--acc-card-x); top: var(--acc-card-y);
+  width: var(--acc-card-w); height: var(--acc-card-h);
+  container-type: inline-size;
+}
 
-.m2acc.is-open .m2acc__overcap { transform: translateY(-7px); }           /* activation */
-.m2acc.is-open .m2acc__trace { opacity: 1; }
-
-.m2acc__core { transition: opacity 420ms cubic-bezier(.2,.7,.2,1); opacity: .88; }
-
-/* ═══ THE LABEL — the only bright plane, and it is CREAM ═══════════════════════════
-   V2 §2: 65-67% of the body, settled. Sized in cqw with NO px floor — see the header.
-   Height is content-driven and the box is clipped, so it can never spill past the glass
-   the way every candidate on the bench did. */
+/* ── THE LABEL — the only live thing in the frame ────────────────────────────────
+   Sized against the SLOT, not the recess, so the type keeps its proportions no matter
+   what width the showcase is given. */
 .m2acc__label {
-  /* measured off the reference: the label starts at .344 of bottle height and is .68 of
-     the body's width. The first pass put it at .41 and .624 — too small and riding too
-     high, which left a dead band of glass under it and shrank the type past reading. */
-  position: absolute; left: 50%; transform: translateX(-50%);
-  top: 34.4%; width: 68%;
-  padding: 3.2% 4.6%;
+  position: absolute; inset: 0;
   background: linear-gradient(180deg, var(--acc-stock), var(--acc-stock-2));
   color: var(--acc-ink);
-  /* it is stuck flat to the glass: no drop shadow, no border, one hairline of the light
-     it is catching along the top edge only */
-  box-shadow: inset 0 1px 0 rgba(255,252,242,.5);
-  display: flex; flex-direction: column; align-items: center;
+  border-radius: 3.5%/2.6%;
+  /* it is stuck flat to the glass: one hairline of caught light along the top, and a
+     contact shadow, or the plate floats a millimetre off the bottle */
+  box-shadow: 0 1px 3px rgba(0,0,0,.34), inset 0 1px 0 rgba(255,250,238,.42);
+  /* space-between, not centre: in the master the kicker sits near the top edge and
+     BY BIRTH ALONE near the bottom, with the marks breathing between them. Centring
+     pooled the block in the middle and read short beside the baked label. */
+  display: flex; flex-direction: column; align-items: center; justify-content: space-between;
+  padding: 6% 4%;
   font-family: "IBM Plex Mono", ui-monospace, Menlo, monospace;
-  /* 3.1% of the BOTTLE's width — see the container note on .m2acc__bottle. Sized so the
-     display serif sets on one line, as it does on the reference. */
-  font-size: 3.1cqw;
+  font-size: 9.4cqw;                 /* of the SLOT — see the container above */
   line-height: 1.5;
   text-align: center;
   overflow: hidden;
-  z-index: 3;
 }
-.m2acc__lrow { width: 100%; display: flex; justify-content: space-between; letter-spacing: .08em; font-size: .8em; }
-.m2acc__lrow--fine { font-size: .72em; }
-.m2acc__lrule { width: 100%; height: 1px; background: rgba(42,33,24,.42); margin: 3.4% 0; }
-.m2acc__lname { letter-spacing: .16em; font-size: .95em; }
-.m2acc__lsub { letter-spacing: .06em; font-size: .74em; opacity: .8; }
-.m2acc__ldiamond { margin: 4% 0 2.4%; font-size: .74em; }
+.m2acc__lrow { width: 100%; display: flex; justify-content: space-between; letter-spacing: .08em; font-size: .46em; }
+.m2acc__lrow--fine { font-size: .42em; }
+.m2acc__lrule { width: 46%; height: 1px; background: rgba(42,33,24,.5); }
+.m2acc__lname { letter-spacing: .15em; font-size: .46em; }
+.m2acc__lsub { letter-spacing: .06em; font-size: .40em; opacity: .82; }
+.m2acc__ldiamond { font-size: .40em; }
 .m2acc__lcrown {
   font-family: "Cormorant Garamond", Georgia, serif;
-  font-size: 2.05em; line-height: 1.12; letter-spacing: .01em; margin-bottom: 5%;
+  /* ONE line, always — it is one line in the master, and a wrapped display serif is the
+     loudest possible tell that the type is not the type it is imitating. In the master
+     it spans ~94% of the plate.
+     ★ Cormorant Garamond is NOT loaded on this route, so this size is tuned to Georgia's
+     wider measure. Resolve the display face before treating the number as final. */
+  font-size: 1.14em; line-height: 1.1; letter-spacing: .01em; white-space: nowrap;
 }
-.m2acc__lsix { display: flex; flex-direction: column; gap: .5em; }
-.m2acc__lmark { letter-spacing: .15em; font-size: .86em; }
-.m2acc__lfoot { letter-spacing: .13em; font-size: .8em; margin-bottom: 2.4%; }
+.m2acc__lsix { display: flex; flex-direction: column; }
+.m2acc__lmark { letter-spacing: .13em; font-size: .46em; line-height: 2.4; }
+.m2acc__lfoot { letter-spacing: .13em; font-size: .44em; }
 
-/* ═══ PLANE 3 — THE PANE, FLUSH WITH THE MENU SURFACE ═════════════════════════════
-   V2 §5: not a lid on a box. Visible only as a partial reflection and a lower-edge
-   trace, so the recess reads as something built into the interface rather than a framed
-   product image. */
-.m2acc__pane {
-  position: absolute; inset: 0; pointer-events: none;
-  background: linear-gradient(180deg, rgba(255,255,255,.014), transparent 40%);
-}
-/* one broad diagonal, brightest at the very top-left, gone by ~45% across. A second
-   highlight anywhere turns glass back into a gradient. */
-.m2acc__gleam {
-  position: absolute; inset: 0; pointer-events: none;
-  background: linear-gradient(146deg, rgba(255,255,255,.075) 0%, rgba(255,255,255,.028) 18%, transparent 45%);
-  transform: translate(0, 0);
-  transition: transform 420ms cubic-bezier(.2,.7,.2,1);
-}
-/* the pane's lower-edge trace — the only other thing that gives the glass away */
-.m2acc__trace {
-  position: absolute; left: 0; right: 0; bottom: 0; height: 26%;
-  pointer-events: none; opacity: .5;
-  background: linear-gradient(180deg, transparent, rgba(190,200,170,.045) 82%, rgba(190,200,170,.075) 100%);
-  transition: opacity 520ms cubic-bezier(.2,.7,.2,1);
-}
+/* ═══ V2 §6 — REST / HOVER / ACTIVATION ═══════════════════════════════════════════
+   The cap can no longer lift 7px and the facets can no longer surface: both are inside
+   the image now, and the asset's README is explicit that it must not be keyed, masked or
+   warped. What it does allow is a restrained wrapper move, so the response is the whole
+   object answering rather than a part of it animating.
+
+   At rest the original menu keeps priority. Nothing loops, nothing breathes. */
+.m2acc.is-armed { transition: transform 420ms cubic-bezier(.2,.7,.2,1); }
+.m2acc.is-armed:hover,
+.m2acc.is-armed:focus-within { transform: translateY(-2px); }
+.m2acc.is-armed .m2acc__label { transition: color 300ms cubic-bezier(.2,.7,.2,1); }
+.m2acc:hover .m2acc__label,
+.m2acc:focus-within .m2acc__label { --acc-ink: #211a12; }   /* contrast rises subtly */
 
 /* the standing card is hidden, never removed — see the note in _m2-accord.js */
 .is-accord-hidden { display: none !important; }

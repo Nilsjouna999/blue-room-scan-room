@@ -18,18 +18,21 @@
    mountMenu() rebuilds the stage from scratch on every remount, and a prototype that
    deletes shipped nodes is a prototype that can strand the real menu if it half-runs.
 
-   ★ WHY A FIXED SKELETON AND NOT THE WINNER'S OWN MARKUP. Ten builders are writing ten
-   standalone files with ten sets of class names. Whichever wins, its CSS has to meet
-   the app somewhere, and a socket with documented names is a smaller adaptation than
-   re-authoring the winner's HTML into the menu. The element ORDER below is the
-   reference document's own stated layer order (its section 6) — recess floor and walls,
-   bottle glass, liquid, label, glass highlights, cap and collar, pane gleam — because
-   in a stack of translucent layers the order IS the design.
+   ★★ AND AT BR-S524 THE OCCUPANT CHANGED. This file was written to host whichever of ten
+   fleet-built CSS bottles won, which is why it once carried a documented skeleton, a
+   stated layer order and two governing ratios (recess 0.808, body 0.582). None of that
+   survives. The bottle ships as a rendered illustration — `assets/birth-accord/` — and
+   the socket's job shrank to mounting one <img> and standing a live node in the card
+   region the asset itself declares.
 
-   ★ THE GEOMETRY IS CUSTOM PROPERTIES, NOT NUMBERS IN RULES. The two ratios that carry
-   the whole silhouette (recess 0.808, bottle body 0.582) are declared once in the
-   stylesheet and everything else is derived from them, so adopting a candidate's
-   proportions is editing two values rather than hunting through selectors.
+   The paragraphs above are kept because the mount/lifecycle reasoning they explain is
+   unchanged; the paragraphs about the skeleton and the ratios are not, and are struck
+   here rather than silently edited so the shape of the change stays legible.
+
+   ★ THE GEOMETRY IS THE ASSET'S, NOT OURS. Canvas and card region are read out of
+   `assets/birth-accord/asset.json`. Nothing about the bottle's proportions is decided in
+   this repo any more, and the asset's README forbids stretching either axis
+   independently — so there is no ratio left to tune, only one to honour.
 
    ★★ THE LABEL IS A FIXTURE AND IT IS MARKED AS ONE. The six lines below are the
    SLOTS, not a person's marks. The moment they come from the real derivation this
@@ -48,96 +51,19 @@
   function style() {
     if (doc.getElementById("m2acc-css")) return;
     var l = doc.createElement("link");
-    l.id = "m2acc-css"; l.rel = "stylesheet"; l.href = "_m2-accord.css?v=516";
+    l.id = "m2acc-css"; l.rel = "stylesheet"; l.href = "_m2-accord.css?v=524b";
     (doc.head || doc.documentElement).appendChild(l);
   }
 
-  /* ═══ BR-S513 — THE SILHOUETTE IS ONE SHAPE, NOT A STACK OF BOXES ═══════════════
-     What the first build got wrong, and it was the whole thing: the bottle was
-     assembled from absolutely-positioned rectangles — a body box, a liquid box, a
-     thickness box, a shoulder wedge — each with its own border-radius. A stack of
-     rectangles cannot produce a flask. There is no arrangement of boxes where the
-     shoulder curves out of the neck, so the object never read as a bottle; it read as
-     a label floating on a dark green panel, which is exactly what the ten candidates
-     also produced and what the reference does not look like.
+  /* BR-S524: the SIL_PATH clip-path and its <defs> injector lived here and are gone
+     with the CSS bottle they shaped. Recover them from BR-S523 if the illustration route
+     is ever reversed; nothing else referenced them.
 
-     So the vessel is now ONE outline, declared once, and every glass layer is clipped
-     to it. Change the path and the whole bottle changes shape together — glass,
-     transmission, thickness, facets and edge highlights included, because they are all
-     inside the same clip.
-
-     ★ WHY objectBoundingBox AND NOT path() OR polygon(). The socket renders at ~145px
-     in the menu and at 462px in the lab, and it must be the same object at both. In
-     objectBoundingBox units every coordinate is a FRACTION of the element's own box, so
-     one declaration serves every size with no media queries and no recomputation. A
-     path() in user units would need re-authoring per size, which is how a silhouette
-     drifts between the bench and the shipping surface.
-
-     ★ THE CAP IS DELIBERATELY OUTSIDE THIS PATH. The outline covers neck, shoulder and
-     body only. The overcap has to move independently — 2-3px on hover, ~7px on
-     activation, per V2 §6 — and a moving part cannot live inside the clip that defines
-     the part it lifts away from. The path ends at the neck's top edge for that reason.
-
-     Coordinates read top-down: neck sides, the shoulder's outward curve, the straight
-     body walls, and a heel with a small radius. The shoulder is a cubic on both sides
-     because that curve is the single feature separating a flask from a jar. */
-  /* ★ THESE NUMBERS ARE MEASURED OFF THE REFERENCE, NOT INVENTED — and measured at
-     MATCHED SIZE on the craft bench, which is the only reading that can be trusted. An
-     earlier pass took them off a scaled screenshot and was wrong on two of three.
-     Down the bottle: cap 0→.108, brass collar .108→.146, a VISIBLE dark neck to .197,
-     the shoulder curve .197→.274, body to the heel at .998. Across: the neck is .168 of
-     the body's width and the walls sit at .034/.966.
-     (The closure fractions live in _m2-accord.css as --acc-cap-h / --acc-collar-*; this
-     path only has to agree with where the neck STARTS, at .133.)
-
-     The first pass guessed and got two things wrong that together read as "not the same
-     object": the neck was .23 wide with no straight section, so the cap appeared to sit
-     directly on the shoulders, and the shoulder curve was too short, which made it a
-     jar's rolled edge rather than a flask's slope. */
-  var SIL_ID = "m2accSil";
-  var SIL_PATH =
-    /* ★ THE SHAPE TARGET CHANGED. A chamfered shoulder was briefly correct — the FIRST
-       reference is a moulded flask with a bevelled corner. The builder's second and
-       better reference (2026-08-16) is a different bottle: soft, generously rounded
-       corners, shoulders curving smoothly into a SHORT neck, and no straight run
-       anywhere on the silhouette. The chamfer is reverted rather than tuned, because
-       the two references disagree about what the object IS, not about a value.
-
-       ★★ AND THIS PATH MAY NOT SURVIVE AT ALL — see the note in _accord-lab.html. If the
-       bottle ships as an exported illustration, everything below is replaced by an image
-       and only the label stays live. Do not invest further in these coordinates until
-       that call is made. */
-    "M .430 .128 L .570 .128 L .570 .176 " +  /* a short neck, per the second reference */
-    "C .676 .190 .880 .224 .948 .286 " +      /* shoulder: one continuous round */
-    "C .964 .306 .968 .330 .968 .360 " +
-    "L .968 .944 " +
-    "C .968 .976 .944 .996 .906 .996 " +      /* generous heel radius */
-    "L .094 .996 " +
-    "C .056 .996 .032 .976 .032 .944 " +
-    "L .032 .360 " +
-    "C .032 .330 .036 .306 .052 .286 " +
-    "C .120 .224 .324 .190 .430 .176 Z";      /* left shoulder, back up to the neck */
-
-  /* One <defs> per document. The SVG carries no size and no paint — it exists only to
-     own the clipPath, so it is pulled out of layout entirely rather than hidden with
-     display:none, which in some engines drops the clip along with the box. */
-  function silhouette() {
-    if (doc.getElementById(SIL_ID)) return;
-    var NS = "http://www.w3.org/2000/svg";
-    var svg = doc.createElementNS(NS, "svg");
-    svg.setAttribute("width", "0"); svg.setAttribute("height", "0");
-    svg.setAttribute("aria-hidden", "true");
-    svg.setAttribute("focusable", "false");
-    svg.style.cssText = "position:absolute;width:0;height:0;overflow:hidden";
-    var defs = doc.createElementNS(NS, "defs");
-    var cp = doc.createElementNS(NS, "clipPath");
-    cp.setAttribute("id", SIL_ID);
-    cp.setAttribute("clipPathUnits", "objectBoundingBox");
-    var p = doc.createElementNS(NS, "path");
-    p.setAttribute("d", SIL_PATH);
-    cp.appendChild(p); defs.appendChild(cp); svg.appendChild(defs);
-    (doc.body || doc.documentElement).appendChild(svg);
-  }
+     ★ hero() and el() live below rather than above only because the deletion that removed
+     the silhouette took them with it — they sat between the clip-path block and the label
+     builder, and a range delete does not know that. The mount failed with "hero is not
+     defined" on the first load after, which is the cheapest possible way for that to
+     surface and the reason the socket gets checked in the menu rather than assumed. */
 
   function hero() { return doc.querySelector(".menu__draw-stage [data-m2-hero]"); }
 
@@ -178,6 +104,33 @@
     return lab;
   }
 
+  /* ═══ BR-S524 — THE BOTTLE IS AN ILLUSTRATION NOW ═══════════════════════════════
+     Everything that used to stand here — the silhouette clip, the vessel and its inner
+     twin, the transmission and thickness layers, the six facets, the rim, the closure,
+     the recess walls and floor and pane — is gone, and the whole of it is replaced by one
+     <img>. That is not a retreat. Two sessions of measuring gradients against a render
+     never closed the gap, because the gap was raytraced glass, and CSS does not have any.
+     The asset does.
+
+     ★ AND THE RENDER CARRIES ITS OWN VITRINE. The frame, the inner shadow, the brass
+     hairline and the single diagonal reflection are all in the image. Painting the CSS
+     recess behind it would double every depth cue the render already resolved, and two
+     sets of shadows disagreeing is worse than either alone. So the recess is not resized
+     to fit the asset — it is retired for this surface, and `.m2acc` becomes a plain sized
+     box holding the plate.
+
+     ★ THE LABEL STAYS LIVE, and it is the only thing that does. It is the one surface
+     making a claim about a person: it has to come out of the reading engine, survive the
+     drift test, be selectable and scale with the type system. The `no-sticker` variant is
+     clean continuous glass with nothing printed on it, so the live node is the only label
+     in the frame — there is no baked text underneath to peek out from behind it.
+
+     Geometry comes from `assets/birth-accord/asset.json`, never from a number typed here.
+     Per that asset's README the region is meant to host the REAL card node, reparented
+     and not cloned; the fixture label below is the placeholder until the reading panel
+     exists (docs/READING_PANELS_V1.md). */
+  var ASSET = "assets/birth-accord/birth-accord-showcase-no-sticker.webp";
+
   function build() {
     var h = hero();
     if (!h || doc.querySelector(".m2acc")) return false;
@@ -185,106 +138,36 @@
     var recess = el("div", "m2acc");
     recess.setAttribute("aria-hidden", "true");     /* decorative until the label is real */
 
-    /* ── the hole, back to front ─────────────────────────────────────────────── */
-    recess.appendChild(el("span", "m2acc__wall"));
-    recess.appendChild(el("span", "m2acc__floor"));   /* the warm pool under the base */
+    /* the plate is a passive stage — it takes no events, and the card above it takes all
+       of them. The width/height attributes are the asset's true pixels so the box is
+       reserved before the image decodes and nothing reflows under it. */
+    var img = doc.createElement("img");
+    img.className = "m2acc__plate";
+    img.src = ASSET;
+    img.width = 875; img.height = 1182;
+    img.alt = ""; img.setAttribute("aria-hidden", "true");
+    img.setAttribute("decoding", "async");
+    recess.appendChild(img);
 
-    /* ── the bottle ──────────────────────────────────────────────────────────── */
-    var b = el("div", "m2acc__bottle");
-
-    /* ★★ THE VESSEL. Everything that is made of glass goes in here, and the wrapper
-       carries the one clip-path, so the layers cannot disagree about the outline. The
-       old build painted each layer its own rectangle and hoped they lined up; they
-       could not, because the shape it needed does not exist in rectangles. */
-    var v = el("div", "m2acc__vessel");
-
-    /* ★★ THE RIM, AND WHY THERE ARE TWO NESTED CLIPS.
-       The first pass drew the bottle's edge highlights as gradients pinned to the left
-       and right of the bottle's BOX. That works down the straight walls and fails
-       everywhere the silhouette is narrower than its box — which is the entire neck and
-       shoulder. The clip simply cut them away up there, so the neck went unlit, and an
-       unlit neck reads as a gap: the cap and collar appeared to float above a bottle
-       they were not attached to. That single defect was most of what still looked wrong.
-
-       The fix is structural. `__vessel` carries the outline and paints ONE thing — the
-       rim colour. `__inner` carries the SAME outline inset by a couple of pixels and
-       holds every material layer. What is left showing between them is a hairline that
-       traces the real silhouette all the way round: up the walls, across the shoulder
-       curve, and up both sides of the neck, which is the part that was missing.
-
-       It also replaces the two hand-placed edge highlights with one mechanism. The
-       asymmetry the reference depends on — bright and continuous left, soft and short
-       right — is now a property of the rim's own gradient rather than two separate
-       elements that had to be kept in agreement with a shape they could not see. */
-    var inner = el("div", "m2acc__inner");
-    inner.appendChild(el("span", "m2acc__glass"));
-    /* ★★ V2 §4 — the green is TRANSMISSION, not a fill. Three layers now, because two
-       could not carry it: __liquid is the body of colour, __core is the light coming
-       THROUGH the centre where the glass is thinnest, and __thick is the density at the
-       edges and heel where you look through more of it. A uniformly green bottle looks
-       painted; a bright outlined one looks like a wireframe. */
-    inner.appendChild(el("span", "m2acc__liquid"));
-    inner.appendChild(el("span", "m2acc__core"));
-    inner.appendChild(el("span", "m2acc__thick"));
-    /* ★★ V2 §3 — THE SIX ARE PHYSICAL. Two shoulder, two side, two heel, cut into the
-       glass and NOT drawn as six bright lines or a hexagon. At rest they are nearly
-       invisible; they become sequentially perceptible as the pointer moves, so the
-       metaphor is discovered rather than announced. The index drives that stagger.
-       Inside the vessel, so a facet can never overhang the silhouette it is cut into. */
-    ["sh", "sh", "sd", "sd", "hl", "hl"].forEach(function (kind, i) {
-      var f = el("span", "m2acc__facet m2acc__facet--" + kind + " m2acc__facet--" + (i % 2 ? "b" : "a"));
-      f.style.setProperty("--i", String(i));
-      inner.appendChild(f);
-    });
-    /* the wet inner line where the fill stops — the one cue that says "liquid in a
-       container" rather than "green object", and the reference has it plainly */
-    inner.appendChild(el("span", "m2acc__fillline"));
-    /* the stem and dip tube sit INSIDE the glass, so they are clipped with it */
-    inner.appendChild(el("span", "m2acc__stem"));
-
-    v.appendChild(inner);
-    b.appendChild(v);
-
-    /* the label sits ON the glass, not in it — a separate plane stuck to the front.
-       Clipping it to the vessel would let the shoulder curve shave its top corners. */
-    b.appendChild(label());
-    /* ★★ V2 §1 — THE CLOSURE CONTROLS THE CATEGORY, and it is the only thing that
-       separates this from a spirits or apothecary bottle. The overcap is a separate
-       node from the pump collar because they must move independently — the cap
-       separates 2-3px on hover and lifts ~7px on activation while the collar stays put.
-       All of it sits OUTSIDE the vessel clip: these are metal, not glass, and the cap
-       has to be able to rise clear of the silhouette. */
-    b.appendChild(el("span", "m2acc__pump"));       /* the narrow brass pump collar */
-    b.appendChild(el("span", "m2acc__seam"));       /* the lift seam */
-    b.appendChild(el("span", "m2acc__overcap"));    /* removable — the moving part */
-    recess.appendChild(b);
-
-    /* ── PLANE 3. V2 §5: the pane is FLUSH WITH THE MENU SURFACE, not a lid on the
-       box — visible only as a partial reflection and a lower-edge trace. The recess
-       occludes from the INSIDE (see __wall) rather than wearing a decorative frame,
-       which is the whole difference between a framed product image and an object built
-       into the interface. ── */
-    recess.appendChild(el("span", "m2acc__pane"));
-    recess.appendChild(el("span", "m2acc__gleam"));
-    recess.appendChild(el("span", "m2acc__trace"));
+    /* the card region, straight out of asset.json's normalized block */
+    var slot = el("div", "m2acc__slot");
+    slot.appendChild(label());
+    recess.appendChild(slot);
 
     h.parentNode.insertBefore(recess, h);
     h.classList.add("is-accord-hidden");             /* hidden, never removed */
-    /* arm the transitions a frame late — see the .is-armed note in the stylesheet. Two
-       frames, because the first only guarantees the nodes are laid out; the stylesheet
-       may still be in flight, and arming before it lands re-opens the very bug this
-       closes. */
+    /* arm a frame late — see the .is-armed note in the stylesheet. Two frames, because
+       the first only guarantees layout; the stylesheet may still be in flight. */
     var arm = function () { recess.classList.add("is-armed"); };
     root.requestAnimationFrame(function () { root.requestAnimationFrame(arm); });
-    /* BACKSTOP, and it is not theoretical: rAF does not run in a tab that is not
-       fronted, so on a background tab the arm never fired and the facets stayed
-       permanently un-transitioned. Every rAF in this repo carries one of these for the
-       same reason. Idempotent — a double call adds the class twice, which is once. */
+    /* BACKSTOP, and it is not theoretical: rAF does not run in a tab that is not fronted,
+       so on a background tab the arm never fired. Idempotent — a double call adds the
+       class twice, which is once. */
     root.setTimeout(arm, 120);
     return true;
   }
 
-  function apply() { style(); silhouette(); return build(); }
+  function apply() { style(); return build(); }
 
   function boot() {
     apply();
