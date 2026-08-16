@@ -42,6 +42,10 @@
   var doc = null, target = null, canvas = null, ctx = null;
   var W = 0, H = 0, DPR = 1, L = null, raf = 0, last = 0, accT = 0, t = 0;
   var env = 0, wantEnv = 0;
+  /* BR-S507 — see the ramp in frame(). HOLD_MS and RATE_IN are the aperture's own
+     `120ms delay, 340ms rise` restated as an envelope; RATE_OUT keeps the departure at
+     the speed it has always had. */
+  var hold = 0, HOLD_MS = 120, RATE_IN = 3.2, RATE_OUT = 5.5;
 
   /* ★★★ THE POSITION WAS WRONG, AND THE RIGHT ONE IS ALREADY WRITTEN DOWN.
      The builder: "the design is badly positioned on codex." Correct — I put the line
@@ -310,7 +314,16 @@
     raf = 0;
     if (!last) last = now;
     var dt = Math.min(0.05, (now - last) / 1000); last = now;
-    env += (wantEnv - env) * Math.min(1, dt * 5.5);
+    /* ★★ BR-S507 — THE LINE ARRIVES WITH THE HOLE, NOT AHEAD OF IT.
+       The builder: "polishing on the logic and design where the white line works with
+       the bloom of codex as it open so it looks smooth and part of design."
+       The aperture is `clip-path 340ms var(--ease-collapse) 120ms`: for 120ms after the
+       seal is pressed nothing has begun to open. `hold` gives the line those 120ms back,
+       and RATE_IN (3.2/s, ~310ms to 0.95) replaces the old 5.5 so the rise takes the
+       iris's 340ms rather than beating it there. Leaving is unchanged and stays quick —
+       BR-S437 requires the line to ride the whole collapse and leave with the bloom. */
+    if (hold > 0 && wantEnv === 1) hold = Math.max(0, hold - dt * 1000);
+    else env += (wantEnv - env) * Math.min(1, dt * (wantEnv === 1 ? RATE_IN : RATE_OUT));
 
     if (env <= 0.002 && wantEnv === 0) { if (ctx) ctx.clearRect(0, 0, W, H); last = 0; return; }
     if (!place()) { raf = RAF(frame); return; }
@@ -339,14 +352,53 @@
      the envelope and paints a frame immediately. Worst case the line is present and
      still; best case the loop takes over and it flows. It also removes the fade-up from
      nothing if the first frame is late. */
+  /* ★★ BR-S507 — open() IS NOW IDEMPOTENT, AND IT IS THE "FIRES TWICE".
+     The builder: "the white line on codex fires twice or something."
+
+     MEASURED: one press of the seal produces FOUR calls to open(true) — three inside
+     the same tick and a fourth at 1885ms. The observer that drives them watches `class`
+     on #menuView, and that attribute changes for many reasons which have nothing to do
+     with the codex (the panel-state classes, is-sliding, the A/B flag). Every one of
+     those was a fresh full-strength repaint followed by a reset to 0.001, so the line
+     flared and re-climbed four times per opening. The three at t=0 read as one hard
+     flash; the one at 1885ms is a second flare almost two seconds after the bloom has
+     finished, and that is the one the eye actually catches as "twice".
+
+     Guarding on the state we already hold costs one comparison and makes the observer's
+     chattiness free — which is the right place to fix it, because filtering the mutation
+     list would mean re-deriving which classes matter every time one is added. Same
+     lesson as the suppression lists: do not maintain a list of names when you can ask
+     the state itself.
+
+     ★ AND THE SYNCHRONOUS FRAME NO LONGER PAINTS AT FULL PRESENCE. That was the other
+     half of the flash — `env = 1; draw(); env = 0.001` put a fully-lit edge on screen
+     one frame after the press, while the iris had not yet begun to move. It still paints
+     synchronously, because a line that is invisible whenever rAF is throttled is fragile
+     beyond the lab and that reasoning stands; it just paints at the presence the moment
+     actually has, and the 5.5/s ramp carries it up from there into the opening iris.
+
+     ★★ AND A MEASUREMENT TRAP THAT COST AN HOUR, WRITTEN DOWN SO IT COSTS NOBODY ELSE
+     ONE. Removing that full-strength paint appeared to BLANK THE LINE — zero lit pixels
+     across the whole canvas, against a baseline that inks rows 0.960-0.996. It had not.
+     The Browser pane freezes rAF in a tab that is not FRONTED, so the loop never ran,
+     and the old `env = 1; draw()` was therefore the ONLY thing that had ever painted in
+     that pane. Drawing honestly at 0.001 and waiting for a ramp that could not come
+     looked exactly like a regression. Front the tab and the same build ramps
+     0.002 -> 0.76 -> 0.99 -> 1 and inks the identical four rows.
+     The lesson is the general one: a fallback that fires in your test environment and
+     nowhere else will read as the feature working. Check what is actually driving the
+     pixels before concluding either way. */
   function open(on) {
+    var was = wantEnv;
     wantEnv = on ? 1 : 0;
     if (on) {
+      if (was === 1) { kick(); return; }   // already open — the ramp owns it, do not re-slam
       ensure();
       place();
+      hold = HOLD_MS;                      // sit still until the aperture starts to move
       env = Math.max(env, 0.001);
       if (L) { for (var i = 0; i < L.N; i++) L.tgt[i] = flow(L.xs[i], t); integrate(); }
-      env = 1; draw(); env = 0.001;      /* one honest frame at full presence, then let the ramp own it */
+      draw();                              /* at the presence this moment HAS — not at 1 */
     }
     kick();
   }
