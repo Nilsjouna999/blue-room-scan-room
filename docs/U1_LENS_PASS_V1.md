@@ -119,7 +119,14 @@ FIX — §8: name only the two real controls, `button.mintlink[data-mint-showcas
 
 - **"`REDUCED` is read at module scope and never re-read."** False — `_u1-rack.js:572-579` re-reads on the media-query `change` event. What survives is narrower and is M4: it ignores the Settings-layer override.
 - **"This repo already ships `animation-timeline: view()` `@supports`-gated at `styles.css:2341-2350`."** NOT FOUND. Searched `styles.css` for `animation-timeline`: no hits; every `@supports` in the file guards `corner-shape: bevel` (`styles.css:421`, `1121`, `1142`). Do not plan on scroll-linked animations being precedented here.
-- **"`docs/FIXTURE_SPECIFICATION.md`"** (cited by the previous fleet, not by this sheet) — NOT FOUND, confirmed absent from `docs/`.
+- ~~**"`docs/FIXTURE_SPECIFICATION.md`"** — NOT FOUND, confirmed absent from `docs/`.~~
+  ★ **THIS ENTRY WAS ITSELF WRONG AND IS WITHDRAWN.** `FIXTURE_SPECIFICATION.md` exists at
+  the **repo root** (8,215 bytes, `d5b5573`) and does verify Margaret, 15 April 1988. The
+  earlier fleet cited it with no directory, which was correct; the `docs/` prefix was
+  added by the main loop, which then checked only `docs/` and reported its own invention
+  as missing. A verification section that fabricates the thing it is disproving is worth
+  more as a standing warning than as a deletion: **a path with no directory means search
+  the repo.**
 - The BUILD lens's `styles.css:3764` for `.m2hero` height is off — the rule opens at `styles.css:3750`; the clamp value was not verified, so do not quote it.
 
 ## THE SHORTEST PATH

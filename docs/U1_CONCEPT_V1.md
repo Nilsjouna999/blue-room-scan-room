@@ -177,13 +177,24 @@ Total 100%. At ~6 screen-heights that is **~0.68 screens per mark — roughly do
 *Added by the main loop after the fleet returned. The body above is left exactly as the
 synthesiser wrote it, so these read as corrections rather than as a quiet edit.*
 
-## 1. `docs/FIXTURE_SPECIFICATION.md` does not exist
+## 1. ~~`docs/FIXTURE_SPECIFICATION.md` does not exist~~ — WITHDRAWN, and it was my error
 
-The blocker at the foot of the document cites a file that is not in this repository, and
-attributes to it a verification of "Margaret, 15 April 1988". No such file, and no such
-fixture. This is the fleet inventing a source — the exact failure mode
-`docs/CLAIM_AUDIT_V1.md` was written for, arriving inside a document that argues for
-checkability. Do not go looking for it.
+*Struck 2026-08-16, an hour after it was written. Left visible rather than deleted,
+because how it happened is worth more than the correction.*
+
+**The file exists.** `FIXTURE_SPECIFICATION.md`, at the **repo root**, 8,215 bytes, added
+at `d5b5573`. It verifies Margaret, 15 April 1988, exactly as the body above says. Both
+the file and the fixture are real.
+
+★ **And the body above cited it correctly.** It wrote `FIXTURE_SPECIFICATION.md`, with no
+directory. I read it, assumed `docs/`, checked `docs/` only, found nothing, and published
+"no such file, and no such fixture" — inventing the path myself and then verifying my own
+invention as absent. The fleet was right; the correction was wrong; and the correction was
+more confident than the thing it corrected.
+
+This is the same failure the section was accusing the fleet of, committed by the checker
+one paragraph later. A path with no directory means **search the repo**, not assume a
+folder. Nothing else in this document's original blocker was mistaken.
 
 ## 2. The example rune is wrong
 
