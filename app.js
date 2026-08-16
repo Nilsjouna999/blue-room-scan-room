@@ -4740,18 +4740,41 @@ const _FLATTRAVEL = !/[?&]flat=0/.test(String(location.search || ""));
      the way ?snap=on and ?glide=native did. */
   if (!/[?&]m2=dark/.test(String(location.search || ""))) document.documentElement.classList.add("m2-parch");
 })();
-function _travelOn()  { if (_FLATTRAVEL) document.documentElement.classList.add("is-travel"); }
-function _travelOff() { document.documentElement.classList.remove("is-travel"); }
+/* ★★ BR-S505 — `is-travel` HAS TWO OWNERS AND USED TO HAVE NONE.
+   Two independent mechanisms drive this one class: the horizontal panel slide
+   (_menuPrime/_menuUnprime) and the vertical U1 descent (_u1GlideTo/_u1Release). As a
+   bare boolean, whichever spoke last won — and the descent's release is bound to
+   keydown in the CAPTURE phase, so it speaks on every key the page ever sees, running
+   its teardown whether or not a descent is happening.
+
+   MEASURED, keyboard M1->L1: prime at 55.3ms sets the class, the capture-phase release
+   queues its rAF teardown from the SAME keystroke, and the class is gone by 63.5ms.
+   Motion does not begin until 76ms and ends at 903.9ms. So the flatten covered 8ms of
+   an 828ms travel — none of it the moving part — and what the eye got instead was the
+   stack switching off and back on twice in the ~20ms before the panel moved. That is
+   the "2 stepped" the builder has now reported five times, and it is why every fix
+   aimed at the CONTENTS of the flatten list changed nothing: the class those rules
+   hang off was already gone before the panel moved a pixel. The same travel driven by
+   MOUSE measures clean (class held 61 -> 709.4ms across motion 99.1 -> 736.1ms), which
+   is the control that proves it is the keystroke and not the slide.
+
+   Owner keys, not a counter. `_travelOff` is called twice on purpose in both mechanisms
+   (an rAF plus a setTimeout backstop for a throttled tab) and both sites document that
+   a double call is free. A refcount would decrement twice for one owner and break the
+   pairing; add/delete on a set keeps that idempotence exactly. */
+const _travelBy = new Set();
+function _travelOn(who)  { if (!_FLATTRAVEL) return; _travelBy.add(who); document.documentElement.classList.add("is-travel"); }
+function _travelOff(who) { _travelBy.delete(who); if (!_travelBy.size) document.documentElement.classList.remove("is-travel"); }
 function _menuUnprime(track) {
   const h = track.closest(".menu") || document.getElementById("menuView");
   if (h) h.classList.remove("is-sliding");                          // BR-S270: the blurs come back at rest
-  _travelOff();                                                     // BR-S276: and the blends come back with them
+  _travelOff("panel");                                              // BR-S276: and the blends come back with them
   track.style.transition = ""; track.style.transform = ""; track.style.willChange = "";
 }
 function _menuPrime(track, cur) {
   const h = track.closest(".menu") || document.getElementById("menuView");
   if (h) h.classList.add("is-sliding");                             // BR-S270: suppresses backdrop-filter for the travel — see styles.css
-  _travelOn();                                                      // BR-S276: and flattens the Desk's blend stack for the same window
+  _travelOn("panel");                                               // BR-S276: and flattens the Desk's blend stack for the same window
   track.style.transition = "none";
   track.style.transform  = "translateX(" + (cur * -100) + "%)";
   track.style.willChange = "transform";                             // promoted for the slide only — cleared in fin(), mirroring BR-S141's add-then-clear
@@ -5221,8 +5244,11 @@ function _u1Release() {
      the whole blend stack back on, a repaint of the heaviest object on the page, and it
      was firing on the frame the glide stops. Deferred one frame, with a timeout backstop
      for a throttled tab. Idempotent, so a double call is free. */
-  requestAnimationFrame(_travelOff);
-  setTimeout(_travelOff, 120);
+  /* BR-S505 — wrapped, and not only for the owner key: rAF hands its callback a
+     timestamp, so the bare reference was calling _travelOff(1234.5). Harmless while the
+     function ignored its argument; a silent no-op the moment it took one. */
+  requestAnimationFrame(function () { _travelOff("u1"); });
+  setTimeout(function () { _travelOff("u1"); }, 120);
   if (_u1GlideT) { clearTimeout(_u1GlideT); _u1GlideT = null; }
   if (_u1RAF) { cancelAnimationFrame(_u1RAF); _u1RAF = null; }
 }
@@ -5255,8 +5281,8 @@ function _u1GlideTo(target) {
      so one frame with the blends still on costs nothing visible, and the repaint no
      longer collides with the launch.  The teardown in _u1Release stays immediate —
      it only ever removes work. */
-  requestAnimationFrame(function () { if (_u1Gliding) _travelOn(); });
-  setTimeout(function () { if (_u1Gliding) _travelOn(); }, 60);        // backstop for a throttled tab
+  requestAnimationFrame(function () { if (_u1Gliding) _travelOn("u1"); });
+  setTimeout(function () { if (_u1Gliding) _travelOn("u1"); }, 60);    // backstop for a throttled tab
   const t0 = _u1Now();
   let expect = from;                                                  // where WE put the page last frame
   const step = function () {

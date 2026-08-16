@@ -244,7 +244,16 @@ PREVIEW_ONLY = ["_u1-rack.js"]
 #
 # THIS IS NOT A CUT. Nothing is deleted and nothing is disabled: every prototype still
 # stands at its own ?case= switch on the dev site, which is where they are looked at.
-DEV_ONLY = ["_m2-box.js", "_m2-box.css", "_m2-vitrine.css", "_m2-pod.css"]
+#
+# BR-S504 adds U1's rebuilt room, and it is worth naming why it lands on THIS tier and
+# not the one below it. The surface it replaces is preview-only, so preview-only would
+# have looked like the matching choice. But the two would then stand in the same build
+# driving the same section, which is the collision the module's own header opens by
+# closing — and a prototype that has never been in front of the builder's eyes has not
+# earned a build a visitor can walk into. It graduates by moving one line down to
+# PREVIEW_ONLY, and the surface it supersedes moves up here on the same commit.
+DEV_ONLY = ["_m2-box.js", "_m2-box.css", "_m2-vitrine.css", "_m2-pod.css",
+            "_u1-room.js", "_u1-room.css"]
 
 # Links into a room this build removed. Deleting the LISTENER leaves a button that looks
 # alive and does nothing, which is worse than a dead link — so these are re-pointed at the
@@ -306,6 +315,13 @@ PROBES = [
     ("M2 vitrine css", "_m2-vitrine.css", r"\.br-vitrine\b",   {"preview": False, "live": False}),
     ("M2 pod css",     "_m2-pod.css",    r"\.m2pod__cavity|\.m2pod\b", {"preview": False, "live": False}),
     ("M2 mounter tag", "index.html",     r"_m2-box\.js",       {"preview": False, "live": False}),
+    # BR-S504 — U1's rebuilt room, same tier and the same three assertions: the
+    # mechanism, its stylesheet, and the tag. The tag matters most of the three here,
+    # because this one loads FIRST in the block and a tag left behind by a cut file
+    # would 404 ahead of everything under it.
+    ("U1 room js",     "_u1-room.js",    r"\bu1rm__marks\b",   {"preview": False, "live": False}),
+    ("U1 room css",    "_u1-room.css",   r"\.u1rm__marks\b",   {"preview": False, "live": False}),
+    ("U1 room tag",    "index.html",     r"_u1-room\.js",      {"preview": False, "live": False}),
 ]
 
 # Emitted by build_routes.py's ROUTES; re-emitted here against dist/index.html.

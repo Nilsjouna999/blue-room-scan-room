@@ -125,7 +125,7 @@
   <!-- The Ceremony (BR-S163) — the forge ceremony on ?dev=ceremony; the builder's
        exact art kept pixel-perfect + brought to life. window.BRCeremony. -->
   <script src="ceremony.js?v=236"></script>
-  <script src="app.js?v=498"></script>
+  <script src="app.js?v=504"></script>
   <!-- BR-S427 — THE CODEX READING FRAME, revived. The living white line at 0.955H
        with the dark under it, drawn by the parent over the codex iframe. Shipped once as
        BR-S237/S238 and lost when U1 was rebuilt at BR-S366, which parked u1-membrane.js
@@ -142,6 +142,11 @@
   <!-- BR-S485 — U1's middle. Preview-only: the launch build carries neither this tag nor
        the file it loads. The module's own header carries the rest and no path is named
        here, because a comment left behind by a cut tag is a signpost to a missing door. -->
+  <!-- BR-S504 — U1 · THE ROOM. Prototype, dev-only, and inert without ?u1=room: no
+       stylesheet is fetched and no node is touched until the parameter is present. It
+       loads BEFORE the tag below on purpose — it writes rk=0 into the URL at module-eval
+       time, and the file underneath reads that parameter when it boots. -->
+  <script src="_u1-room.js?v=504"></script>
   <script src="_u1-rack.js?v=500"></script>
   <!-- BR-S487 — THE CASE around the M2 card. Prototype, preview-only, and inert
        without ?case=1 — no stylesheet is fetched and no node is touched until the
