@@ -44,7 +44,12 @@
   --acc-rec-ar: 0.808;          /* recess w/h  — LOCKED, see the note above */
   --acc-body-ar: 0.582;         /* bottle body w/h — LOCKED */
   --acc-bottle-h: 0.900;        /* measured off the reference: 299/332 of recess height */
-  --acc-body-w: 0.617;          /* measured: 166/266 of recess width */
+  /* ★ RE-MEASURED against the reference at MATCHED SIZE, which is the only way this
+     number can be trusted. The earlier .617 came from reading the vitrine's edges off a
+     scaled screenshot and was too wide by a tenth — enough that the bottle filled its
+     recess and lost the dark margin that makes it look held rather than packed. The
+     reference bottle takes about .53 of the recess width. */
+  --acc-body-w: 0.548;
 
   /* ── the closure, as fractions of TOTAL bottle height ──────────────────────────
      Measured off the reference and agreeing with SIL_PATH in _m2-accord.js, whose neck
@@ -55,11 +60,15 @@
      The cap is also NARROWER than the first pass: .217 of the body's width, against the
      .31 that was guessed. V2 §1 says the closure must not read as a broad crown, and a
      wide cap is the single thing that made the first render look like a decanter. */
-  --acc-cap-h: 0.100;           /* V2 §1: 0.112 is the CEILING, not the target */
-  --acc-cap-x: 39.2%;           /* inset from each side */
-  --acc-collar-x: 38.4%;
-  --acc-collar-t: 0.100;
-  --acc-collar-b: 0.140;
+  /* ★ AND THE CAP WAS OVER-CORRECTED. Told that V2 wanted it quieter, the last pass took
+     it to .216 of the body's width — half the reference's .28 — and a cap that small
+     stops reading as a closure at all: it became a stub with a bright bar under it, and
+     the bar read as detached hardware. "Not a broad crown" is not "barely there". */
+  --acc-cap-h: 0.108;           /* V2 §1: 0.112 is the CEILING — this sits just under it */
+  --acc-cap-x: 36%;             /* inset from each side → cap is .28 of the body */
+  --acc-collar-x: 35.2%;
+  --acc-collar-t: 0.108;
+  --acc-collar-b: 0.146;
 
   /* ── the palette. L* in comments; the whole set spans ~9 levels. ──────────── */
   --acc-page:  #0a0908;         /* L*  3.4  the ground around the recess */
@@ -81,11 +90,19 @@
      the body mid-tone about #262c18, the walls near #0a0d07. The label is the brightest
      thing in the box by a wide margin and everything else is a dark object it is stuck
      to. If the green is the first thing you notice, it is wrong. */
-  --acc-glass-core: #454d2c;    /* the lit centre, where the glass is thinnest */
-  --acc-glass-mid:  #262c18;
-  --acc-glass-low:  #171b0f;
-  --acc-dense:      #0a0d07;    /* the walls and heel — near-black, faintly green */
-  --acc-warm:       #1f1a0d;    /* the heel's warmth, sitting in the pool's light */
+     ★ AND IT IS WARM. Beside the reference the first dark pass read cool and grey — a
+     bottle-green rather than a botanical one. The reference sits closer to olive-brown:
+     the hue leans yellow, not blue, all the way down the ramp. */
+     ★ AND DARKER STILL. Side by side the body was reading as a mid-olive slab: the gap
+     between the glass and the label had closed, and it is that GAP that makes the label
+     look lit and the bottle look like glass. On the reference the label is far and away
+     the brightest thing in the box and the body sits well below it. Value separation is
+     doing more work here than hue. */
+  --acc-glass-core: #434626;    /* the lit centre, where the glass is thinnest */
+  --acc-glass-mid:  #212210;
+  --acc-glass-low:  #141308;
+  --acc-dense:      #0b0b06;    /* the walls and heel — near-black, faintly olive */
+  --acc-warm:       #221b0c;    /* the heel's warmth, sitting in the pool's light */
 
   --acc-stock: #d8cdb4;         /* label cream at its lightest — NOT white */
   --acc-stock-2: #c9bda0;       /* falling toward the bottom */
@@ -132,7 +149,16 @@
 
 /* ═══ PLANE 2 — THE BOTTLE ═════════════════════════════════════════════════════════ */
 .m2acc__bottle {
-  position: absolute; left: 50%; bottom: 4.5%;
+  /* it stands ON the floor, with the floor visible beneath it. At 4.5% the heel ran
+     almost into the recess's bottom edge and the bottle read as cropped rather than
+     placed — the reference leaves a clear band of lit floor under the base. */
+  position: absolute; left: 50%; bottom: 6.2%;
+  /* ★ THE TYPE SCALES OFF THE BOTTLE, NOT THE RECESS. It used to size against `.m2acc`,
+     so narrowing the body left the label's width behind while its type stayed put — and
+     "The Crowned Name", which is one line on the reference, wrapped to two. Anchoring
+     the container here makes the label's proportions independent of --acc-body-w, so a
+     silhouette change can never again break the typography inside it. */
+  container-type: inline-size;
   width: calc(var(--acc-body-w) * 100%);
   height: calc(var(--acc-bottle-h) * 100%);
   transform: translateX(-50%);
@@ -171,13 +197,15 @@
      middle erased exactly the piece of rim this whole mechanism was built to draw, and
      the cap went on floating. The asymmetry is now a tilt across a lit rim, not a fade
      to nothing: brightest at the left wall, still clearly present at the neck. */
+  /* brighter now that the body behind it is darker — on the reference these two vertical
+     lines are the most conspicuous thing about the glass after the label itself */
   background: linear-gradient(90deg,
-    rgba(236,240,220,.78) 0%,
-    rgba(214,222,196,.48) 10%,
-    rgba(188,196,168,.34) 42%,
-    rgba(182,190,162,.31) 68%,
-    rgba(208,216,188,.42) 94%,
-    rgba(226,232,208,.55) 100%);
+    rgba(240,244,226,.92) 0%,
+    rgba(222,230,204,.62) 10%,
+    rgba(196,204,176,.44) 42%,
+    rgba(190,198,170,.40) 68%,
+    rgba(216,224,196,.54) 94%,
+    rgba(232,238,216,.70) 100%);
   -webkit-mask-image: linear-gradient(180deg, transparent 1%, #000 8%, #000 94%, transparent 100%);
           mask-image: linear-gradient(180deg, transparent 1%, #000 8%, #000 94%, transparent 100%);
 }
@@ -196,8 +224,12 @@
 .m2acc__inner::after {
   content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 17%;
   mix-blend-mode: screen; pointer-events: none;
+  /* ★ AND IT IS A GLOW, NOT A FLOODLIGHT. At .38 it washed the whole lower third to a
+     pale tan and the bottle lost its base entirely. The reference keeps the heel DARK —
+     it is the thickest glass on the object — with only a narrow lift right at the floor
+     line. The light has to say "standing in something", not "lit from inside". */
   background: linear-gradient(180deg,
-    transparent 0%, rgba(132,104,58,.16) 52%, rgba(178,148,96,.30) 88%, rgba(198,170,116,.38) 100%);
+    transparent 0%, rgba(120,92,50,.07) 62%, rgba(150,122,74,.15) 90%, rgba(170,142,92,.21) 100%);
 }
 
 /* the base body: dark, and only just green. Everything luminous is added ON TOP of
@@ -228,8 +260,8 @@
   top: 22%;
   mix-blend-mode: screen;
   background:
-    radial-gradient(58% 38% at 46% 32%, rgba(96,106,58,.52), rgba(96,106,58,.13) 56%, transparent 76%),
-    radial-gradient(36% 20% at 53% 66%, rgba(78,88,48,.20), transparent 72%);
+    radial-gradient(56% 36% at 46% 31%, rgba(84,92,50,.40), rgba(84,92,50,.10) 56%, transparent 76%),
+    radial-gradient(34% 19% at 53% 66%, rgba(70,78,42,.15), transparent 72%);
 }
 
 /* ★★ THE THICKNESS. Where you look through MORE glass it goes dark: both walls, and the
@@ -309,9 +341,12 @@
   /* a turned metal ring, not a flat gold bar: lit along its upper third, falling to a
      dark underside. The first render's collar was one bright tan slab, which is the
      other half of why the closure read as a decanter stopper. */
+  /* aged brass in a dark room, not polished gold under a lamp: the lit band is narrow
+     and sits near the top, and most of the ring is already falling away. The previous
+     values put a bright yellow bar under the cap that read as loose hardware. */
   background: linear-gradient(180deg,
-    #b08c52 0%, var(--acc-gold) 22%, var(--acc-brass) 46%, #564126 80%, #2f2416 100%);
-  box-shadow: inset 0 1px 0 rgba(240,216,164,.42);
+    #8f7345 0%, #7d6339 26%, #5f4a2b 54%, #3d2f1c 82%, #241c11 100%);
+  box-shadow: inset 0 1px 0 rgba(214,186,132,.30);
 }
 .m2acc__seam {                                   /* the lift seam — where it comes off */
   position: absolute; left: var(--acc-cap-x); right: var(--acc-cap-x);
@@ -330,7 +365,9 @@
       rgba(255,255,255,.028) 0 1px, transparent 1px 3px),
     linear-gradient(90deg, rgba(0,0,0,.5) 0%, transparent 18%, transparent 64%, rgba(0,0,0,.56) 100%),
     linear-gradient(180deg, #262626 0%, var(--acc-cap) 44%, #0c0c0c 100%);
-  border-radius: 2px 2px 1px 1px;
+  /* the reference's cap crowns — its top edge is visibly rounded where the light catches
+     it, and a flat-topped rectangle is the thing that made this read as a plug */
+  border-radius: 24% 24% 2px 2px / 12% 12% 2px 2px;
   transform: translateY(0);
   transition: transform 340ms cubic-bezier(.2,.7,.2,1);
 }
@@ -373,9 +410,9 @@
   box-shadow: inset 0 1px 0 rgba(255,252,242,.5);
   display: flex; flex-direction: column; align-items: center;
   font-family: "IBM Plex Mono", ui-monospace, Menlo, monospace;
-  /* measured: the reference's label is .535 of the bottle's height. At 1.52cqw it came
-     out .40 and left a dead band of glass beneath it, so the type carries the height. */
-  font-size: 1.92cqw;
+  /* 3.1% of the BOTTLE's width — see the container note on .m2acc__bottle. Sized so the
+     display serif sets on one line, as it does on the reference. */
+  font-size: 3.1cqw;
   line-height: 1.5;
   text-align: center;
   overflow: hidden;

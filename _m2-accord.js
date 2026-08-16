@@ -48,7 +48,7 @@
   function style() {
     if (doc.getElementById("m2acc-css")) return;
     var l = doc.createElement("link");
-    l.id = "m2acc-css"; l.rel = "stylesheet"; l.href = "_m2-accord.css?v=512";
+    l.id = "m2acc-css"; l.rel = "stylesheet"; l.href = "_m2-accord.css?v=516";
     (doc.head || doc.documentElement).appendChild(l);
   }
 
@@ -81,16 +81,19 @@
      Coordinates read top-down: neck sides, the shoulder's outward curve, the straight
      body walls, and a heel with a small radius. The shoulder is a cubic on both sides
      because that curve is the single feature separating a flask from a jar. */
-  /* ★ THESE NUMBERS ARE MEASURED OFF THE REFERENCE, NOT INVENTED. Read from
-     transfer/cologne-reference.webp with the vitrine normalised to its own box: cap
-     0→.100 of bottle height, brass collar .100→.136, a VISIBLE dark neck .136→.197,
-     the shoulder curve .197→.245, body to the heel at .998. Across: the neck is .168
-     of the body's width and the walls sit at .034/.966.
+  /* ★ THESE NUMBERS ARE MEASURED OFF THE REFERENCE, NOT INVENTED — and measured at
+     MATCHED SIZE on the craft bench, which is the only reading that can be trusted. An
+     earlier pass took them off a scaled screenshot and was wrong on two of three.
+     Down the bottle: cap 0→.108, brass collar .108→.146, a VISIBLE dark neck to .197,
+     the shoulder curve .197→.274, body to the heel at .998. Across: the neck is .168 of
+     the body's width and the walls sit at .034/.966.
+     (The closure fractions live in _m2-accord.css as --acc-cap-h / --acc-collar-*; this
+     path only has to agree with where the neck STARTS, at .133.)
 
-     The first pass guessed instead of measuring and got two things wrong that together
-     read as "not the same object": the neck was .23 wide with no straight section, so
-     the cap appeared to sit directly on the shoulders, and the shoulder curve was too
-     short, which made it a jar's rolled edge rather than a flask's slope. */
+     The first pass guessed and got two things wrong that together read as "not the same
+     object": the neck was .23 wide with no straight section, so the cap appeared to sit
+     directly on the shoulders, and the shoulder curve was too short, which made it a
+     jar's rolled edge rather than a flask's slope. */
   var SIL_ID = "m2accSil";
   var SIL_PATH =
     "M .416 .133 L .584 .133 L .584 .197 " +  /* neck: a real straight run, then the slope */

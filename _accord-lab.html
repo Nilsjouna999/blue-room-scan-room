@@ -39,26 +39,35 @@
   .lab__bar a { color: #8a7f6b; text-decoration: none; border-bottom: 1px solid #2a251e; }
   .lab__bar a:hover { color: #d8cdb4; }
 
-  /* the two panes, matched in HEIGHT so silhouettes compare honestly */
-  .lab__pair { display: flex; gap: 28px; padding: 28px 16px 60px; align-items: flex-start; justify-content: center; flex-wrap: wrap; }
-  .lab__pane { display: flex; flex-direction: column; gap: 9px; }
+  /* ★ ONE SCREEN, MATCHED SIZE. The first version put both panes at the stylesheet's
+     full 462px, which on any normal viewport pushed the build below the fold — so every
+     comparison cost a scroll, and a scroll between two images is a comparison from
+     memory, which is the exact failure this bench exists to prevent. --lab-w sizes both
+     panes together; at 360px the pair fits a laptop viewport side by side.
+
+     The reference is cropped to its VITRINE, not to the whole screenshot, using the
+     measured position of that vitrine in the source file (x 604, y 170, 462 wide in a
+     1672px-wide image). Both panes therefore frame the same rectangle at the same size,
+     and the bottle inside them can be compared edge to edge rather than by impression. */
+  .lab__pair { display: flex; gap: 24px; padding: 22px 16px 40px; align-items: flex-start; justify-content: center; flex-wrap: wrap; }
+  .lab__pane { display: flex; flex-direction: column; gap: 8px; --lab-w: 360px; }
   .lab__cap { color: #7d7364; letter-spacing: .17em; font-size: 10px; }
   .lab__cap i { color: #4e4740; font-style: normal; }
 
-  /* The reference is cropped to its bottle by object-fit + object-position so the two
-     panes show the same subject at the same size. The numbers come from measuring the
-     source image: the bottle occupies the middle third, centred. */
   .lab__ref {
-    width: 462px; height: 572px; overflow: hidden; border-radius: 2px;
-    background: #000;
+    width: var(--lab-w);
+    height: calc(var(--lab-w) / 0.808);   /* the recess ratio, so both panes match */
+    overflow: hidden; border-radius: 2px; background: #000;
   }
   .lab__ref img {
-    width: 300%; height: auto; display: block;
-    margin-left: -100%; margin-top: -10.5%;
+    display: block; height: auto;
+    width:       calc(var(--lab-w) * 1672 / 462);
+    margin-left: calc(var(--lab-w) * -604 / 462);
+    margin-top:  calc(var(--lab-w) * -170 / 462);
   }
 
-  /* the socket's own host — same max-width the stylesheet declares */
-  .lab__host { width: 462px; }
+  /* the socket's own host, at the same width as the reference beside it */
+  .lab__host { width: var(--lab-w); }
   .menu__draw-stage { position: relative; }
   [data-m2-hero] { display: none; }   /* the lab has no standing card to hide */
 
