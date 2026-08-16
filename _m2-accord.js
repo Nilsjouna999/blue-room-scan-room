@@ -172,7 +172,7 @@
     /* the stage is rebuilt wholesale on every remount, which takes the recess with it
        and un-hides a fresh hero — so re-apply on the host's children, and on the two
        attribute signals that change visibility without touching children at all. The
-       rack paid for this list; see _u1-room.js's boot for the same three watchers. */
+       rack paid for this list — see _u1-rack.js, which is where it was learned. */
     if (root.MutationObserver && host) {
       var re = function () { apply(); };
       new root.MutationObserver(re).observe(host, { childList: true });

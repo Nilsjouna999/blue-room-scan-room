@@ -253,7 +253,10 @@ PREVIEW_ONLY = ["_u1-rack.js"]
 # earned a build a visitor can walk into. It graduates by moving one line down to
 # PREVIEW_ONLY, and the surface it supersedes moves up here on the same commit.
 DEV_ONLY = ["_m2-box.js", "_m2-box.css", "_m2-vitrine.css", "_m2-pod.css",
-            "_u1-room.js", "_u1-room.css",
+            # BR-S511 — U1's rebuilt room was SCRAPPED, not demoted. The builder looked
+            # at it and the verdict was one word. What is kept is the idea it was built
+            # from (docs/U1_MOTION_V1.md, docs/U1_INTENT_V1.md), which was always the
+            # good part; the 956 lines that dressed it are gone.
             # BR-S510 — the Accord's socket. Same tier for the same reason as the room
             # above it: a mount point whose occupant is still being chosen has not
             # earned a build a visitor can walk into.
@@ -323,9 +326,9 @@ PROBES = [
     # mechanism, its stylesheet, and the tag. The tag matters most of the three here,
     # because this one loads FIRST in the block and a tag left behind by a cut file
     # would 404 ahead of everything under it.
-    ("U1 room js",     "_u1-room.js",    r"\bu1rm__marks\b",   {"preview": False, "live": False}),
-    ("U1 room css",    "_u1-room.css",   r"\.u1rm__marks\b",   {"preview": False, "live": False}),
-    ("U1 room tag",    "index.html",     r"_u1-room\.js",      {"preview": False, "live": False}),
+    # BR-S511 — the U1 room's three probes are gone with the room. The tag assertion is
+    # the one worth a note: it is now guaranteed by the file not existing rather than by
+    # the build cutting it, which is a stronger guarantee and a smaller machine.
     # BR-S510 — the Accord's socket, same three assertions as the two above it.
     ("Accord js",      "_m2-accord.js",  r"\bm2acc__bottle\b", {"preview": False, "live": False}),
     ("Accord css",     "_m2-accord.css", r"\.m2acc__bottle\b", {"preview": False, "live": False}),
