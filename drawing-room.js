@@ -276,6 +276,80 @@
      undo. So the Drawing Room becomes what its name always said: the room you enter to
      draw a READING. The landing is the two tiers and nothing else.
      The BR-S320 two-column pull layout is not lost — it is what M2's hero now is. */
+  /* ═══ BR-S528 — A SITTING, ALREADY CUT ═══════════════════════════════════════════
+     The page reached its two doors in four lines and then stopped, so a stranger chose
+     before understanding what arrives, whether tarot knowledge is needed, what the seats
+     do, or what reversed means. One worked example answers all of those at once, and
+     answers them by SHOWING rather than by explaining — which is the only form an
+     experienced reader will not dismiss.
+
+     ★ IT RENDERS THROUGH THE REAL PATH. `readsHTML()` and `bindingLine()` below are the
+     same functions a paid reading uses, handed a state built here instead of by a cut. So
+     the sample cannot drift from the product, cannot flatter it, and cannot promise a
+     shape the machine does not print. If the reading changes, the sample changes with it.
+     A hand-authored specimen would have been easier and would have been an advertisement.
+
+     ★ CURATED, NOT DRAWN — and this is the one place the room deliberately does not deal.
+     A random triple coheres sometimes; the sample's entire job is to prove that a reading
+     COHERES, so a bad draw here argues the opposite of the thing being demonstrated. Four
+     were chosen by reading the binding sentence each produces:
+        rests on burden, is crossed by apathy, tends toward transition held inward
+        rests on stalemate, is crossed by illusion held inward, tends toward walking away
+        rests on grief, is crossed by introspection held inward, tends toward self-sufficiency
+        rests on patience, is crossed by swift action held inward, tends toward surrender
+     Each carries exactly one reversal, so the orientation is taught by example every time
+     without any visit meeting a wall of them.
+
+     ★ AND IT ROTATES, at the builder's call — a page that shows one fixed reading forever
+     is a poster. One per load, so a second visit is not a repeat.
+
+     ★ NO `data-dr-turn` ANYWHERE IN HERE. The delegated click handler matches that
+     attribute anywhere under HOST, so a turnable sample on the landing could drive the
+     real turn path against a state that is not a draw. The sample arrives already turned;
+     it is a specimen, not a control. */
+  var SAMPLES = [
+    { q: "I keep saying yes to more at work and telling myself it's temporary.",
+      cards: [["Ten of Wands", 0], ["Four of Cups", 0], ["Six of Swords", 1]] },
+    { q: "I've been putting off a decision for months and calling it patience.",
+      cards: [["Two of Swords", 0], ["The Moon", 1], ["Eight of Cups", 0]] },
+    { q: "Something finished a while ago and I keep acting like it hasn't.",
+      cards: [["Five of Cups", 0], ["The Hermit", 1], ["Nine of Pentacles", 0]] },
+    { q: "I can't tell if I want this, or if I'm just good at it.",
+      cards: [["Seven of Pentacles", 0], ["Knight of Swords", 1], ["The Hanged Man", 0]] }
+  ];
+
+  function byName(n) { for (var i = 0; i < DECK.length; i++) if (DECK[i].name === n) return DECK[i]; return null; }
+
+  /* returns a state shaped exactly like a finished Sitting, or null if the deck has not
+     arrived or a chosen card is not in the bank — the sample is never worth a broken
+     section, so it simply does not render */
+  function sampleState() {
+    if (!DECK.length) return null;
+    var s = SAMPLES[Math.floor(Math.random() * SAMPLES.length)], drawn = [], i, c;
+    for (i = 0; i < s.cards.length; i++) {
+      c = byName(s.cards[i][0]);
+      if (!c) return null;
+      drawn.push({ card: c, reversed: !!s.cards[i][1], shown: true });
+    }
+    return { spread: "sitting", question: s.q, drawn: drawn, revealed: drawn.length };
+  }
+
+  function sampleHTML() {
+    var st = sampleState();
+    if (!st) return "";
+    return '<section class="dr-sample" aria-label="An example sitting">' +
+      '<hr class="dr-thresh" aria-hidden="true">' +
+      '<p class="dr-sample__intro">What follows is for the first time you do this.</p>' +
+      '<p class="dr-sample__eyebrow">A sitting, already cut</p>' +
+      '<p class="dr-sample__q">&ldquo;' + esc(st.question) + '&rdquo;</p>' +
+      readsHTML(st) +
+      '<p class="dr-binding">' + esc(bindingLine(SPREADS.sitting, st.drawn)) + '</p>' +
+      '<p class="dr-sample__after">Three paragraphs and one sentence — that is the whole of ' +
+        'what a cut produces. What is not on the table is the part you do: holding the first ' +
+        'against the second, and asking whether the third is somewhere you are willing to arrive.</p>' +
+      '</section>';
+  }
+
   function landingHTML() {
     return '<div class="dr-landing">' +
       '<div class="dr-live" role="status" aria-live="polite" data-dr-live></div>' +
@@ -285,7 +359,9 @@
         ? "Three cards to one question — your free sitting is spent."
         : "Three cards to one question — your first is free.") +
       tierDoor(SPREADS.deep, "One question, taken further — what it grew from, and what it reaches for.") +
-      '</section></div>';
+      '</section>' +
+      sampleHTML() +
+      '</div>';
   }
   /* a paid door carries its price in the specimen label; the free-first sitting stays untouched */
   function tierDoor(sp, sub) {
