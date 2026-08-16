@@ -1,103 +1,366 @@
 <!-- ═══════════════════════════════════════════════════════════════════════════════
-     U1 SHOWCASE — the stabilised sheet.  `docs/U1_SHOWCASE_V1.md`
+     U1 — THE DEMONSTRATION.  `docs/U1_SHOWCASE_V1.md`  (v2, 2026-08-16)
 
-     THIS REPLACES `docs/U1_CONCEPT_V1.md`, which is superseded and carries a banner
-     saying so. Read `docs/U1_AUDIT_V1.md` for why.
+     v1 of this file located the whole design on the wrong product and is replaced
+     wholesale. Keep the lineage in mind when reading anything older:
 
-     The short version: the previous sheet invented a new object language — a machined
-     plate, cut slots, a paper sheet, a wet meniscus, detached tiles, a fold, a wax seal —
-     instead of refining the container that was already agreed. The audit named that as
-     the reason the surface kept starting over, and locked the direction: a RECESSED
-     SHOWCASE added around the REAL Blue Room card, main menu untouched.
+       docs/U1_INTENT_V1.md    what U1 is FOR — the senior document, and the only one
+                               with a DECIDED table. Nothing here may reopen that table.
+       docs/U1_MOTION_V1.md    the builder's own sentence, the four beats, and the two
+                               post-mortems added after the previous build was scrapped
+       docs/U1_AUDIT_V1.md     the audit that killed the plate-and-paper concept
+       docs/U1_LENS_PASS_V1.md five lenses over v1 — 5 blockers, 11 serious, 7 minor
+       docs/U1_CONCEPT_V1.md   SUPERSEDED. Records a direction not taken.
 
-     Produced by a deliberately SMALL fleet — 3 readers, 2 drafts, 1 kill gate, 1 synth —
-     because the audit's own finding was that fourteen agents produced argumentative
-     density rather than quality, and a design carrying defensive machinery against every
-     past criticism is a reactive design. Fewer surviving intentions, not more defeated
-     alternatives.
+     ★★ WHAT V1 GOT WRONG, because it is the thing most likely to recur. v1 said "the
+     card" and pointed at `renderCard()` (app.js:550). That is the PHOTO card — photo
+     overlays, foil and grain, `BR-SCN 01 · 4:5`, four stats about a photograph. It has
+     no name, no date and no six marks, and app.js:3633 says its scan engine is not
+     connected. v1 then asked that object to display the six marks, which belong to a
+     different product entirely.
 
-     ★ THE TITLE IS THE AUDIT'S INSTRUCTION AND IT IS LOAD-BEARING. This is a CANDIDATE
-     awaiting a still-frame test, not a settlement. The last sheet called itself settled
-     while admitting nothing in it had been seen, and that is how a visual hypothesis gets
-     mistaken for a decision. Nothing here has been seen either.
+     The builder, asked plainly: "i want our birth reading product as a showcase in u1".
+     So the subject is THE BIRTH READING, which ships, and whose six marks are the thing
+     being demonstrated.
+
+     ★ IT IS BOTH A DEMONSTRATION AND A SHOWCASE, and an earlier draft of this file got
+     that wrong in the other direction. The builder: "its partly showcase too since we are
+     showing reading panels, the colored perks of results. depth. detail."
+
+     Correct, and `docs/READING_PANELS_V1.md:8-15` already rules it — ONE panel, two uses:
+
+         the reading page   →  panel(the real reading)
+         U1's tutorial      →  panel(the John Bon fixture)
+
+     "The tutorial does not *depict* the product. It **is** the product, running on a
+     fixture." So the panels on U1 — their colour, their depth, their detail — ARE the
+     product on display, and showing them well is half the job.
+
+     This does not collide with `docs/U1_INTENT_V1.md:105` ("The mechanism is the
+     background, not an object" — "It's not a separate object"), and the distinction is
+     worth stating because it is easy to lose. What is forbidden is a widget sitting ON a
+     page, or merchandise on a pedestal. What happens here is that the page is MADE of the
+     panels and they fill in place. The showcase and the demonstration are the same act:
+     you are watching the real component fill with real values.
+
+     `READING_PANELS_V1.md:68-69` — "the filling is a presentation of the panel, never a
+     different panel."
      ═══════════════════════════════════════════════════════════════════════════════ -->
 
-# U1 SHOWCASE — candidate physical model for the still-frame test
+# U1 — THE DEMONSTRATION
 
-*This settles when one actual-size still frame — the Blue Room surface, flush glass, the genuine card at depth, one mark resolved, one compact derivation visible — is judged beside the Codex and the card, and passes.*
+*A candidate physical model, awaiting the still-frame test. It settles when one
+actual-size frame — the field, one mark written, one derivation line, one passage — is
+judged beside the Codex and the card and passes. Nothing in this document has been seen.*
+
+---
 
 ## 1. JOB
 
-A visitor should understand, without being told, that they are looking into a recess in the Blue Room surface where a real card is being derived from what they supplied — and that the card they are watching is the card they will get.
+**A stranger who has just arrived watches the archive take a name and a date and work out
+six marks from them, and watches a reading form out of those marks — and understands,
+without being told, what Blue Room does and what they would receive.**
+
+One job. Not a map, not a roadmap, not a sales page, not a place to explain the joke.
+
+---
 
 ## 2. LOCKED CONTEXT
 
-The main menu is unchanged. Nothing moves, nothing is restyled, nothing is replaced. The showcase is added beneath it and inherits its surface.
+**The product is the Birth Reading.** Six marks — Sun sign, Year animal, Life path, Rune,
+Trigram, Hexagram — and the reading made from them. This ships. The photo card does not
+yet (`app.js:3633`: the scan engine isn't connected), and U1 explains current products,
+never coming ones (`docs/U1_INTENT_V1.md:98`).
 
-The card is the existing card — `renderCard()`'s article, its halo vars, its plate and corner marks, its photo overlays, its titleblock, its four stat rows with their pips and tier words, its mintstrip. Its controls and effects stay live. No substitute, no simplified stand-in, no second render path.
+**The main menu is unchanged.** Nothing above U1 moves, restyles or is replaced. U1 hangs
+under M1 and you descend into it; that descent is the strongest fact about the surface.
 
-The container is the Accord's three-plane recess already built in `_m2-accord.js` / `_m2-accord.css`: an aspect-locked box with one clipping boundary and one stacking context; a wall made by value falloff toward the edges rather than by any drawn frame; a single implied light pooling low; and a pane that is nothing but faint overlays sitting flush with the surrounding surface. U1 reuses that shell and swaps the object in the slot. It does not build a new system.
+**The mechanism is the ground, not an object.** This is a decided item and it governs
+everything below. There is no hero standing on a pedestal. The page IS the mechanism,
+from the two givens at the head to the record at the floor.
 
-Three states are locked: **at depth**, **deriving**, **available**.
+**The fixture is a worked example and is labelled as one.** John Bon, born 26 July 1965 —
+already shipped and already labelled ("A worked example", `_u1-rack.js:239`). There is no
+intake form, no engine call at page load, and no per-visitor state. This was ruled on
+2026-08-16 (`docs/U1_MOTION_V1.md:54-64`) and is not reopened.
+
+**ONE PANEL, TWO USES.** U1 renders the *same* reading-panel component the real reading
+page renders — `docs/READING_PANELS_V1.md`. Not a copy, not a tutorial-shaped lookalike.
+A tutorial built separately drifts the moment the reading changes, and drift in a tutorial
+is a lie about what you are selling. This is the single most important structural
+constraint on the build, and it is the reason U1 cannot be built before the panels are.
+
+**What exists and what is new.** The six marks already have a face in the app —
+`m2bface__marks`, `app.js:2996` — but it prints slot LABELS, not values. Rendering values
+is new work. The reading engine is `arcana-reading.js`, which is **generated** by
+`arcana-build/build_inapp.py` and must never be hand-edited; changes go through the
+builder.
+
+★ **THE TWO PRODUCT PAGES ARE NOT LOCKED.** The builder, 2026-08-16: *"tarot product page
+and birth still need polishing, they are not completely lock in pages yet."* So U1 is being
+designed against a moving target, and the order matters because of it: the panel is settled
+on the reading page FIRST, and U1 adopts it. U1 must never fork the panel to get ahead, and
+nothing here should be read as freezing either page's current state.
+
+**Three states are locked:** at rest → deriving → arrived.
+
+---
 
 ## 3. HERO
 
-The card. One object carries the entire experience. Everything else in the recess exists to light it, hold it, and record what has resolved on it.
+**The reading panels, filling.** One thing carries the surface, and it is both halves at
+once: the *act* of derivation, and the *panels* it fills.
+
+This is the architecture in `docs/READING_PANELS_V1.md`, and it is the whole idea:
+
+```
+    the reading page   →  panel(the real reading)
+    U1's tutorial      →  panel(the John Bon fixture)
+```
+
+**The tutorial does not depict the product. It IS the product, on a fixture.** So the
+panels here are not illustrations of panels — they are the same component a paying reader
+receives, with the same colour, the same depth, the same detail. Showing them well is not
+decoration on top of the demonstration; it is half of what U1 is for. A stranger has to
+want the thing they are watching being made.
+
+★ **And that is exactly why §6 has to hold.** A panel that looks authoritative makes a
+stronger claim than a plain one. Polish is what let the false claims spread at BR-S500 —
+they were believed because they appeared in shipped-looking strings. The better these
+look, the harder the truth contract works.
+
+★ **Object first, then fill it.** Not a container that receives content. That is the order
+the Accord socket was built in and the order the scrapped U1 was not.
+
+What is forbidden is a *separate* object: a widget sitting on a page, or merchandise on a
+pedestal. The page is made of these panels and they fill in place — the mechanism stays
+the ground, exactly as `docs/U1_INTENT_V1.md:105` decided.
+
+---
 
 ## 4. PHYSICAL LAW
 
-There is one law, and it is a place rather than an event.
+One law, and it is a place rather than an event.
 
-**The Blue Room surface has a recess in it. The card sits at the back of that recess. Glass is set flush into the surface across the opening. A fixed light sits in the chamber and does not move. A reading plane travels through the chamber, from the back toward the glass.**
+**You are descending through the archive's own field. Behind everything stands the
+corpus — every system Blue Room reads from, drawn at its true size. As you descend, marks
+are struck out of that field and written into the record in front of you, and the systems
+each mark came from light up behind it.**
 
-That is all. The recess is made from the inside — the chamber falls away toward its edges, so the corners sit further back, and no border is ever drawn. The glass is proven only by the way the surface's own reflection continues across the opening without a lid, a bevel, or a thickness. The card is behind it, smaller than life, further away than the menu.
+That is all. Three consequences follow and nothing else is needed:
 
-Everything the showcase needs to say is said by that one moving plane. It is the shared clock. When it passes a mark's position on the card, that mark resolves. When it reaches the lip of the recess, it crosses the seam into the surface margin and the interpretation settles there. The plane is light in a chamber — something the card and the margin around it can both plausibly receive. It is never a substance, never applied to the card, never wet, never absorbed.
+**THE FIELD IS THE GROUND.** Nine constellations, one per Codex system that holds
+entries, at their real counts — 12 · 17 · 12 · 22 · 56 · 24 · 8 · 64 · 7 = **222 marks**.
+Cluster size is the system's size. This is not decoration: the structure is the claim, and
+it is the same mechanism `_m1-team4.html:108-182` already proves. **The field stands
+still.** That file's own note explains why the drift was deleted — nine composited layers
+for a ±26px translate over 46s that nobody can perceive, which also pushed clusters
+outside their box. A standing corpus does not drift.
 
-The rest follows from that. Depth is legible because the light is fixed and the plane moves through it. Progress is legible because you can see where the plane is. Reversal is legible because a plane that has passed a position can pass back over it.
+**THE FIELD ANSWERS WHAT YOU ARE READING.** While a mark is being derived, the systems it
+actually draws from stand up out of the ambient dim, name themselves and take the mark's
+own colour; the systems it does not draw from stay down. The Birth Reading lights six of
+the nine bodies. That is the reading's composition, stated in the material, held for as
+long as you look — and it is the answer to "which box am I reading, and what did it come
+from", asked and answered without a caption.
+
+**THE MARK TRAVELS.** When a mark resolves, it is struck out of its constellation and
+lands in the record. The thing that arrives is visibly the thing that left.
+
+Depth is legible because the field is behind and the record is in front. Progress is
+legible because you can see how much of the field has been drawn from. Reversal is legible
+because a mark that has been struck can go back.
+
+---
 
 ## 5. THREE STATES
 
-**AT DEPTH.** The card is at the back of the chamber, quiet and small. The name and the date are legible on it. The six mark positions are present and empty — the frames exist, the values do not, so the card is unmistakably *this* card awaiting content rather than a blank. The room stays dominant; the recess is a detail in the surface, not a stage. Nothing loops. Nothing breathes. *What it proves: the object is already there, and it is already this person's.*
+### AT REST
 
-**DERIVING.** The reading plane travels forward through the chamber. Marks resolve one at a time, in the order the plane meets them — a mark and, at the same height in the margin, the compact line saying what it came from. The card accumulates them; there is no second object and nothing leaves the card. Each mark holds a readable rest before the plane moves on. When the plane reaches the lip, it crosses the seam, and only then does the interpretation settle in the margin — the sentence follows the derivation because it follows *from* it. Then both come to rest. *What it proves: this reading was derived, in this order, from those inputs.*
+The field stands, dim and full. At its head, the two givens: **JOHN BON · 26 · 07 · 1965**,
+with the worked-example label already beside them. Six mark positions wait, empty — framed
+and named, so it is legible as *this* reading awaiting content rather than a blank.
 
-**AVAILABLE.** The card advances toward the glass and the light on it changes as it comes forward. Its own controls activate — the mintstrip, the buttons, the existing `CardFrame` modes. The showcased object becomes the usable object; nothing transforms into anything else. *What it proves: the thing you watched being made is the thing you can now have.*
+Nothing loops. Nothing breathes. Nothing drifts.
 
-The existing `BRReveal` stage controller and `CardFrame`'s mode crossfade already implement a develop-and-settle beat of this shape. Reuse that beat as the reading plane's arrival rather than authoring a second one.
+*Proves: how little the archive is given, and how much stands behind it.*
+
+### DERIVING
+
+**Each mark writes itself out as you scroll.** This is the law that was missed last time
+and it is the reason the previous build was scrapped — `docs/U1_MOTION_V1.md:210-214`:
+*"The filling IS the demonstration… A box that arrives already full has shown them
+nothing."* A mark that fades in complete has demonstrated nothing. The writing is the
+thing the reader is watching.
+
+For each of the six, in this order — Sun sign, Year animal, Life path, Rune, Trigram,
+Hexagram (`_u1-rack.js:179-184`):
+
+1. Its constellations rise in the field behind and name themselves.
+2. The derivation line writes out — one line, compact, saying where the value came from.
+3. The mark is struck from the field and lands in the record.
+4. Its passage of the reading writes in beside it.
+5. Everything rests, and stays rested until you move.
+
+The rhythm is **causal, not simultaneous**. The derivation completes, then the mark lands,
+then the passage follows — because it follows *from* it. The delays are small; they exist
+so the eye reads *because* rather than *alongside*, and so the sequence makes sense
+backwards.
+
+*Proves: the marks were worked out, in this order, from those two givens — and the reading
+is what the house made of them.*
+
+### ARRIVED
+
+The six marks stand written, the reading stands beside them, and the field behind shows
+exactly which six of its nine bodies were drawn from. Nothing transforms into anything
+else. One quiet way in — to the Birth Reading that actually ships — sits at the floor.
+
+*Proves: this is a finished, kept thing, and you could have one.*
+
+---
 
 ## 6. TRUTH CONTRACT
 
-Every value shown on U1 comes out of the reading engine, at build time or run time, with its verification attached. Not one typed digit. This is the first thing built, before any container work — `_u1-rack.js:178-186` currently holds a hardcoded literal array for a fixed sample person and has already drifted from the engine once.
+**Every value and every derivation line comes out of the reading engine, with its
+verification attached. Not one typed digit.** This is the first thing built, before any
+field, any motion, any styling.
 
-Where a fictional person is used to demonstrate the surface, that person is identified as a sample on the surface itself, plainly, in the same register as everything else.
+`_u1-rack.js:178-185` currently holds the six as hardcoded string literals under a comment
+claiming they are derived against the engine. They are not. That has already failed once:
+at **BR-S500** four of the six rows were found inventing the **codex's** own keywords —
+Snake printed "restraint", which is Hexagram 7's, two rows below on the same card
+(`_u1-rack.js:160-177`). Hardcoding a keyword produced four wrong rows; hardcoding
+*arithmetic* produces a tutorial that teaches a false derivation, which is the one failure
+this design cannot absorb.
 
-One position on where the values come from, held in every sentence: **nothing here was chosen.** Everything follows from the details supplied. Some values are computed or looked up from the date — the sun sign, the year animal, the life path. Others are drawn deterministically from the seed the name and date form together — the rune, the trigram, the hexagram. Both kinds are fixed the moment the details are given, and the line beside each mark says which it is in the mark's own words. Neither kind is described as checkable, unarguable, or more true than the other.
+The engine is `arcana-reading.js`, **generated** by `arcana-build/build_inapp.py`. Do not
+hand-edit the generated file.
+
+**One position on provenance, held in every sentence: nothing here was chosen.** Everything
+follows from the two details given. Some marks are computed or looked up from the date —
+Sun sign, Year animal, Life path. Others are drawn deterministically from the seed the name
+and date form together — Rune, Trigram, Hexagram. Both kinds are fixed the moment the
+details are given. Neither is described as checkable, unarguable, or more true than the
+other, and the line beside each mark says which kind it is in that mark's own words.
+
+★ **Known defect, and it constrains what may be claimed.** `arcana-reading.js:35-38`
+records that rune, trigram and hexagram come off the same hash and were skewed the same
+way — the rune effectively determines the trigram. Until that is fixed, U1 must not present
+those three as independent draws. Say "drawn from the same seed", which is true.
+
+---
 
 ## 7. INTERACTION CONTRACT
 
-Any position can be reached from either direction and looks the same on arrival. Motion is bound to position, not to elapsed time: the reading plane's position in the chamber is a function of scroll offset. There is no autoplay, no ambient loop, no typing effect.
+**Scroll is the clock.** Every value is a pure function of scroll position — never a
+time-keyed stagger, never a `setTimeout` anywhere in the writing's path. The reader drives
+it, can stop, reverse and re-watch any beat.
 
-Because it is position-based, it is fully reversible: scrolling back moves the plane back, and marks return to unresolved in reverse order. The interpretation retracts across the seam before the marks do, because it depended on them.
+★ **Do not reuse the develop beat as-is.** `reveal/card-frame.js:123-128` is a
+`setTimeout` chain (`ddur=3550`, `pipT0=3486`) with no reverse. Its *visual* treatment can
+be re-authored on the position scalar; its timing machinery cannot come along.
 
-Rest is created, not assumed. Around each resolved mark the plane's mapping flattens into a plateau, so ordinary scrolling naturally comes to a readable stop there instead of requiring restraint. The plateaus are soft — they slow the plane, they never capture the page or fight the input.
+★ **Do not revive the page checkpoints.** They were deleted on instruction at BR-S457
+(`app.js:5101`). Stepping here lives inside U1 and rides `_u1GlideTo()`; `_u1Seat()` is
+untouched.
 
-- **Flick:** the plane runs through the plateaus without stopping and settles at the nearest one when input ends.
-- **Pause mid-transition:** the plane holds exactly where it is, completely still. A half-resolved mark is a legitimate frame and must be legible as such.
-- **Reverse across a boundary:** symmetric with forward. The same crossing, the same order, backwards, with no re-entry animation.
-- **Keyboard:** up and down step between plateaus, matching the existing checkpoint behaviour — one press seats one mark.
-- **Touch:** identical mapping; the plateaus do the work, and the recess never captures the page scroll.
-- **Resize:** the plane's position is expressed as a fraction of the chamber, so the state survives a resize unchanged. The recess reflows with the surface; the card's fractional geometry is unaffected.
-- **Reduced motion:** the same three states, the same marks, the same derivations, in the same order, stepped. Each state appears fully formed on advance, with no travel between them. It is never simply disabled — the sequence is the content.
+**Rest is created, not assumed.** Around each completed mark the scroll-to-progress mapping
+flattens into a plateau, so ordinary scrolling comes to a readable stop there instead of
+requiring restraint. Plateaus slow the descent; they never capture the page or fight the
+input.
 
-## 8. HANDOFF
+- **Flick** — runs through the plateaus and settles at the nearest when input ends.
+- **Pause mid-write** — holds exactly where it is, still. A half-written mark is a
+  legitimate frame and must be legible as one.
+- **Reverse** — symmetric. Marks unwrite in reverse order and return to their
+  constellations; a passage retracts before the mark it depended on.
+- **Keyboard** — ↓/↑ step between plateaus, inside U1 only.
+- **Touch** — identical mapping; the plateaus do the work.
+- **Resize** — progress is a fraction, so state survives. Geometry is `svh`/`dvh`-first,
+  because mobile URL-bar resize already forced that once (`_u1-rack.js:52-55`).
+- **Reduced motion** — read `BRMotion.prefersReduced` (`data.js:16-21`), **not**
+  `matchMedia` directly, so the Settings override is honoured. It quantises progress to the
+  plateau index: same six marks, same derivations, same order, arriving complete and
+  stepped. It is never simply disabled — the sequence is the content.
 
-When the plane has crossed the seam and both sides are at rest, the card advances toward the glass. That advance is the handoff, and it is the only thing that happens: the card's own controls come live in place — the mintstrip stamp, the serial, the record button, the scan-code control — using the same controls, the same handlers, and the same treatment gating as everywhere else in the product. Nothing is copied, re-rendered, or promoted into a new record. The recess does not open, the glass does not lift, the card does not exit the chamber. It comes forward to the near side and stays there, actionable.
+---
 
-## 9. KILL CRITERIA
+## 8. NARROW
 
-Reject this direction if any of these is true of the first still frame, judged at actual size beneath the real menu and beside the Codex and the card:
+The two-track relationship — derivation and passage in one frame — has no room below about
+1200px, and v1 did not notice. Stated now:
 
-- **It weakens the main menu.** If the eye goes to the recess before the menu, or the menu reads as decoration above a feature, the showcase is too loud and the direction is wrong.
-- **It disguises the card.** If the card reads as an illustration, a mockup, or a different object than the one the product sells, the hero has been lost.
-- **It needs explaining.** If a viewer has to be told which surface is in front, what is glass and what is card, or why the card is small, the one law has not landed and no amount of motion will rescue it.
+**Wide:** the record runs in the centre, the passage in the margin beside it, the field
+behind both.
+**Narrow:** the passage moves **under** its mark rather than beside it. Same order, same
+causality, same plateaus — the pair becomes vertical instead of horizontal. The field
+thins to fewer, larger clusters rather than shrinking 222 marks into illegibility.
+
+The field is never allowed to overlap reading text at any width.
+
+---
+
+## 9. HANDOFF
+
+One way in, at the floor: to the Birth Reading that ships. It is a link, plainly worded,
+in the house register.
+
+★ **No promise the product cannot keep.** U1 must not offer a mint, a serial, a record
+button or a scan-code control. Those handlers refuse outside the room (`app.js:7045`,
+`:7088`), two of them are inert spans (`app.js:632-633`), and the photo product they belong
+to is not connected. A door that does not open is worse than no door.
+
+---
+
+## 10. WHAT HAS TO BE BUILT, IN ORDER
+
+0. **The reading panel itself, on the reading page** — `docs/READING_PANELS_V1.md`. U1
+   renders that component; it cannot be built before the component exists, and the two
+   product pages are still being polished. This is genuinely step zero, not a dependency
+   to work around.
+1. **The engine wiring.** Six real values and six real derivation lines out of the reading
+   engine, replacing `_u1-rack.js:178-185`, with a test that fails if they drift.
+2. **The still frame.** One actual-size frame: the field, one panel filled, its derivation
+   line, at rest. Judged beside the Codex and the card before anything moves.
+3. **The recess, PORTED — not reused.** `_m2-accord.js/.css` cannot be reused as they
+   stand: flag-gated (`:44`), mounted to M2's slot only (`:134`), a singleton (`:175`),
+   `aria-hidden` (`:178`), with **zero** scroll, pointer, touch or IntersectionObserver
+   handlers — no motion driver at all. And `build_public.py:263` puts both on `DEV_ONLY`,
+   with `:333-335` asserting them absent from preview *and* live. Take the depth treatment
+   into a U1-owned file with its own mount, and add that file to `build_public.py`'s tier
+   list and `PROBES` on the commit that mounts it. The geometry must also be re-sized for
+   its occupant — the Accord's box is aspect-locked at 0.808 with `overflow:hidden` and
+   would clip a record.
+4. **The field**, from `_m1-team4.html:108-182`, standing still, at real counts.
+5. **The writing**, scroll-driven, on one scalar.
+6. **Narrow**, then reduced motion, then the door.
+
+---
+
+## 11. TERMS
+
+Used precisely and always the same way.
+
+- **The field** — the standing corpus behind everything. Nine constellations, 222 marks.
+- **A constellation** — one Codex system, drawn at its true entry count.
+- **A mark** — one of the six the Birth Reading produces.
+- **The derivation line** — the one compact line saying where a mark came from.
+- **The passage** — the piece of the reading that mark produces.
+- **The record** — the six marks and their passages, standing complete at the floor.
+- **Progress** — the single scalar, a pure function of scroll, that drives everything.
+
+---
+
+## 12. KILL CRITERIA
+
+Reject this direction if any is true of the still frame, judged at actual size:
+
+- **It weakens the front door.** If the eye goes to U1 before M1, it is too loud.
+- **It reads as a sales page.** If the finished reading looks like merchandise on a
+  pedestal rather than a demonstration that finished, the register is wrong.
+- **It needs explaining.** If a viewer must be told what the field is, or why marks are
+  moving, the one law has not landed and no amount of motion will rescue it.
+- **A box arrives already full.** That is the failure that scrapped the last build. If the
+  writing is not the thing being watched, it has failed regardless of what it measures.
+- **It is the weakest thing on the shelf** beside the Codex chamber and the card.
