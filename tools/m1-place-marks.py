@@ -18,7 +18,7 @@ spec = importlib.util.spec_from_file_location("m", os.path.join(
     os.path.dirname(os.path.abspath(__file__)), "m1-measure.py"))
 m = importlib.util.module_from_spec(spec); spec.loader.exec_module(m)
 
-URL = sys.argv[1] if len(sys.argv) > 1 else "http://localhost:8815/_m1-final.html"
+URL = sys.argv[1] if len(sys.argv) > 1 else "http://localhost:8744/_m1-final.html"
 WIDTHS = [(1200, 900), (1440, 900), (1920, 1080)]   # must clear at ALL of them
 CLEAR = 26.0        # >= the runtime guard's 24px, with 2px of authoring margin
 SEP   = 16.0        # min centre-to-centre gap between two marks, in px

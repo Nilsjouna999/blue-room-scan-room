@@ -1,11 +1,11 @@
 # Blue Room — screenshot pipeline for visual review (ChatGPT etc.)
 # Captures key UI states as PNGs into docs/screens/ using headless Edge.
-# Requires the dev server running on http://localhost:8743
+# Requires the dev server running on http://localhost:8744
 # Usage:  powershell -ExecutionPolicy Bypass -File capture-screens.ps1
 
 $edge = "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe"
 if (-not (Test-Path $edge)) { $edge = "C:\Program Files\Microsoft\Edge\Application\msedge.exe" }
-$base = "http://localhost:8743/"
+$base = "http://localhost:8744/"
 $out = Join-Path $PSScriptRoot "docs\screens"
 New-Item -ItemType Directory -Force $out | Out-Null
 

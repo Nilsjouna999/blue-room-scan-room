@@ -7,7 +7,7 @@ BR-S045–S092 are docs / small-CSS / scoped app.js, tracked in `TASK_QUEUE.md` 
 
 General test loop for any change:
 `python -m http.server 8743` in the project folder → open
-http://localhost:8743 → walk 2 sources × 3 treatments × 3 tabs → check the
+http://localhost:8744 → walk 2 sources × 3 treatments × 3 tabs → check the
 browser console is clean (F12).
 
 ---

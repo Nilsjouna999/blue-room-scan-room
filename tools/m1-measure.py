@@ -206,8 +206,8 @@ def main():
     if not target:
         local = os.path.join(root, "_m1-final.html")
         try:
-            urllib.request.urlopen("http://localhost:8815/_m1-final.html", timeout=1)
-            target = "http://localhost:8815/_m1-final.html"
+            urllib.request.urlopen("http://localhost:8744/_m1-final.html", timeout=1)
+            target = "http://localhost:8744/_m1-final.html"
         except Exception:
             target = "file:///" + local.replace("\\", "/")
 
