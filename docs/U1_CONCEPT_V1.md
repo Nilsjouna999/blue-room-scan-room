@@ -25,7 +25,31 @@
      blocker; the blocker is real, the file it names is not.
      ═══════════════════════════════════════════════════════════════════════════════ -->
 
-# U1 — THE CONCEPT, POLISHED
+> # ★★ SUPERSEDED — DO NOT BUILD FROM THIS DOCUMENT
+>
+> **Audited and rejected as a settlement the same day it was written.** See
+> `docs/U1_AUDIT_V1.md` for the builder's audit, and the stabilised sheet it produced.
+>
+> **The finding, in one line:** this document answers a different question than the one
+> already settled. The agreed direction was a **recessed showcase added around the REAL
+> Blue Room card**, with the main menu locked. This invented a new object language — a
+> machined plate, cut slots, a paper sheet, a wet meniscus, detached tiles, a fold, a wax
+> seal and a substitute record — and that invention is why the surface keeps starting
+> over. *"Each pass responds to criticism by inventing another object language rather
+> than refining the agreed container."*
+>
+> **Its title was the tell.** It declared itself settled while stating that nothing in it
+> had been seen, then specified gradients, keylight direction, slot depth and fold
+> physics. Those are visual hypotheses, not decisions.
+>
+> **What survives, and it is real:** the product argument
+> (`input → derivation → interpretation → kept record`), the determination/interpretation
+> split, ending on delivery rather than on the house thinking, position-based
+> reversibility, the motionless hold, and the hardcoded-marks finding — which becomes an
+> implementation invariant rather than a warning. Everything else here is a record of a
+> direction that was not taken.
+
+# U1 — THE CONCEPT, POLISHED  *(superseded — see the banner above)*
 
 ## THE ONE LINE
 
