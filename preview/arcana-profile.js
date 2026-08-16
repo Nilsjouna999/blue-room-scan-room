@@ -133,8 +133,17 @@
      the OWNER's view, and the empty branch, which carries the only price on the
      page and is what every non-paying visitor sees, had never once rendered.
      Default is EMPTY, because that is what a stranger holds. */
+  /* ★ BR-S522 — and the same switch still missed the one event that matters. `br_holdings`
+     is builder-side only: the M3 toggle, the devnav rail, `?holdings=`. Completing a Birth
+     Reading writes `br_has_reading` (arcane.js:1205) and nothing read it, so a customer who
+     had just paid was shown the stranger's branch — "NO CROWN YET · DRAW A READING" — with
+     the price on it. Kept in step with hasHoldings() in app.js; the two must never diverge
+     again, which is why both now test the same pair. */
   function held() {
-    try { return localStorage.getItem("br_holdings") === "1"; } catch (e) { return false; }
+    try {
+      return localStorage.getItem("br_holdings") === "1" ||
+             localStorage.getItem("br_has_reading") === "1";
+    } catch (e) { return false; }
   }
   /* The one accessor every branch reads — null when nothing is held. BR-S387: it now
      RESOLVES THE POINTER rather than returning a lone object. `current_reading` names

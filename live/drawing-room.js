@@ -59,6 +59,45 @@
   function pick(list, seed) { return list && list.length ? list[hash(seed) % list.length] : null; }
   function norm(s) { return String(s == null ? "" : s).toLowerCase().replace(/[^a-z0-9]+/g, " ").trim(); }
   function inApp() { return /[?&]dev=/.test(location.search); }
+
+  /* ═══ BR-S522 — THE ROOM HAS TWO ADDRESSES AND ONLY ONE OF THEM WORKED ═══════════
+     `inApp()` answers "am I on a ?dev= route", and three things were gated behind it
+     that have nothing to do with dev: writing the reading's own URL, writing the
+     landing's URL, and the doors out. At `/tarot/` — the address the public build
+     exists to serve — `location.search` is empty, so all three silently did nothing.
+
+     ★ THE COST WAS NOT COSMETIC. The finished reading prints "Kept at this link" and
+     "This reading lives at the address in your bar" while the bar still reads `/tarot/`.
+     Meanwhile the line that spends the free sitting is NOT gated, so a refresh took the
+     reading away, kept the sitting spent, and offered the replacement at $1.99. The page
+     destroyed the reading, said it was kept, and priced the replacement.
+
+     The seal token is `Date.now()+Math.random()` — once the URL is lost the reading is
+     unrecoverable, so this could not be fixed by the reader.
+
+     `siteRoot()` resolves the folder the site is served from, which is not always "/" —
+     on Pages it is "/blue-room-scan-room/". `addr()` builds the reading's address in the
+     form that belongs to wherever it is running. `reopen()` needs no change: it reads
+     `read`/`t` out of `location.search`, which works at either address. */
+  function siteRoot() {
+    var p = location.pathname.replace(/[^/]*$/, "");     // drop any filename
+    /* `window`, not `root` — this module's IIFE takes no parameter, unlike _m2-accord.js.
+       Written as `root.BR_ROOM` first, which threw a ReferenceError inside the delegated
+       click handler and silently killed the doors again, in a fix whose whole purpose was
+       to make the doors work. The URL writing kept working throughout because it never
+       touches this helper, which is exactly why it looked fixed. */
+    if (window.BR_ROOM) p = p.replace(/[^/]+\/$/, "");   // drop the room's own segment
+    return p || "/";
+  }
+  function addr(query) {
+    var base = inApp() ? "?dev=drawing-room" : location.pathname;
+    if (!query) return base;
+    return base + (inApp() ? "&" : "?") + query;
+  }
+  function doorHref(d) {
+    if (inApp()) return d === "profile" ? "?dev=profile" : location.pathname;
+    return d === "profile" ? siteRoot() + "profile/" : siteRoot();
+  }
   /* BR-S314 — TWO CUTS IN THE SAME MINUTE WERE THE SAME READING. The seal was
      minute-granular, and the seed is "read~<spread>~<normalised question>~<seal>" —
      so asking the same question twice inside one minute produced an identical seed,
@@ -105,8 +144,31 @@
 
   /* the BINDING line — the light synthesis, woven from the drawn cards' OWN
      first keywords + the positions. Fully deterministic; no AI. */
+  /* ★ BR-S527 — IT WAS ORIENTATION-BLIND, AND IT CONTRADICTED THE CARD TWO INCHES ABOVE.
+     `firstKw()` reads `keywords[0]`, which is the UPRIGHT keyword, and nothing here ever
+     looked at `.reversed`. So a Sitting whose Crossing fell reversed printed "is crossed
+     by choices" directly beneath a face already reading "Reversed — inward, not yet"
+     (`:214`). The binding line is the one sentence that claims to read the three together;
+     a reader who checks it against the faces finds the synthesis disagreeing with the
+     draw, which is the fastest way to lose an experienced visitor.
+
+     The repair is the doctrine's own first word, appended rather than substituted —
+     reversed is inward, blocked, not yet expressed, and never the opposite, so the
+     keyword stands and the orientation qualifies it: "is crossed by choices, inward."
+
+     ★ THE HONEST COST: this changes what an ALREADY-FILED link displays. The seed still
+     deals identical cards in identical seats, so the record itself is untouched — what
+     changed is the prose rendered around it. That distinction belongs in a commit
+     message and never on the page. */
   function bindingLine(sp, drawn) {
-    function kw(i) { return firstKw(drawn[i] && drawn[i].card); }
+    function kw(i) {
+      var d = drawn[i], w = firstKw(d && d.card);
+      /* "held inward", not ", inward". The bare appositive interrupts the clause — "is
+         crossed by choices, inward, and tends toward" — and a five-card with three
+         reversals becomes a stutter of parentheticals. "held inward" is one phrase, reads
+         aloud, and stays true to the doctrine on the face: inward, not yet expressed. */
+      return d && d.reversed ? w + " held inward" : w;
+    }
     if (sp.n === 3) return "Read as one — the matter rests on " + kw(0) + ", is crossed by " + kw(1) + ", and tends toward " + kw(2) + ".";
     return "Read as one — it rests on " + kw(0) + ", is crossed by " + kw(1) + ", grew from " + kw(2) + ", reaches for " + kw(3) + ", and tends toward " + kw(4) + ".";
   }
@@ -214,6 +276,80 @@
      undo. So the Drawing Room becomes what its name always said: the room you enter to
      draw a READING. The landing is the two tiers and nothing else.
      The BR-S320 two-column pull layout is not lost — it is what M2's hero now is. */
+  /* ═══ BR-S528 — A SITTING, ALREADY CUT ═══════════════════════════════════════════
+     The page reached its two doors in four lines and then stopped, so a stranger chose
+     before understanding what arrives, whether tarot knowledge is needed, what the seats
+     do, or what reversed means. One worked example answers all of those at once, and
+     answers them by SHOWING rather than by explaining — which is the only form an
+     experienced reader will not dismiss.
+
+     ★ IT RENDERS THROUGH THE REAL PATH. `readsHTML()` and `bindingLine()` below are the
+     same functions a paid reading uses, handed a state built here instead of by a cut. So
+     the sample cannot drift from the product, cannot flatter it, and cannot promise a
+     shape the machine does not print. If the reading changes, the sample changes with it.
+     A hand-authored specimen would have been easier and would have been an advertisement.
+
+     ★ CURATED, NOT DRAWN — and this is the one place the room deliberately does not deal.
+     A random triple coheres sometimes; the sample's entire job is to prove that a reading
+     COHERES, so a bad draw here argues the opposite of the thing being demonstrated. Four
+     were chosen by reading the binding sentence each produces:
+        rests on burden, is crossed by apathy, tends toward transition held inward
+        rests on stalemate, is crossed by illusion held inward, tends toward walking away
+        rests on grief, is crossed by introspection held inward, tends toward self-sufficiency
+        rests on patience, is crossed by swift action held inward, tends toward surrender
+     Each carries exactly one reversal, so the orientation is taught by example every time
+     without any visit meeting a wall of them.
+
+     ★ AND IT ROTATES, at the builder's call — a page that shows one fixed reading forever
+     is a poster. One per load, so a second visit is not a repeat.
+
+     ★ NO `data-dr-turn` ANYWHERE IN HERE. The delegated click handler matches that
+     attribute anywhere under HOST, so a turnable sample on the landing could drive the
+     real turn path against a state that is not a draw. The sample arrives already turned;
+     it is a specimen, not a control. */
+  var SAMPLES = [
+    { q: "I keep saying yes to more at work and telling myself it's temporary.",
+      cards: [["Ten of Wands", 0], ["Four of Cups", 0], ["Six of Swords", 1]] },
+    { q: "I've been putting off a decision for months and calling it patience.",
+      cards: [["Two of Swords", 0], ["The Moon", 1], ["Eight of Cups", 0]] },
+    { q: "Something finished a while ago and I keep acting like it hasn't.",
+      cards: [["Five of Cups", 0], ["The Hermit", 1], ["Nine of Pentacles", 0]] },
+    { q: "I can't tell if I want this, or if I'm just good at it.",
+      cards: [["Seven of Pentacles", 0], ["Knight of Swords", 1], ["The Hanged Man", 0]] }
+  ];
+
+  function byName(n) { for (var i = 0; i < DECK.length; i++) if (DECK[i].name === n) return DECK[i]; return null; }
+
+  /* returns a state shaped exactly like a finished Sitting, or null if the deck has not
+     arrived or a chosen card is not in the bank — the sample is never worth a broken
+     section, so it simply does not render */
+  function sampleState() {
+    if (!DECK.length) return null;
+    var s = SAMPLES[Math.floor(Math.random() * SAMPLES.length)], drawn = [], i, c;
+    for (i = 0; i < s.cards.length; i++) {
+      c = byName(s.cards[i][0]);
+      if (!c) return null;
+      drawn.push({ card: c, reversed: !!s.cards[i][1], shown: true });
+    }
+    return { spread: "sitting", question: s.q, drawn: drawn, revealed: drawn.length };
+  }
+
+  function sampleHTML() {
+    var st = sampleState();
+    if (!st) return "";
+    return '<section class="dr-sample" aria-label="An example sitting">' +
+      '<hr class="dr-thresh" aria-hidden="true">' +
+      '<p class="dr-sample__intro">What follows is for the first time you do this.</p>' +
+      '<p class="dr-sample__eyebrow">A sitting, already cut</p>' +
+      '<p class="dr-sample__q">&ldquo;' + esc(st.question) + '&rdquo;</p>' +
+      readsHTML(st) +
+      '<p class="dr-binding">' + esc(bindingLine(SPREADS.sitting, st.drawn)) + '</p>' +
+      '<p class="dr-sample__after">Three paragraphs and one sentence — that is the whole of ' +
+        'what a cut produces. What is not on the table is the part you do: holding the first ' +
+        'against the second, and asking whether the third is somewhere you are willing to arrive.</p>' +
+      '</section>';
+  }
+
   function landingHTML() {
     return '<div class="dr-landing">' +
       '<div class="dr-live" role="status" aria-live="polite" data-dr-live></div>' +
@@ -223,7 +359,9 @@
         ? "Three cards to one question — your free sitting is spent."
         : "Three cards to one question — your first is free.") +
       tierDoor(SPREADS.deep, "One question, taken further — what it grew from, and what it reaches for.") +
-      '</section></div>';
+      '</section>' +
+      sampleHTML() +
+      '</div>';
   }
   /* a paid door carries its price in the specimen label; the free-first sitting stays untouched */
   function tierDoor(sp, sub) {
@@ -381,7 +519,15 @@
     if (st.revealed < sp.n) return '<p class="dr-draw__cue">Turn each card.</p><a class="dr-intake__back" href="#" data-dr-home>&larr; the deck</a>';
     return '<div class="dr-filed" data-dr-filed>' +
       '<p class="dr-binding">' + esc(bindingLine(sp, st.drawn)) + '</p>' +
-      '<p class="dr-read__frame">Drawn to the matter you laid down — a reflection to sit with, not a forecast.</p>' +
+      /* ★ BR-S527 — this printed unconditionally, so a visitor who left the field empty
+         was told at the emotional close that the cards were "drawn to the matter you laid
+         down" when they had laid nothing down. The frame is the last authored sentence
+         before the seal; being told a small untruth there costs more than the sentence is
+         worth. The half that is true of every reading is kept for everyone. */
+      '<p class="dr-read__frame">' +
+        (st.question ? 'Drawn to the matter you laid down — a reflection to sit with, not a forecast.'
+                     : 'A reflection to sit with, not a forecast.') +
+      '</p>' +
       /* ── BR-S351 — IT SAID FILED AND IT FILED NOTHING. ──────────────────────
          The only thing this room writes is `br_dr_sitting_used` — one flag saying
          the free Sitting is spent. The reading itself is not stored anywhere: it
@@ -465,7 +611,45 @@
   function announce(m) { var l = HOST.querySelector("[data-dr-live]"); if (l) l.textContent = m; }
   function firstSentence(s) { var m = String(s || "").match(/^[^.]+\./); return m ? m[0] : String(s || ""); }
 
-  function showLanding() { STATE.view = "landing"; stage().innerHTML = landingHTML(); if (inApp() && history.replaceState) history.replaceState(null, "", "?dev=drawing-room"); }
+  /* ═══ BR-S526 — GOING BACK TO THE DECK MUST NOT DESTROY THE READING ═══════════════
+     This called `replaceState(addr())` unconditionally, and `← the deck` (`:439`) sits in
+     the tail of a COMPLETED reading, two lines under "Keep the link and it opens exactly
+     as it fell." One click replaced the receipt with the bare address, and the seal is
+     `Date.now()+Math.random()` — once the URL is gone the reading is gone.
+
+     ★ AND IT WAS MINE. BR-S522 fixed the receipt never being written at /tarot/; the same
+     commit made this line run there for the first time. So the fix that gave the reading
+     an address also gave it a way to lose one. That is the shape to watch for: a change
+     that makes something real makes its destruction reachable too.
+
+     `pushState` when a filed reading is in the bar, so the receipt survives in history and
+     Back returns to it; `replaceState` otherwise, so ordinary browsing does not pile up
+     entries. And the draw is CLEARED — `drawn`/`revealed`/`spread`/`seed` used to survive
+     into the landing, where the delegated handler matches `[data-dr-turn]` anywhere under
+     HOST, so any future card-like element on the landing could turn a dead draw and read
+     a stranger's card aloud through `[data-dr-live]`. */
+  /* the render, with no history side-effect — so the popstate handler can use it without
+     writing the entry it is currently responding to, which is how a Back button turns
+     into an infinite loop */
+  function paintLanding() {
+    STATE.view = "landing";
+    STATE.drawn = []; STATE.revealed = 0; STATE.spread = null; STATE.seed = "";
+    stage().innerHTML = landingHTML();
+  }
+  function showLanding() {
+    paintLanding();
+    if (!history.replaceState) return;
+    var filed = /[?&]read=/.test(location.search) && /[?&]t=/.test(location.search);
+    if (filed && history.pushState) history.pushState(null, "", addr());
+    else history.replaceState(null, "", addr());
+  }
+  /* ★ AND THE BACK BUTTON HAS TO ACTUALLY GO BACK. Pushing the receipt into history only
+     restores the ADDRESS; without this the visitor pressed Back, saw their reading's URL
+     return to the bar, and went on looking at the landing — which is arguably worse than
+     losing it, because the bar now says the reading is there and the page says it is not.
+     `reopen()` already rebuilds a filed reading from `read`/`t` alone, so the whole of
+     history navigation is one line of dispatch. */
+  window.addEventListener("popstate", function () { if (!reopen()) paintLanding(); });   /* `window`, not `root` — this IIFE takes no parameter; see the note at siteRoot() */
   function startReading(key) {
     STATE.view = "intake"; STATE.spread = key;
     STATE.drawn = []; STATE.revealed = 0; STATE.question = ""; STATE.seed = "";
@@ -481,7 +665,10 @@
     if (sp.key === "sitting") { try { localStorage.setItem("br_dr_sitting_used", "1"); } catch (e) {} }   // the cut consumes the free sitting — the cut closes the question
     STATE.drawn = drawSpread(STATE.seed, sp.n).map(function (d) { d.shown = false; return d; });
     STATE.revealed = 0; STATE.view = "reading";
-    if (inApp() && history.replaceState) history.replaceState(null, "", "?dev=drawing-room&read=" + sp.key + "&t=" + encodeURIComponent(t) + (STATE.question ? "&q=" + encodeURIComponent(STATE.question) : ""));
+    /* BR-S522: the receipt is written at whatever address this room is being served
+       from. This used to be gated behind inApp(), so at /tarot/ it never ran and the
+       reading the page promised was "kept at this link" had no link. */
+    if (history.replaceState) history.replaceState(null, "", addr("read=" + sp.key + "&t=" + encodeURIComponent(t) + (STATE.question ? "&q=" + encodeURIComponent(STATE.question) : "")));
     /* BR-S318: nothing is replaced here any more. The intake prose is emptied out of a
        region that stays, the cards are laid into the spread that was always there, and
        the deck the reader has been looking at is the deck they just cut. */
@@ -572,7 +759,11 @@
       if (!el) return;
       ev.preventDefault();
       if (SHUFFLING && el.hasAttribute("data-dr-home")) return;   // BR-S319: the escape stays visible but waits out the 820ms
-      if (el.hasAttribute("data-door")) { var d = el.getAttribute("data-door"); if (inApp()) location.href = d === "profile" ? "?dev=profile" : location.pathname; return; }
+      /* BR-S522: the doors work at both addresses. Gated behind inApp() they were
+         preventDefault-ed and then did nothing at /tarot/, and Escape could not rescue it
+         (app.js's handler bails unless the view is "room"), so a visitor who typed the
+         public address was trapped in the room with no way out but the codex balls. */
+      if (el.hasAttribute("data-door")) { location.href = doorHref(el.getAttribute("data-door")); return; }
       if (el.hasAttribute("data-dr-read")) return startReading(el.getAttribute("data-dr-read"));
       if (el.hasAttribute("data-dr-shuffle")) return shuffle();
       if (el.hasAttribute("data-dr-cut")) return cut();

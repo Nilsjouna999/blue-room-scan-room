@@ -732,6 +732,58 @@
 
 .dr-filed { display: flex; flex-direction: column; align-items: center; gap: 14px; width: min(460px, 100%); margin-top: 6px; padding-top: 24px; border-top: 1px solid var(--pf-line-soft); box-shadow: 0 1px 0 rgba(224, 218, 205, .02); }
 .dr-binding { font-family: var(--pf-serif); font-size: 17px; line-height: 1.55; color: var(--pf-cream); margin: 0; max-width: 46ch; }
+
+/* ═══ BR-S528 — A SITTING, ALREADY CUT ════════════════════════════════════════════
+   The worked example below the doors. Built entirely from tokens that already exist:
+   it borrows the reading's own type ramp (.dr-read__*, .dr-binding above) so the
+   specimen is set in the product's voice rather than a voice invented for the page.
+
+   ★ NO NEW BORDERED CONTAINER, ANYWHERE. A box around prose claims it as a feature,
+   and two boxes side by side is a pricing grid whatever the opacity. Everything here
+   is text on the ambient ground; the only surfaces in this room stay the card faces.
+
+   ★ THE FLOOR BEFORE THE THRESHOLD IS DELIBERATE and is the one gap that reads as a
+   change of ground. .dr-landing's own gap is clamp(34px,7vh,66px); this is roughly
+   double it. Not a full empty screen — on a page that has never scrolled, a screen of
+   nothing reads as the end of the page rather than as an invitation. */
+.dr-sample {
+  width: 100%;
+  max-width: 46ch;                      /* the reading's own measure, so the specimen sets like the product */
+  margin-top: clamp(56px, 12vh, 120px); /* the threshold gap — see the note above */
+  display: flex; flex-direction: column; align-items: flex-start;
+  gap: 26px;
+}
+/* the cut, drawn once. The room already says the deck is cut by a hand, so the mark
+   stands for that and for nothing decorative. --pf-line-cut is the token already
+   carrying "a cut" elsewhere in this sheet. */
+.dr-thresh {
+  align-self: stretch;
+  height: 1px; border: 0; margin: 0 0 6px;
+  background: linear-gradient(to right, transparent 0%, var(--pf-line-cut) 18%, var(--pf-line-cut) 74%, transparent 100%);
+}
+.dr-sample__intro {
+  font-family: var(--pf-serif); font-style: italic; font-size: 14px;
+  color: var(--pf-meta); margin: 0;
+}
+.dr-sample__eyebrow {
+  font-family: var(--pf-mono); font-size: 9px; letter-spacing: .18em;
+  text-transform: uppercase; color: var(--pf-gold); margin: 0;
+}
+/* the matter, in the asker's own voice — quoted, so it reads as somebody's sentence
+   rather than as a heading the room wrote */
+.dr-sample__q {
+  font-family: var(--pf-serif); font-style: italic; font-size: 17px; line-height: 1.5;
+  color: var(--pf-cream-display); margin: 0;
+}
+.dr-sample .dr-read { margin: 0; }
+.dr-sample__after {
+  font-family: var(--pf-serif); font-size: 15px; line-height: 1.62;
+  color: var(--pf-body); margin: 0;
+}
+@media (max-width: 620px) {
+  .dr-sample { gap: 22px; margin-top: clamp(40px, 9vh, 72px); }
+  .dr-sample__q { font-size: 16px; }
+}
 .dr-stamp { display: flex; align-items: center; gap: 10px; }
 .dr-hallmark { width: 22px; height: 22px; color: var(--pf-meta); flex: none; }
 .dr-filed__line { font-family: var(--pf-mono); font-size: 9.5px; letter-spacing: .12em; text-transform: uppercase; color: var(--pf-meta); margin: 0; }

@@ -137,9 +137,16 @@ PUBLIC_STRIPS = [
     ('  host.removeEventListener("click", onReliqPreviewClick);'
      '   // BR-S230: M3 preview state toggle — single-bind across remounts\n'
      '  host.addEventListener("click", onReliqPreviewClick);\n', ""),
+    # BR-S529 — re-anchored. BR-S522 added `br_has_reading` to the OFF branch so the
+    # builder's no-account preview still works now that a completed reading also counts
+    # as held; that changed this line and the build correctly refused to ship rather than
+    # strip something it could no longer recognise. The replacement is unchanged: the
+    # public build still has no code path that can write either flag.
     ('  const hp = DEVNAV ? raw : null;\n'
      '  if (hp === "1") localStorage.setItem("br_holdings", "1");\n'
-     '  else if (hp === "0") localStorage.removeItem("br_holdings");\n',
+     '  else if (hp === "0") { localStorage.removeItem("br_holdings");'
+     ' localStorage.removeItem("br_has_reading"); }'
+     '   // BR-S522: clears the state, not one of its two keys\n',
      "  // Public build: no code path here can write the holdings flag.\n"),
     # The dev rail's own holdings flip. Its BUTTON is already gone from the public
     # builds — transform_index strips the rail's markup — so this is unreachable rather
@@ -151,8 +158,13 @@ PUBLIC_STRIPS = [
     # two surfaces disagreeing. The guard caught the edit and refused to build, which is
     # the behaviour it was written for: an anchor that drifts must stop the build, not
     # quietly ship the writer it exists to remove.
-    ('  else if (kind === "holdings") { try { localStorage.getItem("br_holdings") === "1"'
-     ' ? localStorage.removeItem("br_holdings") : localStorage.setItem("br_holdings", "1"); }'
+    # BR-S529: re-anchored again, and for the same reason as BR-S498 — BR-S522 made the
+    # rail toggle the STATE rather than one key, since a completed reading now counts as
+    # held too. The guard refused to build rather than ship a writer it could no longer
+    # recognise, which is precisely the behaviour it exists for.
+    ('  else if (kind === "holdings") { try { if (hasHoldings()) { localStorage.removeItem("br_holdings");'
+     ' localStorage.removeItem("br_has_reading"); }\n'
+     '                                        else localStorage.setItem("br_holdings", "1"); }'
      ' catch (e) {} location.reload(); return; }',
      '  // Public build: the dev rail\'s holdings flip is not part of it.'),
 ]

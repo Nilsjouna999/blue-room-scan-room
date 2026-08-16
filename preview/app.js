@@ -4265,7 +4265,18 @@ const MENU_PANELS = [
 let _menuPushed = 0;     // COUNT of synthetic history entries we pushed (never assign the index)
 let _menuSettle = null;
 
-function hasHoldings() { try { return localStorage.getItem("br_holdings") === "1"; } catch (e) { return false; } }
+/* ★ BR-S522 — TWO KEYS MEANT A PAID READING NEVER UNLOCKED ANYTHING. Finishing a Birth
+   Reading writes `br_has_reading` (arcane.js:1205). This predicate, and the Profile's own
+   `held()` (arcana-profile.js:137), read `br_holdings` — a key nothing in either product
+   ever sets. It is written only by the M3 preview toggle, the devnav rail and `?holdings=`,
+   all builder-side. So a customer who completed a reading was still shown "NO CROWN YET ·
+   DRAW A READING — a crown is earned by taking a reading": the Profile invited the buyer
+   to buy the thing they had just bought.
+   Either key now counts. The builder's toggle keeps working; a real reading counts too. */
+function hasHoldings() {
+  try { return localStorage.getItem("br_holdings") === "1" || localStorage.getItem("br_has_reading") === "1"; }
+  catch (e) { return false; }
+}
 
 /* ── BR-S259: M1's sample source, in ONE place ────────────────────────────────
    The desk shows SRC-03 "Shore Dispatch". Two separate mount paths render it —
@@ -6035,7 +6046,7 @@ document.addEventListener("click", (e) => {
      top-level array evaluated once at load, so a remount would leave M3 updated and the
      U1 door stale: the two surfaces would disagree about the same fact, which is exactly
      what deriving it was meant to end. A reload re-evaluates the registry. Dev-only path. */
-  // Public build: the dev rail's holdings flip is not part of it.
+  // Public build: the dev rail's holdings flip is not part of it.   // BR-S522: the rail toggles the STATE, which is now either key
   else if (kind === "dev") { const u = new URL(location.href); u.searchParams.set("dev", val); u.searchParams.set("devnav", "1"); location.href = u.toString(); }
 });
 
