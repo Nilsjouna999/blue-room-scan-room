@@ -1,0 +1,363 @@
+<!--
+  THE ACCORD — candidate 10, TYPE-forward build
+  Label ink #2a2118 on label cream #d8cdb4 (lightest stock value):
+    relative luminance ink  L = 0.016468
+    relative luminance cream L = 0.615460
+    contrast ratio (L_light+0.05)/(L_dark+0.05) = 0.66546 / 0.066468 = 10.01 : 1
+  10.01:1 clears the required 4.5:1 with wide margin (WCAG AAA for body text, even).
+
+  Geometry ledger (computed from this file's own CSS, matching COLOGNE-REFERENCE.md §5):
+    recess   width : height = 0.808   (aspect-ratio: 0.808 on .recess)
+    bottle   width : total-height = 0.582  (aspect-ratio: 0.582 on .bottle)
+    bottle total-height : recess height = 0.857  (.bottle { height: 85.7% })
+    cap width   = 26.3% of bottle width
+    cap height  = 11.2% of bottle height
+    label width = 66.7% of bottle width
+    label height= 57.1% of bottle height, top at 41%, bottom at 98.1%
+-->
+<title>The Accord — Candidate 10</title>
+<style>
+  :root {
+    color-scheme: dark;
+    /* structural darks — every one of these sits within ~13 levels of near-black */
+    --ground:        #0a0908;
+    --recess-top:    #141210;
+    --recess-mid:    #0d0c0b;
+    --recess-low:    #080807;
+    --glass-body:    #0f0e0c;
+    --cap:           #141414;
+    --brass:         #8a6a3a;
+    --gold-collar:   #9a7a45;
+    /* liquid — olive, desaturated, the one warm accent inside the glass */
+    --liquid-1: #6b6535;
+    --liquid-2: #5a5a30;
+    --liquid-3: #3f3d20;
+    --liquid-4: #2e2c18;
+    /* label — the only bright plane */
+    --label-cream-hi: #d8cdb4;
+    --label-cream-lo: #c9bda0;
+    --label-ink:      #2a2118;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--ground);
+  }
+
+  body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    font-family: ui-monospace, "SFMono-Regular", Consolas, "Courier New", monospace;
+  }
+
+  /* ============ THE RECESS ============ */
+
+  .recess {
+    position: relative;
+    width: min(78vmin, 640px);
+    aspect-ratio: 0.808;           /* 462 / 572, the recess silhouette */
+    background:
+      /* the warm floor pool under the bottle's base */
+      radial-gradient(
+        ellipse 46% 10% at 50% 93%,
+        rgba(120, 96, 60, 0.20) 0%,
+        rgba(120, 96, 60, 0.08) 55%,
+        rgba(120, 96, 60, 0) 100%
+      ),
+      /* the recess body: lighter top face falling to dark low corners, no hard edge */
+      radial-gradient(
+        140% 90% at 50% 0%,
+        var(--recess-top) 0%,
+        var(--recess-mid) 46%,
+        var(--recess-low) 100%
+      );
+    overflow: hidden;
+    isolation: isolate;
+  }
+
+  /* the glass pane over the opening — the outermost surface, drawn last, ONE gleam */
+  .pane-gleam {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(
+      128deg,
+      rgba(255, 250, 240, 0.085) 0%,
+      rgba(255, 250, 240, 0.04) 22%,
+      rgba(255, 250, 240, 0.0) 45%,
+      rgba(255, 250, 240, 0.0) 100%
+    );
+  }
+
+  /* ============ THE BOTTLE ============ */
+
+  .bottle {
+    position: absolute;
+    left: 50%;
+    bottom: 6.8%;
+    height: 85.7%;                 /* 490 / 572 of the recess */
+    aspect-ratio: 0.582;           /* 285 / 490 — the master silhouette ratio */
+    transform: translateX(-50%);
+  }
+
+  .bottle-part { position: absolute; left: 0; width: 100%; }
+
+  /* --- cap: 0 → 11.2% --- */
+  .cap {
+    top: 0;
+    height: 11.2%;
+    width: 26.3%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(
+      90deg,
+      #1a1a1a 0%, var(--cap) 14%, var(--cap) 78%, #0e0e0e 100%
+    );
+    clip-path: polygon(6% 0%, 94% 0%, 100% 100%, 0% 100%);
+  }
+  .cap-band {
+    top: 9.6%;
+    height: 1.8%;
+    width: 27%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--brass);
+  }
+
+  /* --- neck: 11.2% → 15.7% --- */
+  .neck {
+    top: 11.4%;
+    height: 4.3%;
+    width: 15%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(90deg, #201e1a 0%, var(--glass-body) 50%, #17150f 100%);
+  }
+  .collar {
+    top: 15.0%;
+    height: 1.4%;
+    width: 24%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--gold-collar);
+  }
+
+  /* --- shoulder: 15.7% → 23.2% --- */
+  .shoulder {
+    top: 15.7%;
+    height: 7.5%;
+    background: linear-gradient(90deg, #1c1a16 0%, var(--glass-body) 48%, #161410 100%);
+    clip-path: polygon(37% 0%, 63% 0%, 100% 100%, 0% 100%);
+  }
+
+  /* --- body: 23.2% → 95.0% --- */
+  .body {
+    top: 23.2%;
+    height: 71.8%;
+    background: var(--glass-body);
+    border-radius: 3% / 2.2%;
+    overflow: hidden;
+  }
+
+  .liquid {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    top: 9%;                       /* small headspace below the shoulder */
+    background: linear-gradient(
+      180deg,
+      var(--liquid-1) 0%,
+      var(--liquid-2) 34%,
+      var(--liquid-3) 68%,
+      var(--liquid-4) 100%
+    );
+  }
+
+  /* glass edge highlights — positioned in BOTTLE coordinates (not .body's) so they
+     land per §3 regardless of the body's own clip; asymmetric on purpose */
+  .edge-left {
+    top: 26.1%;                    /* body top 23.2% + 4% of body height */
+    height: 66.1%;                 /* 92% of body height */
+    left: 6%;
+    width: 3.2%;
+    background: linear-gradient(
+      180deg,
+      rgba(255, 250, 235, 0.02) 0%,
+      rgba(255, 250, 235, 0.34) 12%,
+      rgba(255, 250, 235, 0.30) 70%,
+      rgba(255, 250, 235, 0.05) 100%
+    );
+    filter: blur(0.4px);
+  }
+  .edge-right {
+    top: 30.4%;                    /* body top 23.2% + 10% of body height */
+    height: 24.4%;                 /* 34% of body height */
+    right: 5%;
+    width: 2%;
+    background: linear-gradient(
+      180deg,
+      rgba(255, 250, 235, 0.0) 0%,
+      rgba(255, 250, 235, 0.10) 40%,
+      rgba(255, 250, 235, 0.0) 100%
+    );
+  }
+
+  /* --- base: 95.0% → 100% --- */
+  .base {
+    top: 94.6%;
+    height: 5.4%;
+    left: -2%;
+    width: 104%;
+    background: linear-gradient(180deg, #0e0d0b 0%, #070605 100%);
+    border-radius: 0 0 8% 8% / 0 0 40% 40%;
+  }
+
+  /* ============ THE LABEL ============ */
+
+  .label {
+    position: absolute;
+    left: 50%;
+    top: 41%;
+    height: 57.1%;
+    width: 66.7%;
+    transform: translateX(-50%);
+    background: linear-gradient(180deg, var(--label-cream-hi) 0%, var(--label-cream-lo) 100%);
+    color: var(--label-ink);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 6.5% 6% 5%;
+    text-align: center;
+    font-size: clamp(6px, 1.15vmin, 10px);   /* base unit — everything else is an em multiple */
+    line-height: 1.15;
+  }
+
+  .l-meta-row {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.72em;
+    letter-spacing: 0.14em;
+    opacity: 0.86;
+  }
+
+  .l-rule {
+    width: 100%;
+    height: 1px;
+    background: var(--label-ink);
+    opacity: 0.4;
+    margin: 8% 0 7%;
+  }
+
+  .l-product {
+    font-size: 1.02em;
+    letter-spacing: 0.22em;
+    font-weight: 600;
+  }
+
+  .l-tagline {
+    margin-top: 5%;
+    font-size: 0.68em;
+    letter-spacing: 0.1em;
+    opacity: 0.72;
+  }
+
+  .l-diamond {
+    margin: 7% 0;
+    font-size: 0.6em;
+    opacity: 0.55;
+  }
+
+  .l-name {
+    font-family: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, "Times New Roman", serif;
+    font-style: italic;
+    font-size: 2.05em;              /* roughly twice anything else on the label */
+    line-height: 1.05;
+    margin: 0 0 6%;
+    letter-spacing: 0.01em;
+  }
+
+  .l-marks {
+    display: flex;
+    flex-direction: column;
+    gap: 0.62em;
+    font-size: 0.8em;
+    letter-spacing: 0.08em;
+    margin-bottom: auto;
+  }
+
+  .l-footer {
+    width: 100%;
+  }
+
+  .l-birth {
+    font-size: 0.66em;
+    letter-spacing: 0.16em;
+    opacity: 0.8;
+  }
+
+  .l-marks-row {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.58em;
+    letter-spacing: 0.06em;
+    margin-top: 6%;
+    opacity: 0.66;
+  }
+</style>
+
+<div class="recess">
+  <div class="bottle">
+    <!-- 1. bottle glass / walls, and the liquid inside them -->
+    <div class="bottle-part base"></div>
+    <div class="bottle-part body">
+      <div class="liquid"></div>
+    </div>
+    <div class="bottle-part shoulder"></div>
+    <div class="bottle-part neck"></div>
+
+    <!-- 2. the label, sitting on the glass -->
+    <div class="label">
+      <div class="l-meta-row"><span>BLUE ROOM ACCORDS</span><span>FORMULA 01</span></div>
+      <div class="l-rule"></div>
+      <div class="l-product">THE BIRTH READING</div>
+      <div class="l-tagline">A PERSONAL ACCORD IN SIX NOTES</div>
+      <div class="l-diamond">&#9670;</div>
+      <div class="l-name">The Crowned Name</div>
+      <div class="l-marks">
+        <div>SUN&nbsp;SIGN</div>
+        <div>YEAR&nbsp;ANIMAL</div>
+        <div>LIFE&nbsp;PATH</div>
+        <div>RUNE</div>
+        <div>TRIGRAM</div>
+        <div>HEXAGRAM</div>
+      </div>
+      <div class="l-footer">
+        <div class="l-rule"></div>
+        <div class="l-birth">BY BIRTH ALONE</div>
+        <div class="l-marks-row"><span>SIX MARKS</span><span>ONE ACCORD</span></div>
+      </div>
+    </div>
+
+    <!-- 3. glass edge highlights, on top of the label -->
+    <div class="bottle-part edge-left"></div>
+    <div class="bottle-part edge-right"></div>
+
+    <!-- 4. cap and collar, opaque, on top -->
+    <div class="bottle-part collar"></div>
+    <div class="bottle-part cap"></div>
+    <div class="bottle-part cap-band"></div>
+  </div>
+
+  <!-- 5. the pane gleam — the outermost surface -->
+  <div class="pane-gleam"></div>
+</div>

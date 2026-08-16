@@ -1,0 +1,342 @@
+<!--
+  THE ACCORD — candidate 06 (silhouette emphasis)
+  Built from transfer/COLOGNE-REFERENCE.md. Scope: the recess ("the hole") and the
+  bottle standing in it only.
+
+  LABEL CONTRAST (computed, WCAG relative-luminance method):
+    ink #2a2118 on cream top  #d8cdb4  ->  10.10 : 1
+    ink #2a2118 on cream base #c9bda0  ->   8.55 : 1
+  Both clear 4.5:1 with margin to spare.
+
+  Key geometry, computed from this file's own declared percentages:
+    recess   w/h = 0.808  (--recess-w / --recess-h below, matches 462:572)
+    bottle   w/h = 0.582  (--bottle-w / --bottle-h below, matches 285:490)
+    cap 0.112 / neck 0.045 / shoulder 0.075 / body 0.72 / base 0.048 of bottle height
+-->
+<title>The Accord — Candidate 06</title>
+<style>
+  :root{
+    /* ground + recess — the near-black stack, all inside ~25 L* levels */
+    --ground:        #0a0908;
+    --recess-top:    #141210;
+    --recess-mid:    #0d0c0b;
+    --recess-corner: #080807;
+
+    /* bottle glass + liquid */
+    --cap:           #141414;
+    --brass:         #8a6a3a;
+    --gold-collar:   #9a7a45;
+    --glass-shadow:  #0c0b0a;
+    --liquid-1:      #6b6535;
+    --liquid-2:      #5a5a30;
+    --liquid-3:      #3f3d20;
+    --liquid-4:      #2e2c18;
+
+    /* label */
+    --label-top:     #d8cdb4;
+    --label-bot:     #c9bda0;
+    --ink:           #2a2118;
+
+    /* geometry unit: recess is 462 x 572 reference px -> ratio kept exactly */
+    --recess-w: 462;
+    --recess-h: 572;
+    --bottle-w: 285;
+    --bottle-h: 490;
+  }
+
+  *{ box-sizing:border-box; }
+
+  html,body{
+    margin:0;
+    padding:0;
+    width:100%;
+    height:100%;
+    background:var(--ground);
+  }
+
+  body{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    min-height:100vh;
+  }
+
+  .accord-stage{
+    /* the exhibit's own box; width is the free variable, height follows the ratio */
+    width:min(72vh, 92vw, 560px);
+  }
+
+  /* ---------------------------------------------------------------- RECESS */
+  .recess{
+    position:relative;
+    width:100%;
+    aspect-ratio: var(--recess-w) / var(--recess-h); /* 0.808 w/h, exact */
+    background:
+      radial-gradient(120% 90% at 50% 8%,  var(--recess-top) 0%, transparent 62%),
+      linear-gradient(180deg, var(--recess-top) 0%, var(--recess-mid) 55%, var(--recess-corner) 100%),
+      radial-gradient(85% 70% at 6% 100%,  var(--recess-corner) 0%, transparent 55%),
+      radial-gradient(85% 70% at 94% 100%, var(--recess-corner) 0%, transparent 55%);
+    overflow:hidden;
+  }
+
+  /* warm pool on the recess floor, under the bottle's base — wider than the bottle,
+     low contrast, warm rather than white */
+  .recess::before{
+    content:"";
+    position:absolute;
+    left:50%;
+    bottom:1.5%;
+    width:78%;
+    height:9%;
+    transform:translateX(-50%);
+    background:radial-gradient(closest-side, rgba(120,96,58,0.16), rgba(120,96,58,0.05) 65%, transparent 100%);
+    filter:blur(1px);
+    pointer-events:none;
+  }
+
+  /* the glass pane over the opening: one broad diagonal gleam, upper-left, gone by ~45% across */
+  .recess__pane{
+    position:absolute;
+    inset:0;
+    background:linear-gradient(128deg,
+      rgba(255,255,255,0.085) 0%,
+      rgba(255,255,255,0.05) 14%,
+      rgba(255,255,255,0.018) 30%,
+      rgba(255,255,255,0) 45%,
+      rgba(255,255,255,0) 100%);
+    pointer-events:none;
+  }
+
+  /* ---------------------------------------------------------------- BOTTLE */
+  .bottle{
+    position:absolute;
+    left:50%;
+    bottom:3%;
+    width:61.7%;                                   /* 285/462 of recess width */
+    aspect-ratio: var(--bottle-w) / var(--bottle-h); /* 0.582 w/h, exact */
+    transform:translateX(-50%);
+    display:flex;
+    flex-direction:column;
+  }
+
+  .bottle__cap{
+    flex:0 0 11.2%;
+    align-self:center;
+    width:26.3%;                    /* 75/285 of body width */
+    background:var(--cap);
+    border-bottom:3px solid var(--brass);
+    border-radius:2px 2px 0 0;
+    clip-path:polygon(4% 0%, 96% 0%, 100% 100%, 0% 100%); /* very slightly tapered */
+  }
+
+  .bottle__neck{
+    flex:0 0 4.5%;
+    align-self:center;
+    width:14%;
+    background:linear-gradient(180deg, var(--cap) 0%, var(--glass-shadow) 100%);
+    border-bottom:2px solid var(--gold-collar);
+  }
+
+  .bottle__shoulder{
+    flex:0 0 7.5%;
+    width:100%;
+    background:linear-gradient(180deg, var(--glass-shadow) 0%, var(--liquid-1) 100%);
+    clip-path:polygon(43% 0%, 57% 0%, 100% 100%, 0% 100%);
+  }
+
+  .bottle__body{
+    position:relative;
+    flex:0 0 72%;
+    width:100%;
+    border-radius:0 0 3px 3px;
+    background:linear-gradient(180deg,
+      var(--liquid-1) 0%,
+      var(--liquid-2) 34%,
+      var(--liquid-3) 68%,
+      var(--liquid-4) 100%);
+    /* glass thickness at the rim — reads as depth, not a flat fill; kept
+       symmetric on purpose, this is shading, not the asymmetrical highlight */
+    box-shadow:
+      inset 6px 0 10px -6px rgba(0,0,0,0.55),
+      inset -6px 0 10px -6px rgba(0,0,0,0.55),
+      inset 0 -14px 18px -10px rgba(0,0,0,0.45);
+    overflow:hidden;
+  }
+
+  .bottle__base{
+    flex:0 0 4.8%;
+    width:100%;
+    background:linear-gradient(180deg, var(--liquid-4) 0%, #211f10 100%);
+    border-radius:0 0 4px 4px;
+    box-shadow:
+      inset 5px 0 8px -5px rgba(0,0,0,0.5),
+      inset -5px 0 8px -5px rgba(0,0,0,0.5);
+  }
+
+  /* glass edge highlights — asymmetrical on purpose: bright/continuous left,
+     soft/short right. anchored to the body+base span only (23.2% -> 100%),
+     never the shoulder, so they never float outside the tapered silhouette. */
+  .bottle::before,
+  .bottle::after{
+    content:"";
+    position:absolute;
+    width:3px;
+    border-radius:2px;
+    pointer-events:none;
+  }
+  .bottle::before{
+    left:5.5%;
+    top:24.5%;
+    height:71%;
+    background:linear-gradient(180deg,
+      rgba(255,255,255,0.36) 0%,
+      rgba(255,255,255,0.24) 45%,
+      rgba(255,255,255,0.16) 80%,
+      rgba(255,255,255,0.06) 100%);
+  }
+  .bottle::after{
+    right:6.5%;
+    top:29%;
+    height:38%;
+    background:linear-gradient(180deg,
+      rgba(255,255,255,0.13) 0%,
+      rgba(255,255,255,0.06) 60%,
+      rgba(255,255,255,0) 100%);
+  }
+
+  /* -------------------------------------------------------------- LABEL */
+  .label{
+    position:absolute;
+    left:50%;
+    top:41%;                    /* top edge at 0.41 of total bottle height */
+    height:57%;                 /* bottom edge at 0.98 of total bottle height */
+    width:66.7%;                /* 190/285 of body width */
+    transform:translateX(-50%);
+    background:linear-gradient(180deg, var(--label-top) 0%, var(--label-bot) 100%);
+    color:var(--ink);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:flex-start;
+    font-family:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+    padding:5% 6%;
+    text-align:center;
+    overflow:hidden;
+    container-type:inline-size;  /* every child is sized off the LABEL's own
+                                    width, so it fits its fixed box at any
+                                    stage size instead of overflowing it */
+  }
+
+  .label__mono{
+    font-family:"Courier New",Courier,ui-monospace,monospace;
+  }
+
+  .label__meta{
+    width:100%;
+    display:flex;
+    justify-content:space-between;
+    gap:2%;
+    font-size:4.7cqw;
+    letter-spacing:0.02em;
+    line-height:1.15;
+    white-space:nowrap;
+  }
+
+  .label__rule{
+    width:100%;
+    height:1px;
+    background:var(--ink);
+    opacity:0.55;
+    margin:4% 0;
+    flex:none;
+  }
+
+  .label__product{
+    font-size:7.4cqw;
+    letter-spacing:0.16em;
+    line-height:1.15;
+  }
+
+  .label__tagline{
+    font-size:5cqw;
+    letter-spacing:0.06em;
+    opacity:0.82;
+    margin-top:2%;
+  }
+
+  .label__diamond{
+    font-size:5.6cqw;
+    margin:3% 0;
+    line-height:1;
+  }
+
+  .label__name{
+    font-size:14.5cqw;
+    font-style:italic;
+    line-height:1.05;
+    margin-bottom:3%;
+  }
+
+  .label__marks{
+    font-size:5.6cqw;
+    letter-spacing:0.1em;
+    line-height:1.85;
+  }
+
+  .label__foot{
+    width:100%;
+    font-size:4cqw;
+    letter-spacing:0.04em;
+    line-height:1.3;
+    margin-top:auto;
+  }
+
+  .label__split{
+    width:100%;
+    display:flex;
+    justify-content:space-between;
+    gap:2%;
+    white-space:nowrap;
+  }
+
+  @media (prefers-reduced-motion: no-preference){
+    /* intentionally no motion is defined anywhere in this file */
+  }
+</style>
+
+<div class="accord-stage">
+  <div class="recess">
+    <div class="bottle">
+      <div class="bottle__cap"></div>
+      <div class="bottle__neck"></div>
+      <div class="bottle__shoulder"></div>
+      <div class="bottle__body"></div>
+      <div class="bottle__base"></div>
+
+      <div class="label">
+        <div class="label__meta label__mono">
+          <span>BLUE ROOM ACCORDS</span><span>FORMULA 01</span>
+        </div>
+        <div class="label__rule"></div>
+        <div class="label__product label__mono">THE BIRTH READING</div>
+        <div class="label__tagline label__mono">A PERSONAL ACCORD IN SIX NOTES</div>
+        <div class="label__diamond">&#9670;</div>
+        <div class="label__name">The Crowned Name</div>
+        <div class="label__marks label__mono">
+          SUN SIGN<br>
+          YEAR ANIMAL<br>
+          LIFE PATH<br>
+          RUNE<br>
+          TRIGRAM<br>
+          HEXAGRAM
+        </div>
+        <div class="label__rule"></div>
+        <div class="label__foot label__mono">
+          <div>BY BIRTH ALONE</div>
+          <div class="label__split"><span>SIX MARKS</span><span>ONE ACCORD</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="recess__pane"></div>
+  </div>
+</div>

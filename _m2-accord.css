@@ -1,0 +1,280 @@
+/* ═══════════════════════════════════════════════════════════════════════════════
+   M2 · THE ACCORD — the socket's stylesheet.  `_m2-accord.css`
+
+   Fetched by `_m2-accord.js` only on `?m2=accord`, with its OWN `?v=` token. Cache
+   tokens are per-asset in this repo — bumping app.js does not bump this file, and four
+   commits of correct CSS have already been invisible in a browser for exactly that
+   reason. Bump the token in the JS when this file changes.
+
+   ★ THIS IS A SOCKET, NOT THE FINISHED EXHIBIT. Ten builders are producing rival
+   versions of the recess and the bottle right now. What is here is the geometry from
+   the reference document, wired to the skeleton the JS emits, so a winner can be
+   adopted by editing values rather than re-authoring markup. It is deliberately plain:
+   the shapes are in the right places at the right sizes with the right values, and the
+   craft — the glass, the pool, the gleam's exact falloff — is what the fleet is for.
+
+   ★★ EVERYTHING DERIVES FROM TWO RATIOS. The reference's section 5 says the recess
+   at 0.808 and the bottle body at 0.582 carry the whole silhouette, and that a bottle
+   even 10% narrower stops reading as a flask. So they are declared once, here, and
+   every other size is computed from them. Adopting a candidate's proportions is
+   editing two numbers.
+
+   ★ THE VALUE RANGE IS THE OTHER HARD RULE. Recess, ground and bottle all live inside
+   about 25 levels of near-black. Every colour below is written with its L* in a
+   comment so the range stays checkable by reading rather than by rendering.
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+.m2acc {
+  /* ── the two governing ratios ─────────────────────────────────────────────── */
+  --acc-rec-ar: 0.808;          /* recess w/h  — LOCKED, see the note above */
+  --acc-body-ar: 0.582;         /* bottle body w/h — LOCKED */
+  --acc-bottle-h: 0.857;        /* bottle total height as a fraction of recess height */
+  --acc-body-w: 0.617;          /* bottle body width as a fraction of recess width */
+
+  /* ── the vertical stack, as fractions of TOTAL bottle height ──────────────── */
+  --acc-cap-h: 0.112;
+  --acc-neck-h: 0.045;
+  --acc-shoulder-h: 0.075;
+  --acc-base-h: 0.05;
+
+  /* ── the palette. L* in comments; the whole set spans ~9 levels. ──────────── */
+  --acc-page:  #0a0908;         /* L*  3.4  the ground around the recess */
+  --acc-rec-1: #141210;         /* L*  6.6  the recess top face */
+  --acc-rec-2: #0d0c0b;         /* L*  4.4  settling lower */
+  --acc-rec-3: #080807;         /* L*  2.6  the bottom corners */
+  --acc-cap:   #141414;         /* L*  7.0  near-black cylinder */
+  --acc-brass: #8a6a3a;         /* the cap band */
+  --acc-gold:  #9a7a45;         /* the neck collar, brighter than the band */
+  --acc-liq-1: #6b6535;         /* the fill, top — olive, NOT emerald and NOT yellow */
+  --acc-liq-2: #5a5a30;
+  --acc-liq-3: #3f3d20;
+  --acc-liq-4: #2e2c18;         /* darkest at the very bottom */
+  --acc-stock: #d8cdb4;         /* label cream at its lightest — NOT white */
+  --acc-stock-2: #c9bda0;       /* falling toward the bottom */
+  --acc-ink:   #2a2118;         /* label ink — 8.9:1 on the cream above */
+
+  position: relative;
+  width: 100%;
+  max-width: 462px;
+  aspect-ratio: var(--acc-rec-ar);
+  margin: 0 auto;
+  background:
+    radial-gradient(120% 100% at 50% 0%, var(--acc-rec-1) 0%, var(--acc-rec-2) 62%, var(--acc-rec-3) 100%);
+  /* the reference is explicit: no visible border, under 4px radius. The recess is
+     defined by VALUE, not by a line. */
+  border-radius: 2px;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+/* the walls, and the warm pool the base stands in — wider than the bottle, low
+   contrast, warm rather than white */
+.m2acc__wall {
+  position: absolute; inset: 0;
+  background: radial-gradient(90% 70% at 50% 106%, rgba(0,0,0,.55), transparent 70%);
+}
+.m2acc__floor {
+  position: absolute; left: 50%; bottom: 3%;
+  width: 78%; height: 12%;
+  transform: translateX(-50%);
+  background: radial-gradient(closest-side, rgba(154,122,69,.20), transparent 76%);
+}
+
+/* ── THE BOTTLE ──────────────────────────────────────────────────────────────── */
+.m2acc__bottle {
+  position: absolute; left: 50%; bottom: 4.5%;
+  width: calc(var(--acc-body-w) * 100%);
+  height: calc(var(--acc-bottle-h) * 100%);
+  transform: translateX(-50%);
+}
+/* the body: straight-sided, small radius, occupying everything below the shoulder */
+.m2acc__glass {
+  position: absolute; left: 0; right: 0; bottom: 0;
+  height: calc((1 - var(--acc-cap-h) - var(--acc-neck-h) - var(--acc-shoulder-h)) * 100%);
+  border-radius: 3% / 2%;
+  background: linear-gradient(180deg, rgba(28,26,22,.92), rgba(14,13,11,.96));
+}
+/* ★★ V2 §4 — GREEN MUST BEHAVE LIKE GLASS. Two layers, and the second is the one that
+   matters. __liquid is the body of colour; __thick is THICKNESS — it darkens where you
+   would be looking through more glass (the two edges and the heel) and clears through
+   the centre, warms near the base and cools in the isolated reflections. A single flat
+   fill is what makes a bottle look painted or plastic, and V1's four vertical stops
+   were exactly that. */
+.m2acc__liquid {
+  position: absolute; left: 4%; right: 4%; bottom: calc(var(--acc-base-h) * 100%);
+  height: calc((1 - var(--acc-cap-h) - var(--acc-neck-h) - var(--acc-shoulder-h) - var(--acc-base-h)) * 96%);
+  border-radius: 2%;
+  background:
+    /* clearer through the centre — this is transmission, not a highlight */
+    radial-gradient(58% 46% at 50% 40%, rgba(150,160,96,.30), transparent 72%),
+    linear-gradient(180deg, var(--acc-liq-1) 0%, var(--acc-liq-2) 34%, var(--acc-liq-3) 72%, var(--acc-liq-4) 100%);
+  transition: opacity 420ms cubic-bezier(.2,.7,.2,1);
+}
+.m2acc__thick {
+  position: absolute; left: 4%; right: 4%; bottom: calc(var(--acc-base-h) * 100%);
+  height: calc((1 - var(--acc-cap-h) - var(--acc-neck-h) - var(--acc-shoulder-h) - var(--acc-base-h)) * 96%);
+  border-radius: 2%; pointer-events: none;
+  background:
+    linear-gradient(90deg, rgba(12,20,10,.72) 0%, transparent 26%, transparent 74%, rgba(12,20,10,.66) 100%),
+    linear-gradient(180deg, transparent 62%, rgba(28,22,10,.42) 100%);   /* warmer, denser heel */
+}
+/* ★ ASYMMETRIC ON PURPOSE. Bright, narrow and near-continuous on the left; softer,
+   dimmer and shorter on the right. Symmetry reads as a CSS gradient. */
+.m2acc__edge {
+  position: absolute; top: 18%; width: 1.5px; border-radius: 1px;
+}
+.m2acc__edge--l {
+  left: 3%; bottom: 7%;
+  background: linear-gradient(180deg, transparent, rgba(232,226,214,.42) 12%, rgba(232,226,214,.34) 82%, transparent);
+}
+.m2acc__edge--r {
+  right: 3%; bottom: 34%;
+  background: linear-gradient(180deg, transparent, rgba(232,226,214,.16) 30%, transparent);
+}
+.m2acc__shoulder {
+  position: absolute; left: 10%; right: 10%;
+  top: calc((var(--acc-cap-h) + var(--acc-neck-h)) * 100%);
+  height: calc(var(--acc-shoulder-h) * 100%);
+  background: linear-gradient(180deg, rgba(20,19,16,.9), rgba(26,24,20,.94));
+  clip-path: polygon(38% 0, 62% 0, 100% 100%, 0 100%);
+}
+/* ═══ V2 §1 — THE CLOSURE, which is the ONLY thing that makes this fragrance ═══════
+   A glass body alone shares territory with spirits, bitters and apothecary jars. The
+   overcap, the narrow brass PUMP collar, the lift seam, and the stem and dip tube
+   visible inside the glass are what settle the category. The cap is deliberately
+   SMALLER and quieter than V1 measured — it must not compete with the reading or read
+   as a broad crown, so --acc-cap-h is now a ceiling and this uses .74 of it. */
+.m2acc__stem {                                   /* inside the glass: stem + dip tube */
+  position: absolute; left: 49.2%; width: 1.6%;
+  top: calc((var(--acc-cap-h) + var(--acc-neck-h)) * 100%);
+  bottom: calc((var(--acc-base-h) + .04) * 100%);
+  background: linear-gradient(180deg, rgba(190,186,170,.20), rgba(150,148,132,.10) 30%, rgba(120,120,104,.07));
+}
+.m2acc__neck {
+  position: absolute; left: 40%; right: 40%;
+  top: calc(var(--acc-cap-h) * 100%); height: calc(var(--acc-neck-h) * 100%);
+  background: linear-gradient(180deg, #191714, #221f19);
+}
+.m2acc__pump {                                   /* the narrow brass pump collar */
+  position: absolute; left: 38.5%; right: 38.5%;
+  top: calc((var(--acc-cap-h) + var(--acc-neck-h) - .012) * 100%); height: 1.5%;
+  background: linear-gradient(180deg, var(--acc-gold), var(--acc-brass));
+  border-radius: 1px;
+}
+.m2acc__seam {                                   /* the lift seam — where it comes off */
+  position: absolute; left: 36%; right: 36%;
+  top: calc(var(--acc-cap-h) * .74 * 100%); height: 1px;
+  background: rgba(0,0,0,.55);
+  box-shadow: 0 1px 0 rgba(190,186,170,.07);
+}
+.m2acc__overcap {                                /* removable — the one moving part */
+  position: absolute; left: 35%; right: 35%; top: 0;
+  height: calc(var(--acc-cap-h) * .74 * 100%);
+  background: linear-gradient(180deg, #181818, var(--acc-cap));
+  border-radius: 2px 2px 0 0;
+  transform: translateY(0);
+  transition: transform 340ms cubic-bezier(.2,.7,.2,1);
+}
+
+/* ═══ V2 §3 — THE SIX ARE PHYSICAL ════════════════════════════════════════════════
+   Two shoulder, two side, two heel. At rest they are NEARLY INVISIBLE — never six
+   bright lines, never a legible hexagon. They become sequentially perceptible as the
+   pointer arrives, staggered by --i, so the metaphor is discovered rather than
+   announced: six separate structures alter the light, and together they define one
+   vessel. Opacity and transform only; nothing pulses or repeats. */
+.m2acc__facet {
+  position: absolute; pointer-events: none;
+  opacity: .06;
+  background: linear-gradient(115deg, transparent, rgba(214,222,190,.34) 48%, transparent);
+}
+/* ★ ARMED A FRAME AFTER MOUNT, and this is a real bug that was measured, not a
+   precaution. The stylesheet is fetched by a <link> the mounter appends, so the facets
+   exist at the browser's default opacity 1 BEFORE the rule above arrives. Declaring a
+   transition on the base selector therefore turns the arrival of the resting state into
+   an animation FROM fully visible — six bright lines fading down, which is precisely
+   the thing V2 says must never happen. Measured on the socket: computed opacity 1 with
+   a running transition, seconds after mount. Arming one frame later means the resting
+   value is simply the value, and only the hover moves. */
+.m2acc.is-armed .m2acc__facet {
+  transition: opacity 300ms cubic-bezier(.2,.7,.2,1);
+  transition-delay: calc(var(--i, 0) * 55ms);
+}
+.m2acc__facet--sh { top: calc((var(--acc-cap-h) + var(--acc-neck-h)) * 100%); height: calc(var(--acc-shoulder-h) * 100%); width: 26%; }
+.m2acc__facet--sd { top: 38%; height: 30%; width: 9%; }
+.m2acc__facet--hl { bottom: calc(var(--acc-base-h) * 100%); height: 9%; width: 22%; }
+.m2acc__facet--a { left: 6%; }
+.m2acc__facet--b { right: 6%; transform: scaleX(-1); }
+
+/* ═══ V2 §6 — REST / HOVER / ACTIVATION, and nothing else ═════════════════════════
+   At rest the original menu keeps priority: the bottle is still, the facets are
+   nearly invisible, the cap is closed, the pane reflection is faint. No idle bobbing,
+   no rotation, no cloud, no particles. */
+.m2acc:hover .m2acc__facet,
+.m2acc:focus-within .m2acc__facet { opacity: .30; }
+.m2acc:hover .m2acc__liquid,
+.m2acc:focus-within .m2acc__liquid { opacity: 1; }
+.m2acc:hover .m2acc__overcap,
+.m2acc:focus-within .m2acc__overcap { transform: translateY(-2.5px); }   /* separates 2-3px */
+.m2acc:hover .m2acc__label,
+.m2acc:focus-within .m2acc__label { --acc-ink: #211a12; }                 /* contrast rises subtly */
+.m2acc:hover .m2acc__gleam,
+.m2acc:focus-within .m2acc__gleam { transform: translate(3px, 2px); }     /* the pane moves a few px */
+
+.m2acc.is-open .m2acc__overcap { transform: translateY(-7px); }           /* activation */
+.m2acc.is-open .m2acc__trace { opacity: 1; }
+
+/* ── THE LABEL — the only bright plane, and it is CREAM ──────────────────────── */
+.m2acc__label {
+  position: absolute; left: 50%; transform: translateX(-50%);
+  top: 41%; width: 66.7%; height: 57%;
+  padding: 4% 6%;
+  background: linear-gradient(180deg, var(--acc-stock), var(--acc-stock-2));
+  color: var(--acc-ink);
+  /* no drop shadow, no border: it reads as stuck flat to the glass */
+  display: flex; flex-direction: column; align-items: center;
+  font-family: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+  font-size: clamp(4px, 1.55cqw, 8px);
+  container-type: inline-size;
+  line-height: 1.5;
+  text-align: center;
+}
+.m2acc__lrow { width: 100%; display: flex; justify-content: space-between; letter-spacing: .1em; font-size: .82em; }
+.m2acc__lrow--fine { font-size: .74em; }
+.m2acc__lrule { width: 100%; height: 1px; background: rgba(42,33,24,.45); margin: 4% 0; }
+.m2acc__lname { letter-spacing: .18em; font-size: .95em; }
+.m2acc__lsub { letter-spacing: .08em; font-size: .78em; opacity: .82; }
+.m2acc__ldiamond { margin: 5% 0 3%; font-size: .8em; }
+.m2acc__lcrown {
+  font-family: "Cormorant Garamond", Georgia, serif;
+  font-size: 2.1em; line-height: 1.1; letter-spacing: .01em; margin-bottom: 6%;
+}
+.m2acc__lsix { display: flex; flex-direction: column; gap: .55em; }
+.m2acc__lmark { letter-spacing: .16em; font-size: .88em; }
+.m2acc__lfoot { letter-spacing: .14em; font-size: .82em; margin-bottom: 3%; }
+
+/* ── THE PANE, and its ONE gleam ─────────────────────────────────────────────── */
+.m2acc__pane {
+  position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(180deg, rgba(255,255,255,.012), transparent 40%);
+}
+/* one broad diagonal, brightest at the very top-left, gone by ~45% across. A second
+   highlight anywhere turns glass back into a gradient. */
+.m2acc__gleam {
+  position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(146deg, rgba(255,255,255,.075) 0%, rgba(255,255,255,.028) 18%, transparent 45%);
+  transform: translate(0, 0);
+  transition: transform 420ms cubic-bezier(.2,.7,.2,1);
+}
+/* the ONE refracted trace, on activation only — passes BEHIND the bottle, so it sits
+   with the pane group but under nothing else. Opacity only; it does not travel. */
+.m2acc__trace {
+  position: absolute; left: 8%; right: 8%; top: 34%; height: 22%;
+  pointer-events: none; opacity: 0;
+  background: linear-gradient(100deg, transparent, rgba(150,160,96,.16) 45%, transparent 78%);
+  transition: opacity 520ms cubic-bezier(.2,.7,.2,1);
+}
+
+/* the standing card is hidden, never removed — see the note in _m2-accord.js */
+.is-accord-hidden { display: none !important; }
+
+@media (prefers-reduced-motion: reduce) { .m2acc, .m2acc * { transition: none !important; } }

@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<!--
+  THE ACCORD — candidate 08. Emphasis: RESTRAINT.
+  Scope: the recess ("the hole") and the bottle standing in it. Nothing else.
+
+  LABEL CONTRAST (computed, WCAG relative-luminance method):
+    ink  #2a2118  -> Y = 0.2126*0.0233 + 0.7152*0.01522 + 0.0722*0.00915 = 0.01650
+    cream (worst case, darker stop) #c9bda0 -> Y = 0.2126*0.5840 + 0.7152*0.5089 + 0.0722*0.3517 = 0.5136
+    ratio = (0.5136+0.05) / (0.01650+0.05) = 0.5636 / 0.0665 = 8.48 : 1   (>= 4.5:1, PASS)
+    against the lighter cream stop #d8cdb4 the ratio is higher still (~10.5:1).
+
+  GEOMETRY, measured live off the rendered boxes (matches the CSS ratios below):
+    .accord-recess   width/height  = 0.8077  (target 0.808, §2)
+    .accord-bottle   width/height  = 0.5815  (target 0.582 — this is the WHOLE bottle
+                                     bounding box, cap-top to base, at body width; it is
+                                     NOT .accord-bottle__body's own w/h, since the body
+                                     div is only the 0.72-height middle segment. §3, §5.1)
+  No canvas, no SVG, no external images or fonts. System stacks only. No animation.
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>The Accord — candidate 08</title>
+<style>
+  /* ============================================================
+     THE ACCORD — cand-08
+     All geometry is expressed as ratios of the recess (the unit),
+     per transfer/COLOGNE-REFERENCE.md §1. Comments carry the
+     source fraction next to every rule that encodes one, so the
+     numbers can be audited straight off the declarations.
+     ============================================================ */
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  body {
+    /* the page ground — §2: recess reads lighter than this at the
+       top face and darker than this at the bottom corners */
+    background: #0a0908;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    overflow: hidden;
+  }
+
+  /* ----------------------------------------------------------
+     THE RECESS — §2. w/h target 0.808. Reference px 462 x 572.
+     gcd(462,572)=22 -> 21/26 = 0.80769..., set via aspect-ratio
+     so the browser enforces the exact fraction at any scale.
+     ---------------------------------------------------------- */
+  .accord-recess {
+    position: relative;
+    width: min(44vw, 70vh, 560px);
+    aspect-ratio: 21 / 26;           /* = 0.8077 ≈ 0.808 (§2, §5.1) */
+    border-radius: 0;                 /* square corners, §2 */
+    overflow: hidden;
+
+    /* value only, no border — top face slightly lighter than the
+       page (#141210 vs #0a0908), settling to #0d0c0b, and darker
+       than the page in the bottom corners (#080807 vs #0a0908) */
+    background:
+      radial-gradient(130% 95% at 12% 105%, #060605 0%, transparent 52%),
+      radial-gradient(130% 95% at 88% 105%, #060605 0%, transparent 52%),
+      linear-gradient(to bottom, #141210 0%, #0d0c0b 46%, #0a0908 78%, #080807 100%);
+  }
+
+  /* a soft warm pool on the recess floor, under the bottle base */
+  .accord-recess__pool {
+    position: absolute;
+    left: 50%;
+    bottom: 3%;
+    width: 78%;
+    height: 12%;
+    transform: translateX(-50%);
+    background: radial-gradient(closest-side, rgba(140, 104, 58, 0.10) 0%, rgba(140, 104, 58, 0) 72%);
+    pointer-events: none;
+  }
+
+  /* the glass pane over the opening — ONE gleam, upper-left,
+     peak alpha inside 0.06-0.09, gone by ~45% across. §2, §5.5 */
+  .accord-recess__pane {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      128deg,
+      rgba(255, 255, 255, 0.085) 0%,
+      rgba(255, 255, 255, 0.035) 20%,
+      rgba(255, 255, 255, 0) 45%
+    );
+    pointer-events: none;
+  }
+
+  /* ----------------------------------------------------------
+     THE BOTTLE — §3. Wrapper width = body width (0.617 of the
+     recess width). Wrapper height = total bottle height (0.857
+     of the recess height). body w/h target: 0.582.
+     ---------------------------------------------------------- */
+  .accord-bottle {
+    position: absolute;
+    left: 50%;
+    bottom: 6%;
+    transform: translateX(-50%);
+    width: 61.7%;    /* body width / recess width = 285/462 = 0.617, §3 */
+    height: 85.7%;   /* total height / recess height = 490/572 = 0.857, §3 */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  /* vertical stack fractions of total bottle height, §3:
+     cap 0.112 + neck 0.045 + shoulder 0.075 + body 0.72 + base 0.048 = 1.000 */
+
+  .accord-bottle__cap {
+    width: 26.3%;                 /* cap width / body width = 75/285 = 0.263 */
+    height: 11.2%;                /* 55/490 = 0.112 */
+    background: #141414;
+    border-radius: 2px 2px 0 0;   /* flat top, "very slightly tapered" read only in the corner */
+    flex-shrink: 0;
+  }
+
+  .accord-bottle__band {
+    /* brass band at the cap's base */
+    width: 100%;
+    height: 6%;
+    background: #8a6a3a;
+  }
+
+  .accord-bottle__neck {
+    width: 26.3%;
+    height: 4.5%;                 /* ~0.045 */
+    background: #171614;
+    flex-shrink: 0;
+  }
+
+  .accord-bottle__collar {
+    /* gold collar where the neck meets the shoulder */
+    width: 100%;
+    height: 14%;
+    background: #9a7a45;
+  }
+
+  .accord-bottle__shoulder {
+    width: 100%;
+    height: 7.5%;                 /* ~0.075 */
+    flex-shrink: 0;
+    background: linear-gradient(to bottom, #6b6535, #5c5a30);
+    /* steep decanter shoulder: neck width (26.3%, ±13.15% of centre) at the
+       top widening to full body width at the bottom — not a gentle curve */
+    clip-path: polygon(36.85% 0%, 63.15% 0%, 100% 100%, 0% 100%);
+  }
+
+  .accord-bottle__body {
+    position: relative;
+    width: 100%;                  /* the body IS the 1.000 unit for §3's own ratio column */
+    height: 72%;                  /* 0.72 of the wrapper's total height, §3. (The 0.582
+                                      silhouette ratio in §5.1 belongs to the .accord-bottle
+                                      wrapper as a whole, not to this segment alone.) */
+    border-radius: 3%;            /* small radius, ~0.03 of body width, §3.4 */
+    overflow: hidden;
+    flex-shrink: 0;
+
+    /* the liquid, olive-gold, desaturated, darkest at the bottom,
+       lightest through the upper-middle. §3 "the liquid" */
+    background: linear-gradient(
+      to bottom,
+      #6b6535 0%,
+      #5f5c31 30%,
+      #5a5a30 44%,
+      #3f3d20 74%,
+      #2e2c18 100%
+    );
+  }
+
+  .accord-bottle__base {
+    width: 100%;
+    height: 4.8%;                 /* ~0.048, close to the noted 0.05 */
+    flex-shrink: 0;
+    border-radius: 0 0 6% 6%;
+    background: linear-gradient(to bottom, #2a2814 0%, #1c1b10 100%);
+  }
+
+  /* glass edge highlights — deliberately ASYMMETRIC. §3, §5.4 */
+  .accord-bottle__edge {
+    position: absolute;
+    top: 24.5%;                    /* within the wrapper: clears cap/neck/shoulder */
+    width: 2.6%;
+    border-radius: 3px;
+    pointer-events: none;
+  }
+
+  .accord-bottle__edge--left {
+    left: 3.5%;
+    height: 68%;                   /* near-continuous down most of the body */
+    background: linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0.03) 0%,
+      rgba(255, 255, 255, 0.20) 10%,
+      rgba(255, 255, 255, 0.16) 55%,
+      rgba(255, 255, 255, 0.05) 92%,
+      rgba(255, 255, 255, 0) 100%
+    );
+  }
+
+  .accord-bottle__edge--right {
+    right: 4.5%;
+    top: 27%;
+    height: 34%;                   /* clearly the secondary side: shorter */
+    background: linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.07) 30%,
+      rgba(255, 255, 255, 0.05) 65%,
+      rgba(255, 255, 255, 0) 100%
+    );
+  }
+
+  /* ----------------------------------------------------------
+     THE LABEL — §4. Positioned against the WHOLE bottle height,
+     not the body: top 0.41, bottom 0.98 -> height 0.57.
+     width 190/285 = 0.667 of the body (= wrapper) width.
+     ---------------------------------------------------------- */
+  .accord-bottle__label {
+    position: absolute;
+    left: 50%;
+    top: 41%;                      /* 0.41 of total bottle height, §4 */
+    height: 57%;                   /* 280/490 = 0.571, §4 */
+    width: 66.7%;                  /* 190/285 = 0.667, §4 */
+    transform: translateX(-50%);
+    background: linear-gradient(to bottom, #d8cdb4 0%, #cfc4a9 60%, #c9bda0 100%);
+    color: #2a2118;                /* ink, §4 — 8.48:1 on the worst-case cream stop, see top comment */
+    border-radius: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 5% 6% 4%;
+    text-align: center;
+    container-type: inline-size;
+    font-family: ui-monospace, "SFMono-Regular", Consolas, Menlo, "Courier New", monospace;
+    line-height: 1.25;
+  }
+
+  .accord-label__meta {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    font-size: 4.6cqw;
+    letter-spacing: 0.08em;
+    opacity: 0.86;
+  }
+
+  .accord-label__rule {
+    width: 100%;
+    height: 1px;
+    background: currentColor;
+    opacity: 0.42;
+    margin: 5% 0;
+  }
+
+  .accord-label__product {
+    font-size: 6.3cqw;
+    letter-spacing: 0.16em;
+    font-variant: small-caps;
+    margin-bottom: 3%;
+  }
+
+  .accord-label__sub {
+    font-size: 4.2cqw;
+    letter-spacing: 0.08em;
+    opacity: 0.72;
+    margin-bottom: 4%;
+  }
+
+  .accord-label__diamond {
+    font-size: 4.4cqw;
+    opacity: 0.6;
+    margin-bottom: 4%;
+  }
+
+  .accord-label__name {
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 14cqw;              /* ~2x the six marks, §4 hierarchy */
+    line-height: 1.05;
+    margin-bottom: 5%;
+  }
+
+  .accord-label__marks {
+    width: 100%;
+    font-size: 4.9cqw;             /* smaller than the crowned name, matches §4 hierarchy */
+    letter-spacing: 0.1em;
+    line-height: 2.05;             /* "generously line-spaced", §4 */
+    opacity: 0.92;
+    margin-bottom: 4%;
+  }
+
+  .accord-label__footer {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    font-size: 4cqw;
+    letter-spacing: 0.06em;
+    opacity: 0.78;
+  }
+
+  .accord-label__byline {
+    font-size: 4.6cqw;
+    letter-spacing: 0.06em;
+    opacity: 0.85;
+    margin-bottom: 4%;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    /* nothing animates in this build — this rule is a no-op left
+       in place to document that reduced motion has nothing to disable */
+    * { animation: none !important; transition: none !important; }
+  }
+</style>
+</head>
+<body>
+
+  <div class="accord-recess">
+    <div class="accord-recess__pool"></div>
+
+    <div class="accord-bottle">
+      <div class="accord-bottle__cap">
+        <div class="accord-bottle__band"></div>
+      </div>
+      <div class="accord-bottle__neck">
+        <div class="accord-bottle__collar"></div>
+      </div>
+      <div class="accord-bottle__shoulder"></div>
+      <div class="accord-bottle__body"></div>
+      <div class="accord-bottle__base"></div>
+
+      <!-- label sits above the liquid; DOM order after the body
+           puts it correctly above the liquid layer, §6 -->
+      <div class="accord-bottle__label">
+        <div class="accord-label__meta"><span>BLUE ROOM ACCORDS</span><span>FORMULA 01</span></div>
+        <div class="accord-label__rule"></div>
+        <div class="accord-label__product">THE BIRTH READING</div>
+        <div class="accord-label__sub">A PERSONAL ACCORD IN SIX NOTES</div>
+        <div class="accord-label__diamond">&#9670;</div>
+        <div class="accord-label__name">The Crowned Name</div>
+        <div class="accord-label__marks">
+          SUN SIGN<br>
+          YEAR ANIMAL<br>
+          LIFE PATH<br>
+          RUNE<br>
+          TRIGRAM<br>
+          HEXAGRAM
+        </div>
+        <div class="accord-label__rule"></div>
+        <div class="accord-label__byline">BY BIRTH ALONE</div>
+        <div class="accord-label__footer"><span>SIX MARKS</span><span>ONE ACCORD</span></div>
+      </div>
+
+      <!-- glass edge highlights sit above the label, per §6's
+           stated layer order (liquid -> label -> glass highlights) -->
+      <div class="accord-bottle__edge accord-bottle__edge--left"></div>
+      <div class="accord-bottle__edge accord-bottle__edge--right"></div>
+    </div>
+
+    <!-- pane gleam is the topmost layer: the glass covering the
+         whole opening, in front of the bottle -->
+    <div class="accord-recess__pane"></div>
+  </div>
+
+</body>
+</html>

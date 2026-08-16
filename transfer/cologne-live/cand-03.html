@@ -1,0 +1,374 @@
+<!--
+  THE ACCORD — cand-03 — GLASS emphasis
+  Built to transfer/COLOGNE-REFERENCE.md. Scope: the recess ("the hole") and the
+  bottle standing in it. Nothing else.
+
+  Label ink/cream contrast (WCAG relative-luminance formula, computed by hand):
+    ink #2a2118  -> relative luminance L = 0.015966
+    cream (lightest stop) #d8cdb4 -> L = 0.615476  =>  ratio (0.615476+0.05)/(0.015966+0.05)
+      = 0.665476 / 0.065966 = 10.09 : 1
+    cream (darkest stop)  #c9bda0 -> L = 0.513406  =>  ratio (0.513406+0.05)/(0.015966+0.05)
+      = 0.563406 / 0.065966 = 8.54 : 1
+    Both clear 4.5:1 with margin to spare across the whole cream gradient.
+
+  Geometry (exact fractions used below, matched to the reference doc's ratios):
+    recess w/h            = 462/572  = 0.8077   (doc: 0.808)
+    bottle total w/h       = 285/490  = 0.5816   (doc: 0.582)
+    bottle-total height    = 85.66% of recess height (490/572)
+    bottle-total width     = 61.69% of recess width  (285/462), derived from aspect-ratio
+    cap+neck width         = 26.3% of body width (75/285)
+    vertical stack (of total bottle height): cap 11.2 / neck 4.5 / shoulder 7.5 /
+      body 71.8 / base 5.0  (doc: 11.2 / 4.5 / 7.5 / 72 / 5, normalised to 100)
+    label: top 41%, bottom 98% (height 57%) of total bottle height; width 66.7%
+      of body width (190/285), centred.
+
+  Emphasis: GLASS. The left edge carries one bright near-continuous highlight the
+  full height of the body; the right edge carries a shorter, dimmer one. The
+  shoulder gets a small separate catch. The base gets a horizontal thickening
+  band that bleeds into the warm floor pool beneath it. No blur filters are used
+  anywhere — all softness comes from gradient stops, per the hard constraint.
+-->
+<style>
+  .accord-exhibit, .accord-exhibit * { box-sizing: border-box; }
+
+  .accord-exhibit {
+    --mono: ui-monospace, "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    --serif: Georgia, "Times New Roman", Cambria, serif;
+
+    /* ground */
+    --ground: #0a0908;
+
+    /* recess value steps — all within ~25 levels of near-black */
+    --recess-top: #141210;
+    --recess-mid: #0d0c0b;
+    --recess-corner: #080807;
+
+    /* bottle */
+    --cap: #141414;
+    --brass-band: #8a6a3a;
+    --gold-collar: #9a7a45;
+
+    --liquid-1: #6b6535;
+    --liquid-2: #5a5a30;
+    --liquid-3: #3f3d20;
+    --liquid-4: #2e2c18;
+
+    --label-top: #d8cdb4;
+    --label-bot: #c9bda0;
+    --ink: #2a2118;
+
+    width: 100%;
+    min-height: 100vh;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--ground);
+    font-size: clamp(10px, 1.7vmin, 15px);
+  }
+
+  /* ================= THE RECESS ================= */
+
+  .recess {
+    position: relative;
+    width: min(86vmin, 560px);
+    aspect-ratio: 462 / 572;
+    border-radius: 2px; /* corners "square, or under 4px" */
+    overflow: hidden;
+
+    /* value only — no border. Lighter top face falling to darker corners. */
+    background:
+      radial-gradient(120% 90% at 50% 0%, var(--recess-top) 0%, var(--recess-mid) 46%, var(--recess-corner) 100%),
+      radial-gradient(70% 55% at 8% 100%, var(--recess-corner) 0%, transparent 60%),
+      radial-gradient(70% 55% at 92% 100%, var(--recess-corner) 0%, transparent 60%);
+  }
+
+  /* warm floor pool under the bottle base */
+  .recess::before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: 6.5%;
+    width: 46%;
+    height: 9%;
+    transform: translateX(-50%);
+    background: radial-gradient(ellipse at center, rgba(150, 118, 66, 0.16) 0%, rgba(120, 95, 55, 0.07) 55%, transparent 80%);
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  /* the glass pane: one broad diagonal gleam, upper-left, gone by ~45% across */
+  .recess::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      128deg,
+      rgba(255, 255, 255, 0.085) 0%,
+      rgba(255, 255, 255, 0.05) 14%,
+      rgba(255, 255, 255, 0.018) 30%,
+      rgba(255, 255, 255, 0) 45%
+    );
+    pointer-events: none;
+    z-index: 5;
+  }
+
+  /* ================= THE BOTTLE ================= */
+
+  .bottle {
+    position: absolute;
+    left: 50%;
+    bottom: 8%;
+    height: 85.66%;
+    aspect-ratio: 285 / 490;
+    transform: translateX(-50%);
+    z-index: 2;
+  }
+
+  /* --- cap, neck, shoulder: one shaped element via clip-path --- */
+  .bottle-top {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 23.2%; /* cap 11.2 + neck 4.5 + shoulder 7.5 */
+    clip-path: polygon(
+      36.85% 0%,
+      63.15% 0%,
+      63.15% 67.7%,   /* (11.2+4.5)/23.2 = 67.7% down the top-piece = bottom of neck */
+      100% 100%,
+      0% 100%,
+      36.85% 67.7%
+    );
+    background: linear-gradient(
+      to bottom,
+      var(--cap) 0%,
+      var(--cap) 48.3%,        /* cap ends at 11.2/23.2 = 48.3% */
+      var(--gold-collar) 48.3%,
+      var(--gold-collar) 51.5%,
+      var(--liquid-2) 51.5%,
+      var(--liquid-2) 67.7%,   /* neck body */
+      var(--liquid-2) 67.7%,
+      var(--liquid-1) 100%      /* shoulder catching light, slightly warmer/lighter */
+    );
+  }
+
+  /* brass band at the cap's base */
+  .bottle-top::before {
+    content: "";
+    position: absolute;
+    left: 36.85%;
+    width: 26.3%;
+    top: calc(48.3% - 1.6%);
+    height: 1.6%;
+    background: var(--brass-band);
+  }
+
+  /* shoulder catch: a small separate highlight, upper-left of the shoulder */
+  .bottle-top::after {
+    content: "";
+    position: absolute;
+    left: 8%;
+    top: 70%;
+    width: 34%;
+    height: 22%;
+    background: radial-gradient(ellipse at 30% 30%, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0.05) 45%, transparent 75%);
+    pointer-events: none;
+  }
+
+  /* --- body + base: rounded rect, liquid fill, edge highlights --- */
+  .bottle-body {
+    position: absolute;
+    left: 0;
+    top: 23.2%;
+    width: 100%;
+    height: 76.8%; /* body 71.8 + base 5.0 */
+    border-radius: 3% 3% 5% 5% / 2% 2% 4% 4%;
+    overflow: hidden;
+    background: linear-gradient(
+      to bottom,
+      var(--liquid-1) 0%,
+      var(--liquid-2) 34%,
+      var(--liquid-3) 72%,
+      var(--liquid-4) 93.5%,   /* base begins at 71.8/76.8 = 93.5% */
+      var(--liquid-4) 100%
+    );
+  }
+
+  /* base thickening: horizontal band, slightly darker + a soft horizontal
+     catch, bleeding toward the floor pool it sits in */
+  .bottle-body::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 6.5%;
+    background:
+      linear-gradient(to bottom, rgba(0, 0, 0, 0.22) 0%, rgba(0, 0, 0, 0.34) 100%),
+      linear-gradient(to right, transparent 0%, rgba(255, 255, 255, 0.06) 10%, transparent 22%);
+    z-index: 3;
+  }
+
+  /* LEFT edge highlight — bright, narrow, near-continuous. The brightest
+     thing on the bottle after the label. */
+  .bottle-body::after {
+    content: "";
+    position: absolute;
+    left: 3%;
+    top: 1.5%;
+    bottom: 4%;
+    width: 6.5%;
+    background: linear-gradient(
+      to right,
+      transparent 0%,
+      rgba(255, 255, 255, 0.5) 42%,
+      rgba(255, 255, 255, 0.62) 55%,
+      rgba(255, 255, 255, 0.4) 68%,
+      transparent 100%
+    );
+    opacity: 0.9;
+    z-index: 4;
+  }
+
+  /* RIGHT edge highlight — softer, dimmer, shorter: the clearly secondary
+     side. A separate element so it can be independently short + dim. */
+  .glass-right {
+    position: absolute;
+    right: 4%;
+    top: 22%;
+    height: 40%;
+    width: 4%;
+    background: linear-gradient(
+      to right,
+      transparent 0%,
+      rgba(255, 255, 255, 0.14) 45%,
+      rgba(255, 255, 255, 0.19) 55%,
+      transparent 100%
+    );
+    z-index: 4;
+    pointer-events: none;
+  }
+
+  /* ================= THE LABEL ================= */
+
+  .label {
+    position: absolute;
+    left: 50%;
+    top: 41%;
+    height: 57%;
+    width: 66.7%;
+    transform: translateX(-50%);
+    background: linear-gradient(to bottom, var(--label-top) 0%, var(--label-bot) 100%);
+    color: var(--ink);
+    z-index: 6;
+    padding: 6.5% 7% 5%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    font-family: var(--mono);
+    overflow: hidden;
+  }
+
+  .label .row-split {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.62em;
+    letter-spacing: 0.12em;
+    opacity: 0.86;
+  }
+
+  .label .rule {
+    width: 100%;
+    height: 1px;
+    background: var(--ink);
+    opacity: 0.55;
+    margin: 0.55em 0;
+  }
+
+  .label .product-name {
+    font-size: 0.82em;
+    letter-spacing: 0.16em;
+    font-variant: small-caps;
+    margin-top: 0.15em;
+  }
+
+  .label .product-sub {
+    font-size: 0.55em;
+    letter-spacing: 0.08em;
+    opacity: 0.72;
+    margin-top: 0.35em;
+  }
+
+  .label .diamond {
+    font-size: 0.55em;
+    margin: 0.55em 0;
+    opacity: 0.7;
+  }
+
+  .label .crowned-name {
+    font-family: var(--serif);
+    font-size: 1.7em;
+    line-height: 1.05;
+    margin: 0.1em 0 0.4em;
+    font-weight: 400;
+  }
+
+  .label .six {
+    font-family: var(--mono);
+    font-size: 0.58em;
+    letter-spacing: 0.1em;
+    line-height: 1.9;
+    opacity: 0.92;
+  }
+
+  .label .bottom-mono {
+    font-size: 0.55em;
+    letter-spacing: 0.1em;
+    opacity: 0.78;
+    margin-top: 0.3em;
+  }
+
+  .label .row-split.small {
+    font-size: 0.5em;
+    opacity: 0.68;
+  }
+</style>
+
+<div class="accord-exhibit">
+  <div class="recess">
+    <div class="bottle">
+      <div class="bottle-top"></div>
+      <div class="bottle-body">
+        <div class="glass-right"></div>
+      </div>
+      <div class="label">
+        <div class="row-split">
+          <span>BLUE ROOM ACCORDS</span>
+          <span>FORMULA 01</span>
+        </div>
+        <div class="rule"></div>
+        <div class="product-name">THE BIRTH READING</div>
+        <div class="product-sub">A PERSONAL ACCORD IN SIX NOTES</div>
+        <div class="diamond">&#9670;</div>
+        <div class="crowned-name">The Crowned Name</div>
+        <div class="six">
+          SUN SIGN<br />
+          YEAR ANIMAL<br />
+          LIFE PATH<br />
+          RUNE<br />
+          TRIGRAM<br />
+          HEXAGRAM
+        </div>
+        <div class="rule"></div>
+        <div class="bottom-mono">BY BIRTH ALONE</div>
+        <div class="row-split small">
+          <span>SIX MARKS</span>
+          <span>ONE ACCORD</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,339 @@
+<!--
+  THE ACCORD — cand-04
+  Emphasis: THE LABEL.
+
+  Label ink #2a2118 on label cream:
+    vs lightest cream #d8cdb4 (top of label) -> contrast ratio 10.01:1
+    vs darkest  cream #c9bda0 (base of label) -> contrast ratio  8.48:1
+  Worst case (bottom of label, where the gradient is darkest) is 8.48:1,
+  comfortably above the required 4.5:1. Computed via WCAG relative luminance
+  (sRGB -> linear -> Y = 0.2126R + 0.7152G + 0.0722B -> (L1+0.05)/(L2+0.05)).
+
+  Geometry, computed from this file's own numbers:
+    recess  w/h = 462/572 = 0.8077   (target 0.808)
+    bottle  body-width / total-height = 285/490 = 0.5816   (target 0.582)
+    cap width / body width   = 75/285  = 0.263
+    cap height / total height = 55/490 = 0.112
+    label width / body width  = 190/285 = 0.667
+    label height / total height = 280/490 = 0.571
+    label top / total height  = 0.41   label bottom / total height = 0.98
+    vertical stack (fractions of total bottle height): cap .112, neck .045,
+    shoulder .075, body .719, base .049 → sums to 1.000
+-->
+<style>
+  .accord-stage{
+    --ground:#0a0908;
+    --recess-top:#141210;
+    --recess-mid:#0d0c0b;
+    --recess-corner:#080807;
+    --glass-tone:#0f0e0d;
+    --cap:#141414;
+    --brass:#8a6a3a;
+    --gold:#9a7a45;
+    --liquid-1:#6b6535;
+    --liquid-2:#5a5a30;
+    --liquid-3:#3f3d20;
+    --liquid-4:#2e2c18;
+    --label-top:#d8cdb4;
+    --label-bottom:#c9bda0;
+    --ink:#2a2118;
+
+    box-sizing:border-box;
+    width:100%;
+    min-height:100vh;
+    margin:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:var(--ground);
+    padding:6vmin 4vmin;
+  }
+  .accord-stage *{box-sizing:border-box;}
+
+  /* ---------- THE RECESS ---------- */
+  .accord-recess{
+    position:relative;
+    width:min(50vmin, 560px);
+    aspect-ratio:462 / 572;
+    border-radius:0;
+    background:
+      radial-gradient(115% 55% at 50% 0%,   var(--recess-top) 0%, transparent 72%),
+      radial-gradient(75%  55% at 4%   100%, var(--recess-corner) 0%, transparent 62%),
+      radial-gradient(75%  55% at 96%  100%, var(--recess-corner) 0%, transparent 62%),
+      var(--recess-mid);
+    overflow:hidden;
+  }
+
+  /* warm pool under the bottle's base, on the recess floor */
+  .accord-pool{
+    position:absolute;
+    left:50%;
+    bottom:6.5%;
+    width:70%;
+    height:9%;
+    transform:translateX(-50%);
+    background:radial-gradient(closest-side, rgba(150,115,60,0.13), rgba(150,115,60,0.05) 55%, transparent 80%);
+    pointer-events:none;
+  }
+
+  /* the glass pane over the opening: one gleam, upper-left, nothing else */
+  .accord-pane{
+    position:absolute;
+    inset:0;
+    background:linear-gradient(128deg,
+      rgba(255,255,255,0.085) 0%,
+      rgba(255,255,255,0.045) 16%,
+      rgba(255,255,255,0.015) 30%,
+      transparent 46%);
+    pointer-events:none;
+  }
+
+  /* ---------- THE BOTTLE ---------- */
+  .accord-bottle{
+    position:absolute;
+    left:50%;
+    top:3%;
+    width:61.69%;   /* 285 / 462 */
+    height:85.66%;  /* 490 / 572 */
+    transform:translateX(-50%);
+    display:flex;
+    flex-direction:column;
+  }
+
+  .accord-cap{
+    position:relative;
+    align-self:center;
+    width:26.3%;
+    height:11.2%;
+    background:linear-gradient(90deg, #0c0c0c 0%, var(--cap) 35%, #1c1c1c 68%, #0c0c0c 100%);
+    border-radius:8% 8% 4% 4%;
+  }
+  .accord-cap::after{
+    content:"";
+    position:absolute;
+    left:0; right:0; bottom:0;
+    height:14%;
+    background:var(--brass);
+    border-radius:0 0 4% 4%;
+  }
+
+  .accord-neck{
+    position:relative;
+    align-self:center;
+    width:15%;
+    height:4.5%;
+    background:linear-gradient(90deg, #0a0a0a 0%, #17140f 45%, #0a0a0a 100%);
+  }
+  .accord-neck::after{
+    content:"";
+    position:absolute;
+    left:-4%; right:-4%; bottom:0;
+    height:22%;
+    background:var(--gold);
+  }
+
+  .accord-shoulder{
+    width:100%;
+    height:7.5%;
+    background:linear-gradient(90deg, #0b0a09 0%, var(--glass-tone) 50%, #0b0a09 100%);
+    clip-path:polygon(42.5% 0%, 57.5% 0%, 100% 100%, 0% 100%);
+  }
+
+  .accord-body{
+    position:relative;
+    width:100%;
+    height:71.9%;
+    border-radius:4% / 3%;
+    background:linear-gradient(90deg, #0a0908 0%, var(--glass-tone) 8%, #131110 50%, var(--glass-tone) 92%, #0a0908 100%);
+    overflow:hidden;
+  }
+
+  .accord-base{
+    align-self:center;
+    width:96%;
+    height:4.9%;
+    margin-top:auto;
+    background:linear-gradient(180deg, #0a0908 0%, #060605 100%);
+    border-radius:0 0 6% 6%;
+  }
+
+  /* liquid, inside the body, olive and desaturated */
+  .accord-liquid{
+    position:absolute;
+    left:3%;
+    right:3%;
+    bottom:2%;
+    height:88%;
+    border-radius:2% 2% 6% 6%;
+    background:linear-gradient(to top,
+      var(--liquid-4) 0%,
+      var(--liquid-3) 34%,
+      var(--liquid-2) 66%,
+      var(--liquid-1) 100%);
+  }
+
+  /* asymmetric glass edge highlights */
+  .accord-edge-left{
+    position:absolute;
+    left:4%;
+    top:6%;
+    width:5%;
+    height:82%;
+    background:linear-gradient(180deg,
+      rgba(255,255,255,0) 0%,
+      rgba(255,255,255,0.20) 10%,
+      rgba(255,255,255,0.16) 55%,
+      rgba(255,255,255,0.08) 85%,
+      rgba(255,255,255,0) 100%);
+  }
+  .accord-edge-right{
+    position:absolute;
+    right:5%;
+    top:20%;
+    width:3%;
+    height:40%;
+    background:linear-gradient(180deg,
+      rgba(255,255,255,0) 0%,
+      rgba(255,255,255,0.07) 30%,
+      rgba(255,255,255,0.05) 65%,
+      rgba(255,255,255,0) 100%);
+  }
+
+  /* ---------- THE LABEL ---------- */
+  .accord-label{
+    position:absolute;
+    left:50%;
+    top:41%;
+    width:66.7%;
+    height:57%;
+    transform:translateX(-50%);
+    background:linear-gradient(180deg, var(--label-top) 0%, var(--label-top) 40%, var(--label-bottom) 100%);
+    border-radius:0;
+    color:var(--ink);
+    padding:6.5% 7% 5.5%;
+    display:flex;
+    flex-direction:column;
+    font-family:ui-monospace, SFMono-Regular, Consolas, "Courier New", monospace;
+  }
+  .accord-label::after{
+    content:"";
+    position:absolute;
+    inset:0;
+    box-shadow:inset 0 0 0 1px rgba(0,0,0,0.03);
+    pointer-events:none;
+  }
+
+  .accord-label-head{
+    display:flex;
+    justify-content:space-between;
+    font-size:clamp(6px, 1.05cqw, 9px);
+    font-size:2.55cqw;
+    letter-spacing:0.12em;
+    opacity:0.82;
+  }
+  .accord-label .accord-rule{
+    height:1px;
+    background:var(--ink);
+    opacity:0.35;
+    margin:6% 0;
+    width:100%;
+  }
+  .accord-label-title{
+    text-align:center;
+    font-size:3.2cqw;
+    letter-spacing:0.22em;
+    font-weight:600;
+  }
+  .accord-label-sub{
+    text-align:center;
+    font-size:2.15cqw;
+    letter-spacing:0.1em;
+    opacity:0.62;
+    margin-top:5%;
+  }
+  .accord-label-mark{
+    text-align:center;
+    font-size:3.6cqw;
+    opacity:0.7;
+    margin:5% 0 3%;
+  }
+  .accord-label-name{
+    text-align:center;
+    font-family:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+    font-style:italic;
+    font-size:7.6cqw;
+    line-height:1.05;
+    margin:1% 0 6%;
+  }
+  .accord-label-six{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:0.62em;
+    font-size:2.3cqw;
+    letter-spacing:0.08em;
+    line-height:1.3;
+  }
+  .accord-label-six span{ opacity:0.55; margin-left:0.55em; letter-spacing:0.04em; }
+  .accord-label-foot{
+    text-align:center;
+    font-size:2.05cqw;
+    letter-spacing:0.16em;
+    opacity:0.8;
+    margin-top:6%;
+  }
+  .accord-label-tag{
+    display:flex;
+    justify-content:space-between;
+    font-size:1.7cqw;
+    letter-spacing:0.1em;
+    opacity:0.5;
+    margin-top:4%;
+  }
+
+  .accord-label{ container-type: inline-size; }
+</style>
+
+<div class="accord-stage">
+  <div class="accord-recess">
+    <div class="accord-pool"></div>
+
+    <div class="accord-bottle">
+      <div class="accord-cap"></div>
+      <div class="accord-neck"></div>
+      <div class="accord-shoulder"></div>
+      <div class="accord-body">
+        <div class="accord-liquid"></div>
+        <div class="accord-edge-left"></div>
+        <div class="accord-edge-right"></div>
+      </div>
+      <div class="accord-base"></div>
+
+      <div class="accord-label">
+        <div class="accord-label-head">
+          <span>BLUE ROOM ACCORDS</span><span>FORMULA 01</span>
+        </div>
+        <div class="accord-rule"></div>
+        <div class="accord-label-title">THE BIRTH READING</div>
+        <div class="accord-label-sub">A PERSONAL ACCORD IN SIX NOTES</div>
+        <div class="accord-label-mark">&#9670;</div>
+        <div class="accord-label-name">Isolde Marrow</div>
+        <div class="accord-label-six">
+          <div>SUN SIGN<span>LEO</span></div>
+          <div>YEAR ANIMAL<span>OX</span></div>
+          <div>LIFE PATH<span>VII</span></div>
+          <div>RUNE<span>FEHU</span></div>
+          <div>TRIGRAM<span>QIAN</span></div>
+          <div>HEXAGRAM<span>01</span></div>
+        </div>
+        <div class="accord-rule" style="margin-top:auto;"></div>
+        <div class="accord-label-foot">BY BIRTH ALONE</div>
+        <div class="accord-label-tag">
+          <span>SIX MARKS</span><span>ONE ACCORD</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="accord-pane"></div>
+  </div>
+</div>

@@ -253,7 +253,11 @@ PREVIEW_ONLY = ["_u1-rack.js"]
 # earned a build a visitor can walk into. It graduates by moving one line down to
 # PREVIEW_ONLY, and the surface it supersedes moves up here on the same commit.
 DEV_ONLY = ["_m2-box.js", "_m2-box.css", "_m2-vitrine.css", "_m2-pod.css",
-            "_u1-room.js", "_u1-room.css"]
+            "_u1-room.js", "_u1-room.css",
+            # BR-S510 — the Accord's socket. Same tier for the same reason as the room
+            # above it: a mount point whose occupant is still being chosen has not
+            # earned a build a visitor can walk into.
+            "_m2-accord.js", "_m2-accord.css"]
 
 # Links into a room this build removed. Deleting the LISTENER leaves a button that looks
 # alive and does nothing, which is worse than a dead link — so these are re-pointed at the
@@ -322,6 +326,10 @@ PROBES = [
     ("U1 room js",     "_u1-room.js",    r"\bu1rm__marks\b",   {"preview": False, "live": False}),
     ("U1 room css",    "_u1-room.css",   r"\.u1rm__marks\b",   {"preview": False, "live": False}),
     ("U1 room tag",    "index.html",     r"_u1-room\.js",      {"preview": False, "live": False}),
+    # BR-S510 — the Accord's socket, same three assertions as the two above it.
+    ("Accord js",      "_m2-accord.js",  r"\bm2acc__bottle\b", {"preview": False, "live": False}),
+    ("Accord css",     "_m2-accord.css", r"\.m2acc__bottle\b", {"preview": False, "live": False}),
+    ("Accord tag",     "index.html",     r"_m2-accord\.js",    {"preview": False, "live": False}),
 ]
 
 # Emitted by build_routes.py's ROUTES; re-emitted here against dist/index.html.

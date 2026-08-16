@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta name="color-scheme" content="dark" />
+<title>THE ACCORD — live bench</title>
+<style>
+  :root { --ink:#e8e2d6; --dim:#8a8378; --rule:#2a2724; --bg:#0a0908; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink);
+         font:13px/1.5 "IBM Plex Mono",ui-monospace,Menlo,monospace; }
+  header { position:sticky; top:0; z-index:5; background:rgba(10,9,8,.94);
+           border-bottom:1px solid var(--rule); padding:12px 18px;
+           display:flex; align-items:baseline; gap:16px; flex-wrap:wrap; }
+  h1 { margin:0; font-size:13px; letter-spacing:.22em; font-weight:500; }
+  .meta { color:var(--dim); letter-spacing:.08em; }
+  .meta b { color:var(--ink); font-weight:500; }
+  main { display:grid; gap:14px; padding:16px;
+         grid-template-columns:repeat(auto-fill,minmax(330px,1fr)); }
+  figure { margin:0; border:1px solid var(--rule); background:#0d0c0b; overflow:hidden; }
+  figcaption { padding:7px 10px; border-bottom:1px solid var(--rule);
+               display:flex; justify-content:space-between; gap:8px;
+               letter-spacing:.1em; font-size:11px; color:var(--dim); }
+  figcaption b { color:var(--ink); font-weight:500; }
+  .frame { position:relative; width:100%; aspect-ratio:462/572; background:#000; }
+  iframe { position:absolute; inset:0; width:100%; height:100%; border:0; }
+  .ref { border-color:#6b6535; }
+  .ref figcaption b { color:#b9ad72; }
+  .ref .frame { aspect-ratio:auto; }
+  .ref img { width:100%; display:block; }
+  .empty { padding:40px 18px; color:var(--dim); }
+  .dot { display:inline-block; width:6px; height:6px; border-radius:50%;
+         background:#6b6535; margin-right:6px; vertical-align:middle; }
+</style>
+</head>
+<body>
+<header>
+  <h1>◆ THE ACCORD — LIVE BENCH</h1>
+  <span class="meta"><span class="dot"></span>candidates <b id="n">0</b></span>
+  <span class="meta">refreshed <b id="t">—</b></span>
+  <span class="meta">auto every 6s · the reference is first, the builds follow</span>
+</header>
+
+<main id="grid">
+  <figure class="ref">
+    <figcaption><b>THE REFERENCE</b><span>what they are aiming at</span></figcaption>
+    <div class="frame"><img src="../cologne-reference.webp" alt="reference" /></div>
+  </figure>
+</main>
+<div class="empty" id="empty">No candidate files yet — builders write them as they finish.</div>
+
+<script>
+/* Each builder writes transfer/cologne-live/cand-NN.html. We simply probe for them:
+   a static host has no directory listing, so asking for the file IS the manifest. A
+   candidate that 404s has not been written yet and is skipped without noise. */
+var MAX = 24, seen = {};
+function pad(n){ return (n < 10 ? "0" : "") + n; }
+function add(name){
+  if (seen[name]) return; seen[name] = 1;
+  var fig = document.createElement("figure");
+  fig.innerHTML = '<figcaption><b>' + name + '</b><span></span></figcaption>' +
+                  '<div class="frame"><iframe src="' + name + '.html?t=' + Date.now() +
+                  '" loading="lazy" sandbox="allow-same-origin"></iframe></div>';
+  document.getElementById("grid").appendChild(fig);
+  document.getElementById("empty").style.display = "none";
+  document.getElementById("n").textContent = Object.keys(seen).length;
+}
+function sweep(){
+  for (var i = 1; i <= MAX; i++) (function(i){
+    var name = "cand-" + pad(i);
+    if (seen[name]) return;
+    fetch(name + ".html", { method: "HEAD", cache: "no-store" })
+      .then(function(r){ if (r.ok) add(name); })
+      .catch(function(){});
+  })(i);
+  /* already-mounted frames get re-poked so an edited candidate updates in place */
+  [].forEach.call(document.querySelectorAll("main iframe"), function(f){
+    var base = f.src.split("?")[0];
+    if (f.dataset.n) f.src = base + "?t=" + Date.now();
+    f.dataset.n = "1";
+  });
+  document.getElementById("t").textContent = new Date().toTimeString().slice(0,8);
+}
+sweep(); setInterval(sweep, 6000);
+</script>
+</body>
+</html>

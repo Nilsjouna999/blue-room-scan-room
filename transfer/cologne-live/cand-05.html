@@ -1,0 +1,291 @@
+<!doctype html>
+<!--
+  THE ACCORD — candidate 05. Emphasis: THE RECESS.
+
+  LABEL CONTRAST (computed, WCAG relative-luminance formula):
+    ink #2a2118  vs  cream (lightest, top) #d8cdb4  ->  10.02 : 1
+    ink #2a2118  vs  cream (darkest, base) #c9bda0  ->   8.48 : 1
+  Both clear the 4.5:1 floor with wide margin.
+
+  KEY RATIOS THIS BUILD TARGETS (see transfer/COLOGNE-REFERENCE.md §5):
+    recess  w/h  = 462/572 = 0.8077   (target 0.808)   -> .recess { aspect-ratio: 462/572 }
+    bottle body-width / total-height  ~ 0.582           -> emerges from .bottle{width:61.7%;height:85.7%}
+                                                             of the recess box, see arithmetic below.
+    bottle total-height / recess-height = 0.857          -> .bottle { height: 85.7% }
+    bottle body-width  / recess-width  = 0.617           -> .bottle { width: 61.7% }
+  Vertical stack (fractions of total bottle height): cap .112, neck .045, shoulder .075,
+  body .718, base .050 — implemented as absolutely-positioned top/height pairs, cumulative.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta name="color-scheme" content="dark" />
+<title>THE ACCORD — recess study</title>
+<style>
+  :root{
+    --ground:      #0a0908;   /* page/ground */
+    --recess-hi:   #141210;   /* recess top face, lightest interior value */
+    --recess-mid:  #0d0c0b;
+    --recess-lo:   #080807;   /* bottom-corner falloff */
+    --recess-floor:#060605;
+
+    --glass-base:  #0f0e0c;   /* bare glass, seen where no liquid/label */
+    --cap:         #141414;
+    --brass:       #8a6a3a;
+    --gold:        #9a7a45;
+
+    --liquid-1:    #6b6535;
+    --liquid-2:    #5a5a30;
+    --liquid-3:    #3f3d20;
+    --liquid-4:    #2e2c18;
+
+    --cream-hi:    #d8cdb4;
+    --cream-lo:    #c9bda0;
+    --ink:         #2a2118;
+
+    --pool:        rgba(146,112,64,0.14);
+    --gleam:       rgba(237,232,220,0.085);
+  }
+
+  *{ box-sizing:border-box; }
+  html,body{ height:100%; margin:0; }
+  body{
+    background:var(--ground);
+    display:flex; align-items:center; justify-content:center;
+    overflow:hidden;
+    font-family:ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace;
+  }
+
+  /* ---------- THE RECESS ---------- */
+  .recess{
+    position:relative;
+    width:80.7692vh;         /* 462:572 solved for the tall axis */
+    max-width:100vw;
+    aspect-ratio:462/572;    /* 0.808 — the recess's own silhouette ratio */
+    border-radius:0;         /* square corners, per reference */
+    overflow:hidden;
+    isolation:isolate;
+
+    /* value falloff — no line anywhere, only luminance.
+       top face slightly lifted, bottom corners sunk, everything inside
+       a ~12-level 8-bit band (see the report). */
+    background:
+      radial-gradient(ellipse 90% 40% at 50% 0%,   var(--recess-hi) 0%, transparent 62%),
+      radial-gradient(ellipse 60% 45% at 10% 100%, var(--recess-floor) 0%, transparent 58%),
+      radial-gradient(ellipse 60% 45% at 90% 100%, var(--recess-floor) 0%, transparent 58%),
+      linear-gradient(180deg, var(--recess-mid) 0%, var(--recess-mid) 40%, var(--recess-lo) 78%, var(--recess-lo) 100%);
+  }
+
+  /* warm pool on the floor, under the bottle's base — wider than the bottle,
+     low-contrast, warm rather than white. Sits BELOW the bottle in the stack. */
+  .pool{
+    position:absolute;
+    left:50%; bottom:1.5%;
+    width:78%; height:15%;
+    transform:translateX(-50%);
+    background:radial-gradient(ellipse at 50% 60%, var(--pool) 0%, rgba(146,112,64,0.06) 45%, transparent 78%);
+    z-index:1;
+  }
+
+  /* ---------- THE BOTTLE ---------- */
+  .bottle{
+    position:absolute;
+    left:50%; bottom:7.6%;
+    width:61.7%;             /* of recess width  -> body width */
+    height:85.7%;            /* of recess height -> total bottle height */
+    transform:translateX(-50%);
+    z-index:2;
+  }
+  /* NOTE: only position is generic here — left/width are NOT, because a
+     combinator selector like ".bottle > div" out-specifies a single class
+     like ".cap", which would silently stomp every child's own left/width.
+     Full-width children (.shoulder, .body) set left:0;width:100% themselves. */
+  .bottle > div{ position:absolute; }
+
+  .cap{
+    top:0%; height:11.2%;
+    left:36.85%; width:26.3%;
+    background:linear-gradient(90deg, #0a0a0a 0%, var(--cap) 22%, #1c1c1c 46%, var(--cap) 70%, #090909 100%);
+    clip-path:polygon(8% 0%, 92% 0%, 100% 100%, 0% 100%); /* very slight taper, flat top */
+  }
+  .cap::after{ /* brass band at the cap's base */
+    content:""; position:absolute; left:0; right:0; bottom:0; height:9%;
+    background:linear-gradient(180deg, var(--brass) 0%, #6f5528 100%);
+  }
+
+  .neck{
+    top:11.2%; height:4.5%;
+    left:33%; width:34%;
+    background:linear-gradient(90deg, #0c0b0a 0%, #201e1a 40%, #100f0d 100%);
+  }
+  .neck::after{ /* gold collar where the neck meets the shoulder */
+    content:""; position:absolute; left:-4%; right:-4%; bottom:0; height:22%;
+    background:var(--gold);
+  }
+
+  .shoulder{
+    top:15.7%; height:7.5%;
+    left:0; width:100%;
+    background:linear-gradient(180deg, #100f0d 0%, #1a1815 55%, #221f19 100%);
+    clip-path:polygon(33% 0%, 67% 0%, 100% 100%, 0% 100%);
+  }
+
+  .body{
+    top:23.2%; height:71.8%;
+    left:0; width:100%;
+    border-radius:3% / 2.2%;
+    overflow:hidden;
+    background:
+      linear-gradient(180deg,
+        var(--liquid-1) 0%,
+        var(--liquid-2) 38%,
+        var(--liquid-3) 82%,
+        #362f1c 100%);
+    box-shadow:inset 0 0 0 1px rgba(0,0,0,0.35);
+  }
+
+  .base{
+    top:95%; height:5%;
+    left:2%; width:96%;
+    border-radius:0 0 6% 6% / 0 0 30% 30%;
+    background:linear-gradient(180deg, #322f1c 0%, var(--liquid-4) 55%, #201d10 100%);
+  }
+
+  /* glass edge highlights — deliberately ASYMMETRIC.
+     left: bright, narrow, near-continuous. right: soft, dim, short. */
+  .edge-left{
+    position:absolute; top:3%; left:7%; width:3%; height:90%;
+    background:linear-gradient(180deg,
+      transparent 0%,
+      rgba(255,255,255,0.07) 10%,
+      rgba(255,255,255,0.34) 24%,
+      rgba(255,255,255,0.40) 48%,
+      rgba(255,255,255,0.24) 74%,
+      rgba(255,255,255,0.04) 92%,
+      transparent 100%);
+    filter:blur(0.5px);
+    z-index:3;
+    pointer-events:none;
+  }
+  .edge-right{
+    position:absolute; top:20%; right:10%; width:2%; height:38%;
+    background:linear-gradient(180deg,
+      transparent 0%,
+      rgba(255,255,255,0.09) 30%,
+      rgba(255,255,255,0.11) 60%,
+      transparent 100%);
+    filter:blur(0.4px);
+    z-index:3;
+    pointer-events:none;
+  }
+  .shoulder-catch{
+    position:absolute; top:15.7%; left:24%; width:8%; height:7.5%;
+    background:linear-gradient(200deg, rgba(255,255,255,0.18), transparent 70%);
+    z-index:3;
+    pointer-events:none;
+  }
+
+  /* ---------- THE LABEL ---------- */
+  .label{
+    position:absolute;
+    top:41%; height:57%;
+    left:16.65%; width:66.7%;
+    background:linear-gradient(180deg, var(--cream-hi) 0%, var(--cream-hi) 55%, var(--cream-lo) 100%);
+    border-radius:0;
+    color:var(--ink);
+    padding:6% 7% 5%;
+    display:flex; flex-direction:column;
+    z-index:4;
+  }
+  .label .row{
+    display:flex; justify-content:space-between;
+    font-size:0.52vw; letter-spacing:0.16em; font-weight:600;
+    text-transform:uppercase;
+  }
+  .rule{ height:1px; background:rgba(42,33,24,0.55); margin:6% 0; width:100%; }
+  .product{
+    text-align:center; font-size:0.66vw; letter-spacing:0.22em; font-weight:700;
+    text-transform:uppercase;
+  }
+  .subline{
+    text-align:center; margin-top:5%; font-size:0.5vw; letter-spacing:0.14em;
+    text-transform:uppercase; color:#4a3c2a;
+  }
+  .diamond{ text-align:center; font-size:0.6vw; margin:6% 0; opacity:0.7; }
+  .crowned{
+    text-align:center;
+    font-family:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman",serif;
+    font-style:italic;
+    font-size:1.55vw;
+    line-height:1.15;
+    margin:2% 0 6%;
+  }
+  .marks{
+    text-align:center; flex:1;
+    display:flex; flex-direction:column; justify-content:center; gap:9%;
+    font-size:0.5vw; letter-spacing:0.2em; text-transform:uppercase;
+  }
+  .foot{ text-align:center; font-size:0.48vw; letter-spacing:0.16em; text-transform:uppercase; margin-top:4%; }
+  .foot2{
+    display:flex; justify-content:space-between;
+    font-size:0.42vw; letter-spacing:0.14em; text-transform:uppercase; margin-top:3%;
+    color:#4a3c2a;
+  }
+
+  /* ---------- THE PANE — one gleam, upper-left, nothing else ---------- */
+  .pane{
+    position:absolute; inset:0;
+    z-index:5;
+    pointer-events:none;
+    background:linear-gradient(135deg,
+      var(--gleam) 0%,
+      rgba(237,232,220,0.04) 20%,
+      rgba(237,232,220,0) 45%);
+  }
+
+  /* no @keyframes and no transitions anywhere in this file — the scene is
+     complete at rest, so prefers-reduced-motion needs no special-casing. */
+</style>
+</head>
+<body>
+
+  <div class="recess">
+    <div class="pool"></div>
+
+    <div class="bottle">
+      <div class="cap"></div>
+      <div class="neck"></div>
+      <div class="shoulder"></div>
+      <div class="body"></div>
+      <div class="base"></div>
+      <div class="edge-left"></div>
+      <div class="edge-right"></div>
+      <div class="shoulder-catch"></div>
+
+      <div class="label">
+        <div class="row"><span>BLUE ROOM ACCORDS</span><span>FORMULA 01</span></div>
+        <div class="rule"></div>
+        <div class="product">The Birth Reading</div>
+        <div class="subline">A Personal Accord in Six Notes</div>
+        <div class="diamond">&#9670;</div>
+        <div class="crowned">The Crowned Name</div>
+        <div class="marks">
+          <div>Sun Sign</div>
+          <div>Year Animal</div>
+          <div>Life Path</div>
+          <div>Rune</div>
+          <div>Trigram</div>
+          <div>Hexagram</div>
+        </div>
+        <div class="rule"></div>
+        <div class="foot">By Birth Alone</div>
+        <div class="foot2"><span>Six Marks</span><span>One Accord</span></div>
+      </div>
+    </div>
+
+    <div class="pane"></div>
+  </div>
+
+</body>
+</html>

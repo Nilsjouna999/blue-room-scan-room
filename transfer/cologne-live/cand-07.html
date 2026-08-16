@@ -1,0 +1,353 @@
+<!--
+  THE ACCORD — candidate 07 (emphasis: LIQUID)
+  Built to transfer/COLOGNE-REFERENCE.md.
+
+  GEOMETRY ACHIEVED (computed from the CSS custom properties below):
+    recess width/height   .......  462 / 572  =  0.8077  (target 0.808)
+    bottle max-w / total-h ......  285 / 490  =  0.5816  (target 0.582)
+    cap height / total-h  ......  0.112        (target 0.112)
+    neck height / total-h ......  0.045        (target 0.045)
+    shoulder height / total-h ..  0.075        (target 0.075)
+    body height / total-h ......  0.720        (target 0.72)
+    base height / total-h ......  0.048        (target ~0.05)
+    cap width / body width .....  0.263        (target 0.263)
+    label width / body width ...  0.667        (target 0.667)
+    label height / total-h .....  0.570  (top 41% -> bottom 98%, target 0.571)
+
+  LABEL CONTRAST (WCAG relative-luminance formula, computed by hand):
+    ink #2a2118 on cream top-stop  #d8cdb4  ->  L_ink=0.01647, L_cream=0.6158
+        ratio = (0.6158+0.05) / (0.01647+0.05) = 10.02 : 1
+    ink #2a2118 on cream bottom-stop #c9bda0 -> L_cream=0.5136
+        ratio = (0.5136+0.05) / (0.01647+0.05) = 8.48 : 1
+    Both clear 4.5:1 by a wide margin — the label stays legible across its
+    own gradient from light top to darker bottom.
+
+  LIQUID EMPHASIS: four stops from the reference are used verbatim as
+  anchor colours (#6b6535, #5a5a30, #3f3d20, #2e2c18); a fifth interpolated
+  tone (#625d34) sits at the very top edge (the meniscus, in shadow under
+  the neck) so the true peak brightness lands at 18% down — "lightest
+  through the upper-middle" — rather than pinned to the top pixel row.
+-->
+<title>The Accord — Formula 01</title>
+<style>
+  :root {
+    color-scheme: dark;
+    --recess-w: 462;
+    --recess-h: 572;
+
+    /* page / recess */
+    --page: #0a0908;
+    --recess-top: #141210;
+    --recess-mid: #100f0d;
+    --recess-low: #0d0c0b;
+    --recess-corner: #080807;
+
+    /* bottle glass body */
+    --glass-dark: #0c0b0a;
+    --glass-mid: #131210;
+    --glass-hi: rgba(255, 252, 240, 0.5);
+    --glass-hi-soft: rgba(255, 250, 235, 0.22);
+
+    /* cap / neck metals */
+    --cap-base: #141414;
+    --cap-lit: #1c1c1b;
+    --brass: #8a6a3a;
+    --gold-collar: #9a7a45;
+
+    /* liquid — the emphasis */
+    --liq-meniscus: #625d34;
+    --liq-peak: #6b6535;
+    --liq-upper: #5a5a30;
+    --liq-lower: #3f3d20;
+    --liq-floor: #2e2c18;
+
+    /* label */
+    --cream-top: #d8cdb4;
+    --cream-bot: #c9bda0;
+    --ink: #2a2118;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    height: 100%;
+    margin: 0;
+  }
+
+  body {
+    background: var(--page);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 4vh 4vw;
+  }
+
+  /* ================= THE RECESS ================= */
+
+  .recess {
+    position: relative;
+    width: min(46vw, 74vh);
+    aspect-ratio: var(--recess-w) / var(--recess-h);
+    background-image:
+      radial-gradient(120% 70% at 12% 4%, rgba(255, 244, 220, 0.05), transparent 55%),
+      radial-gradient(90% 60% at 0% 100%, var(--recess-corner) 0%, transparent 55%),
+      radial-gradient(90% 60% at 100% 100%, var(--recess-corner) 0%, transparent 55%),
+      linear-gradient(180deg, var(--recess-top) 0%, var(--recess-mid) 45%, var(--recess-low) 78%, var(--recess-corner) 100%);
+    overflow: hidden;
+    border-radius: 0;
+  }
+
+  /* warm pool on the floor, under the base, wider than the bottle */
+  .floor-pool {
+    position: absolute;
+    left: 50%;
+    bottom: 3%;
+    width: 78%;
+    height: 14%;
+    transform: translateX(-50%);
+    background: radial-gradient(closest-side, rgba(150, 108, 58, 0.14), rgba(150, 108, 58, 0.05) 60%, transparent 80%);
+    pointer-events: none;
+  }
+
+  /* ================= THE BOTTLE ================= */
+
+  .bottle {
+    position: absolute;
+    left: 50%;
+    bottom: 9%;
+    width: 61.7%;                 /* 285/462 of recess width */
+    height: 85.7%;                /* 490/572 of recess height */
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .cap {
+    position: relative;
+    flex: 0 0 11.2%;
+    width: 26.3%;                 /* 75/285 of body width */
+    margin: 0 auto;
+    background: linear-gradient(90deg, #0e0e0e 0%, var(--cap-lit) 38%, var(--cap-base) 62%, #0a0a0a 100%);
+    border-radius: 6% 6% 2% 2% / 10% 10% 4% 4%;
+  }
+  .cap-band {
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    height: 12%;
+    background: linear-gradient(90deg, #6e5327, var(--brass) 45%, #a5875a 55%, #6e5327);
+  }
+
+  .neck {
+    position: relative;
+    flex: 0 0 4.5%;
+    width: 15%;
+    margin: 0 auto;
+    background: linear-gradient(90deg, #0d0c0b, #171614 45%, #100f0e 60%, #0a0908);
+  }
+  .neck-collar {
+    position: absolute;
+    left: -6%; right: -6%; bottom: 0;
+    height: 34%;
+    background: linear-gradient(90deg, #6e5327, var(--gold-collar) 50%, #b8996a 58%, #6e5327);
+  }
+
+  .shoulder {
+    flex: 0 0 7.5%;
+    width: 100%;
+    background: linear-gradient(90deg, #0c0b0a 0%, #171512 42%, #100f0d 58%, #0a0908 100%);
+    clip-path: polygon(42.5% 0, 57.5% 0, 100% 100%, 0% 100%);
+  }
+
+  .body {
+    position: relative;
+    flex: 0 0 72%;
+    width: 100%;
+    border-radius: 3% / 2.2%;
+    overflow: hidden;
+    background: linear-gradient(90deg, var(--glass-dark) 0%, var(--glass-mid) 46%, var(--glass-dark) 100%);
+  }
+
+  .base {
+    flex: 0 0 4.8%;
+    width: 100%;
+    border-radius: 0 0 4% 4% / 0 0 30% 30%;
+    background: linear-gradient(180deg, var(--glass-dark), var(--recess-corner));
+  }
+
+  /* ---- liquid: fills body + base, the emphasis of this build ---- */
+  .liquid {
+    position: absolute;
+    left: 4%;
+    right: 4%;
+    top: 4%;
+    bottom: -6.8%;                /* extends visually down through the base */
+    border-radius: 2% / 1.5%;
+    background: linear-gradient(
+      180deg,
+      var(--liq-meniscus) 0%,
+      var(--liq-peak) 18%,
+      var(--liq-upper) 45%,
+      var(--liq-lower) 72%,
+      var(--liq-floor) 100%
+    );
+  }
+  /* a whisper of surface sheen right at the meniscus line, nothing more */
+  .liquid::before {
+    content: "";
+    position: absolute;
+    left: 6%; right: 6%; top: 0;
+    height: 6%;
+    background: linear-gradient(180deg, rgba(255, 244, 210, 0.10), transparent);
+  }
+
+  /* ---- label ---- */
+  .label {
+    position: absolute;
+    left: 50%;
+    top: 41%;
+    height: 57%;                  /* 41% -> 98% of total bottle height */
+    width: 66.7%;                 /* 190/285 of body width */
+    transform: translateX(-50%);
+    background: linear-gradient(180deg, var(--cream-top) 0%, var(--cream-top) 55%, var(--cream-bot) 100%);
+    color: var(--ink);
+    font-family: ui-monospace, "SFMono-Regular", Consolas, "Courier New", monospace;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 6% 5% 5%;
+    text-align: center;
+  }
+  .label .top-row {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.46em;
+    letter-spacing: 0.06em;
+    opacity: 0.85;
+  }
+  .label hr {
+    width: 100%;
+    border: none;
+    border-top: 1px solid rgba(42, 33, 24, 0.55);
+    margin: 6% 0;
+  }
+  .label .product-name {
+    font-size: 0.62em;
+    letter-spacing: 0.18em;
+    font-weight: 700;
+  }
+  .label .product-sub {
+    font-size: 0.42em;
+    letter-spacing: 0.1em;
+    opacity: 0.75;
+    margin-top: 6%;
+  }
+  .label .diamond {
+    font-size: 0.5em;
+    margin: 5% 0;
+    opacity: 0.7;
+  }
+  .label .crowned-name {
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 1.3em;
+    line-height: 1.05;
+    margin: 2% 0 4%;
+  }
+  .label .marks {
+    font-size: 0.44em;
+    letter-spacing: 0.12em;
+    line-height: 2;
+    opacity: 0.9;
+  }
+  .label .bottom-line {
+    font-size: 0.42em;
+    letter-spacing: 0.1em;
+    opacity: 0.8;
+  }
+  .label .bottom-row {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.38em;
+    letter-spacing: 0.06em;
+    opacity: 0.75;
+    margin-top: 6%;
+  }
+
+  /* ---- glass edge highlights — asymmetric, on purpose ---- */
+  .hi-left {
+    position: absolute;
+    left: 3%;
+    top: 2%;
+    bottom: 2%;
+    width: 4.5%;
+    background: linear-gradient(
+      180deg,
+      transparent 0%,
+      var(--glass-hi) 10%,
+      var(--glass-hi-soft) 45%,
+      rgba(255, 250, 235, 0.1) 78%,
+      transparent 100%
+    );
+  }
+  .hi-right {
+    position: absolute;
+    right: 4%;
+    top: 6%;
+    height: 32%;
+    width: 2.2%;
+    background: linear-gradient(180deg, rgba(255, 248, 230, 0.16), transparent);
+  }
+
+  /* ================= THE PANE ================= */
+
+  .pane {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(
+      135deg,
+      rgba(255, 255, 250, 0.08) 0%,
+      rgba(255, 255, 250, 0.045) 16%,
+      rgba(255, 255, 250, 0.015) 32%,
+      transparent 46%
+    );
+  }
+
+  @media (prefers-reduced-motion: reduce), (prefers-reduced-motion: no-preference) {
+    /* no animation exists either way — this rule intentionally does nothing */
+  }
+</style>
+
+<div class="recess">
+  <div class="floor-pool"></div>
+
+  <div class="bottle">
+    <div class="cap"><div class="cap-band"></div></div>
+    <div class="neck"><div class="neck-collar"></div></div>
+    <div class="shoulder"></div>
+    <div class="body">
+      <div class="liquid"></div>
+    </div>
+    <div class="base"></div>
+
+    <div class="label">
+      <div class="top-row"><span>BLUE ROOM ACCORDS</span><span>FORMULA 01</span></div>
+      <hr />
+      <div class="product-name">THE BIRTH READING</div>
+      <div class="product-sub">A PERSONAL ACCORD IN SIX NOTES</div>
+      <div class="diamond">&#9670;</div>
+      <div class="crowned-name">The Crowned Name</div>
+      <div class="marks">SUN SIGN<br />YEAR ANIMAL<br />LIFE PATH<br />RUNE<br />TRIGRAM<br />HEXAGRAM</div>
+      <hr />
+      <div class="bottom-line">BY BIRTH ALONE</div>
+      <div class="bottom-row"><span>SIX MARKS</span><span>ONE ACCORD</span></div>
+    </div>
+
+    <div class="hi-left"></div>
+    <div class="hi-right"></div>
+  </div>
+
+  <div class="pane"></div>
+</div>

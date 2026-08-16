@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>The Accord — cand-01</title>
+<style>
+/* ==========================================================================
+   THE ACCORD — cand-01 — PROPORTION-LED BUILD
+
+   GEOMETRY, laid out as numbers first (reference px → ratio used in CSS):
+
+     RECESS   width 462 : height 572   → w/h = 0.80769   (--recess-w / 0.80769)
+     BOTTLE   width 285 : height 490   → w/h = 0.58163   (--bottle-w / 0.58163)
+     bottle-w / recess-w = 285/462 = 0.61688
+
+     Vertical stack, fraction of bottle total height (490):
+       cap       55/490 = 0.1122
+       neck      22/490 = 0.0449
+       shoulder  37/490 = 0.0750
+       body     353/490 = 0.7204
+       base      25/490 = 0.0500
+                          ------
+                          1.0025  (rounding)
+
+     cap width   75/285 = 0.2632 of bottle width
+     label width 190/285 = 0.6667 of bottle width
+     label height 280/490 = 0.5714 of bottle height
+     label top   0.41 of bottle height   → label bottom = 0.41+0.5714 = 0.981  ✓ matches doc
+
+   COLOUR — near-black structural set (recess / ground / glass / cap only;
+   the liquid and the label are the two deliberate exceptions to "near-black"):
+     page ground        #0a0908   L* ≈ 2.5
+     recess top face    #141210   L* ≈ 5.6
+     recess low         #0d0c0b   L* ≈ 3.4
+     recess corners     #080807   L* ≈ 2.2
+     cap                #141414   L* ≈ 6.3
+   → structural range spans L* 2.2–6.3, about 4 L* steps / ~12 raw levels:
+     comfortably inside the "~25 levels of near-black" ceiling.
+
+   LABEL CONTRAST (computed, WCAG relative-luminance method):
+     ink #2a2118  →  Y = 0.01661
+     cream, lightest stop #d8cdb4 → Y = 0.61407  → contrast = 9.97 : 1
+     cream, darkest stop  #c9bda0 → Y = 0.51347  → contrast = 8.46 : 1
+     WORST CASE (darkest cream stop) = 8.46 : 1  — clears 4.5:1 with margin.
+   ========================================================================== */
+
+  :root{
+    --recess-w: clamp(240px, 40vmin, 480px);
+    --recess-h: calc(var(--recess-w) / 0.80769);
+
+    --bottle-w: calc(var(--recess-w) * 0.61688);
+    --bottle-h: calc(var(--bottle-w) / 0.58163);
+
+    --cap-w: calc(var(--bottle-w) * 0.2632);
+    --cap-h: calc(var(--bottle-h) * 0.1122);
+    --neck-h: calc(var(--bottle-h) * 0.0449);
+    --shoulder-h: calc(var(--bottle-h) * 0.0750);
+    --body-h: calc(var(--bottle-h) * 0.7204);
+    --base-h: calc(var(--bottle-h) * 0.0500);
+
+    --y-neck: var(--cap-h);
+    --y-shoulder: calc(var(--cap-h) + var(--neck-h));
+    --y-body: calc(var(--cap-h) + var(--neck-h) + var(--shoulder-h));
+    --y-base: calc(var(--cap-h) + var(--neck-h) + var(--shoulder-h) + var(--body-h));
+
+    --label-w: calc(var(--bottle-w) * 0.6667);
+    --label-h: calc(var(--bottle-h) * 0.5714);
+    --label-top: calc(var(--bottle-h) * 0.41);
+  }
+
+  *{ box-sizing:border-box; }
+
+  html,body{ height:100%; margin:0; }
+
+  body.accord-stage{
+    min-height:100%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:#0a0908;
+    padding:6vmin 4vmin;
+  }
+
+  .accord-recess{
+    position:relative;
+    width:var(--recess-w);
+    height:var(--recess-h);
+    border-radius:0;
+    overflow:hidden;
+    background-color:#0d0c0b;
+    background-image:
+      radial-gradient(140% 100% at 0% 100%, rgba(0,0,0,0.30), transparent 62%),
+      radial-gradient(140% 100% at 100% 100%, rgba(0,0,0,0.30), transparent 62%),
+      linear-gradient(180deg, #141210 0%, #0f0e0c 55%, #0d0c0b 100%);
+  }
+
+  /* warm pool under the bottle's base, on the recess floor */
+  .accord-floor-pool{
+    position:absolute;
+    left:50%;
+    bottom:calc(var(--recess-h) * 0.025);
+    width:calc(var(--bottle-w) * 1.7);
+    height:calc(var(--recess-h) * 0.12);
+    transform:translateX(-50%);
+    background:radial-gradient(closest-side, rgba(130,102,58,0.11), rgba(130,102,58,0) 72%);
+    pointer-events:none;
+  }
+
+  /* the glass pane over the opening: ONE diagonal gleam, upper-left, nothing else */
+  .accord-pane-gleam{
+    position:absolute;
+    inset:0;
+    background:linear-gradient(135deg,
+      rgba(255,255,255,0.085) 0%,
+      rgba(255,255,255,0.04) 18%,
+      rgba(255,255,255,0) 45%);
+    pointer-events:none;
+  }
+
+  .accord-bottle{
+    position:absolute;
+    left:50%;
+    top:calc(var(--recess-h) * 0.05);
+    width:var(--bottle-w);
+    height:var(--bottle-h);
+    transform:translateX(-50%);
+  }
+
+  /* CAP — near-black, flat top, very slightly tapered */
+  .accord-cap{
+    position:absolute;
+    top:0;
+    left:50%;
+    width:var(--cap-w);
+    height:var(--cap-h);
+    transform:translateX(-50%);
+    background:#141414;
+    clip-path:polygon(11% 0%, 89% 0%, 100% 100%, 0% 100%);
+  }
+  .accord-cap-band{
+    position:absolute;
+    left:0; right:0; bottom:0;
+    height:max(2px, calc(var(--cap-h) * 0.09));
+    background:#8a6a3a;
+  }
+
+  /* NECK — narrow, glass-dark */
+  .accord-neck{
+    position:absolute;
+    top:var(--y-neck);
+    left:50%;
+    width:calc(var(--cap-w) * 0.60);
+    height:var(--neck-h);
+    transform:translateX(-50%);
+    background:linear-gradient(180deg,#1c1c1a,#232320);
+  }
+
+  /* COLLAR — gold, where the neck meets the shoulder, brighter than the cap band */
+  .accord-collar{
+    position:absolute;
+    top:calc(var(--y-shoulder) - max(1.5px, var(--neck-h) * 0.24));
+    left:50%;
+    width:calc(var(--cap-w) * 0.66);
+    height:max(1.5px, calc(var(--neck-h) * 0.24));
+    transform:translateX(-50%);
+    background:#9a7a45;
+  }
+
+  /* SHOULDER — steep slope, neck width out to full body width */
+  .accord-shoulder{
+    position:absolute;
+    top:var(--y-shoulder);
+    left:50%;
+    width:var(--bottle-w);
+    height:var(--shoulder-h);
+    transform:translateX(-50%);
+    background:linear-gradient(180deg,#1a1a17,#171613);
+    clip-path:polygon(41.7% 0%, 58.3% 0%, 100% 100%, 0% 100%);
+  }
+
+  /* BODY — straight sides, small corner radius, the glass */
+  .accord-body{
+    position:absolute;
+    top:var(--y-body);
+    left:50%;
+    width:var(--bottle-w);
+    height:var(--body-h);
+    transform:translateX(-50%);
+    border-radius:calc(var(--bottle-w) * 0.03);
+    overflow:hidden;
+    background:linear-gradient(180deg, rgba(46,46,40,0.35), rgba(20,20,18,0.4));
+  }
+
+  /* LIQUID — olive-gold, desaturated, darkest low, lightest upper-middle */
+  .accord-liquid{
+    position:absolute;
+    left:0; right:0; bottom:0;
+    top:8%;
+    background:linear-gradient(180deg,
+      #6b6535 0%,
+      #5a5a30 35%,
+      #3f3d20 70%,
+      #2e2c18 100%);
+  }
+
+  /* BASE — slightly darker, glass thickens, catches the floor pool */
+  .accord-base{
+    position:absolute;
+    top:var(--y-base);
+    left:50%;
+    width:var(--bottle-w);
+    height:var(--base-h);
+    transform:translateX(-50%);
+    background:#131311;
+    border-radius:0 0 calc(var(--bottle-w) * 0.02) calc(var(--bottle-w) * 0.02);
+  }
+
+  /* GLASS EDGE HIGHLIGHTS — asymmetric: bright continuous left, soft short right */
+  .accord-highlight-left{
+    position:absolute;
+    top:calc(var(--y-body) + var(--body-h) * 0.04);
+    left:calc(var(--bottle-w) * 0.03);
+    width:calc(var(--bottle-w) * 0.016);
+    height:calc(var(--body-h) * 0.90);
+    background:linear-gradient(180deg,
+      rgba(255,255,255,0) 0%,
+      rgba(255,255,255,0.55) 8%,
+      rgba(255,255,255,0.40) 55%,
+      rgba(255,255,255,0) 100%);
+  }
+  .accord-highlight-right{
+    position:absolute;
+    top:calc(var(--y-body) + var(--body-h) * 0.16);
+    right:calc(var(--bottle-w) * 0.035);
+    width:calc(var(--bottle-w) * 0.010);
+    height:calc(var(--body-h) * 0.42);
+    background:linear-gradient(180deg,
+      rgba(255,255,255,0) 0%,
+      rgba(255,255,255,0.20) 22%,
+      rgba(255,255,255,0.13) 60%,
+      rgba(255,255,255,0) 100%);
+  }
+
+  /* LABEL — the only bright plane. cream, matte, no shadow, no border */
+  .accord-label{
+    position:absolute;
+    top:var(--label-top);
+    left:50%;
+    width:var(--label-w);
+    height:var(--label-h);
+    transform:translateX(-50%);
+    background:linear-gradient(180deg, #d8cdb4 0%, #d2c6a9 55%, #c9bda0 100%);
+    color:#2a2118;
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+    align-items:stretch;
+    padding:6% 7%;
+    overflow:hidden;
+    font-family: ui-monospace, "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  }
+
+  .accord-label .l-row{ display:flex; align-items:center; }
+  .accord-label .l-split{ justify-content:space-between; }
+  .accord-label .l-micro{
+    font-size:calc(var(--label-w) * 0.050);
+    letter-spacing:0.06em;
+    line-height:1;
+    white-space:nowrap;
+  }
+  .accord-label .l-rule{
+    height:1px;
+    background:#2a2118;
+    opacity:0.55;
+    width:100%;
+  }
+  /* hierarchy, largest to smallest: l-name (0.145) > l-six (0.064) >
+     l-heading "THE BIRTH READING" (0.052) > everything else (0.040–0.046) */
+  .accord-label .l-heading{
+    font-size:calc(var(--label-w) * 0.052);
+    letter-spacing:0.14em;
+    text-align:center;
+    line-height:1;
+  }
+  .accord-label .l-sub{
+    font-size:calc(var(--label-w) * 0.042);
+    letter-spacing:0.05em;
+    text-align:center;
+    line-height:1;
+    opacity:0.72;
+  }
+  .accord-label .l-diamond{
+    font-size:calc(var(--label-w) * 0.040);
+    text-align:center;
+    line-height:1;
+  }
+  .accord-label .l-name{
+    font-family: Georgia, "Times New Roman", Times, serif;
+    font-size:calc(var(--label-w) * 0.145);
+    text-align:center;
+    line-height:1;
+    font-style:italic;
+  }
+  .accord-label .l-six{
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+    align-items:center;
+    row-gap:2%;
+    font-size:calc(var(--label-w) * 0.064);
+    letter-spacing:0.10em;
+    line-height:1;
+    text-align:center;
+  }
+  .accord-label .l-foot{
+    font-size:calc(var(--label-w) * 0.042);
+    letter-spacing:0.08em;
+    text-align:center;
+    line-height:1;
+  }
+</style>
+</head>
+<body class="accord-stage">
+
+  <div class="accord-recess">
+
+    <div class="accord-floor-pool"></div>
+
+    <div class="accord-bottle">
+
+      <div class="accord-shoulder"></div>
+
+      <div class="accord-body">
+        <div class="accord-liquid"></div>
+      </div>
+
+      <div class="accord-label">
+        <div class="l-row l-split l-micro"><span>BLUE ROOM ACCORDS</span><span>FORMULA 01</span></div>
+        <div class="l-rule"></div>
+        <div class="l-heading">THE BIRTH READING</div>
+        <div class="l-sub">A PERSONAL ACCORD IN SIX NOTES</div>
+        <div class="l-diamond">&#9670;</div>
+        <div class="l-name">The Crowned Name</div>
+        <div class="l-six">
+          <div>SUN SIGN</div>
+          <div>YEAR ANIMAL</div>
+          <div>LIFE PATH</div>
+          <div>RUNE</div>
+          <div>TRIGRAM</div>
+          <div>HEXAGRAM</div>
+        </div>
+        <div class="l-rule"></div>
+        <div class="l-foot">BY BIRTH ALONE</div>
+        <div class="l-row l-split l-micro"><span>SIX MARKS</span><span>ONE ACCORD</span></div>
+      </div>
+
+      <div class="accord-highlight-left"></div>
+      <div class="accord-highlight-right"></div>
+
+      <div class="accord-base"></div>
+
+      <div class="accord-neck"></div>
+      <div class="accord-collar"></div>
+      <div class="accord-cap">
+        <div class="accord-cap-band"></div>
+      </div>
+
+    </div>
+
+    <div class="accord-pane-gleam"></div>
+
+  </div>
+
+</body>
+</html>
