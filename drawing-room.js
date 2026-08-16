@@ -504,7 +504,45 @@
   function announce(m) { var l = HOST.querySelector("[data-dr-live]"); if (l) l.textContent = m; }
   function firstSentence(s) { var m = String(s || "").match(/^[^.]+\./); return m ? m[0] : String(s || ""); }
 
-  function showLanding() { STATE.view = "landing"; stage().innerHTML = landingHTML(); if (history.replaceState) history.replaceState(null, "", addr()); }
+  /* ═══ BR-S526 — GOING BACK TO THE DECK MUST NOT DESTROY THE READING ═══════════════
+     This called `replaceState(addr())` unconditionally, and `← the deck` (`:439`) sits in
+     the tail of a COMPLETED reading, two lines under "Keep the link and it opens exactly
+     as it fell." One click replaced the receipt with the bare address, and the seal is
+     `Date.now()+Math.random()` — once the URL is gone the reading is gone.
+
+     ★ AND IT WAS MINE. BR-S522 fixed the receipt never being written at /tarot/; the same
+     commit made this line run there for the first time. So the fix that gave the reading
+     an address also gave it a way to lose one. That is the shape to watch for: a change
+     that makes something real makes its destruction reachable too.
+
+     `pushState` when a filed reading is in the bar, so the receipt survives in history and
+     Back returns to it; `replaceState` otherwise, so ordinary browsing does not pile up
+     entries. And the draw is CLEARED — `drawn`/`revealed`/`spread`/`seed` used to survive
+     into the landing, where the delegated handler matches `[data-dr-turn]` anywhere under
+     HOST, so any future card-like element on the landing could turn a dead draw and read
+     a stranger's card aloud through `[data-dr-live]`. */
+  /* the render, with no history side-effect — so the popstate handler can use it without
+     writing the entry it is currently responding to, which is how a Back button turns
+     into an infinite loop */
+  function paintLanding() {
+    STATE.view = "landing";
+    STATE.drawn = []; STATE.revealed = 0; STATE.spread = null; STATE.seed = "";
+    stage().innerHTML = landingHTML();
+  }
+  function showLanding() {
+    paintLanding();
+    if (!history.replaceState) return;
+    var filed = /[?&]read=/.test(location.search) && /[?&]t=/.test(location.search);
+    if (filed && history.pushState) history.pushState(null, "", addr());
+    else history.replaceState(null, "", addr());
+  }
+  /* ★ AND THE BACK BUTTON HAS TO ACTUALLY GO BACK. Pushing the receipt into history only
+     restores the ADDRESS; without this the visitor pressed Back, saw their reading's URL
+     return to the bar, and went on looking at the landing — which is arguably worse than
+     losing it, because the bar now says the reading is there and the page says it is not.
+     `reopen()` already rebuilds a filed reading from `read`/`t` alone, so the whole of
+     history navigation is one line of dispatch. */
+  window.addEventListener("popstate", function () { if (!reopen()) paintLanding(); });   /* `window`, not `root` — this IIFE takes no parameter; see the note at siteRoot() */
   function startReading(key) {
     STATE.view = "intake"; STATE.spread = key;
     STATE.drawn = []; STATE.revealed = 0; STATE.question = ""; STATE.seed = "";
