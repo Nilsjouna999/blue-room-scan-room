@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>THE ACCORD — craft lab</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<!-- ═══════════════════════════════════════════════════════════════════════════════
+     THE ACCORD — craft lab.  `_accord-lab.html`
+
+     Dev-only isolation bench for the M2 Accord socket. It exists because the socket
+     mounts into the menu at ~145px wide, which is far too small to judge glass, and
+     because judging craft against a remembered reference is how the last run failed:
+     the reference is pinned HERE, at matched height, so every iteration is a direct
+     comparison rather than a recollection.
+
+     ★ IT LOADS THE REAL SOCKET. This page fakes the one thing `_m2-accord.js` looks
+     for — a `.menu__draw-stage [data-m2-hero]` — and then loads that file unmodified
+     with `?m2=accord` in its own URL, which is the gate the script reads. So the lab
+     exercises the shipping code path; it does not reimplement it. If the lab looks
+     right, the menu is right, because they are the same markup and the same stylesheet.
+
+     Open with the gate:  _accord-lab.html?m2=accord
+     ═══════════════════════════════════════════════════════════════════════════════ -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: #0a0908; color: #6f6a5e;
+    font-family: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+    font-size: 11px; letter-spacing: .09em;
+  }
+  .lab__bar {
+    position: sticky; top: 0; z-index: 9;
+    display: flex; gap: 18px; align-items: baseline; flex-wrap: wrap;
+    padding: 10px 16px; background: #100e0c; border-bottom: 1px solid #1c1916;
+  }
+  .lab__bar b { color: #c9bda0; letter-spacing: .16em; font-weight: 500; }
+  .lab__bar a { color: #8a7f6b; text-decoration: none; border-bottom: 1px solid #2a251e; }
+  .lab__bar a:hover { color: #d8cdb4; }
+
+  /* the two panes, matched in HEIGHT so silhouettes compare honestly */
+  .lab__pair { display: flex; gap: 28px; padding: 28px 16px 60px; align-items: flex-start; justify-content: center; flex-wrap: wrap; }
+  .lab__pane { display: flex; flex-direction: column; gap: 9px; }
+  .lab__cap { color: #7d7364; letter-spacing: .17em; font-size: 10px; }
+  .lab__cap i { color: #4e4740; font-style: normal; }
+
+  /* The reference is cropped to its bottle by object-fit + object-position so the two
+     panes show the same subject at the same size. The numbers come from measuring the
+     source image: the bottle occupies the middle third, centred. */
+  .lab__ref {
+    width: 462px; height: 572px; overflow: hidden; border-radius: 2px;
+    background: #000;
+  }
+  .lab__ref img {
+    width: 300%; height: auto; display: block;
+    margin-left: -100%; margin-top: -10.5%;
+  }
+
+  /* the socket's own host — same max-width the stylesheet declares */
+  .lab__host { width: 462px; }
+  .menu__draw-stage { position: relative; }
+  [data-m2-hero] { display: none; }   /* the lab has no standing card to hide */
+
+  .lab__note { max-width: 980px; margin: 0 auto; padding: 0 16px 60px; line-height: 1.9; color: #5d574c; }
+  .lab__note b { color: #9a8f7b; font-weight: 500; }
+</style>
+</head>
+<body>
+
+<div class="lab__bar">
+  <b>◆ THE ACCORD — CRAFT LAB</b>
+  <span>reference left · build right · matched height</span>
+  <a href="?m2=accord">reload</a>
+  <a href="/?view=menu&amp;m2=accord&amp;devnav=1">see it in the menu →</a>
+</div>
+
+<div class="lab__pair">
+  <div class="lab__pane">
+    <div class="lab__cap">THE REFERENCE <i>— what it has to become</i></div>
+    <div class="lab__ref"><img src="transfer/cologne-reference.webp" alt="the reference bottle"></div>
+  </div>
+  <div class="lab__pane">
+    <div class="lab__cap">THE BUILD <i>— the real socket, real stylesheet</i></div>
+    <div class="lab__host">
+      <div class="menu__draw-stage"><div data-m2-hero></div></div>
+    </div>
+  </div>
+</div>
+
+<div class="lab__note">
+  <b>What this page is.</b> The socket mounts into the live menu at about 145px wide — too
+  small to judge glass, thickness or a lift seam. Here it runs at its declared 462px with
+  the reference pinned beside it at matched height, so each pass is a comparison instead of
+  a recollection. Nothing on this page is a copy of the socket: the markup below the caption
+  is built by <b>_m2-accord.js</b> itself and painted by <b>_m2-accord.css</b>, so what is
+  true here is true in the menu.
+</div>
+
+<!-- ★ THE LAB BUSTS ITS OWN CACHE, ON PURPOSE.
+     Cache tokens in this repo are PER-ASSET: bumping one file does not bump another, and
+     the first pass of this very rewrite was judged against a stale script that was still
+     asking for the previous stylesheet — the build looked unchanged because it WAS
+     unchanged. On a craft bench that trap costs a whole iteration every time it fires, so
+     the lab appends a fresh token per load and can never show a cached socket. The
+     shipping pages keep their deliberate `?v=` tokens; this is the bench, and the bench
+     must always be showing what is actually on disk.
+
+     The stylesheet is fetched by the script itself, so its token has to be overridden
+     too — the script's own href is rewritten by the same stamp before it can run. -->
+<script>
+  (function () {
+    var t = String(Date.now());
+    // pre-empt the stylesheet the socket is about to request, under a token it cannot
+    // have cached, so the <link> it appends de-duplicates against this one.
+    var l = document.createElement("link");
+    l.id = "m2acc-css"; l.rel = "stylesheet"; l.href = "_m2-accord.css?lab=" + t;
+    document.head.appendChild(l);
+    var s = document.createElement("script");
+    s.src = "_m2-accord.js?lab=" + t;
+    document.body.appendChild(s);
+  })();
+</script>
+</body>
+</html>

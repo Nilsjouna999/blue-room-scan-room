@@ -48,8 +48,84 @@
   function style() {
     if (doc.getElementById("m2acc-css")) return;
     var l = doc.createElement("link");
-    l.id = "m2acc-css"; l.rel = "stylesheet"; l.href = "_m2-accord.css?v=510b";
+    l.id = "m2acc-css"; l.rel = "stylesheet"; l.href = "_m2-accord.css?v=512";
     (doc.head || doc.documentElement).appendChild(l);
+  }
+
+  /* ═══ BR-S513 — THE SILHOUETTE IS ONE SHAPE, NOT A STACK OF BOXES ═══════════════
+     What the first build got wrong, and it was the whole thing: the bottle was
+     assembled from absolutely-positioned rectangles — a body box, a liquid box, a
+     thickness box, a shoulder wedge — each with its own border-radius. A stack of
+     rectangles cannot produce a flask. There is no arrangement of boxes where the
+     shoulder curves out of the neck, so the object never read as a bottle; it read as
+     a label floating on a dark green panel, which is exactly what the ten candidates
+     also produced and what the reference does not look like.
+
+     So the vessel is now ONE outline, declared once, and every glass layer is clipped
+     to it. Change the path and the whole bottle changes shape together — glass,
+     transmission, thickness, facets and edge highlights included, because they are all
+     inside the same clip.
+
+     ★ WHY objectBoundingBox AND NOT path() OR polygon(). The socket renders at ~145px
+     in the menu and at 462px in the lab, and it must be the same object at both. In
+     objectBoundingBox units every coordinate is a FRACTION of the element's own box, so
+     one declaration serves every size with no media queries and no recomputation. A
+     path() in user units would need re-authoring per size, which is how a silhouette
+     drifts between the bench and the shipping surface.
+
+     ★ THE CAP IS DELIBERATELY OUTSIDE THIS PATH. The outline covers neck, shoulder and
+     body only. The overcap has to move independently — 2-3px on hover, ~7px on
+     activation, per V2 §6 — and a moving part cannot live inside the clip that defines
+     the part it lifts away from. The path ends at the neck's top edge for that reason.
+
+     Coordinates read top-down: neck sides, the shoulder's outward curve, the straight
+     body walls, and a heel with a small radius. The shoulder is a cubic on both sides
+     because that curve is the single feature separating a flask from a jar. */
+  /* ★ THESE NUMBERS ARE MEASURED OFF THE REFERENCE, NOT INVENTED. Read from
+     transfer/cologne-reference.webp with the vitrine normalised to its own box: cap
+     0→.100 of bottle height, brass collar .100→.136, a VISIBLE dark neck .136→.197,
+     the shoulder curve .197→.245, body to the heel at .998. Across: the neck is .168
+     of the body's width and the walls sit at .034/.966.
+
+     The first pass guessed instead of measuring and got two things wrong that together
+     read as "not the same object": the neck was .23 wide with no straight section, so
+     the cap appeared to sit directly on the shoulders, and the shoulder curve was too
+     short, which made it a jar's rolled edge rather than a flask's slope. */
+  var SIL_ID = "m2accSil";
+  var SIL_PATH =
+    "M .416 .133 L .584 .133 L .584 .197 " +  /* neck: a real straight run, then the slope */
+    /* ★ THE SHOULDER IS A LONG SLOPE, NOT A CORNER. The first curve put its control
+       points far out (x .70 and .898 while y had barely moved), so the bottle reached
+       nearly full width in the first third of the shoulder's vertical run and read as a
+       rounded rectangle with a spout. Holding the curve close to the neck at the start
+       and letting it sweep out late is what makes the reference a flask. */
+    "C .626 .205 .878 .232 .966 .274 " +      /* right shoulder, curving out to the wall */
+    "L .966 .970 " +                          /* right wall */
+    "C .966 .989 .951 .998 .930 .998 " +      /* heel, right */
+    "L .070 .998 " +
+    "C .049 .998 .034 .989 .034 .970 " +      /* heel, left */
+    "L .034 .274 " +                          /* left wall */
+    "C .122 .232 .374 .205 .416 .197 Z";      /* left shoulder, back up to the neck */
+
+  /* One <defs> per document. The SVG carries no size and no paint — it exists only to
+     own the clipPath, so it is pulled out of layout entirely rather than hidden with
+     display:none, which in some engines drops the clip along with the box. */
+  function silhouette() {
+    if (doc.getElementById(SIL_ID)) return;
+    var NS = "http://www.w3.org/2000/svg";
+    var svg = doc.createElementNS(NS, "svg");
+    svg.setAttribute("width", "0"); svg.setAttribute("height", "0");
+    svg.setAttribute("aria-hidden", "true");
+    svg.setAttribute("focusable", "false");
+    svg.style.cssText = "position:absolute;width:0;height:0;overflow:hidden";
+    var defs = doc.createElementNS(NS, "defs");
+    var cp = doc.createElementNS(NS, "clipPath");
+    cp.setAttribute("id", SIL_ID);
+    cp.setAttribute("clipPathUnits", "objectBoundingBox");
+    var p = doc.createElementNS(NS, "path");
+    p.setAttribute("d", SIL_PATH);
+    cp.appendChild(p); defs.appendChild(cp); svg.appendChild(defs);
+    (doc.body || doc.documentElement).appendChild(svg);
   }
 
   function hero() { return doc.querySelector(".menu__draw-stage [data-m2-hero]"); }
@@ -104,36 +180,69 @@
 
     /* ── the bottle ──────────────────────────────────────────────────────────── */
     var b = el("div", "m2acc__bottle");
-    b.appendChild(el("span", "m2acc__glass"));
-    /* ★★ V2 §4 — the green is TRANSMISSION, not a fill. Two layers: the body of
-       colour, and a thickness layer that darkens where you look through more glass
-       (edges and heel) and clears through the centre. A uniformly green bottle looks
+
+    /* ★★ THE VESSEL. Everything that is made of glass goes in here, and the wrapper
+       carries the one clip-path, so the layers cannot disagree about the outline. The
+       old build painted each layer its own rectangle and hoped they lined up; they
+       could not, because the shape it needed does not exist in rectangles. */
+    var v = el("div", "m2acc__vessel");
+
+    /* ★★ THE RIM, AND WHY THERE ARE TWO NESTED CLIPS.
+       The first pass drew the bottle's edge highlights as gradients pinned to the left
+       and right of the bottle's BOX. That works down the straight walls and fails
+       everywhere the silhouette is narrower than its box — which is the entire neck and
+       shoulder. The clip simply cut them away up there, so the neck went unlit, and an
+       unlit neck reads as a gap: the cap and collar appeared to float above a bottle
+       they were not attached to. That single defect was most of what still looked wrong.
+
+       The fix is structural. `__vessel` carries the outline and paints ONE thing — the
+       rim colour. `__inner` carries the SAME outline inset by a couple of pixels and
+       holds every material layer. What is left showing between them is a hairline that
+       traces the real silhouette all the way round: up the walls, across the shoulder
+       curve, and up both sides of the neck, which is the part that was missing.
+
+       It also replaces the two hand-placed edge highlights with one mechanism. The
+       asymmetry the reference depends on — bright and continuous left, soft and short
+       right — is now a property of the rim's own gradient rather than two separate
+       elements that had to be kept in agreement with a shape they could not see. */
+    var inner = el("div", "m2acc__inner");
+    inner.appendChild(el("span", "m2acc__glass"));
+    /* ★★ V2 §4 — the green is TRANSMISSION, not a fill. Three layers now, because two
+       could not carry it: __liquid is the body of colour, __core is the light coming
+       THROUGH the centre where the glass is thinnest, and __thick is the density at the
+       edges and heel where you look through more of it. A uniformly green bottle looks
        painted; a bright outlined one looks like a wireframe. */
-    b.appendChild(el("span", "m2acc__liquid"));
-    b.appendChild(el("span", "m2acc__thick"));
+    inner.appendChild(el("span", "m2acc__liquid"));
+    inner.appendChild(el("span", "m2acc__core"));
+    inner.appendChild(el("span", "m2acc__thick"));
     /* ★★ V2 §3 — THE SIX ARE PHYSICAL. Two shoulder, two side, two heel, cut into the
        glass and NOT drawn as six bright lines or a hexagon. At rest they are nearly
        invisible; they become sequentially perceptible as the pointer moves, so the
-       metaphor is discovered rather than announced. The index drives that stagger. */
+       metaphor is discovered rather than announced. The index drives that stagger.
+       Inside the vessel, so a facet can never overhang the silhouette it is cut into. */
     ["sh", "sh", "sd", "sd", "hl", "hl"].forEach(function (kind, i) {
       var f = el("span", "m2acc__facet m2acc__facet--" + kind + " m2acc__facet--" + (i % 2 ? "b" : "a"));
       f.style.setProperty("--i", String(i));
-      b.appendChild(f);
+      inner.appendChild(f);
     });
+    /* the wet inner line where the fill stops — the one cue that says "liquid in a
+       container" rather than "green object", and the reference has it plainly */
+    inner.appendChild(el("span", "m2acc__fillline"));
+    /* the stem and dip tube sit INSIDE the glass, so they are clipped with it */
+    inner.appendChild(el("span", "m2acc__stem"));
+
+    v.appendChild(inner);
+    b.appendChild(v);
+
+    /* the label sits ON the glass, not in it — a separate plane stuck to the front.
+       Clipping it to the vessel would let the shoulder curve shave its top corners. */
     b.appendChild(label());
-    /* asymmetric on purpose: bright continuous left, soft short right. Symmetry reads
-       as a gradient, asymmetry reads as glass — the reference's own ranking puts this
-       fourth of six things that make or break it. */
-    b.appendChild(el("span", "m2acc__edge m2acc__edge--l"));
-    b.appendChild(el("span", "m2acc__edge m2acc__edge--r"));
-    b.appendChild(el("span", "m2acc__shoulder"));
     /* ★★ V2 §1 — THE CLOSURE CONTROLS THE CATEGORY, and it is the only thing that
-       separates this from a spirits or apothecary bottle. The stem and dip tube sit
-       INSIDE the glass, so they go in before the neck; the overcap is a separate node
-       from the pump collar because they must move independently — the cap separates
-       2-3px on hover and lifts ~7px on activation while the collar stays put. */
-    b.appendChild(el("span", "m2acc__stem"));
-    b.appendChild(el("span", "m2acc__neck"));
+       separates this from a spirits or apothecary bottle. The overcap is a separate
+       node from the pump collar because they must move independently — the cap
+       separates 2-3px on hover and lifts ~7px on activation while the collar stays put.
+       All of it sits OUTSIDE the vessel clip: these are metal, not glass, and the cap
+       has to be able to rise clear of the silhouette. */
     b.appendChild(el("span", "m2acc__pump"));       /* the narrow brass pump collar */
     b.appendChild(el("span", "m2acc__seam"));       /* the lift seam */
     b.appendChild(el("span", "m2acc__overcap"));    /* removable — the moving part */
@@ -164,7 +273,7 @@
     return true;
   }
 
-  function apply() { style(); return build(); }
+  function apply() { style(); silhouette(); return build(); }
 
   function boot() {
     apply();
