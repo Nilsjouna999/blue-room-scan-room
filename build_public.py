@@ -330,8 +330,17 @@ PROBES = [
     # the one worth a note: it is now guaranteed by the file not existing rather than by
     # the build cutting it, which is a stronger guarantee and a smaller machine.
     # BR-S510 — the Accord's socket, same three assertions as the two above it.
-    ("Accord js",      "_m2-accord.js",  r"\bm2acc__bottle\b", {"preview": False, "live": False}),
-    ("Accord css",     "_m2-accord.css", r"\.m2acc__bottle\b", {"preview": False, "live": False}),
+    # ★ BR-S525 — these two pointed at `m2acc__bottle`, a class BR-S524 DELETED when the
+    # CSS bottle became an illustration. They pass today only because DEV_ONLY keeps the
+    # files out of dist entirely, and the loop short-circuits on a missing file before it
+    # ever reads the pattern. The moment anyone promotes the Accord, the guard would look
+    # for a class that no longer exists, find it absent, call that the expected ABSENT and
+    # wave the file straight through. A probe whose pattern has rotted is worse than no
+    # probe: it reports a safety it has stopped checking. Repointed at classes the files
+    # actually contain — and the lesson generalises, since renaming a class silently
+    # disarms every probe aimed at it.
+    ("Accord js",      "_m2-accord.js",  r"\bm2acc__plate\b",  {"preview": False, "live": False}),
+    ("Accord css",     "_m2-accord.css", r"\.m2acc__slot\b",   {"preview": False, "live": False}),
     ("Accord tag",     "index.html",     r"_m2-accord\.js",    {"preview": False, "live": False}),
 ]
 
